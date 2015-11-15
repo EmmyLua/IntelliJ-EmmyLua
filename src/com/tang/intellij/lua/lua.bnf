@@ -77,9 +77,9 @@
         LONGSTRING_END = "LONGSTRING_END"
   ]
 }
-luaFile ::= block*
+luaFile ::= stat*
 
-chunk ::= {stat [';']} [laststat [';']]
+chunk ::= (stat ';'?)* (laststat ';'?)?
 
 block ::= chunk
 
@@ -88,24 +88,24 @@ stat ::=  varlist1 '=' explist1 |
      'do' block 'end' |
      'while' expression 'do' block 'end' |
      'repeat' block 'until' expression |
-     'if' expression 'then' block {'elseif' expression 'then' block} ['else' block] 'end' |
-     'for' NAME '=' expression ',' expression [',' expression] 'do' block 'end' |
+     'if' expression 'then' block ('elseif' expression 'then' block)* ('else' block)? 'end' |
+     'for' NAME '=' expression ',' expression (',' expression)? 'do' block 'end' |
      'for' namelist 'in' explist1 'do' block 'end' |
      'function' funcname funcbody |
      'local' 'function' NAME funcbody |
-     'local' namelist ['=' explist1]
+     'local' namelist ('=' explist1)?
 
-laststat ::= return [explist1] | break
+laststat ::= return explist1? | break
 
-funcname ::= NAME {'.' NAME} [':' NAME]
+funcname ::= NAME ('.' NAME)* (':' NAME)?
 
-varlist1 ::= var {',' var}
+varlist1 ::= var (',' var)*
 
 var ::=  NAME | prefixexp '[' expression ']' | prefixexp '.' NAME
 
-namelist ::= NAME {',' NAME}
+namelist ::= NAME (',' NAME)*
 
-explist1 ::= {expression ','} expression
+explist1 ::= (expression ',')* expression
 
 expression ::=  'nil' | 'false' | 'true' | NUMBER | STRING | '...' | func |
      prefixexp | tableconstructor | expression binop expression | unop expression
@@ -114,17 +114,17 @@ prefixexp ::= var | functioncall | '(' expression ')'
 
 functioncall ::=  prefixexp args | prefixexp ':' NAME args
 
-args ::=  '(' [explist1] ')' | tableconstructor | STRING
+args ::=  '(' (explist1)? ')' | tableconstructor | STRING
 
 func ::= 'function' funcbody
 
-funcbody ::= '(' [parlist1] ')' block 'end'
+funcbody ::= '(' (parlist1)? ')' block? 'end'
 
-parlist1 ::= namelist [',' '...'] | '...'
+parlist1 ::= namelist (',' '...')? | '...'
 
-tableconstructor ::= '{' [fieldlist] '}'
+tableconstructor ::= '{' (fieldlist)? '}'
 
-fieldlist ::= field {fieldsep field} [fieldsep]
+fieldlist ::= field (fieldsep field)* (fieldsep)?
 
 field ::= '[' expression ']' '=' expression | NAME '=' expression | expression
 
