@@ -83,17 +83,29 @@ chunk ::= (stat ';'?)* (lastStat ';'?)?
 
 block ::= chunk
 
-stat ::=  varList '=' exprList |
-     funcCall |
-     'do' block 'end' |
-     'while' expr 'do' block 'end' |
-     'repeat' block 'until' expr |
-     'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end' |
-     'for' NAME '=' expr ',' expr (',' expr)? 'do' block 'end' |
-     'for' nameList 'in' exprList 'do' block 'end' |
-     'function' funcName funcBody |
-     'local' 'function' NAME funcBody |
-     'local' nameList ('=' exprList)?
+stat ::=
+    assignStat |
+    funcCall |
+    doStat |
+    whileStat |
+    repeatStat |
+    ifStat |
+    forAStat |
+    forBStat |
+    globalFuncDef |
+    localFuncDef |
+    localDef
+
+assignStat ::= varList '=' exprList
+doStat ::= 'do' block 'end'
+whileStat ::= 'while' expr 'do' block 'end'
+repeatStat ::= 'repeat' block 'until' expr
+ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end'
+forAStat ::= 'for' NAME '=' expr ',' expr (',' expr)? 'do' block 'end'
+forBStat ::= 'for' nameList 'in' exprList 'do' block 'end'
+globalFuncDef ::= 'function' funcName funcBody
+localFuncDef ::= 'local' 'function' NAME funcBody
+localDef ::= 'local' nameList ('=' exprList)?
 
 lastStat ::= return exprList? | break
 
