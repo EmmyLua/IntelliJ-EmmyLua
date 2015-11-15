@@ -79,54 +79,54 @@
 }
 luaFile ::= stat*
 
-chunk ::= (stat ';'?)* (laststat ';'?)?
+chunk ::= (stat ';'?)* (lastStat ';'?)?
 
 block ::= chunk
 
-stat ::=  varlist1 '=' explist1 |
-     functioncall |
+stat ::=  varList '=' exprList |
+     funcCall |
      'do' block 'end' |
-     'while' expression 'do' block 'end' |
-     'repeat' block 'until' expression |
-     'if' expression 'then' block ('elseif' expression 'then' block)* ('else' block)? 'end' |
-     'for' NAME '=' expression ',' expression (',' expression)? 'do' block 'end' |
-     'for' namelist 'in' explist1 'do' block 'end' |
-     'function' funcname funcbody |
-     'local' 'function' NAME funcbody |
-     'local' namelist ('=' explist1)?
+     'while' expr 'do' block 'end' |
+     'repeat' block 'until' expr |
+     'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end' |
+     'for' NAME '=' expr ',' expr (',' expr)? 'do' block 'end' |
+     'for' nameList 'in' exprList 'do' block 'end' |
+     'function' funcName funcBody |
+     'local' 'function' NAME funcBody |
+     'local' nameList ('=' exprList)?
 
-laststat ::= return explist1? | break
+lastStat ::= return exprList? | break
 
-funcname ::= NAME ('.' NAME)* (':' NAME)?
+funcName ::= NAME ('.' NAME)* (':' NAME)?
 
-varlist1 ::= var (',' var)*
+varList ::= var (',' var)*
 
-var ::=  NAME | prefixexp '[' expression ']' | prefixexp '.' NAME
+var ::=  NAME | prefixExp '[' expr ']' | prefixExp '.' NAME
 
-namelist ::= NAME (',' NAME)*
+nameList ::= NAME (',' NAME)*
 
-explist1 ::= (expression ',')* expression
+exprList ::= (expr ',')* expr
 
-expression ::=  'nil' | 'false' | 'true' | NUMBER | STRING | '...' | func |
-     prefixexp | tableconstructor | expression binop expression | unop expression
+expr ::=  'nil' | 'false' | 'true' | NUMBER | STRING | '...' | func |
+     prefixExp | tableConstructor | expr binop expr | unop expr
 
-prefixexp ::= var | functioncall | '(' expression ')'
+prefixExp ::= var | funcCall | '(' expr ')'
 
-functioncall ::=  prefixexp args | prefixexp ':' NAME args
+funcCall ::=  prefixExp args | prefixExp ':' NAME args
 
-args ::=  '(' (explist1)? ')' | tableconstructor | STRING
+args ::=  '(' (exprList)? ')' | tableConstructor | STRING
 
-func ::= 'function' funcbody
+func ::= 'function' funcBody
 
-funcbody ::= '(' (parlist1)? ')' block? 'end'
+funcBody ::= '(' (parList)? ')' block? 'end'
 
-parlist1 ::= namelist (',' '...')? | '...'
+parList ::= nameList (',' '...')? | '...'
 
-tableconstructor ::= '{' (fieldlist)? '}'
+tableConstructor ::= '{' (fieldlist)? '}'
 
 fieldlist ::= field (fieldsep field)* (fieldsep)?
 
-field ::= '[' expression ']' '=' expression | NAME '=' expression | expression
+field ::= '[' expr ']' '=' expr | NAME '=' expr | expr
 
 fieldsep ::= ',' | ';'
 
