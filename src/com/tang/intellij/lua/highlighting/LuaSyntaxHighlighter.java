@@ -14,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
 /**
- * Created by tangzx on 2015/11/15.
+ * Created by tangzx
+ * Date : 2015/11/15.
  */
 public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
 
