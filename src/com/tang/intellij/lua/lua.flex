@@ -90,7 +90,7 @@ luadoc      =   ---[^\r\n]*{nl}([ \t]*--({nobrknl}{nonl}*{nl}|{nonl}{nl}|{nl}))*
 
 
 "#!"         { yybegin( XSHORTCOMMENT ); return SHEBANG; }
-{wnl}        { return WS; }
+{wnl}        { return TokenType.WHITE_SPACE; }
 "..."        { return ELLIPSIS; }
 ".."         { return CONCAT; }
 "=="         { return EQ; }
