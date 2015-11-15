@@ -21,7 +21,7 @@ public class LuaFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getName() {
-        return "Lua-Tang";
+        return "lua";
     }
 
     @NotNull

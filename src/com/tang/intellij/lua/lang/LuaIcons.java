@@ -9,5 +9,5 @@ import javax.swing.*;
  * Email:272669294@qq.com
  */
 public class LuaIcons {
-    public static final Icon FILE = IconLoader.getIcon("/test.png");
+    public static final Icon FILE = IconLoader.getIcon("/com/tang/intellij/lua/lang/lua-file.png");
 }

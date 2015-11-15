@@ -26,6 +26,8 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
+    <lang.parserDefinition language="Lua" implementationClass="com.tang.intellij.lua.lang.LuaParserDefinition"/>
+
     <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
   </extensions>
 

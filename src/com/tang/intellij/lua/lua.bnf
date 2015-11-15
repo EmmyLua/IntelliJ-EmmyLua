@@ -1,0 +1,137 @@
+{
+  parserClass="com.tang.intellij.lua.parser.LuaParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Lua"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.tang.intellij.lua.psi"
+  psiImplPackage="com.tang.intellij.lua.psi.impl"
+
+  elementTypeHolderClass="com.tang.intellij.lua.psi.LuaTypes"
+  elementTypeClass="com.tang.intellij.lua.psi.LuaElementType"
+  tokenTypeClass="com.tang.intellij.lua.psi.LuaTokenType"
+
+  tokens = [
+        /* Keywords */
+        AND = "and"
+        BREAK = "break"
+        DO = "do"
+        ELSE = "else"
+        ELSEIF = "elseif"
+        END = "end"
+        FALSE = "false"
+        FOR = "for"
+        FUNCTION = "function"
+        IF = "if"
+        IN = "in"
+        LOCAL = "local"
+        NIL = "nil"
+        NOT = "not"
+        OR = "or"
+        REPEAT = "repeat"
+        RETURN = "return"
+        THEN = "then"
+        TRUE = "true"
+        UNTIL = "until"
+        WHILE = "while"
+
+        SHEBANG = "#!"
+        ELLIPSIS = "..."
+        CONCAT = ".."
+        EQ = "=="
+        GE = ">="
+        LE = "<="
+        NE = "~="
+        MINUS = "-"
+        PLUS = "+"
+        MULT = "*"
+        MOD = "%"
+        DIV = "/"
+        ASSIGN = "="
+        GT = ">"
+        LT = "<"
+        LPAREN = "("
+        RPAREN = ")"
+        LBRACK = "["
+        RBRACK = "]"
+        LCURLY = "{"
+        RCURLY = "}"
+        GETN = "#"
+        COMMA = ","
+        SEMI = ";"
+        COLON = ":"
+        DOT = "."
+        EXP = "^"
+
+        WS = "WS"
+        LUADOC_COMMENT = "LUADOC_COMMENT"
+        NL_BEFORE_LONGSTRING = "NL_BEFORE_LONGSTRING"
+        WRONG = "WRONG"
+        SHORTCOMMENT = "SHORTCOMMENT"
+        LONGCOMMENT_BEGIN = "LONGCOMMENT_BEGIN"
+        LONGCOMMENT = "LONGCOMMENT"
+        LONGCOMMENT_END = "LONGCOMMENT_END"
+        LONGSTRING_BEGIN = "LONGSTRING_BEGIN"
+        LONGSTRING = "LONGSTRING"
+        LONGSTRING_END = "LONGSTRING_END"
+  ]
+}
+luaFile ::= block*
+
+chunk ::= {stat [';']} [laststat [';']]
+
+block ::= chunk
+
+stat ::=  varlist1 '=' explist1 |
+     functioncall |
+     'do' block 'end' |
+     'while' expression 'do' block 'end' |
+     'repeat' block 'until' expression |
+     'if' expression 'then' block {'elseif' expression 'then' block} ['else' block] 'end' |
+     'for' NAME '=' expression ',' expression [',' expression] 'do' block 'end' |
+     'for' namelist 'in' explist1 'do' block 'end' |
+     'function' funcname funcbody |
+     'local' 'function' NAME funcbody |
+     'local' namelist ['=' explist1]
+
+laststat ::= return [explist1] | break
+
+funcname ::= NAME {'.' NAME} [':' NAME]
+
+varlist1 ::= var {',' var}
+
+var ::=  NAME | prefixexp '[' expression ']' | prefixexp '.' NAME
+
+namelist ::= NAME {',' NAME}
+
+explist1 ::= {expression ','} expression
+
+expression ::=  'nil' | 'false' | 'true' | NUMBER | STRING | '...' | func |
+     prefixexp | tableconstructor | expression binop expression | unop expression
+
+prefixexp ::= var | functioncall | '(' expression ')'
+
+functioncall ::=  prefixexp args | prefixexp ':' NAME args
+
+args ::=  '(' [explist1] ')' | tableconstructor | STRING
+
+func ::= 'function' funcbody
+
+funcbody ::= '(' [parlist1] ')' block 'end'
+
+parlist1 ::= namelist [',' '...'] | '...'
+
+tableconstructor ::= '{' [fieldlist] '}'
+
+fieldlist ::= field {fieldsep field} [fieldsep]
+
+field ::= '[' expression ']' '=' expression | NAME '=' expression | expression
+
+fieldsep ::= ',' | ';'
+
+binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
+     '<' | '<=' | '>' | '>=' | '==' | '~=' |
+     'and' | 'or'
+
+unop ::= '-' | 'not' | '#'
