@@ -1,0 +1,20 @@
+{
+  parserClass="com.tang.intellij.lua.parser.LuaParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Lua"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.tang.intellij.psi"
+  psiImplPackage="com.tang.intellij.psi.impl"
+
+  elementTypeHolderClass="com.tang.intellij.psi.SimpleTypes"
+  elementTypeClass="com.tang.intellij.psi.SimpleElementType"
+  tokenTypeClass="com.tang.intellij.psi.SimpleTokenType"
+}
+
+simpleFile ::= item_*
+
+private item_ ::= (property|COMMENT|CRLF)
+
+property ::= (KEY? SEPARATOR VALUE?) | KEY
