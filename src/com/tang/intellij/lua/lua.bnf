@@ -113,18 +113,25 @@ funcName ::= NAME ('.' NAME)* (':' NAME)?
 
 varList ::= var (',' var)*
 
-var ::=  NAME | prefixExp '[' expr ']' | prefixExp '.' NAME
-
 nameList ::= NAME (',' NAME)*
 
 exprList ::= (expr ',')* expr
 
-expr ::=  'nil' | 'false' | 'true' | NUMBER | STRING | '...' | func |
-     prefixExp | tableConstructor | expr binop expr | unop expr
+value ::= nil | false | true | NUMBER | STRING | "..." | func | tableConstructor | funcCall | var | '(' expr ')'
 
-prefixExp ::= var | funcCall | '(' expr ')'
+expr ::= unop expr | value (binop expr)?
 
-funcCall ::=  prefixExp args | prefixExp ':' NAME args
+prefixExpr ::= '(' expr ')' | NAME
+
+indexExpr ::= '[' expr ']' | '.' NAME
+
+callExpr ::= args | ':' NAME args
+
+suffixExpr ::= callExpr | indexExpr
+
+var ::= prefixExpr (suffixExpr)* indexExpr | NAME
+
+funcCall ::= prefixExpr (suffixExpr)* callExpr
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING
 
