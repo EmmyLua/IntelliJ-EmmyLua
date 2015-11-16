@@ -8,6 +8,6 @@ import com.intellij.lexer.FlexAdapter;
  */
 public class LuaLexerAdapter extends FlexAdapter {
     public LuaLexerAdapter() {
-        super(new LuaLexer(null));
+        super(new _LuaLexer(null));
     }
 }

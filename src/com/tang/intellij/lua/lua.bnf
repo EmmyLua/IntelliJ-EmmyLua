@@ -64,24 +64,22 @@
         DOT = "."
         EXP = "^"
 
-        WS = "WS"
-        LUADOC_COMMENT = "LUADOC_COMMENT"
-        NL_BEFORE_LONGSTRING = "NL_BEFORE_LONGSTRING"
-        WRONG = "WRONG"
-        SHORTCOMMENT = "SHORTCOMMENT"
-        LONGCOMMENT_BEGIN = "LONGCOMMENT_BEGIN"
-        LONGCOMMENT = "LONGCOMMENT"
-        LONGCOMMENT_END = "LONGCOMMENT_END"
-        LONGSTRING_BEGIN = "LONGSTRING_BEGIN"
-        LONGSTRING = "LONGSTRING"
-        LONGSTRING_END = "LONGSTRING_END"
+        SHORTCOMMENT="regexp:--.*"
+        LUADOC_COMMENT="regexp:(---.*\n?)+"
+        ID="regexp:[A-Za-z_][A-Za-z0-9_]*"
+        NUMBER="regexp:-?([0-9]+|(0x[a-fA-F0-9]+))"
+        DOUBLE_QUOTED_STRING="regexp:\"([^\\\"\r\n]|\\[^\r\n])*\"?"
+        SINGLE_QUOTED_STRING="regexp:'([^\\\'\r\n]|\\[^\r\n])*'?"
   ]
 }
-luaFile ::= stat*
+
+luaFile ::= (SHORTCOMMENT | LUADOC_COMMENT | stat)*
 
 chunk ::= (stat ';'?)* (lastStat ';'?)?
 
 block ::= chunk
+
+private STRING ::= DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING
 
 stat ::=
     assignStat |
@@ -96,24 +94,24 @@ stat ::=
     localFuncDef |
     localDef
 
-assignStat ::= varList '=' exprList
-doStat ::= 'do' block 'end'
-whileStat ::= 'while' expr 'do' block 'end'
-repeatStat ::= 'repeat' block 'until' expr
-ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end'
-forAStat ::= 'for' NAME '=' expr ',' expr (',' expr)? 'do' block 'end'
-forBStat ::= 'for' nameList 'in' exprList 'do' block 'end'
-globalFuncDef ::= 'function' funcName funcBody
-localFuncDef ::= 'local' 'function' NAME funcBody
-localDef ::= 'local' nameList ('=' exprList)?
+assignStat ::= varList '=' exprList { pin = 2 }
+doStat ::= 'do' block 'end' { pin = 1 }
+whileStat ::= 'while' expr 'do' block 'end' { pin = 1 }
+repeatStat ::= 'repeat' block 'until' expr { pin = 1 }
+ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end' { pin = 1 }
+forAStat ::= 'for' ID '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 2 }
+forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 2 }
+globalFuncDef ::= 'function' funcName funcBody { pin = 1 }
+localFuncDef ::= 'local' 'function' ID funcBody { pin = 2 }
+localDef ::= 'local' nameList ('=' exprList)? { pin = 2 }
 
 lastStat ::= return exprList? | break
 
-funcName ::= NAME ('.' NAME)* (':' NAME)?
+funcName ::= ID ('.' ID)* (':' ID)?
 
 varList ::= var (',' var)*
 
-nameList ::= NAME (',' NAME)*
+nameList ::= ID (',' ID)*
 
 exprList ::= (expr ',')* expr
 
@@ -121,15 +119,15 @@ value ::= nil | false | true | NUMBER | STRING | "..." | func | tableConstructor
 
 expr ::= unop expr | value (binop expr)?
 
-prefixExpr ::= '(' expr ')' | NAME
+prefixExpr ::= '(' expr ')' | ID
 
-indexExpr ::= '[' expr ']' | '.' NAME
+indexExpr ::= '[' expr ']' | '.' ID
 
-callExpr ::= args | ':' NAME args
+callExpr ::= args | ':' ID args
 
 suffixExpr ::= callExpr | indexExpr
 
-var ::= prefixExpr (suffixExpr)* indexExpr | NAME
+var ::= prefixExpr (suffixExpr)* indexExpr | ID
 
 funcCall ::= prefixExpr (suffixExpr)* callExpr
 
@@ -145,7 +143,7 @@ tableConstructor ::= '{' (fieldlist)? '}'
 
 fieldlist ::= field (fieldsep field)* (fieldsep)?
 
-field ::= '[' expr ']' '=' expr | NAME '=' expr | expr
+field ::= '[' expr ']' '=' expr | ID '=' expr | expr
 
 fieldsep ::= ',' | ';'
 
