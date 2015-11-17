@@ -6,6 +6,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 %%
 
 %{
+  private StringBuilder string = new StringBuilder();
   public _LuaLexer() {
     this((java.io.Reader)null);
   }
@@ -28,6 +29,9 @@ ID=[A-Za-z_][A-Za-z0-9_]*
 NUMBER=-?([0-9]+|(0x[a-fA-F0-9]+))
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
 SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
+
+%state xDOUBLE_QUOTED_STRING
+%state xSINGLE_QUOTED_STRING
 
 %%
 <YYINITIAL> {
@@ -82,12 +86,21 @@ SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
   "."                         { return DOT; }
   "^"                         { return EXP; }
 
+  "\""                        { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
+  "'"                         { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
+
   {SHORTCOMMENT}              { return SHORTCOMMENT; }
   {LUADOC_COMMENT}            { return LUADOC_COMMENT; }
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
-  {DOUBLE_QUOTED_STRING}      { return DOUBLE_QUOTED_STRING; }
-  {SINGLE_QUOTED_STRING}      { return SINGLE_QUOTED_STRING; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<xDOUBLE_QUOTED_STRING> {
+    {DOUBLE_QUOTED_STRING} { yybegin(YYINITIAL); return STRING; }
+}
+
+<xSINGLE_QUOTED_STRING> {
+    {SINGLE_QUOTED_STRING} { yybegin(YYINITIAL); return STRING; }
 }

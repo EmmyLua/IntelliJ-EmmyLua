@@ -68,8 +68,7 @@
         LUADOC_COMMENT="regexp:(---.*\n?)+"
         ID="regexp:[A-Za-z_][A-Za-z0-9_]*"
         NUMBER="regexp:-?([0-9]+|(0x[a-fA-F0-9]+))"
-        DOUBLE_QUOTED_STRING="regexp:\"([^\\\"\r\n]|\\[^\r\n])*\"?"
-        SINGLE_QUOTED_STRING="regexp:'([^\\\'\r\n]|\\[^\r\n])*'?"
+        STRING = "STRING"
   ]
 }
 
@@ -78,8 +77,6 @@ luaFile ::= (SHORTCOMMENT | LUADOC_COMMENT | stat)*
 chunk ::= (stat ';'?)* (lastStat ';'?)?
 
 block ::= chunk
-
-private STRING ::= DOUBLE_QUOTED_STRING | SINGLE_QUOTED_STRING
 
 stat ::=
     assignStat |
