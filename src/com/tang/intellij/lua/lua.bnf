@@ -7,7 +7,7 @@
   psiImplClassSuffix="Impl"
   psiPackage="com.tang.intellij.lua.psi"
   psiImplPackage="com.tang.intellij.lua.psi.impl"
-
+  parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.psi.LuaTypes"
   elementTypeClass="com.tang.intellij.lua.psi.LuaElementType"
   tokenTypeClass="com.tang.intellij.lua.psi.LuaTokenType"
@@ -116,17 +116,17 @@ value ::= nil | false | true | NUMBER | STRING | "..." | func | tableConstructor
 
 expr ::= unop expr | value (binop expr)?
 
-prefixExpr ::= '(' expr ')' | ID
+private prefixExpr ::= '(' expr ')' | ID
 
 indexExpr ::= '[' expr ']' | '.' ID
 
 callExpr ::= args | ':' ID args
 
-suffixExpr ::= callExpr | indexExpr
+private suffixIndexExpr ::= callExpr | <<twoExpr indexExpr>> indexExpr
+var ::= prefixExpr (suffixIndexExpr)* indexExpr | ID
 
-var ::= prefixExpr (suffixExpr)* indexExpr | ID
-
-funcCall ::= prefixExpr (suffixExpr)* callExpr
+private suffixCallExpr ::= <<twoExpr callExpr>> callExpr | indexExpr
+funcCall ::= prefixExpr (suffixCallExpr)* callExpr
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING
 
