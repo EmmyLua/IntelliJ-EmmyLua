@@ -136,13 +136,13 @@ funcBody ::= '(' (parList)? ')' block? 'end'
 
 parList ::= nameList (',' '...')? | '...'
 
-tableConstructor ::= '{' (fieldlist)? '}'
+tableConstructor ::= '{' (fieldList)? '}'
 
-fieldlist ::= field (fieldsep field)* (fieldsep)?
+fieldList ::= field (fieldSep field)* (fieldSep)?
 
 field ::= '[' expr ']' '=' expr | ID '=' expr | expr
 
-fieldsep ::= ',' | ';'
+fieldSep ::= ',' | ';'
 
 binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
      '<' | '<=' | '>' | '>=' | '==' | '~=' |
