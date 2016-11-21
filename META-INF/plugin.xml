@@ -1,17 +1,15 @@
 <idea-plugin version="2">
-    <id>com.yourcompany.unique.plugin.id</id>
-    <name>Plugin display name here</name>
+    <id>com.tang</id>
+    <name>Lua IDE</name>
     <version>1.0</version>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="love.tang@qq.com" url="http://www.yourcompany.com">NULL</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+    Just a lua plugin for IDEA
     ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+
     ]]>
     </change-notes>
 
