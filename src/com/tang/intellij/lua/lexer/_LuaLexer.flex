@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.lexer;
 import com.intellij.lexer.*;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.psi.LuaTokenType;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 %%
@@ -90,7 +91,7 @@ SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
   "'"                         { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
 
   {SHORTCOMMENT}              { return SHORTCOMMENT; }
-  {LUADOC_COMMENT}            { return LUADOC_COMMENT; }
+  {LUADOC_COMMENT}            { return LuaTokenType.DOC_COMMENT; }
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
 
