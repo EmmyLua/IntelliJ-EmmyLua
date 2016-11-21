@@ -64,7 +64,7 @@
         DOT = "."
         EXP = "^"
 
-        SHORTCOMMENT="regexp:--.*"
+        SHORT_COMMENT="regexp:--.*"
         LUADOC_COMMENT="regexp:(---.*\n?)+"
         ID="regexp:[A-Za-z_][A-Za-z0-9_]*"
         NUMBER="regexp:-?([0-9]+|(0x[a-fA-F0-9]+))"
@@ -72,7 +72,7 @@
   ]
 }
 
-luaFile ::= (SHORTCOMMENT | LUADOC_COMMENT | stat)*
+luaFile ::= (SHORT_COMMENT | LUADOC_COMMENT | stat)*
 
 chunk ::= (stat ';'?)* (lastStat ';'?)?
 

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 public class LuaParserDefinition implements ParserDefinition {
 
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(LuaTypes.SHORTCOMMENT);
+    public static final TokenSet COMMENTS = TokenSet.create(LuaTypes.SHORT_COMMENT);
 
     public static final IFileElementType FILE = new IFileElementType(Language.<LuaLanguage>findInstance(LuaLanguage.class));
 

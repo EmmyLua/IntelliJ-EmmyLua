@@ -24,7 +24,7 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
-SHORTCOMMENT=--.*
+SHORT_COMMENT=--.*
 LUADOC_COMMENT=(---.*\n?)+
 ID=[A-Za-z_][A-Za-z0-9_]*
 NUMBER=-?([0-9]+|(0x[a-fA-F0-9]+))
@@ -90,8 +90,8 @@ SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
   "\""                        { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
   "'"                         { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
 
-  {SHORTCOMMENT}              { return SHORTCOMMENT; }
-  {LUADOC_COMMENT}            { return LuaTokenType.DOC_COMMENT; }
+  {SHORT_COMMENT}             { return SHORT_COMMENT; }
+  {LUADOC_COMMENT}            { return LUADOC_COMMENT; }
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
 
