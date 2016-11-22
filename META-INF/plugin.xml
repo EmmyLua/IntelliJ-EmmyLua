@@ -31,6 +31,8 @@
         <lang.parserDefinition language="Lua" implementationClass="com.tang.intellij.lua.lang.LuaParserDefinition"/>
 
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
+
+        <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
     </extensions>
 
     <application-components>
