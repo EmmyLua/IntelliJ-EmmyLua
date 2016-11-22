@@ -60,39 +60,19 @@ import com.tang.intellij.lua.doc.psi.LuaDocTypes;
 %state ATT_SPACE
 %state ATT_R
 
-WHITE_DOC_SPACE_CHAR=[\ \t\f\n\r]
-WHITE_DOC_SPACE_NO_NL=[\ \t\f]
-NON_WHITE_DOC_SPACE_CHAR=[^\ \t\f\n\r]
-DIGIT=[0-9]
-ALPHA=[:jletter:]
-TAGNAME={ALPHA}({ALPHA}|{DIGIT})*
+EOL="\r"|"\n"|"\r\n"
+LINE_WS=[\ \t\f]
+WHITE_SPACE=({LINE_WS}|{EOL})+
+ID=[A-Za-z0-9_]+
 AT=@
 %%
 
-<YYINITIAL> --- { yybegin(COMMENT_DATA_START); return LDOC_COMMENT_START; }
-<COMMENT_DATA_START> {WHITE_DOC_SPACE_NO_NL}+ { return LDOC_WHITESPACE; }
-<COMMENT_DATA_START> (--+) { return LDOC_DASHES; }
-<COMMENT_DATA>  {WHITE_DOC_SPACE_NO_NL}+ { return LDOC_COMMENT_DATA; }
-<COMMENT_DATA, COMMENT_DATA_START, TAG_DOC_SPACE>  \r?\n { yybegin(COMMENT_DATA_START); return LDOC_WHITESPACE; }
-
-<TAG_DOC_SPACE> {WHITE_DOC_SPACE_NO_NL}+ { yybegin(COMMENT_DATA); return LDOC_WHITESPACE; }
-<DOC_TAG_VALUE> {NON_WHITE_DOC_SPACE_CHAR}+ { yybegin(TAG_DOC_SPACE); return LDOC_TAG_VALUE; }
-
-<COMMENT_DATA_START> {AT} { yybegin(TAG_AT); return LDOC_AT; }
-
-<PRE_TAG_DATA_SPACE>  {WHITE_DOC_SPACE_CHAR}+ {yybegin(DOC_TAG_VALUE); return LDOC_WHITESPACE;}
-
-//---> ATT
-<COMMENT_DATA> "[" { yybegin(ATT_L); return LDOC_ATT_L; }
-<ATT_L> {TAGNAME} { yybegin(ATT_NAME); return LDOC_ATT_NAME; }
-<ATT_NAME> ":" { yybegin(ATT_EQ); return LDOC_ATT_EQ; }
-<ATT_EQ> {TAGNAME} { yybegin(ATT_VALUE); return LDOC_ATT_VALUE; }
-<ATT_VALUE> "]" { yybegin(ATT_R); return LDOC_ATT_R; }
-<ATT_VALUE> "," { yybegin(ATT_L); return LDOC_ATT_L; }
-//<--- ATT
-
-<TAG_AT> {TAGNAME} { yybegin(PRE_TAG_DATA_SPACE); return LDOC_TAG_NAME;  }
-
-<COMMENT_DATA_START, COMMENT_DATA, DOC_TAG_VALUE, ATT_R> . { yybegin(COMMENT_DATA); return LDOC_COMMENT_DATA; }
-
-[^] { return LDOC_COMMENT_BAD_CHARACTER; }
+<YYINITIAL> {
+ {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
+ ---                        { return LDOC_COMMENT_START; }
+ --                         { return LDOC_DASHES; }
+ "@"                        { return AT; }
+ "="                        { return EQ; }
+ {ID}                       { return ID; }
+ [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}

@@ -10,8 +10,11 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.tang.intellij.lua.doc.psi.LuaDocElementType;
+import com.tang.intellij.lua.doc.psi.LuaDocTypes;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
 import com.tang.intellij.lua.psi.LuaFile;
@@ -70,6 +73,10 @@ public class LuaParserDefinition implements ParserDefinition {
 
     @NotNull
     public PsiElement createElement(ASTNode node) {
+        IElementType type = node.getElementType();
+        if (type instanceof LuaDocElementType) {
+            return LuaDocTypes.Factory.createElement(node);
+        }
         return LuaTypes.Factory.createElement(node);
     }
 }

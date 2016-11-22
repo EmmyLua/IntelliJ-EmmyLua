@@ -13,22 +13,16 @@
   tokenTypeClass="com.tang.intellij.lua.doc.psi.LuaDocTokenType"
 
   tokens = [
+  ID = 'ID'
+  AT = '@'
+  EQ = '='
   LDOC_COMMENT_START = 'LDOC_COMMENT_START'
-  LDOC_WHITESPACE = 'LDOC_WHITESPACE'
   LDOC_DASHES = 'LDOC_DASHES'
-  LDOC_COMMENT_DATA = 'LDOC_COMMENT_DATA'
-  LDOC_AT = 'LDOC_AT'
-  LDOC_ATT_L = 'LDOC_ATT_L'
-  LDOC_TAG_VALUE = 'LDOC_TAG_VALUE'
-  LDOC_TAG_NAME = 'LDOC_TAG_NAME'
-  LDOC_ATT_NAME = 'LDOC_ATT_NAME'
-  LDOC_ATT_EQ = 'LDOC_ATT_EQ'
-  LDOC_ATT_VALUE = 'LDOC_ATT_VALUE'
-  LDOC_ATT_R = 'LDOC_ATT_R'
-  LDOC_COMMENT_BAD_CHARACTER = 'LDOC_COMMENT_BAD_CHARACTER'
   ]
 }
 
-doc ::= tag_pair
+doc ::= LDOC_COMMENT_START tag_pair*
 
-tag_pair ::= LDOC_ATT_NAME LDOC_ATT_EQ LDOC_TAG_VALUE
+tag_name ::= ID
+tag_value ::= ID
+tag_pair ::= LDOC_COMMENT_START AT tag_name '=' tag_value { pin = 2 }
