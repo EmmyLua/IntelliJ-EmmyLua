@@ -33,6 +33,9 @@
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
 
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
+
+        <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
+        <stubIndex implementation="com.tang.intellij.lua.psi.index.TypeNameIndex" />
     </extensions>
 
     <application-components>

@@ -1,12 +1,15 @@
 {
   parserClass="com.tang.intellij.lua.parser.LuaParser"
 
+  implements="com.tang.intellij.lua.psi.LuaPsiElement"
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="Lua"
   psiImplClassSuffix="Impl"
   psiPackage="com.tang.intellij.lua.psi"
   psiImplPackage="com.tang.intellij.lua.psi.impl"
+  psiImplUtilClass="com.tang.intellij.lua.psi.LuaPsiImplUtil"
+
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.psi.LuaTypes"
   elementTypeClass="com.tang.intellij.lua.psi.LuaElementType"
@@ -70,6 +73,8 @@
         NUMBER="regexp:-?([0-9]+|(0x[a-fA-F0-9]+))"
         STRING = "STRING"
   ]
+
+  implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
 }
 
 luaFile ::= (SHORT_COMMENT | LUADOC_COMMENT | stat)*
@@ -98,7 +103,11 @@ repeatStat ::= 'repeat' block 'until' expr { pin = 1 }
 ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end' { pin = 1 }
 forAStat ::= 'for' ID '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 2 }
 forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 2 }
-globalFuncDef ::= 'function' funcName funcBody { pin = 1 }
+globalFuncDef ::= 'function' funcName funcBody {
+    pin = 1
+    methods = []
+    stubClass="com.tang.intellij.lua.psi.stub.LuaGlobalFuncDefStub"
+}
 localFuncDef ::= 'local' 'function' ID funcBody { pin = 2 }
 localDef ::= 'local' nameList ('=' exprList)? { pin = 2 }
 
@@ -123,12 +132,14 @@ indexExpr ::= '[' expr ']' | '.' ID
 callExpr ::= args | ':' ID args
 
 private suffixIndexExpr ::= callExpr | <<twoExpr indexExpr>> indexExpr
-var ::= prefixExpr (suffixIndexExpr)* indexExpr | ID
+var ::= prefixExpr (suffixIndexExpr)* indexExpr | identifier
 
 private suffixCallExpr ::= <<twoExpr callExpr>> callExpr | indexExpr
 funcCall ::= prefixExpr (suffixCallExpr)* callExpr
 
-args ::=  '(' (exprList)? ')' | tableConstructor | STRING
+args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
+    methods = [getArgType]
+}
 
 func ::= 'function' funcBody
 
@@ -149,3 +160,7 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
      'and' | 'or'
 
 unop ::= '-' | 'not' | '#'
+
+identifier ::= ID {
+    methods = [getReference]
+}
