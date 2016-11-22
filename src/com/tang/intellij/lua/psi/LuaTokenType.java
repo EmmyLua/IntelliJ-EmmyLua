@@ -1,9 +1,14 @@
 package com.tang.intellij.lua.psi;
 
-import com.intellij.lang.ASTNode;
+import com.intellij.lang.*;
+import com.intellij.lexer.Lexer;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LazyParseableElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.ILazyParseableElementType;
+import com.tang.intellij.lua.doc.lexer.LuaDocLexerAdapter;
+import com.tang.intellij.lua.doc.parser.LuaDocParser;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.doc.psi.impl.LuaCommentImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
@@ -27,7 +32,18 @@ public class LuaTokenType extends IElementType {
 
         @Override
         public ASTNode parseContents(ASTNode chameleon) {
-            return super.parseContents(chameleon);
+            PsiElement parentElement = chameleon.getTreeParent().getPsi();
+            Project project = parentElement.getProject();
+            Language languageForParser = this.getLanguageForParser(parentElement);
+            PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
+                    project,
+                    chameleon,
+                    new LuaDocLexerAdapter(),
+                    languageForParser,
+                    chameleon.getChars());
+            PsiParser parser = new LuaDocParser();
+            ASTNode node = parser.parse(this, builder);
+            return node.getFirstChildNode();
         }
 
         @Nullable
