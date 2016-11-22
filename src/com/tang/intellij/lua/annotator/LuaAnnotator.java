@@ -16,7 +16,7 @@ public class LuaAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder annotationHolder) {
         if (psiElement instanceof LuaDocTagName) {
-            Annotation annotation = annotationHolder.createErrorAnnotation(psiElement, null);
+            Annotation annotation = annotationHolder.createInfoAnnotation(psiElement, null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG);
         }
     }
