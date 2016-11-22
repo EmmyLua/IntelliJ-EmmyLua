@@ -1,0 +1,34 @@
+{
+  parserClass="com.tang.intellij.lua.doc.parser.LuaDocParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="LuaDoc"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.tang.intellij.lua.doc.psi"
+  psiImplPackage="com.tang.intellij.lua.doc.psi.impl"
+  parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
+  elementTypeHolderClass="com.tang.intellij.lua.doc.psi.LuaDocTypes"
+  elementTypeClass="com.tang.intellij.lua.doc.psi.LuaDocElementType"
+  tokenTypeClass="com.tang.intellij.lua.doc.psi.LuaDocTokenType"
+
+  tokens = [
+  LDOC_COMMENT_START = 'LDOC_COMMENT_START'
+  LDOC_WHITESPACE = 'LDOC_WHITESPACE'
+  LDOC_DASHES = 'LDOC_DASHES'
+  LDOC_COMMENT_DATA = 'LDOC_COMMENT_DATA'
+  LDOC_AT = 'LDOC_AT'
+  LDOC_ATT_L = 'LDOC_ATT_L'
+  LDOC_TAG_VALUE = 'LDOC_TAG_VALUE'
+  LDOC_TAG_NAME = 'LDOC_TAG_NAME'
+  LDOC_ATT_NAME = 'LDOC_ATT_NAME'
+  LDOC_ATT_EQ = 'LDOC_ATT_EQ'
+  LDOC_ATT_VALUE = 'LDOC_ATT_VALUE'
+  LDOC_ATT_R = 'LDOC_ATT_R'
+  LDOC_COMMENT_BAD_CHARACTER = 'LDOC_COMMENT_BAD_CHARACTER'
+  ]
+}
+
+doc ::= tag_pair
+
+tag_pair ::= LDOC_ATT_NAME LDOC_ATT_EQ LDOC_TAG_VALUE
