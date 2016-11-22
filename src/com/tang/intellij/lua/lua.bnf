@@ -162,5 +162,6 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 unop ::= '-' | 'not' | '#'
 
 identifier ::= ID {
-    methods = [getReference]
+    methods = [setName getName getReference resolve]
+    implements = "com.tang.intellij.lua.psi.LuaNamedElement"
 }
