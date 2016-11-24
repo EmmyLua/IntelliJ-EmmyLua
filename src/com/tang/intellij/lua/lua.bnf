@@ -76,12 +76,13 @@
 
   implements(".*Ref") = "com.tang.intellij.lua.psi.LuaRef"
   implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
+  extends("localDef") = "com.tang.intellij.lua.psi.impl.LuaDeclarationImpl"
   implements("chunk|funcBody") = "com.tang.intellij.lua.psi.LuaPsiScope"
 }
 
 luaFile ::= (SHORT_COMMENT | LUADOC_COMMENT | stat)*
 
-chunk ::= (stat ';'?)* (lastStat ';'?)?
+private chunk ::= (stat ';'?)* (lastStat ';'?)?
 
 block ::= chunk
 
@@ -107,7 +108,6 @@ forAStat ::= 'for' ID '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 2 }
 forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 2 }
 globalFuncDef ::= 'function' funcName funcBody {
     pin = 1
-    methods = []
     stubClass="com.tang.intellij.lua.psi.stub.LuaGlobalFuncDefStub"
 }
 localFuncDef ::= 'local' 'function' ID funcBody { pin = 2 }
