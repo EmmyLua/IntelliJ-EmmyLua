@@ -117,7 +117,8 @@ funcName ::= ID ('.' ID)* (':' ID)?
 
 varList ::= var (',' var)*
 
-nameList ::= ID (',' ID)*
+nameDef ::= ID { implements = "com.tang.intellij.lua.psi.LuaNamedElement" methods = [setName getName] }
+nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr
 
@@ -132,7 +133,7 @@ indexExpr ::= '[' expr ']' | '.' ID
 callExpr ::= args | ':' ID args
 
 private suffixIndexExpr ::= callExpr | <<twoExpr indexExpr>> indexExpr
-var ::= prefixExpr (suffixIndexExpr)* indexExpr | identifier
+var ::= prefixExpr (suffixIndexExpr)* indexExpr | identifierRef
 
 private suffixCallExpr ::= <<twoExpr callExpr>> callExpr | indexExpr
 funcCall ::= prefixExpr (suffixCallExpr)* callExpr
@@ -161,7 +162,4 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 
 unop ::= '-' | 'not' | '#'
 
-identifier ::= ID {
-    methods = [setName getName getReference resolve]
-    implements = "com.tang.intellij.lua.psi.LuaNamedElement"
-}
+identifierRef ::= ID

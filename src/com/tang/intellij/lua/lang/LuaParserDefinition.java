@@ -19,6 +19,7 @@ import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
 import com.tang.intellij.lua.psi.LuaFile;
 import com.tang.intellij.lua.psi.LuaTypes;
+import com.tang.intellij.lua.reference.LuaIdentifierRef;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -76,6 +77,9 @@ public class LuaParserDefinition implements ParserDefinition {
         IElementType type = node.getElementType();
         if (type instanceof LuaDocElementType) {
             return LuaDocTypes.Factory.createElement(node);
+        }
+        else if (type == LuaTypes.IDENTIFIER_REF) {
+            return new LuaIdentifierRef(node);
         }
         return LuaTypes.Factory.createElement(node);
     }
