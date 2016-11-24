@@ -2,7 +2,9 @@ package com.tang.intellij.lua.doc.psi.impl;
 
 import com.intellij.psi.impl.source.tree.LazyParseablePsiElement;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaTokenType;
 import com.tang.intellij.lua.psi.LuaTypes;
 
@@ -20,5 +22,15 @@ public class LuaCommentImpl extends LazyParseablePsiElement implements LuaCommen
     @Override
     public IElementType getTokenType() {
         return LuaTokenType.DOC_COMMENT;
+    }
+
+    @Override
+    public LuaCommentOwner getOwner() {
+        return LuaCommentUtil.findOwner(this);
+    }
+
+    @Override
+    public String toString() {
+        return "DOC_COMMENT";
     }
 }

@@ -7,6 +7,8 @@
   psiImplClassSuffix="Impl"
   psiPackage="com.tang.intellij.lua.doc.psi"
   psiImplPackage="com.tang.intellij.lua.doc.psi.impl"
+  psiImplUtilClass="com.tang.intellij.lua.doc.psi.LuaDocPsiImplUtil"
+
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.doc.psi.LuaDocTypes"
   elementTypeClass="com.tang.intellij.lua.doc.psi.LuaDocElementType"
