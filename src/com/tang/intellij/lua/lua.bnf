@@ -74,7 +74,9 @@
         STRING = "STRING"
   ]
 
+  implements(".*Ref") = "com.tang.intellij.lua.psi.LuaRef"
   implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
+  implements("chunk|funcBody") = "com.tang.intellij.lua.psi.LuaPsiScope"
 }
 
 luaFile ::= (SHORT_COMMENT | LUADOC_COMMENT | stat)*
@@ -162,4 +164,6 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 
 unop ::= '-' | 'not' | '#'
 
-identifierRef ::= ID
+identifierRef ::= ID {
+    mixin = "com.tang.intellij.lua.reference.LuaIdentifierRefElement"
+}

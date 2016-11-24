@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiElement;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * LuaPsiImplUtil
@@ -24,6 +25,7 @@ public class LuaPsiImplUtil {
         return newId;
     }
 
+    @NotNull
     public static String getName(LuaNameDef identifier) {
         return identifier.getId().getText();
     }

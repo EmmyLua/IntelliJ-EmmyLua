@@ -15,9 +15,9 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/11/22.
  */
-public class LuaIdentifierRef extends ASTWrapperPsiElement implements PsiReference, com.tang.intellij.lua.psi.LuaIdentifierRef {
+public class LuaIdentifierRefElement extends ASTWrapperPsiElement implements LuaRef, LuaIdentifierRef {
 
-    public LuaIdentifierRef(@NotNull ASTNode node) {
+    public LuaIdentifierRefElement(@NotNull ASTNode node) {
         super(node);
     }
 
@@ -39,9 +39,7 @@ public class LuaIdentifierRef extends ASTWrapperPsiElement implements PsiReferen
     @Nullable
     @Override
     public PsiElement resolve() {
-        LuaLocalDef localDef = PsiTreeUtil.findChildOfType(getContainingFile(), LuaLocalDef.class);
-
-        return PsiTreeUtil.findChildOfType(localDef, LuaNameDef.class);
+        return LuaPsiResolveUtil.resolve(this);
     }
 
     @NotNull
@@ -64,7 +62,7 @@ public class LuaIdentifierRef extends ASTWrapperPsiElement implements PsiReferen
 
     @Override
     public boolean isReferenceTo(PsiElement psiElement) {
-        return true;
+        return getManager().areElementsEquivalent(psiElement, resolve());
     }
 
     @NotNull
@@ -81,6 +79,14 @@ public class LuaIdentifierRef extends ASTWrapperPsiElement implements PsiReferen
     @NotNull
     @Override
     public PsiElement getId() {
-        return findChildByType(LuaTypes.ID);
+        PsiElement id = findChildByType(LuaTypes.ID);
+        assert id != null;
+        return id;
+    }
+
+    @NotNull
+    @Override
+    public String getRefName() {
+        return getId().getText();
     }
 }
