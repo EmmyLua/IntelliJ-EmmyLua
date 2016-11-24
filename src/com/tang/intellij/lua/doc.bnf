@@ -16,13 +16,42 @@
   ID = 'ID'
   AT = '@'
   EQ = '='
+  LCURLY = '{'
+  RCURLY = '}'
+  COMMA = ','
+  PARAM = 'param'
+  PRIVATE = 'private'
+  PUBLIC = 'public'
+  CLASS = 'class'
+  EXTENDS = "extends"
+  INTERFACE = 'interface'
+  TYPE_DEF = 'typedef'
+  RETURN = 'return'
   LDOC_COMMENT_START = 'LDOC_COMMENT_START'
   LDOC_DASHES = 'LDOC_DASHES'
   ]
 }
 
-doc ::= LDOC_COMMENT_START tag_pair*
+doc ::= LDOC_COMMENT_START (LDOC_DASHES doc_item?)*
 
+private doc_item ::= param_dec | return_dec | tag_dec | class_dec | comment_string
+
+//--- tag
 tag_name ::= ID
 tag_value ::= ID
-tag_pair ::= LDOC_COMMENT_START AT tag_name '=' tag_value { pin = 2 }
+tag_dec ::= '@' tag_name '=' tag_value { pin = 2 }
+
+//--- param
+param_name_ref ::= ID
+param_dec ::= '@' PARAM param_name_ref class_name_ref { pin = 2 }
+
+//--- return
+type_list ::= class_name_ref (',' class_name_ref)?
+return_dec ::= '@' 'return' type_list
+
+//---- class
+class_name ::= ID
+class_name_ref ::= ID
+class_dec ::= '@' '{' CLASS class_name (EXTENDS class_name_ref)? '}' { pin = 3 }
+
+comment_string ::= ID

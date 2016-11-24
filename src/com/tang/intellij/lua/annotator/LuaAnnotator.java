@@ -5,6 +5,8 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.psi.PsiElement;
+import com.tang.intellij.lua.doc.psi.LuaDocClassName;
+import com.tang.intellij.lua.doc.psi.LuaDocClassNameRef;
 import com.tang.intellij.lua.doc.psi.LuaDocTagName;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.psi.LuaFuncName;
@@ -21,6 +23,14 @@ public class LuaAnnotator implements Annotator {
         if (psiElement instanceof LuaDocTagName) {
             Annotation annotation = annotationHolder.createInfoAnnotation(psiElement, null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG);
+        }
+        else if (psiElement instanceof LuaDocClassName) {
+            Annotation annotation = annotationHolder.createInfoAnnotation(psiElement, null);
+            annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_NAME);
+        }
+        else if (psiElement instanceof LuaDocClassNameRef) {
+            Annotation annotation = annotationHolder.createInfoAnnotation(psiElement, null);
+            annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);
         }
         else if (psiElement instanceof LuaGlobalFuncDef) {
             LuaGlobalFuncDef def = (LuaGlobalFuncDef)psiElement;

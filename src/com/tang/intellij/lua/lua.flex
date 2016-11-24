@@ -24,8 +24,8 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
-SHORT_COMMENT=--.*
-LUADOC_COMMENT=(---.*\n?)+
+SHORT_COMMENT=---*.*
+LUADOC_COMMENT=----*(\n*---*.*)+
 ID=[A-Za-z_][A-Za-z0-9_]*
 NUMBER=-?([0-9]+|(0x[a-fA-F0-9]+))
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
