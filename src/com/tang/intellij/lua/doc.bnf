@@ -44,7 +44,9 @@ tag_value ::= ID
 tag_dec ::= '@' tag_name '=' tag_value { pin = 2 }
 
 //--- param
-param_name_ref ::= ID
+param_name_ref ::= ID {
+    methods = [getReference]
+}
 param_dec ::= '@' PARAM param_name_ref class_name_ref { pin = 2 }
 
 //--- return

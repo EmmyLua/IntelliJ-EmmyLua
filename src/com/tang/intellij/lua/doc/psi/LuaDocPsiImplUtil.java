@@ -1,5 +1,7 @@
 package com.tang.intellij.lua.doc.psi;
 
+import com.intellij.psi.PsiReference;
+import com.tang.intellij.lua.doc.reference.LuaDocParamNameReference;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 
 /**
@@ -12,4 +14,7 @@ public class LuaDocPsiImplUtil {
         return null;
     }
 
+    public static PsiReference getReference(LuaDocParamNameRef nameRef) {
+        return new LuaDocParamNameReference(nameRef);
+    }
 }
