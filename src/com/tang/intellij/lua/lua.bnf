@@ -86,7 +86,7 @@ private chunk ::= (stat ';'?)* (lastStat ';'?)?
 
 block ::= chunk
 
-stat ::=
+private stat ::=
     assignStat |
     funcCall |
     doStat |
