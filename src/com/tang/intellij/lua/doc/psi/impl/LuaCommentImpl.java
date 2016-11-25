@@ -6,7 +6,6 @@ import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaTokenType;
-import com.tang.intellij.lua.psi.LuaTypes;
 
 /**
  * Created by Tangzx on 2016/11/21.

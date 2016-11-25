@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
+import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocParamNameRef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.*;
@@ -34,25 +35,13 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
     @Nullable
     @Override
     public PsiElement resolve() {
-        LuaComment comment = null;
-        PsiElement searchDoc = myElement;
-        while (searchDoc != null && !(searchDoc instanceof PsiFile)) {
-            if (searchDoc instanceof LuaComment) {
-                comment = (LuaComment) searchDoc;
-                break;
-            }
-            searchDoc = searchDoc.getParent();
-        }
+        LuaCommentOwner owner = LuaCommentUtil.findOwner(myElement);
 
-        if (comment != null) {
-            PsiElement sib = comment.getNextSibling();
-            while (!(sib instanceof LuaPsiElement))
-                sib = sib.getNextSibling();
-
-            if (sib instanceof LuaLocalFuncDef) {
+        if (owner != null) {
+            if (owner instanceof LuaLocalFuncDef) {
                 String name = myElement.getText();
 
-                LuaLocalFuncDef funcDef = (LuaLocalFuncDef) sib;
+                LuaLocalFuncDef funcDef = (LuaLocalFuncDef) owner;
                 LuaParList list = funcDef.getFuncBody().getParList();
                 List<LuaNameDef> defList = list.getNameList().getNameDefList();
                 for (LuaNameDef nameDef : defList) {

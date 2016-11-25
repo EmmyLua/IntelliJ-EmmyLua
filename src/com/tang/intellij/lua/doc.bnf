@@ -2,6 +2,7 @@
   parserClass="com.tang.intellij.lua.doc.parser.LuaDocParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+  implements="com.tang.intellij.lua.doc.psi.LuaDocPsiElement"
 
   psiClassPrefix="LuaDoc"
   psiImplClassSuffix="Impl"

@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.doc.psi.api;
 
 import com.intellij.psi.PsiComment;
+import com.tang.intellij.lua.doc.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 
 /**
@@ -8,6 +9,6 @@ import com.tang.intellij.lua.psi.LuaCommentOwner;
  *
  * @qq 272669294
  */
-public interface LuaComment extends PsiComment {
+public interface LuaComment extends PsiComment, LuaDocPsiElement {
     LuaCommentOwner getOwner();
 }
