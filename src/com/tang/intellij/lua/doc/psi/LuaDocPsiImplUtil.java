@@ -2,7 +2,6 @@ package com.tang.intellij.lua.doc.psi;
 
 import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.doc.reference.LuaDocParamNameReference;
-import com.tang.intellij.lua.psi.LuaCommentOwner;
 
 /**
  *
@@ -10,11 +9,7 @@ import com.tang.intellij.lua.psi.LuaCommentOwner;
  */
 public class LuaDocPsiImplUtil {
 
-    public static LuaCommentOwner getOwner() {
-        return null;
-    }
-
-    public static PsiReference getReference(LuaDocParamNameRef nameRef) {
-        return new LuaDocParamNameReference(nameRef);
+    public static PsiReference getReference(LuaDocParamNameRef paramNameRef) {
+        return new LuaDocParamNameReference(paramNameRef);
     }
 }

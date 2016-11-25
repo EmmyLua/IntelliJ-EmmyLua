@@ -109,9 +109,16 @@ forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 2 }
 globalFuncDef ::= 'function' funcName funcBody {
     pin = 1
     stubClass="com.tang.intellij.lua.psi.stub.LuaGlobalFuncDefStub"
+    methods = [getComment]
 }
-localFuncDef ::= 'local' 'function' ID funcBody { pin = 2 }
-localDef ::= 'local' nameList ('=' exprList)? { pin = 2 }
+localFuncDef ::= 'local' 'function' ID funcBody {
+    pin = 2
+    methods = [getComment]
+}
+localDef ::= 'local' nameList ('=' exprList)? {
+    pin = 2
+    methods = [getComment]
+}
 
 lastStat ::= return exprList? | break
 
@@ -119,7 +126,10 @@ funcName ::= ID ('.' ID)* (':' ID)?
 
 varList ::= var (',' var)*
 
-nameDef ::= ID { implements = "com.tang.intellij.lua.psi.LuaNamedElement" methods = [setName getName] }
+nameDef ::= ID {
+    implements = "com.tang.intellij.lua.psi.LuaNamedElement"
+    methods = [setName getName]
+}
 nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr

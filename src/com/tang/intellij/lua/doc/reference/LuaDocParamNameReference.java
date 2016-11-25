@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
+import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocParamNameRef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
@@ -30,6 +31,13 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
     @Override
     public boolean isReferenceTo(PsiElement element) {
         return true;
+    }
+
+    @Override
+    public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+        PsiElement id = LuaElementFactory.createIdentifier(myElement.getProject(), newElementName);
+        myElement.getFirstChild().replace(id);
+        return id;
     }
 
     @Nullable
