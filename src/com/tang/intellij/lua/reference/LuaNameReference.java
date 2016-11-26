@@ -27,7 +27,7 @@ public class LuaNameReference extends PsiReferenceBase<LuaNameRef> {
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
         PsiElement newId = LuaElementFactory.createIdentifier(myElement.getProject(), newElementName);
-        myElement.getId().replace(newId);
+        myElement.getFirstChild().replace(newId);
         return newId;
     }
 

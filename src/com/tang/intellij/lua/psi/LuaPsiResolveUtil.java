@@ -11,7 +11,7 @@ import com.sun.istack.internal.NotNull;
 public class LuaPsiResolveUtil {
 
     public static PsiElement resolve(LuaNameRef ref) {
-        String refName = ref.getId().getText();
+        String refName = ref.getText();
         PsiElement curr = ref;
         do {
             PsiElement next = curr.getPrevSibling();

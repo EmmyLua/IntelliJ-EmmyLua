@@ -53,7 +53,7 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
                 LuaParList list = funcDef.getFuncBody().getParList();
                 List<LuaNameDef> defList = list.getNameList().getNameDefList();
                 for (LuaNameDef nameDef : defList) {
-                    if (nameDef.getId().getText().equals(name)) {
+                    if (nameDef.getText().equals(name)) {
                         return nameDef;
                     }
                 }

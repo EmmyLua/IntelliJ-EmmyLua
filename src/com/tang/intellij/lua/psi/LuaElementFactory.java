@@ -24,6 +24,6 @@ public class LuaElementFactory {
         LuaFile file = createFile(project, content);
         LuaNameDef def = PsiTreeUtil.findChildOfType(file, LuaNameDef.class);
         assert (def != null);
-        return def.getId();
+        return def.getFirstChild();
     }
 }

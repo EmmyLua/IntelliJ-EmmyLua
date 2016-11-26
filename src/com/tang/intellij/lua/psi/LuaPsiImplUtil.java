@@ -26,13 +26,14 @@ public class LuaPsiImplUtil {
 
     public static PsiElement setName(LuaNameDef identifier, String name) {
         PsiElement newId = LuaElementFactory.createIdentifier(identifier.getProject(), name);
-        identifier.getId().replace(newId);
+        PsiElement oldId = identifier.getFirstChild();
+        oldId.replace(newId);
         return newId;
     }
 
     @NotNull
     public static String getName(LuaNameDef identifier) {
-        return identifier.getId().getText();
+        return identifier.getText();
     }
 
     public static PsiReference getReference(LuaNameRef ref) {
