@@ -120,14 +120,10 @@ localDef ::= 'local' nameList ('=' exprList)? {
 
 lastStat ::= return exprList? | break
 
-funcName ::= identifierRef ('.' identifierRef)* (':' ID)?
+funcName ::= nameRef ('.' nameRef)* (':' ID)?
 
 varList ::= var (',' var)*
 
-nameDef ::= ID {
-    implements = "com.tang.intellij.lua.psi.LuaNamedElement"
-    methods = [setName getName]
-}
 nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr
@@ -143,7 +139,7 @@ indexExpr ::= '[' expr ']' | '.' ID
 callExpr ::= args | ':' ID args
 
 private suffixIndexExpr ::= callExpr | <<twoExpr indexExpr>> indexExpr
-var ::= prefixExpr (suffixIndexExpr)* indexExpr | identifierRef
+var ::= prefixExpr (suffixIndexExpr)* indexExpr | nameRef
 
 private suffixCallExpr ::= <<twoExpr callExpr>> callExpr | indexExpr
 funcCall ::= prefixExpr (suffixCallExpr)* callExpr
@@ -172,6 +168,10 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 
 unop ::= '-' | 'not' | '#'
 
-identifierRef ::= ID {
-    mixin = "com.tang.intellij.lua.reference.LuaIdentifierRefElement"
+nameDef ::= ID {
+    implements = "com.tang.intellij.lua.psi.LuaNamedElement"
+    methods = [setName getName]
+}
+nameRef ::= ID {
+    mixin = "com.tang.intellij.lua.reference.LuaNameRefElement"
 }

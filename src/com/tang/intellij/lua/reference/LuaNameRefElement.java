@@ -15,9 +15,9 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/11/22.
  */
-public class LuaIdentifierRefElement extends ASTWrapperPsiElement implements LuaRef, LuaIdentifierRef {
+public class LuaNameRefElement extends ASTWrapperPsiElement implements LuaRef, LuaIdentifierRef {
 
-    public LuaIdentifierRefElement(@NotNull ASTNode node) {
+    public LuaNameRefElement(@NotNull ASTNode node) {
         super(node);
     }
 
