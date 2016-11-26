@@ -65,6 +65,8 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
         else if (type == LuaTypes.STRING)
             return pack(DefaultLanguageHighlighterColors.STRING);
+        else if (type == LuaTypes.SELF)
+            return pack(LuaHighlightingData.KEYWORD);
 
         return new TextAttributesKey[0];
     }
