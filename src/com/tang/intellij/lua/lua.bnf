@@ -76,7 +76,7 @@
 
   implements(".*Ref") = "com.tang.intellij.lua.psi.LuaRef"
   implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
-  extends("localDef") = "com.tang.intellij.lua.psi.impl.LuaDeclarationImpl"
+  //extends("localDef") = "com.tang.intellij.lua.psi.impl.LuaDeclarationImpl"
   implements("chunk|funcBody") = "com.tang.intellij.lua.psi.LuaPsiScope"
 }
 
@@ -111,7 +111,7 @@ globalFuncDef ::= 'function' funcName funcBody {
     stubClass="com.tang.intellij.lua.psi.stub.LuaGlobalFuncDefStub"
     methods = [getComment]
 }
-localFuncDef ::= 'local' 'function' ID funcBody {
+localFuncDef ::= 'local' 'function' nameDef funcBody {
     pin = 2
     methods = [getComment]
 }

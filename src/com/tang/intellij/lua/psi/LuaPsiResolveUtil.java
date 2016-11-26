@@ -2,6 +2,7 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.sun.istack.internal.NotNull;
 
 /**
  *
@@ -10,38 +11,42 @@ import com.intellij.psi.PsiFile;
 public class LuaPsiResolveUtil {
 
     public static PsiElement resolve(LuaIdentifierRef ref) {
-        PsiElement scope = LuaPsiUtil.getUpperScope(ref);
-        PsiElement result = null;
-        while (scope != null) {
-            result = resolveInScope(scope, ref);
-            if (result == null && !(scope instanceof PsiFile))
-                scope = LuaPsiUtil.getUpperScope(scope);
-            else
-                break;
-        }
-        return result;
+        String refName = ref.getRefName();
+        PsiElement curr = ref;
+        do {
+            PsiElement next = curr.getPrevSibling();
+            if (next == null) {
+                next = curr.getParent();
+            }
+            curr = next;
+
+            if (curr instanceof LuaLocalDef) {
+                LuaNameList nameList = ((LuaLocalDef) curr).getNameList();
+                PsiElement result = resolveInNameList(nameList, refName);
+                if (result != null) return result;
+            }
+            else if (curr instanceof LuaLocalFuncDef) {
+                LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
+                if (refName.equals(localFuncDef.getNameDef().getText()))
+                    return localFuncDef.getNameDef();
+
+                PsiElement result = resolveInParList(localFuncDef.getFuncBody().getParList(), refName);
+                if (result != null) return result;
+            }
+        } while (!(curr instanceof PsiFile));
+        return null;
     }
 
-    public static PsiElement resolveInScope(final PsiElement scope, final LuaRef reference) {
-        String refName = reference.getRefName();
-        PsiElement[] children = scope.getChildren();
-        for (PsiElement child : children) {
-            if (child instanceof LuaPsiScope) continue;
+    static PsiElement resolveInParList(LuaParList parList, String searchName) {
+        return resolveInNameList(parList.getNameList(), searchName);
+    }
 
-            if (child instanceof LuaLocalDef) {
-                LuaNameList nameList = ((LuaLocalDef) child).getNameList();
-                for (LuaNameDef nameDef : nameList.getNameDefList()) {
-                    if (nameDef.getName().equals(refName)) {
-                        return nameDef;
-                    }
-                }
-            }
-            else {
-                PsiElement r = resolveInScope(child, reference);
-                if (r != null) return r;
+    static PsiElement resolveInNameList(@NotNull LuaNameList nameList, String searchName) {
+        for (LuaNameDef nameDef : nameList.getNameDefList()) {
+            if (nameDef.getName().equals(searchName)) {
+                return nameDef;
             }
         }
         return null;
     }
-
 }
