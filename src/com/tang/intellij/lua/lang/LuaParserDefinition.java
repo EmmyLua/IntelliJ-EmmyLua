@@ -1,7 +1,6 @@
 package com.tang.intellij.lua.lang;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.Language;
 import com.intellij.lang.ParserDefinition;
 import com.intellij.lang.PsiParser;
 import com.intellij.lexer.Lexer;
@@ -21,6 +20,7 @@ import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaFile;
 import com.tang.intellij.lua.psi.LuaTokenType;
 import com.tang.intellij.lua.psi.LuaTypes;
+import com.tang.intellij.lua.psi.stub.elements.LuaFileStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,7 +32,7 @@ public class LuaParserDefinition implements ParserDefinition {
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(LuaTypes.SHORT_COMMENT);
 
-    public static final IFileElementType FILE = new IFileElementType(Language.<LuaLanguage>findInstance(LuaLanguage.class));
+    public static final LuaFileStubElementType FILE = new LuaFileStubElementType();
 
     @NotNull
     @Override

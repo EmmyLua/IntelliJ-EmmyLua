@@ -1,9 +1,12 @@
-package com.tang.intellij.lua.lang;
+package com.tang.intellij.lua.psi.stub.elements;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
+import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
+import com.tang.intellij.lua.psi.index.GlobalFuncIndex;
 import com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub;
 import com.tang.intellij.lua.psi.stub.impl.LuaGlobalFuncStubImpl;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +39,13 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
     }
 
     @Override
-    public void serialize(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
+    public boolean shouldCreateStub(ASTNode node) {
+        return true;
+    }
 
+    @Override
+    public void serialize(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
+        System.out.println("se");
     }
 
     @NotNull
@@ -48,6 +56,6 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public void indexStub(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull IndexSink indexSink) {
-
+        indexSink.occurrence(GlobalFuncIndex.KEY, "test");
     }
 }
