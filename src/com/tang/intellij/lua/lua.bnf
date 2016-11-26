@@ -131,7 +131,7 @@ value ::= nil | false | true | NUMBER | STRING | "..." | func | tableConstructor
 
 expr ::= unop expr | value (binop expr)?
 
-private prefixExpr ::= '(' expr ')' | ID
+private prefixExpr ::= '(' expr ')' | nameRef
 
 indexExpr ::= '[' expr ']' | '.' ID
 
