@@ -1,9 +1,11 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocPsiImplUtil;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.reference.LuaNameReference;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,6 +33,10 @@ public class LuaPsiImplUtil {
     @NotNull
     public static String getName(LuaNameDef identifier) {
         return identifier.getId().getText();
+    }
+
+    public static PsiReference getReference(LuaNameRef ref) {
+        return new LuaNameReference(ref);
     }
 
     public static LuaComment getComment(LuaGlobalFuncDef globalFuncDef) {

@@ -8,6 +8,5 @@ import org.jetbrains.annotations.NotNull;
  * Created by TangZX on 2016/11/24.
  */
 public interface LuaRef extends PsiReference, LuaPsiElement {
-    @NotNull
-    String getRefName();
+
 }

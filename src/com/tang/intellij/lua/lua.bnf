@@ -74,7 +74,6 @@
         STRING = "STRING"
   ]
 
-  implements(".*Ref") = "com.tang.intellij.lua.psi.LuaRef"
   implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
   implements("chunk|funcBody") = "com.tang.intellij.lua.psi.LuaPsiScope"
 }
@@ -173,5 +172,5 @@ nameDef ::= ID {
     methods = [setName getName]
 }
 nameRef ::= ID {
-    mixin = "com.tang.intellij.lua.reference.LuaNameRefElement"
+    methods = [getReference]
 }
