@@ -17,7 +17,9 @@ import com.tang.intellij.lua.doc.psi.LuaDocElementType;
 import com.tang.intellij.lua.doc.psi.LuaDocTypes;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
+import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.psi.LuaTokenType;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -78,5 +80,19 @@ public class LuaParserDefinition implements ParserDefinition {
             return LuaDocTypes.Factory.createElement(node);
         }
         return LuaTypes.Factory.createElement(node);
+    }
+
+    public static IElementType createType(String string) {
+        if ("GLOBAL_FUNC_DEF".equals(string))
+            return LuaElementType.GLOBAL_FUNC_DEF;
+
+        return new LuaElementType(string);
+    }
+
+    public static IElementType createToken(String string) {
+        if (string.equals("LUADOC_COMMENT"))
+            return LuaElementType.DOC_COMMENT;
+
+        return new LuaTokenType(string);
     }
 }
