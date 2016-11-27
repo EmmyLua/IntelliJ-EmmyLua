@@ -9,13 +9,13 @@ import org.jetbrains.annotations.NotNull;
  *
  * Created by TangZX on 2016/11/22.
  */
-public class GlobalFuncIndex extends StringStubIndexExtension<LuaGlobalFuncDef> {
+public class LuaGlobalFuncIndex extends StringStubIndexExtension<LuaGlobalFuncDef> {
 
     public static final StubIndexKey<String, LuaGlobalFuncDef> KEY = StubIndexKey.createIndexKey("lua.index.type.name");
 
-    private static final GlobalFuncIndex INSTANCE = new GlobalFuncIndex();
+    private static final LuaGlobalFuncIndex INSTANCE = new LuaGlobalFuncIndex();
 
-    public static GlobalFuncIndex getInstance() {
+    public static LuaGlobalFuncIndex getInstance() {
         return INSTANCE;
     }
 

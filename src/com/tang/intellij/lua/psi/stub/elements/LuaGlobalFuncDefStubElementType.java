@@ -6,7 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
-import com.tang.intellij.lua.psi.index.GlobalFuncIndex;
+import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub;
 import com.tang.intellij.lua.psi.stub.impl.LuaGlobalFuncStubImpl;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +59,6 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public void indexStub(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull IndexSink indexSink) {
-        indexSink.occurrence(GlobalFuncIndex.KEY, luaGlobalFuncStub.getName());
+        indexSink.occurrence(LuaGlobalFuncIndex.KEY, luaGlobalFuncStub.getName());
     }
 }
