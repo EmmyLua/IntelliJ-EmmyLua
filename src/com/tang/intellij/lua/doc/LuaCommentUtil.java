@@ -42,8 +42,19 @@ public class LuaCommentUtil {
         }
     }
 
-    public static LuaComment findComment(PsiElement element) {
-        return null;
+    public static LuaComment findComment(LuaCommentOwner element) {
+        PsiElement prev = element.getPrevSibling();
+        while (true) {
+            if (prev == null)
+                return null;
+            if (prev instanceof LuaComment)
+                return (LuaComment) prev;
+            IElementType type = prev.getNode().getElementType();
+            if (LuaParserDefinition.WHITE_SPACES.contains(type))
+                prev = prev.getPrevSibling();
+            else
+                return null;
+        }
     }
 
 }
