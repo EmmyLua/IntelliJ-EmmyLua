@@ -12,7 +12,16 @@ import com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub;
  * Created by tangzx on 2016/11/26.
  */
 public class LuaGlobalFuncStubImpl extends StubBase<LuaGlobalFuncDef> implements LuaGlobalFuncStub {
-    public LuaGlobalFuncStubImpl(StubElement parent) {
+
+    private String funcName;
+
+    public LuaGlobalFuncStubImpl(String name, StubElement parent) {
         super(parent, (IStubElementType) LuaTypes.GLOBAL_FUNC_DEF);
+        funcName = name;
+    }
+
+    @Override
+    public String getName() {
+        return funcName;
     }
 }

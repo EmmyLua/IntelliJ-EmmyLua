@@ -46,7 +46,10 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getDescriptiveName(@NotNull PsiElement psiElement) {
-        return ((LuaNameDef)psiElement).getName();
+        if (psiElement instanceof LuaNameDef)
+            return ((LuaNameDef)psiElement).getName();
+        else
+            return "";
     }
 
     @NotNull
