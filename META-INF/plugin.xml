@@ -31,6 +31,7 @@
         <lang.findUsagesProvider language="Lua" implementationClass="com.tang.intellij.lua.usages.LuaFindUsagesProvider"/>
 
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
+        <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterHandlerDelegate" />
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
