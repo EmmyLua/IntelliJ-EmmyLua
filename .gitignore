@@ -3,4 +3,6 @@
 /*.iws
 gen
 .idea
+*.skeleton
 *.java~
+*Lexer.java
