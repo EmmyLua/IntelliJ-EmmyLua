@@ -76,7 +76,7 @@ public class LuaParserDefinition implements ParserDefinition {
     @NotNull
     public PsiElement createElement(ASTNode node) {
         IElementType type = node.getElementType();
-        if (type instanceof LuaDocElementType) {
+        if (type instanceof LuaDocElementType || type == LuaElementType.CLASS_DEF) {
             return LuaDocTypes.Factory.createElement(node);
         }
         return LuaTypes.Factory.createElement(node);
@@ -94,5 +94,12 @@ public class LuaParserDefinition implements ParserDefinition {
             return LuaElementType.DOC_COMMENT;
 
         return new LuaTokenType(string);
+    }
+
+    public static IElementType createDocType(String string) {
+        if ("CLASS_DEF".equals(string))
+            return LuaElementType.CLASS_DEF;
+
+        return new LuaDocElementType(string);
     }
 }

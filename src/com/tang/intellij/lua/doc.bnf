@@ -13,6 +13,7 @@
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.doc.psi.LuaDocTypes"
   elementTypeClass="com.tang.intellij.lua.doc.psi.LuaDocElementType"
+  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createDocType"
   tokenTypeClass="com.tang.intellij.lua.doc.psi.LuaDocTokenType"
 
   tokens = [
@@ -57,6 +58,9 @@ return_dec ::= '@' 'return' type_list
 //---- class
 class_name ::= ID
 class_name_ref ::= ID
-class_def ::= '@' '{' CLASS class_name (EXTENDS class_name_ref)? '}' { pin = 3 }
+class_def ::= '@' '{' CLASS class_name (EXTENDS class_name_ref)? '}' {
+    pin = 3
+    stubClass = "com.tang.intellij.lua.psi.stub.LuaClassDefStub"
+}
 
 comment_string ::= ID
