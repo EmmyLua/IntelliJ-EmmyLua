@@ -36,6 +36,7 @@
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex" />
+        <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
     </extensions>
 
     <application-components>
