@@ -39,8 +39,6 @@ LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 ID=[A-Za-z0-9_]+
 AT=@
-//三个-以上
-DOC_COMMENT_START = ----*
 //两个-以上
 DOC_DASHES = ---*
 
@@ -49,11 +47,6 @@ DOC_DASHES = ---*
 %%
 
 <YYINITIAL> {
- {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
- {DOC_COMMENT_START}        { yybegin(xDOC_COMMENT_START); return LDOC_COMMENT_START; }
- [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
-}
-<xDOC_COMMENT_START> {
  {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
  {DOC_DASHES}               { return LDOC_DASHES; }
  "@"                        { return AT; }

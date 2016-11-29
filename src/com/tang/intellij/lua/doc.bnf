@@ -31,12 +31,11 @@
   INTERFACE = 'interface'
   TYPE_DEF = 'typedef'
   RETURN = 'return'
-  LDOC_COMMENT_START = 'LDOC_COMMENT_START'
   LDOC_DASHES = 'LDOC_DASHES'
   ]
 }
 
-doc ::= LDOC_COMMENT_START (LDOC_DASHES doc_item?)*
+doc ::= (LDOC_DASHES doc_item?)*
 
 private doc_item ::= param_dec | return_dec | tag_dec | class_def | comment_string
 
@@ -64,7 +63,7 @@ class_name_ref ::= ID {
     methods = [getReference]
 }
 class_def ::= '@' '{' CLASS class_name (EXTENDS class_name_ref)? '}' {
-    pin = 3
+    pin = 4
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassDefStub"
 }
 
