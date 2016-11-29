@@ -78,7 +78,6 @@
   ]
 
   implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
-  implements("chunk|funcBody") = "com.tang.intellij.lua.psi.LuaPsiScope"
 }
 
 luaFile ::= (SHORT_COMMENT | LUADOC_COMMENT | stat)*
