@@ -132,7 +132,7 @@ nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr
 
-value ::= nil | false | true | NUMBER | STRING | "..." | func | tableConstructor | funcCall | var | '(' expr ')'
+value ::= nil | false | true | NUMBER | STRING | "..." | lambdaFunc | tableConstructor | funcCall | var | '(' expr ')'
 
 expr ::= unop expr | value (binop expr)?
 
@@ -152,7 +152,7 @@ args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     methods = [getArgType]
 }
 
-func ::= 'function' funcBody
+lambdaFunc ::= 'function' funcBody
 
 funcBody ::= '(' (parList)? ')' block? 'end' { pin = 1 }
 
