@@ -56,8 +56,13 @@ type_list ::= class_name_ref (',' class_name_ref)?
 return_dec ::= '@' 'return' type_list
 
 //---- class
-class_name ::= ID
-class_name_ref ::= ID
+class_name ::= ID {
+    implements = "com.tang.intellij.lua.doc.psi.LuaDocNamedElement"
+    methods = [getName setName]
+}
+class_name_ref ::= ID {
+    methods = [getReference]
+}
 class_def ::= '@' '{' CLASS class_name (EXTENDS class_name_ref)? '}' {
     pin = 3
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassDefStub"
