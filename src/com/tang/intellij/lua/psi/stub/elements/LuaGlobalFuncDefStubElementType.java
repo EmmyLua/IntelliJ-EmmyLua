@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.psi.stub.elements;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.LuaLanguage;
@@ -43,9 +44,12 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public boolean shouldCreateStub(ASTNode node) {
-        if (node.textContains(':')) // eg. function m:getName() end
-            return false;
-        return true;
+        PsiElement element = node.getPsi();
+        if (element instanceof LuaGlobalFuncDef) {
+            LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) element;
+            return !globalFuncDef.getFuncName().textContains(':');
+        }
+        return false;
     }
 
     @Override
