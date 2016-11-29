@@ -15,12 +15,12 @@ import com.tang.intellij.lua.psi.LuaTypes;
 public class LuaCommentImpl extends LazyParseablePsiElement implements LuaComment {
 
     public LuaCommentImpl(CharSequence charSequence) {
-        super(LuaTypes.LUADOC_COMMENT, charSequence);
+        super(LuaTypes.DOC_COMMENT, charSequence);
     }
 
     @Override
     public IElementType getTokenType() {
-        return LuaTypes.LUADOC_COMMENT;
+        return LuaTypes.DOC_COMMENT;
     }
 
     @Override

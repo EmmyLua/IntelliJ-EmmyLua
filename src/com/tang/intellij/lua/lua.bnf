@@ -71,8 +71,8 @@
         EXP = "^"
 
         SHORT_COMMENT="SHORT_COMMENT"
-        LUADOC_COMMENT="LUADOC_COMMENT"
-        ID="ID"
+        DOC_COMMENT="DOC_COMMENT"
+        ID="regexp:[A-Za-z_][A-Za-z0-9_]*"
         NUMBER="NUMBER"
         STRING = "STRING"
   ]
@@ -80,7 +80,7 @@
   implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
 }
 
-luaFile ::= (SHORT_COMMENT | LUADOC_COMMENT | stat)*
+luaFile ::= (SHORT_COMMENT | DOC_COMMENT | stat)*
 
 private chunk ::= (stat ';'?)* (lastStat ';'?)?
 

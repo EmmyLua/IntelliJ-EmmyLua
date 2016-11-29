@@ -90,7 +90,7 @@ public class LuaParserDefinition implements ParserDefinition {
     }
 
     public static IElementType createToken(String string) {
-        if (string.equals("LUADOC_COMMENT"))
+        if (string.equals("DOC_COMMENT"))
             return LuaElementType.DOC_COMMENT;
 
         return new LuaTokenType(string);

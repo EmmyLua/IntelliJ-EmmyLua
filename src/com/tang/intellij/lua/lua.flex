@@ -25,7 +25,7 @@ LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
 SHORT_COMMENT=--.*
-LUADOC_COMMENT=----*.*(\n---*.*)*
+DOC_COMMENT=----*.*(\n---*.*)*
 ID=[A-Za-z_][A-Za-z0-9_]*
 NUMBER=-?([0-9]+|(0x[a-fA-F0-9]+))
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
@@ -37,7 +37,7 @@ SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 %%
 <YYINITIAL> {
   {WHITE_SPACE}               { return com.intellij.psi.TokenType.WHITE_SPACE; }
-  {LUADOC_COMMENT}            { return LUADOC_COMMENT; }
+  {DOC_COMMENT}               { return DOC_COMMENT; }
   {SHORT_COMMENT}             { return SHORT_COMMENT; }
   "and"                       { return AND; }
   "break"                     { return BREAK; }

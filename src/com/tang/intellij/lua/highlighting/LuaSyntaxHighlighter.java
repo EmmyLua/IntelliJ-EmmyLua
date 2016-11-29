@@ -61,7 +61,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(NUMBER);
         else if (type == LuaTypes.SHORT_COMMENT)
             return pack(DefaultLanguageHighlighterColors.LINE_COMMENT);
-        else if (type == LuaTypes.LUADOC_COMMENT)
+        else if (type == LuaTypes.DOC_COMMENT)
             return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
         else if (type == LuaTypes.STRING)
             return pack(DefaultLanguageHighlighterColors.STRING);
