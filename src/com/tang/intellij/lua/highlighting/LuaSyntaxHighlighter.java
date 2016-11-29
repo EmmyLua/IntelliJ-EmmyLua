@@ -6,8 +6,8 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.lexer.LuaLexerAdapter;
-import com.tang.intellij.lua.psi.LuaTokenType;
+import com.tang.intellij.lua.doc.psi.LuaDocTokenType;
+import com.tang.intellij.lua.doc.psi.LuaDocTypes;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +49,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new LuaLexerAdapter();
+        return new LuaFileLexer();
     }
 
     @NotNull
@@ -59,14 +59,20 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(KEYWORD);
         else if (type == LuaTypes.NUMBER)
             return pack(NUMBER);
-        else if (type == LuaTypes.SHORT_COMMENT)
-            return pack(DefaultLanguageHighlighterColors.LINE_COMMENT);
-        else if (type == LuaTypes.DOC_COMMENT)
-            return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
         else if (type == LuaTypes.STRING)
             return pack(DefaultLanguageHighlighterColors.STRING);
         else if (type == LuaTypes.SELF)
             return pack(LuaHighlightingData.KEYWORD);
+
+        // for comment
+        else if (type == LuaTypes.SHORT_COMMENT)
+            return pack(DefaultLanguageHighlighterColors.LINE_COMMENT);
+        //else if (type == LuaTypes.DOC_COMMENT)
+        //    return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
+        else if (type == LuaDocTypes.CLASS)
+            return pack(LuaHighlightingData.STRING);
+        else if (type instanceof LuaDocTokenType)
+            return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
 
         return new TextAttributesKey[0];
     }
