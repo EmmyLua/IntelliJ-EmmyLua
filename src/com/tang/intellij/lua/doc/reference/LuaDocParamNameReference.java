@@ -2,12 +2,10 @@ package com.tang.intellij.lua.doc.reference;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocParamNameRef;
-import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +28,7 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
-        return true;
+        return myElement.getManager().areElementsEquivalent(element, resolve());
     }
 
     @Override
@@ -46,17 +44,29 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
         LuaCommentOwner owner = LuaCommentUtil.findOwner(myElement);
 
         if (owner != null) {
-            if (owner instanceof LuaLocalFuncDef) {
-                String name = myElement.getText();
-
+            String name = myElement.getText();
+            if (owner instanceof LuaGlobalFuncDef) {
+                LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) owner;
+                return findParamWithName(globalFuncDef.getFuncBody(), name);
+            }
+            else if (owner instanceof LuaLocalFuncDef) {
                 LuaLocalFuncDef funcDef = (LuaLocalFuncDef) owner;
-                LuaParList list = funcDef.getFuncBody().getParList();
-                List<LuaNameDef> defList = list.getNameList().getNameDefList();
-                for (LuaNameDef nameDef : defList) {
-                    if (nameDef.getText().equals(name)) {
-                        return nameDef;
-                    }
-                }
+                return findParamWithName(funcDef.getFuncBody(), name);
+            }
+        }
+        return null;
+    }
+
+    PsiElement findParamWithName(LuaFuncBody funcBody, String str) {
+        if (funcBody == null) return null;
+        LuaParList list = funcBody.getParList();
+        if (list == null) return null;
+        LuaNameList nameList = list.getNameList();
+        if (nameList == null) return null;
+        List<LuaNameDef> defList = nameList.getNameDefList();
+        for (LuaNameDef nameDef : defList) {
+            if (nameDef.getText().equals(str)) {
+                return nameDef;
             }
         }
         return null;
