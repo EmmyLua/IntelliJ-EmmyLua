@@ -22,7 +22,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder annotationHolder) {
         myHolder = annotationHolder;
-        if (psiElement instanceof LuaDocElementType) {
+        if (psiElement instanceof LuaDocPsiElement) {
             psiElement.accept(docVisitor);
         }
         else if (psiElement instanceof LuaPsiElement) {
