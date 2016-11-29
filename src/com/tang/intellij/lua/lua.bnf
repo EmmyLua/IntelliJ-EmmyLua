@@ -99,7 +99,8 @@ private stat ::=
     globalFuncDef |
     localFuncDef |
     localDef |
-    lastStat
+    lastStat |
+    errorStat
 
 assignStat ::= varList '=' exprList { pin = 2 }
 doStat ::= 'do' block 'end' { pin = 1 }
@@ -154,7 +155,7 @@ args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
 
 func ::= 'function' funcBody
 
-funcBody ::= '(' (parList)? ')' block? 'end'
+funcBody ::= '(' (parList)? ')' block? 'end' { pin = 1 }
 
 parList ::= nameList (',' '...')? | '...'
 
@@ -178,4 +179,9 @@ nameDef ::= ID {
 }
 nameRef ::= ID | SELF {
     methods = [getReference]
+}
+
+errorStat ::= ID | 'local' | 'for' {
+    implements = "com.intellij.psi.PsiErrorElement"
+    methods = [getErrorDescription]
 }
