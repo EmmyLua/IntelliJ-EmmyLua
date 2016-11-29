@@ -47,12 +47,12 @@ public class LuaPsiResolveUtil {
 
     static PsiElement resolveInFuncBody(LuaFuncBody body, String searchName) {
         if (body == null) return null;
-        return resolveInParList(body.getParList(), searchName);
-    }
-
-    static PsiElement resolveInParList(LuaParList parList, String searchName) {
-        if (parList == null) return null;
-        return resolveInNameList(parList.getNameList(), searchName);
+        for (LuaNameDef nameDef : body.getParDefList()) {
+            if (nameDef.getName().equals(searchName)) {
+                return nameDef;
+            }
+        }
+        return null;
     }
 
     static PsiElement resolveInNameList(@NotNull LuaNameList nameList, String searchName) {

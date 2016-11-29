@@ -77,7 +77,7 @@
         STRING = "STRING"
   ]
 
-  implements(".*Def") = "com.tang.intellij.lua.psi.LuaDeclaration"
+  implements("globalFuncDef|localFuncDef|localDef") = "com.tang.intellij.lua.psi.LuaDeclaration"
 }
 
 luaFile ::= (SHORT_COMMENT | DOC_COMMENT | stat)*
@@ -109,7 +109,7 @@ ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 
 forAStat ::= 'for' ID '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 3 }
 forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 3 }
 globalFuncDef ::= 'function' funcName funcBody {
-    pin = 1
+    pin = 2
     methods = [getComment]
     stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub"
 }
@@ -156,7 +156,10 @@ lambdaFunc ::= 'function' funcBody
 
 funcBody ::= '(' (parList)? ')' block? 'end' { pin = 1 }
 
-parList ::= nameList (',' '...')? | '...'
+parDef ::= ID {
+    extends = nameDef
+}
+private parList ::= parDef (',' parDef)* (',' '...')? | '...'
 
 tableConstructor ::= '{' (fieldList)? '}'
 
