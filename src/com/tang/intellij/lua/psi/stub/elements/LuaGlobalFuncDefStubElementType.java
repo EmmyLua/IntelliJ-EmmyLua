@@ -43,6 +43,8 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public boolean shouldCreateStub(ASTNode node) {
+        if (node.textContains(':')) // eg. function m:getName() end
+            return false;
         return true;
     }
 
