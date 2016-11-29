@@ -11,7 +11,16 @@ import com.tang.intellij.lua.psi.stub.LuaClassDefStub;
  * Created by tangzx on 2016/11/28.
  */
 public class LuaClassDefStubImpl extends StubBase<LuaDocClassDef> implements LuaClassDefStub {
-    public LuaClassDefStubImpl(StubElement parent) {
+
+    private String className;
+
+    public LuaClassDefStubImpl(String className, StubElement parent) {
         super(parent, LuaElementType.CLASS_DEF);
+        this.className = className;
+    }
+
+    @Override
+    public String getClassName() {
+        return className;
     }
 }

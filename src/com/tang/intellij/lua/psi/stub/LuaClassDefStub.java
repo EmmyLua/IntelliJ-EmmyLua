@@ -8,4 +8,5 @@ import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
  * Created by tangzx on 2016/11/28.
  */
 public interface LuaClassDefStub extends StubElement<LuaDocClassDef> {
+    String getClassName();
 }
