@@ -27,7 +27,7 @@ WHITE_SPACE=({LINE_WS}|{EOL})+
 SHORT_COMMENT=--.*
 DOC_COMMENT=----*.*(\n---*.*)*
 ID=[A-Za-z_][A-Za-z0-9_]*
-NUMBER=-?([0-9]+|(0x[a-fA-F0-9]+))
+NUMBER=-?(\d*(\.\d+)?|(0x[a-fA-F0-9]+))
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
 SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 
