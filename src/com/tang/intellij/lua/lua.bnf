@@ -180,7 +180,7 @@ nameDef ::= ID {
     methods = [setName getName]
 }
 nameRef ::= ID | SELF {
-    methods = [getReference]
+    methods = [getReference resolve]
 }
 
 errorStat ::= ID | 'local' | 'for' {

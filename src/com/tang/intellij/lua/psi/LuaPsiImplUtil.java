@@ -40,6 +40,10 @@ public class LuaPsiImplUtil {
         return new LuaNameReference(ref);
     }
 
+    public static PsiElement resolve(LuaNameRef ref) {
+        return LuaPsiResolveUtil.resolve(ref);
+    }
+
     public static LuaComment getComment(LuaGlobalFuncDef globalFuncDef) {
         return LuaCommentUtil.findComment(globalFuncDef);
     }
