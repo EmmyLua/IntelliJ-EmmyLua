@@ -3,6 +3,7 @@ package com.tang.intellij.lua.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
+import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.LuaDocPsiImplUtil;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.reference.LuaNameReference;
@@ -42,6 +43,10 @@ public class LuaPsiImplUtil {
 
     public static PsiElement resolve(LuaNameRef ref) {
         return LuaPsiResolveUtil.resolve(ref);
+    }
+
+    public static LuaDocClassDef resolveType(LuaParDef parDef) {
+        return null;
     }
 
     public static LuaComment getComment(LuaGlobalFuncDef globalFuncDef) {
