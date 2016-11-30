@@ -23,36 +23,36 @@
   LCURLY = '{'
   RCURLY = '}'
   COMMA = ','
-  PARAM = 'param'
+  TAG_NAME = 'TAG_NAME'
+  TAG_PARAM = '@param'
+  TAG_RETURN = '@return'
   PRIVATE = 'private'
   PUBLIC = 'public'
   CLASS = 'class'
   EXTENDS = "extends"
   INTERFACE = 'interface'
   TYPE_DEF = 'typedef'
-  RETURN = 'return'
-  LDOC_DASHES = 'LDOC_DASHES'
+  DASHES = 'DASHES'
   ]
 }
 
-doc ::= (LDOC_DASHES doc_item?)*
+doc ::= (DASHES doc_item?)*
 
 private doc_item ::= param_dec | return_dec | tag_dec | class_def | comment_string
 
 //--- tag
-tag_name ::= ID
 tag_value ::= ID
-tag_dec ::= '@' tag_name '=' tag_value { pin = 2 }
+tag_dec ::= TAG_NAME tag_value { pin = 1 }
 
 //--- param
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_dec ::= '@' PARAM param_name_ref class_name_ref { pin = 2 }
+param_dec ::= TAG_PARAM param_name_ref class_name_ref { pin = 1 }
 
 //--- return
 type_list ::= class_name_ref (',' class_name_ref)?
-return_dec ::= '@' 'return' type_list
+return_dec ::= TAG_RETURN type_list
 
 //---- class
 class_name ::= ID {

@@ -67,10 +67,10 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
         // for comment
         else if (type == LuaTypes.SHORT_COMMENT)
             return pack(DefaultLanguageHighlighterColors.LINE_COMMENT);
-        //else if (type == LuaTypes.DOC_COMMENT)
-        //    return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
         else if (type == LuaDocTypes.CLASS)
             return pack(LuaHighlightingData.STRING);
+        else if (type == LuaDocTypes.TAG_NAME || type == LuaDocTypes.TAG_PARAM || type == LuaDocTypes.TAG_RETURN)
+            return pack(LuaHighlightingData.LUADOC_TAG);
         else if (type instanceof LuaDocTokenType)
             return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
 

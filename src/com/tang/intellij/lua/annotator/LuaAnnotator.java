@@ -52,11 +52,6 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
     }
 
     class LuaDocElementVisitor extends LuaDocVisitor {
-        @Override
-        public void visitTagName(@NotNull LuaDocTagName o) {
-            Annotation annotation = myHolder.createInfoAnnotation(o, null);
-            annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG);
-        }
 
         @Override
         public void visitClassName(@NotNull LuaDocClassName o) {

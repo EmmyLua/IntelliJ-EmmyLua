@@ -48,20 +48,20 @@ DOC_DASHES = ---*
 
 <YYINITIAL> {
  {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
- {DOC_DASHES}               { return LDOC_DASHES; }
+ {DOC_DASHES}               { return DASHES; }
+ "@return"                  { return TAG_RETURN; }
+ "@param"                   { return TAG_PARAM; }
+ "@"\w+                     { return TAG_NAME; }
  "@"                        { return AT; }
  "="                        { return EQ; }
  "{"                        { return LCURLY; }
  "}"                        { return RCURLY; }
  ","                        { return COMMA; }
- "param"                    { return PARAM; }
  "private"                  { return PRIVATE; }
  "public"                   { return PUBLIC; }
  "class"                    { return CLASS; }
  "interface"                { return INTERFACE; }
- "typedef"                  { return TYPE_DEF; }
  "extends"                  { return EXTENDS; }
- "return"                   { return RETURN; }
  {ID}                       { return ID; }
  [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
