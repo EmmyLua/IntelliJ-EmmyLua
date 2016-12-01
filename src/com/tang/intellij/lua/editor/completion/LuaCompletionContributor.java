@@ -5,12 +5,17 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaNameRef;
 import com.tang.intellij.lua.psi.LuaTypeResolvable;
+import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 
@@ -47,14 +52,21 @@ public class LuaCompletionContributor extends CompletionContributor {
                         if (resolve instanceof LuaTypeResolvable) {
                             LuaTypeResolvable typeResolvable = (LuaTypeResolvable) resolve;
                             LuaDocClassDef classDef = typeResolvable.resolveType();
+
+                            //提示方法
                             if (classDef != null) {
-                                completionResultSet.addElement(LookupElementBuilder.create(classDef.getClassName()));
+                                String clazzName = classDef.getClassName().getText();
+                                Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+                                for (LuaGlobalFuncDef def : list) {
+                                    completionResultSet.addElement(LookupElementBuilder.create(def.getFuncName().getId().getText()));
+                                }
                             }
+
+                            //提示属性
                         }
                     }
                 }
             }
         });
     }
-
 }
