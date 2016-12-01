@@ -20,6 +20,8 @@ import java.io.IOException;
  * Created by tangzx on 2016/11/26.
  */
 public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef> {
+    public static String NON_PREFIX_GLOBAL_FUNC = "NON_PREFIX_GLOBAL_FUNC";
+
     public LuaGlobalFuncDefStubElementType() {
         super("GLOBAL_FUNC_DEF", LuaLanguage.INSTANCE);
     }
@@ -32,6 +34,7 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
     @Override
     public LuaGlobalFuncStub createStub(@NotNull LuaGlobalFuncDef globalFuncDef, StubElement stubElement) {
         LuaFuncName funcName = globalFuncDef.getFuncName();
+        assert funcName != null;
         LuaNameRef nameRef = PsiTreeUtil.findChildOfType(funcName, LuaNameRef.class);
         assert nameRef != null;
         String indexText = nameRef.getText();
@@ -42,6 +45,10 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
             if (classDef != null) {
                 indexText = classDef.getClassName().getText();
             }
+        }
+        //全局函数
+        if (funcName.getId() == null) {
+            indexText = NON_PREFIX_GLOBAL_FUNC;
         }
         return new LuaGlobalFuncStubImpl(indexText, stubElement);
     }

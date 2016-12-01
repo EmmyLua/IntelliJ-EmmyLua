@@ -8,11 +8,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaIndexExpr;
-import com.tang.intellij.lua.psi.LuaNameRef;
-import com.tang.intellij.lua.psi.LuaTypeResolvable;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
+import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -65,6 +63,18 @@ public class LuaCompletionContributor extends CompletionContributor {
                             //提示属性
                         }
                     }
+                }
+            }
+        });
+
+        //提示全局函数
+        extend(CompletionType.BASIC, psiElement().inside(LuaFile.class), new CompletionProvider<CompletionParameters>() {
+            @Override
+            protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                Project project = completionParameters.getOriginalFile().getProject();
+                Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(LuaGlobalFuncDefStubElementType.NON_PREFIX_GLOBAL_FUNC, project, new ProjectAndLibrariesScope(project));
+                for (LuaGlobalFuncDef def : list) {
+                    completionResultSet.addElement(LookupElementBuilder.create(def.getFuncName().getText()));
                 }
             }
         });
