@@ -1,12 +1,15 @@
 package com.tang.intellij.lua.editor.completion;
 
 import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaNameRef;
+import com.tang.intellij.lua.psi.LuaTypeResolvable;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
@@ -41,8 +44,12 @@ public class LuaCompletionContributor extends CompletionContributor {
                     if (prev instanceof LuaNameRef) {
                         LuaNameRef ref = (LuaNameRef) prev;
                         PsiElement resolve = ref.resolve();
-                        if (resolve != null) {
-
+                        if (resolve instanceof LuaTypeResolvable) {
+                            LuaTypeResolvable typeResolvable = (LuaTypeResolvable) resolve;
+                            LuaDocClassDef classDef = typeResolvable.resolveType();
+                            if (classDef != null) {
+                                completionResultSet.addElement(LookupElementBuilder.create(classDef.getClassName()));
+                            }
                         }
                     }
                 }

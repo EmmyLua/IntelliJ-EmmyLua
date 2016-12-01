@@ -6,6 +6,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.sun.istack.internal.NotNull;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 
 /**
@@ -75,7 +76,10 @@ public class LuaPsiResolveUtil {
             if (owner != null) {
                 LuaComment comment = owner.getComment();
                 if (comment != null) {
-
+                    LuaDocParamDef paramDef = comment.getParamDef(nameDef.getText());
+                    if (paramDef != null) {
+                        return paramDef.resolveType();
+                    }
                 }
             }
         }

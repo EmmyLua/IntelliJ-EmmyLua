@@ -38,24 +38,24 @@
 
 doc ::= (DASHES doc_item?)*
 
-private doc_item ::= param_dec | return_dec | tag_dec | class_def | comment_string
+private doc_item ::= param_def | return_def | tag_def | class_def | comment_string
 
 //--- tag
 tag_value ::= ID
-tag_dec ::= TAG_NAME tag_value { pin = 1 }
+tag_def ::= TAG_NAME tag_value { pin = 1 }
 
 //--- param
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_dec ::= TAG_PARAM param_name_ref class_name_ref {
+param_def ::= TAG_PARAM param_name_ref class_name_ref {
     pin = 1
     methods = [resolveType]
 }
 
 //--- return
 type_list ::= class_name_ref (',' class_name_ref)?
-return_dec ::= TAG_RETURN type_list
+return_def ::= TAG_RETURN type_list
 
 //---- class
 class_name ::= ID {

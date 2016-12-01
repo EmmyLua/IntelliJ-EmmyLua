@@ -158,6 +158,7 @@ funcBody ::= '(' (parList)? ')' block? 'end' { pin = 1 }
 parDef ::= ID {
     extends = nameDef
     methods = [resolveType]
+    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable"
 }
 private parList ::= parDef (',' parDef)* (',' '...')? | '...'
 

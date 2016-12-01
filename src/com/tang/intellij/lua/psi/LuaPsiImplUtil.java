@@ -4,7 +4,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.doc.psi.LuaDocPsiImplUtil;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.reference.LuaNameReference;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +36,7 @@ public class LuaPsiImplUtil {
         return identifier.getText();
     }
 
+    @NotNull
     public static PsiReference getReference(LuaNameRef ref) {
         return new LuaNameReference(ref);
     }
