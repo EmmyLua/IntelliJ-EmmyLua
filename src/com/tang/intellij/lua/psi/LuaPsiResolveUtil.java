@@ -82,6 +82,14 @@ public class LuaPsiResolveUtil {
                     }
                 }
             }
+        } else {
+            LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
+            if (owner != null) {
+                LuaComment comment = owner.getComment();
+                if (comment != null) {
+                    return comment.getClassDef();
+                }
+            }
         }
         return null;
     }

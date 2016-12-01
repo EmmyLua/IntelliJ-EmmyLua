@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
@@ -31,9 +32,18 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
     @Override
     public LuaGlobalFuncStub createStub(@NotNull LuaGlobalFuncDef globalFuncDef, StubElement stubElement) {
         LuaFuncName funcName = globalFuncDef.getFuncName();
-        LuaNameRef nameDef = PsiTreeUtil.findChildOfType(funcName, LuaNameRef.class);
-        assert nameDef != null;
-        return new LuaGlobalFuncStubImpl(nameDef.getText(), stubElement);
+        LuaNameRef nameRef = PsiTreeUtil.findChildOfType(funcName, LuaNameRef.class);
+        assert nameRef != null;
+        String indexText = nameRef.getText();
+        //是否连接到类
+        LuaNameDef def = (LuaNameDef) nameRef.resolve();
+        if (def != null) {
+            LuaDocClassDef classDef = def.resolveType();
+            if (classDef != null) {
+                indexText = classDef.getClassName().getText();
+            }
+        }
+        return new LuaGlobalFuncStubImpl(indexText, stubElement);
     }
 
     @NotNull
@@ -48,7 +58,8 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
         if (element instanceof LuaGlobalFuncDef) {
             LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) element;
             LuaFuncName funcName = globalFuncDef.getFuncName();
-            return funcName != null && !funcName.textContains(':');
+            return funcName != null;
+            //return funcName != null && !funcName.textContains(':');
         }
         return false;
     }

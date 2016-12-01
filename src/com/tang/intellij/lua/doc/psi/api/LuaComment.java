@@ -14,5 +14,5 @@ import com.tang.intellij.lua.psi.LuaCommentOwner;
 public interface LuaComment extends PsiComment, LuaDocPsiElement {
     LuaCommentOwner getOwner();
     LuaDocParamDef getParamDef(String name);
-    LuaDocClassDef getClassDef(String name);
+    LuaDocClassDef getClassDef();
 }

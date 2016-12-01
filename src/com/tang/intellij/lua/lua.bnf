@@ -177,8 +177,8 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 unop ::= '-' | 'not' | '#'
 
 nameDef ::= ID {
-    implements = "com.tang.intellij.lua.psi.LuaNamedElement"
-    methods = [setName getName]
+    implements = "com.tang.intellij.lua.psi.LuaNamedElement,com.tang.intellij.lua.psi.LuaTypeResolvable"
+    methods = [setName getName resolveType]
 }
 nameRef ::= ID | SELF {
     methods = [getReference resolve]
