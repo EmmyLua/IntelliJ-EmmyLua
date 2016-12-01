@@ -46,7 +46,7 @@ public class LuaPsiImplUtil {
     }
 
     public static LuaDocClassDef resolveType(LuaParDef parDef) {
-        return null;
+        return LuaPsiResolveUtil.resolveType(parDef);
     }
 
     public static LuaComment getComment(LuaGlobalFuncDef globalFuncDef) {

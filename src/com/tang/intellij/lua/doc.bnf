@@ -48,7 +48,10 @@ tag_dec ::= TAG_NAME tag_value { pin = 1 }
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_dec ::= TAG_PARAM param_name_ref class_name_ref { pin = 1 }
+param_dec ::= TAG_PARAM param_name_ref class_name_ref {
+    pin = 1
+    methods = [resolveType]
+}
 
 //--- return
 type_list ::= class_name_ref (',' class_name_ref)?

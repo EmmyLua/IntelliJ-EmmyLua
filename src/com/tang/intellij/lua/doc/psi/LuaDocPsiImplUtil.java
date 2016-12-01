@@ -26,4 +26,11 @@ public class LuaDocPsiImplUtil {
     public static PsiElement setName(LuaDocClassName className, String newName) {
         return null;
     }
+
+    public static LuaDocClassDef resolveType(LuaDocParamDec paramDec) {
+        LuaDocClassNameRef ref = paramDec.getClassNameRef();
+        if (ref == null) return null;
+
+        return (LuaDocClassDef) ref.getReference().resolve();
+    }
 }

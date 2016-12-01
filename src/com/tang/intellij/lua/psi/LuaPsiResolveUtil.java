@@ -2,7 +2,11 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.sun.istack.internal.NotNull;
+import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.doc.psi.api.LuaComment;
 
 /**
  *
@@ -60,6 +64,19 @@ public class LuaPsiResolveUtil {
         for (LuaNameDef nameDef : nameList.getNameDefList()) {
             if (nameDef.getName().equals(searchName)) {
                 return nameDef;
+            }
+        }
+        return null;
+    }
+
+    static LuaDocClassDef resolveType(LuaNameDef nameDef) {
+        if (nameDef instanceof LuaParDef) {
+            LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
+            if (owner != null) {
+                LuaComment comment = owner.getComment();
+                if (comment != null) {
+
+                }
             }
         }
         return null;
