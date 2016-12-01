@@ -98,8 +98,7 @@ private stat ::=
     globalFuncDef |
     localFuncDef |
     localDef |
-    lastStat |
-    errorStat
+    lastStat
 
 assignStat ::= varList '=' exprList { pin = 1 }
 doStat ::= 'do' block 'end' { pin = 1 }
@@ -182,9 +181,4 @@ nameDef ::= ID {
 }
 nameRef ::= ID | SELF {
     methods = [getReference resolve]
-}
-
-errorStat ::= nameRef '.' | 'local' | 'for' {
-    implements = "com.intellij.psi.PsiErrorElement"
-    methods = [getErrorDescription]
 }

@@ -60,8 +60,4 @@ public class LuaPsiImplUtil {
     public static LuaComment getComment(LuaLocalDef localDef) {
         return LuaCommentUtil.findComment(localDef);
     }
-
-    public static String getErrorDescription(LuaErrorStat errorStat) {
-        return "error";
-    }
 }
