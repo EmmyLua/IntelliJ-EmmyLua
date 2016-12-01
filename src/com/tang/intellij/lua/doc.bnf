@@ -20,25 +20,24 @@
   ID = 'ID'
   AT = '@'
   EQ = '='
-  LCURLY = '{'
-  RCURLY = '}'
+  GETN = '--'
   COMMA = ','
   TAG_NAME = 'TAG_NAME'
-  TAG_PARAM = '@param'
-  TAG_RETURN = '@return'
+  TAG_PARAM = 'param'
+  TAG_RETURN = 'return'
   PRIVATE = 'private'
   PUBLIC = 'public'
   CLASS = 'class'
   EXTENDS = "extends"
   INTERFACE = 'interface'
-  TYPE_DEF = 'typedef'
   DASHES = 'DASHES'
+  STRING = 'STRING'
   ]
 }
 
 doc ::= (DASHES doc_item?)*
 
-private doc_item ::= param_def | return_def | tag_def | class_def | comment_string
+private doc_item ::= '@' (param_def | return_def | tag_def | class_def) comment_string?
 
 //--- tag
 tag_value ::= ID
@@ -65,9 +64,9 @@ class_name ::= ID {
 class_name_ref ::= ID {
     methods = [getReference]
 }
-class_def ::= '@' '{' CLASS class_name (EXTENDS class_name_ref)? '}' {
-    pin = 4
+class_def ::= CLASS class_name (EXTENDS class_name_ref)?  {
+    pin = 2
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassDefStub"
 }
 
-comment_string ::= ID
+comment_string ::= GETN STRING?

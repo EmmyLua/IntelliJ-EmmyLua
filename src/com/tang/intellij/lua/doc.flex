@@ -37,26 +37,25 @@ import com.tang.intellij.lua.doc.psi.LuaDocTypes;
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
+STRING=[^\t\f\r\n]+
 ID=[A-Za-z0-9_]+
 AT=@
-//两个-以上
-DOC_DASHES = ---*
+//三个-以上
+DOC_DASHES = ----*
 
-%state xDOC_COMMENT_START
+%state xTAG
+%state xCOMMENT_STRING
 
 %%
 
 <YYINITIAL> {
  {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
  {DOC_DASHES}               { return DASHES; }
- "@return"                  { return TAG_RETURN; }
- "@param"                   { return TAG_PARAM; }
- "@"\w+                     { return TAG_NAME; }
  "@"                        { return AT; }
- "="                        { return EQ; }
- "{"                        { return LCURLY; }
- "}"                        { return RCURLY; }
+ "--"                       { yybegin(xCOMMENT_STRING); return GETN; }
  ","                        { return COMMA; }
+ "return"                   { return TAG_RETURN; }
+ "param"                    { return TAG_PARAM; }
  "private"                  { return PRIVATE; }
  "public"                   { return PUBLIC; }
  "class"                    { return CLASS; }
@@ -64,4 +63,9 @@ DOC_DASHES = ---*
  "extends"                  { return EXTENDS; }
  {ID}                       { return ID; }
  [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<xCOMMENT_STRING> {
+ {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
+ {STRING}                   { yybegin(YYINITIAL); return STRING; }
 }
