@@ -101,7 +101,7 @@ private stat ::=
     lastStat |
     errorStat
 
-assignStat ::= varList '=' exprList { pin = 2 }
+assignStat ::= varList '=' exprList { pin = 1 }
 doStat ::= 'do' block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' block 'end' { pin = 1 }
 repeatStat ::= 'repeat' block 'until' expr { pin = 1 }
@@ -138,7 +138,7 @@ expr ::= unop expr | value (binop expr)?
 
 private prefixExpr ::= '(' expr ')' | nameRef
 
-indexExpr ::= '[' expr ']' | '.' ID
+indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
 
 callExpr ::= args | ':' ID args
 
