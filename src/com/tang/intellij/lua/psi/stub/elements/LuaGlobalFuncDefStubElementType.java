@@ -47,7 +47,8 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
         PsiElement element = node.getPsi();
         if (element instanceof LuaGlobalFuncDef) {
             LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) element;
-            return !globalFuncDef.getFuncName().textContains(':');
+            LuaFuncName funcName = globalFuncDef.getFuncName();
+            return funcName != null && !funcName.textContains(':');
         }
         return false;
     }
