@@ -138,15 +138,19 @@ expr ::= unop expr | value (binop expr)?
 
 private prefixExpr ::= '(' expr ')' | nameRef
 
-indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
+private check_indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
 
-callExpr ::= args | ':' ID args { pin(".*") = 1 }
+left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
 
-private suffixIndexExpr ::= callExpr | <<twoExpr indexExpr>> indexExpr
+private checkCallExpr ::= args | ':' ID args { pin(".*") = 1 }
+
+left callExpr ::= args | ':' ID args { pin(".*") = 1 }
+
+private suffixIndexExpr ::= callExpr | <<twoExpr check_indexExpr>> indexExpr
 var ::= prefixExpr (suffixIndexExpr)* indexExpr | nameRef
 
-private suffixCallExpr ::= <<twoExpr callExpr>> callExpr | indexExpr
-funcCall ::= prefixExpr (suffixCallExpr)* callExpr
+private suffixCallExpr ::= <<twoExpr checkCallExpr>> callExpr | indexExpr
+funcCall ::= (prefixExpr (suffixCallExpr)*) callExpr
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     pin(".*") = 1
