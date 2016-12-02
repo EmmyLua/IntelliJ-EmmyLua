@@ -150,7 +150,6 @@ funcCall ::= prefixExpr (suffixCallExpr)* callExpr
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     pin(".*") = 1
-    methods = [getArgType]
 }
 
 lambdaFunc ::= 'function' funcBody { pin = 1 }

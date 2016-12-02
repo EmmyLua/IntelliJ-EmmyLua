@@ -14,16 +14,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LuaPsiImplUtil {
 
-    public enum ArgType {
-        NAME_LIST,
-        TABLE,
-        STRING
-    }
-
-    public static ArgType getArgType(LuaArgs args) {
-        return ArgType.NAME_LIST;
-    }
-
     public static PsiElement setName(LuaNameDef identifier, String name) {
         PsiElement newId = LuaElementFactory.createIdentifier(identifier.getProject(), name);
         PsiElement oldId = identifier.getFirstChild();
