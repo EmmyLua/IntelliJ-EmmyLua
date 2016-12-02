@@ -18,7 +18,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, psiElement().afterLeaf("@"), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                String[] keyWords = new String[]{ "class", "param", "return" };
+                String[] keyWords = new String[]{ "class", "param", "return", "type" };
                 for (String keyWord : keyWords) {
                     completionResultSet.addElement(LookupElementBuilder.create(keyWord));
                 }

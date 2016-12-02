@@ -42,6 +42,13 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaTypes.UNTIL,
             LuaTypes.WHILE
     );
+    public static final TokenSet DOC_KEYWORD_TOKENS = TokenSet.create(
+            LuaDocTypes.TAG_NAME,
+            LuaDocTypes.TAG_PARAM,
+            LuaDocTypes.TAG_RETURN,
+            LuaDocTypes.CLASS,
+            LuaDocTypes.TYPE
+    );
 
     private static final TextAttributesKey KEYWORD = createTextAttributesKey("LUA_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
     private static final TextAttributesKey NUMBER = createTextAttributesKey("LUA_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
@@ -67,7 +74,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
         // for comment
         else if (type == LuaTypes.SHORT_COMMENT)
             return pack(DefaultLanguageHighlighterColors.LINE_COMMENT);
-        else if (type == LuaDocTypes.TAG_NAME || type == LuaDocTypes.TAG_PARAM || type == LuaDocTypes.TAG_RETURN || type == LuaDocTypes.CLASS)
+        else if (DOC_KEYWORD_TOKENS.contains(type))
             return pack(LuaHighlightingData.LUADOC_TAG);
         else if (type instanceof LuaDocTokenType)
             return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);

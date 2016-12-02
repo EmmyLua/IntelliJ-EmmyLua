@@ -7,6 +7,7 @@ import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
 import com.tang.intellij.lua.doc.psi.LuaDocParamNameRef;
+import com.tang.intellij.lua.doc.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaTypes;
@@ -53,6 +54,18 @@ public class LuaCommentImpl extends LazyParseablePsiElement implements LuaCommen
         while (element != null) {
             if (element instanceof LuaDocClassDef) {
                 return (LuaDocClassDef) element;
+            }
+            element = element.getNextSibling();
+        }
+        return null;
+    }
+
+    @Override
+    public LuaDocTypeDef getTypeDef() {
+        PsiElement element = getFirstChild();
+        while (element != null) {
+            if (element instanceof LuaDocTypeDef) {
+                return (LuaDocTypeDef) element;
             }
             element = element.getNextSibling();
         }

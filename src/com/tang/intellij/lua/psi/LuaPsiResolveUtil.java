@@ -2,12 +2,15 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
 import com.sun.istack.internal.NotNull;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
+import com.tang.intellij.lua.doc.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.psi.index.LuaClassIndex;
 
 /**
  *
@@ -71,6 +74,7 @@ public class LuaPsiResolveUtil {
     }
 
     static LuaDocClassDef resolveType(LuaNameDef nameDef) {
+        //作为函数参数，类型在函数注释里找
         if (nameDef instanceof LuaParDef) {
             LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
             if (owner != null) {
@@ -82,12 +86,22 @@ public class LuaPsiResolveUtil {
                     }
                 }
             }
-        } else {
+        }
+        //变量声明，local x = 0
+        else {
             LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
             if (owner != null) {
                 LuaComment comment = owner.getComment();
                 if (comment != null) {
-                    return comment.getClassDef();
+                    LuaDocClassDef def = comment.getClassDef(); // @class XXX
+                    if (def != null)
+                        return def;
+                    else { // @type xxx
+                        LuaDocTypeDef typeDef = comment.getTypeDef();
+                        if (typeDef != null && typeDef.getClassNameRef() != null) {
+                            return LuaClassIndex.find(typeDef.getClassNameRef().getText(), nameDef.getProject(), new ProjectAndLibrariesScope(nameDef.getProject()));
+                        }
+                    }
                 }
             }
         }
