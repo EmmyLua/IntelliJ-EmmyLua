@@ -37,7 +37,7 @@ import com.tang.intellij.lua.doc.psi.LuaDocTypes;
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
-STRING=[^\t\f\r\n]+
+STRING=[^\r\n\t\f]*
 ID=[A-Za-z0-9_]+
 AT=@
 //三个-以上
@@ -51,8 +51,14 @@ DOC_DASHES = ----*
 <YYINITIAL> {
  {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
  {DOC_DASHES}               { return DASHES; }
- "@"                        { return AT; }
- "--"                       { yybegin(xCOMMENT_STRING); return GETN; }
+ "@"                        { yybegin(xTAG); return AT; }
+ .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
+}
+
+<xTAG> {
+ {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
+ {LINE_WS}                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
+ "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
  ","                        { return COMMA; }
  "return"                   { return TAG_RETURN; }
  "param"                    { return TAG_PARAM; }
@@ -60,12 +66,12 @@ DOC_DASHES = ----*
  "public"                   { return PUBLIC; }
  "class"                    { return CLASS; }
  "interface"                { return INTERFACE; }
- "extends"                  { return EXTENDS; }
+ "extends"                  { return EXTENDS;}
+ "type"                     { return TYPE;}
  {ID}                       { return ID; }
  [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 
 <xCOMMENT_STRING> {
- {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
  {STRING}                   { yybegin(YYINITIAL); return STRING; }
 }

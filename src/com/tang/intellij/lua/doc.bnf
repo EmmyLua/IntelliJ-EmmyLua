@@ -20,7 +20,6 @@
   ID = 'ID'
   AT = '@'
   EQ = '='
-  GETN = '--'
   COMMA = ','
   TAG_NAME = 'TAG_NAME'
   TAG_PARAM = 'param'
@@ -31,19 +30,23 @@
   EXTENDS = "extends"
   INTERFACE = 'interface'
   DASHES = 'DASHES'
+  STRING_BEGIN = 'STRING_BEGIN'
   STRING = 'STRING'
+  TYPE = 'type'
   ]
 }
 
-doc ::= (DASHES doc_item?)*
+doc ::= (DASHES after_dash?)*
 
-private doc_item ::= '@' (param_def | return_def | tag_def | class_def) comment_string?
+private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
+//private after_dash_recover ::= !(DASHES)
+private doc_item ::= '@' (param_def | return_def | tag_def | class_def | type_def) comment_string?
 
 //--- tag
 tag_value ::= ID
 tag_def ::= TAG_NAME tag_value { pin = 1 }
 
-//--- param
+//@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
     methods = [getReference]
 }
@@ -54,9 +57,9 @@ param_def ::= TAG_PARAM param_name_ref class_name_ref {
 
 //--- return
 type_list ::= class_name_ref (',' class_name_ref)?
-return_def ::= TAG_RETURN type_list
+return_def ::= TAG_RETURN type_list { pin = 1 }
 
-//---- class
+//@class NAME extends CLASS_REF
 class_name ::= ID {
     implements = "com.tang.intellij.lua.doc.psi.LuaDocNamedElement"
     methods = [getName setName]
@@ -69,4 +72,7 @@ class_def ::= CLASS class_name (EXTENDS class_name_ref)?  {
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassDefStub"
 }
 
-comment_string ::= GETN STRING?
+// @type CLASS_REF
+type_def ::= TYPE class_name_ref { pin = 1 }
+
+comment_string ::= STRING_BEGIN STRING? { pin = 1 }
