@@ -43,7 +43,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                 PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
                 if (element != null) {
                     LuaIndexExpr indexExpr = (LuaIndexExpr) element.getParent();
-                    PsiElement prev = indexExpr.getPrevSibling();
+                    PsiElement prev = indexExpr.getFirstChild();
                     if (prev instanceof LuaNameRef) {
                         LuaNameRef ref = (LuaNameRef) prev;
                         PsiElement resolve = ref.resolve();
