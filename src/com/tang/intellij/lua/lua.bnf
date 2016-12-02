@@ -80,9 +80,10 @@
   implements("globalFuncDef|localFuncDef|localDef") = "com.tang.intellij.lua.psi.LuaDeclaration"
 }
 
-luaFile ::= (SHORT_COMMENT | DOC_COMMENT | stat)*
+luaFile ::= stat_or_comment*
 
-private chunk ::= (stat ';'?)* (lastStat ';'?)?
+private stat_or_comment ::= SHORT_COMMENT | DOC_COMMENT | stat ';'?
+private chunk ::= stat_or_comment* (lastStat ';'?)?
 
 block ::= chunk
 
