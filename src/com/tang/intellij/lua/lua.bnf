@@ -87,8 +87,8 @@ private chunk ::= (stat ';'?)* (lastStat ';'?)?
 block ::= chunk
 
 private stat ::=
-    assignStat |
     funcCall |
+    assignStat |
     doStat |
     whileStat |
     repeatStat |
@@ -139,7 +139,7 @@ private prefixExpr ::= '(' expr ')' | nameRef
 
 indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
 
-callExpr ::= args | ':' ID args
+callExpr ::= args | ':' ID args { pin(".*") = 1 }
 
 private suffixIndexExpr ::= callExpr | <<twoExpr indexExpr>> indexExpr
 var ::= prefixExpr (suffixIndexExpr)* indexExpr | nameRef
@@ -148,21 +148,22 @@ private suffixCallExpr ::= <<twoExpr callExpr>> callExpr | indexExpr
 funcCall ::= prefixExpr (suffixCallExpr)* callExpr
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
+    pin(".*") = 1
     methods = [getArgType]
 }
 
-lambdaFunc ::= 'function' funcBody
+lambdaFunc ::= 'function' funcBody { pin = 1 }
 
 funcBody ::= '(' (parList)? ')' block? 'end' { pin = 1 }
 
-parDef ::= ID {
+parDef ::= ID | SELF {
     extends = nameDef
     methods = [resolveType]
     implements = "com.tang.intellij.lua.psi.LuaTypeResolvable"
 }
 private parList ::= parDef (',' parDef)* (',' '...')? | '...'
 
-tableConstructor ::= '{' (fieldList)? '}'
+tableConstructor ::= '{' (fieldList)? '}' { pin = 1 }
 
 fieldList ::= field (fieldSep field)* (fieldSep)?
 

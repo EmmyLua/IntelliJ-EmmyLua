@@ -2,8 +2,6 @@ package com.tang.intellij.lua.doc;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.doc.psi.LuaDocParamDec;
 import com.tang.intellij.lua.doc.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaParserDefinition;
