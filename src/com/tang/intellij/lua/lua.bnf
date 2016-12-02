@@ -106,7 +106,7 @@ doStat ::= 'do' block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' block 'end' { pin = 1 }
 repeatStat ::= 'repeat' block 'until' expr { pin = 1 }
 ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end' { pin = 1 }
-forAStat ::= 'for' ID '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 3 }
+forAStat ::= 'for' nameDef '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 3 }
 forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 1 }
 globalFuncDef ::= 'function' funcName funcBody {
     pin = 1

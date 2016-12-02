@@ -49,6 +49,20 @@ public class LuaPsiResolveUtil {
                 PsiElement result = resolveInFuncBody(globalFuncDef.getFuncBody(), refName);
                 if (result != null) return result;
             }
+            // for name = x, y do end
+            else if (curr instanceof LuaForAStat) {
+                LuaForAStat forAStat = (LuaForAStat) curr;
+                PsiElement id = forAStat.getNameDef();
+                if (id.getText().equals(refName))
+                    return id;
+            }
+            // for name in xxx do end
+            else if (curr instanceof LuaForBStat) {
+                LuaForBStat forBStat = (LuaForBStat) curr;
+                PsiElement result = resolveInNameList(forBStat.getNameList(), refName);
+                if (result != null)
+                    return result;
+            }
         } while (!(curr instanceof PsiFile));
         return null;
     }
