@@ -32,14 +32,15 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
 
     private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
         return new SpacingBuilder(settings, LuaLanguage.INSTANCE)
-                .withinPair(DO, END).spaces(1, true)
+                .before(END).lineBreakInCode()
+                .after(DO).lineBreakInCode()
+                .after(THEN).lineBreakInCode()
                 .after(LOCAL).spaces(1)
                 .after(COMMA).spaces(1)
-                .after(FUNCTION).spaces(1)
                 .after(FUNC_NAME).none()
+                .between(FUNCTION, FUNC_BODY).none()
                 .between(FUNCTION, NAME_DEF).spaces(1)
                 .between(FUNCTION, FUNC_NAME).spaces(1)
-                .between(FUNCTION, FUNC_BODY).none()
                 .around(BINOP).spaces(1)
                 .around(UNOP).spaces(1)
                 .around(ASSIGN).spaces(1)
