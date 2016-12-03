@@ -1,7 +1,7 @@
 package com.tang.intellij.lua.folding;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.lang.folding.FoldingBuilderEx;
+import com.intellij.lang.folding.FoldingBuilder;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.lang.folding.NamedFoldingDescriptor;
 import com.intellij.openapi.editor.Document;
@@ -9,31 +9,38 @@ import com.intellij.openapi.editor.FoldingGroup;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
-import com.intellij.psi.impl.source.tree.ElementType;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.psi.LuaBlock;
-import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
+import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by tangzx
  * Date : 2015/11/16.
  */
-public class LuaFoldingBuilder extends FoldingBuilderEx {
+public class LuaFoldingBuilder implements FoldingBuilder {
 
     static final String HOLDER_TEXT = "...";
 
     @NotNull
     @Override
-    public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement psiElement, @NotNull Document document, boolean b) {
+    public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
         List<FoldingDescriptor> descriptors = new ArrayList<>();
-        Collection<LuaBlock> luaFuncBodies = PsiTreeUtil.findChildrenOfType(psiElement, LuaBlock.class);
-        luaFuncBodies.forEach(block -> {
+        collectDescriptorsRecursively(node, document, descriptors);
+        return descriptors.toArray(new FoldingDescriptor[descriptors.size()]);
+    }
+
+    private  void collectDescriptorsRecursively(@NotNull ASTNode node,
+                                                @NotNull Document document,
+                                                @NotNull List<FoldingDescriptor> descriptors) {
+        IElementType type = node.getElementType();
+        if (type == LuaTypes.BLOCK) {
+            LuaBlock block = (LuaBlock) node.getPsi();
             PsiElement prev = PsiTreeUtil.skipSiblingsBackward(block, PsiWhiteSpace.class);
             PsiElement next = PsiTreeUtil.skipSiblingsForward(block, PsiWhiteSpace.class);
             if (prev != null && next != null) {
@@ -42,17 +49,17 @@ public class LuaFoldingBuilder extends FoldingBuilderEx {
 
                 TextRange range = new TextRange(l, r);
                 if (range.getLength() > 0 && !addOneLineMethodFolding(descriptors, block, range, prev, next)) {
-                    descriptors.add(new FoldingDescriptor(block, range) {
-                        @Nullable
-                        @Override
-                        public String getPlaceholderText() {
-                            return HOLDER_TEXT;
-                        }
-                    });
+                    descriptors.add(new FoldingDescriptor(block, range));
                 }
             }
-        });
-        return descriptors.toArray(new FoldingDescriptor[descriptors.size()]);
+        }
+        else if (type == LuaTypes.DOC_COMMENT) {
+            descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
+        }
+
+        for (ASTNode child : node.getChildren(null)) {
+            collectDescriptorsRecursively(child, document, descriptors);
+        }
     }
 
     private boolean addOneLineMethodFolding(List<FoldingDescriptor> descriptors, LuaBlock block, TextRange range, PsiElement prev, PsiElement next) {
@@ -89,11 +96,14 @@ public class LuaFoldingBuilder extends FoldingBuilderEx {
     @Nullable
     @Override
     public String getPlaceholderText(@NotNull ASTNode astNode) {
+        IElementType type = astNode.getElementType();
+        if (type == LuaTypes.BLOCK) return HOLDER_TEXT;
+        else if (type == LuaTypes.DOC_COMMENT) return "/** ... */";
         return null;
     }
 
     @Override
     public boolean isCollapsedByDefault(@NotNull ASTNode astNode) {
-        return true;
+        return false;
     }
 }
