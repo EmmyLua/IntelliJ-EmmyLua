@@ -4,9 +4,11 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.folding.FoldingBuilderEx;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.psi.LuaLocalFuncDef;
+import com.tang.intellij.lua.psi.LuaBlock;
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,16 +25,26 @@ public class LuaFoldingBuilder extends FoldingBuilderEx {
     @Override
     public FoldingDescriptor[] buildFoldRegions(@NotNull PsiElement psiElement, @NotNull Document document, boolean b) {
         List<FoldingDescriptor> descriptors = new ArrayList<FoldingDescriptor>();
-        Collection<LuaLocalFuncDef> localFuncDefs = PsiTreeUtil.findChildrenOfType(psiElement, LuaLocalFuncDef.class);
-        for (final LuaLocalFuncDef funcDef : localFuncDefs) {
-            descriptors.add(new FoldingDescriptor(funcDef, funcDef.getTextRange()) {
-                @Nullable
-                @Override
-                public String getPlaceholderText() {
-                    return "local function() ... end";
-                }
-            });
-        }
+        Collection<LuaBlock> luaFuncBodies = PsiTreeUtil.findChildrenOfType(psiElement, LuaBlock.class);
+        luaFuncBodies.forEach(block -> {
+            PsiElement prev = LuaPsiTreeUtil.getPrevSiblingSkipSpace(block);
+            PsiElement next = LuaPsiTreeUtil.getNextSiblingSkipSpace(block);
+            TextRange range = block.getTextRange();
+
+            int l = prev != null ? prev.getTextOffset() + prev.getTextLength() : range.getStartOffset();
+            int r = next != null ? next.getTextOffset() : range.getEndOffset();
+
+            range = new TextRange(l, r);
+            if (range.getLength() > 0) {
+                descriptors.add(new FoldingDescriptor(block, range) {
+                    @Nullable
+                    @Override
+                    public String getPlaceholderText() {
+                        return "...";
+                    }
+                });
+            }
+        });
         return descriptors.toArray(new FoldingDescriptor[descriptors.size()]);
     }
 
