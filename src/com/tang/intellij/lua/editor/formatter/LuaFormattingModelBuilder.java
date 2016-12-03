@@ -35,15 +35,16 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
                 .before(END).lineBreakInCode()
                 .after(DO).lineBreakInCode()
                 .after(THEN).lineBreakInCode()
-                .after(LOCAL).spaces(1)
-                .after(COMMA).spaces(1)
+                .after(LOCAL).spaces(1) //local<SPACE>
+                .after(COMMA).spaces(1) //,<SPACE>
+                .after(FIELD_SEP).spaces(1) // { 1,<SPACE>2 }
                 .after(FUNC_NAME).none()
                 .between(FUNCTION, FUNC_BODY).none()
-                .between(FUNCTION, NAME_DEF).spaces(1)
-                .between(FUNCTION, FUNC_NAME).spaces(1)
+                .between(FUNCTION, NAME_DEF).spaces(1) //function<SPACE>name()
+                .between(FUNCTION, FUNC_NAME).spaces(1)//local function<SPACE>name
                 .around(BINOP).spaces(1)
                 .around(UNOP).spaces(1)
-                .around(ASSIGN).spaces(1)
+                .around(ASSIGN).lineBreakOrForceSpace(false, true) // = 号两头不能换行
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1);
     }
 

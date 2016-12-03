@@ -18,12 +18,19 @@ import java.util.List;
  */
 public class LuaScriptBlock extends AbstractBlock {
 
-    TokenSet set = TokenSet.create(
+    //格式化时
+    TokenSet formattingSet = TokenSet.create(
+            LuaTypes.BLOCK,
+            LuaTypes.FIELD_LIST
+    );
+
+    //回车时
+    TokenSet childAttrSet = TokenSet.orSet(formattingSet, TokenSet.create(
             LuaTypes.IF_STAT,
             LuaTypes.DO_STAT,
             LuaTypes.FUNC_BODY,
-            LuaTypes.BLOCK
-    );
+            LuaTypes.TABLE_CONSTRUCTOR
+    ));
 
     private SpacingBuilder spacingBuilder;
     private Indent indent;
@@ -45,7 +52,7 @@ public class LuaScriptBlock extends AbstractBlock {
         while (node != null) {
             if (shouldCreateBlockFor(node)) {
                 Indent childIndent = Indent.getNoneIndent();
-                if (myNode.getElementType() == LuaTypes.BLOCK) {
+                if (formattingSet.contains(myNode.getElementType())) {
                     childIndent = Indent.getNormalIndent();
                 }
 
@@ -76,7 +83,7 @@ public class LuaScriptBlock extends AbstractBlock {
     @NotNull
     @Override
     public ChildAttributes getChildAttributes(int newChildIndex) {
-        if (set.contains(myNode.getElementType()))
+        if (childAttrSet.contains(myNode.getElementType()))
             return new ChildAttributes(Indent.getNormalIndent(), null);
         return super.getChildAttributes(newChildIndex);
     }
