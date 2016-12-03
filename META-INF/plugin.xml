@@ -29,6 +29,7 @@
         <lang.syntaxHighlighterFactory language="Lua" implementationClass="com.tang.intellij.lua.highlighting.LuaSyntaxHighlighterFactory"/>
         <lang.parserDefinition language="Lua" implementationClass="com.tang.intellij.lua.lang.LuaParserDefinition"/>
         <lang.findUsagesProvider language="Lua" implementationClass="com.tang.intellij.lua.usages.LuaFindUsagesProvider"/>
+        <lang.formatter language="Lua" implementationClass="com.tang.intellij.lua.editor.formatter.LuaFormattingModelBuilder"/>
 
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>
