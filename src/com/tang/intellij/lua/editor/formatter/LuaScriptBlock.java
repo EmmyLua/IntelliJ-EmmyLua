@@ -2,8 +2,9 @@ package com.tang.intellij.lua.editor.formatter;
 
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
-import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,11 +18,24 @@ import java.util.List;
  */
 public class LuaScriptBlock extends AbstractBlock {
 
-    private SpacingBuilder spacingBuilder;
+    TokenSet set = TokenSet.create(
+            LuaTypes.IF_STAT,
+            LuaTypes.DO_STAT,
+            LuaTypes.FUNC_BODY,
+            LuaTypes.BLOCK
+    );
 
-    protected LuaScriptBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, SpacingBuilder spacingBuilder) {
-        super(node, wrap, alignment);
+    private SpacingBuilder spacingBuilder;
+    private Indent indent;
+
+    protected LuaScriptBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, Indent indent, SpacingBuilder spacingBuilder) {
+        super(node, null, null);
         this.spacingBuilder = spacingBuilder;
+        this.indent = indent;
+    }
+
+    private static boolean shouldCreateBlockFor(ASTNode node) {
+        return node.getTextRange().getLength() != 0 && node.getElementType() != TokenType.WHITE_SPACE;
     }
 
     @Override
@@ -29,9 +43,13 @@ public class LuaScriptBlock extends AbstractBlock {
         List<Block> blocks = new ArrayList<>();
         ASTNode node = myNode.getFirstChildNode();
         while (node != null) {
-            IElementType type = node.getElementType();
-            if (type == LuaTypes.LOCAL_FUNC_DEF) {
-                blocks.add(new LuaScriptBlock(node, myWrap, myAlignment, spacingBuilder));
+            if (shouldCreateBlockFor(node)) {
+                Indent childIndent = Indent.getNoneIndent();
+                if (myNode.getElementType() == LuaTypes.BLOCK) {
+                    childIndent = Indent.getNormalIndent();
+                }
+
+                blocks.add(new LuaScriptBlock(node, myWrap, myAlignment, childIndent, spacingBuilder));
             }
 
             node = node.getTreeNext();
@@ -42,11 +60,24 @@ public class LuaScriptBlock extends AbstractBlock {
     @Nullable
     @Override
     public Spacing getSpacing(@Nullable Block block, @NotNull Block block1) {
-        return null;
+        return spacingBuilder.getSpacing(this, block, block1);
     }
 
     @Override
     public boolean isLeaf() {
-        return false;
+        return myNode.getFirstChildNode() == null;
+    }
+
+    @Override
+    public Indent getIndent() {
+        return indent;
+    }
+
+    @NotNull
+    @Override
+    public ChildAttributes getChildAttributes(int newChildIndex) {
+        if (set.contains(myNode.getElementType()))
+            return new ChildAttributes(Indent.getNormalIndent(), null);
+        return super.getChildAttributes(newChildIndex);
     }
 }
