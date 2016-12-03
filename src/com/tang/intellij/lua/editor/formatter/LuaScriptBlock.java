@@ -29,7 +29,7 @@ public class LuaScriptBlock extends AbstractBlock {
     private Indent indent;
 
     protected LuaScriptBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, Indent indent, SpacingBuilder spacingBuilder) {
-        super(node, null, null);
+        super(node, wrap, alignment);
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
     }
@@ -49,7 +49,7 @@ public class LuaScriptBlock extends AbstractBlock {
                     childIndent = Indent.getNormalIndent();
                 }
 
-                blocks.add(new LuaScriptBlock(node, myWrap, myAlignment, childIndent, spacingBuilder));
+                blocks.add(new LuaScriptBlock(node, null, null, childIndent, spacingBuilder));
             }
 
             node = node.getTreeNext();
