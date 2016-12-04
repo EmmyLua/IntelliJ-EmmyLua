@@ -67,10 +67,16 @@ public class LuaCompletionContributor extends CompletionContributor {
             }
         });
 
-        //提示全局函数
+        //提示全局函数,local变量,local函数
         extend(CompletionType.BASIC, psiElement().inside(LuaFile.class), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                //local
+                PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset());
+                LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())));
+                LuaPsiTreeUtil.walkUpLocalFuncDef(cur, nameDef -> completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())));
+
+                //global
                 Project project = completionParameters.getOriginalFile().getProject();
                 Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(LuaGlobalFuncDefStubElementType.NON_PREFIX_GLOBAL_FUNC, project, new ProjectAndLibrariesScope(project));
                 for (LuaGlobalFuncDef def : list) {
