@@ -1,14 +1,12 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
 import com.tang.intellij.lua.doc.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.index.LuaClassIndex;
 
 /**
  *
@@ -77,8 +75,8 @@ public class LuaPsiResolveUtil {
                         return LuaTypeSet.create(def);
                     else { // @type xxx
                         LuaDocTypeDef typeDef = comment.getTypeDef();
-                        if (typeDef != null && typeDef.getClassNameRef() != null) {
-                            return LuaTypeSet.create(LuaClassIndex.find(typeDef.getClassNameRef().getText(), nameDef.getProject(), new ProjectAndLibrariesScope(nameDef.getProject())));
+                        if (typeDef != null) {
+                            return typeDef.guessType();
                         }
                     }
                 }

@@ -80,6 +80,6 @@ class_def ::= CLASS class_name (EXTENDS class_name_ref)?  {
 }
 
 // @type CLASS_REF
-type_def ::= TYPE class_name_ref { pin = 1 }
+type_def ::= TYPE type_set { pin = 1 methods = [guessType] }
 
 comment_string ::= STRING_BEGIN STRING? { pin = 1 }

@@ -70,4 +70,8 @@ public class LuaDocPsiImplUtil {
     public static String getClassNameText(LuaDocClassDef classDef) {
         return classDef.getClassName().getName();
     }
+
+    public static LuaTypeSet guessType(LuaDocTypeDef typeDef) {
+        return resolveDocTypeSet(typeDef.getTypeSet(), null);
+    }
 }
