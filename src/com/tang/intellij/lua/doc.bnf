@@ -53,7 +53,7 @@ tag_def ::= TAG_NAME tag_value { pin = 1 }
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_def ::= TAG_PARAM param_name_ref class_name_ref {
+param_def ::= TAG_PARAM param_name_ref type_set {
     pin = 1
     methods = [resolveType]
 }
