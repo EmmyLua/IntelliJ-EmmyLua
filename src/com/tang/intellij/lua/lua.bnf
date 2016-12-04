@@ -119,8 +119,9 @@ globalFuncDef ::= 'function' nameDef funcBody {
 }
 
 private checkFuncPrefix ::= ID ('.' | ':') ID
-left funcPrefixRef ::= <<checkNext checkFuncPrefix>> ID { extends = nameRef }
-classMethodName ::= funcPrefixRef ('.' funcPrefixRef)* (('.' ID) | (':' ID))
+
+left funcPrefixRef ::= '.' <<checkNext checkFuncPrefix>> nameRef
+classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) { pin = 3 }
 classMethodFuncDef ::= 'function' classMethodName funcBody {
     pin = 2
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassMethodStub"
