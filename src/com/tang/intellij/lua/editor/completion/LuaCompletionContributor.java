@@ -28,6 +28,7 @@ public class LuaCompletionContributor extends CompletionContributor {
             psiElement().withText(":").withParent(LuaCallExpr.class));
     private static final PsiElementPattern.Capture<PsiElement> SHOW_FIELD = psiElement().afterLeaf(
             psiElement().withText(".").withParent(LuaIndexExpr.class));
+    private static final PsiElementPattern.Capture<PsiElement> IN_COMMENT = psiElement().inside(psiElement().withElementType(LuaTypes.DOC_COMMENT));
 
     public LuaCompletionContributor() {
 
@@ -65,7 +66,7 @@ public class LuaCompletionContributor extends CompletionContributor {
         });
 
         //提示全局函数,local变量,local函数
-        extend(CompletionType.BASIC, psiElement().inside(LuaFile.class).andNot(SHOW_CLASS_METHOD).andNot(SHOW_FIELD), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, psiElement().inside(LuaFile.class).andNot(SHOW_CLASS_METHOD).andNot(SHOW_FIELD).andNot(IN_COMMENT), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 //local

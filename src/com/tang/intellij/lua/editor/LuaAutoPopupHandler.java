@@ -16,7 +16,7 @@ public class LuaAutoPopupHandler extends TypedHandlerDelegate {
 
     @Override
     public Result checkAutoPopup(char charTyped, Project project, Editor editor, PsiFile file) {
-        if (charTyped == ':') {
+        if (charTyped == ':' || charTyped == '@') {
             AutoPopupController.getInstance(project).autoPopupMemberLookup(editor, null);
             return Result.STOP;
         }
