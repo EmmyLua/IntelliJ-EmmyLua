@@ -60,6 +60,12 @@ public class LuaPsiResolveUtil {
                 }
             }
         }
+        //在Table字段里
+        else if (nameDef.getParent() instanceof LuaField) {
+            LuaField field = (LuaField) nameDef.getParent();
+            LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
+            if (expr != null) return expr.guessType();
+        }
         //变量声明，local x = 0
         else {
             LuaLocalDef localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef.class);
