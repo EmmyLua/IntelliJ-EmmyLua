@@ -43,7 +43,7 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 //private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (param_def | return_def | tag_def | class_def | type_def) comment_string?
 
-type_set ::= '#' class_name_ref (',' class_name_ref)?
+type_set ::= '#' class_name_ref (',' class_name_ref)*
 
 //--- tag
 tag_value ::= ID
