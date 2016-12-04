@@ -85,6 +85,7 @@ public class LuaScriptBlock extends AbstractBlock {
     public ChildAttributes getChildAttributes(int newChildIndex) {
         if (childAttrSet.contains(myNode.getElementType()))
             return new ChildAttributes(Indent.getNormalIndent(), null);
-        return super.getChildAttributes(newChildIndex);
+        return new ChildAttributes(Indent.getNoneIndent(), null);
+        //return super.getChildAttributes(newChildIndex);
     }
 }
