@@ -1,20 +1,27 @@
 package com.tang.intellij.lua.editor;
 
+import com.intellij.codeInsight.AutoPopupController;
 import com.intellij.codeInsight.editorActions.TypedHandlerDelegate;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.tang.intellij.lua.psi.LuaFile;
-import com.tang.intellij.lua.psi.LuaFuncBody;
-import org.jetbrains.annotations.NotNull;
 
 /**
  *
  * Created by TangZX on 2016/11/28.
  */
 public class LuaAutoPopupHandler extends TypedHandlerDelegate {
+
+    @Override
+    public Result checkAutoPopup(char charTyped, Project project, Editor editor, PsiFile file) {
+        if (charTyped == ':') {
+            AutoPopupController.getInstance(project).autoPopupMemberLookup(editor, null);
+            return Result.STOP;
+        }
+        return super.checkAutoPopup(charTyped, project, editor, file);
+    }
 
     @Override
     public Result beforeCharTyped(char charTyped, Project project, Editor editor, PsiFile file, FileType fileType) {

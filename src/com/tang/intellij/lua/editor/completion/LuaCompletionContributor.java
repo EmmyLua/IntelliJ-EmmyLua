@@ -2,6 +2,7 @@ package com.tang.intellij.lua.editor.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
@@ -23,29 +24,20 @@ import static com.intellij.patterns.PlatformPatterns.psiElement;
  */
 public class LuaCompletionContributor extends CompletionContributor {
 
-    private static final PsiElementPattern.Capture<PsiElement> AFTER_DOT = psiElement().afterLeaf(
-            psiElement().withText(".").withParent(LuaIndexExpr.class));
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_METHOD = psiElement().afterLeaf(
+            psiElement().withText(":").withParent(LuaCallExpr.class));
 
     public LuaCompletionContributor() {
-        extend(CompletionType.BASIC, AFTER_DOT, new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SHOW_CLASS_METHOD, new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 Project project = completionParameters.getOriginalFile().getProject();
 
-                //global functions
-                //Collection<String> all = LuaGlobalFuncIndex.getInstance().getAllKeys(completionParameters.getOriginalFile().getProject());
-                //all.forEach(name -> completionResultSet.addElement(LookupElementBuilder.create(name)));
-
-                //class
-                //Collection<String> allClasses = LuaClassIndex.getInstance().getAllKeys(project);
-                //allClasses.forEach(className -> completionResultSet.addElement(LookupElementBuilder.create(className)));
-
                 PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
                 if (element != null) {
-                    LuaIndexExpr indexExpr = (LuaIndexExpr) element.getParent();
-                    PsiElement prev = indexExpr.getFirstChild();
-                    if (prev instanceof LuaNameRef) {
-                        LuaNameRef ref = (LuaNameRef) prev;
+                    LuaCallExpr callExpr = (LuaCallExpr) element.getParent();
+                    LuaNameRef ref = callExpr.getNameRef();
+                    if (ref != null) {
                         PsiElement resolve = ref.resolve();
                         if (resolve instanceof LuaTypeResolvable) {
                             LuaTypeResolvable typeResolvable = (LuaTypeResolvable) resolve;
@@ -57,12 +49,14 @@ public class LuaCompletionContributor extends CompletionContributor {
                                     String clazzName = luaType.getClassNameText();
                                     Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
                                     for (LuaGlobalFuncDef def : list) {
-                                        completionResultSet.addElement(LookupElementBuilder.create(def.getFuncName().getId().getText()));
+                                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getFuncName().getId().getText())
+                                                .withIcon(AllIcons.Nodes.Method)
+                                                .withTypeText(clazzName);
+
+                                        completionResultSet.addElement(elementBuilder);
                                     }
                                 });
                             }
-
-                            //提示属性
                         }
                     }
                 }
@@ -70,19 +64,36 @@ public class LuaCompletionContributor extends CompletionContributor {
         });
 
         //提示全局函数,local变量,local函数
-        extend(CompletionType.BASIC, psiElement().inside(LuaFile.class), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, psiElement().inside(LuaFile.class).andNot(SHOW_CLASS_METHOD), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 //local
                 PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset());
-                LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> { completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())); return  true; });
-                LuaPsiTreeUtil.walkUpLocalFuncDef(cur, nameDef -> { completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())); return true; });
+                LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> {
+                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
+                            .withIcon(AllIcons.Nodes.Variable);
+                    completionResultSet.addElement(elementBuilder);
+                    return  true;
+                });
+                LuaPsiTreeUtil.walkUpLocalFuncDef(cur, nameDef -> {
+                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
+                            .withIcon(AllIcons.Nodes.Method);
+                    completionResultSet.addElement(elementBuilder);
+                    return true;
+                });
 
-                //global
+                //global functions
                 Project project = completionParameters.getOriginalFile().getProject();
                 Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(LuaGlobalFuncDefStubElementType.NON_PREFIX_GLOBAL_FUNC, project, new ProjectAndLibrariesScope(project));
                 for (LuaGlobalFuncDef def : list) {
-                    completionResultSet.addElement(LookupElementBuilder.create(def.getFuncName().getText()));
+                    LuaFuncName funcName = def.getFuncName();
+                    if (funcName != null) {
+                        String text = funcName.getText();
+                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(text)
+                                .withTypeText("Global Func")
+                                .withIcon(AllIcons.Nodes.Function);
+                        completionResultSet.addElement(elementBuilder);
+                    }
                 }
             }
         });
