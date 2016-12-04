@@ -3,13 +3,11 @@ package com.tang.intellij.lua.doc.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.reference.LuaClassNameReference;
 import com.tang.intellij.lua.doc.reference.LuaDocParamNameReference;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Collection;
 
 /**
  *
@@ -36,12 +34,18 @@ public class LuaDocPsiImplUtil {
         return null;
     }
 
-    public static LuaDocClassDef resolveType(LuaDocParamDef paramDec) {
+    public static LuaTypeSet resolveType(LuaDocParamDef paramDec) {
         LuaDocClassNameRef ref = paramDec.getClassNameRef();
         if (ref == null) return null;
 
-        Collection<LuaDocClassDef> list = LuaClassIndex.getInstance().get(ref.getText(), paramDec.getProject(), new ProjectAndLibrariesScope(paramDec.getProject()));
-        if (list.size() > 0) return list.iterator().next();
+        LuaDocClassDef def = LuaClassIndex.find(ref.getText(), paramDec.getProject(), new ProjectAndLibrariesScope(paramDec.getProject()));
+        if (def != null) {
+            return LuaTypeSet.create(def);
+        }
         return null;
+    }
+
+    public static String getClassNameText(LuaDocClassDef classDef) {
+        return classDef.getClassName().getName();
     }
 }

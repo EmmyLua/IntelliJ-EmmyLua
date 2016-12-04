@@ -3,8 +3,8 @@ package com.tang.intellij.lua.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.reference.LuaNameReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +26,7 @@ public class LuaPsiImplUtil {
         return identifier.getText();
     }
 
-    public static LuaDocClassDef resolveType(LuaNameDef nameDef) {
+    public static LuaTypeSet resolveType(LuaNameDef nameDef) {
         return LuaPsiResolveUtil.resolveType(nameDef);
     }
 
@@ -39,7 +39,7 @@ public class LuaPsiImplUtil {
         return LuaPsiResolveUtil.resolve(ref);
     }
 
-    public static LuaDocClassDef resolveType(LuaParDef parDef) {
+    public static LuaTypeSet resolveType(LuaParDef parDef) {
         return LuaPsiResolveUtil.resolveType(parDef);
     }
 
@@ -55,7 +55,7 @@ public class LuaPsiImplUtil {
         return LuaCommentUtil.findComment(localDef);
     }
 
-    public static LuaDocClassDef guessType(LuaFuncCall funcCall) {
+    public static LuaTypeSet guessType(LuaFuncCall funcCall) {
         LuaCallExpr callExpr = (LuaCallExpr)funcCall.getFirstChild();
         if (callExpr == null) return null;
         else return callExpr.guessType();

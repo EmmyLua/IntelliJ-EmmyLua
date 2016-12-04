@@ -70,6 +70,7 @@ class_name_ref ::= ID {
 class_def ::= CLASS class_name (EXTENDS class_name_ref)?  {
     pin = 2
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassDefStub"
+    methods = [getClassNameText]
 }
 
 // @type CLASS_REF

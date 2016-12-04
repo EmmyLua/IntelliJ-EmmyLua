@@ -5,11 +5,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.LuaDocClassNameRef;
 import com.tang.intellij.lua.doc.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.doc.psi.LuaDocTypeList;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
@@ -26,16 +26,16 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     }
 
     @Override
-    public LuaDocClassDef guessType() {
+    public LuaTypeSet guessType() {
         if (this instanceof LuaValueExpr)
             return guessType((LuaValueExpr) this);
         if (this instanceof LuaCallExpr)
             return guessType((LuaCallExpr) this);
-        LuaDocClassDef def = LuaClassIndex.find("AAA", getProject(), new ProjectAndLibrariesScope(getProject()));
-        return def;
+
+        return null;
     }
 
-    private LuaDocClassDef guessType(LuaCallExpr luaCallExpr) {
+    private LuaTypeSet guessType(LuaCallExpr luaCallExpr) {
         LuaNameRef nameRef = luaCallExpr.getNameRef();
         if (nameRef != null) {
             PsiElement funRef = nameRef.resolve();
@@ -50,7 +50,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                             if (classNameRefList.size() > 0) {
                                 LuaDocClassNameRef ref = classNameRefList.get(0);
                                 String name = ref.getText();
-                                return LuaClassIndex.find(name, getProject(), new ProjectAndLibrariesScope(getProject()));
+                                return LuaTypeSet.create(LuaClassIndex.find(name, getProject(), new ProjectAndLibrariesScope(getProject())));
                             }
                         }
                     }
@@ -60,7 +60,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         return null;
     }
 
-    static LuaDocClassDef guessType(LuaValueExpr valueExpr) {
+    static LuaTypeSet guessType(LuaValueExpr valueExpr) {
         PsiElement firstChild = valueExpr.getFirstChild();
         if (firstChild instanceof LuaFuncCall) {
             return ((LuaFuncCall) firstChild).guessType();

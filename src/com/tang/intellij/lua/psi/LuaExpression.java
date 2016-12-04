@@ -1,6 +1,6 @@
 package com.tang.intellij.lua.psi;
 
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 
 /**
  * 表达式，可以推算计算后的数据类型
@@ -9,5 +9,5 @@ import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 public interface LuaExpression extends LuaPsiElement {
 
     // 表达式计算后的结果推算
-    LuaDocClassDef guessType();
+    LuaTypeSet guessType();
 }

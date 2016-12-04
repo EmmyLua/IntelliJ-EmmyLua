@@ -4,8 +4,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
@@ -41,9 +41,9 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
         //是否连接到类
         LuaNameDef def = (LuaNameDef) nameRef.resolve();
         if (def != null) {
-            LuaDocClassDef classDef = def.resolveType();
-            if (classDef != null) {
-                indexText = classDef.getClassName().getText();
+            LuaTypeSet typeSet = def.resolveType();
+            if (typeSet != null && !typeSet.isEmpty()) {
+                indexText = typeSet.getType(0).getClassNameText();
             }
         }
         //全局函数

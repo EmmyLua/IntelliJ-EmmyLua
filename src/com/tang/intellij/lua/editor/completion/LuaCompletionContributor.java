@@ -7,7 +7,7 @@ import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.ProcessingContext;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
@@ -49,15 +49,17 @@ public class LuaCompletionContributor extends CompletionContributor {
                         PsiElement resolve = ref.resolve();
                         if (resolve instanceof LuaTypeResolvable) {
                             LuaTypeResolvable typeResolvable = (LuaTypeResolvable) resolve;
-                            LuaDocClassDef classDef = typeResolvable.resolveType();
+                            LuaTypeSet luaTypeSet = typeResolvable.resolveType();
 
                             //提示方法
-                            if (classDef != null) {
-                                String clazzName = classDef.getClassName().getText();
-                                Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
-                                for (LuaGlobalFuncDef def : list) {
-                                    completionResultSet.addElement(LookupElementBuilder.create(def.getFuncName().getId().getText()));
-                                }
+                            if (luaTypeSet != null) {
+                                luaTypeSet.getTypes().forEach(luaType -> {
+                                    String clazzName = luaType.getClassNameText();
+                                    Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+                                    for (LuaGlobalFuncDef def : list) {
+                                        completionResultSet.addElement(LookupElementBuilder.create(def.getFuncName().getId().getText()));
+                                    }
+                                });
                             }
 
                             //提示属性

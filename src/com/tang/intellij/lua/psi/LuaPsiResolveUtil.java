@@ -7,6 +7,7 @@ import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
 import com.tang.intellij.lua.doc.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;
 
 /**
@@ -45,7 +46,7 @@ public class LuaPsiResolveUtil {
         return result;
     }
 
-    static LuaDocClassDef resolveType(LuaNameDef nameDef) {
+    static LuaTypeSet resolveType(LuaNameDef nameDef) {
         //作为函数参数，类型在函数注释里找
         if (nameDef instanceof LuaParDef) {
             LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
@@ -67,11 +68,11 @@ public class LuaPsiResolveUtil {
                 if (comment != null) {
                     LuaDocClassDef def = comment.getClassDef(); // @class XXX
                     if (def != null)
-                        return def;
+                        return LuaTypeSet.create(def);
                     else { // @type xxx
                         LuaDocTypeDef typeDef = comment.getTypeDef();
                         if (typeDef != null && typeDef.getClassNameRef() != null) {
-                            return LuaClassIndex.find(typeDef.getClassNameRef().getText(), nameDef.getProject(), new ProjectAndLibrariesScope(nameDef.getProject()));
+                            return LuaTypeSet.create(LuaClassIndex.find(typeDef.getClassNameRef().getText(), nameDef.getProject(), new ProjectAndLibrariesScope(nameDef.getProject())));
                         }
                     }
                 }
