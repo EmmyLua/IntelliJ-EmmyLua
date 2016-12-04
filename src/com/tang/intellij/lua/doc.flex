@@ -60,6 +60,7 @@ DOC_DASHES = ----*
  {LINE_WS}                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
  "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
  ","                        { return COMMA; }
+ "#"                        { return SHARP; }
  "return"                   { return TAG_RETURN; }
  "param"                    { return TAG_PARAM; }
  "private"                  { return PRIVATE; }

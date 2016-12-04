@@ -19,6 +19,7 @@
   tokens = [
   ID = 'ID'
   AT = '@'
+  SHARP = '#'
   EQ = '='
   COMMA = ','
   TAG_NAME = 'TAG_NAME'
@@ -42,6 +43,8 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 //private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (param_def | return_def | tag_def | class_def | type_def) comment_string?
 
+type_set ::= '#' class_name_ref (',' class_name_ref)?
+
 //--- tag
 tag_value ::= ID
 tag_def ::= TAG_NAME tag_value { pin = 1 }
@@ -56,8 +59,11 @@ param_def ::= TAG_PARAM param_name_ref class_name_ref {
 }
 
 //--- return
-type_list ::= class_name_ref (',' class_name_ref)?
-return_def ::= TAG_RETURN type_list { pin = 1 }
+type_list ::= type_set+
+return_def ::= TAG_RETURN type_list {
+    pin = 1
+    methods = [resolveTypeAt]
+}
 
 //@class NAME extends CLASS_REF
 class_name ::= ID {

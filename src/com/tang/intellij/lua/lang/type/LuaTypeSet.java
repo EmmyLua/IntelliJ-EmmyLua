@@ -12,6 +12,10 @@ import java.util.List;
  */
 public class LuaTypeSet {
 
+    public static LuaTypeSet create() {
+        return new LuaTypeSet();
+    }
+
     public static LuaTypeSet create(LuaDocClassDef ... classDefs) {
         LuaTypeSet set = new LuaTypeSet();
         for (LuaDocClassDef def : classDefs) {
@@ -27,6 +31,10 @@ public class LuaTypeSet {
     }
 
     private List<LuaType> types = new ArrayList<>();
+
+    public void addType(LuaDocClassDef classDef) {
+        types.add(LuaType.create(classDef));
+    }
 
     public List<LuaType> getTypes() {
         return types;
