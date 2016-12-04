@@ -7,8 +7,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.lang.type.LuaTypeTable;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,8 +55,8 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             if (firstChild instanceof LuaFuncCall) {
                 return ((LuaFuncCall) firstChild).guessType();
             }
-            else if (type == LuaTypes.TABLE_CONSTRUCTOR) {
-                return LuaTypeSet.create(LuaType.TABLE);
+            else if (firstChild instanceof LuaTableConstructor) {
+                return LuaTypeSet.create(LuaTypeTable.create((LuaTableConstructor) firstChild));
             }
             else if (type == LuaTypes.STRING) {
                 //TODO STRING TYPESET

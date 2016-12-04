@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.lang.type.LuaTypeTable;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
@@ -72,7 +73,18 @@ public class LuaCompletionContributor extends CompletionContributor {
                     LuaIndexExpr indexExpr = (LuaIndexExpr) element.getParent();
                     LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType();
                     if (prefixTypeSet != null) {
+                        prefixTypeSet.getTypes().forEach(luaType -> {
+                            if (luaType instanceof LuaTypeTable) {
+                                LuaTypeTable table = (LuaTypeTable) luaType;
+                                for (String s : table.fieldStringList) {
+                                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
+                                            .withIcon(AllIcons.Nodes.Field)
+                                            .withTypeText("Table");
 
+                                    completionResultSet.addElement(elementBuilder);
+                                }
+                            }
+                        });
                     }
                 }
             }
