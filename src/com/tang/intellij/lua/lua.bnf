@@ -177,7 +177,10 @@ parDef ::= ID | SELF {
 }
 private parList ::= parDef (',' parDef)* (',' '...')? | '...'
 
-tableConstructor ::= '{' (fieldList)? '}' { pin = 1 }
+tableConstructor ::= '{' (fieldList)? '}' {
+    pin = 1
+    methods = [findField]
+}
 
 fieldList ::= field (fieldSep field)* (fieldSep)?
 

@@ -99,4 +99,16 @@ public class LuaPsiImplUtil {
         if (id != null) return new LuaIndexReference(indexExpr, id);
         else return null;
     }
+
+    public static LuaField findField(LuaTableConstructor table, String fieldName) {
+        LuaFieldList fieldList = table.getFieldList();
+        if (fieldList != null) {
+            for (LuaField field : fieldList.getFieldList()) {
+                LuaNameDef id = field.getNameDef();
+                if (id != null && fieldName.equals(id.getName()))
+                    return field;
+            }
+        }
+        return null;
+    }
 }

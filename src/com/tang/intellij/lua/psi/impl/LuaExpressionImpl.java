@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.lang.type.LuaTypeTable;
 import com.tang.intellij.lua.psi.*;
@@ -27,7 +28,30 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             return guessType((LuaValueExpr) this);
         if (this instanceof LuaCallExpr)
             return guessType((LuaCallExpr) this);
+        if (this instanceof LuaIndexExpr)
+            return guessType((LuaIndexExpr) this);
 
+        return null;
+    }
+
+    private LuaTypeSet guessType(LuaIndexExpr indexExpr) {
+        PsiElement id = indexExpr.getId();
+        if (id == null) return null;
+
+        LuaTypeSet prefixType = indexExpr.guessPrefixType();
+        if (prefixType != null && !prefixType.isEmpty()) {
+            for (LuaType type : prefixType.getTypes()) {
+                if (type instanceof LuaTypeTable) {
+                    LuaTypeTable table = (LuaTypeTable) type;
+                    LuaField field = table.tableConstructor.findField(id.getText());
+                    if (field != null) {
+                        LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
+                        if (expr != null) return expr.guessType();
+                    }
+                }
+                //TODO other TYPE
+            }
+        }
         return null;
     }
 
