@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by tangzx on 2016/12/4.
  */
 public class LuaClassMethodIndex extends StringStubIndexExtension<LuaClassMethodFuncDef> {
-    public static final StubIndexKey<String, LuaClassMethodFuncDef> KEY = StubIndexKey.createIndexKey("lua.index.class");
+    public static final StubIndexKey<String, LuaClassMethodFuncDef> KEY = StubIndexKey.createIndexKey("lua.index.class.method");
 
     private static final LuaClassMethodIndex INSTANCE = new LuaClassMethodIndex();
 

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LuaGlobalFuncIndex extends StringStubIndexExtension<LuaGlobalFuncDef> {
 
-    public static final StubIndexKey<String, LuaGlobalFuncDef> KEY = StubIndexKey.createIndexKey("lua.index.type.name");
+    public static final StubIndexKey<String, LuaGlobalFuncDef> KEY = StubIndexKey.createIndexKey("lua.index.global_function");
 
     private static final LuaGlobalFuncIndex INSTANCE = new LuaGlobalFuncIndex();
 
