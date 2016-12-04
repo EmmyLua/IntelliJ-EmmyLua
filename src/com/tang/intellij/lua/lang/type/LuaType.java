@@ -8,6 +8,8 @@ import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
  */
 public class LuaType {
 
+    public final static LuaType TABLE = new LuaType();
+
     public static LuaType create(LuaDocClassDef classDef) {
         LuaType type = new LuaType();
         type.classDef = classDef;

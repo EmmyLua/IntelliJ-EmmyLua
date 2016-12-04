@@ -47,13 +47,32 @@ public class LuaCompletionContributor extends CompletionContributor {
                             String clazzName = luaType.getClassNameText();
                             Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
                             for (LuaGlobalFuncDef def : list) {
-                                LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getFuncName().getId().getText())
+                                LuaFuncName funcName = def.getFuncName();
+                                if (funcName == null) continue;
+                                LookupElementBuilder elementBuilder = LookupElementBuilder.create(funcName.getText())
                                         .withIcon(AllIcons.Nodes.Method)
                                         .withTypeText(clazzName);
 
                                 completionResultSet.addElement(elementBuilder);
                             }
                         });
+                    }
+                }
+            }
+        });
+
+        //提示属性
+        extend(CompletionType.BASIC, SHOW_FIELD, new CompletionProvider<CompletionParameters>() {
+            @Override
+            protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                Project project = completionParameters.getOriginalFile().getProject();
+                PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
+
+                if (element != null) {
+                    LuaIndexExpr indexExpr = (LuaIndexExpr) element.getParent();
+                    LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType();
+                    if (prefixTypeSet != null) {
+
                     }
                 }
             }

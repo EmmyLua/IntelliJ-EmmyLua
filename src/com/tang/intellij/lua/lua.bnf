@@ -145,7 +145,7 @@ private prefixExpr ::= '(' expr ')' | nameRef
 
 private checkIndexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
 
-left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
+left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 methods = [guessPrefixType] }
 
 private checkCallExpr ::= args | ':' ID args { pin(".*") = 1 }
 

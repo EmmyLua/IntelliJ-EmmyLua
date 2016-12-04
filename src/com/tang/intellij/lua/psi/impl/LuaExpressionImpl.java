@@ -2,10 +2,12 @@ package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -48,8 +50,18 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
 
     static LuaTypeSet guessType(LuaValueExpr valueExpr) {
         PsiElement firstChild = valueExpr.getFirstChild();
-        if (firstChild instanceof LuaFuncCall) {
-            return ((LuaFuncCall) firstChild).guessType();
+        if (firstChild != null) {
+            IElementType type = firstChild.getNode().getElementType();
+            if (firstChild instanceof LuaFuncCall) {
+                return ((LuaFuncCall) firstChild).guessType();
+            }
+            else if (type == LuaTypes.TABLE_CONSTRUCTOR) {
+                return LuaTypeSet.create(LuaType.TABLE);
+            }
+            else if (type == LuaTypes.STRING) {
+                //TODO STRING TYPESET
+                //TODO bool typeset
+            }
         }
         return null;
     }
