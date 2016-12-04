@@ -8,6 +8,7 @@ import com.intellij.psi.tree.ILazyParseableElementType;
 import com.tang.intellij.lua.doc.lexer.LuaDocLexerAdapter;
 import com.tang.intellij.lua.doc.parser.LuaDocParser;
 import com.tang.intellij.lua.doc.psi.impl.LuaCommentImpl;
+import com.tang.intellij.lua.psi.stub.elements.LuaClassMethodStubElementType;
 import com.tang.intellij.lua.psi.stub.elements.LuaClassStubElementType;
 import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
 import com.tang.intellij.lua.lang.LuaLanguage;
@@ -48,5 +49,6 @@ public class LuaElementType extends IElementType {
     };
 
     public static LuaGlobalFuncDefStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncDefStubElementType();
+    public static LuaClassMethodStubElementType CLASS_METHOD_DEF = new LuaClassMethodStubElementType();
     public static LuaClassStubElementType CLASS_DEF = new LuaClassStubElementType();
 }

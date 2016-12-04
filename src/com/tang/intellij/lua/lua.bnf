@@ -98,6 +98,7 @@ private stat ::=
     ifStat |
     forAStat |
     forBStat |
+    classMethodFuncDef |
     globalFuncDef |
     localFuncDef |
     localDef |
@@ -111,12 +112,20 @@ ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 
 forAStat ::= 'for' nameDef '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 3 }
 forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 1 }
 
-funcName ::= nameRef ('.' nameRef)* (':' ID)?
-globalFuncDef ::= 'function' funcName funcBody {
+globalFuncDef ::= 'function' nameDef funcBody {
     pin = 1
     methods = [getComment]
     stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub"
 }
+
+private checkFuncPrefix ::= ID ('.' | ':') ID
+left funcPrefixRef ::= <<checkNext checkFuncPrefix>> ID { extends = nameRef }
+classMethodName ::= funcPrefixRef ('.' funcPrefixRef)* (('.' ID) | (':' ID))
+classMethodFuncDef ::= 'function' classMethodName funcBody {
+    pin = 2
+    stubClass = "com.tang.intellij.lua.psi.stub.LuaClassMethodStub"
+}
+
 localFuncDef ::= 'local' 'function' nameDef funcBody {
     pin = 2
     methods = [getComment]

@@ -3,10 +3,10 @@ package com.tang.intellij.lua.psi.stub.elements;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.LuaElementType;
+import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.psi.LuaNameDef;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub;
@@ -33,24 +33,9 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public LuaGlobalFuncStub createStub(@NotNull LuaGlobalFuncDef globalFuncDef, StubElement stubElement) {
-        LuaFuncName funcName = globalFuncDef.getFuncName();
-        assert funcName != null;
-        LuaNameRef nameRef = PsiTreeUtil.findChildOfType(funcName, LuaNameRef.class);
+        LuaNameDef nameRef = globalFuncDef.getNameDef();
         assert nameRef != null;
-        String indexText = nameRef.getText();
-        //是否连接到类
-        LuaNameDef def = (LuaNameDef) nameRef.resolve();
-        if (def != null) {
-            LuaTypeSet typeSet = def.resolveType();
-            if (typeSet != null && !typeSet.isEmpty()) {
-                indexText = typeSet.getType(0).getClassNameText();
-            }
-        }
-        //全局函数
-        if (funcName.getId() == null) {
-            indexText = NON_PREFIX_GLOBAL_FUNC;
-        }
-        return new LuaGlobalFuncStubImpl(indexText, stubElement);
+        return new LuaGlobalFuncStubImpl(NON_PREFIX_GLOBAL_FUNC, stubElement);
     }
 
     @NotNull
@@ -64,9 +49,7 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
         PsiElement element = node.getPsi();
         if (element instanceof LuaGlobalFuncDef) {
             LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) element;
-            LuaFuncName funcName = globalFuncDef.getFuncName();
-            return funcName != null;
-            //return funcName != null && !funcName.textContains(':');
+            return globalFuncDef.getNameDef() != null;
         }
         return false;
     }

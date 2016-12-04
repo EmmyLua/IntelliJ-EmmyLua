@@ -5,7 +5,10 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.doc.psi.*;
+import com.tang.intellij.lua.doc.psi.LuaDocClassName;
+import com.tang.intellij.lua.doc.psi.LuaDocClassNameRef;
+import com.tang.intellij.lua.doc.psi.LuaDocPsiElement;
+import com.tang.intellij.lua.doc.psi.LuaDocVisitor;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +46,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitGlobalFuncDef(@NotNull LuaGlobalFuncDef o) {
-            LuaFuncName name = o.getFuncName();
+            PsiElement name = o.getNameDef();
             if (name != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(name, null);
                 annotation.setTextAttributes(LuaHighlightingData.FIELD);

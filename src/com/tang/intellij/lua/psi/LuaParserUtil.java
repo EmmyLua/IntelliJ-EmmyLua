@@ -12,4 +12,11 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         marker.rollbackTo();
         return r;
     }
+
+    public static boolean checkNext(PsiBuilder builder_, int level_, Parser parser) {
+        PsiBuilder.Marker marker = builder_.mark();
+        boolean r = parser.parse(builder_, level_);
+        marker.rollbackTo();
+        return r;
+    }
 }

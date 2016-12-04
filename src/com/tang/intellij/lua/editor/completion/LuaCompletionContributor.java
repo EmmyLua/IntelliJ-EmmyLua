@@ -88,7 +88,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                 Project project = completionParameters.getOriginalFile().getProject();
                 Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(LuaGlobalFuncDefStubElementType.NON_PREFIX_GLOBAL_FUNC, project, new ProjectAndLibrariesScope(project));
                 for (LuaGlobalFuncDef def : list) {
-                    LuaFuncName funcName = def.getFuncName();
+                    LuaNameDef funcName = def.getNameDef();
                     if (funcName != null) {
                         String text = funcName.getText();
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create(text)
