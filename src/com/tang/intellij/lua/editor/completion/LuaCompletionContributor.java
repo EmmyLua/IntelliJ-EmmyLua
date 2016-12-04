@@ -73,8 +73,8 @@ public class LuaCompletionContributor extends CompletionContributor {
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 //local
                 PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset());
-                LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())));
-                LuaPsiTreeUtil.walkUpLocalFuncDef(cur, nameDef -> completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())));
+                LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> { completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())); return  true; });
+                LuaPsiTreeUtil.walkUpLocalFuncDef(cur, nameDef -> { completionResultSet.addElement(LookupElementBuilder.create(nameDef.getText())); return true; });
 
                 //global
                 Project project = completionParameters.getOriginalFile().getProject();

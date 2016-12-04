@@ -3,22 +3,25 @@ package com.tang.intellij.lua.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 
-import java.util.function.Consumer;
-
 /**
  *
  * Created by tangzx on 2016/12/3.
  */
 public class LuaPsiTreeUtil {
 
+    public interface ElementProcessor<T extends PsiElement> {
+        boolean accept(T t);
+    }
+
     /**
      * 向上寻找 local function 定义
      * @param current 当前搜导起点
      * @param processor 处理器
      */
-    public static void walkUpLocalFuncDef(PsiElement current, Consumer<LuaNameDef> processor) {
+    public static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaNameDef> processor) {
         if (current == null || processor == null)
             return;
+        boolean continueSearch = true;
         PsiElement curr = current;
         do {
             PsiElement next = curr.getPrevSibling();
@@ -31,9 +34,9 @@ public class LuaPsiTreeUtil {
                 LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
                 LuaNameDef funcName = localFuncDef.getNameDef();
                 //名字部分
-                processor.accept(funcName);
+                continueSearch = processor.accept(funcName);
             }
-        } while (!(curr instanceof PsiFile));
+        } while (continueSearch && !(curr instanceof PsiFile));
     }
 
     /**
@@ -41,9 +44,10 @@ public class LuaPsiTreeUtil {
      * @param current 当前搜导起点
      * @param processor 处理器
      */
-    public static void walkUpLocalNameDef(PsiElement current, Consumer<LuaNameDef> processor) {
+    public static void walkUpLocalNameDef(PsiElement current, ElementProcessor<LuaNameDef> processor) {
         if (current == null || processor == null)
             return;
+        boolean continueSearch = true;
         PsiElement curr = current;
         do {
             boolean searchParList = false;
@@ -56,7 +60,7 @@ public class LuaPsiTreeUtil {
 
             if (curr instanceof LuaLocalDef) {
                 LuaNameList nameList = ((LuaLocalDef) curr).getNameList();
-                resolveInNameList(nameList, processor);
+                continueSearch = resolveInNameList(nameList, processor);
             }
             else if (curr instanceof LuaLocalFuncDef) {
                 LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
@@ -64,35 +68,41 @@ public class LuaPsiTreeUtil {
                 //名字部分
 
                 //参数部分
-                if (searchParList) resolveInFuncBody(localFuncDef.getFuncBody(), processor);
+                if (searchParList) continueSearch = resolveInFuncBody(localFuncDef.getFuncBody(), processor);
             }
             else if (curr instanceof LuaGlobalFuncDef) {
                 //参数部分
                 LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) curr;
-                if (searchParList) resolveInFuncBody(globalFuncDef.getFuncBody(), processor);
+                if (searchParList) continueSearch = resolveInFuncBody(globalFuncDef.getFuncBody(), processor);
             }
             // for name = x, y do end
             else if (curr instanceof LuaForAStat) {
                 LuaForAStat forAStat = (LuaForAStat) curr;
-                if (searchParList) processor.accept(forAStat.getNameDef());
+                if (searchParList) continueSearch = processor.accept(forAStat.getNameDef());
             }
             // for name in xxx do end
             else if (curr instanceof LuaForBStat) {
                 LuaForBStat forBStat = (LuaForBStat) curr;
-                if (searchParList) resolveInNameList(forBStat.getNameList(), processor);
+                if (searchParList) continueSearch = resolveInNameList(forBStat.getNameList(), processor);
             }
-        } while (!(curr instanceof PsiFile));
+        } while (continueSearch && !(curr instanceof PsiFile));
     }
 
-    private static void resolveInFuncBody(LuaFuncBody funcBody, Consumer<LuaNameDef> processor) {
+    private static boolean resolveInFuncBody(LuaFuncBody funcBody, ElementProcessor<LuaNameDef> processor) {
         if (funcBody != null) {
-            funcBody.getParDefList().forEach(processor);
+            for (LuaParDef parDef : funcBody.getParDefList()) {
+                if (!processor.accept(parDef)) return false;
+            }
         }
+        return true;
     }
 
-    private static void resolveInNameList(LuaNameList nameList, Consumer<LuaNameDef> processor) {
+    private static boolean resolveInNameList(LuaNameList nameList, ElementProcessor<LuaNameDef> processor) {
         if (nameList != null) {
-            nameList.getNameDefList().forEach(processor);
+            for (LuaNameDef nameDef : nameList.getNameDefList()) {
+                if (!processor.accept(nameDef)) return false;
+            }
         }
+        return true;
     }
 }
