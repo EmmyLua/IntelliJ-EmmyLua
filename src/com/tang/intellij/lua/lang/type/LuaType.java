@@ -42,21 +42,21 @@ public class LuaType {
 
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         if (classDef != null) {
-            String clazzName = getClassNameText();
-            Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
-            for (LuaGlobalFuncDef def : list) {
-                //取名字的后半截 : 之后的部分
-                LuaFuncName funcName = def.getFuncName();
-                if (funcName == null) continue;
-                PsiElement postfixName = funcName.getId();
-                if (postfixName == null) continue;
-
-                LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
-                        .withIcon(AllIcons.Nodes.Method)
-                        .withTypeText(clazzName);
-
-                completionResultSet.addElement(elementBuilder);
-            }
+//            String clazzName = getClassNameText();
+//            Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
+//            for (LuaGlobalFuncDef def : list) {
+//                //取名字的后半截 : 之后的部分
+//                LuaFuncName funcName = def.getFuncName();
+//                if (funcName == null) continue;
+//                PsiElement postfixName = funcName.getId();
+//                if (postfixName == null) continue;
+//
+//                LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
+//                        .withIcon(AllIcons.Nodes.Method)
+//                        .withTypeText(clazzName);
+//
+//                completionResultSet.addElement(elementBuilder);
+//            }
         }
     }
 
