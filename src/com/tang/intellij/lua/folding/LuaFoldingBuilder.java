@@ -79,12 +79,13 @@ public class LuaFoldingBuilder implements FoldingBuilder {
         if (validCount == 1) {
             if (first.textContains('\n')) return false;
 
-            FoldingGroup group = FoldingGroup.newGroup("one-liner");
-
             TextRange lRange = new TextRange(range.getStartOffset(), first.getTextOffset());
-            descriptors.add(new NamedFoldingDescriptor(prev.getNode(), lRange, group, HOLDER_TEXT));
-
             TextRange rRange = new TextRange(first.getTextOffset() + first.getTextLength(), range.getEndOffset());
+            if (lRange.isEmpty() || rRange.isEmpty())
+                return false;
+
+            FoldingGroup group = FoldingGroup.newGroup("one-liner");
+            descriptors.add(new NamedFoldingDescriptor(prev.getNode(), lRange, group, HOLDER_TEXT));
             descriptors.add(new NamedFoldingDescriptor(next.getNode(), rRange, group, HOLDER_TEXT));
 
             return true;
