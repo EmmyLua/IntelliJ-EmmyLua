@@ -17,6 +17,8 @@ public class LuaPsiTreeUtil {
      * @param processor 处理器
      */
     public static void walkUpLocalFuncDef(PsiElement current, Consumer<LuaNameDef> processor) {
+        if (current == null || processor == null)
+            return;
         PsiElement curr = current;
         do {
             PsiElement next = curr.getPrevSibling();
@@ -40,7 +42,8 @@ public class LuaPsiTreeUtil {
      * @param processor 处理器
      */
     public static void walkUpLocalNameDef(PsiElement current, Consumer<LuaNameDef> processor) {
-
+        if (current == null || processor == null)
+            return;
         PsiElement curr = current;
         do {
             boolean searchParList = false;
@@ -71,12 +74,12 @@ public class LuaPsiTreeUtil {
             // for name = x, y do end
             else if (curr instanceof LuaForAStat) {
                 LuaForAStat forAStat = (LuaForAStat) curr;
-                processor.accept(forAStat.getNameDef());
+                if (searchParList) processor.accept(forAStat.getNameDef());
             }
             // for name in xxx do end
             else if (curr instanceof LuaForBStat) {
                 LuaForBStat forBStat = (LuaForBStat) curr;
-                resolveInNameList(forBStat.getNameList(), processor);
+                if (searchParList) resolveInNameList(forBStat.getNameList(), processor);
             }
         } while (!(curr instanceof PsiFile));
     }
