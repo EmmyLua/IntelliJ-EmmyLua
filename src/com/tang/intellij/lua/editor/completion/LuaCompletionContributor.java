@@ -38,30 +38,22 @@ public class LuaCompletionContributor extends CompletionContributor {
                 Project project = completionParameters.getOriginalFile().getProject();
 
                 PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
+
                 if (element != null) {
                     LuaCallExpr callExpr = (LuaCallExpr) element.getParent();
-                    LuaNameRef ref = callExpr.getNameRef();
-                    if (ref != null) {
-                        PsiElement resolve = ref.resolve();
-                        if (resolve instanceof LuaTypeResolvable) {
-                            LuaTypeResolvable typeResolvable = (LuaTypeResolvable) resolve;
-                            LuaTypeSet luaTypeSet = typeResolvable.resolveType();
+                    LuaTypeSet luaTypeSet = callExpr.guessPrefixType();
+                    if (luaTypeSet != null) {
+                        luaTypeSet.getTypes().forEach(luaType -> {
+                            String clazzName = luaType.getClassNameText();
+                            Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+                            for (LuaGlobalFuncDef def : list) {
+                                LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getFuncName().getId().getText())
+                                        .withIcon(AllIcons.Nodes.Method)
+                                        .withTypeText(clazzName);
 
-                            //提示方法
-                            if (luaTypeSet != null) {
-                                luaTypeSet.getTypes().forEach(luaType -> {
-                                    String clazzName = luaType.getClassNameText();
-                                    Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
-                                    for (LuaGlobalFuncDef def : list) {
-                                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getFuncName().getId().getText())
-                                                .withIcon(AllIcons.Nodes.Method)
-                                                .withTypeText(clazzName);
-
-                                        completionResultSet.addElement(elementBuilder);
-                                    }
-                                });
+                                completionResultSet.addElement(elementBuilder);
                             }
-                        }
+                        });
                     }
                 }
             }

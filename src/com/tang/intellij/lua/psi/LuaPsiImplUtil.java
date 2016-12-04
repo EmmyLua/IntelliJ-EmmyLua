@@ -60,4 +60,20 @@ public class LuaPsiImplUtil {
         if (callExpr == null) return null;
         else return callExpr.guessType();
     }
+
+    public static LuaTypeSet guessPrefixType(LuaCallExpr callExpr) {
+        LuaNameRef nameRef = callExpr.getNameRef();
+        if (nameRef != null) {
+            PsiElement def = nameRef.resolve();
+            if (def instanceof LuaTypeResolvable) {
+                return ((LuaTypeResolvable) def).resolveType();
+            }
+        }
+        else {
+            LuaExpr prefix = (LuaExpr) callExpr.getFirstChild();
+            if (prefix != null)
+                return prefix.guessType();
+        }
+        return null;
+    }
 }
