@@ -48,9 +48,13 @@ public class LuaCompletionContributor extends CompletionContributor {
                             String clazzName = luaType.getClassNameText();
                             Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
                             for (LuaGlobalFuncDef def : list) {
+                                //取名字的后半截 : 之后的部分
                                 LuaFuncName funcName = def.getFuncName();
                                 if (funcName == null) continue;
-                                LookupElementBuilder elementBuilder = LookupElementBuilder.create(funcName.getText())
+                                PsiElement postfixName = funcName.getId();
+                                if (postfixName == null) continue;
+
+                                LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
                                         .withIcon(AllIcons.Nodes.Method)
                                         .withTypeText(clazzName);
 
