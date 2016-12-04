@@ -61,9 +61,9 @@ public class LuaPsiResolveUtil {
         }
         //变量声明，local x = 0
         else {
-            LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
-            if (owner != null) {
-                LuaComment comment = owner.getComment();
+            LuaLocalDef localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef.class);
+            if (localDef != null) {
+                LuaComment comment = localDef.getComment();
                 if (comment != null) {
                     LuaDocClassDef def = comment.getClassDef(); // @class XXX
                     if (def != null)
@@ -72,6 +72,19 @@ public class LuaPsiResolveUtil {
                         LuaDocTypeDef typeDef = comment.getTypeDef();
                         if (typeDef != null && typeDef.getClassNameRef() != null) {
                             return LuaClassIndex.find(typeDef.getClassNameRef().getText(), nameDef.getProject(), new ProjectAndLibrariesScope(nameDef.getProject()));
+                        }
+                    }
+                }
+
+                //计算 expr 返回类型
+                LuaNameList nameList = localDef.getNameList();
+                LuaExprList exprList = localDef.getExprList();
+                if (nameList != null && exprList != null) {
+                    int index = nameList.getNameDefList().indexOf(nameDef);
+                    if (index != -1) {
+                        LuaExpr expr = exprList.getExprList().get(index);
+                        if (expr != null) {
+                            return expr.guessType();
                         }
                     }
                 }

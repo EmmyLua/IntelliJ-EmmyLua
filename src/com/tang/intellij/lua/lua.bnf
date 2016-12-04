@@ -78,6 +78,8 @@
   ]
 
   implements("globalFuncDef|localFuncDef|localDef") = "com.tang.intellij.lua.psi.LuaDeclaration"
+  implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
+  extends(".*Expr") = expr
 }
 
 luaFile ::= stat_or_comment*
@@ -132,9 +134,12 @@ nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr
 
-value ::= nil | false | true | NUMBER | STRING | "..." | lambdaFunc | tableConstructor | funcCall | var | '(' expr ')'
+valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFunc | tableConstructor | funcCall | var | '(' expr ')'
 
-expr ::= unop expr | value (binop expr)?
+expr ::= unopExpr | binopExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
+
+unopExpr ::= unop expr { pin = 1 }
+binopExpr ::= valueExpr binop expr { pin = 2 }
 
 private prefixExpr ::= '(' expr ')' | nameRef
 
@@ -152,7 +157,7 @@ var ::= prefixExpr (suffixIndexExpr)* indexExpr | nameRef
 
 private suffixCallExpr ::= <<twoExpr checkCallExpr>> callExpr | indexExpr
 // 最终产生 callExpr
-funcCall ::= (prefixExpr (suffixCallExpr)*) callExpr
+funcCall ::= (prefixExpr (suffixCallExpr)*) callExpr { methods = [guessType] }
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     pin(".*") = 1

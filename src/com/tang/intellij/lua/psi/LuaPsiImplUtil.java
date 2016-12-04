@@ -54,4 +54,10 @@ public class LuaPsiImplUtil {
     public static LuaComment getComment(LuaLocalDef localDef) {
         return LuaCommentUtil.findComment(localDef);
     }
+
+    public static LuaDocClassDef guessType(LuaFuncCall funcCall) {
+        LuaCallExpr callExpr = (LuaCallExpr)funcCall.getFirstChild();
+        if (callExpr == null) return null;
+        else return callExpr.guessType();
+    }
 }
