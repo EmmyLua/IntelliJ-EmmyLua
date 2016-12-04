@@ -5,6 +5,7 @@ import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -91,5 +92,11 @@ public class LuaPsiImplUtil {
                 return prefix.guessType();
         }
         return null;
+    }
+
+    public static PsiReference getReference(LuaIndexExpr indexExpr) {
+        PsiElement id = indexExpr.getId();
+        if (id != null) return new LuaIndexReference(indexExpr, id);
+        else return null;
     }
 }

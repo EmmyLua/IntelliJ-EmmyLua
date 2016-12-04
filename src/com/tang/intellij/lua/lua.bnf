@@ -145,7 +145,10 @@ private prefixExpr ::= '(' expr ')' | nameRef
 
 private checkIndexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
 
-left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 methods = [guessPrefixType] }
+left indexExpr ::= '[' expr ']' | '.' ID {
+    pin(".*") = 1
+    methods = [guessPrefixType getReference]
+}
 
 private checkCallExpr ::= args | ':' ID args { pin(".*") = 1 }
 
@@ -178,7 +181,7 @@ tableConstructor ::= '{' (fieldList)? '}' { pin = 1 }
 
 fieldList ::= field (fieldSep field)* (fieldSep)?
 
-field ::= '[' expr ']' '=' expr | ID '=' expr | expr
+field ::= '[' expr ']' '=' expr | nameDef '=' expr | expr
 
 fieldSep ::= ',' | ';'
 

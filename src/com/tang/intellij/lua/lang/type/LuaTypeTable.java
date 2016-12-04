@@ -18,13 +18,15 @@ public class LuaTypeTable extends LuaType {
         return new LuaTypeTable(tableElement);
     }
 
+    public LuaTableConstructor tableConstructor;
     public List<String> fieldStringList = new ArrayList<>();
 
     protected LuaTypeTable(LuaTableConstructor tableElement) {
+        tableConstructor = tableElement;
         LuaFieldList fieldList = tableElement.getFieldList();
         if (fieldList != null) {
             for (LuaField field : fieldList.getFieldList()) {
-                PsiElement id = field.getId();
+                PsiElement id = field.getNameDef();
                 if (id != null) {
                     fieldStringList.add(id.getText());
                 }
