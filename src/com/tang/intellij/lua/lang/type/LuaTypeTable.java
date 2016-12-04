@@ -1,9 +1,14 @@
 package com.tang.intellij.lua.lang.type;
 
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.psi.LuaField;
 import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,4 +39,18 @@ public class LuaTypeTable extends LuaType {
         }
     }
 
+    // table 没有 class method
+    @Override
+    public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {}
+
+    @Override
+    public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+        for (String s : fieldStringList) {
+            LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
+                    .withIcon(AllIcons.Nodes.Field)
+                    .withTypeText("Table");
+
+            completionResultSet.addElement(elementBuilder);
+        }
+    }
 }

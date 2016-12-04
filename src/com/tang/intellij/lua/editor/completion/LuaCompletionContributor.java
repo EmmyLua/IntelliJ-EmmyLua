@@ -9,7 +9,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.lang.type.LuaTypeTable;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
@@ -36,31 +35,13 @@ public class LuaCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SHOW_CLASS_METHOD, new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                Project project = completionParameters.getOriginalFile().getProject();
-
                 PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
 
                 if (element != null) {
                     LuaCallExpr callExpr = (LuaCallExpr) element.getParent();
                     LuaTypeSet luaTypeSet = callExpr.guessPrefixType();
                     if (luaTypeSet != null) {
-                        luaTypeSet.getTypes().forEach(luaType -> {
-                            String clazzName = luaType.getClassNameText();
-                            Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
-                            for (LuaGlobalFuncDef def : list) {
-                                //取名字的后半截 : 之后的部分
-                                LuaFuncName funcName = def.getFuncName();
-                                if (funcName == null) continue;
-                                PsiElement postfixName = funcName.getId();
-                                if (postfixName == null) continue;
-
-                                LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
-                                        .withIcon(AllIcons.Nodes.Method)
-                                        .withTypeText(clazzName);
-
-                                completionResultSet.addElement(elementBuilder);
-                            }
-                        });
+                        luaTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet));
                     }
                 }
             }
@@ -77,18 +58,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                     LuaIndexExpr indexExpr = (LuaIndexExpr) element.getParent();
                     LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType();
                     if (prefixTypeSet != null) {
-                        prefixTypeSet.getTypes().forEach(luaType -> {
-                            if (luaType instanceof LuaTypeTable) {
-                                LuaTypeTable table = (LuaTypeTable) luaType;
-                                for (String s : table.fieldStringList) {
-                                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
-                                            .withIcon(AllIcons.Nodes.Field)
-                                            .withTypeText("Table");
-
-                                    completionResultSet.addElement(elementBuilder);
-                                }
-                            }
-                        });
+                        prefixTypeSet.getTypes().forEach(luaType -> luaType.addFieldCompletions(completionParameters, completionResultSet));
                     }
                 }
             }
