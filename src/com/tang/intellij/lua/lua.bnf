@@ -110,6 +110,8 @@ repeatStat ::= 'repeat' block 'until' expr { pin = 1 }
 ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end' { pin = 1 }
 forAStat ::= 'for' nameDef '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 3 }
 forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 1 }
+
+funcName ::= nameRef ('.' nameRef)* (':' ID)?
 globalFuncDef ::= 'function' funcName funcBody {
     pin = 1
     methods = [getComment]
@@ -126,15 +128,13 @@ localDef ::= 'local' nameList ('=' exprList)? {
 
 lastStat ::= return exprList? | break
 
-funcName ::= nameRef ('.' nameRef)* (':' ID)?
-
 varList ::= var (',' var)*
 
 nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr
 
-valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFunc | tableConstructor | funcCall | var | '(' expr ')'
+valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | funcCall | var | '(' expr ')'
 
 expr ::= unopExpr | binopExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
 
@@ -166,7 +166,7 @@ args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     pin(".*") = 1
 }
 
-lambdaFunc ::= 'function' funcBody { pin = 1 }
+lambdaFuncDef ::= 'function' funcBody { pin = 1 }
 
 funcBody ::= '(' (parList)? ')' block? 'end' { pin = 1 }
 
