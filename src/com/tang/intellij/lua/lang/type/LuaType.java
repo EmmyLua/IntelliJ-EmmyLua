@@ -7,9 +7,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.psi.LuaFuncName;
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
+import com.tang.intellij.lua.psi.LuaClassMethodFuncDef;
+import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -42,21 +41,18 @@ public class LuaType {
 
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         if (classDef != null) {
-//            String clazzName = getClassNameText();
-//            Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
-//            for (LuaGlobalFuncDef def : list) {
-//                //取名字的后半截 : 之后的部分
-//                LuaFuncName funcName = def.getFuncName();
-//                if (funcName == null) continue;
-//                PsiElement postfixName = funcName.getId();
-//                if (postfixName == null) continue;
-//
-//                LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
-//                        .withIcon(AllIcons.Nodes.Method)
-//                        .withTypeText(clazzName);
-//
-//                completionResultSet.addElement(elementBuilder);
-//            }
+            String clazzName = getClassNameText();
+            Collection<LuaClassMethodFuncDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
+            for (LuaClassMethodFuncDef def : list) {
+                //取名字的后半截 : 之后的部分
+                PsiElement postfixName = def.getClassMethodName().getId();
+
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
+                        .withIcon(AllIcons.Nodes.Method)
+                        .withTypeText(clazzName);
+
+                completionResultSet.addElement(elementBuilder);
+            }
         }
     }
 

@@ -8,4 +8,6 @@ import com.tang.intellij.lua.psi.LuaClassMethodFuncDef;
  * Created by tangzx on 2016/12/4.
  */
 public interface LuaClassMethodStub extends StubElement<LuaClassMethodFuncDef> {
+
+    String getClassName();
 }

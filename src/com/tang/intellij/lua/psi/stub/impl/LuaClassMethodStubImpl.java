@@ -11,7 +11,16 @@ import com.tang.intellij.lua.psi.stub.LuaClassMethodStub;
  * Created by tangzx on 2016/12/4.
  */
 public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodFuncDef> implements LuaClassMethodStub {
-    public LuaClassMethodStubImpl(StubElement parent) {
+
+    private String className;
+
+    public LuaClassMethodStubImpl(String className, StubElement parent) {
         super(parent, LuaElementType.CLASS_METHOD_DEF);
+        this.className = className;
+    }
+
+    @Override
+    public String getClassName() {
+        return className;
     }
 }
