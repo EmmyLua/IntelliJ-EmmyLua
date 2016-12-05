@@ -40,6 +40,15 @@ public class LuaPsiImplUtil {
         return LuaPsiResolveUtil.resolve(ref);
     }
 
+    public static LuaTypeSet resolveType(LuaNameRef nameRef) {
+        PsiElement target = nameRef.resolve();
+        if (target instanceof LuaTypeResolvable) {
+            LuaTypeResolvable typeResolvable = (LuaTypeResolvable) target;
+            return typeResolvable.resolveType();
+        }
+        return null;
+    }
+
     public static LuaTypeSet resolveType(LuaParDef parDef) {
         return LuaPsiResolveUtil.resolveType(parDef);
     }

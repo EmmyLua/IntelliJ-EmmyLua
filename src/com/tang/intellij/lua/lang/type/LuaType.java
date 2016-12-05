@@ -36,7 +36,10 @@ public class LuaType {
     }
 
     public String getClassNameText() {
-        return classDef.getClassNameText();
+        if (classDef != null)
+            return classDef.getClassNameText();
+        else
+            return null;
     }
 
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {

@@ -209,5 +209,5 @@ nameDef ::= ID {
     methods = [setName getName resolveType]
 }
 nameRef ::= ID | SELF {
-    methods = [getReference resolve]
+    methods = [getReference resolve resolveType]
 }

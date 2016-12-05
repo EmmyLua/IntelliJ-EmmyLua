@@ -1,13 +1,11 @@
 package com.tang.intellij.lua.psi.stub.elements;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaClassMethodFuncDef;
 import com.tang.intellij.lua.psi.LuaElementType;
-import com.tang.intellij.lua.psi.LuaNameDef;
 import com.tang.intellij.lua.psi.LuaNameRef;
 import com.tang.intellij.lua.psi.impl.LuaClassMethodFuncDefImpl;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
@@ -36,13 +34,9 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         LuaNameRef ref = luaClassMethodFuncDef.getClassMethodName().getNameRef();
         String clazzName = null;
         if (ref != null) {
-            PsiElement target = ref.resolve();
-            if (target instanceof LuaNameDef) {
-                LuaNameDef def = (LuaNameDef) target;
-                LuaTypeSet typeSet = def.resolveType();
-                if (typeSet != null && !typeSet.isEmpty()) {
-                    clazzName = typeSet.getType(0).getClassNameText();
-                }
+            LuaTypeSet typeSet = ref.resolveType();
+            if (typeSet != null && !typeSet.isEmpty()) {
+                clazzName = typeSet.getType(0).getClassNameText();
             }
         }
         return new LuaClassMethodStubImpl(clazzName, stubElement);
