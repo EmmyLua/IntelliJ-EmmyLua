@@ -2,7 +2,9 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
+import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.ArrayUtil;
 
 public class LuaParserUtil extends GeneratedParserUtilBase {
 
@@ -23,18 +25,35 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
     }
 
     public static boolean lazyBlock(PsiBuilder builder_, int level_) {
-        PsiBuilder.Marker marker = builder_.mark();
+        int i = 0;
+        IElementType prev=  builder_.rawLookup(--i);
+        while (prev == ElementType.WHITE_SPACE)
+            prev = builder_.rawLookup(--i);
 
-        IElementType type = builder_.getTokenType();
+        if (prev != null) {
+            PsiBuilder.Marker marker = builder_.mark();
+            matchStart(builder_, level_, prev);
+            marker.collapse(LuaTypes.BLOCK);
+        }
+        return true;
+    }
+
+    static void matchStart(PsiBuilder builder, int level, IElementType type) {
+        if (type == LuaTypes.DO) matchEnd(builder, level, LuaTypes.END);
+        if (type == LuaTypes.REPEAT) matchEnd(builder, level, LuaTypes.UNTIL);
+    }
+
+    static void matchEnd(PsiBuilder builder, int level, IElementType ... types) {
+        IElementType type = builder.getTokenType();
         while (true) {
-            if (type == null || builder_.eof() || type == LuaTypes.END) {
+            if (type == null || builder.eof() || type == LuaTypes.END) {
                 break;
             }
-            builder_.advanceLexer();
-            type = builder_.getTokenType();
-        }
+            if (ArrayUtil.indexOf(types, type) != -1)
+                break;
 
-        marker.collapse(LuaTypes.BLOCK);
-        return true;
+            builder.advanceLexer();
+            type = builder.getTokenType();
+        }
     }
 }
