@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.psi.stub.elements;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -31,14 +32,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
     @Override
     public LuaClassMethodStub createStub(@NotNull LuaClassMethodFuncDef luaClassMethodFuncDef, StubElement stubElement) {
-        LuaNameRef ref = luaClassMethodFuncDef.getClassMethodName().getNameRef();
-        String clazzName = null;
-        if (ref != null) {
-            LuaTypeSet typeSet = ref.resolveType();
-            if (typeSet != null && !typeSet.isEmpty()) {
-                clazzName = typeSet.getType(0).getClassNameText();
-            }
-        }
+        String clazzName = resolveClassName(luaClassMethodFuncDef);
         return new LuaClassMethodStubImpl(clazzName, stubElement);
     }
 
@@ -50,7 +44,8 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
     @Override
     public boolean shouldCreateStub(ASTNode node) {
-        return true;
+        PsiElement psi = node.getPsi();
+        return psi instanceof LuaClassMethodFuncDef && resolveClassName((LuaClassMethodFuncDef) psi) != null;
     }
 
     @Override
@@ -72,5 +67,17 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         if (className != null) {
             indexSink.occurrence(LuaClassMethodIndex.KEY, className);
         }
+    }
+
+    static String resolveClassName(LuaClassMethodFuncDef luaClassMethodFuncDef) {
+        LuaNameRef ref = luaClassMethodFuncDef.getClassMethodName().getNameRef();
+        String clazzName = null;
+        if (ref != null) {
+            LuaTypeSet typeSet = ref.resolveType();
+            if (typeSet != null && !typeSet.isEmpty()) {
+                clazzName = typeSet.getType(0).getClassNameText();
+            }
+        }
+        return clazzName;
     }
 }
