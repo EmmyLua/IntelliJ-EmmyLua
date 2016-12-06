@@ -3,20 +3,18 @@ package com.tang.intellij.lua.psi;
 import com.intellij.lang.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.tree.ICompositeElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.ILazyParseableElementType;
+import com.intellij.psi.tree.IReparseableElementType;
 import com.tang.intellij.lua.doc.lexer.LuaDocLexerAdapter;
 import com.tang.intellij.lua.doc.parser.LuaDocParser;
 import com.tang.intellij.lua.doc.psi.impl.LuaCommentImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
-import com.tang.intellij.lua.psi.impl.LuaLazyBlockImpl;
 import com.tang.intellij.lua.psi.stub.elements.LuaClassMethodStubElementType;
 import com.tang.intellij.lua.psi.stub.elements.LuaClassStubElementType;
 import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -58,7 +56,7 @@ public class LuaElementType extends IElementType {
     public static LuaClassStubElementType CLASS_DEF = new LuaClassStubElementType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
 
-    static class LuaBlockElementType extends ILazyParseableElementType implements ICompositeElementType {
+    static class LuaBlockElementType extends IReparseableElementType {
 
         public LuaBlockElementType() {
             super("LuaBlock", LuaLanguage.INSTANCE);
@@ -77,19 +75,13 @@ public class LuaElementType extends IElementType {
                     LuaLanguage.INSTANCE,
                     chameleon.getText());
             LuaParser luaParser = new LuaParser();
-            return luaParser.parse(LuaTypes.DEEP_BLOCK, builder);
+            return luaParser.parse(LuaTypes.BLOCK, builder).getFirstChildNode();
         }
 
         @Nullable
         @Override
         public ASTNode createNode(CharSequence text) {
-            return new LuaLazyBlockImpl(text);
-        }
-
-        @NotNull
-        @Override
-        public ASTNode createCompositeNode() {
-            return new LuaLazyBlockImpl(null);
+            return null;
         }
     }
 }

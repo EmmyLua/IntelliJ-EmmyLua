@@ -87,8 +87,8 @@ luaFile ::= stat_or_comment*
 private stat_or_comment ::= SHORT_COMMENT | DOC_COMMENT | stat ';'?
 private chunk ::= stat_or_comment* (lastStat ';'?)?
 
-block ::= <<lazyBlock>>
-deepBlock ::= chunk
+private lazy_block ::= <<lazyBlock>>
+block ::= chunk
 
 private stat ::=
     funcCall |
@@ -106,12 +106,12 @@ private stat ::=
     lastStat
 
 assignStat ::= varList '=' exprList { pin = 1 }
-doStat ::= 'do' block 'end' { pin = 1 }
-whileStat ::= 'while' expr 'do' block 'end' { pin = 1 }
-repeatStat ::= 'repeat' block 'until' expr { pin = 1 }
-ifStat ::= 'if' expr 'then' block ('elseif' expr 'then' block)* ('else' block)? 'end' { pin = 1 }
-forAStat ::= 'for' nameDef '=' expr ',' expr (',' expr)? 'do' block 'end' { pin = 3 }
-forBStat ::= 'for' nameList 'in' exprList 'do' block 'end' { pin = 1 }
+doStat ::= 'do' lazy_block 'end' { pin = 1 }
+whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
+repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
+ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' { pin = 1 }
+forAStat ::= 'for' nameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 }
+forBStat ::= 'for' nameList 'in' exprList 'do' lazy_block 'end' { pin = 1 }
 
 globalFuncDef ::= 'function' nameDef funcBody {
     pin = 1
@@ -179,7 +179,7 @@ args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
 
 lambdaFuncDef ::= 'function' funcBody { pin = 1 }
 
-funcBody ::= '(' (parList)? ')' block? 'end' { pin = 1 }
+funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 1 }
 
 parDef ::= ID | SELF {
     extends = nameDef
