@@ -39,8 +39,17 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
     }
 
     static void matchStart(PsiBuilder builder, int level, IElementType type) {
-        if (type == LuaTypes.DO) matchEnd(builder, level, LuaTypes.END);
-        if (type == LuaTypes.REPEAT) matchEnd(builder, level, LuaTypes.UNTIL);
+        if (type == LuaTypes.DO)
+            matchEnd(builder, level, LuaTypes.END);
+        else if (type == LuaTypes.REPEAT)
+            matchEnd(builder, level, LuaTypes.UNTIL);
+        else if (type == LuaTypes.THEN)
+            matchEnd(builder, level, LuaTypes.ELSE, LuaTypes.ELSEIF, LuaTypes.END);
+        else if (type == LuaTypes.ELSE)
+            matchEnd(builder, level, LuaTypes.END);
+        else if (type == LuaTypes.ELSEIF)
+            matchEnd(builder, level, LuaTypes.ELSEIF, LuaTypes.ELSE, LuaTypes.END);
+        //TODO function body
     }
 
     static void matchEnd(PsiBuilder builder, int level, IElementType ... types) {
@@ -49,11 +58,13 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             if (type == null || builder.eof() || type == LuaTypes.END) {
                 break;
             }
+            builder.advanceLexer();
+            type = builder.getTokenType();
+
             if (ArrayUtil.indexOf(types, type) != -1)
                 break;
 
-            builder.advanceLexer();
-            type = builder.getTokenType();
+            matchStart(builder, level, type);
         }
     }
 }
