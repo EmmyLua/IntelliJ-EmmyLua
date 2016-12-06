@@ -3,15 +3,20 @@ package com.tang.intellij.lua.psi;
 import com.intellij.lang.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.ICompositeElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.ILazyParseableElementType;
 import com.tang.intellij.lua.doc.lexer.LuaDocLexerAdapter;
 import com.tang.intellij.lua.doc.parser.LuaDocParser;
 import com.tang.intellij.lua.doc.psi.impl.LuaCommentImpl;
+import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lexer.LuaLexerAdapter;
+import com.tang.intellij.lua.parser.LuaParser;
+import com.tang.intellij.lua.psi.impl.LuaLazyBlockImpl;
 import com.tang.intellij.lua.psi.stub.elements.LuaClassMethodStubElementType;
 import com.tang.intellij.lua.psi.stub.elements.LuaClassStubElementType;
 import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
-import com.tang.intellij.lua.lang.LuaLanguage;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -51,4 +56,40 @@ public class LuaElementType extends IElementType {
     public static LuaGlobalFuncDefStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncDefStubElementType();
     public static LuaClassMethodStubElementType CLASS_METHOD_DEF = new LuaClassMethodStubElementType();
     public static LuaClassStubElementType CLASS_DEF = new LuaClassStubElementType();
+    public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
+
+    static class LuaBlockElementType extends ILazyParseableElementType implements ICompositeElementType {
+
+        public LuaBlockElementType() {
+            super("LuaBlock", LuaLanguage.INSTANCE);
+        }
+
+        @Override
+        public ASTNode parseContents(ASTNode chameleon) {
+            PsiElement psiFile = chameleon.getPsi();
+            assert psiFile != null;
+
+            Project project = psiFile.getProject();
+            PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
+                    project,
+                    chameleon,
+                    new LuaLexerAdapter(),
+                    LuaLanguage.INSTANCE,
+                    chameleon.getText());
+            LuaParser luaParser = new LuaParser();
+            return luaParser.parse(LuaTypes.DEEP_BLOCK, builder);
+        }
+
+        @Nullable
+        @Override
+        public ASTNode createNode(CharSequence text) {
+            return new LuaLazyBlockImpl(text);
+        }
+
+        @NotNull
+        @Override
+        public ASTNode createCompositeNode() {
+            return new LuaLazyBlockImpl(null);
+        }
+    }
 }

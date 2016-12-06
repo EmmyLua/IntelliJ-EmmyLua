@@ -87,6 +87,8 @@ public class LuaParserDefinition implements ParserDefinition {
             return LuaElementType.GLOBAL_FUNC_DEF;
         else if ("CLASS_METHOD_FUNC_DEF".equals(string))
             return LuaElementType.CLASS_METHOD_DEF;
+        else if ("BLOCK".equals(string))
+            return LuaElementType.BLOCK;
 
         return new LuaElementType(string);
     }
