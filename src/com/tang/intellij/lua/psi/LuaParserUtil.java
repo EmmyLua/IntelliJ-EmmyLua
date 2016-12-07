@@ -26,55 +26,66 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
 
     public static boolean lazyBlock(PsiBuilder builder_, int level_) {
         int i = 0;
-        IElementType prev=  builder_.rawLookup(--i);
-        while (prev == ElementType.WHITE_SPACE)
-            prev = builder_.rawLookup(--i);
+        IElementType begin=  builder_.rawLookup(--i);
+        while (begin == ElementType.WHITE_SPACE)
+            begin = builder_.rawLookup(--i);
 
-        if (prev != null) {
+        if (begin != null) {
             PsiBuilder.Marker marker = builder_.mark();
-            if (prev == LuaTypes.RPAREN)
-                prev = LuaTypes.FUNCTION;
+            if (begin == LuaTypes.RPAREN)
+                begin = LuaTypes.FUNCTION;
 
-            matchStart(builder_, 0, prev);
+            boolean r = matchStart(builder_, 0, begin, true);
             marker.collapse(LuaTypes.BLOCK);
         }
         return true;
     }
 
-    static void matchStart(PsiBuilder builder, int level, IElementType type) {
-        if (type == LuaTypes.DO)
-            matchEnd(type, builder, level + 1, LuaTypes.END);
-        else if (type == LuaTypes.REPEAT)
-            matchEnd(type, builder, level + 1, LuaTypes.UNTIL);
-        else if (type == LuaTypes.THEN)
-            matchEnd(type, builder, level + 1, LuaTypes.ELSE, LuaTypes.ELSEIF, LuaTypes.END);
-        else if (type == LuaTypes.ELSE)
-            matchEnd(type, builder, level + 1, LuaTypes.END);
-        else if (type == LuaTypes.ELSEIF)
-            matchEnd(type, builder, level + 1, LuaTypes.ELSEIF, LuaTypes.ELSE, LuaTypes.END);
-        else if (type == LuaTypes.FUNCTION)
-            matchEnd(type, builder, level + 1, LuaTypes.END);
+    static boolean matchStart(PsiBuilder builder, int level, IElementType begin, boolean advanced) {
+        if (begin == LuaTypes.DO)
+            return matchEnd(begin, advanced, builder, level, LuaTypes.END);
+        else if (begin == LuaTypes.REPEAT)
+            return matchEnd(begin, advanced, builder, level, LuaTypes.UNTIL);
+        else if (begin == LuaTypes.THEN)
+            return matchEnd(begin, advanced, builder, level, LuaTypes.ELSE, LuaTypes.ELSEIF, LuaTypes.END);
+        else if (begin == LuaTypes.ELSE)
+            return matchEnd(begin, advanced, builder, level, LuaTypes.END);
+        //else if (begin == LuaTypes.ELSEIF)
+        //    return matchEnd(begin, advanced, builder, level, LuaTypes.ELSEIF, LuaTypes.ELSE, LuaTypes.END);
+        else if (begin == LuaTypes.FUNCTION)
+            return matchEnd(begin, advanced, builder, level, LuaTypes.END);
+        return false;
     }
 
-    static void matchEnd(IElementType start, PsiBuilder builder, int level, IElementType ... types) {
+    static boolean matchEnd(IElementType start, boolean advanced,  PsiBuilder builder, int level, IElementType ... types) {
+        if (!advanced)
+            builder.advanceLexer();
         IElementType type = builder.getTokenType();
+
         while (true) {
             if (type == null || builder.eof()) {
-                break;
+                return false;
             }
-            
-            builder.advanceLexer();
-            type = builder.getTokenType();
-
 
             if (ArrayUtil.indexOf(types, type) != -1) {
-                level--;
-                if (level == 0) {
-
-                    break;
+                if (level != 0 && (type == LuaTypes.ELSE || type == LuaTypes.ELSEIF)) {
+                    matchStart(builder, level + 1, type, false);
                 }
+                return true;
             }
-            matchStart(builder, level, type);
+
+            boolean v = false;
+            while (matchStart(builder, level + 1, type, false)) {
+                builder.advanceLexer();
+                type = builder.getTokenType();
+                v = true;
+                if (level == 0) break;
+            }
+
+            if (!v) {
+                builder.advanceLexer();
+                type = builder.getTokenType();
+            }
         }
     }
 }
