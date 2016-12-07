@@ -34,7 +34,8 @@ public class LuaPsiTreeUtil {
                 LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
                 LuaNameDef funcName = localFuncDef.getNameDef();
                 //名字部分
-                continueSearch = processor.accept(funcName);
+                if (funcName != null)
+                    continueSearch = processor.accept(funcName);
             }
         } while (continueSearch && !(curr instanceof PsiFile));
     }
