@@ -32,7 +32,10 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
 
         if (prev != null) {
             PsiBuilder.Marker marker = builder_.mark();
-            matchStart(builder_, level_, prev);
+            if (prev == LuaTypes.RPAREN)
+                prev = LuaTypes.FUNCTION;
+
+            matchStart(builder_, 0, prev);
             marker.collapse(LuaTypes.BLOCK);
         }
         return true;
@@ -40,30 +43,37 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
 
     static void matchStart(PsiBuilder builder, int level, IElementType type) {
         if (type == LuaTypes.DO)
-            matchEnd(builder, level, LuaTypes.END);
+            matchEnd(type, builder, level + 1, LuaTypes.END);
         else if (type == LuaTypes.REPEAT)
-            matchEnd(builder, level, LuaTypes.UNTIL);
+            matchEnd(type, builder, level + 1, LuaTypes.UNTIL);
         else if (type == LuaTypes.THEN)
-            matchEnd(builder, level, LuaTypes.ELSE, LuaTypes.ELSEIF, LuaTypes.END);
+            matchEnd(type, builder, level + 1, LuaTypes.ELSE, LuaTypes.ELSEIF, LuaTypes.END);
         else if (type == LuaTypes.ELSE)
-            matchEnd(builder, level, LuaTypes.END);
+            matchEnd(type, builder, level + 1, LuaTypes.END);
         else if (type == LuaTypes.ELSEIF)
-            matchEnd(builder, level, LuaTypes.ELSEIF, LuaTypes.ELSE, LuaTypes.END);
-        //TODO function body
+            matchEnd(type, builder, level + 1, LuaTypes.ELSEIF, LuaTypes.ELSE, LuaTypes.END);
+        else if (type == LuaTypes.FUNCTION)
+            matchEnd(type, builder, level + 1, LuaTypes.END);
     }
 
-    static void matchEnd(PsiBuilder builder, int level, IElementType ... types) {
+    static void matchEnd(IElementType start, PsiBuilder builder, int level, IElementType ... types) {
         IElementType type = builder.getTokenType();
         while (true) {
-            if (type == null || builder.eof() || type == LuaTypes.END) {
+            if (type == null || builder.eof()) {
                 break;
             }
+            
             builder.advanceLexer();
             type = builder.getTokenType();
 
-            if (ArrayUtil.indexOf(types, type) != -1)
-                break;
 
+            if (ArrayUtil.indexOf(types, type) != -1) {
+                level--;
+                if (level == 0) {
+
+                    break;
+                }
+            }
             matchStart(builder, level, type);
         }
     }
