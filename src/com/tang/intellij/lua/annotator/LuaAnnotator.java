@@ -5,10 +5,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.doc.psi.LuaDocClassName;
-import com.tang.intellij.lua.doc.psi.LuaDocClassNameRef;
-import com.tang.intellij.lua.doc.psi.LuaDocPsiElement;
-import com.tang.intellij.lua.doc.psi.LuaDocVisitor;
+import com.tang.intellij.lua.doc.psi.*;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +49,12 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                 annotation.setTextAttributes(LuaHighlightingData.FIELD);
             }
         }
+
+        @Override
+        public void visitClassMethodName(@NotNull LuaClassMethodName o) {
+            Annotation annotation = myHolder.createInfoAnnotation(o, null);
+            annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_METHOD);
+        }
     }
 
     class LuaDocElementVisitor extends LuaDocVisitor {
@@ -66,6 +69,12 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         public void visitClassNameRef(@NotNull LuaDocClassNameRef o) {
             Annotation annotation = myHolder.createInfoAnnotation(o, null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_REFERENCE);
+        }
+
+        @Override
+        public void visitParamNameRef(@NotNull LuaDocParamNameRef o) {
+            Annotation annotation = myHolder.createInfoAnnotation(o, null);
+            annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
         }
     }
 }
