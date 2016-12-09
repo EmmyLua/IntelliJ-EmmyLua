@@ -5,12 +5,10 @@ import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.util.ArrayUtil;
 
 public class LuaParserUtil extends GeneratedParserUtilBase {
 
     public static boolean twoExpr(PsiBuilder builder_, int level_, Parser parser) {
-        System.out.println("twoExpr");
         PsiBuilder.Marker marker = builder_.mark();
         boolean r = parser.parse(builder_, level_);
         r = r && parser.parse(builder_, level_);
