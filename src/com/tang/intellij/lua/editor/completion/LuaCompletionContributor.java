@@ -3,11 +3,18 @@ package com.tang.intellij.lua.editor.completion;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
+import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ProcessingContext;
+import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
+import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
@@ -97,7 +104,34 @@ public class LuaCompletionContributor extends CompletionContributor {
                         completionResultSet.addElement(elementBuilder);
                     }
                 }
+
+                //key words
+                for (IElementType keyWordToken : LuaSyntaxHighlighter.KEYWORD_TOKENS.getTypes()) {
+                    completionResultSet.addElement(LookupElementBuilder.create(keyWordToken));
+                }
             }
         });
+    }
+
+    private static void suggestKeywords(PsiElement position) {
+
+        GeneratedParserUtilBase.CompletionState state = new GeneratedParserUtilBase.CompletionState(8) {
+            @Override
+            public String convertItem(Object o) {
+                if (o instanceof LuaTokenType) {
+                    LuaTokenType tokenType = (LuaTokenType) o;
+                    return tokenType.toString();
+                }
+                // we do not have other keywords
+                return o instanceof String? (String)o : null;
+            }
+        };
+
+        PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(position.getProject());
+        PsiFile file = psiFileFactory.createFileFromText("a.lua", LuaLanguage.INSTANCE, "local ", true, false);
+        file.putUserData(GeneratedParserUtilBase.COMPLETION_STATE_KEY, state);
+        TreeUtil.ensureParsed(file.getNode());
+
+        System.out.println("---");
     }
 }

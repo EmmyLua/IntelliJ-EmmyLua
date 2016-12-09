@@ -11,9 +11,4 @@ public class LuaTokenType extends IElementType {
     public LuaTokenType(String debugName) {
         super(debugName, LuaLanguage.INSTANCE);
     }
-
-    @Override
-    public String toString() {
-        return "LuaTokenType." + super.toString();
-    }
 }
