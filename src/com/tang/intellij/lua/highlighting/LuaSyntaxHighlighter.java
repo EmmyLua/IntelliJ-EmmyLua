@@ -47,7 +47,9 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaDocTypes.TAG_PARAM,
             LuaDocTypes.TAG_RETURN,
             LuaDocTypes.CLASS,
-            LuaDocTypes.TYPE
+            LuaDocTypes.TYPE,
+            LuaDocTypes.DEFINE,
+            LuaDocTypes.FIELD
     );
 
     private static final TextAttributesKey KEYWORD = createTextAttributesKey("LUA_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);

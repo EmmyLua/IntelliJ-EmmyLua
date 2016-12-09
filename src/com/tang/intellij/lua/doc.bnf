@@ -30,6 +30,8 @@
   CLASS = 'class'
   EXTENDS = "extends"
   INTERFACE = 'interface'
+  FIELD = 'field'
+  DEFINE = 'define'
   DASHES = 'DASHES'
   STRING_BEGIN = 'STRING_BEGIN'
   STRING = 'STRING'
@@ -41,9 +43,17 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 //private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def | return_def | tag_def | class_def | type_def) comment_string?
+private doc_item ::= '@' (global_def | param_def | return_def | tag_def | class_def | field_def | type_def) comment_string?
 
 type_set ::= '#' class_name_ref (',' class_name_ref)*
+
+//--- define
+global_def ::= DEFINE {
+    stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub"
+}
+
+//--- field def
+field_def ::= FIELD type_set { pin = 1 }
 
 //--- tag
 tag_value ::= ID

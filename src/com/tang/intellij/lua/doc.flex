@@ -61,6 +61,8 @@ DOC_DASHES = ----*
  "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
  ","                        { return COMMA; }
  "#"                        { return SHARP; }
+ "field"                    { return FIELD; }
+ "define"                   { return DEFINE; }
  "return"                   { return TAG_RETURN; }
  "param"                    { return TAG_PARAM; }
  "private"                  { return PRIVATE; }

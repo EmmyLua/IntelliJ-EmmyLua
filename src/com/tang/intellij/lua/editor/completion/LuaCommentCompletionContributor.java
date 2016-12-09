@@ -7,10 +7,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.ElementType;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.doc.psi.LuaDocTypes;
+import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
@@ -43,9 +46,9 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SHOW_DOC_TAG, new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                String[] keyWords = new String[]{ "class", "param", "return", "type" };
-                for (String keyWord : keyWords) {
-                    completionResultSet.addElement(LookupElementBuilder.create(keyWord));
+                TokenSet set = LuaSyntaxHighlighter.DOC_KEYWORD_TOKENS;
+                for (IElementType type : set.getTypes()) {
+                    completionResultSet.addElement(LookupElementBuilder.create(type));
                 }
             }
         });
