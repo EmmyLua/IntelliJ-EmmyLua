@@ -22,21 +22,28 @@ public class LuaPsiTreeUtil {
         if (current == null || processor == null)
             return;
         boolean continueSearch = true;
+        int treeDeep = 0;
+        int funcDeep = 0;
         PsiElement curr = current;
         do {
-            PsiElement next = curr.getPrevSibling();
-            if (next == null) {
-                next = curr.getParent();
-            }
-            curr = next;
-
             if (curr instanceof LuaLocalFuncDef) {
-                LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
-                LuaNameDef funcName = localFuncDef.getNameDef();
-                //名字部分
-                if (funcName != null)
-                    continueSearch = processor.accept(funcName);
+                //第一级local function不能使用
+                if (funcDeep > 0 || treeDeep == 0) {
+                    LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
+                    LuaNameDef funcName = localFuncDef.getNameDef();
+                    //名字部分
+                    if (funcName != null)
+                        continueSearch = processor.accept(funcName);
+                }
+                funcDeep++;
             }
+
+            PsiElement prevSibling = curr.getPrevSibling();
+            if (prevSibling == null) {
+                treeDeep++;
+                prevSibling = curr.getParent();
+            }
+            curr = prevSibling;
         } while (continueSearch && !(curr instanceof PsiFile));
     }
 
