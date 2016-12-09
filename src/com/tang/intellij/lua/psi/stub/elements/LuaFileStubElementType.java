@@ -1,12 +1,15 @@
 package com.tang.intellij.lua.psi.stub.elements;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.StubBuilder;
 import com.intellij.psi.stubs.DefaultStubBuilder;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.psi.LuaTypes;
 import com.tang.intellij.lua.psi.stub.LuaFileStub;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +31,15 @@ public class LuaFileStubElementType extends IStubFileElementType<LuaFileStub> {
                 if (file instanceof LuaFile)
                     return new LuaFileStub((LuaFile) file);
                 return super.createStubForFile(file);
+            }
+
+            @Override
+            protected boolean skipChildProcessingWhenBuildingStubs(@NotNull PsiElement parent, @NotNull PsiElement element) {
+                IElementType type = element.getNode().getElementType();
+                if (type == LuaTypes.BLOCK) {
+                    return true;
+                }
+                return false;
             }
         };
     }
