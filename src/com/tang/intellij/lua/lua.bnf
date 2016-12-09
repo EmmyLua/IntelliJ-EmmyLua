@@ -77,7 +77,7 @@
         STRING = "STRING"
   ]
 
-  implements("localDef") = "com.tang.intellij.lua.psi.LuaDeclaration"
+  implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
   implements("globalFuncDef|localFuncDef|classMethodFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner, com.tang.intellij.lua.psi.LuaDeclaration"
   implements("lambdaFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
@@ -107,7 +107,7 @@ private stat ::=
     localDef |
     lastStat
 
-assignStat ::= varList '=' exprList { pin = 1 }
+assignStat ::= varList '=' exprList { pin = 1 methods = [getComment] }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
 repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }

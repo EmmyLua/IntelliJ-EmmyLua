@@ -40,6 +40,7 @@
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex" />
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaClassIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaClassMethodIndex"/>
+        <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
     </extensions>
 

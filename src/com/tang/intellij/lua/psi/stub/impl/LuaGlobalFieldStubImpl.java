@@ -12,7 +12,14 @@ import com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub;
  */
 public class LuaGlobalFieldStubImpl extends StubBase<LuaDocGlobalDef> implements LuaGlobalFieldStub {
 
-    public LuaGlobalFieldStubImpl(StubElement parent) {
-        super(parent, LuaElementType.GLOBAL_FUNC_DEF);
+    private String[] names;
+
+    public LuaGlobalFieldStubImpl(StubElement parent, String[] names) {
+        super(parent, LuaElementType.GLOBAL_FIELD_DEF);
+        this.names = names;
+    }
+
+    public String[] getNames() {
+        return names;
     }
 }

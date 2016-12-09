@@ -17,6 +17,7 @@ import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
 import org.jetbrains.annotations.NotNull;
@@ -103,6 +104,12 @@ public class LuaCompletionContributor extends CompletionContributor {
                                 .withIcon(AllIcons.Nodes.Function);
                         completionResultSet.addElement(elementBuilder);
                     }
+                }
+
+                //global fields
+                Collection<String> allGlobalFieldNames = LuaGlobalFieldIndex.getInstance().getAllKeys(project);
+                for (String name : allGlobalFieldNames) {
+                    completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(AllIcons.Nodes.Field));
                 }
 
                 //key words

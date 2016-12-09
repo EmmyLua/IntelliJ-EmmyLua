@@ -1,15 +1,19 @@
 package com.tang.intellij.lua.psi.stub.elements;
 
 import com.intellij.psi.stubs.*;
+import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.doc.psi.impl.LuaDocGlobalDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.psi.LuaElementType;
+import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub;
 import com.tang.intellij.lua.psi.stub.impl.LuaGlobalFieldStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -23,12 +27,26 @@ public class LuaGlobalFieldStubElementType extends IStubElementType<LuaGlobalFie
 
     @Override
     public LuaDocGlobalDef createPsi(@NotNull LuaGlobalFieldStub luaGlobalFieldStub) {
-        return new LuaDocGlobalDefImpl(luaGlobalFieldStub, LuaElementType.GLOBAL_FUNC_DEF);
+        return new LuaDocGlobalDefImpl(luaGlobalFieldStub, LuaElementType.GLOBAL_FIELD_DEF);
     }
 
     @Override
     public LuaGlobalFieldStub createStub(@NotNull LuaDocGlobalDef luaDocGlobalDef, StubElement stubElement) {
-        return new LuaGlobalFieldStubImpl(stubElement);
+        List<String> names = new ArrayList<>();
+
+        LuaCommentOwner owner = LuaCommentUtil.findOwner(luaDocGlobalDef);
+        if (owner instanceof LuaAssignStat) {
+            LuaAssignStat stat = (LuaAssignStat) owner;
+            LuaVarList list = stat.getVarList();
+            for (LuaVar var : list.getVarList()) {
+                LuaNameRef ref = var.getNameRef();
+                if (ref != null) {
+                    names.add(ref.getText());
+                }
+            }
+        }
+
+        return new LuaGlobalFieldStubImpl(stubElement, names.toArray(new String[names.size()]));
     }
 
     @NotNull
@@ -39,17 +57,28 @@ public class LuaGlobalFieldStubElementType extends IStubElementType<LuaGlobalFie
 
     @Override
     public void serialize(@NotNull LuaGlobalFieldStub luaGlobalFieldStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-
+        String[] names = luaGlobalFieldStub.getNames();
+        stubOutputStream.writeInt(names.length);
+        for (String name : names)
+            stubOutputStream.writeUTFFast(name);
     }
 
     @NotNull
     @Override
     public LuaGlobalFieldStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        return new LuaGlobalFieldStubImpl(stubElement);
+        int length = stubInputStream.readInt();
+        String[] names = new String[length];
+        for (int i = 0; i < length; i++) {
+            names[i] = stubInputStream.readUTFFast();
+        }
+        return new LuaGlobalFieldStubImpl(stubElement, names);
     }
 
     @Override
     public void indexStub(@NotNull LuaGlobalFieldStub luaGlobalFieldStub, @NotNull IndexSink indexSink) {
-
+        String[] names = luaGlobalFieldStub.getNames();
+        for (String name : names) {
+            indexSink.occurrence(LuaGlobalFieldIndex.KEY, name);
+        }
     }
 }
