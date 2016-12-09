@@ -75,14 +75,21 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     static LuaTypeSet guessType(LuaValueExpr valueExpr) {
         PsiElement firstChild = valueExpr.getFirstChild();
         if (firstChild != null) {
-            IElementType type = firstChild.getNode().getElementType();
             if (firstChild instanceof LuaFuncCall) {
                 return ((LuaFuncCall) firstChild).guessType();
             }
             else if (firstChild instanceof LuaTableConstructor) {
                 return LuaTypeSet.create(LuaTypeTable.create((LuaTableConstructor) firstChild));
             }
-            else if (type == LuaTypes.STRING) {
+            else if (firstChild instanceof LuaVar) {
+                LuaVar luaVar = (LuaVar) firstChild;
+                LuaNameRef ref = luaVar.getNameRef();
+                if (ref != null)
+                    return ref.resolveType();
+                else if (luaVar.getExpr() != null)
+                    return luaVar.getExpr().guessType();
+            } else {
+                //IElementType type = firstChild.getNode().getElementType();
                 //TODO STRING TYPESET
                 //TODO bool typeset
             }
