@@ -19,6 +19,16 @@ public class LuaPsiResolveUtil {
     public static PsiElement resolve(LuaNameRef ref) {
         String refName = ref.getText();
 
+        if (refName.equals("self")) {
+            LuaClassMethodFuncDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodFuncDef.class);
+            if (classMethodFuncDef != null) {
+                LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
+                if (nameRef != null)
+                    return nameRef.resolve();
+            }
+            return null;
+        }
+
         //local 变量, 参数
         LuaPsiTreeUtil.walkUpLocalNameDef(ref, nameDef -> {
             if (refName.equals(nameDef.getName())) {
