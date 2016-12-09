@@ -166,7 +166,7 @@ left indexExpr ::= '[' expr ']' | '.' ID {
 
 private checkCallExpr ::= args | ':' ID args { pin(".*") = 1 }
 
-left callExpr ::= args | ':' ID args { pin(".*") = 1 methods = [guessPrefixType] }
+left callExpr ::= args | ':' ID args { pin(".*") = 1 methods = [getReference guessPrefixType] }
 
 private suffixIndexExpr ::= callExpr | <<twoExpr checkIndexExpr>> indexExpr
 // 最终产生 index expr | nameRef

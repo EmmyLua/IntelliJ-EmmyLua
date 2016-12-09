@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.psi;
 
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
@@ -7,6 +8,7 @@ import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
+import com.tang.intellij.lua.reference.LuaRequireReference;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -75,6 +77,24 @@ public class LuaPsiImplUtil {
             LuaExpr prefix = (LuaExpr) callExpr.getFirstChild();
             if (prefix != null)
                 return prefix.guessType();
+        }
+        return null;
+    }
+
+    public static PsiReference getReference(LuaCallExpr callExpr) {
+        PsiElement id = callExpr.getNameRef();
+        if (id != null && id.getText().equals("require")) {
+            LuaArgs args = callExpr.getArgs();
+            if (args != null) {
+                PsiElement path = args.getFirstChild();
+                if (path != null && path.getNode().getElementType() == LuaTypes.STRING) {
+                    String pathString = path.getText();
+                    pathString = pathString.substring(1, pathString.length() - 1);
+                    int start = args.getStartOffsetInParent() + 1;
+                    int end = start + path.getTextLength() - 2;
+                    return new LuaRequireReference(callExpr, new TextRange(start, end), pathString);
+                }
+            }
         }
         return null;
     }
