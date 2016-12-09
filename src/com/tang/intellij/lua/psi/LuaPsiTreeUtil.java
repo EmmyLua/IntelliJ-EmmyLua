@@ -63,18 +63,9 @@ public class LuaPsiTreeUtil {
                 LuaNameList nameList = ((LuaLocalDef) curr).getNameList();
                 continueSearch = resolveInNameList(nameList, processor);
             }
-            else if (curr instanceof LuaLocalFuncDef) {
-                LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
-                //LuaNameDef funcName = localFuncDef.getNameDef();
-                //名字部分
-
+            else if (curr instanceof LuaFuncBody) {
                 //参数部分
-                if (searchParList) continueSearch = resolveInFuncBody(localFuncDef.getFuncBody(), processor);
-            }
-            else if (curr instanceof LuaGlobalFuncDef) {
-                //参数部分
-                LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) curr;
-                if (searchParList) continueSearch = resolveInFuncBody(globalFuncDef.getFuncBody(), processor);
+                if (searchParList) continueSearch = resolveInFuncBody((LuaFuncBody) curr, processor);
             }
             // for name = x, y do end
             else if (curr instanceof LuaForAStat) {

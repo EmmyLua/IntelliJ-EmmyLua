@@ -77,7 +77,9 @@
         STRING = "STRING"
   ]
 
-  implements("globalFuncDef|localFuncDef|localDef") = "com.tang.intellij.lua.psi.LuaDeclaration"
+  implements("localDef") = "com.tang.intellij.lua.psi.LuaDeclaration"
+  implements("globalFuncDef|localFuncDef|classMethodFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner, com.tang.intellij.lua.psi.LuaDeclaration"
+  implements("lambdaFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
   extends(".*Expr") = expr
 }
@@ -126,6 +128,7 @@ classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) { pin = 3 }
 classMethodFuncDef ::= 'function' classMethodName funcBody {
     pin = 2
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassMethodStub"
+    methods = [getComment]
 }
 
 localFuncDef ::= 'local' 'function' nameDef funcBody {

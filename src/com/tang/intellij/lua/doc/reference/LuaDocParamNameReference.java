@@ -45,13 +45,9 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
 
         if (owner != null) {
             String name = myElement.getText();
-            if (owner instanceof LuaGlobalFuncDef) {
-                LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) owner;
-                return findParamWithName(globalFuncDef.getFuncBody(), name);
-            }
-            else if (owner instanceof LuaLocalFuncDef) {
-                LuaLocalFuncDef funcDef = (LuaLocalFuncDef) owner;
-                return findParamWithName(funcDef.getFuncBody(), name);
+            if (owner instanceof LuaFuncBodyOwner) {
+                LuaFuncBodyOwner bodyOwner = (LuaFuncBodyOwner) owner;
+                return findParamWithName(bodyOwner.getFuncBody(), name);
             }
         }
         return null;

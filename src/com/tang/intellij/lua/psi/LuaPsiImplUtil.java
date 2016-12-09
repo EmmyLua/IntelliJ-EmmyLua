@@ -53,16 +53,8 @@ public class LuaPsiImplUtil {
         return LuaPsiResolveUtil.resolveType(parDef);
     }
 
-    public static LuaComment getComment(LuaGlobalFuncDef globalFuncDef) {
+    public static LuaComment getComment(LuaDeclaration globalFuncDef) {
         return LuaCommentUtil.findComment(globalFuncDef);
-    }
-
-    public static LuaComment getComment(LuaLocalFuncDef localFuncDef) {
-        return LuaCommentUtil.findComment(localFuncDef);
-    }
-
-    public static LuaComment getComment(LuaLocalDef localDef) {
-        return LuaCommentUtil.findComment(localDef);
     }
 
     public static LuaTypeSet guessType(LuaFuncCall funcCall) {
