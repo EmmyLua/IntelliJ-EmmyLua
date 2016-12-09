@@ -1,12 +1,19 @@
 package com.tang.intellij.lua.psi;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.doc.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
 import com.tang.intellij.lua.doc.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
+import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
+
+import java.util.Collection;
 
 /**
  *
@@ -14,7 +21,7 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
  */
 public class LuaPsiResolveUtil {
 
-    static LuaNameDef resolveResult;
+    static PsiElement resolveResult;
 
     public static PsiElement resolve(LuaNameRef ref) {
         String refName = ref.getText();
@@ -38,8 +45,8 @@ public class LuaPsiResolveUtil {
             return true;
         });
 
+        //local 函数名
         if (resolveResult == null) {
-            //local 函数名
             LuaPsiTreeUtil.walkUpLocalFuncDef(ref, nameDef -> {
                 if (refName.equals(nameDef.getName())) {
                     resolveResult = nameDef;
@@ -47,6 +54,24 @@ public class LuaPsiResolveUtil {
                 }
                 return true;
             });
+        }
+
+        //global field
+        if (resolveResult == null) {
+            Project project = ref.getProject();
+            Collection<LuaDocGlobalDef> defs = LuaGlobalFieldIndex.getInstance().get(refName, project, new ProjectAndLibrariesScope(project));
+            if (defs.size() > 0) {
+                resolveResult = defs.iterator().next();
+            }
+        }
+
+        //global function
+        if (resolveResult == null) {
+            Project project = ref.getProject();
+            Collection<LuaGlobalFuncDef> defs = LuaGlobalFuncIndex.getInstance().get(refName, project, new ProjectAndLibrariesScope(project));
+            if (defs.size() > 0) {
+                resolveResult = defs.iterator().next();
+            }
         }
 
         PsiElement result = resolveResult;

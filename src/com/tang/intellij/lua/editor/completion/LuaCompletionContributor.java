@@ -94,16 +94,12 @@ public class LuaCompletionContributor extends CompletionContributor {
 
                 //global functions
                 Project project = completionParameters.getOriginalFile().getProject();
-                Collection<LuaGlobalFuncDef> list = LuaGlobalFuncIndex.getInstance().get(LuaGlobalFuncDefStubElementType.NON_PREFIX_GLOBAL_FUNC, project, new ProjectAndLibrariesScope(project));
-                for (LuaGlobalFuncDef def : list) {
-                    LuaNameDef funcName = def.getNameDef();
-                    if (funcName != null) {
-                        String text = funcName.getText();
-                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(text)
-                                .withTypeText("Global Func")
-                                .withIcon(AllIcons.Nodes.Function);
-                        completionResultSet.addElement(elementBuilder);
-                    }
+                Collection<String> list = LuaGlobalFuncIndex.getInstance().getAllKeys(project);
+                for (String name : list) {
+                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
+                            .withTypeText("Global Func")
+                            .withIcon(AllIcons.Nodes.Function);
+                    completionResultSet.addElement(elementBuilder);
                 }
 
                 //global fields
