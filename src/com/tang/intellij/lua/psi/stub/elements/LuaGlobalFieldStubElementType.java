@@ -1,9 +1,9 @@
 package com.tang.intellij.lua.psi.stub.elements;
 
 import com.intellij.psi.stubs.*;
-import com.tang.intellij.lua.doc.LuaCommentUtil;
-import com.tang.intellij.lua.doc.psi.LuaDocGlobalDef;
-import com.tang.intellij.lua.doc.psi.impl.LuaDocGlobalDefImpl;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
+import com.tang.intellij.lua.comment.psi.impl.LuaDocGlobalDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;

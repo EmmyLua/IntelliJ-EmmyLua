@@ -2,7 +2,7 @@ package com.tang.intellij.lua.psi.stub;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.io.StringRef;
-import com.tang.intellij.lua.doc.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 
 /**
  *

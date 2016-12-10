@@ -1,20 +1,20 @@
 {
-  parserClass="com.tang.intellij.lua.doc.parser.LuaDocParser"
+  parserClass="com.tang.intellij.lua.comment.parser.LuaDocParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-  implements="com.tang.intellij.lua.doc.psi.LuaDocPsiElement"
+  implements="com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
 
   psiClassPrefix="LuaDoc"
   psiImplClassSuffix="Impl"
-  psiPackage="com.tang.intellij.lua.doc.psi"
-  psiImplPackage="com.tang.intellij.lua.doc.psi.impl"
-  psiImplUtilClass="com.tang.intellij.lua.doc.psi.LuaDocPsiImplUtil"
+  psiPackage="com.tang.intellij.lua.comment.psi"
+  psiImplPackage="com.tang.intellij.lua.comment.psi.impl"
+  psiImplUtilClass="com.tang.intellij.lua.comment.psi.LuaDocPsiImplUtil"
 
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
-  elementTypeHolderClass="com.tang.intellij.lua.doc.psi.LuaDocTypes"
-  elementTypeClass="com.tang.intellij.lua.doc.psi.LuaDocElementType"
+  elementTypeHolderClass="com.tang.intellij.lua.comment.psi.LuaDocTypes"
+  elementTypeClass="com.tang.intellij.lua.comment.psi.LuaDocElementType"
   elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createDocType"
-  tokenTypeClass="com.tang.intellij.lua.doc.psi.LuaDocTokenType"
+  tokenTypeClass="com.tang.intellij.lua.comment.psi.LuaDocTokenType"
 
   tokens = [
   ID = 'ID'
@@ -51,14 +51,14 @@ access_modifier ::= "protected" | "public"
 //--- define
 global_def ::= DEFINE {
     stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub"
-    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable, com.tang.intellij.lua.doc.psi.LuaDocPsiElement"
+    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable, com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
     methods = [resolveType]
 }
 
 //--- field def
 //@field name #TYPE
 field_name_def ::= ID {
-    implements = "com.tang.intellij.lua.doc.psi.LuaDocNamedElement"
+    implements = "com.tang.intellij.lua.comment.psi.LuaDocNamedElement"
     methods = [setName getName]
 }
 field_def ::= FIELD access_modifier field_name_def type_set {
@@ -88,7 +88,7 @@ return_def ::= TAG_RETURN type_list {
 
 //@class NAME extends CLASS_REF
 class_name ::= ID {
-    implements = "com.tang.intellij.lua.doc.psi.LuaDocNamedElement"
+    implements = "com.tang.intellij.lua.comment.psi.LuaDocNamedElement"
     methods = [getName setName]
 }
 class_name_ref ::= ID {

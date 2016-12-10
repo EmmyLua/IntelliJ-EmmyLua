@@ -1,9 +1,9 @@
-package com.tang.intellij.lua.doc;
+package com.tang.intellij.lua.comment;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.doc.psi.LuaDocPsiElement;
-import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaParserDefinition;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import org.jetbrains.annotations.NotNull;

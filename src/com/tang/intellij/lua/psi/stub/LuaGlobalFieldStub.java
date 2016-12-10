@@ -1,7 +1,7 @@
 package com.tang.intellij.lua.psi.stub;
 
 import com.intellij.psi.stubs.StubElement;
-import com.tang.intellij.lua.doc.psi.LuaDocGlobalDef;
+import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 
 /**
  *

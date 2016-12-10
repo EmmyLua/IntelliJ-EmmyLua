@@ -1,14 +1,14 @@
-package com.tang.intellij.lua.doc.psi.impl;
+package com.tang.intellij.lua.comment.psi.impl;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.impl.source.tree.LazyParseablePsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.doc.LuaCommentUtil;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
-import com.tang.intellij.lua.doc.psi.LuaDocParamNameRef;
-import com.tang.intellij.lua.doc.psi.LuaDocTypeDef;
-import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
+import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef;
+import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaTypes;
 

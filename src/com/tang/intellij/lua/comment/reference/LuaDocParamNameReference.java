@@ -1,11 +1,11 @@
-package com.tang.intellij.lua.doc.reference;
+package com.tang.intellij.lua.comment.reference;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.IncorrectOperationException;
-import com.tang.intellij.lua.doc.LuaCommentUtil;
-import com.tang.intellij.lua.doc.psi.LuaDocParamNameRef;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

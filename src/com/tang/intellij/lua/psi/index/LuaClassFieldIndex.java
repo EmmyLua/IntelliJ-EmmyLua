@@ -2,7 +2,7 @@ package com.tang.intellij.lua.psi.index;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
-import com.tang.intellij.lua.doc.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import org.jetbrains.annotations.NotNull;
 
 /**

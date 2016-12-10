@@ -3,7 +3,7 @@ package com.tang.intellij.lua.psi.stub.impl;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.io.StringRef;
-import com.tang.intellij.lua.doc.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.stub.LuaClassFieldStub;
 

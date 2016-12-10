@@ -6,8 +6,8 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.doc.psi.LuaDocTokenType;
-import com.tang.intellij.lua.doc.psi.LuaDocTypes;
+import com.tang.intellij.lua.comment.psi.LuaDocTokenType;
+import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,4 +1,4 @@
-package com.tang.intellij.lua.doc.lexer;
+package com.tang.intellij.lua.comment.lexer;
 
 import com.intellij.lexer.FlexAdapter;
 

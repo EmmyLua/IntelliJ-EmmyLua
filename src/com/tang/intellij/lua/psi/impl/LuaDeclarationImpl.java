@@ -1,8 +1,8 @@
 package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.lang.ASTNode;
-import com.tang.intellij.lua.doc.LuaCommentUtil;
-import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaDeclaration;
 import org.jetbrains.annotations.NotNull;

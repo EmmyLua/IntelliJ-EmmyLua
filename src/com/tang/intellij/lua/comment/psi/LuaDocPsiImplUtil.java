@@ -1,12 +1,12 @@
-package com.tang.intellij.lua.doc.psi;
+package com.tang.intellij.lua.comment.psi;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
-import com.tang.intellij.lua.doc.LuaCommentUtil;
-import com.tang.intellij.lua.doc.psi.api.LuaComment;
-import com.tang.intellij.lua.doc.reference.LuaClassNameReference;
-import com.tang.intellij.lua.doc.reference.LuaDocParamNameReference;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
+import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;

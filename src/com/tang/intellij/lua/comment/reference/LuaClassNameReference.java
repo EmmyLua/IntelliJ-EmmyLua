@@ -1,11 +1,11 @@
-package com.tang.intellij.lua.doc.reference;
+package com.tang.intellij.lua.comment.reference;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.doc.psi.LuaDocClassNameRef;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

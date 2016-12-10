@@ -1,6 +1,6 @@
 package com.tang.intellij.lua.lang.type;
 
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 
 import java.util.ArrayList;
 import java.util.Collections;

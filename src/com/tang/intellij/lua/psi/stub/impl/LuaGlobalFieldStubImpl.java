@@ -2,7 +2,7 @@ package com.tang.intellij.lua.psi.stub.impl;
 
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
-import com.tang.intellij.lua.doc.psi.LuaDocGlobalDef;
+import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub;
 

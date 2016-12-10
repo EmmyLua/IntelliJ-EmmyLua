@@ -1,8 +1,8 @@
 package com.tang.intellij.lua.psi.stub.elements;
 
 import com.intellij.psi.stubs.*;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.doc.psi.impl.LuaDocClassDefImpl;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;

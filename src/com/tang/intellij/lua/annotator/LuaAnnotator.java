@@ -5,7 +5,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.doc.psi.*;
+import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;

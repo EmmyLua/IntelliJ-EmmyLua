@@ -1,6 +1,6 @@
 package com.tang.intellij.lua.psi;
 
-import com.tang.intellij.lua.doc.psi.api.LuaComment;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 
 /**
  *

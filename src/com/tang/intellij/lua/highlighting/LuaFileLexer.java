@@ -1,7 +1,7 @@
 package com.tang.intellij.lua.highlighting;
 
 import com.intellij.lexer.LayeredLexer;
-import com.tang.intellij.lua.doc.lexer.LuaDocLexerAdapter;
+import com.tang.intellij.lua.comment.lexer.LuaDocLexerAdapter;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.psi.LuaElementType;
 

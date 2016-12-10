@@ -1,4 +1,4 @@
-package com.tang.intellij.lua.doc.psi;
+package com.tang.intellij.lua.comment.psi;
 
 import com.intellij.psi.PsiElement;
 

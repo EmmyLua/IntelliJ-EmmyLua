@@ -2,10 +2,9 @@ package com.tang.intellij.lua.psi.index;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
-import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
