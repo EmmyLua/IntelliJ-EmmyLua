@@ -76,5 +76,11 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             Annotation annotation = myHolder.createInfoAnnotation(o, null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
         }
+
+        @Override
+        public void visitFieldNameDef(@NotNull LuaDocFieldNameDef o) {
+            Annotation annotation = myHolder.createInfoAnnotation(o, null);
+            annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
+        }
     }
 }
