@@ -3,7 +3,9 @@ package com.tang.intellij.lua.psi;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.doc.LuaCommentUtil;
+import com.tang.intellij.lua.doc.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.reference.LuaIndexReference;
@@ -71,6 +73,20 @@ public class LuaPsiImplUtil {
             PsiElement def = nameRef.resolve();
             if (def instanceof LuaTypeResolvable) {
                 return ((LuaTypeResolvable) def).resolveType();
+            } else if (def instanceof LuaNameRef) {
+                // global
+                // --- @define
+                // --- @type XXX
+                // myGlobal = ...
+                LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
+                if (assignStat != null) {
+                    LuaComment comment = LuaCommentUtil.findComment(assignStat);
+                    if (comment != null) {
+                        LuaDocTypeDef typeDef = comment.getTypeDef();
+                        if (typeDef != null)
+                            return typeDef.guessType();
+                    }
+                }
             }
         }
         else {

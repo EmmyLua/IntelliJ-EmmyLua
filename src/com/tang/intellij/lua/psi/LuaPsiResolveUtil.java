@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.doc.LuaCommentUtil;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
 import com.tang.intellij.lua.doc.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.doc.psi.LuaDocParamDef;
@@ -14,6 +15,7 @@ import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -61,7 +63,19 @@ public class LuaPsiResolveUtil {
             Project project = ref.getProject();
             Collection<LuaDocGlobalDef> defs = LuaGlobalFieldIndex.getInstance().get(refName, project, new ProjectAndLibrariesScope(project));
             if (defs.size() > 0) {
-                resolveResult = defs.iterator().next();
+                LuaDocGlobalDef globalDef = defs.iterator().next();
+                LuaCommentOwner owner = LuaCommentUtil.findOwner(globalDef);
+                if (owner instanceof LuaAssignStat) {
+                    LuaAssignStat assignStat = (LuaAssignStat) owner;
+                    List<LuaVar> varList = assignStat.getVarList().getVarList();
+                    for (LuaVar var : varList) {
+                        LuaNameRef nameRef = var.getNameRef();
+                        if (nameRef != null && nameRef.getText().equals(refName)) {
+                            resolveResult = nameRef;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
