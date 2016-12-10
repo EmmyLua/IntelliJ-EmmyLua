@@ -30,11 +30,11 @@ public class LuaDocPsiImplUtil {
     }
 
     @NotNull
-    public static String getName(LuaDocClassName className) {
+    public static String getName(LuaDocNamedElement className) {
         return className.getText();
     }
 
-    public static PsiElement setName(LuaDocClassName className, String newName) {
+    public static PsiElement setName(LuaDocNamedElement className, String newName) {
         return null;
     }
 

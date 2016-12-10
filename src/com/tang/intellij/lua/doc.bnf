@@ -25,7 +25,7 @@
   TAG_NAME = 'TAG_NAME'
   TAG_PARAM = 'param'
   TAG_RETURN = 'return'
-  PRIVATE = 'private'
+  PROTECTED = 'protected'
   PUBLIC = 'public'
   CLASS = 'class'
   EXTENDS = "extends"
@@ -46,6 +46,7 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 private doc_item ::= '@' (global_def | param_def | return_def | tag_def | class_def | field_def | type_def) comment_string?
 
 type_set ::= '#' class_name_ref (',' class_name_ref)*
+access_modifier ::= "protected" | "public"
 
 //--- define
 global_def ::= DEFINE {
@@ -55,7 +56,12 @@ global_def ::= DEFINE {
 }
 
 //--- field def
-field_def ::= FIELD type_set {
+//@field name #TYPE
+field_name_def ::= ID {
+    implements = "com.tang.intellij.lua.doc.psi.LuaDocNamedElement"
+    methods = [setName getName]
+}
+field_def ::= FIELD access_modifier field_name_def type_set {
     pin = 1
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassFieldStub"
 }

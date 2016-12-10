@@ -65,7 +65,7 @@ DOC_DASHES = ----*
  "define"                   { return DEFINE; }
  "return"                   { return TAG_RETURN; }
  "param"                    { return TAG_PARAM; }
- "private"                  { return PRIVATE; }
+ "protected"                { return PROTECTED; }
  "public"                   { return PUBLIC; }
  "class"                    { return CLASS; }
  "interface"                { return INTERFACE; }
