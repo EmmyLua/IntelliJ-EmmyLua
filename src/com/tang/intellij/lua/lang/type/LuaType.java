@@ -7,7 +7,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
-import com.tang.intellij.lua.psi.LuaClassMethodFuncDef;
+import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,8 +45,8 @@ public class LuaType {
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         if (classDef != null) {
             String clazzName = getClassNameText();
-            Collection<LuaClassMethodFuncDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
-            for (LuaClassMethodFuncDef def : list) {
+            Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
+            for (LuaClassMethodDef def : list) {
                 //取名字的后半截 : 之后的部分
                 PsiElement postfixName = def.getClassMethodName().getId();
 

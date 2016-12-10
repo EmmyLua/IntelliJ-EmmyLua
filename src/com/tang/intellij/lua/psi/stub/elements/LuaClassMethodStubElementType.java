@@ -5,10 +5,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.LuaClassMethodFuncDef;
+import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaNameRef;
-import com.tang.intellij.lua.psi.impl.LuaClassMethodFuncDefImpl;
+import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import com.tang.intellij.lua.psi.stub.LuaClassMethodStub;
 import com.tang.intellij.lua.psi.stub.impl.LuaClassMethodStubImpl;
@@ -20,18 +20,18 @@ import java.io.IOException;
  *
  * Created by tangzx on 2016/12/4.
  */
-public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMethodStub, LuaClassMethodFuncDef> {
+public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMethodStub, LuaClassMethodDef> {
     public LuaClassMethodStubElementType() {
         super("LuaClassMethodStubElementType", LuaLanguage.INSTANCE);
     }
 
     @Override
-    public LuaClassMethodFuncDef createPsi(@NotNull LuaClassMethodStub luaClassMethodStub) {
-        return new LuaClassMethodFuncDefImpl(luaClassMethodStub, LuaElementType.CLASS_METHOD_DEF);
+    public LuaClassMethodDef createPsi(@NotNull LuaClassMethodStub luaClassMethodStub) {
+        return new LuaClassMethodDefImpl(luaClassMethodStub, LuaElementType.CLASS_METHOD_DEF);
     }
 
     @Override
-    public LuaClassMethodStub createStub(@NotNull LuaClassMethodFuncDef luaClassMethodFuncDef, StubElement stubElement) {
+    public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef luaClassMethodFuncDef, StubElement stubElement) {
         String clazzName = resolveClassName(luaClassMethodFuncDef);
         return new LuaClassMethodStubImpl(clazzName, stubElement);
     }
@@ -45,7 +45,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         PsiElement psi = node.getPsi();
-        return psi instanceof LuaClassMethodFuncDef && resolveClassName((LuaClassMethodFuncDef) psi) != null;
+        return psi instanceof LuaClassMethodDef && resolveClassName((LuaClassMethodDef) psi) != null;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         }
     }
 
-    static String resolveClassName(LuaClassMethodFuncDef luaClassMethodFuncDef) {
+    static String resolveClassName(LuaClassMethodDef luaClassMethodFuncDef) {
         LuaNameRef ref = luaClassMethodFuncDef.getClassMethodName().getNameRef();
         String clazzName = null;
         if (ref != null) {

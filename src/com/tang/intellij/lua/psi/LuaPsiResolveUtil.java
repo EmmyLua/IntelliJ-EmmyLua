@@ -29,7 +29,7 @@ public class LuaPsiResolveUtil {
         String refName = ref.getText();
 
         if (refName.equals("self")) {
-            LuaClassMethodFuncDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodFuncDef.class);
+            LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodDef.class);
             if (classMethodFuncDef != null) {
                 LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
                 if (nameRef != null)
