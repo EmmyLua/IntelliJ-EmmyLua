@@ -10,7 +10,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.impl.source.tree.TreeUtil;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
@@ -19,7 +18,6 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
-import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -60,7 +58,6 @@ public class LuaCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, SHOW_FIELD, new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                Project project = completionParameters.getOriginalFile().getProject();
                 PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
 
                 if (element != null) {

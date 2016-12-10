@@ -7,7 +7,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.doc.psi.LuaDocClassDef;
+import com.tang.intellij.lua.doc.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.doc.psi.LuaDocFieldNameDef;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,6 +63,22 @@ public class LuaType {
     }
 
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+        if (classDef != null) {
+            String clazzName = getClassNameText();
+            Collection<LuaDocFieldDef> list = LuaClassFieldIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
 
+            for (LuaDocFieldDef fieldName : list) {
+                LuaDocFieldNameDef nameDef = fieldName.getFieldNameDef();
+                if (nameDef == null)
+                    continue;
+
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getName())
+                        .withIcon(AllIcons.Nodes.Field)
+                        .withTypeText(clazzName);
+
+                completionResultSet.addElement(elementBuilder);
+            }
+
+        }
     }
 }
