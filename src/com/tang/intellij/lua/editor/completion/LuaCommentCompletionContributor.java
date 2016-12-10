@@ -46,6 +46,10 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             psiElement().withText(",").inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
     );
 
+    private static final  PsiElementPattern.Capture<PsiElement> SHOW_ACCESS_MODIFIER =  psiElement().afterLeaf(
+            psiElement().withElementType(LuaDocTypes.FIELD).inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
+    );
+
     public LuaCommentCompletionContributor() {
         extend(CompletionType.BASIC, SHOW_DOC_TAG, new CompletionProvider<CompletionParameters>() {
             @Override
@@ -91,6 +95,14 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                 collection.forEach(className -> {
                     completionResultSet.addElement(LookupElementBuilder.create(className).withIcon(AllIcons.Nodes.Class));
                 });
+            }
+        });
+
+        extend(CompletionType.BASIC, SHOW_ACCESS_MODIFIER, new CompletionProvider<CompletionParameters>() {
+            @Override
+            protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                completionResultSet.addElement(LookupElementBuilder.create("protected"));
+                completionResultSet.addElement(LookupElementBuilder.create("public"));
             }
         });
     }
