@@ -50,6 +50,8 @@ type_set ::= '#' class_name_ref (',' class_name_ref)*
 //--- define
 global_def ::= DEFINE {
     stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub"
+    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable, com.tang.intellij.lua.doc.psi.LuaDocPsiElement"
+    methods = [resolveType]
 }
 
 //--- field def

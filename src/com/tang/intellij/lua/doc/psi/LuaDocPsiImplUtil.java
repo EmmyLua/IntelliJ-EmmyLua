@@ -3,6 +3,8 @@ package com.tang.intellij.lua.doc.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.tang.intellij.lua.doc.LuaCommentUtil;
+import com.tang.intellij.lua.doc.psi.api.LuaComment;
 import com.tang.intellij.lua.doc.reference.LuaClassNameReference;
 import com.tang.intellij.lua.doc.reference.LuaDocParamNameReference;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -33,6 +35,15 @@ public class LuaDocPsiImplUtil {
     }
 
     public static PsiElement setName(LuaDocClassName className, String newName) {
+        return null;
+    }
+
+    public static LuaTypeSet resolveType(LuaDocGlobalDef docGlobalDef) {
+        LuaComment comment = LuaCommentUtil.findContainer(docGlobalDef);
+        LuaDocTypeDef docTypeDef = comment.getTypeDef();
+        if (docTypeDef != null) {
+            return resolveDocTypeSet(docTypeDef.getTypeSet(), null);
+        }
         return null;
     }
 
