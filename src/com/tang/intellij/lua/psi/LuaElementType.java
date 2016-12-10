@@ -12,10 +12,7 @@ import com.tang.intellij.lua.doc.psi.impl.LuaCommentImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
-import com.tang.intellij.lua.psi.stub.elements.LuaClassMethodStubElementType;
-import com.tang.intellij.lua.psi.stub.elements.LuaClassStubElementType;
-import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFieldStubElementType;
-import com.tang.intellij.lua.psi.stub.elements.LuaGlobalFuncDefStubElementType;
+import com.tang.intellij.lua.psi.stub.elements.*;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -54,6 +51,7 @@ public class LuaElementType extends IElementType {
 
     public static LuaGlobalFuncDefStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncDefStubElementType();
     public static LuaClassMethodStubElementType CLASS_METHOD_DEF = new LuaClassMethodStubElementType();
+    public static LuaClassFieldStubElementType CLASS_FIELD_DEF = new LuaClassFieldStubElementType();
     public static LuaGlobalFieldStubElementType GLOBAL_FIELD_DEF = new LuaGlobalFieldStubElementType();
     public static LuaClassStubElementType CLASS_DEF = new LuaClassStubElementType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();

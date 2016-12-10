@@ -55,7 +55,10 @@ global_def ::= DEFINE {
 }
 
 //--- field def
-field_def ::= FIELD type_set { pin = 1 }
+field_def ::= FIELD type_set {
+    pin = 1
+    stubClass = "com.tang.intellij.lua.psi.stub.LuaClassFieldStub"
+}
 
 //--- tag
 tag_value ::= ID
