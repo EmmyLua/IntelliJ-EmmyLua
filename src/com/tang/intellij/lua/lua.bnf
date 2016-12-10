@@ -213,5 +213,6 @@ nameDef ::= ID {
     methods = [setName getName resolveType]
 }
 nameRef ::= ID | SELF {
-    methods = [getReference resolve resolveType]
+    implements = "com.tang.intellij.lua.psi.LuaNamedElement"
+    methods = [setName getName getReference resolve resolveType]
 }

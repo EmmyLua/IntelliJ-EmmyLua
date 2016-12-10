@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LuaPsiImplUtil {
 
-    public static PsiElement setName(LuaNameDef identifier, String name) {
+    public static PsiElement setName(LuaNamedElement identifier, String name) {
         PsiElement newId = LuaElementFactory.createIdentifier(identifier.getProject(), name);
         PsiElement oldId = identifier.getFirstChild();
         oldId.replace(newId);
@@ -25,7 +25,7 @@ public class LuaPsiImplUtil {
     }
 
     @NotNull
-    public static String getName(LuaNameDef identifier) {
+    public static String getName(LuaNamedElement identifier) {
         return identifier.getText();
     }
 
