@@ -29,23 +29,33 @@ import static com.intellij.patterns.PlatformPatterns.psiElement;
  */
 public class LuaCommentCompletionContributor extends CompletionContributor {
 
+    // 在 @ 之后提示 param class type ...
     private static final PsiElementPattern.Capture<PsiElement> SHOW_DOC_TAG = psiElement().afterLeaf(
             psiElement().withText("@")
                     .afterSiblingSkipping(psiElement().withElementType(ElementType.WHITE_SPACE), psiElement().withElementType(LuaDocTypes.DASHES))
     );
 
+    // 在 @param 之后提示方法的参数
     private static final PsiElementPattern.Capture<PsiElement> AFTER_PARAM =  psiElement().afterLeaf(
             psiElement().withElementType(LuaDocTypes.TAG_PARAM)
     );
 
+    // 在 # 之后提示类型
     private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_SHARP =  psiElement().afterLeaf(
             psiElement().withText("#").inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
     );
 
+    // 在 , 之后提示类型
     private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_COMMA =  psiElement().afterLeaf(
             psiElement().withText(",").inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
     );
 
+    // 在 extends 之后提示类型
+    private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_EXTENDS =  psiElement().afterLeaf(
+            psiElement().withElementType(LuaDocTypes.EXTENDS).inside(psiElement().withElementType(LuaDocTypes.CLASS_DEF))
+    );
+
+    // 在 @field 之后提示 public / protected
     private static final  PsiElementPattern.Capture<PsiElement> SHOW_ACCESS_MODIFIER =  psiElement().afterLeaf(
             psiElement().withElementType(LuaDocTypes.FIELD).inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
     );
@@ -87,7 +97,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             }
         });
 
-        extend(CompletionType.BASIC, psiElement().andOr(SHOW_CLASS_AFTER_SHARP, SHOW_CLASS_AFTER_COMMA), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, psiElement().andOr(SHOW_CLASS_AFTER_SHARP, SHOW_CLASS_AFTER_COMMA, SHOW_CLASS_AFTER_EXTENDS), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 Project project = completionParameters.getPosition().getProject();
