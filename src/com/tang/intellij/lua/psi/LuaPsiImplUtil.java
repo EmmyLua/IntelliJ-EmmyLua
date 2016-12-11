@@ -83,6 +83,10 @@ public class LuaPsiImplUtil {
      * @return 类名
      */
     public static String getClassName(LuaClassMethodDef classMethodDef) {
+        if (classMethodDef.getStub() != null) {
+            return classMethodDef.getStub().getClassName();
+        }
+
         LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
         String clazzName = null;
         if (ref != null) {
