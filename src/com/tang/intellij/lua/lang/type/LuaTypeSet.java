@@ -47,4 +47,8 @@ public class LuaTypeSet {
     public boolean isEmpty() {
         return types.isEmpty();
     }
+
+    public void addType(LuaType type) {
+        types.add(type);
+    }
 }

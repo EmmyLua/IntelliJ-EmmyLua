@@ -38,6 +38,12 @@ public class LuaType {
         return classDef;
     }
 
+    public LuaType getSuperClass() {
+        if (classDef != null)
+            return classDef.getSuperClass();
+        return null;
+    }
+
     public String getClassNameText() {
         if (classDef != null)
             return classDef.getClassNameText();
@@ -46,6 +52,10 @@ public class LuaType {
     }
 
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+        addMethodCompletions(completionParameters, completionResultSet, true, true);
+    }
+
+    public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
         if (classDef != null) {
             String clazzName = getClassNameText();
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
@@ -56,13 +66,25 @@ public class LuaType {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
                         .withIcon(AllIcons.Nodes.Method)
                         .withTypeText(clazzName);
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
 
                 completionResultSet.addElement(elementBuilder);
+            }
+
+            if (withSuper) {
+                LuaType superType = getSuperClass();
+                if (superType != null)
+                    superType.addMethodCompletions(completionParameters, completionResultSet, false, true);
             }
         }
     }
 
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+        addFieldCompletions(completionParameters, completionResultSet, true, true);
+    }
+
+    public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
         if (classDef != null) {
             String clazzName = getClassNameText();
             Collection<LuaDocFieldDef> list = LuaClassFieldIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
@@ -75,10 +97,18 @@ public class LuaType {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getName())
                         .withIcon(AllIcons.Nodes.Field)
                         .withTypeText(clazzName);
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
 
                 completionResultSet.addElement(elementBuilder);
             }
 
+            // super
+            if (withSuper) {
+                LuaType superType = getSuperClass();
+                if (superType != null)
+                    superType.addFieldCompletions(completionParameters, completionResultSet, false, true);
+            }
         }
     }
 }
