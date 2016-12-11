@@ -4,7 +4,6 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
@@ -60,10 +59,7 @@ public class LuaType {
             String clazzName = getClassNameText();
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
             for (LuaClassMethodDef def : list) {
-                //取名字的后半截 : 之后的部分
-                PsiElement postfixName = def.getClassMethodName().getId();
-
-                LookupElementBuilder elementBuilder = LookupElementBuilder.create(postfixName.getText())
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
                         .withIcon(AllIcons.Nodes.Method)
                         .withTypeText(clazzName);
                 if (bold)

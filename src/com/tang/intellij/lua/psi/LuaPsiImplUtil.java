@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
@@ -57,8 +58,56 @@ public class LuaPsiImplUtil {
         return LuaPsiResolveUtil.resolveType(parDef);
     }
 
-    public static LuaComment getComment(LuaDeclaration globalFuncDef) {
-        return LuaCommentUtil.findComment(globalFuncDef);
+    /**
+     * 寻找 Comment
+     * @param declaration owner
+     * @return LuaComment
+     */
+    public static LuaComment getComment(LuaDeclaration declaration) {
+        return LuaCommentUtil.findComment(declaration);
+    }
+
+    /**
+     * 取方法体名
+     * @param classMethodDef def
+     * @return String
+     */
+    public static String getMethodName(LuaClassMethodDef classMethodDef) {
+        PsiElement postfixName = classMethodDef.getClassMethodName().getId();
+        return postfixName.getText();
+    }
+
+    /**
+     * 寻找 class method 对应的类名
+     * @param classMethodDef def
+     * @return 类名
+     */
+    public static String getClassName(LuaClassMethodDef classMethodDef) {
+        LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
+        String clazzName = null;
+        if (ref != null) {
+            LuaTypeSet typeSet = ref.resolveType();
+            if (typeSet != null && !typeSet.isEmpty()) {
+                clazzName = typeSet.getType(0).getClassNameText();
+            }
+        }
+        return clazzName;
+    }
+
+    /**
+     * 寻找对应的类
+     * @param classMethodDef def
+     * @return LuaType
+     */
+    public static LuaType getClassType(LuaClassMethodDef classMethodDef) {
+        LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
+        if (ref != null) {
+            LuaTypeSet typeSet = ref.resolveType();
+            if (typeSet != null && !typeSet.isEmpty()) {
+                return typeSet.getType(0);
+            }
+        }
+        return null;
     }
 
     public static String getName(LuaGlobalFuncDef globalFuncDef) {

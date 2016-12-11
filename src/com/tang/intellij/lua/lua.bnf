@@ -128,7 +128,7 @@ classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) { pin = 3 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassMethodStub"
-    methods = [getComment]
+    methods = [getComment getClassType getClassName getMethodName]
 }
 
 localFuncDef ::= 'local' 'function' nameDef funcBody {
