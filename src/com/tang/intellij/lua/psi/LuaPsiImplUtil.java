@@ -61,6 +61,13 @@ public class LuaPsiImplUtil {
         return LuaCommentUtil.findComment(globalFuncDef);
     }
 
+    public static String getName(LuaGlobalFuncDef globalFuncDef) {
+        if (globalFuncDef.getStub() != null)
+            return globalFuncDef.getStub().getName();
+        LuaNameDef nameDef = globalFuncDef.getNameDef();
+        return nameDef != null ? nameDef.getName() : null;
+    }
+
     public static LuaTypeSet guessType(LuaFuncCall funcCall) {
         LuaCallExpr callExpr = (LuaCallExpr)funcCall.getFirstChild();
         if (callExpr == null) return null;

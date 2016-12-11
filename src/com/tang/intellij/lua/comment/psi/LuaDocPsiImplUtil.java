@@ -79,6 +79,9 @@ public class LuaDocPsiImplUtil {
     }
 
     public static String getClassNameText(LuaDocClassDef classDef) {
+        if (classDef.getStub() != null) {
+            return classDef.getStub().getClassName();
+        }
         return classDef.getClassName().getName();
     }
 

@@ -38,6 +38,7 @@
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterHandlerDelegate" />
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
+        <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex" />
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaClassIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaClassMethodIndex"/>
