@@ -78,5 +78,6 @@ public class LuaClassFieldStubElementType extends IStubElementType<LuaClassField
     public void indexStub(@NotNull LuaClassFieldStub luaFieldStub, @NotNull IndexSink indexSink) {
         StringRef className = luaFieldStub.getClassName();
         indexSink.occurrence(LuaClassFieldIndex.KEY, className.getString());
+        indexSink.occurrence(LuaClassFieldIndex.KEY, className + "." + luaFieldStub.getName());
     }
 }

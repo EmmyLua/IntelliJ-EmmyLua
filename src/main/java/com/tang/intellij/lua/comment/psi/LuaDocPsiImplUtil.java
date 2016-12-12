@@ -55,6 +55,10 @@ public class LuaDocPsiImplUtil {
         return null;
     }
 
+    public static LuaTypeSet resolveType(LuaDocFieldDef fieldDef) {
+        return resolveDocTypeSet(fieldDef.getTypeSet(), null);
+    }
+
     /**
      * 猜测全局定义的类型
      * @param docGlobalDef 全局定义

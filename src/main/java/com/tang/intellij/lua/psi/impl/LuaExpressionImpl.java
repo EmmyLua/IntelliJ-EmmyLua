@@ -2,14 +2,17 @@ package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.lang.type.LuaTypeTable;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.index.LuaClassFieldIndex;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -39,16 +42,23 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
 
         LuaTypeSet prefixType = indexExpr.guessPrefixType();
         if (prefixType != null && !prefixType.isEmpty()) {
+            String propName = id.getText();
             for (LuaType type : prefixType.getTypes()) {
                 if (type instanceof LuaTypeTable) {
                     LuaTypeTable table = (LuaTypeTable) type;
-                    LuaField field = table.tableConstructor.findField(id.getText());
+                    LuaField field = table.tableConstructor.findField(propName);
                     if (field != null) {
                         LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
                         if (expr != null) return expr.guessType();
                     }
+                } else {
+                    //TODO: optimize
+                    String searchName = type.getClassNameText() + "." + propName;
+                    LuaDocFieldDef fieldDef = LuaClassFieldIndex.find(searchName, indexExpr.getProject(), new ProjectAndLibrariesScope(indexExpr.getProject()));
+                    if (fieldDef != null) {
+                        return fieldDef.resolveType();
+                    }
                 }
-                //TODO other TYPE
             }
         }
         return null;
