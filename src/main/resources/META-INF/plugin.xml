@@ -48,6 +48,11 @@
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.psi.index.LuaClassFieldIndex"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
+
+        <intentionAction>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocAction</className>
+            <descriptionDirectoryName>Test</descriptionDirectoryName>
+        </intentionAction>
     </extensions>
 
     <application-components>
