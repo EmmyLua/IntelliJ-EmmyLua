@@ -1,5 +1,7 @@
 package com.tang.intellij.lua.comment.psi;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -12,7 +14,9 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -105,6 +109,33 @@ public class LuaDocPsiImplUtil {
             }
         }
         return typeSet;
+    }
+
+    /**
+     * for Goto Class
+     * @param classDef class def
+     * @return ItemPresentation
+     */
+    public static ItemPresentation getPresentation(LuaDocClassDef classDef) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return classDef.getClassNameText();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                return classDef.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean b) {
+                return AllIcons.Nodes.Class;
+            }
+        };
     }
 
     /**
