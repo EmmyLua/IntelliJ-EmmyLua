@@ -1,7 +1,9 @@
 package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
@@ -52,9 +54,9 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                         if (expr != null) return expr.guessType();
                     }
                 } else {
-                    //TODO: optimize
-                    String searchName = type.getClassNameText() + "." + propName;
-                    LuaDocFieldDef fieldDef = LuaClassFieldIndex.find(searchName, indexExpr.getProject(), new ProjectAndLibrariesScope(indexExpr.getProject()));
+                    Project project = indexExpr.getProject();
+                    GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
+                    LuaDocFieldDef fieldDef = LuaClassFieldIndex.find(type.getClassNameText(), propName, project, scope);
                     if (fieldDef != null) {
                         return fieldDef.resolveType();
                     }

@@ -35,4 +35,8 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaDocFieldDef>
             return list.iterator().next();
         return null;
     }
+
+    public static LuaDocFieldDef find(String className, String fieldName, Project project, GlobalSearchScope scope) {
+        return find(className + "." + fieldName, project, scope);
+    }
 }
