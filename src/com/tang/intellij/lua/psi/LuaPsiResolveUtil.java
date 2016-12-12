@@ -14,7 +14,6 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -61,9 +60,8 @@ public class LuaPsiResolveUtil {
         //global field
         if (resolveResult == null) {
             Project project = ref.getProject();
-            Collection<LuaDocGlobalDef> defs = LuaGlobalFieldIndex.getInstance().get(refName, project, new ProjectAndLibrariesScope(project));
-            if (defs.size() > 0) {
-                LuaDocGlobalDef globalDef = defs.iterator().next();
+            LuaDocGlobalDef globalDef = LuaGlobalFieldIndex.find(refName, project, new ProjectAndLibrariesScope(project));
+            if (globalDef != null) {
                 LuaCommentOwner owner = LuaCommentUtil.findOwner(globalDef);
                 if (owner instanceof LuaAssignStat) {
                     LuaAssignStat assignStat = (LuaAssignStat) owner;
@@ -82,10 +80,7 @@ public class LuaPsiResolveUtil {
         //global function
         if (resolveResult == null) {
             Project project = ref.getProject();
-            Collection<LuaGlobalFuncDef> defs = LuaGlobalFuncIndex.getInstance().get(refName, project, new ProjectAndLibrariesScope(project));
-            if (defs.size() > 0) {
-                resolveResult = defs.iterator().next();
-            }
+            resolveResult = LuaGlobalFuncIndex.find(refName, project, new ProjectAndLibrariesScope(project));
         }
 
         PsiElement result = resolveResult;
