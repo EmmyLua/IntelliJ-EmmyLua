@@ -32,6 +32,7 @@
         <lang.formatter language="Lua" implementationClass="com.tang.intellij.lua.editor.formatter.LuaFormattingModelBuilder"/>
         <lang.documentationProvider language="Lua" implementationClass="com.tang.intellij.lua.documentation.LuaDocumentationProvider"/>
         <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
+        <gotoSymbolContributor implementation="com.tang.intellij.lua.editor.LuaSymbolNavigationContributor"/>
 
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>

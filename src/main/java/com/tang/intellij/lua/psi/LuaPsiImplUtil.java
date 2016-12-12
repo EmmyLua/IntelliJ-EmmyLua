@@ -1,5 +1,7 @@
 package com.tang.intellij.lua.psi;
 
+import com.intellij.icons.AllIcons;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -13,6 +15,9 @@ import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
 import com.tang.intellij.lua.reference.LuaRequireReference;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 /**
  * LuaPsiImplUtil
@@ -119,6 +124,28 @@ public class LuaPsiImplUtil {
             return globalFuncDef.getStub().getName();
         LuaNameDef nameDef = globalFuncDef.getNameDef();
         return nameDef != null ? nameDef.getName() : null;
+    }
+
+    public static ItemPresentation getPresentation(LuaGlobalFuncDef globalFuncDef) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return globalFuncDef.getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                return globalFuncDef.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean b) {
+                return AllIcons.Nodes.Function;
+            }
+        };
     }
 
     public static LuaTypeSet guessType(LuaFuncCall funcCall) {
