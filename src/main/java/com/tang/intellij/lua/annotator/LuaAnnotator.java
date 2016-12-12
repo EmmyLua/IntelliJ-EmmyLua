@@ -55,6 +55,23 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             Annotation annotation = myHolder.createInfoAnnotation(o, null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_METHOD);
         }
+
+        @Override
+        public void visitParDef(@NotNull LuaParDef o) {
+            Annotation annotation = myHolder.createInfoAnnotation(o, null);
+            annotation.setTextAttributes(LuaHighlightingData.UPVAL);
+            super.visitParDef(o);
+        }
+
+        @Override
+        public void visitNameRef(@NotNull LuaNameRef o) {
+            PsiElement res = o.resolve();
+            if (res instanceof LuaParDef) {
+                Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                annotation.setTextAttributes(LuaHighlightingData.UPVAL);
+            }
+            super.visitNameRef(o);
+        }
     }
 
     class LuaDocElementVisitor extends LuaDocVisitor {

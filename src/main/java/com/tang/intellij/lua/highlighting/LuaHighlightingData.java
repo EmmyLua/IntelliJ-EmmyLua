@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.highlighting;
 
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -73,7 +74,8 @@ public class LuaHighlightingData {
 
     public static final TextAttributesKey LOCAL_VAR =
             TextAttributesKey.createTextAttributesKey(LOCAL_VAR_ID, LOCAL_VARIABLE);
-    public static final TextAttributesKey UPVAL = TextAttributesKey.createTextAttributesKey(UPVAL_ID, LOCAL_VAR);
+    public static final TextAttributesKey UPVAL =
+            TextAttributesKey.createTextAttributesKey(UPVAL_ID, CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
     public static final TextAttributesKey PARAMETER =
             TextAttributesKey.createTextAttributesKey(PARAMETER_ID, DefaultLanguageHighlighterColors.PARAMETER);
     public static final TextAttributesKey GLOBAL_VAR =
@@ -122,4 +124,6 @@ public class LuaHighlightingData {
 
     public static final TextAttributesKey DEFINED_CONSTANTS =
             TextAttributesKey.createTextAttributesKey(DEFINED_CONSTANTS_ID, CONSTANT);
+    public static final TextAttributesKey SELF =
+            TextAttributesKey.createTextAttributesKey("SELF", CustomHighlighterColors.CUSTOM_KEYWORD2_ATTRIBUTES);
 }
