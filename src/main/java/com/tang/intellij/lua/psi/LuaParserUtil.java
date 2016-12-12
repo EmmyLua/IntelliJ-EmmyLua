@@ -61,7 +61,7 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             if (level == 0)
                 return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(LuaTypes.ELSE, LuaTypes.ELSEIF, LuaTypes.END));
             else
-                return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(LuaTypes.END));
+                return matchEnd(begin, advanced, builder, level, TokenSet.create(LuaTypes.ELSE, LuaTypes.ELSEIF), TokenSet.create(LuaTypes.END));
         }
         else if (begin == LuaTypes.ELSE) {
             return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(LuaTypes.END));
