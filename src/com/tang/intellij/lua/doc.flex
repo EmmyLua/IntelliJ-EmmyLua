@@ -1,8 +1,8 @@
-package com.tang.intellij.lua.doc.lexer;
+package com.tang.intellij.lua.comment.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.doc.psi.LuaDocTypes;
+import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 
 %%
 
