@@ -133,12 +133,12 @@ public class LuaCompletionContributor extends CompletionContributor {
 
             @Override
             public void visitElement(PsiElement element) {
-                if (element.getNode().getElementType() == LuaTypes.ID) {
-                    completionResultSet.addElement(LookupElementBuilder
+                if (element.getNode().getElementType() == LuaTypes.ID && element.getTextLength() > 2) {
+                    completionResultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
                             .create(element.getText())
                             .withIcon(AllIcons.Actions.Edit)
                             .withTypeText("Word In File")
-                    );
+                    , -1));
                 }
                 super.visitElement(element);
             }
