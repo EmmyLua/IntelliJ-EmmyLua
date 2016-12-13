@@ -127,7 +127,11 @@ left funcPrefixRef ::= '.' <<checkNext checkFuncPrefix>> nameRef
 classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) { pin = 3 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
-    implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner,com.tang.intellij.lua.psi.LuaDeclaration,com.tang.intellij.lua.psi.LuaClassMember"
+    implements = [
+        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+        "com.tang.intellij.lua.psi.LuaDeclaration"
+        "com.tang.intellij.lua.psi.LuaClassMember"
+    ]
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassMethodStub"
     methods = [getComment getClassType getClassName getMethodName]
 }
@@ -210,7 +214,10 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 unop ::= '-' | 'not' | '#'
 
 nameDef ::= ID {
-    implements = "com.tang.intellij.lua.psi.LuaNamedElement,com.tang.intellij.lua.psi.LuaTypeResolvable"
+    implements = [
+        "com.tang.intellij.lua.psi.LuaNamedElement"
+        "com.tang.intellij.lua.psi.LuaTypeResolvable"
+    ]
     methods = [setName getName resolveType]
 }
 nameRef ::= ID | SELF {
