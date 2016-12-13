@@ -83,7 +83,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
     static String resolveClassName(LuaClassMethodDef luaClassMethodFuncDef) {
         clazzNameToSearch = null;
         //如果全局定义的对象的方法，则优先找本文件内的 assign stat
-        LuaPsiTreeUtil.walkTopLevelAssignStatInFile(luaClassMethodFuncDef.getContainingFile(), luaAssignStat -> {
+        LuaPsiTreeUtil.walkTopLevelAssignStatInFile(luaClassMethodFuncDef, luaAssignStat -> {
             LuaComment comment = luaAssignStat.getComment();
             if (comment != null) {
                 LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);

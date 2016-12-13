@@ -13,10 +13,14 @@ public class LuaPsiTreeUtil {
         boolean accept(T t);
     }
 
-    public static void walkTopLevelAssignStatInFile(PsiFile file, ElementProcessor<LuaAssignStat> processor) {
-        if (file == null || processor == null)
+    public static void walkTopLevelAssignStatInFile(PsiElement element, ElementProcessor<LuaAssignStat> processor) {
+        if (element == null || processor == null)
             return;
-        for(PsiElement child = file.getFirstChild(); child != null; child = child.getNextSibling()) {
+        PsiElement parent = element;
+        while (parent instanceof PsiFile)
+            parent = parent.getParent();
+
+        for(PsiElement child = parent; child != null; child = child.getPrevSibling()) {
             if (child instanceof LuaAssignStat) {
                 if (!processor.accept((LuaAssignStat) child)) {
                     break;
