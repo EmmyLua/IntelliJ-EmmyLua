@@ -7,9 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
-import com.tang.intellij.lua.psi.LuaElementType;
-import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import com.tang.intellij.lua.psi.stub.LuaClassMethodStub;
@@ -35,7 +33,13 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
     @Override
     public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef luaClassMethodFuncDef, StubElement stubElement) {
         String clazzName = resolveClassName(luaClassMethodFuncDef);
-        return new LuaClassMethodStubImpl(clazzName, stubElement);
+
+        LuaClassMethodName methodName = luaClassMethodFuncDef.getClassMethodName();
+        PsiElement id = methodName.getId();
+        PsiElement prev = id.getPrevSibling();
+        boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
+
+        return new LuaClassMethodStubImpl(clazzName, isStatic, stubElement);
     }
 
     @NotNull
@@ -53,21 +57,25 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
     @Override
     public void serialize(@NotNull LuaClassMethodStub luaClassMethodStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
         stubOutputStream.writeUTFFast(luaClassMethodStub.getClassName());
+        stubOutputStream.writeBoolean(luaClassMethodStub.isStatic());
     }
 
     @NotNull
     @Override
     public LuaClassMethodStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
         String name = stubInputStream.readUTFFast();
-
-        return new LuaClassMethodStubImpl(name, stubElement);
+        boolean isStatic = stubInputStream.readBoolean();
+        return new LuaClassMethodStubImpl(name, isStatic, stubElement);
     }
 
     @Override
     public void indexStub(@NotNull LuaClassMethodStub luaClassMethodStub, @NotNull IndexSink indexSink) {
         String className = luaClassMethodStub.getClassName();
         if (className != null) {
-            indexSink.occurrence(LuaClassMethodIndex.KEY, className);
+            if (luaClassMethodStub.isStatic())
+                indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static");
+            else
+                indexSink.occurrence(LuaClassMethodIndex.KEY, className);
         }
     }
 

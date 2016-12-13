@@ -76,8 +76,32 @@ public class LuaType {
         }
     }
 
+    public void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+        if (classDef != null) {
+            String clazzName = getClassNameText();
+            Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
+            for (LuaClassMethodDef def : list) {
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
+                        .withIcon(AllIcons.Nodes.Method)
+                        .withTypeText(clazzName)
+                        .withItemTextUnderlined(true);
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
+
+                completionResultSet.addElement(elementBuilder);
+            }
+
+            if (withSuper) {
+                LuaType superType = getSuperClass();
+                if (superType != null)
+                    superType.addStaticMethodCompletions(completionParameters, completionResultSet, false, true);
+            }
+        }
+    }
+
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         addFieldCompletions(completionParameters, completionResultSet, true, true);
+        addStaticMethodCompletions(completionParameters, completionResultSet, true, true);
     }
 
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {

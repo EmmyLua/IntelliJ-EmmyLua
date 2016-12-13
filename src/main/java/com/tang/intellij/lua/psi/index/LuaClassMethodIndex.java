@@ -1,9 +1,13 @@
 package com.tang.intellij.lua.psi.index;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 /**
  *
@@ -22,5 +26,10 @@ public class LuaClassMethodIndex extends StringStubIndexExtension<LuaClassMethod
     @Override
     public StubIndexKey<String, LuaClassMethodDef> getKey() {
         return KEY;
+    }
+
+    public static Collection<LuaClassMethodDef> findStaticMethods(String className, Project project, GlobalSearchScope scope) {
+        String key = className + ".static";
+        return INSTANCE.get(key, project, scope);
     }
 }

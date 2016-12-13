@@ -10,4 +10,6 @@ import com.tang.intellij.lua.psi.LuaClassMethodDef;
 public interface LuaClassMethodStub extends StubElement<LuaClassMethodDef> {
 
     String getClassName();
+
+    boolean isStatic();
 }
