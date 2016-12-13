@@ -13,6 +13,18 @@ public class LuaPsiTreeUtil {
         boolean accept(T t);
     }
 
+    public static void walkTopLevelAssignStatInFile(PsiFile file, ElementProcessor<LuaAssignStat> processor) {
+        if (file == null || processor == null)
+            return;
+        for(PsiElement child = file.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof LuaAssignStat) {
+                if (!processor.accept((LuaAssignStat) child)) {
+                    break;
+                }
+            }
+        }
+    }
+
     /**
      * 向上寻找 local function 定义
      * @param current 当前搜导起点

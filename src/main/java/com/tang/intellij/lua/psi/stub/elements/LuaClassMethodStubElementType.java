@@ -3,9 +3,13 @@ package com.tang.intellij.lua.psi.stub.elements;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaElementType;
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import com.tang.intellij.lua.psi.stub.LuaClassMethodStub;
@@ -67,7 +71,23 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         }
     }
 
+    static String clazzNameToSearch;
     static String resolveClassName(LuaClassMethodDef luaClassMethodFuncDef) {
-        return luaClassMethodFuncDef.getClassName();
+        clazzNameToSearch = null;
+        //如果全局定义的对象的方法，则优先找本文件内的 assign stat
+        LuaPsiTreeUtil.walkTopLevelAssignStatInFile(luaClassMethodFuncDef.getContainingFile(), luaAssignStat -> {
+            LuaComment comment = luaAssignStat.getComment();
+            if (comment != null) {
+                LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
+                if (classDef != null) {
+                    clazzNameToSearch = classDef.getClassNameText();
+                    return false;
+                }
+            }
+            return true;
+        });
+        if (clazzNameToSearch == null)
+            clazzNameToSearch = luaClassMethodFuncDef.getClassName();
+        return clazzNameToSearch;
     }
 }
