@@ -70,17 +70,27 @@ public class LuaPsiTreeUtil {
         boolean continueSearch = true;
         PsiElement curr = current;
         do {
+            // 跳过类似
+            // local name = name //skip
+            boolean searchLocalDef = true;
+            // 跳过类似
+            // local name
+            // function(name) end //skip
+            // name = nil
             boolean searchParList = false;
             PsiElement next = curr.getPrevSibling();
             if (next == null) {
+                searchLocalDef = false;
                 searchParList = true;
                 next = curr.getParent();
             }
             curr = next;
 
             if (curr instanceof LuaLocalDef) {
-                LuaNameList nameList = ((LuaLocalDef) curr).getNameList();
-                continueSearch = resolveInNameList(nameList, processor);
+                if (searchLocalDef) {
+                    LuaNameList nameList = ((LuaLocalDef) curr).getNameList();
+                    continueSearch = resolveInNameList(nameList, processor);
+                }
             }
             else if (curr instanceof LuaFuncBody) {
                 //参数部分
