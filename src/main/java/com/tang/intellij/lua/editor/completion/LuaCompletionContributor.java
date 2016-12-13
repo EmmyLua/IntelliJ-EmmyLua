@@ -2,7 +2,6 @@ package com.tang.intellij.lua.editor.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
@@ -15,6 +14,7 @@ import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.containers.HashSet;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
@@ -84,13 +84,13 @@ public class LuaCompletionContributor extends CompletionContributor {
                 PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset());
                 LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
-                            .withIcon(AllIcons.Nodes.Variable);
+                            .withIcon(LuaIcons.LOCAL_VAR);
                     completionResultSet.addElement(elementBuilder);
                     return  true;
                 });
                 LuaPsiTreeUtil.walkUpLocalFuncDef(cur, nameDef -> {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
-                            .withIcon(AllIcons.Nodes.Method);
+                            .withIcon(LuaIcons.LOCAL_FUNCTION);
                     completionResultSet.addElement(elementBuilder);
                     return true;
                 });
@@ -101,14 +101,14 @@ public class LuaCompletionContributor extends CompletionContributor {
                 for (String name : list) {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
                             .withTypeText("Global Func")
-                            .withIcon(AllIcons.Nodes.Function);
+                            .withIcon(LuaIcons.GLOBAL_FUNCTION);
                     completionResultSet.addElement(elementBuilder);
                 }
 
                 //global fields
                 Collection<String> allGlobalFieldNames = LuaGlobalFieldIndex.getInstance().getAllKeys(project);
                 for (String name : allGlobalFieldNames) {
-                    completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(AllIcons.Nodes.Field));
+                    completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(LuaIcons.GLOBAL_FIELD));
                 }
 
                 //key words
@@ -145,7 +145,7 @@ public class LuaCompletionContributor extends CompletionContributor {
         for (String s : wordsInFileSet) {
             completionResultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
                             .create(s)
-                            .withIcon(AllIcons.Actions.Edit)
+                            .withIcon(LuaIcons.WORD)
                             .withTypeText("Word In File")
                     , -1));
         }

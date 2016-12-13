@@ -3,11 +3,11 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
@@ -60,7 +60,7 @@ public class LuaType {
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
             for (LuaClassMethodDef def : list) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
-                        .withIcon(AllIcons.Nodes.Method)
+                        .withIcon(LuaIcons.CLASS_METHOD)
                         .withTypeText(clazzName);
                 if (bold)
                     elementBuilder = elementBuilder.bold();
@@ -82,7 +82,7 @@ public class LuaType {
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
             for (LuaClassMethodDef def : list) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
-                        .withIcon(AllIcons.Nodes.Method)
+                        .withIcon(LuaIcons.CLASS_METHOD)
                         .withTypeText(clazzName)
                         .withItemTextUnderlined(true);
                 if (bold)
@@ -115,7 +115,7 @@ public class LuaType {
                     continue;
 
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getName())
-                        .withIcon(AllIcons.Nodes.Field)
+                        .withIcon(LuaIcons.CLASS_FIELD)
                         .withTypeText(clazzName);
                 if (bold)
                     elementBuilder = elementBuilder.bold();
