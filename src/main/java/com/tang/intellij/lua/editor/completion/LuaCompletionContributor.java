@@ -52,6 +52,8 @@ public class LuaCompletionContributor extends CompletionContributor {
                         luaTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet));
                     }
                 }
+                //words in file
+                suggestWordsInFile(completionParameters, processingContext, completionResultSet);
             }
         });
 
@@ -68,6 +70,8 @@ public class LuaCompletionContributor extends CompletionContributor {
                         prefixTypeSet.getTypes().forEach(luaType -> luaType.addFieldCompletions(completionParameters, completionResultSet));
                     }
                 }
+                //words in file
+                suggestWordsInFile(completionParameters, processingContext, completionResultSet);
             }
         });
 
@@ -112,6 +116,31 @@ public class LuaCompletionContributor extends CompletionContributor {
                 for (IElementType keyWordToken : keywords.getTypes()) {
                     completionResultSet.addElement(LookupElementBuilder.create(keyWordToken));
                 }
+
+                //words in file
+                suggestWordsInFile(completionParameters, processingContext, completionResultSet);
+            }
+        });
+    }
+
+    private static void suggestWordsInFile(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+        PsiFile file = completionParameters.getOriginalFile();
+        file.acceptChildren(new LuaVisitor() {
+            @Override
+            public void visitPsiElement(@NotNull LuaPsiElement o) {
+                o.acceptChildren(this);
+            }
+
+            @Override
+            public void visitElement(PsiElement element) {
+                if (element.getNode().getElementType() == LuaTypes.ID) {
+                    completionResultSet.addElement(LookupElementBuilder
+                            .create(element.getText())
+                            .withIcon(AllIcons.Actions.Edit)
+                            .withTypeText("Word In File")
+                    );
+                }
+                super.visitElement(element);
             }
         });
     }
