@@ -1,5 +1,7 @@
 package com.tang.intellij.lua.highlighting;
 
+import com.intellij.execution.process.ConsoleHighlighter;
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -26,21 +28,23 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaTypes.ELSE,
             LuaTypes.ELSEIF,
             LuaTypes.END,
-            LuaTypes.FALSE,
             LuaTypes.FOR,
             LuaTypes.FUNCTION,
             LuaTypes.IF,
             LuaTypes.IN,
             LuaTypes.LOCAL,
-            LuaTypes.NIL,
             LuaTypes.NOT,
             LuaTypes.OR,
             LuaTypes.REPEAT,
             LuaTypes.RETURN,
             LuaTypes.THEN,
-            LuaTypes.TRUE,
             LuaTypes.UNTIL,
             LuaTypes.WHILE
+    );
+    public static final TokenSet PRIMITIVE_TYPE_SET = TokenSet.create(
+            LuaTypes.FALSE,
+            LuaTypes.NIL,
+            LuaTypes.TRUE
     );
     public static final TokenSet DOC_KEYWORD_TOKENS = TokenSet.create(
             LuaDocTypes.TAG_NAME,
@@ -70,6 +74,8 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(NUMBER);
         else if (type == LuaTypes.STRING)
             return pack(DefaultLanguageHighlighterColors.STRING);
+        else if (PRIMITIVE_TYPE_SET.contains(type))
+            return pack(ConsoleHighlighter.CYAN_BRIGHT);
         else if (type == LuaTypes.SELF)
             return pack(LuaHighlightingData.SELF);
 

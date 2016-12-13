@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaLanguage;
@@ -106,7 +107,9 @@ public class LuaCompletionContributor extends CompletionContributor {
                 }
 
                 //key words
-                for (IElementType keyWordToken : LuaSyntaxHighlighter.KEYWORD_TOKENS.getTypes()) {
+                TokenSet keywords = TokenSet.orSet(LuaSyntaxHighlighter.KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET);
+                keywords = TokenSet.orSet(TokenSet.create(LuaTypes.SELF), keywords);
+                for (IElementType keyWordToken : keywords.getTypes()) {
                     completionResultSet.addElement(LookupElementBuilder.create(keyWordToken));
                 }
             }
