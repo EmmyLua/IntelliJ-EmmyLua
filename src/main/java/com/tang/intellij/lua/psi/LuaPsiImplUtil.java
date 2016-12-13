@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
@@ -208,6 +209,17 @@ public class LuaPsiImplUtil {
             PsiElement def = nameRef.resolve();
             if (def instanceof LuaTypeResolvable) {
                 return ((LuaTypeResolvable) def).resolveType();
+            } else if (def instanceof LuaNameRef) { // TODO : Global assign
+                LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
+                if (luaAssignStat != null) {
+                    LuaComment comment = luaAssignStat.getComment();
+                    if (comment != null) {
+                        LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
+                        if (classDef != null) {
+                            return LuaTypeSet.create(classDef);
+                        }
+                    }
+                }
             }
         }
         else {

@@ -61,6 +61,7 @@ DOC_DASHES = ----*
  "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
  ","                        { return COMMA; }
  "#"                        { return SHARP; }
+ ":"                        { return EXTENDS;}
  "field"                    { return FIELD; }
  "define"                   { return DEFINE; }
  "return"                   { return TAG_RETURN; }
@@ -69,7 +70,6 @@ DOC_DASHES = ----*
  "public"                   { return PUBLIC; }
  "class"                    { return CLASS; }
  "interface"                { return INTERFACE; }
- "extends"                  { return EXTENDS;}
  "type"                     { return TYPE;}
  {ID}                       { return ID; }
  [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
