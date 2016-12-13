@@ -2,7 +2,7 @@
     <id>com.tang</id>
     <name>Lua IDE</name>
     <version>1.0</version>
-    <vendor email="love.tang@qq.com" url="http://www.yourcompany.com">NULL</vendor>
+    <vendor email="love.tangzx@qq.com" url="http://www.yourcompany.com">NULL</vendor>
 
     <description><![CDATA[
     Just a lua plugin for IDEA
