@@ -13,6 +13,7 @@ import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.ProcessingContext;
+import com.intellij.util.containers.HashSet;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -124,6 +125,7 @@ public class LuaCompletionContributor extends CompletionContributor {
     }
 
     private static void suggestWordsInFile(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+        HashSet<String> wordsInFileSet = new HashSet<>();
         PsiFile file = completionParameters.getOriginalFile();
         file.acceptChildren(new LuaVisitor() {
             @Override
@@ -134,15 +136,19 @@ public class LuaCompletionContributor extends CompletionContributor {
             @Override
             public void visitElement(PsiElement element) {
                 if (element.getNode().getElementType() == LuaTypes.ID && element.getTextLength() > 2) {
-                    completionResultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
-                            .create(element.getText())
-                            .withIcon(AllIcons.Actions.Edit)
-                            .withTypeText("Word In File")
-                    , -1));
+                    wordsInFileSet.add(element.getText());
                 }
                 super.visitElement(element);
             }
         });
+
+        for (String s : wordsInFileSet) {
+            completionResultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
+                            .create(s)
+                            .withIcon(AllIcons.Actions.Edit)
+                            .withTypeText("Word In File")
+                    , -1));
+        }
     }
 
     private static void suggestKeywords(PsiElement position) {
