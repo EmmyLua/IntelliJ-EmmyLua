@@ -5,6 +5,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
@@ -12,6 +13,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
 import com.tang.intellij.lua.reference.LuaRequireReference;
@@ -156,6 +158,11 @@ public class LuaPsiImplUtil {
         else return callExpr.guessType();
     }
 
+    /**
+     * 猜出前面的类型
+     * @param callExpr call expr
+     * @return LuaTypeSet
+     */
     public static LuaTypeSet guessPrefixType(LuaCallExpr callExpr) {
         LuaNameRef nameRef = callExpr.getNameRef();
         if (nameRef != null) {
@@ -182,6 +189,23 @@ public class LuaPsiImplUtil {
             LuaExpr prefix = (LuaExpr) callExpr.getFirstChild();
             if (prefix != null)
                 return prefix.guessType();
+        }
+        return null;
+    }
+
+    /**
+     * 找出函数体
+     * @param callExpr call expr
+     * @return LuaFuncBodyOwner
+     */
+    public static LuaFuncBodyOwner resolveFuncBodyOwner(LuaCallExpr callExpr) {
+        LuaTypeSet typeSet = callExpr.guessPrefixType();
+        if (typeSet != null) {
+            PsiElement id = callExpr.getId();
+            if (id != null) {
+                LuaType type = typeSet.getType(0);
+                return LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
+            }
         }
         return null;
     }

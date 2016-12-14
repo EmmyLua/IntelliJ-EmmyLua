@@ -5,11 +5,7 @@ import com.intellij.codeInsight.hints.InlayParameterHintsProvider;
 import com.intellij.codeInsight.hints.MethodInfo;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
-import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,17 +25,10 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
         List<InlayInfo> list = new ArrayList<>();
         if (psiElement instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) psiElement;
-            LuaTypeSet typeSet = callExpr.guessPrefixType();
             String[] parameters = null;
-            if (typeSet != null) {
-                PsiElement id = callExpr.getId();
-                if (id != null) {
-                    LuaType type = typeSet.getType(0);
-                    LuaClassMethodDef methodDef = LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
-                    if (methodDef != null) {
-                        parameters = methodDef.getParameters();
-                    }
-                }
+            LuaFuncBodyOwner methodDef = callExpr.resolveFuncBodyOwner();
+            if (methodDef != null) {
+                parameters = methodDef.getParameters();
             }
 
             LuaArgs args = callExpr.getArgs();
