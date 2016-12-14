@@ -5,10 +5,11 @@ import com.intellij.codeInsight.hints.InlayParameterHintsProvider;
 import com.intellij.codeInsight.hints.MethodInfo;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.psi.LuaArgs;
-import com.tang.intellij.lua.psi.LuaCallExpr;
-import com.tang.intellij.lua.psi.LuaExpr;
-import com.tang.intellij.lua.psi.LuaExprList;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,15 +29,28 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
         List<InlayInfo> list = new ArrayList<>();
         if (psiElement instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) psiElement;
+            LuaTypeSet typeSet = callExpr.guessPrefixType();
+            List<LuaParDef> parDefList = null;
+            if (typeSet != null) {
+                PsiElement id = callExpr.getId();
+                if (id != null) {
+                    LuaType type = typeSet.getType(0);
+                    LuaClassMethodDef methodDef = LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
+                    if (methodDef != null && methodDef.getFuncBody() != null) {
+                        parDefList = methodDef.getFuncBody().getParDefList();
+                    }
+                }
+            }
 
             LuaArgs args = callExpr.getArgs();
-            if (args != null) {
+            if (args != null && parDefList != null) {
                 LuaExprList luaExprList = args.getExprList();
                 if (luaExprList != null) {
                     List<LuaExpr> exprList = luaExprList.getExprList();
-                    for (int i = 0; i < exprList.size(); i++) {
+                    for (int i = 0; i < exprList.size() && i < parDefList.size(); i++) {
                         LuaExpr expr = exprList.get(i);
-                        list.add(new InlayInfo("AAA", expr.getTextOffset()));
+                        LuaParDef parDef = parDefList.get(i);
+                        list.add(new InlayInfo(parDef.getName(), expr.getTextOffset()));
                     }
                 }
             }
