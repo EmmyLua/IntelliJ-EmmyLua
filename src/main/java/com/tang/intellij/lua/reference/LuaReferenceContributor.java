@@ -24,6 +24,8 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
         @Override
         public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
             LuaCallExpr expr = (LuaCallExpr) psiElement;
+            if (expr.getId() == null)
+                return PsiReference.EMPTY_ARRAY;
             return new PsiReference[]{ new LuaCallExprReference(expr) };
         }
     }
