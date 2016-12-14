@@ -187,7 +187,7 @@ args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
 
 lambdaFuncDef ::= 'function' funcBody { pin = 1 }
 
-funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 1 }
+funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 5 }
 
 parDef ::= ID | SELF {
     extends = nameDef
