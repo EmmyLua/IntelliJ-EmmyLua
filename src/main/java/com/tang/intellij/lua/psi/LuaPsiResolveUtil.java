@@ -13,6 +13,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -22,10 +23,37 @@ import java.util.List;
  */
 public class LuaPsiResolveUtil {
 
-    static PsiElement resolveResult;
+    private static LuaFuncBodyOwner funcBodyOwner = null;
+
+    static LuaFuncBodyOwner resolveFuncBodyOwner(@NotNull LuaNameRef ref) {
+        String refName = ref.getName();
+        //local 函数名
+        if (funcBodyOwner == null) {
+            LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
+                LuaNameDef nameDef = localFuncDef.getNameDef();
+                if (nameDef != null && refName.equals(nameDef.getName())) {
+                    funcBodyOwner = localFuncDef;
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        //global function
+        if (funcBodyOwner == null) {
+            Project project = ref.getProject();
+            funcBodyOwner = LuaGlobalFuncIndex.find(refName, project, new ProjectAndLibrariesScope(project));
+        }
+
+        LuaFuncBodyOwner temp = funcBodyOwner;
+        funcBodyOwner = null;
+        return temp;
+    }
+
+    private static PsiElement resolveResult;
 
     public static PsiElement resolve(LuaNameRef ref) {
-        String refName = ref.getText();
+        String refName = ref.getName();
 
         if (refName.equals("self")) {
             LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodDef.class);
@@ -48,8 +76,9 @@ public class LuaPsiResolveUtil {
 
         //local 函数名
         if (resolveResult == null) {
-            LuaPsiTreeUtil.walkUpLocalFuncDef(ref, nameDef -> {
-                if (refName.equals(nameDef.getName())) {
+            LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
+                LuaNameDef nameDef = localFuncDef.getNameDef();
+                if (nameDef != null && refName.equals(nameDef.getName())) {
                     resolveResult = nameDef;
                     return false;
                 }

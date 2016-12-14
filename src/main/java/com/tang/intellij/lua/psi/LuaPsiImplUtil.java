@@ -199,12 +199,20 @@ public class LuaPsiImplUtil {
      * @return LuaFuncBodyOwner
      */
     public static LuaFuncBodyOwner resolveFuncBodyOwner(LuaCallExpr callExpr) {
-        LuaTypeSet typeSet = callExpr.guessPrefixType();
-        if (typeSet != null) {
+        LuaArgs args = callExpr.getArgs();
+        if (args != null) {
             PsiElement id = callExpr.getId();
-            if (id != null) {
-                LuaType type = typeSet.getType(0);
-                return LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
+            if (id == null) { // local, global, static
+                LuaNameRef luaNameRef = PsiTreeUtil.getPrevSiblingOfType(args, LuaNameRef.class);
+                if (luaNameRef != null)
+                    return LuaPsiResolveUtil.resolveFuncBodyOwner(luaNameRef);
+            } else {
+                LuaTypeSet typeSet = callExpr.guessPrefixType();
+                if (typeSet != null) { //TODO multi-type
+                    // class method
+                    LuaType type = typeSet.getType(0);
+                    return LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
+                }
             }
         }
         return null;

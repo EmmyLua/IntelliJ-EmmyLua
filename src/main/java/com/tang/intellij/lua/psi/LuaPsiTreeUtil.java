@@ -34,7 +34,7 @@ public class LuaPsiTreeUtil {
      * @param current 当前搜导起点
      * @param processor 处理器
      */
-    public static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaNameDef> processor) {
+    public static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaLocalFuncDef> processor) {
         if (current == null || processor == null)
             return;
         boolean continueSearch = true;
@@ -46,10 +46,7 @@ public class LuaPsiTreeUtil {
                 //第一级local function不能使用
                 if (funcDeep > 0 || treeDeep == 0) {
                     LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
-                    LuaNameDef funcName = localFuncDef.getNameDef();
-                    //名字部分
-                    if (funcName != null)
-                        continueSearch = processor.accept(funcName);
+                    continueSearch = processor.accept(localFuncDef);
                 }
                 funcDeep++;
             }
