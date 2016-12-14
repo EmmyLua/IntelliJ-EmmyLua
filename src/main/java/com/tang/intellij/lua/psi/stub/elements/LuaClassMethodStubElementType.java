@@ -56,8 +56,10 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
     @Override
     public void serialize(@NotNull LuaClassMethodStub luaClassMethodStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        stubOutputStream.writeUTFFast(luaClassMethodStub.getClassName());
-        stubOutputStream.writeBoolean(luaClassMethodStub.isStatic());
+        if (luaClassMethodStub.getClassName() != null) {
+            stubOutputStream.writeUTFFast(luaClassMethodStub.getClassName());
+            stubOutputStream.writeBoolean(luaClassMethodStub.isStatic());
+        }
     }
 
     @NotNull
