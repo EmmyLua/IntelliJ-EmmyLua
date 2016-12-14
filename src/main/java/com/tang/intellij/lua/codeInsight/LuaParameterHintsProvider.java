@@ -30,27 +30,26 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
         if (psiElement instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) psiElement;
             LuaTypeSet typeSet = callExpr.guessPrefixType();
-            List<LuaParDef> parDefList = null;
+            String[] parameters = null;
             if (typeSet != null) {
                 PsiElement id = callExpr.getId();
                 if (id != null) {
                     LuaType type = typeSet.getType(0);
                     LuaClassMethodDef methodDef = LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
-                    if (methodDef != null && methodDef.getFuncBody() != null) {
-                        parDefList = methodDef.getFuncBody().getParDefList();
+                    if (methodDef != null) {
+                        parameters = methodDef.getParameters();
                     }
                 }
             }
 
             LuaArgs args = callExpr.getArgs();
-            if (args != null && parDefList != null) {
+            if (args != null && parameters != null) {
                 LuaExprList luaExprList = args.getExprList();
                 if (luaExprList != null) {
                     List<LuaExpr> exprList = luaExprList.getExprList();
-                    for (int i = 0; i < exprList.size() && i < parDefList.size(); i++) {
+                    for (int i = 0; i < exprList.size() && i < parameters.length; i++) {
                         LuaExpr expr = exprList.get(i);
-                        LuaParDef parDef = parDefList.get(i);
-                        list.add(new InlayInfo(parDef.getName(), expr.getTextOffset()));
+                        list.add(new InlayInfo(parameters[i], expr.getTextOffset()));
                     }
                 }
             }

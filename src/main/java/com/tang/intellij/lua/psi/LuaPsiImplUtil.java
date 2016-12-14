@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.List;
 
 /**
  * LuaPsiImplUtil
@@ -246,5 +247,21 @@ public class LuaPsiImplUtil {
             }
         }
         return null;
+    }
+
+    private static final String[] EMPTY_PARAMETERS = new String[0];
+    public static String[] getParameters(LuaFuncBodyOwner funcBodyOwner) {
+        LuaFuncBody body = funcBodyOwner.getFuncBody();
+        if (body != null) {
+            List<LuaParDef> parDefList = body.getParDefList();
+            String[] array = new String[parDefList.size()];
+            for (int i = 0; i < parDefList.size(); i++) {
+                LuaParDef parDef = parDefList.get(i);
+                array[i] = parDef.getName();
+            }
+            return array;
+        }
+
+        return EMPTY_PARAMETERS;
     }
 }

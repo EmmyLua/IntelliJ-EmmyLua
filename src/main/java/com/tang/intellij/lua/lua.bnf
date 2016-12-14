@@ -117,7 +117,7 @@ forBStat ::= 'for' nameList 'in' exprList 'do' lazy_block 'end' { pin = 1 }
 
 globalFuncDef ::= 'function' nameDef funcBody {
     pin = 1
-    methods = [getComment getName getPresentation]
+    methods = [getComment getName getPresentation getParameters]
     stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub"
 }
 
@@ -134,12 +134,12 @@ classMethodDef ::= 'function' classMethodName funcBody {
         "com.tang.intellij.lua.psi.LuaFunction"
     ]
     stubClass = "com.tang.intellij.lua.psi.stub.LuaClassMethodStub"
-    methods = [getComment getClassType getClassName getMethodName]
+    methods = [getComment getClassType getClassName getMethodName getParameters]
 }
 
 localFuncDef ::= 'local' 'function' nameDef funcBody {
     pin = 2
-    methods = [getComment]
+    methods = [getComment getParameters]
 }
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
@@ -186,7 +186,10 @@ args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     pin(".*") = 1
 }
 
-lambdaFuncDef ::= 'function' funcBody { pin = 1 }
+lambdaFuncDef ::= 'function' funcBody {
+    pin = 1
+    methods = [getParameters]
+}
 
 funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 5 }
 
