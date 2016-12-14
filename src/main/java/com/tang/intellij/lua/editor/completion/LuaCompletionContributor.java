@@ -81,7 +81,7 @@ public class LuaCompletionContributor extends CompletionContributor {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 //local
-                PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset());
+                PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
                 LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
                             .withIcon(LuaIcons.LOCAL_VAR);
