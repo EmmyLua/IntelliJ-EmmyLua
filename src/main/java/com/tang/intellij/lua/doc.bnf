@@ -70,7 +70,7 @@ field_def ::= FIELD access_modifier field_name_def type_set {
 
 //--- tag
 tag_value ::= ID
-tag_def ::= TAG_NAME tag_value { pin = 1 }
+tag_def ::= TAG_NAME tag_value? { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {

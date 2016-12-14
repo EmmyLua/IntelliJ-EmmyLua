@@ -44,35 +44,46 @@ AT=@
 DOC_DASHES = ----*
 
 %state xTAG
+%state xTAG_NAME
 %state xCOMMENT_STRING
 
 %%
 
 <YYINITIAL> {
- {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
- {DOC_DASHES}               { return DASHES; }
- "@"                        { yybegin(xTAG); return AT; }
- .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
+    {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
+    {DOC_DASHES}               { return DASHES; }
+    "@"                        { yybegin(xTAG_NAME); return AT; }
+    .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
+}
+
+<xTAG, xTAG_NAME> {
+    {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
+    {LINE_WS}                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
+}
+
+<xTAG_NAME> {
+    "field"                    { yybegin(xTAG); return FIELD; }
+    "define"                   { yybegin(xTAG); return DEFINE; }
+    "return"                   { yybegin(xTAG); return TAG_RETURN; }
+    "param"                    { yybegin(xTAG); return TAG_PARAM; }
+    "class"                    { yybegin(xTAG); return CLASS; }
+    "interface"                { yybegin(xTAG); return INTERFACE; }
+    "type"                     { yybegin(xTAG); return TYPE;}
+    {ID}                       { yybegin(xTAG); return TAG_NAME; }
+    [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 
 <xTAG> {
- {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
- {LINE_WS}                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
- "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
- ","                        { return COMMA; }
- "#"                        { return SHARP; }
- ":"                        { return EXTENDS;}
- "field"                    { return FIELD; }
- "define"                   { return DEFINE; }
- "return"                   { return TAG_RETURN; }
- "param"                    { return TAG_PARAM; }
- "protected"                { return PROTECTED; }
- "public"                   { return PUBLIC; }
- "class"                    { return CLASS; }
- "interface"                { return INTERFACE; }
- "type"                     { return TYPE;}
- {ID}                       { return ID; }
- [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+    //{EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
+    //{LINE_WS}                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
+    "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
+    ","                        { return COMMA; }
+    "#"                        { return SHARP; }
+    ":"                        { return EXTENDS;}
+    "protected"                { yybegin(xTAG); return PROTECTED; }
+    "public"                   { yybegin(xTAG); return PUBLIC; }
+    {ID}                       { return ID; }
+    [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 
 <xCOMMENT_STRING> {
