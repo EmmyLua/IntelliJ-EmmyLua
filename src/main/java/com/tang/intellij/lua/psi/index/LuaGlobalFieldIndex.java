@@ -5,6 +5,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
+import com.tang.intellij.lua.lang.LuaLanguage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -27,6 +28,9 @@ public class LuaGlobalFieldIndex extends StringStubIndexExtension<LuaDocGlobalDe
     public static LuaGlobalFieldIndex getInstance() {
         return INSTANCE;
     }
+
+    @Override
+    public int getVersion() { return LuaLanguage.INDEX_VERSION;}
 
     public static LuaDocGlobalDef find(String key, Project project, GlobalSearchScope scope) {
         try {

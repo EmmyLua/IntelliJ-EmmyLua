@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
+import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +22,9 @@ public class LuaClassMethodIndex extends StringStubIndexExtension<LuaClassMethod
     public static LuaClassMethodIndex getInstance() {
         return INSTANCE;
     }
+
+    @Override
+    public int getVersion() { return LuaLanguage.INDEX_VERSION;}
 
     @NotNull
     @Override

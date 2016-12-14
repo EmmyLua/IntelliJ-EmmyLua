@@ -5,6 +5,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
+import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +24,9 @@ public class LuaGlobalFuncIndex extends StringStubIndexExtension<LuaGlobalFuncDe
     public static LuaGlobalFuncIndex getInstance() {
         return INSTANCE;
     }
+
+    @Override
+    public int getVersion() { return LuaLanguage.INDEX_VERSION;}
 
     @NotNull
     @Override
