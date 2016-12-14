@@ -36,4 +36,14 @@ public class LuaClassMethodIndex extends StringStubIndexExtension<LuaClassMethod
         String key = className + ".static";
         return INSTANCE.get(key, project, scope);
     }
+
+    public static LuaClassMethodDef findMethodWithName(@NotNull String className, @NotNull String methodName, Project project, GlobalSearchScope scope) {
+        Collection<LuaClassMethodDef> collection = INSTANCE.get(className, project, scope);
+        for (LuaClassMethodDef methodDef : collection) {
+            if (methodDef.getMethodName().equals(methodName)) {
+                return methodDef;
+            }
+        }
+        return null;
+    }
 }
