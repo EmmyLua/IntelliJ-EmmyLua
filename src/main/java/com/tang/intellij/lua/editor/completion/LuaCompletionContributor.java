@@ -88,7 +88,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                     completionResultSet.addElement(elementBuilder);
                     return  true;
                 });
-                LuaPsiTreeUtil.walkUpLocalFuncDef(cur, nameDef -> {
+                LuaPsiTreeUtil.walkUpLocalFuncNameDef(cur, nameDef -> {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
                             .withIcon(LuaIcons.LOCAL_FUNCTION);
                     completionResultSet.addElement(elementBuilder);

@@ -43,11 +43,11 @@ public class LuaPsiTreeUtil {
         PsiElement curr = current;
         do {
             if (curr instanceof LuaLocalFuncDef) {
-                //第一级local function不能使用
-                if (funcDeep > 0 || treeDeep == 0) {
+                //todo 第一级local function不能使用
+                //if (funcDeep > 0 || treeDeep != 1) {
                     LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
                     continueSearch = processor.accept(localFuncDef);
-                }
+                //}
                 funcDeep++;
             }
 
@@ -58,6 +58,18 @@ public class LuaPsiTreeUtil {
             }
             curr = prevSibling;
         } while (continueSearch && !(curr instanceof PsiFile));
+    }
+
+    /**
+     * 向上寻找 local function 定义
+     * @param current 当前搜导起点
+     * @param processor 处理器
+     */
+    public static void walkUpLocalFuncNameDef(PsiElement current, ElementProcessor<LuaNameDef> processor) {
+        walkUpLocalFuncDef(current, localFuncDef -> {
+            LuaNameDef nameDef = localFuncDef.getNameDef();
+            return nameDef == null || processor.accept(nameDef);
+        });
     }
 
     /**
