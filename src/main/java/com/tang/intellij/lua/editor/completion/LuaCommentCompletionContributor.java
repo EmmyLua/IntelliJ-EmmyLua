@@ -15,7 +15,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.psi.index.LuaClassIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

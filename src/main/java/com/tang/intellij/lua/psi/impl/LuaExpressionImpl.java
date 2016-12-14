@@ -14,7 +14,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.lang.type.LuaTypeTable;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.psi.index.LuaClassFieldIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -1,4 +1,4 @@
-package com.tang.intellij.lua.psi.index;
+package com.tang.intellij.lua.stubs.index;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;

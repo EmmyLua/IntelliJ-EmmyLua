@@ -9,8 +9,8 @@ import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
-import com.tang.intellij.lua.psi.index.LuaClassFieldIndex;
-import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

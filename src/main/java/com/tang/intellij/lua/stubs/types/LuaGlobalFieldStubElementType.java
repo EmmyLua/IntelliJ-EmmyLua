@@ -1,4 +1,4 @@
-package com.tang.intellij.lua.psi.stub.elements;
+package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
@@ -6,9 +6,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocGlobalDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
-import com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub;
-import com.tang.intellij.lua.psi.stub.impl.LuaGlobalFieldStubImpl;
+import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
+import com.tang.intellij.lua.stubs.LuaGlobalFieldStub;
+import com.tang.intellij.lua.stubs.impl.LuaGlobalFieldStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

@@ -118,7 +118,7 @@ forBStat ::= 'for' nameList 'in' exprList 'do' lazy_block 'end' { pin = 1 }
 globalFuncDef ::= 'function' nameDef funcBody {
     pin = 1
     methods = [getComment getName getPresentation getParameters]
-    stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFuncStub"
 }
 
 private checkFuncPrefix ::= ID ('.' | ':') ID
@@ -133,7 +133,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         "com.tang.intellij.lua.psi.LuaClassMember"
         "com.tang.intellij.lua.psi.LuaFunction"
     ]
-    stubClass = "com.tang.intellij.lua.psi.stub.LuaClassMethodStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
     methods = [getComment getClassType getClassName getMethodName getParameters]
 }
 

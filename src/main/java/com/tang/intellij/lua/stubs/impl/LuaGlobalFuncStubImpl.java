@@ -1,11 +1,11 @@
-package com.tang.intellij.lua.psi.stub.impl;
+package com.tang.intellij.lua.stubs.impl;
 
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import com.tang.intellij.lua.psi.LuaTypes;
-import com.tang.intellij.lua.psi.stub.LuaGlobalFuncStub;
+import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 
 /**
  *

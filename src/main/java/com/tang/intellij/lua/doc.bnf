@@ -50,7 +50,7 @@ access_modifier ::= "protected" | "public"
 
 //--- define
 global_def ::= DEFINE {
-    stubClass = "com.tang.intellij.lua.psi.stub.LuaGlobalFieldStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFieldStub"
     implements = "com.tang.intellij.lua.psi.LuaTypeResolvable, com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
     methods = [resolveType]
 }
@@ -64,7 +64,7 @@ field_name_def ::= ID {
 field_def ::= FIELD access_modifier field_name_def type_set {
     pin = 1
     implements = "com.tang.intellij.lua.psi.LuaClassMember,com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
-    stubClass = "com.tang.intellij.lua.psi.stub.LuaClassFieldStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaClassFieldStub"
     methods = [resolveType]
 }
 
@@ -98,7 +98,7 @@ class_name_ref ::= ID {
 }
 class_def ::= CLASS class_name (EXTENDS class_name_ref)?  {
     pin = 2
-    stubClass = "com.tang.intellij.lua.psi.stub.LuaClassDefStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaClassDefStub"
     methods = [getClassNameText getSuperClass getSuperClasses getPresentation]
 }
 

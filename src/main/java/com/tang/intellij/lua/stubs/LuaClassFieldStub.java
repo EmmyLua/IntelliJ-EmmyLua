@@ -1,4 +1,4 @@
-package com.tang.intellij.lua.psi.stub;
+package com.tang.intellij.lua.stubs;
 
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.io.StringRef;

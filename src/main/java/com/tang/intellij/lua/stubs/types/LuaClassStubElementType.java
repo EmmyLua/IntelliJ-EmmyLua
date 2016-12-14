@@ -1,13 +1,13 @@
-package com.tang.intellij.lua.psi.stub.elements;
+package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaElementType;
-import com.tang.intellij.lua.psi.index.LuaClassIndex;
-import com.tang.intellij.lua.psi.stub.LuaClassDefStub;
-import com.tang.intellij.lua.psi.stub.impl.LuaClassDefStubImpl;
+import com.tang.intellij.lua.stubs.index.LuaClassIndex;
+import com.tang.intellij.lua.stubs.LuaClassDefStub;
+import com.tang.intellij.lua.stubs.impl.LuaClassDefStubImpl;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

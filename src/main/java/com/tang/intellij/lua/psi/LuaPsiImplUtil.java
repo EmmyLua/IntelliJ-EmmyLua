@@ -13,7 +13,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
 import com.tang.intellij.lua.reference.LuaRequireReference;

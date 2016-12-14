@@ -12,7 +12,7 @@ import com.tang.intellij.lua.comment.psi.impl.LuaCommentImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
-import com.tang.intellij.lua.psi.stub.elements.*;
+import com.tang.intellij.lua.stubs.types.*;
 import org.jetbrains.annotations.Nullable;
 
 /**

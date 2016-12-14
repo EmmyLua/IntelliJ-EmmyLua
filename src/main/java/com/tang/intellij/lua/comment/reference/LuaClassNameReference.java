@@ -6,7 +6,7 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
-import com.tang.intellij.lua.psi.index.LuaClassIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

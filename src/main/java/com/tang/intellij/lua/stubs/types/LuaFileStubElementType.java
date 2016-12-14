@@ -1,4 +1,4 @@
-package com.tang.intellij.lua.psi.stub.elements;
+package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -10,7 +10,7 @@ import com.intellij.psi.tree.IStubFileElementType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaFile;
 import com.tang.intellij.lua.psi.LuaTypes;
-import com.tang.intellij.lua.psi.stub.LuaFileStub;
+import com.tang.intellij.lua.stubs.LuaFileStub;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -12,7 +12,7 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCallExpr;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaElementFactory;
-import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

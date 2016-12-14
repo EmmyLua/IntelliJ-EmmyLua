@@ -12,7 +12,7 @@ import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.index.LuaClassIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

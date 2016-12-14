@@ -20,7 +20,7 @@ import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaFile;
 import com.tang.intellij.lua.psi.LuaTokenType;
 import com.tang.intellij.lua.psi.LuaTypes;
-import com.tang.intellij.lua.psi.stub.elements.LuaFileStubElementType;
+import com.tang.intellij.lua.stubs.types.LuaFileStubElementType;
 import org.jetbrains.annotations.NotNull;
 
 /**

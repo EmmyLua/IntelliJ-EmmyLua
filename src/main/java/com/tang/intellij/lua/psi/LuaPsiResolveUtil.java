@@ -11,8 +11,8 @@ import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.index.LuaGlobalFieldIndex;
-import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
+import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
+import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

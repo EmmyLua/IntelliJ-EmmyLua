@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.containers.HashSet;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.index.LuaGlobalFuncIndex;
+import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
 
 /**
