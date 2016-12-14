@@ -1,4 +1,4 @@
-package com.tang.intellij.lua.editor;
+package com.tang.intellij.lua.codeInsight;
 
 import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider;
