@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by TangZX on 2016/11/24.
  */
 public class LuaPsiElementImpl extends ASTWrapperPsiElement implements LuaPsiElement {
-    public LuaPsiElementImpl(@NotNull ASTNode node) {
+    LuaPsiElementImpl(@NotNull ASTNode node) {
         super(node);
     }
 

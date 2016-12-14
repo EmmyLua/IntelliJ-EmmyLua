@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by TangZX on 2016/12/4.
  */
 public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpression {
-    public LuaExpressionImpl(@NotNull ASTNode node) {
+    LuaExpressionImpl(@NotNull ASTNode node) {
         super(node);
     }
 
@@ -83,7 +83,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         return null;
     }
 
-    static LuaTypeSet guessType(LuaValueExpr valueExpr) {
+    private static LuaTypeSet guessType(LuaValueExpr valueExpr) {
         PsiElement firstChild = valueExpr.getFirstChild();
         if (firstChild != null) {
             if (firstChild instanceof LuaFuncCall) {
