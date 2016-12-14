@@ -11,6 +11,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCallExpr;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.psi.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,11 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        return super.handleElementRename(newElementName);
+        PsiElement newId = LuaElementFactory.createIdentifier(myElement.getProject(), newElementName);
+        PsiElement oldId = expr.getId();
+        assert oldId != null;
+        oldId.replace(newId);
+        return newId;
     }
 
     @Override
@@ -57,7 +62,7 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
                 for (LuaType luaType : typeSet.getTypes()) {
                     LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(luaType.getClassNameText(), methodName, project, scope);
                     if (def != null) {
-                        return def.getClassMethodName().getId();
+                        return def.getClassMethodName().getNameDef();
                     }
                 }
             }

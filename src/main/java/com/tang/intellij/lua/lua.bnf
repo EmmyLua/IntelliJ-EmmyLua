@@ -124,7 +124,7 @@ globalFuncDef ::= 'function' nameDef funcBody {
 private checkFuncPrefix ::= ID ('.' | ':') ID
 
 left funcPrefixRef ::= '.' <<checkNext checkFuncPrefix>> nameRef
-classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) { pin = 3 }
+classMethodName ::=  nameRef (funcPrefixRef)* (('.' nameDef) | (':' nameDef)) { pin = 3 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
     implements = [

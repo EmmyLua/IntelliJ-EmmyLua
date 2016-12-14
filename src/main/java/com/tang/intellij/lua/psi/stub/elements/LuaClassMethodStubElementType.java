@@ -35,7 +35,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         String clazzName = resolveClassName(luaClassMethodFuncDef);
 
         LuaClassMethodName methodName = luaClassMethodFuncDef.getClassMethodName();
-        PsiElement id = methodName.getId();
+        PsiElement id = methodName.getNameDef();
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
 

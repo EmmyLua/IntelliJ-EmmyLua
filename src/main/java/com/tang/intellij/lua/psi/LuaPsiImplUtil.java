@@ -79,7 +79,7 @@ public class LuaPsiImplUtil {
      * @return String
      */
     public static String getMethodName(LuaClassMethodDef classMethodDef) {
-        PsiElement postfixName = classMethodDef.getClassMethodName().getId();
+        PsiElement postfixName = classMethodDef.getClassMethodName().getNameDef();
         return postfixName.getText();
     }
 
