@@ -35,11 +35,11 @@
         <psi.referenceContributor language="Lua" implementation="com.tang.intellij.lua.reference.LuaReferenceContributor"/>
         <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
         <gotoSymbolContributor implementation="com.tang.intellij.lua.editor.LuaSymbolNavigationContributor"/>
-
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCommentCompletionContributor"/>
         <codeInsight.lineMarkerProvider language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaLineMarkerProvider"/>
+        <codeInsight.parameterNameHints language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaParameterHintsProvider"/>
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterHandlerDelegate" />
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
