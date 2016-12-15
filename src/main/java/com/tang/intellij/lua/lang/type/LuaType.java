@@ -153,8 +153,12 @@ public class LuaType {
     public LuaClassMethodDef findMethod(String methodName, Project project, GlobalSearchScope scope) {
         if (classDef == null)
             return null;
-        LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(getClassNameText(), methodName, project, scope);
-        if (def == null) {
+        String className = getClassNameText();
+        LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(className, methodName, project, scope);
+        if (def == null) { // static
+            def = LuaClassMethodIndex.findStaticMethod(className, methodName, project, scope);
+        }
+        if (def == null) { // super
             LuaType superType = getSuperClass();
             if (superType != null)
                 def = superType.findMethod(methodName, project, scope);

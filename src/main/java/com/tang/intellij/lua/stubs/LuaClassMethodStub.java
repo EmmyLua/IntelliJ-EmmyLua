@@ -11,5 +11,7 @@ public interface LuaClassMethodStub extends StubElement<LuaClassMethodDef> {
 
     String getClassName();
 
+    String getShortName();
+
     boolean isStatic();
 }

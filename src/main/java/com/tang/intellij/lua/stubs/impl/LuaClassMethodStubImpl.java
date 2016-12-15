@@ -12,11 +12,13 @@ import com.tang.intellij.lua.stubs.LuaClassMethodStub;
  */
 public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implements LuaClassMethodStub {
 
+    private String shortName;
     private String className;
     private boolean isStatic;
 
-    public LuaClassMethodStubImpl(String className, boolean isStatic, StubElement parent) {
+    public LuaClassMethodStubImpl(String shortName, String className, boolean isStatic, StubElement parent) {
         super(parent, LuaElementType.CLASS_METHOD_DEF);
+        this.shortName = shortName;
         this.className = className;
         this.isStatic = isStatic;
     }
@@ -24,6 +26,11 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
     @Override
     public String getClassName() {
         return className;
+    }
+
+    @Override
+    public String getShortName() {
+        return shortName;
     }
 
     @Override

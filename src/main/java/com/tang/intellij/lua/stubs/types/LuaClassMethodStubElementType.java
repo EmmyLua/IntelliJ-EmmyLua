@@ -42,7 +42,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
 
-        return new LuaClassMethodStubImpl(clazzName, isStatic, stubElement);
+        return new LuaClassMethodStubImpl(id.getText(), clazzName, isStatic, stubElement);
     }
 
     @NotNull
@@ -66,28 +66,32 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         if (name != null) {
             stubOutputStream.writeUTFFast(luaClassMethodStub.getClassName());
         }
+        stubOutputStream.writeUTFFast(luaClassMethodStub.getShortName());
         stubOutputStream.writeBoolean(luaClassMethodStub.isStatic());
     }
 
     @NotNull
     @Override
     public LuaClassMethodStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        boolean hasName = stubInputStream.readBoolean();
-        String name = null;
-        if (hasName)
-            name = stubInputStream.readUTFFast();
+        boolean hasClassName = stubInputStream.readBoolean();
+        String className = null;
+        if (hasClassName)
+            className = stubInputStream.readUTFFast();
+        String shortName = stubInputStream.readUTFFast();
         boolean isStatic = stubInputStream.readBoolean();
-        return new LuaClassMethodStubImpl(name, isStatic, stubElement);
+        return new LuaClassMethodStubImpl(shortName, className, isStatic, stubElement);
     }
 
     @Override
     public void indexStub(@NotNull LuaClassMethodStub luaClassMethodStub, @NotNull IndexSink indexSink) {
         String className = luaClassMethodStub.getClassName();
         if (className != null) {
-            if (luaClassMethodStub.isStatic())
+            if (luaClassMethodStub.isStatic()) {
                 indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static");
-            else
+                indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + luaClassMethodStub.getShortName());
+            } else {
                 indexSink.occurrence(LuaClassMethodIndex.KEY, className);
+            }
         }
     }
 
