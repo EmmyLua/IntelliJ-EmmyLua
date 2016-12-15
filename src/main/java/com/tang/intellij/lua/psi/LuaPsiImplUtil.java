@@ -165,7 +165,7 @@ public class LuaPsiImplUtil {
      */
     public static LuaTypeSet guessPrefixType(LuaCallExpr callExpr) {
         LuaNameRef nameRef = callExpr.getNameRef();
-        if (nameRef != null) {
+        if (nameRef != null) { // 形如 xx:method, xx.method
             PsiElement def = nameRef.resolve();
             if (def instanceof LuaTypeResolvable) {
                 return ((LuaTypeResolvable) def).resolveType();
