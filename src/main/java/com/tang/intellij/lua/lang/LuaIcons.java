@@ -11,7 +11,7 @@ import javax.swing.*;
  * Email:272669294@qq.com
  */
 public class LuaIcons {
-    public static final Icon FILE = IconLoader.getIcon("/com/tang/intellij/lua/lang/lua-file.png");
+    public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;
     public static final Icon CLASS_METHOD = AllIcons.Nodes.Method;
