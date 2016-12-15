@@ -231,10 +231,7 @@ public class LuaPsiImplUtil {
                 if (luaAssignStat != null) {
                     LuaComment comment = luaAssignStat.getComment();
                     if (comment != null) {
-                        LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
-                        if (classDef != null) {
-                            return LuaTypeSet.create(classDef);
-                        }
+                        return comment.guessType();
                     }
                 }
             }

@@ -9,6 +9,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef;
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaTypes;
 
@@ -69,6 +70,17 @@ public class LuaCommentImpl extends LazyParseablePsiElement implements LuaCommen
             }
             element = element.getNextSibling();
         }
+        return null;
+    }
+
+    @Override
+    public LuaTypeSet guessType() {
+        LuaDocClassDef classDef = getClassDef();
+        if (classDef != null)
+            return LuaTypeSet.create(classDef);
+        LuaDocTypeDef typeDef = getTypeDef();
+        if (typeDef != null)
+            return typeDef.guessType();
         return null;
     }
 
