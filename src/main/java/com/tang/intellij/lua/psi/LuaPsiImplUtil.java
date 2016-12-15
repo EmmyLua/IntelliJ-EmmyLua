@@ -14,7 +14,6 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -214,7 +213,7 @@ public class LuaPsiImplUtil {
                 if (typeSet != null && !typeSet.isEmpty()) { //TODO multi-type
                     // class method
                     LuaType type = typeSet.getType(0);
-                    return LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
+                    return type.findMethod(id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
                 }
             }
         }
