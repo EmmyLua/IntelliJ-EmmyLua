@@ -178,6 +178,11 @@ public class LuaPsiImplUtil {
                 if (assignStat != null) {
                     LuaComment comment = LuaCommentUtil.findComment(assignStat);
                     if (comment != null) {
+                        // ---@class XXX
+                        LuaDocClassDef classDef = comment.getClassDef();
+                        if (classDef != null)
+                            return LuaTypeSet.create(classDef);
+                        // ---@type XXX
                         LuaDocTypeDef typeDef = comment.getTypeDef();
                         if (typeDef != null)
                             return typeDef.guessType();
