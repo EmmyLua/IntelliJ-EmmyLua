@@ -3,9 +3,11 @@ package com.tang.intellij.lua.reference;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.tang.intellij.lua.psi.LuaCallExpr;
+import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  *
@@ -14,12 +16,46 @@ import org.jetbrains.annotations.Nullable;
 public class LuaRequireReference extends PsiReferenceBase<LuaCallExpr> {
 
     private String pathString;
-    private TextRange range;
+    private TextRange range = TextRange.EMPTY_RANGE;
 
-    public LuaRequireReference(@NotNull LuaCallExpr element, TextRange range,  String pathString) {
-        super(element);
-        this.range = range;
-        this.pathString = pathString;
+    LuaRequireReference(@NotNull LuaCallExpr callExpr) {
+        super(callExpr);
+
+        LuaArgs args = callExpr.getArgs();
+        if (args != null) {
+            PsiElement path = null;
+
+            // require "xxx"
+            for (PsiElement child = args.getFirstChild(); child != null; child = child.getNextSibling()) {
+                if (child.getNode().getElementType() == LuaTypes.STRING) {
+                    path = child;
+                    break;
+                }
+            }
+            // require("")
+            if (path == null) {
+                LuaExprList exprList = args.getExprList();
+                if (exprList != null) {
+                    List<LuaExpr> list = exprList.getExprList();
+                    if (list.size() == 1 && list.get(0) instanceof LuaValueExpr) {
+                        LuaValueExpr valueExpr = (LuaValueExpr) list.get(0);
+                        PsiElement node = valueExpr.getFirstChild();
+                        if (node.getNode().getElementType() == LuaTypes.STRING) {
+                            path = node;
+                        }
+                    }
+                }
+            }
+
+            if (path != null && path.getNode().getElementType() == LuaTypes.STRING) {
+                pathString = path.getText();
+                pathString = pathString.substring(1, pathString.length() - 1);
+
+                int start = path.getTextOffset() - callExpr.getTextOffset() + 1;
+                int end = start + path.getTextLength() - 2;
+                range = new TextRange(start, end);
+            }
+        }
     }
 
     @Override

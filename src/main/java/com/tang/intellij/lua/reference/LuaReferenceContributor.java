@@ -3,6 +3,7 @@ package com.tang.intellij.lua.reference;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.psi.LuaCallExpr;
+import com.tang.intellij.lua.psi.LuaNameRef;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +25,15 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
         @Override
         public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
             LuaCallExpr expr = (LuaCallExpr) psiElement;
-            if (expr.getId() == null)
+            LuaNameRef nameRef = expr.getNameRef();
+            if (nameRef != null) {
+                if (nameRef.getText().equals("require")) {
+                    return new PsiReference[] { new LuaRequireReference(expr) };
+                }
+            }
+
+            PsiElement id = expr.getId();
+            if (id == null)
                 return PsiReference.EMPTY_ARRAY;
             return new PsiReference[]{ new LuaCallExprReference(expr) };
         }

@@ -2,7 +2,6 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
@@ -13,10 +12,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
-import com.tang.intellij.lua.reference.LuaRequireReference;
+import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -217,24 +215,6 @@ public class LuaPsiImplUtil {
                     // class method
                     LuaType type = typeSet.getType(0);
                     return LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
-                }
-            }
-        }
-        return null;
-    }
-
-    public static PsiReference getReference(LuaCallExpr callExpr) {
-        PsiElement id = callExpr.getNameRef();
-        if (id != null && id.getText().equals("require")) {
-            LuaArgs args = callExpr.getArgs();
-            if (args != null) {
-                PsiElement path = args.getFirstChild();
-                if (path != null && path.getNode().getElementType() == LuaTypes.STRING) {
-                    String pathString = path.getText();
-                    pathString = pathString.substring(1, pathString.length() - 1);
-                    int start = args.getStartOffsetInParent() + 1;
-                    int end = start + path.getTextLength() - 2;
-                    return new LuaRequireReference(callExpr, new TextRange(start, end), pathString);
                 }
             }
         }
