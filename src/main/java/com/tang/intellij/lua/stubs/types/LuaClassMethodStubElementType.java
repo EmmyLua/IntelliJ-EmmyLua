@@ -9,9 +9,9 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl;
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassMethodStubImpl;
+import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -30,6 +30,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         return new LuaClassMethodDefImpl(luaClassMethodStub, LuaElementType.CLASS_METHOD_DEF);
     }
 
+    @NotNull
     @Override
     public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef luaClassMethodFuncDef, StubElement stubElement) {
         String clazzName = resolveClassName(luaClassMethodFuncDef);
@@ -50,8 +51,9 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
     @Override
     public boolean shouldCreateStub(ASTNode node) {
-        PsiElement psi = node.getPsi();
-        return psi instanceof LuaClassMethodDef && resolveClassName((LuaClassMethodDef) psi) != null;
+        //确定是完整的，否则会报错
+        LuaClassMethodDef psi = (LuaClassMethodDef) node.getPsi();
+        return psi.getFuncBody() != null;
     }
 
     @Override
@@ -81,8 +83,8 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         }
     }
 
-    static String clazzNameToSearch;
-    static String resolveClassName(LuaClassMethodDef luaClassMethodFuncDef) {
+    private static String clazzNameToSearch;
+    private static String resolveClassName(LuaClassMethodDef luaClassMethodFuncDef) {
         clazzNameToSearch = null;
         //如果全局定义的对象的方法，则优先找本文件内的 assign stat
         LuaPsiTreeUtil.walkTopLevelAssignStatInFile(luaClassMethodFuncDef, luaAssignStat -> {
@@ -96,8 +98,13 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
             }
             return true;
         });
-        if (clazzNameToSearch == null)
-            clazzNameToSearch = luaClassMethodFuncDef.getClassName();
+        if (clazzNameToSearch == null) {
+            try {
+                clazzNameToSearch = luaClassMethodFuncDef.getClassName();
+            } catch (Exception e) {
+                System.out.println(luaClassMethodFuncDef.getText());
+            }
+        }
         return clazzNameToSearch;
     }
 }
