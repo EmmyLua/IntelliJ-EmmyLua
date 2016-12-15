@@ -208,7 +208,7 @@ public class LuaPsiImplUtil {
                     return LuaPsiResolveUtil.resolveFuncBodyOwner(luaNameRef);
             } else {
                 LuaTypeSet typeSet = callExpr.guessPrefixType();
-                if (typeSet != null) { //TODO multi-type
+                if (typeSet != null && !typeSet.isEmpty()) { //TODO multi-type
                     // class method
                     LuaType type = typeSet.getType(0);
                     return LuaClassMethodIndex.findMethodWithName(type.getClassNameText(), id.getText(), callExpr.getProject(), new ProjectAndLibrariesScope(callExpr.getProject()));
