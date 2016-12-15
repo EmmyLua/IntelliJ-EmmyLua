@@ -96,7 +96,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         clazzNameToSearch = null;
 
         // 寻找Local定义
-        LuaPsiTreeUtil.walkTopLevelLocalDefInFile(luaClassMethodFuncDef, luaLocalDef -> {
+        LuaPsiTreeUtil.walkTopLevelInFile(luaClassMethodFuncDef, LuaLocalDef.class, luaLocalDef -> {
 
             LuaNameList nameList = luaLocalDef.getNameList();
             if (nameList != null) {
@@ -119,7 +119,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
         //如果全局定义的对象的方法，则优先找本文件内的 assign stat
         if (clazzNameToSearch == null) {
-            LuaPsiTreeUtil.walkTopLevelAssignStatInFile(luaClassMethodFuncDef, luaAssignStat -> {
+            LuaPsiTreeUtil.walkTopLevelInFile(luaClassMethodFuncDef, LuaAssignStat.class, luaAssignStat -> {
                 LuaVarList varList = luaAssignStat.getVarList();
                 for (PsiElement child = varList.getFirstChild(); child != null; child = child.getNextSibling()) {
                     if (child instanceof LuaVar) {
