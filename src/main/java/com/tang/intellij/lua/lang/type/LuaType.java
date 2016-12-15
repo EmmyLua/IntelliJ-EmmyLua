@@ -137,14 +137,28 @@ public class LuaType {
     public LuaTypeSet guessFieldType(String propName, Project project, GlobalSearchScope scope) {
         if (classDef == null)
             return null;
+        LuaTypeSet set = null;
         LuaDocFieldDef fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, project, scope);
-        if (fieldDef == null) {
+        if (fieldDef != null)
+            set = fieldDef.resolveType();
+        else {
             LuaType superType = getSuperClass();
             if (superType != null)
-                return superType.guessFieldType(propName, project, scope);
-        } else {
-            return fieldDef.resolveType();
+                set = superType.guessFieldType(propName, project, scope);
         }
-        return null;
+
+        return set;
+    }
+
+    public LuaClassMethodDef findMethod(String methodName, Project project, GlobalSearchScope scope) {
+        if (classDef == null)
+            return null;
+        LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(getClassNameText(), methodName, project, scope);
+        if (def == null) {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                def = superType.findMethod(methodName, project, scope);
+        }
+        return def;
     }
 }

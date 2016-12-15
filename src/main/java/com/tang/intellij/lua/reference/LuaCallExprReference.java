@@ -12,7 +12,6 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCallExpr;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaElementFactory;
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +59,7 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
                 Project project = expr.getProject();
                 GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
                 for (LuaType luaType : typeSet.getTypes()) {
-                    LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(luaType.getClassNameText(), methodName, project, scope);
+                    LuaClassMethodDef def = luaType.findMethod(methodName, project, scope);
                     if (def != null) {
                         return def.getClassMethodName().getNameDef();
                     }
