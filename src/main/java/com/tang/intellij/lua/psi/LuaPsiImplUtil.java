@@ -203,7 +203,7 @@ public class LuaPsiImplUtil {
     public static LuaFuncBodyOwner resolveFuncBodyOwner(LuaCallExpr callExpr) {
         LuaArgs args = callExpr.getArgs();
         if (args != null) {
-            PsiElement id = callExpr.getId();
+            PsiElement id = callExpr.getId(); //todo static : xxx.method
             if (id == null) { // local, global, static
                 LuaNameRef luaNameRef = PsiTreeUtil.getPrevSiblingOfType(args, LuaNameRef.class);
                 if (luaNameRef != null)
