@@ -3,6 +3,8 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
@@ -54,7 +56,7 @@ public class LuaType {
         addMethodCompletions(completionParameters, completionResultSet, true, true);
     }
 
-    public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+    private void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
         if (classDef != null) {
             String clazzName = getClassNameText();
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
@@ -76,7 +78,7 @@ public class LuaType {
         }
     }
 
-    public void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+    private void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
         if (classDef != null) {
             String clazzName = getClassNameText();
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
@@ -104,7 +106,7 @@ public class LuaType {
         addStaticMethodCompletions(completionParameters, completionResultSet, true, true);
     }
 
-    public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+    private void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
         if (classDef != null) {
             String clazzName = getClassNameText();
             Collection<LuaDocFieldDef> list = LuaClassFieldIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
@@ -130,5 +132,19 @@ public class LuaType {
                     superType.addFieldCompletions(completionParameters, completionResultSet, false, true);
             }
         }
+    }
+
+    public LuaTypeSet guessFieldType(String propName, Project project, GlobalSearchScope scope) {
+        if (classDef == null)
+            return null;
+        LuaDocFieldDef fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, project, scope);
+        if (fieldDef == null) {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                return superType.guessFieldType(propName, project, scope);
+        } else {
+            return fieldDef.resolveType();
+        }
+        return null;
     }
 }

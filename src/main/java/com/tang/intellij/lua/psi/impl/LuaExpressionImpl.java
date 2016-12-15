@@ -7,14 +7,12 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.lang.type.LuaTypeTable;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -56,10 +54,9 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                 } else {
                     Project project = indexExpr.getProject();
                     GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
-                    LuaDocFieldDef fieldDef = LuaClassFieldIndex.find(type.getClassNameText(), propName, project, scope);
-                    if (fieldDef != null) {
-                        return fieldDef.resolveType();
-                    }
+                    LuaTypeSet typeSet = type.guessFieldType(propName, project, scope);
+                    if (typeSet != null)
+                        return typeSet;
                 }
             }
         }
