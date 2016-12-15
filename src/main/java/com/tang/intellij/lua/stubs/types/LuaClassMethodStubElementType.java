@@ -33,10 +33,12 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
     @NotNull
     @Override
     public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef luaClassMethodFuncDef, StubElement stubElement) {
-        String clazzName = resolveClassName(luaClassMethodFuncDef);
-
         LuaClassMethodName methodName = luaClassMethodFuncDef.getClassMethodName();
         PsiElement id = methodName.getNameDef();
+        PsiElement prefix = methodName.getNameRef();
+        assert prefix != null;
+        String clazzName = resolveClassName(prefix.getText(), luaClassMethodFuncDef);
+
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
 
@@ -51,23 +53,29 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
     @Override
     public boolean shouldCreateStub(ASTNode node) {
-        //确定是完整的，否则会报错
+        //确定是完整的，并且是 class:method, class.method 形式的， 否则会报错
         LuaClassMethodDef psi = (LuaClassMethodDef) node.getPsi();
-        return psi.getFuncBody() != null;
+        LuaClassMethodName classMethodName = psi.getClassMethodName();
+        return classMethodName.getNameRef() != null && psi.getFuncBody() != null;
     }
 
     @Override
     public void serialize(@NotNull LuaClassMethodStub luaClassMethodStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        if (luaClassMethodStub.getClassName() != null) {
+        String name = luaClassMethodStub.getClassName();
+        stubOutputStream.writeBoolean(name != null);
+        if (name != null) {
             stubOutputStream.writeUTFFast(luaClassMethodStub.getClassName());
-            stubOutputStream.writeBoolean(luaClassMethodStub.isStatic());
         }
+        stubOutputStream.writeBoolean(luaClassMethodStub.isStatic());
     }
 
     @NotNull
     @Override
     public LuaClassMethodStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        String name = stubInputStream.readUTFFast();
+        boolean hasName = stubInputStream.readBoolean();
+        String name = null;
+        if (hasName)
+            name = stubInputStream.readUTFFast();
         boolean isStatic = stubInputStream.readBoolean();
         return new LuaClassMethodStubImpl(name, isStatic, stubElement);
     }
@@ -84,27 +92,55 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
     }
 
     private static String clazzNameToSearch;
-    private static String resolveClassName(LuaClassMethodDef luaClassMethodFuncDef) {
+    private static String resolveClassName(String prefixName, LuaClassMethodDef luaClassMethodFuncDef) {
         clazzNameToSearch = null;
-        //如果全局定义的对象的方法，则优先找本文件内的 assign stat
-        LuaPsiTreeUtil.walkTopLevelAssignStatInFile(luaClassMethodFuncDef, luaAssignStat -> {
-            LuaComment comment = luaAssignStat.getComment();
-            if (comment != null) {
-                LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
-                if (classDef != null) {
-                    clazzNameToSearch = classDef.getClassNameText();
+
+        // 寻找Local定义
+        LuaPsiTreeUtil.walkTopLevelLocalDefInFile(luaClassMethodFuncDef, luaLocalDef -> {
+
+            LuaNameList nameList = luaLocalDef.getNameList();
+            if (nameList != null) {
+                LuaNameDef nameDef = PsiTreeUtil.findChildOfType(nameList, LuaNameDef.class);
+                if (nameDef != null && prefixName.equals(nameDef.getName())) {
+                    //find LuaDocClassDef in doc comment
+                    LuaComment comment = luaLocalDef.getComment();
+                    if (comment != null) {
+                        LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
+                        if (classDef != null) {
+                            clazzNameToSearch = classDef.getClassNameText();
+                            return false;
+                        }
+                    }
                     return false;
                 }
             }
             return true;
         });
+
+        //如果全局定义的对象的方法，则优先找本文件内的 assign stat
         if (clazzNameToSearch == null) {
-            try {
-                clazzNameToSearch = luaClassMethodFuncDef.getClassName();
-            } catch (Exception e) {
-                System.out.println(luaClassMethodFuncDef.getText());
-            }
+            LuaPsiTreeUtil.walkTopLevelAssignStatInFile(luaClassMethodFuncDef, luaAssignStat -> {
+                LuaVarList varList = luaAssignStat.getVarList();
+                for (PsiElement child = varList.getFirstChild(); child != null; child = child.getNextSibling()) {
+                    if (child instanceof LuaVar) {
+                        LuaVar var = (LuaVar) child;
+                        if (var.getNameRef() != null && prefixName.equals(var.getNameRef().getName())) {
+                            LuaComment comment = luaAssignStat.getComment();
+                            if (comment != null) {
+                                LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
+                                if (classDef != null) {
+                                    clazzNameToSearch = classDef.getClassNameText();
+                                    return false;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+                return true;
+            });
         }
+        //TODO search global index
         return clazzNameToSearch;
     }
 }
