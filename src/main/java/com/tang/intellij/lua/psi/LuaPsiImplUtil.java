@@ -7,8 +7,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -175,14 +173,7 @@ public class LuaPsiImplUtil {
                 if (assignStat != null) {
                     LuaComment comment = LuaCommentUtil.findComment(assignStat);
                     if (comment != null) {
-                        // ---@class XXX
-                        LuaDocClassDef classDef = comment.getClassDef();
-                        if (classDef != null)
-                            return LuaTypeSet.create(classDef);
-                        // ---@type XXX
-                        LuaDocTypeDef typeDef = comment.getTypeDef();
-                        if (typeDef != null)
-                            return typeDef.guessType();
+                        return comment.guessType();
                     }
                 }
             }

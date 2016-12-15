@@ -5,10 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
-import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
@@ -142,15 +140,8 @@ public class LuaPsiResolveUtil {
             if (localDef != null) {
                 LuaComment comment = localDef.getComment();
                 if (comment != null) {
-                    LuaDocClassDef def = comment.getClassDef(); // @class XXX
-                    if (def != null)
-                        return LuaTypeSet.create(def);
-                    else { // @type xxx
-                        LuaDocTypeDef typeDef = comment.getTypeDef();
-                        if (typeDef != null) {
-                            return typeDef.guessType();
-                        }
-                    }
+                    LuaTypeSet typeSet = comment.guessType();
+                    if (typeSet != null) return typeSet;
                 }
 
                 //计算 expr 返回类型
