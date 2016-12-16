@@ -3,8 +3,8 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.psi.PsiElement;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaField;
 import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableConstructor;
@@ -24,16 +24,22 @@ public class LuaTypeTable extends LuaType {
     }
 
     public LuaTableConstructor tableConstructor;
-    public List<String> fieldStringList = new ArrayList<>();
+    private List<String> fieldStringList;
 
-    protected LuaTypeTable(LuaTableConstructor tableElement) {
+    private LuaTypeTable(LuaTableConstructor tableElement) {
         tableConstructor = tableElement;
-        LuaFieldList fieldList = tableElement.getFieldList();
-        if (fieldList != null) {
-            for (LuaField field : fieldList.getFieldList()) {
-                PsiElement id = field.getNameDef();
-                if (id != null) {
-                    fieldStringList.add(id.getText());
+    }
+
+    private void InitFieldList() {
+        if (fieldStringList == null) {
+            fieldStringList = new ArrayList<>();
+            LuaFieldList fieldList = tableConstructor.getFieldList();
+            if (fieldList != null) {
+                for (LuaField field : fieldList.getFieldList()) {
+                    PsiElement id = field.getNameDef();
+                    if (id != null) {
+                        fieldStringList.add(id.getText());
+                    }
                 }
             }
         }
@@ -45,9 +51,10 @@ public class LuaTypeTable extends LuaType {
 
     @Override
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+        InitFieldList();
         for (String s : fieldStringList) {
             LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
-                    .withIcon(AllIcons.Nodes.Field)
+                    .withIcon(LuaIcons.CLASS_FIELD)
                     .withTypeText("Table");
 
             completionResultSet.addElement(elementBuilder);
