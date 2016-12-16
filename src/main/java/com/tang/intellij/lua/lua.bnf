@@ -193,12 +193,7 @@ lambdaFuncDef ::= 'function' funcBody {
 
 funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 5 }
 
-parDef ::= ID | SELF {
-    extends = nameDef
-    methods = [resolveType]
-    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable"
-}
-private parList ::= parDef (',' parDef)* (',' '...')? | '...'
+private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...'
 
 tableConstructor ::= '{' (fieldList)? '}' {
     pin = 1
@@ -217,14 +212,14 @@ binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
 
 unop ::= '-' | 'not' | '#'
 
-nameDef ::= ID {
+fake name ::= ID {
     implements = [
         "com.tang.intellij.lua.psi.LuaNamedElement"
     ]
     methods = [setName getName]
 }
 fake funcNameDef ::= ID {
-    extends = nameDef
+    extends = name
 }
 //全局函数专用名
 globalFuncNameDef ::= ID {
@@ -238,7 +233,15 @@ localFuncNameDef ::= ID {
 classFuncNameDef ::= ID {
     extends = funcNameDef
 }
+nameDef ::= ID {
+    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable"
+    methods = [resolveType]
+    extends = name
+}
 nameRef ::= ID | SELF {
     implements = "com.tang.intellij.lua.psi.LuaNamedElement"
     methods = [setName getName getReference resolve resolveType]
+}
+paramNameDef ::= ID | SELF {
+    extends = nameDef
 }

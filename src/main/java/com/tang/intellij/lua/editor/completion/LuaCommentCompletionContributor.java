@@ -84,8 +84,8 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                         LuaFuncBodyOwner bodyOwner = (LuaFuncBodyOwner) owner;
                         LuaFuncBody body = bodyOwner.getFuncBody();
                         if (body != null) {
-                            List<LuaParDef> parDefList = body.getParDefList();
-                            for (LuaParDef def : parDefList) {
+                            List<LuaParamNameDef> parDefList = body.getParamNameDefList();
+                            for (LuaParamNameDef def : parDefList) {
                                 completionResultSet.addElement(
                                         LookupElementBuilder.create(def.getText())
                                                 .withIcon(LuaIcons.FUNCTION_PARAMETER)
@@ -102,9 +102,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 Project project = completionParameters.getPosition().getProject();
                 Collection<String> collection = LuaClassIndex.getInstance().getAllKeys(project);
-                collection.forEach(className -> {
-                    completionResultSet.addElement(LookupElementBuilder.create(className).withIcon(LuaIcons.CLASS));
-                });
+                collection.forEach(className -> completionResultSet.addElement(LookupElementBuilder.create(className).withIcon(LuaIcons.CLASS)));
             }
         });
 

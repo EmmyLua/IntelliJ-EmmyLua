@@ -28,7 +28,7 @@ public class LuaPsiResolveUtil {
         //local 函数名
         if (funcBodyOwner == null) {
             LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
-                LuaNameDef nameDef = localFuncDef.getLocalFuncNameDef();
+                LuaName nameDef = localFuncDef.getLocalFuncNameDef();
                 if (nameDef != null && refName.equals(nameDef.getName())) {
                     funcBodyOwner = localFuncDef;
                     return false;
@@ -116,7 +116,7 @@ public class LuaPsiResolveUtil {
 
     static LuaTypeSet resolveType(LuaNameDef nameDef) {
         //作为函数参数，类型在函数注释里找
-        if (nameDef instanceof LuaParDef) {
+        if (nameDef instanceof LuaParamNameDef) {
             LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
             if (owner != null) {
                 LuaComment comment = owner.getComment();

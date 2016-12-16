@@ -34,7 +34,7 @@ public class LuaPsiTreeUtil {
      * @param current 当前搜导起点
      * @param processor 处理器
      */
-    public static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaLocalFuncDef> processor) {
+    static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaLocalFuncDef> processor) {
         if (current == null || processor == null)
             return;
         boolean continueSearch = true;
@@ -65,9 +65,9 @@ public class LuaPsiTreeUtil {
      * @param current 当前搜导起点
      * @param processor 处理器
      */
-    public static void walkUpLocalFuncNameDef(PsiElement current, ElementProcessor<LuaNameDef> processor) {
+    public static void walkUpLocalFuncNameDef(PsiElement current, ElementProcessor<LuaName> processor) {
         walkUpLocalFuncDef(current, localFuncDef -> {
-            LuaNameDef nameDef = localFuncDef.getLocalFuncNameDef();
+            LuaName nameDef = localFuncDef.getLocalFuncNameDef();
             return nameDef == null || processor.accept(nameDef);
         });
     }
@@ -124,7 +124,7 @@ public class LuaPsiTreeUtil {
 
     private static boolean resolveInFuncBody(LuaFuncBody funcBody, ElementProcessor<LuaNameDef> processor) {
         if (funcBody != null) {
-            for (LuaParDef parDef : funcBody.getParDefList()) {
+            for (LuaParamNameDef parDef : funcBody.getParamNameDefList()) {
                 if (!processor.accept(parDef)) return false;
             }
         }

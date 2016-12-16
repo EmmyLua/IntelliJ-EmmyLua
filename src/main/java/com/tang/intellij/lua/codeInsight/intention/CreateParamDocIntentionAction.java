@@ -14,7 +14,7 @@ import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
-import com.tang.intellij.lua.psi.LuaParDef;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +42,7 @@ public class CreateParamDocIntentionAction extends BaseIntentionAction {
         PsiElement element = psiFile.findElementAt(offset);
         if (element != null) {
             element = element.getParent();
-            if (element instanceof LuaParDef) {
+            if (element instanceof LuaParamNameDef) {
                 //TODO: 并且没有相应 Doc
                 return true;
             }
@@ -55,7 +55,7 @@ public class CreateParamDocIntentionAction extends BaseIntentionAction {
         int offset = editor.getCaretModel().getOffset();
         PsiElement element = psiFile.findElementAt(offset);
         assert element != null;
-        LuaParDef parDef = (LuaParDef) element.getParent();
+        LuaParamNameDef parDef = (LuaParamNameDef) element.getParent();
         LuaFuncBodyOwner bodyOwner = PsiTreeUtil.getParentOfType(parDef, LuaFuncBodyOwner.class);
         if (bodyOwner != null && bodyOwner instanceof LuaCommentOwner) {
             LuaComment comment = ((LuaCommentOwner) bodyOwner).getComment();

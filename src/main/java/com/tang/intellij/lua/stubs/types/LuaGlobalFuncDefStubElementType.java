@@ -6,11 +6,11 @@ import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaNameDef;
+import com.tang.intellij.lua.psi.LuaName;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
-import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 import com.tang.intellij.lua.stubs.impl.LuaGlobalFuncStubImpl;
+import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public LuaGlobalFuncStub createStub(@NotNull LuaGlobalFuncDef globalFuncDef, StubElement stubElement) {
-        LuaNameDef nameRef = globalFuncDef.getGlobalFuncNameDef();
+        LuaName nameRef = globalFuncDef.getGlobalFuncNameDef();
         assert nameRef != null;
         return new LuaGlobalFuncStubImpl(nameRef.getName(), stubElement);
     }

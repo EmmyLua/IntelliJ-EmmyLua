@@ -7,7 +7,7 @@ import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.openapi.editor.Editor;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBody;
-import com.tang.intellij.lua.psi.LuaParDef;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -38,8 +38,8 @@ public class CreateDocForMethodIntention extends ClassMethodBasedIntention {
             MacroCallNode typeSuggest = new MacroCallNode(new SuggestTypeMacro());
 
             // params
-            List<LuaParDef> parDefList = funcBody.getParDefList();
-            for (LuaParDef parDef : parDefList) {
+            List<LuaParamNameDef> parDefList = funcBody.getParamNameDefList();
+            for (LuaParamNameDef parDef : parDefList) {
                 template.addTextSegment(String.format("\n---@param %s #", parDef.getName()));
                 template.addVariable(parDef.getName(), typeSuggest, new TextExpression("table"), false);
             }

@@ -57,10 +57,6 @@ public class LuaPsiImplUtil {
         return null;
     }
 
-    public static LuaTypeSet resolveType(LuaParDef parDef) {
-        return LuaPsiResolveUtil.resolveType(parDef);
-    }
-
     /**
      * 寻找 Comment
      * @param declaration owner
@@ -120,7 +116,7 @@ public class LuaPsiImplUtil {
     public static String getName(LuaGlobalFuncDef globalFuncDef) {
         if (globalFuncDef.getStub() != null)
             return globalFuncDef.getStub().getName();
-        LuaNameDef nameDef = globalFuncDef.getGlobalFuncNameDef();
+        LuaName nameDef = globalFuncDef.getGlobalFuncNameDef();
         return nameDef != null ? nameDef.getName() : null;
     }
 
@@ -264,10 +260,10 @@ public class LuaPsiImplUtil {
     public static String[] getParameters(LuaFuncBodyOwner funcBodyOwner) {
         LuaFuncBody body = funcBodyOwner.getFuncBody();
         if (body != null) {
-            List<LuaParDef> parDefList = body.getParDefList();
+            List<LuaParamNameDef> parDefList = body.getParamNameDefList();
             String[] array = new String[parDefList.size()];
             for (int i = 0; i < parDefList.size(); i++) {
-                LuaParDef parDef = parDefList.get(i);
+                LuaParamNameDef parDef = parDefList.get(i);
                 array[i] = parDef.getName();
             }
             return array;

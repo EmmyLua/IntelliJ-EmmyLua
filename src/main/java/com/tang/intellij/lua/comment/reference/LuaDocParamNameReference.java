@@ -53,10 +53,10 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
         return null;
     }
 
-    PsiElement findParamWithName(LuaFuncBody funcBody, String str) {
+    private PsiElement findParamWithName(LuaFuncBody funcBody, String str) {
         if (funcBody == null) return null;
-        List<LuaParDef> defList = funcBody.getParDefList();
-        for (LuaParDef nameDef : defList) {
+        List<LuaParamNameDef> defList = funcBody.getParamNameDefList();
+        for (LuaParamNameDef nameDef : defList) {
             if (nameDef.getText().equals(str)) {
                 return nameDef;
             }
