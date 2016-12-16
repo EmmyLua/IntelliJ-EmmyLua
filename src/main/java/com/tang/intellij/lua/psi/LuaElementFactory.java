@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by TangZX on 2016/11/24.
  */
 public class LuaElementFactory {
-    public static LuaFile createFile(Project project, String content) {
+    private static LuaFile createFile(Project project, String content) {
         String name = "dummy.lua";
         return (LuaFile) PsiFileFactory.getInstance(project).
                 createFileFromText(name, LuaLanguage.INSTANCE, content);
@@ -25,5 +25,17 @@ public class LuaElementFactory {
         LuaNameDef def = PsiTreeUtil.findChildOfType(file, LuaNameDef.class);
         assert (def != null);
         return def.getFirstChild();
+    }
+
+    public static PsiElement createLineBreak(Project project) {
+        String content = "\n";
+        LuaFile file = createFile(project, content);
+        return file.getFirstChild();
+    }
+
+    public static PsiElement createParamDoc(Project project, String name) {
+        String content = String.format("---@param %s #table", name);
+        LuaFile file = createFile(project, content);
+        return file.getFirstChild();
     }
 }
