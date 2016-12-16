@@ -64,16 +64,13 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     }
 
     private LuaTypeSet guessType(LuaCallExpr luaCallExpr) {
-        LuaNameRef nameRef = luaCallExpr.getNameRef();
-        if (nameRef != null) {
-            PsiElement funRef = nameRef.resolve();
-            if (funRef != null && funRef.getParent() instanceof LuaCommentOwner) { // 获取 ---@return CLASS
-                LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) funRef.getParent());
-                if (comment != null) {
-                    LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
-                    if (returnDef != null) {
-                        return returnDef.resolveTypeAt(0);
-                    }
+        LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner();
+        if (bodyOwner instanceof LuaCommentOwner) {
+            LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) bodyOwner);
+            if (comment != null) {
+                LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
+                if (returnDef != null) {
+                    return returnDef.resolveTypeAt(0); //TODO : multi
                 }
             }
         }
