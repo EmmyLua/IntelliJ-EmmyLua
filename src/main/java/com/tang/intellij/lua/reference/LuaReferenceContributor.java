@@ -3,6 +3,7 @@ package com.tang.intellij.lua.reference;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.psi.LuaCallExpr;
+import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaNameRef;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +18,7 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
     @Override
     public void registerReferenceProviders(@NotNull PsiReferenceRegistrar psiReferenceRegistrar) {
         psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.CALL_EXPR), new CallExprReferenceProvider());
+        psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.INDEX_EXPR), new IndexExprReferenceProvider());
     }
 
     class CallExprReferenceProvider extends PsiReferenceProvider {
@@ -36,6 +38,20 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
             if (id == null)
                 return PsiReference.EMPTY_ARRAY;
             return new PsiReference[]{ new LuaCallExprReference(expr) };
+        }
+    }
+
+    class IndexExprReferenceProvider extends PsiReferenceProvider {
+
+        @NotNull
+        @Override
+        public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
+            LuaIndexExpr indexExpr = (LuaIndexExpr) psiElement;
+            PsiElement id = indexExpr.getId();
+            if (id != null) {
+                return new PsiReference[] { new LuaIndexReference(indexExpr, id) };
+            }
+            return PsiReference.EMPTY_ARRAY;
         }
     }
 }

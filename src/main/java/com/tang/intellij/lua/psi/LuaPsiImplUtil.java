@@ -10,7 +10,6 @@ import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.reference.LuaIndexReference;
 import com.tang.intellij.lua.reference.LuaNameReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -233,12 +232,6 @@ public class LuaPsiImplUtil {
                 return prefix.guessType();
         }
         return null;
-    }
-
-    public static PsiReference getReference(LuaIndexExpr indexExpr) {
-        PsiElement id = indexExpr.getId();
-        if (id != null) return new LuaIndexReference(indexExpr, id);
-        else return null;
     }
 
     public static LuaField findField(LuaTableConstructor table, String fieldName) {

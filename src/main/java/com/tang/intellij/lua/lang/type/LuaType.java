@@ -150,6 +150,19 @@ public class LuaType {
         return set;
     }
 
+    public LuaDocFieldDef findField(String fieldName, Project project, GlobalSearchScope scope) {
+        if (classDef == null)
+            return null;
+        String className = getClassNameText();
+        LuaDocFieldDef def = LuaClassFieldIndex.find(className, fieldName, project, scope);
+        if (def == null) {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                def = superType.findField(fieldName, project, scope);
+        }
+        return def;
+    }
+
     public LuaClassMethodDef findMethod(String methodName, Project project, GlobalSearchScope scope) {
         if (classDef == null)
             return null;
@@ -162,6 +175,19 @@ public class LuaType {
             LuaType superType = getSuperClass();
             if (superType != null)
                 def = superType.findMethod(methodName, project, scope);
+        }
+        return def;
+    }
+
+    public LuaClassMethodDef findStaticMethod(String methodName, boolean withSuper, Project project, GlobalSearchScope scope) {
+        if (classDef == null)
+            return null;
+        String className = getClassNameText();
+        LuaClassMethodDef def = LuaClassMethodIndex.findStaticMethod(className, methodName, project, scope);
+        if (def == null && withSuper) {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                def = superType.findStaticMethod(methodName, true, project, scope);
         }
         return def;
     }
