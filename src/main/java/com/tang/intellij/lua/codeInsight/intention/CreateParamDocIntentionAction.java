@@ -66,6 +66,7 @@ public class CreateParamDocIntentionAction extends BaseIntentionAction {
             template.addTextSegment(String.format("---@param %s #", parDef.getName()));
             MacroCallNode name = new MacroCallNode(new SuggestTypeMacro());
             template.addVariable("type", name, new TextExpression("table"), true);
+            template.addEndVariable();
 
             if (comment != null) {
                 editor.getCaretModel().moveToOffset(comment.getTextOffset() + comment.getTextLength());

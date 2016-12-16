@@ -7,7 +7,6 @@ import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
@@ -36,9 +35,7 @@ public class CreateTypeDeclarationIntentionAction extends BaseIntentionAction {
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile psiFile) {
-        int offset = editor.getCaretModel().getOffset();
-        PsiElement element = psiFile.findElementAt(offset);
-        LuaLocalDef localDef = PsiTreeUtil.getParentOfType(element, LuaLocalDef.class);
+        LuaLocalDef localDef = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaLocalDef.class, false);
         if (localDef != null) {
             LuaComment comment = localDef.getComment();
             return comment == null || comment.getTypeDef() == null;
@@ -48,9 +45,7 @@ public class CreateTypeDeclarationIntentionAction extends BaseIntentionAction {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        int offset = editor.getCaretModel().getOffset();
-        PsiElement element = psiFile.findElementAt(offset);
-        LuaLocalDef localDef = PsiTreeUtil.getParentOfType(element, LuaLocalDef.class);
+        LuaLocalDef localDef = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaLocalDef.class, false);
         if (localDef != null) {
             LuaComment comment = localDef.getComment();
 
@@ -60,6 +55,7 @@ public class CreateTypeDeclarationIntentionAction extends BaseIntentionAction {
             template.addTextSegment("---@type #");
             MacroCallNode name = new MacroCallNode(new SuggestTypeMacro());
             template.addVariable("type", name, new TextExpression("table"), true);
+            template.addEndVariable();
 
             if (comment != null) {
                 editor.getCaretModel().moveToOffset(comment.getTextOffset() + comment.getTextLength());

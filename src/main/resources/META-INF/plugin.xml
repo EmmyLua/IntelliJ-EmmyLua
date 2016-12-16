@@ -60,6 +60,14 @@
             <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeDeclarationIntentionAction</className>
             <descriptionDirectoryName>Create Type Declaration</descriptionDirectoryName>
         </intentionAction>
+        <intentionAction>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateReturnDocIntention</className>
+            <descriptionDirectoryName>Create Return Declaration</descriptionDirectoryName>
+        </intentionAction>
+        <intentionAction>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateDocForMethodIntention</className>
+            <descriptionDirectoryName>Create Doc For Method</descriptionDirectoryName>
+        </intentionAction>
     </extensions>
 
     <application-components>
