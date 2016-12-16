@@ -34,22 +34,23 @@ public class LuaType {
     }
 
     private LuaDocClassDef classDef;
+    private String className;
+    private LuaType superType;
 
     public LuaDocClassDef getClassDef() {
         return classDef;
     }
 
     public LuaType getSuperClass() {
-        if (classDef != null)
-            return classDef.getSuperClass();
-        return null;
+        if (classDef != null && superType == null)
+            superType = classDef.getSuperClass();
+        return superType;
     }
 
     public String getClassNameText() {
-        if (classDef != null)
-            return classDef.getClassNameText();
-        else
-            return null;
+        if (classDef != null && className == null)
+            className = classDef.getClassNameText();
+        return className;
     }
 
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
