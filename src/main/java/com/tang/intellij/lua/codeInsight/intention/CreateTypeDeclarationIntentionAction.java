@@ -44,7 +44,7 @@ public class CreateTypeDeclarationIntentionAction extends BaseIntentionAction {
             LuaComment comment = localDef.getComment();
             return comment == null || comment.getTypeDef() == null;
         }
-        return true;
+        return false;
     }
 
     @Override
