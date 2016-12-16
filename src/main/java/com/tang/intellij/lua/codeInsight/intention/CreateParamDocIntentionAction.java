@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * Created by TangZX on 2016/12/12.
  */
-public class CreateParamDocAction extends BaseIntentionAction {
+public class CreateParamDocIntentionAction extends BaseIntentionAction {
     @Nls
     @NotNull
     @Override

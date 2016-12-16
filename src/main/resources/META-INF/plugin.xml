@@ -53,8 +53,12 @@
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
 
         <intentionAction>
-            <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocAction</className>
-            <descriptionDirectoryName>Test</descriptionDirectoryName>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocIntentionAction</className>
+            <descriptionDirectoryName>Create Parameter Doc</descriptionDirectoryName>
+        </intentionAction>
+        <intentionAction>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeDeclarationIntentionAction</className>
+            <descriptionDirectoryName>Create Type Declaration</descriptionDirectoryName>
         </intentionAction>
     </extensions>
 
