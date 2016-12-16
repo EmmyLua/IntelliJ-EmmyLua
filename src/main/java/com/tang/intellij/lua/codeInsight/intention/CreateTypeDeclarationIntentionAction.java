@@ -1,6 +1,11 @@
 package com.tang.intellij.lua.codeInsight.intention;
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction;
+import com.intellij.codeInsight.template.Template;
+import com.intellij.codeInsight.template.TemplateManager;
+import com.intellij.codeInsight.template.impl.MacroCallNode;
+import com.intellij.codeInsight.template.impl.TextExpression;
+import com.intellij.codeInsight.template.macro.SuggestVariableNameMacro;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -49,11 +54,21 @@ public class CreateTypeDeclarationIntentionAction extends BaseIntentionAction {
         LuaLocalDef localDef = PsiTreeUtil.getParentOfType(element, LuaLocalDef.class);
         if (localDef != null) {
             LuaComment comment = localDef.getComment();
-            if (comment == null) {
-                editor.getDocument().insertString(localDef.getTextOffset(), "---@type #table\n");
+
+            TemplateManager templateManager = TemplateManager.getInstance(project);
+            Template template = templateManager.createTemplate("", "");
+            if (comment != null) template.addTextSegment("\n");
+            template.addTextSegment("---@type #");
+            MacroCallNode name = new MacroCallNode(new SuggestVariableNameMacro());
+            template.addVariable("type", name, new TextExpression("table"), true);
+
+            if (comment != null) {
+                editor.getCaretModel().moveToOffset(comment.getTextOffset() + comment.getTextLength());
             } else {
-                editor.getDocument().insertString(comment.getTextOffset(), "---@type #table\n");
+                editor.getCaretModel().moveToOffset(localDef.getTextOffset());
+                template.addTextSegment("\n");
             }
+            templateManager.startTemplate(editor, template);
         }
     }
 }
