@@ -2,7 +2,6 @@ package com.tang.intellij.lua.editor.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
@@ -14,6 +13,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
@@ -88,7 +88,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                             for (LuaParDef def : parDefList) {
                                 completionResultSet.addElement(
                                         LookupElementBuilder.create(def.getText())
-                                                .withIcon(AllIcons.Nodes.Variable)
+                                                .withIcon(LuaIcons.FUNCTION_PARAMETER)
                                 );
                             }
                         }
@@ -103,7 +103,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                 Project project = completionParameters.getPosition().getProject();
                 Collection<String> collection = LuaClassIndex.getInstance().getAllKeys(project);
                 collection.forEach(className -> {
-                    completionResultSet.addElement(LookupElementBuilder.create(className).withIcon(AllIcons.Nodes.Class));
+                    completionResultSet.addElement(LookupElementBuilder.create(className).withIcon(LuaIcons.CLASS));
                 });
             }
         });

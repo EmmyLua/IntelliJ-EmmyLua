@@ -17,7 +17,8 @@ public class LuaIcons {
     public static final Icon CLASS_METHOD = AllIcons.Nodes.Method;
     public static final Icon GLOBAL_FUNCTION = new LayeredIcon(AllIcons.Nodes.Method, AllIcons.Nodes.StaticMark);
     public static final Icon GLOBAL_FIELD = new LayeredIcon(AllIcons.Nodes.Field, AllIcons.Nodes.StaticMark);
-    public static final Icon LOCAL_VAR = new LayeredIcon(AllIcons.Nodes.Variable);
+    public static final Icon LOCAL_VAR = AllIcons.Nodes.Variable;
     public static final Icon LOCAL_FUNCTION = new LayeredIcon(AllIcons.Nodes.Function, AllIcons.Nodes.C_private);
+    public static final Icon FUNCTION_PARAMETER = AllIcons.Nodes.Variable;
     public static final Icon WORD = AllIcons.Actions.Edit;
 }

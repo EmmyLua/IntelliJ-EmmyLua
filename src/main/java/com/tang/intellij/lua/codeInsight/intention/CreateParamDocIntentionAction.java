@@ -5,7 +5,6 @@ import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TextExpression;
-import com.intellij.codeInsight.template.macro.SuggestVariableNameMacro;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -65,7 +64,7 @@ public class CreateParamDocIntentionAction extends BaseIntentionAction {
             Template template = templateManager.createTemplate("", "");
             if (comment != null) template.addTextSegment("\n");
             template.addTextSegment(String.format("---@param %s #", parDef.getName()));
-            MacroCallNode name = new MacroCallNode(new SuggestVariableNameMacro());
+            MacroCallNode name = new MacroCallNode(new SuggestTypeMacro());
             template.addVariable("type", name, new TextExpression("table"), true);
 
             if (comment != null) {
