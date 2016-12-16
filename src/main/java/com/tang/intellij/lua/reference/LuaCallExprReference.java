@@ -61,7 +61,7 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
                 for (LuaType luaType : typeSet.getTypes()) {
                     LuaClassMethodDef def = luaType.findMethod(methodName, project, scope);
                     if (def != null) {
-                        return def.getClassMethodName().getNameDef();
+                        return def.getClassMethodName().getClassFuncNameDef();
                     }
                 }
             }

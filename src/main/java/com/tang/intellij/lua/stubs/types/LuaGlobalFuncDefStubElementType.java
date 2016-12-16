@@ -32,7 +32,7 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public LuaGlobalFuncStub createStub(@NotNull LuaGlobalFuncDef globalFuncDef, StubElement stubElement) {
-        LuaNameDef nameRef = globalFuncDef.getNameDef();
+        LuaNameDef nameRef = globalFuncDef.getGlobalFuncNameDef();
         assert nameRef != null;
         return new LuaGlobalFuncStubImpl(nameRef.getName(), stubElement);
     }
@@ -48,7 +48,7 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
         PsiElement element = node.getPsi();
         if (element instanceof LuaGlobalFuncDef) {
             LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) element;
-            return globalFuncDef.getNameDef() != null;
+            return globalFuncDef.getGlobalFuncNameDef() != null;
         }
         return false;
     }

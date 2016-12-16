@@ -115,7 +115,7 @@ ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else
 forAStat ::= 'for' nameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 }
 forBStat ::= 'for' nameList 'in' exprList 'do' lazy_block 'end' { pin = 1 }
 
-globalFuncDef ::= 'function' nameDef funcBody {
+globalFuncDef ::= 'function' globalFuncNameDef funcBody {
     pin = 1
     methods = [getComment getName getPresentation getParameters]
     stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFuncStub"
@@ -124,7 +124,7 @@ globalFuncDef ::= 'function' nameDef funcBody {
 private checkFuncPrefix ::= ID ('.' | ':') ID
 
 left funcPrefixRef ::= '.' <<checkNext checkFuncPrefix>> nameRef
-classMethodName ::=  nameRef (funcPrefixRef)* (('.' nameDef) | (':' nameDef)) { pin = 3 }
+classMethodName ::=  nameRef (funcPrefixRef)* (('.' classFuncNameDef) | (':' classFuncNameDef)) { pin = 3 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
     implements = [
@@ -137,7 +137,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
     methods = [getComment getClassType getClassName getMethodName getParameters]
 }
 
-localFuncDef ::= 'local' 'function' nameDef funcBody {
+localFuncDef ::= 'local' 'function' localFuncNameDef funcBody {
     pin = 2
     methods = [getComment getParameters]
 }
@@ -220,9 +220,23 @@ unop ::= '-' | 'not' | '#'
 nameDef ::= ID {
     implements = [
         "com.tang.intellij.lua.psi.LuaNamedElement"
-        "com.tang.intellij.lua.psi.LuaTypeResolvable"
     ]
-    methods = [setName getName resolveType]
+    methods = [setName getName]
+}
+fake funcNameDef ::= ID {
+    extends = nameDef
+}
+//全局函数专用名
+globalFuncNameDef ::= ID {
+    extends = funcNameDef
+}
+//local函数专用名
+localFuncNameDef ::= ID {
+    extends = funcNameDef
+}
+//xx:func专用名
+classFuncNameDef ::= ID {
+    extends = funcNameDef
 }
 nameRef ::= ID | SELF {
     implements = "com.tang.intellij.lua.psi.LuaNamedElement"

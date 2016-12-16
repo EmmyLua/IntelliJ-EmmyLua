@@ -76,7 +76,7 @@ public class LuaPsiImplUtil {
      * @return String
      */
     public static String getMethodName(LuaClassMethodDef classMethodDef) {
-        PsiElement postfixName = classMethodDef.getClassMethodName().getNameDef();
+        PsiElement postfixName = classMethodDef.getClassMethodName().getClassFuncNameDef();
         return postfixName.getText();
     }
 
@@ -120,7 +120,7 @@ public class LuaPsiImplUtil {
     public static String getName(LuaGlobalFuncDef globalFuncDef) {
         if (globalFuncDef.getStub() != null)
             return globalFuncDef.getStub().getName();
-        LuaNameDef nameDef = globalFuncDef.getNameDef();
+        LuaNameDef nameDef = globalFuncDef.getGlobalFuncNameDef();
         return nameDef != null ? nameDef.getName() : null;
     }
 

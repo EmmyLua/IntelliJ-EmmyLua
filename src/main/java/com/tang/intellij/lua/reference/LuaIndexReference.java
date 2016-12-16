@@ -71,7 +71,7 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
                         return fieldDef.getFieldNameDef();
                     LuaClassMethodDef methodDef = type.findStaticMethod(idString, true, project, scope);
                     if (methodDef != null)
-                        return methodDef.getClassMethodName().getNameDef();
+                        return methodDef.getClassMethodName().getClassFuncNameDef();
                 }
             }
         }

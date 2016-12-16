@@ -28,7 +28,7 @@ public class LuaPsiResolveUtil {
         //local 函数名
         if (funcBodyOwner == null) {
             LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
-                LuaNameDef nameDef = localFuncDef.getNameDef();
+                LuaNameDef nameDef = localFuncDef.getLocalFuncNameDef();
                 if (nameDef != null && refName.equals(nameDef.getName())) {
                     funcBodyOwner = localFuncDef;
                     return false;

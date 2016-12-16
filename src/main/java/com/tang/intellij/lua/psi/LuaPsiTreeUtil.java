@@ -67,7 +67,7 @@ public class LuaPsiTreeUtil {
      */
     public static void walkUpLocalFuncNameDef(PsiElement current, ElementProcessor<LuaNameDef> processor) {
         walkUpLocalFuncDef(current, localFuncDef -> {
-            LuaNameDef nameDef = localFuncDef.getNameDef();
+            LuaNameDef nameDef = localFuncDef.getLocalFuncNameDef();
             return nameDef == null || processor.accept(nameDef);
         });
     }
