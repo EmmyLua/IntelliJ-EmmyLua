@@ -152,7 +152,7 @@ varList ::= var (',' var)*
 
 nameList ::= nameDef (',' nameDef)*
 
-exprList ::= (expr ',')* expr
+exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
 valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | funcCall | var | '(' expr ')'
 

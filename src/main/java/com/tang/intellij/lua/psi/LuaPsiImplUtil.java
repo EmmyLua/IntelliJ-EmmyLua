@@ -210,6 +210,19 @@ public class LuaPsiImplUtil {
         return null;
     }
 
+    public static LuaTypeSet guessTypeAt(LuaExprList list, int index) {
+        int cur = 0;
+        for (PsiElement child = list.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof LuaExpr) {
+                if (cur == index) {
+                    return ((LuaExpr)child).guessType();
+                }
+                cur++;
+            }
+        }
+        return null;
+    }
+
     public static LuaTypeSet guessPrefixType(LuaIndexExpr indexExpr) {
         LuaNameRef nameRef = indexExpr.getNameRef();
         if (nameRef != null) {
@@ -220,9 +233,16 @@ public class LuaPsiImplUtil {
                 LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
                 if (luaAssignStat != null) {
                     LuaComment comment = luaAssignStat.getComment();
+                    //优先从 Comment 猜
                     if (comment != null) {
-                        return comment.guessType();
+                        LuaTypeSet typeSet = comment.guessType();
+                        if (typeSet != null)
+                            return typeSet;
                     }
+                    //再从赋值猜
+                    LuaExprList exprList = luaAssignStat.getExprList();
+                    if (exprList != null)
+                        return exprList.guessTypeAt(0);//TODO : multi
                 }
             }
         }

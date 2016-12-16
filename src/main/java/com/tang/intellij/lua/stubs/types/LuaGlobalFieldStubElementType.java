@@ -30,6 +30,7 @@ public class LuaGlobalFieldStubElementType extends IStubElementType<LuaGlobalFie
         return new LuaDocGlobalDefImpl(luaGlobalFieldStub, LuaElementType.GLOBAL_FIELD_DEF);
     }
 
+    @NotNull
     @Override
     public LuaGlobalFieldStub createStub(@NotNull LuaDocGlobalDef luaDocGlobalDef, StubElement stubElement) {
         List<String> names = new ArrayList<>();

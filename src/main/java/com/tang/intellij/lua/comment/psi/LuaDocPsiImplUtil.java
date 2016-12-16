@@ -101,7 +101,7 @@ public class LuaDocPsiImplUtil {
         return typeSet;
     }
 
-    static LuaTypeSet resolveDocTypeSet(LuaDocTypeSet docTypeSet, LuaTypeSet typeSet ) {
+    private static LuaTypeSet resolveDocTypeSet(LuaDocTypeSet docTypeSet, LuaTypeSet typeSet) {
         if (typeSet == null) typeSet = LuaTypeSet.create();
         if (docTypeSet != null) {
             List<LuaDocClassNameRef> classNameRefList = docTypeSet.getClassNameRefList();

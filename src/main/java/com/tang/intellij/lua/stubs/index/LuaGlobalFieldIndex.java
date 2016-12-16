@@ -39,6 +39,7 @@ public class LuaGlobalFieldIndex extends StringStubIndexExtension<LuaDocGlobalDe
                 return defs.iterator().next();
             }
         } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
         return null;
     }
