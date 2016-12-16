@@ -180,7 +180,7 @@ var ::= prefixExpr (suffixIndexExpr)* indexExpr | nameRef
 
 private suffixCallExpr ::= <<twoExpr checkCallExpr>> callExpr | indexExpr
 // 最终产生 callExpr
-funcCall ::= (prefixExpr (suffixCallExpr)*) callExpr { methods = [guessType] }
+private funcCall ::= (prefixExpr (suffixCallExpr)*) callExpr
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     pin(".*") = 1

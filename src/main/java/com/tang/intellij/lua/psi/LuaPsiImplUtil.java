@@ -146,12 +146,6 @@ public class LuaPsiImplUtil {
         };
     }
 
-    public static LuaTypeSet guessType(LuaFuncCall funcCall) {
-        LuaCallExpr callExpr = (LuaCallExpr)funcCall.getFirstChild();
-        if (callExpr == null) return null;
-        else return callExpr.guessType();
-    }
-
     /**
      * 猜出前面的类型
      * @param callExpr call expr
