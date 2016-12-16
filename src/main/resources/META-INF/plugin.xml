@@ -68,6 +68,11 @@
             <className>com.tang.intellij.lua.codeInsight.intention.CreateDocForMethodIntention</className>
             <descriptionDirectoryName>Create Doc For Method</descriptionDirectoryName>
         </intentionAction>
+
+        <localInspection implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
+                         displayName="Duplicate Class"
+                         enabledByDefault="true"
+                         groupName="Lua"/>
     </extensions>
 
     <application-components>
