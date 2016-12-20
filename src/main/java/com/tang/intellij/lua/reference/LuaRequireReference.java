@@ -59,6 +59,11 @@ public class LuaRequireReference extends PsiReferenceBase<LuaCallExpr> {
     }
 
     @Override
+    public boolean isReferenceTo(PsiElement element) {
+        return myElement.getManager().areElementsEquivalent(element, resolve());
+    }
+
+    @Override
     public TextRange getRangeInElement() {
         return range;
     }

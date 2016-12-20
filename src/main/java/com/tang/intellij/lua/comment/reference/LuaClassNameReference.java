@@ -28,7 +28,7 @@ public class LuaClassNameReference extends PsiReferenceBase<LuaDocClassNameRef> 
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
-        return true;
+        return myElement.getManager().areElementsEquivalent(element, resolve());
     }
 
     @Nullable
