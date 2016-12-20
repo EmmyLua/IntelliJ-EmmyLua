@@ -34,7 +34,7 @@ public class LuaPsiTreeUtil {
      * @param current 当前搜导起点
      * @param processor 处理器
      */
-    static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaLocalFuncDef> processor) {
+    public static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaLocalFuncDef> processor) {
         if (current == null || processor == null)
             return;
         boolean continueSearch = true;

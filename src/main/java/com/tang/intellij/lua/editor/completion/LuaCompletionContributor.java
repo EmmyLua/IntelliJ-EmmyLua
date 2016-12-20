@@ -88,10 +88,14 @@ public class LuaCompletionContributor extends CompletionContributor {
                     completionResultSet.addElement(elementBuilder);
                     return  true;
                 });
-                LuaPsiTreeUtil.walkUpLocalFuncNameDef(cur, nameDef -> {
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
-                            .withIcon(LuaIcons.LOCAL_FUNCTION);
-                    completionResultSet.addElement(elementBuilder);
+                LuaPsiTreeUtil.walkUpLocalFuncDef(cur, localFuncDef -> {
+                    LuaLocalFuncNameDef nameDef = localFuncDef.getLocalFuncNameDef();
+                    if (nameDef != null) {
+                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getName())
+                                .withInsertHandler(new FuncInsertHandler(localFuncDef.getFuncBody()))
+                                .withIcon(LuaIcons.LOCAL_FUNCTION);
+                        completionResultSet.addElement(elementBuilder);
+                    }
                     return true;
                 });
 
@@ -101,6 +105,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                 for (String name : list) {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
                             .withTypeText("Global Func")
+                            .withInsertHandler(new GlobalFuncInsertHandler(name, project))
                             .withIcon(LuaIcons.GLOBAL_FUNCTION);
                     completionResultSet.addElement(elementBuilder);
                 }

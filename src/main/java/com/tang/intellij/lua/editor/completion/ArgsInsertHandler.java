@@ -8,22 +8,20 @@ import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.codeInsight.template.macro.SuggestVariableNameMacro;
-import com.tang.intellij.lua.psi.LuaFuncBody;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
 
 import java.util.List;
 
-public class ArgsInsertHandler implements InsertHandler<LookupElement> {
+public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> {
 
-    private LuaFuncBody funcBody;
-
-    public ArgsInsertHandler(LuaFuncBody def) {
-        funcBody = def;
+    protected List<LuaParamNameDef> getParams() {
+        return null;
     }
 
     @Override
     public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
-        if (funcBody != null) {
+        List<LuaParamNameDef> paramNameDefList = getParams();
+        if (paramNameDefList != null) {
             TemplateManager manager = TemplateManager.getInstance(insertionContext.getProject());
             Template template = manager.createTemplate("", "");
             template.addTextSegment("(");
@@ -31,7 +29,6 @@ public class ArgsInsertHandler implements InsertHandler<LookupElement> {
             boolean isFirst = true;
             MacroCallNode name = new MacroCallNode(new SuggestVariableNameMacro());
 
-            List<LuaParamNameDef> paramNameDefList = funcBody.getParamNameDefList();
             for (LuaParamNameDef paramNameDef : paramNameDefList) {
                 if (!isFirst)
                     template.addTextSegment(", ");

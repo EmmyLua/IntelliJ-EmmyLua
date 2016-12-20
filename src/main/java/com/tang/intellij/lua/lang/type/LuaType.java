@@ -9,6 +9,7 @@ import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
+import com.tang.intellij.lua.editor.completion.FuncInsertHandler;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
@@ -64,6 +65,7 @@ public class LuaType {
             for (LuaClassMethodDef def : list) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
                         .withIcon(LuaIcons.CLASS_METHOD)
+                        .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
                         .withTypeText(clazzName);
                 if (bold)
                     elementBuilder = elementBuilder.bold();
@@ -86,6 +88,7 @@ public class LuaType {
             for (LuaClassMethodDef def : list) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
                         .withIcon(LuaIcons.CLASS_METHOD)
+                        .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
                         .withTypeText(clazzName)
                         .withItemTextUnderlined(true);
                 if (bold)
