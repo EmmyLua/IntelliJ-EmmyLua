@@ -81,6 +81,7 @@
   implements("globalFuncDef|localFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner, com.tang.intellij.lua.psi.LuaDeclaration"
   implements("lambdaFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
+  implements("doStat|whileStat|repeatStat|ifStat|forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange"
   extends(".*Expr") = expr
 }
 
@@ -192,7 +193,7 @@ lambdaFuncDef ::= 'function' funcBody {
     methods = [getParameters]
 }
 
-funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 5 }
+funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...'
 

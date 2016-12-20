@@ -56,6 +56,7 @@
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassFieldIndex"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
+        <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
 
         <intentionAction>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocIntentionAction</className>

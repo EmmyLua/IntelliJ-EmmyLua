@@ -120,7 +120,9 @@ public class LuaCompletionContributor extends CompletionContributor {
                 TokenSet keywords = TokenSet.orSet(LuaSyntaxHighlighter.KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET);
                 keywords = TokenSet.orSet(TokenSet.create(LuaTypes.SELF), keywords);
                 for (IElementType keyWordToken : keywords.getTypes()) {
-                    completionResultSet.addElement(LookupElementBuilder.create(keyWordToken));
+                    completionResultSet.addElement(LookupElementBuilder.create(keyWordToken)
+                            .withInsertHandler(new KeywordInsertHandler(keyWordToken))
+                    );
                 }
 
                 //words in file
