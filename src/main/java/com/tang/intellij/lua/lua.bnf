@@ -123,7 +123,7 @@ globalFuncDef ::= 'function' globalFuncNameDef funcBody {
 
 private checkFuncPrefix ::= ID ('.' | ':') ID
 
-left funcPrefixRef ::= '.' <<checkNext checkFuncPrefix>> nameRef
+left funcPrefixRef ::= '.' <<repeat checkFuncPrefix 1>> nameRef
 classMethodName ::=  nameRef (funcPrefixRef)* (('.' classFuncNameDef) | (':' classFuncNameDef)) { pin = 3 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
@@ -170,15 +170,16 @@ left indexExpr ::= '[' expr ']' | '.' ID {
     methods = [guessPrefixType]
 }
 
-private checkCallExpr ::= args | ':' ID args { pin(".*") = 1 }
+private check_args ::= STRING | <<fastCheckArgs>> | <<fastCheckTable>>
+private checkCallExpr ::= check_args | ':' ID check_args { pin(".*") = 1 }
 
 left callExpr ::= args | ':' ID args { pin(".*") = 1 methods = [guessPrefixType resolveFuncBodyOwner] }
 
-private suffixIndexExpr ::= callExpr | <<twoExpr checkIndexExpr>> indexExpr
+private suffixIndexExpr ::= callExpr | <<repeat checkIndexExpr 2>> indexExpr
 // 最终产生 index expr | nameRef
 var ::= prefixExpr (suffixIndexExpr)* indexExpr | nameRef
 
-private suffixCallExpr ::= <<twoExpr checkCallExpr>> callExpr | indexExpr
+private suffixCallExpr ::= <<repeat checkCallExpr 2>> callExpr | indexExpr
 // 最终产生 callExpr
 private funcCall ::= (prefixExpr (suffixCallExpr)*) callExpr
 

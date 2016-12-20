@@ -8,18 +8,59 @@ import com.intellij.psi.tree.TokenSet;
 
 public class LuaParserUtil extends GeneratedParserUtilBase {
 
-    public static boolean twoExpr(PsiBuilder builder_, int level_, Parser parser) {
+    public static boolean repeat(PsiBuilder builder_, int level_, Parser parser, int times) {
         PsiBuilder.Marker marker = builder_.mark();
-        boolean r = parser.parse(builder_, level_);
-        r = r && parser.parse(builder_, level_);
+        boolean r = true;
+        for (int i = 0; r && i < times; i++) {
+            r = parser.parse(builder_, level_);
+        }
         marker.rollbackTo();
         return r;
     }
 
-    public static boolean checkNext(PsiBuilder builder_, int level_, Parser parser) {
+    public static boolean fastCheckArgs(PsiBuilder builder_, int level_) {
+        boolean r;
         PsiBuilder.Marker marker = builder_.mark();
-        boolean r = parser.parse(builder_, level_);
-        marker.rollbackTo();
+        r = builder_.getTokenType() == LuaTypes.LPAREN;
+        if (r) {
+            int lTimes = 1;
+            while (true) {
+                builder_.advanceLexer();
+                IElementType type = builder_.getTokenType();
+                if (type == LuaTypes.LPAREN)
+                    lTimes++;
+                else if (type == LuaTypes.RPAREN)
+                    lTimes--;
+                if (type == null || lTimes == 0) {
+                    break;
+                }
+            }
+            r = lTimes == 0;
+        }
+        if (!r) marker.drop();
+        return r;
+    }
+
+    public static boolean fastCheckTable(PsiBuilder builder_, int level_) {
+        boolean r;
+        PsiBuilder.Marker marker = builder_.mark();
+        r = builder_.getTokenType() == LuaTypes.LCURLY;
+        if (r) {
+            int lTimes = 1;
+            while (true) {
+                builder_.advanceLexer();
+                IElementType type = builder_.getTokenType();
+                if (type == LuaTypes.LCURLY)
+                    lTimes++;
+                else if (type == LuaTypes.RCURLY)
+                    lTimes--;
+                if (type == null || lTimes == 0) {
+                    break;
+                }
+            }
+            r = lTimes == 0;
+        }
+        if (!r) marker.drop();
         return r;
     }
 
@@ -40,7 +81,7 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
-    static boolean matchStart(PsiBuilder builder, int level, IElementType begin, boolean advanced) {
+    private static boolean matchStart(PsiBuilder builder, int level, IElementType begin, boolean advanced) {
         if (begin == LuaTypes.DO) {
             return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(LuaTypes.END));
         }
@@ -72,7 +113,7 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         return false;
     }
 
-    static boolean matchEnd(IElementType start, boolean advanced,  PsiBuilder builder, int level, TokenSet skips, TokenSet types) {
+    private static boolean matchEnd(IElementType start, boolean advanced, PsiBuilder builder, int level, TokenSet skips, TokenSet types) {
         if (!advanced)
             builder.advanceLexer();
         IElementType type = builder.getTokenType();
