@@ -39,6 +39,10 @@ public class LuaPsiImplUtil {
         return LuaPsiResolveUtil.resolveType(nameDef);
     }
 
+    public static PsiElement getNameIdentifier(LuaNameDef nameDef) {
+        return nameDef.getFirstChild();
+    }
+
     @NotNull
     public static PsiReference getReference(LuaNameRef ref) {
         return new LuaNameReference(ref);

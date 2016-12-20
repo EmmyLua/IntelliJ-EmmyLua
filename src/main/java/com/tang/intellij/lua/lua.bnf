@@ -234,8 +234,8 @@ classFuncNameDef ::= ID {
     extends = funcNameDef
 }
 nameDef ::= ID {
-    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable"
-    methods = [resolveType]
+    implements = ["com.tang.intellij.lua.psi.LuaTypeResolvable" "com.intellij.psi.PsiNameIdentifierOwner"]
+    methods = [resolveType getNameIdentifier]
     extends = name
 }
 nameRef ::= ID | SELF {
