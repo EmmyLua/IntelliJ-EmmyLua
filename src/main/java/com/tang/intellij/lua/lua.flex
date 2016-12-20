@@ -24,17 +24,24 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
-SHORT_COMMENT=--.*
-DOC_COMMENT=----*.*(\n---*.*)*
 ID=[A-Za-z_][A-Za-z0-9_]*
-NUMBER=-?(\d*(\.\d+)?|(0x[a-fA-F0-9]+))
-DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
-SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 
+//Number
+n=[0-9]+
+exp=[Ee][+-]?{n}
+NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
+
+//Comments
 //[[ 与 ]] 中间的内容
 SS=([^\]]|\][^\]])*
 //--[[]]
 BLOCK_COMMENT=--+\[\[{SS}\]\]
+SHORT_COMMENT=--.*
+DOC_COMMENT=----*.*(\n---*.*)*
+
+//Strings
+DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
+SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 //[[]]
 LONG_STRING=\[=*\[{SS}\]\]
 
