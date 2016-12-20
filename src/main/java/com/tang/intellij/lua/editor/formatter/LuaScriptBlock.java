@@ -19,13 +19,13 @@ import java.util.List;
 public class LuaScriptBlock extends AbstractBlock {
 
     //格式化时
-    TokenSet formattingSet = TokenSet.create(
+    private TokenSet formattingSet = TokenSet.create(
             LuaTypes.BLOCK,
             LuaTypes.FIELD_LIST
     );
 
     //回车时
-    TokenSet childAttrSet = TokenSet.orSet(formattingSet, TokenSet.create(
+    private TokenSet childAttrSet = TokenSet.orSet(formattingSet, TokenSet.create(
             LuaTypes.IF_STAT,
             LuaTypes.DO_STAT,
             LuaTypes.FUNC_BODY,
@@ -35,7 +35,7 @@ public class LuaScriptBlock extends AbstractBlock {
     private SpacingBuilder spacingBuilder;
     private Indent indent;
 
-    protected LuaScriptBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, Indent indent, SpacingBuilder spacingBuilder) {
+    LuaScriptBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, Indent indent, SpacingBuilder spacingBuilder) {
         super(node, wrap, alignment);
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
@@ -86,6 +86,5 @@ public class LuaScriptBlock extends AbstractBlock {
         if (childAttrSet.contains(myNode.getElementType()))
             return new ChildAttributes(Indent.getNormalIndent(), null);
         return new ChildAttributes(Indent.getNoneIndent(), null);
-        //return super.getChildAttributes(newChildIndex);
     }
 }

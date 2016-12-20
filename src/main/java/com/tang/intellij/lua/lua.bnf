@@ -88,7 +88,8 @@
 
 luaFile ::= stat_or_comment*
 
-private stat_or_comment ::= SHORT_COMMENT | DOC_COMMENT | BLOCK_COMMENT | stat ';'?
+private comment ::= SHORT_COMMENT | DOC_COMMENT | BLOCK_COMMENT
+private stat_or_comment ::= comment | stat ';'?
 private chunk ::= stat_or_comment* (lastStat ';'?)?
 
 private lazy_block ::= <<lazyBlock>>
