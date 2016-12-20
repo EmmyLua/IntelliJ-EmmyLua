@@ -30,7 +30,8 @@ import org.jetbrains.annotations.NotNull;
 public class LuaParserDefinition implements ParserDefinition {
 
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-    public static final TokenSet COMMENTS = TokenSet.create(LuaTypes.SHORT_COMMENT, LuaTypes.DOC_COMMENT, LuaTypes.BLOCK_COMMENT);
+    private static final TokenSet COMMENTS = TokenSet.create(LuaTypes.SHORT_COMMENT, LuaTypes.DOC_COMMENT, LuaTypes.BLOCK_COMMENT);
+    private static final TokenSet STRINGS =TokenSet.create(LuaTypes.STRING);
 
     public static final LuaFileStubElementType FILE = new LuaFileStubElementType();
 
@@ -52,7 +53,7 @@ public class LuaParserDefinition implements ParserDefinition {
 
     @NotNull
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return STRINGS;
     }
 
     @NotNull
