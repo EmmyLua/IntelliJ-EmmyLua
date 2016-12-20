@@ -74,8 +74,6 @@ DOC_DASHES = ----*
 }
 
 <xTAG> {
-    //{EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
-    //{LINE_WS}                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
     "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
     ","                        { return COMMA; }
     "#"                        { return SHARP; }
