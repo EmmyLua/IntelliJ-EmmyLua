@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/12/9.
  */
-public interface LuaFuncBodyOwner extends LuaIndentRange {
+public interface LuaFuncBodyOwner extends LuaPsiElement {
     @Nullable
     LuaFuncBody getFuncBody();
     @NotNull
