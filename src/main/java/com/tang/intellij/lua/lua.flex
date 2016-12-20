@@ -31,12 +31,20 @@ NUMBER=-?(\d*(\.\d+)?|(0x[a-fA-F0-9]+))
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
 SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 
+//[[ 与 ]] 中间的内容
+SS=([^\]]|\][^\]])*
+//--[[]]
+BLOCK_COMMENT=--+\[\[{SS}\]\]
+//[[]]
+LONG_STRING=\[=*\[{SS}\]\]
+
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
 
 %%
 <YYINITIAL> {
   {WHITE_SPACE}               { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  {BLOCK_COMMENT}             { return BLOCK_COMMENT; }
   {DOC_COMMENT}               { return DOC_COMMENT; }
   {SHORT_COMMENT}             { return SHORT_COMMENT; }
   "and"                       { return AND; }
@@ -91,6 +99,7 @@ SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 
   "\""                        { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
   "'"                         { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
+  {LONG_STRING}               { return STRING; }
 
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
@@ -99,9 +108,9 @@ SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 }
 
 <xDOUBLE_QUOTED_STRING> {
-    {DOUBLE_QUOTED_STRING} { yybegin(YYINITIAL); return STRING; }
+    {DOUBLE_QUOTED_STRING}    { yybegin(YYINITIAL); return STRING; }
 }
 
 <xSINGLE_QUOTED_STRING> {
-    {SINGLE_QUOTED_STRING} { yybegin(YYINITIAL); return STRING; }
+    {SINGLE_QUOTED_STRING}    { yybegin(YYINITIAL); return STRING; }
 }

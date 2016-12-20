@@ -72,6 +72,7 @@
 
         SHORT_COMMENT="SHORT_COMMENT"
         DOC_COMMENT="DOC_COMMENT"
+        BLOCK_COMMENT="BLOCK_COMMENT"
         ID="regexp:[A-Za-z_][A-Za-z0-9_]*"
         NUMBER="NUMBER"
         STRING = "STRING"
@@ -87,7 +88,7 @@
 
 luaFile ::= stat_or_comment*
 
-private stat_or_comment ::= SHORT_COMMENT | DOC_COMMENT | stat ';'?
+private stat_or_comment ::= SHORT_COMMENT | DOC_COMMENT | BLOCK_COMMENT | stat ';'?
 private chunk ::= stat_or_comment* (lastStat ';'?)?
 
 private lazy_block ::= <<lazyBlock>>

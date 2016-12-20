@@ -1,7 +1,6 @@
 package com.tang.intellij.lua.highlighting;
 
 import com.intellij.execution.process.ConsoleHighlighter;
-import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -80,7 +79,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(LuaHighlightingData.SELF);
 
         // for comment
-        else if (type == LuaTypes.SHORT_COMMENT)
+        else if (type == LuaTypes.SHORT_COMMENT || type == LuaTypes.BLOCK_COMMENT)
             return pack(DefaultLanguageHighlighterColors.LINE_COMMENT);
         else if (DOC_KEYWORD_TOKENS.contains(type))
             return pack(LuaHighlightingData.LUADOC_TAG);
