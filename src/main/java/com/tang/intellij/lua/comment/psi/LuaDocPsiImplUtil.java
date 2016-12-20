@@ -12,6 +12,7 @@ import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +53,10 @@ public class LuaDocPsiImplUtil {
     }
 
     public static PsiElement setName(LuaDocNamedElement className, String newName) {
-        return null;
+        PsiElement newId = LuaElementFactory.createIdentifier(className.getProject(), newName);
+        PsiElement oldId = className.getFirstChild();
+        oldId.replace(newId);
+        return newId;
     }
 
     public static LuaTypeSet resolveType(LuaDocFieldDef fieldDef) {
