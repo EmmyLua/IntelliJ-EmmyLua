@@ -19,7 +19,7 @@ public class LuaTypeSet {
     public static LuaTypeSet create(LuaDocClassDef ... classDefs) {
         LuaTypeSet set = new LuaTypeSet();
         for (LuaDocClassDef def : classDefs) {
-            set.types.add(LuaType.create(def));
+            set.types.add(LuaClassType.create(def));
         }
         return set;
     }
@@ -33,7 +33,7 @@ public class LuaTypeSet {
     private List<LuaType> types = new ArrayList<>();
 
     public void addType(LuaDocClassDef classDef) {
-        types.add(LuaType.create(classDef));
+        types.add(LuaClassType.create(classDef));
     }
 
     public List<LuaType> getTypes() {

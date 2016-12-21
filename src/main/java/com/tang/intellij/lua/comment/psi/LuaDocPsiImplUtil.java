@@ -10,6 +10,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference;
+import com.tang.intellij.lua.lang.type.LuaClassType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaElementFactory;
@@ -42,7 +43,7 @@ public class LuaDocPsiImplUtil {
         Collection<LuaDocClassDef> defs = LuaClassIndex.getInstance().get(nameRef.getText(), project, new ProjectAndLibrariesScope(project));
         if (!defs.isEmpty()) {
             LuaDocClassDef classDef = defs.iterator().next();
-            return LuaType.create(classDef);
+            return LuaClassType.create(classDef);
         }
         return null;
     }
@@ -164,7 +165,7 @@ public class LuaDocPsiImplUtil {
      * @return 超类集合
      */
     public static LuaTypeSet getSuperClasses(LuaDocClassDef classDef) {
-        LuaType type = LuaType.create(classDef);
+        LuaType type = LuaClassType.create(classDef);
         LuaType supper = type.getSuperClass();
         LuaTypeSet set = LuaTypeSet.create();
         while (supper != null) {

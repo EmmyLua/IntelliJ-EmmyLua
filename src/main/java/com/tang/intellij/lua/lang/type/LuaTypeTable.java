@@ -45,12 +45,8 @@ public class LuaTypeTable extends LuaType {
         }
     }
 
-    // table 没有 class method
     @Override
-    public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {}
-
-    @Override
-    public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+    protected void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
         InitFieldList();
         for (String s : fieldStringList) {
             LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
