@@ -26,6 +26,7 @@ public class LuaClassStubElementType extends IStubElementType<LuaClassDefStub, L
         return new LuaDocClassDefImpl(luaClassDefStub, LuaElementType.CLASS_DEF);
     }
 
+    @NotNull
     @Override
     public LuaClassDefStub createStub(@NotNull LuaDocClassDef luaDocClassDef, StubElement stubElement) {
         return new LuaClassDefStubImpl(luaDocClassDef.getClassName().getText(), stubElement);
