@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.editor;
 
+import com.intellij.codeInsight.generation.IndentedCommenter;
 import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;
 
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
  * Lua Commenter
  * Created by TangZX on 2016/12/15.
  */
-public class LuaCommenter implements Commenter {
+public class LuaCommenter implements Commenter, IndentedCommenter {
     @Nullable
     @Override
     public String getLineCommentPrefix() {
@@ -36,5 +37,11 @@ public class LuaCommenter implements Commenter {
     @Override
     public String getCommentedBlockCommentSuffix() {
         return null;
+    }
+
+    @Nullable
+    @Override
+    public Boolean forceIndentedLineComment() {
+        return true;
     }
 }
