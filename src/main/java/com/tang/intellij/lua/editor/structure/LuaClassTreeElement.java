@@ -6,8 +6,8 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaIcons;
+import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
@@ -28,7 +28,7 @@ public class LuaClassTreeElement implements StructureViewTreeElement {
     private String className;
     private LuaDocClassDef docClassDef;
 
-    public LuaClassTreeElement(LuaDocClassDef docClassDef) {
+    LuaClassTreeElement(LuaDocClassDef docClassDef) {
         this.className = docClassDef.getClassNameText();
         this.docClassDef = docClassDef;
     }
@@ -84,9 +84,9 @@ public class LuaClassTreeElement implements StructureViewTreeElement {
         Project project = docClassDef.getProject();
         ProjectAndLibrariesScope scope = new ProjectAndLibrariesScope(project);
 
-        Collection<LuaDocFieldDef> classFieldDefs =
+        Collection<LuaClassField> classFieldDefs =
                 LuaClassFieldIndex.getInstance().get(className, project, scope);
-        for (LuaDocFieldDef classFieldDef : classFieldDefs) {
+        for (LuaClassField classFieldDef : classFieldDefs) {
             list.add(new LuaClassFieldTreeElement(classFieldDef));
         }
 

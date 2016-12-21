@@ -7,14 +7,10 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.IncorrectOperationException;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.lang.type.LuaTypeTable;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
-import com.tang.intellij.lua.psi.LuaElementFactory;
-import com.tang.intellij.lua.psi.LuaField;
-import com.tang.intellij.lua.psi.LuaIndexExpr;
+import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +22,7 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
 
     private PsiElement id;
 
-    public LuaIndexReference(@NotNull LuaIndexExpr element, PsiElement id) {
+    LuaIndexReference(@NotNull LuaIndexExpr element, PsiElement id) {
         super(element);
         this.id = id;
     }
@@ -66,9 +62,9 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
                         return field.getNameDef();
                     }
                 } else {
-                    LuaDocFieldDef fieldDef = type.findField(idString, project, scope);
+                    LuaClassField fieldDef = type.findField(idString, project, scope);
                     if (fieldDef != null)
-                        return fieldDef.getFieldNameDef();
+                        return fieldDef.getNameDef();
                     LuaClassMethodDef methodDef = type.findStaticMethod(idString, true, project, scope);
                     if (methodDef != null)
                         return methodDef.getClassMethodName().getClassFuncNameDef();

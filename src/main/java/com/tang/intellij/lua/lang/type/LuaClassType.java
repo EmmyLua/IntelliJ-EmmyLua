@@ -4,13 +4,13 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
 import com.tang.intellij.lua.editor.completion.FuncInsertHandler;
 import com.tang.intellij.lua.lang.LuaIcons;
+import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
@@ -91,10 +91,10 @@ public class LuaClassType extends LuaType {
 
     protected void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
         String clazzName = getClassNameText();
-        Collection<LuaDocFieldDef> list = LuaClassFieldIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
+        Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
 
-        for (LuaDocFieldDef fieldName : list) {
-            LuaDocFieldNameDef nameDef = fieldName.getFieldNameDef();
+        for (LuaClassField fieldName : list) {
+            PsiNamedElement nameDef = fieldName.getNameDef();
             if (nameDef == null)
                 continue;
 
@@ -117,7 +117,7 @@ public class LuaClassType extends LuaType {
 
     public LuaTypeSet guessFieldType(String propName, Project project, GlobalSearchScope scope) {
         LuaTypeSet set = null;
-        LuaDocFieldDef fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, project, scope);
+        LuaClassField fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, project, scope);
         if (fieldDef != null)
             set = fieldDef.resolveType();
         else {
@@ -129,9 +129,9 @@ public class LuaClassType extends LuaType {
         return set;
     }
 
-    public LuaDocFieldDef findField(String fieldName, Project project, GlobalSearchScope scope) {
+    public LuaClassField findField(String fieldName, Project project, GlobalSearchScope scope) {
         String className = getClassNameText();
-        LuaDocFieldDef def = LuaClassFieldIndex.find(className, fieldName, project, scope);
+        LuaClassField def = LuaClassFieldIndex.find(className, fieldName, project, scope);
         if (def == null) {
             LuaType superType = getSuperClass();
             if (superType != null)

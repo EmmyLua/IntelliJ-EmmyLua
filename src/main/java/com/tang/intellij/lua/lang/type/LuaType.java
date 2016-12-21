@@ -4,7 +4,7 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +51,7 @@ public class LuaType {
         return null;
     }
 
-    public LuaDocFieldDef findField(String fieldName, Project project, GlobalSearchScope scope) {
+    public LuaClassField findField(String fieldName, Project project, GlobalSearchScope scope) {
         return null;
     }
 

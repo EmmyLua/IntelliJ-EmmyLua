@@ -63,9 +63,9 @@ field_name_def ::= ID {
 }
 field_def ::= FIELD access_modifier field_name_def type_set {
     pin = 1
-    implements = "com.tang.intellij.lua.psi.LuaClassMember,com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+    implements = ["com.tang.intellij.lua.psi.LuaClassField" "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassFieldStub"
-    methods = [resolveType]
+    methods = [resolveType nameDef = "field_name_def" ]
 }
 
 //--- tag
