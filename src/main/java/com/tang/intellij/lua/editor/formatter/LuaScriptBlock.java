@@ -5,6 +5,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.TokenSet;
+import com.tang.intellij.lua.psi.LuaIndentRange;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +30,9 @@ public class LuaScriptBlock extends AbstractBlock {
             LuaTypes.IF_STAT,
             LuaTypes.DO_STAT,
             LuaTypes.FUNC_BODY,
+            LuaTypes.FOR_A_STAT,
+            LuaTypes.FOR_B_STAT,
+            LuaTypes.REPEAT_STAT,
             LuaTypes.TABLE_CONSTRUCTOR
     ));
 
@@ -83,7 +87,7 @@ public class LuaScriptBlock extends AbstractBlock {
     @NotNull
     @Override
     public ChildAttributes getChildAttributes(int newChildIndex) {
-        if (childAttrSet.contains(myNode.getElementType()))
+        if (myNode.getPsi() instanceof LuaIndentRange)
             return new ChildAttributes(Indent.getNormalIndent(), null);
         return new ChildAttributes(Indent.getNoneIndent(), null);
     }
