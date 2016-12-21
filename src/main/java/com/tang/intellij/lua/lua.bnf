@@ -78,6 +78,7 @@
         STRING = "STRING"
   ]
 
+  implements("tableConstructor") = "com.tang.intellij.lua.psi.LuaIndentRange"
   implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
   implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
   implements("globalFuncDef|localFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner, com.tang.intellij.lua.psi.LuaDeclaration"

@@ -11,6 +11,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.editor.completion.KeywordInsertHandler;
 import com.tang.intellij.lua.psi.LuaIndentRange;
 import com.tang.intellij.lua.psi.LuaTypes;
@@ -22,6 +23,15 @@ import org.jetbrains.annotations.Nullable;
  * Created by tangzx on 2016/11/26.
  */
 public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
+
+    private static IElementType getEnd(IElementType range) {
+        if (range == LuaTypes.TABLE_CONSTRUCTOR)
+            return LuaTypes.RCURLY;
+        if (range == LuaTypes.REPEAT_STAT)
+            return LuaTypes.UNTIL;
+        return LuaTypes.END;
+    }
+
     @Override
     public Result preprocessEnter(@NotNull PsiFile psiFile, @NotNull Editor editor, @NotNull Ref<Integer> caretOffsetRef, @NotNull Ref<Integer> caretAdvance, @NotNull DataContext dataContext, @Nullable EditorActionHandler editorActionHandler) {
         int caretOffset = caretOffsetRef.get();
@@ -34,8 +44,9 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
                 PsiElement searched = cur.getParent();
                 if (searched == null || searched instanceof PsiFile) break;
                 if (searched instanceof LuaIndentRange) {
+                    IElementType endType = getEnd(searched.getNode().getElementType());
                     PsiElement lastChild = searched.getLastChild();
-                    if (lastChild.getNode().getElementType() != LuaTypes.END) {
+                    if (lastChild.getNode().getElementType() != endType) {
                         needAddEnd = true;
                         range = searched;
                         break;
@@ -45,15 +56,17 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
             }
 
             if (needAddEnd) {
+                IElementType endType = getEnd(range.getNode().getElementType());
                 Document document = editor.getDocument();
-                document.insertString(caretOffset, "\nend");
+                document.insertString(caretOffset, "\n" + endType.toString());
                 Project project = element.getProject();
 
                 PsiDocumentManager.getInstance(project).commitDocument(document);
                 CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
                 styleManager.adjustLineIndent(psiFile, range.getTextRange());
-                KeywordInsertHandler.autoIndent(LuaTypes.END, psiFile, project, document, caretOffset);
+                KeywordInsertHandler.autoIndent(endType, psiFile, project, document, caretOffset);
             }
+            return Result.DefaultForceIndent;
         }
 
         return Result.Continue;
