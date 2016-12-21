@@ -1,6 +1,5 @@
 package com.tang.intellij.lua.psi;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -11,9 +10,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/12/9.
  */
-public interface LuaFuncBodyOwner extends LuaPsiElement {
+public interface LuaFuncBodyOwner extends LuaParametersOwner {
     @Nullable
     LuaFuncBody getFuncBody();
-    @NotNull
-    String[] getParameters();
 }

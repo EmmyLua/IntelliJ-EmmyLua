@@ -15,6 +15,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.LuaParametersOwner;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,9 +57,9 @@ public class CreateParamDocIntentionAction extends BaseIntentionAction {
         PsiElement element = psiFile.findElementAt(offset);
         assert element != null;
         LuaParamNameDef parDef = (LuaParamNameDef) element.getParent();
-        LuaFuncBodyOwner bodyOwner = PsiTreeUtil.getParentOfType(parDef, LuaFuncBodyOwner.class);
-        if (bodyOwner != null && bodyOwner instanceof LuaCommentOwner) {
-            LuaComment comment = ((LuaCommentOwner) bodyOwner).getComment();
+        LuaParametersOwner parametersOwner = PsiTreeUtil.getParentOfType(parDef, LuaParametersOwner.class);
+        if (parametersOwner != null && parametersOwner instanceof LuaCommentOwner) {
+            LuaComment comment = ((LuaCommentOwner) parametersOwner).getComment();
 
             TemplateManager templateManager = TemplateManager.getInstance(project);
             Template template = templateManager.createTemplate("", "");
@@ -71,7 +72,7 @@ public class CreateParamDocIntentionAction extends BaseIntentionAction {
             if (comment != null) {
                 editor.getCaretModel().moveToOffset(comment.getTextOffset() + comment.getTextLength());
             } else {
-                editor.getCaretModel().moveToOffset(bodyOwner.getTextOffset());
+                editor.getCaretModel().moveToOffset(parametersOwner.getTextOffset());
                 template.addTextSegment("\n");
             }
 

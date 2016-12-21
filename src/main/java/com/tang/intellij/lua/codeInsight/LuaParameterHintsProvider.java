@@ -25,10 +25,10 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
         List<InlayInfo> list = new ArrayList<>();
         if (psiElement instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) psiElement;
-            String[] parameters = null;
+            List<LuaParamNameDef> parameters = null;
             LuaFuncBodyOwner methodDef = callExpr.resolveFuncBodyOwner();
             if (methodDef != null) {
-                parameters = methodDef.getParameters();
+                parameters = methodDef.getParamNameDefList();
             }
 
             LuaArgs args = callExpr.getArgs();
@@ -36,9 +36,9 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                 LuaExprList luaExprList = args.getExprList();
                 if (luaExprList != null) {
                     List<LuaExpr> exprList = luaExprList.getExprList();
-                    for (int i = 0; i < exprList.size() && i < parameters.length; i++) {
+                    for (int i = 0; i < exprList.size() && i < parameters.size(); i++) {
                         LuaExpr expr = exprList.get(i);
-                        list.add(new InlayInfo(parameters[i], expr.getTextOffset()));
+                        list.add(new InlayInfo(parameters.get(i).getName(), expr.getTextOffset()));
                     }
                 }
             }

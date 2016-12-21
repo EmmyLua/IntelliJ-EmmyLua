@@ -6,7 +6,10 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.LuaCommentOwner;
+import com.tang.intellij.lua.psi.LuaElementFactory;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.LuaParametersOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,17 +48,15 @@ public class LuaDocParamNameReference extends PsiReferenceBase<LuaDocParamNameRe
 
         if (owner != null) {
             String name = myElement.getText();
-            if (owner instanceof LuaFuncBodyOwner) {
-                LuaFuncBodyOwner bodyOwner = (LuaFuncBodyOwner) owner;
-                return findParamWithName(bodyOwner.getFuncBody(), name);
+            if (owner instanceof LuaParametersOwner) {
+                LuaParametersOwner parametersOwner = (LuaParametersOwner) owner;
+                return findParamWithName(parametersOwner.getParamNameDefList(), name);
             }
         }
         return null;
     }
 
-    private PsiElement findParamWithName(LuaFuncBody funcBody, String str) {
-        if (funcBody == null) return null;
-        List<LuaParamNameDef> defList = funcBody.getParamNameDefList();
+    private PsiElement findParamWithName(List<LuaParamNameDef> defList, String str) {
         for (LuaParamNameDef nameDef : defList) {
             if (nameDef.getText().equals(str)) {
                 return nameDef;

@@ -78,6 +78,7 @@
         STRING = "STRING"
   ]
 
+  implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
   implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
   implements("globalFuncDef|localFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner, com.tang.intellij.lua.psi.LuaDeclaration"
   implements("lambdaFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
@@ -115,12 +116,12 @@ doStat ::= 'do' lazy_block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
 repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
 ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' { pin = 1 }
-forAStat ::= 'for' nameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 }
-forBStat ::= 'for' nameList 'in' exprList 'do' lazy_block 'end' { pin = 1 }
+forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 methods = [getComment getParamNameDefList] }
+forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 methods = [getComment] }
 
 globalFuncDef ::= 'function' globalFuncNameDef funcBody {
     pin = 1
-    methods = [getComment getName getPresentation getParameters]
+    methods = [getComment getName getPresentation getParamNameDefList]
     stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFuncStub"
 }
 
@@ -137,12 +138,12 @@ classMethodDef ::= 'function' classMethodName funcBody {
         "com.tang.intellij.lua.psi.LuaFunction"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
-    methods = [getComment getClassType getClassName getMethodName getParameters]
+    methods = [getComment getClassType getClassName getMethodName getParamNameDefList]
 }
 
 localFuncDef ::= 'local' 'function' localFuncNameDef funcBody {
     pin = 2
-    methods = [getComment getParameters]
+    methods = [getComment getParamNameDefList]
 }
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
@@ -192,7 +193,7 @@ args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
 
 lambdaFuncDef ::= 'function' funcBody {
     pin = 1
-    methods = [getParameters]
+    methods = [getParamNameDefList]
 }
 
 funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }

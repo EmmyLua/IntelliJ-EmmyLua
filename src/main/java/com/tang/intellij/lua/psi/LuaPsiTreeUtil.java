@@ -3,6 +3,8 @@ package com.tang.intellij.lua.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 
+import java.util.List;
+
 /**
  *
  * Created by tangzx on 2016/12/3.
@@ -112,12 +114,12 @@ public class LuaPsiTreeUtil {
             // for name = x, y do end
             else if (curr instanceof LuaForAStat) {
                 LuaForAStat forAStat = (LuaForAStat) curr;
-                if (searchParList) continueSearch = processor.accept(forAStat.getNameDef());
+                if (searchParList) continueSearch = processor.accept(forAStat.getParamNameDef());
             }
             // for name in xxx do end
             else if (curr instanceof LuaForBStat) {
                 LuaForBStat forBStat = (LuaForBStat) curr;
-                if (searchParList) continueSearch = resolveInNameList(forBStat.getNameList(), processor);
+                if (searchParList) continueSearch = resolveInNameList(forBStat.getParamNameDefList(), processor);
             }
         } while (continueSearch && !(curr instanceof PsiFile));
     }
@@ -134,6 +136,15 @@ public class LuaPsiTreeUtil {
     private static boolean resolveInNameList(LuaNameList nameList, ElementProcessor<LuaNameDef> processor) {
         if (nameList != null) {
             for (LuaNameDef nameDef : nameList.getNameDefList()) {
+                if (!processor.accept(nameDef)) return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean resolveInNameList(List<LuaParamNameDef> nameList, ElementProcessor<LuaNameDef> processor) {
+        if (nameList != null) {
+            for (LuaNameDef nameDef : nameList) {
                 if (!processor.accept(nameDef)) return false;
             }
         }

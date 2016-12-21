@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,7 +67,7 @@ public class LuaPsiImplUtil {
      * @param declaration owner
      * @return LuaComment
      */
-    public static LuaComment getComment(LuaDeclaration declaration) {
+    public static LuaComment getComment(LuaCommentOwner declaration) {
         return LuaCommentUtil.findComment(declaration);
     }
 
@@ -260,19 +261,17 @@ public class LuaPsiImplUtil {
         return null;
     }
 
-    private static final String[] EMPTY_PARAMETERS = new String[0];
-    public static String[] getParameters(LuaFuncBodyOwner funcBodyOwner) {
-        LuaFuncBody body = funcBodyOwner.getFuncBody();
-        if (body != null) {
-            List<LuaParamNameDef> parDefList = body.getParamNameDefList();
-            String[] array = new String[parDefList.size()];
-            for (int i = 0; i < parDefList.size(); i++) {
-                LuaParamNameDef parDef = parDefList.get(i);
-                array[i] = parDef.getName();
-            }
-            return array;
-        }
+    public static List<LuaParamNameDef> getParamNameDefList(LuaFuncBodyOwner funcBodyOwner) {
+        LuaFuncBody funcBody = funcBodyOwner.getFuncBody();
+        if (funcBody != null)
+            return funcBody.getParamNameDefList();
+        else
+            return null;
+    }
 
-        return EMPTY_PARAMETERS;
+    public static List<LuaParamNameDef> getParamNameDefList(LuaForAStat forAStat) {
+        List<LuaParamNameDef> list = new ArrayList<>();
+        list.add(forAStat.getParamNameDef());
+        return list;
     }
 }
