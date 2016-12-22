@@ -64,6 +64,25 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     }
 
     private LuaTypeSet guessType(LuaCallExpr luaCallExpr) {
+        // xxx()
+        LuaNameRef ref = luaCallExpr.getNameRef();
+        if (ref != null) {
+            // 从 require 'xxx' 中获取返回类型
+            if (ref.textMatches("require")) {
+                String filePath = null;
+                PsiElement string = luaCallExpr.getFirstStringArg();
+                if (string != null) {
+                    filePath = string.getText();
+                    filePath = filePath.substring(1, filePath.length() - 1);
+                }
+                LuaFile file = null;
+                if (filePath != null)
+                    file = LuaPsiResolveUtil.resolveRequireFile(filePath, luaCallExpr.getProject());
+                if (file != null)
+                    return file.getReturnedType();
+            }
+        }
+        // find in comment
         LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner();
         if (bodyOwner instanceof LuaCommentOwner) {
             LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) bodyOwner);

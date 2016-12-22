@@ -205,6 +205,42 @@ public class LuaPsiImplUtil {
         return null;
     }
 
+    /**
+     * 获取第一个字符串参数
+     * @param callExpr callExpr
+     * @return String PsiElement
+     */
+    public static PsiElement getFirstStringArg(LuaCallExpr callExpr) {
+        LuaArgs args = callExpr.getArgs();
+        if (args != null) {
+            PsiElement path = null;
+
+            // require "xxx"
+            for (PsiElement child = args.getFirstChild(); child != null; child = child.getNextSibling()) {
+                if (child.getNode().getElementType() == LuaTypes.STRING) {
+                    path = child;
+                    break;
+                }
+            }
+            // require("")
+            if (path == null) {
+                LuaExprList exprList = args.getExprList();
+                if (exprList != null) {
+                    List<LuaExpr> list = exprList.getExprList();
+                    if (list.size() == 1 && list.get(0) instanceof LuaValueExpr) {
+                        LuaValueExpr valueExpr = (LuaValueExpr) list.get(0);
+                        PsiElement node = valueExpr.getFirstChild();
+                        if (node.getNode().getElementType() == LuaTypes.STRING) {
+                            path = node;
+                        }
+                    }
+                }
+            }
+            return path;
+        }
+        return null;
+    }
+
     public static LuaTypeSet guessTypeAt(LuaExprList list, int index) {
         int cur = 0;
         for (PsiElement child = list.getFirstChild(); child != null; child = child.getNextSibling()) {

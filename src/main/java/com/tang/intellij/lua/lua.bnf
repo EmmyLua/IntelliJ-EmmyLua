@@ -180,7 +180,7 @@ left indexExpr ::= '[' expr ']' | '.' ID {
 private check_args ::= STRING | <<fastCheckArgs>> | <<fastCheckTable>>
 private checkCallExpr ::= check_args | ':' ID check_args { pin(".*") = 1 }
 
-left callExpr ::= args | ':' ID args { pin(".*") = 1 methods = [guessPrefixType resolveFuncBodyOwner] }
+left callExpr ::= args | ':' ID args { pin(".*") = 1 methods = [guessPrefixType resolveFuncBodyOwner getFirstStringArg] }
 
 private suffixIndexExpr ::= callExpr | <<repeat checkIndexExpr 2>> indexExpr
 // 最终产生 index expr | nameRef

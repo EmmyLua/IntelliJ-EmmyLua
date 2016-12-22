@@ -1,7 +1,7 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.*;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
@@ -156,6 +156,33 @@ public class LuaPsiResolveUtil {
                         }
                     }
                 }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 找到 require 的文件路径
+     * @param pathString 参数字符串 require "aa.bb.cc"
+     * @param project MyProject
+     * @return PsiFile
+     */
+    public static LuaFile resolveRequireFile(String pathString, Project project) {
+        int lastDot = pathString.lastIndexOf('.');
+        String packagePath = "";
+        String fileName = pathString;
+        if (lastDot != -1) {
+            fileName = pathString.substring(lastDot + 1);
+            packagePath = pathString.substring(0, lastDot);
+        }
+        fileName += ".lua";
+        PsiPackage psiPackage = JavaPsiFacade.getInstance(project).findPackage(packagePath);
+        if (psiPackage != null) {
+            PsiDirectory[] directories = psiPackage.getDirectories();
+            for (PsiDirectory directory : directories) {
+                PsiFile file = directory.findFile(fileName);
+                if (file instanceof LuaFile)
+                    return (LuaFile) file;
             }
         }
         return null;
