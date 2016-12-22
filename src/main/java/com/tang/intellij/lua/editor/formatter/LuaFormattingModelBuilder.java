@@ -41,8 +41,8 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
                 .before(BLOCK).blankLines(0)
                 .between(FUNCTION, FUNC_BODY).none()
                 .between(FUNCTION, NAME_DEF).spaces(1) //function<SPACE>name()
-                .around(BINOP).spaces(1)
-                .around(UNOP).spaces(1)
+                .around(BINARY_OP).spaces(1)
+                .around(UNARY_OP).spaces(1)
                 .around(ASSIGN).lineBreakOrForceSpace(false, true) // = 号两头不能换行
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1);
     }

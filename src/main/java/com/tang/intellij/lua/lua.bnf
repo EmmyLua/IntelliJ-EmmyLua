@@ -93,9 +93,8 @@ luaFile ::= stat_or_comment*
 private comment ::= SHORT_COMMENT | DOC_COMMENT | BLOCK_COMMENT
 private stat_or_comment ::= comment | stat ';'?
 private chunk ::= stat_or_comment* (lastStat ';'?)?
-
-private lazy_block ::= <<lazyBlock>>
 block ::= chunk
+private lazy_block ::= <<lazyBlock>>
 
 private stat ::=
     funcCall |
@@ -151,7 +150,9 @@ localDef ::= 'local' nameList ('=' exprList)? {
     methods = [getComment]
 }
 
-lastStat ::= return exprList? | break
+returnStat ::= return exprList?
+breakStat ::= break
+private lastStat ::= returnStat | breakStat
 
 varList ::= var (',' var)*
 
@@ -159,12 +160,13 @@ nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
-valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | funcCall | var | '(' expr ')'
+valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | funcCall | var | parenExpr
 
-expr ::= unopExpr | binopExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
+expr ::= unaryExpr | binaryExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
 
-unopExpr ::= unop expr { pin = 1 }
-binopExpr ::= valueExpr binop expr { pin = 2 }
+parenExpr ::= '(' expr ')' { pin = 1 }
+unaryExpr ::= unaryOp expr { pin = 1 }
+binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
 
 private prefixExpr ::= '(' expr ')' | nameRef
 
@@ -212,11 +214,11 @@ field ::= '[' expr ']' '=' expr | nameDef '=' expr | expr
 
 fieldSep ::= ',' | ';'
 
-binop ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
+binaryOp ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
      '<' | '<=' | '>' | '>=' | '==' | '~=' |
      'and' | 'or'
 
-unop ::= '-' | 'not' | '#'
+unaryOp ::= '-' | 'not' | '#'
 
 fake name ::= ID {
     implements = [
