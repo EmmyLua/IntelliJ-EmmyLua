@@ -23,6 +23,7 @@
     -->
 
     <extensions defaultExtensionNs="com.intellij">
+        <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
         <moduleType id="LUA_MODULE" implementationClass="com.tang.intellij.lua.project.LuaModuleType"/>
         <moduleConfigurationEditorProvider implementation="com.tang.intellij.lua.project.LuaModuleConfigurationEditorProvider"/>
         <sdkType implementation="com.tang.intellij.lua.project.LuaSdkType"/>
@@ -99,7 +100,11 @@
     </project-components>
 
     <actions>
-        <!-- Add your actions here -->
+        <action class="com.tang.intellij.lua.actions.CreateLuaFileAction"
+                text="New Lua File"
+                id="lua.newFile">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
     </actions>
 
 </idea-plugin>
