@@ -64,7 +64,7 @@ public class CreateParamDocIntentionAction extends BaseIntentionAction {
             TemplateManager templateManager = TemplateManager.getInstance(project);
             Template template = templateManager.createTemplate("", "");
             if (comment != null) template.addTextSegment("\n");
-            template.addTextSegment(String.format("---@param %s #", parDef.getName()));
+            template.addTextSegment(String.format("---@param %s ", parDef.getName()));
             MacroCallNode name = new MacroCallNode(new SuggestTypeMacro());
             template.addVariable("type", name, new TextExpression("table"), true);
             template.addEndVariable();

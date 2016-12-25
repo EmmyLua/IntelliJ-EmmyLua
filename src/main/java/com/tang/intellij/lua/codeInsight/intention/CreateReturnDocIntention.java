@@ -37,7 +37,7 @@ public class CreateReturnDocIntention extends ClassMethodBasedIntention {
             TemplateManager templateManager = TemplateManager.getInstance(methodDef.getProject());
             Template template = templateManager.createTemplate("", "");
             if (comment != null) template.addTextSegment("\n");
-            template.addTextSegment("---@return #");
+            template.addTextSegment("---@return ");
             MacroCallNode typeSuggest = new MacroCallNode(new SuggestTypeMacro());
             template.addVariable("returnType", typeSuggest, new TextExpression("table"), false);
             template.addEndVariable();

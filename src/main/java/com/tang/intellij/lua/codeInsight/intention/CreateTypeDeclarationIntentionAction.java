@@ -52,7 +52,7 @@ public class CreateTypeDeclarationIntentionAction extends BaseIntentionAction {
             TemplateManager templateManager = TemplateManager.getInstance(project);
             Template template = templateManager.createTemplate("", "");
             if (comment != null) template.addTextSegment("\n");
-            template.addTextSegment("---@type #");
+            template.addTextSegment("---@type ");
             MacroCallNode name = new MacroCallNode(new SuggestTypeMacro());
             template.addVariable("type", name, new TextExpression("table"), true);
             template.addEndVariable();

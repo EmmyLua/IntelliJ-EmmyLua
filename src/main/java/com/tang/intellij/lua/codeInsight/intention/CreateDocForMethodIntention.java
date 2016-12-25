@@ -40,12 +40,13 @@ public class CreateDocForMethodIntention extends ClassMethodBasedIntention {
             // params
             List<LuaParamNameDef> parDefList = funcBody.getParamNameDefList();
             for (LuaParamNameDef parDef : parDefList) {
-                template.addTextSegment(String.format("\n---@param %s #", parDef.getName()));
+                template.addTextSegment(String.format("\n---@param %s ", parDef.getName()));
                 template.addVariable(parDef.getName(), typeSuggest, new TextExpression("table"), false);
             }
             //return
-            template.addTextSegment("\n---@return #");
-            template.addVariable("returnType", typeSuggest, new TextExpression("table"), false);
+            /*template.addTextSegment("\n---@return ");
+            template.addVariable("returnType", typeSuggest, new TextExpression("table"), false);*/
+
             template.addEndVariable();
             template.addTextSegment("\n");
 
