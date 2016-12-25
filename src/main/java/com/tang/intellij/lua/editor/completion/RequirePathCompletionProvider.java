@@ -13,7 +13,7 @@ import com.intellij.psi.PsiPackage;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaPsiImplUtil;
+import com.tang.intellij.lua.lang.type.LuaString;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -29,9 +29,9 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
         PsiFile file = completionParameters.getOriginalFile();
         PsiElement cur = file.findElementAt(completionParameters.getOffset() - 1);
         if (cur != null) {
-            String content = LuaPsiImplUtil.getStringContent(cur);
-            int textOffset = completionParameters.getOffset() - cur.getTextOffset() - 1;
-            content = content.substring(0, textOffset);
+            LuaString ls = LuaString.getContent(cur.getText());
+            int textOffset = completionParameters.getOffset() - cur.getTextOffset() - ls.start;
+            String content = ls.value.substring(0, textOffset);
 
             int last = content.lastIndexOf(PATH_SPLITTER);
             String prefixPackage = "";

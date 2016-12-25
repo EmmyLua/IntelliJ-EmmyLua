@@ -310,17 +310,4 @@ public class LuaPsiImplUtil {
         list.add(forAStat.getParamNameDef());
         return list;
     }
-
-    /**
-     * 获取 lua 字符串的内容，
-     * "content"
-     * 'content'
-     * [[content]] todo
-     * @param element string element
-     * @return content of String
-     */
-    public static String getStringContent(PsiElement element) {
-        String text = element.getText();
-        return text.substring(1, text.length() - 1);
-    }
 }
