@@ -16,7 +16,6 @@ import com.intellij.util.containers.HashSet;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
@@ -34,50 +33,27 @@ public class LuaCompletionContributor extends CompletionContributor {
 
     private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_METHOD = psiElement().afterLeaf(
             psiElement().withText(":").withParent(LuaCallExpr.class));
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_FIELD = psiElement().afterLeaf(
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_FIELD = psiElement().afterLeaf(
             psiElement().withText(".").withParent(LuaIndexExpr.class));
     private static final PsiElementPattern.Capture<PsiElement> IN_COMMENT = psiElement().inside(psiElement().withElementType(LuaTypes.DOC_COMMENT));
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement().withElementType(LuaTypes.ID).withParent(LuaClassFuncNameDef.class);
 
     public LuaCompletionContributor() {
+        //可以override
+        extend(CompletionType.BASIC, SHOW_OVERRIDE, new OverrideCompletionProvider());
 
         //提示方法
-        extend(CompletionType.BASIC, SHOW_CLASS_METHOD, new CompletionProvider<CompletionParameters>() {
-            @Override
-            protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
-
-                if (element != null) {
-                    LuaCallExpr callExpr = (LuaCallExpr) element.getParent();
-                    LuaTypeSet luaTypeSet = callExpr.guessPrefixType();
-                    if (luaTypeSet != null) {
-                        luaTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet));
-                    }
-                }
-                //words in file
-                suggestWordsInFile(completionParameters, processingContext, completionResultSet);
-            }
-        });
+        extend(CompletionType.BASIC, SHOW_CLASS_METHOD, new ClassMethodCompletionProvider());
 
         //提示属性
-        extend(CompletionType.BASIC, SHOW_FIELD, new CompletionProvider<CompletionParameters>() {
-            @Override
-            protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-                PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
-
-                if (element != null) {
-                    LuaIndexExpr indexExpr = (LuaIndexExpr) element.getParent();
-                    LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType();
-                    if (prefixTypeSet != null) {
-                        prefixTypeSet.getTypes().forEach(luaType -> luaType.addFieldCompletions(completionParameters, completionResultSet));
-                    }
-                }
-                //words in file
-                suggestWordsInFile(completionParameters, processingContext, completionResultSet);
-            }
-        });
+        extend(CompletionType.BASIC, SHOW_CLASS_FIELD, new ClassFieldCompletionProvider());
 
         //提示全局函数,local变量,local函数
-        extend(CompletionType.BASIC, psiElement().inside(LuaFile.class).andNot(SHOW_CLASS_METHOD).andNot(SHOW_FIELD).andNot(IN_COMMENT), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, psiElement().inside(LuaFile.class)
+                .andNot(SHOW_CLASS_METHOD)
+                .andNot(SHOW_CLASS_FIELD)
+                .andNot(IN_COMMENT)
+                .andNot(SHOW_OVERRIDE), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 //local
@@ -131,7 +107,7 @@ public class LuaCompletionContributor extends CompletionContributor {
         });
     }
 
-    private static void suggestWordsInFile(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+    static void suggestWordsInFile(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         HashSet<String> wordsInFileSet = new HashSet<>();
         PsiFile file = completionParameters.getOriginalFile();
         file.acceptChildren(new LuaVisitor() {
