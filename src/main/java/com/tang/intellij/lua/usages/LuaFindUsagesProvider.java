@@ -6,7 +6,9 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
-import com.tang.intellij.lua.psi.LuaNameDef;
+import com.tang.intellij.lua.psi.LuaGlobalFuncNameDef;
+import com.tang.intellij.lua.psi.LuaName;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,9 +28,7 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-        if (psiElement instanceof LuaNameDef)
-            return true;
-        return false;
+        return psiElement instanceof LuaName;
     }
 
     @Nullable
@@ -40,14 +40,18 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getType(@NotNull PsiElement psiElement) {
-        return "test";
+        if (psiElement instanceof LuaGlobalFuncNameDef)
+            return "Global Function";
+        if (psiElement instanceof LuaParamNameDef)
+            return "Param";
+        return "Name";
     }
 
     @NotNull
     @Override
     public String getDescriptiveName(@NotNull PsiElement psiElement) {
-        if (psiElement instanceof LuaNameDef)
-            return ((LuaNameDef)psiElement).getName();
+        if (psiElement instanceof LuaName)
+            return ((LuaName)psiElement).getName();
         else
             return "";
     }
@@ -55,6 +59,6 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getNodeText(@NotNull PsiElement psiElement, boolean b) {
-        return ((LuaNameDef)psiElement).getName();
+        return ((LuaName)psiElement).getName();
     }
 }
