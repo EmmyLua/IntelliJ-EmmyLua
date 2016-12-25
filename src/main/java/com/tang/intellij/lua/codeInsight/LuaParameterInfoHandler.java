@@ -4,6 +4,8 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.lang.parameterInfo.*;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,10 +89,25 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
             for (int i = 0; i < defList.size(); i++) {
                 LuaParamNameDef nameDef = defList.get(i);
                 if (i > 0)
-                    sb.append(" ,");
+                    sb.append(", ");
                 if (i == index)
                     start = sb.length();
                 sb.append(nameDef.getName());
+
+                LuaTypeSet typeSet = nameDef.resolveType();
+                if (typeSet != null) {
+                    sb.append(" : ");
+                    List<LuaType> types = typeSet.getTypes();
+                    for (int j = 0; j < types.size(); j++) {
+                        LuaType type = types.get(j);
+                        if (type.getClassNameText() != null) {
+                            if (j > 0)
+                                sb.append(" | ");
+                            sb.append(type.getClassNameText());
+                        }
+                    }
+                }
+
                 if (i == index)
                     end = sb.length();
             }
