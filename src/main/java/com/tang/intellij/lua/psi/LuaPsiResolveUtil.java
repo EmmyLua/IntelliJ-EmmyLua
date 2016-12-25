@@ -168,6 +168,9 @@ public class LuaPsiResolveUtil {
      * @return PsiFile
      */
     public static LuaFile resolveRequireFile(String pathString, Project project) {
+        if (pathString == null)
+            return null;
+
         int lastDot = pathString.lastIndexOf('.');
         String packagePath = "";
         String fileName = pathString;
