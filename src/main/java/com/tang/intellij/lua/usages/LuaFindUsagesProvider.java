@@ -6,9 +6,7 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
-import com.tang.intellij.lua.psi.LuaGlobalFuncNameDef;
-import com.tang.intellij.lua.psi.LuaName;
-import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +40,10 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
     public String getType(@NotNull PsiElement psiElement) {
         if (psiElement instanceof LuaGlobalFuncNameDef)
             return "Global Function";
+        if (psiElement instanceof LuaLocalFuncNameDef)
+            return "Local Function";
+        if (psiElement instanceof LuaClassFuncNameDef)
+            return "Class Function";
         if (psiElement instanceof LuaParamNameDef)
             return "Param";
         return "Name";
