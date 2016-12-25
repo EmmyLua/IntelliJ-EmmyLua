@@ -10,6 +10,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
+import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef;
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
@@ -36,24 +38,10 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
     );
 
     // 在 @param 之后提示方法的参数
-    private static final PsiElementPattern.Capture<PsiElement> AFTER_PARAM =  psiElement().afterLeaf(
-            psiElement().withElementType(LuaDocTypes.TAG_PARAM)
-    );
-
-    // 在 # 之后提示类型
-    private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_SHARP =  psiElement().afterLeaf(
-            psiElement().withText("#").inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
-    );
-
-    // 在 , 之后提示类型
-    private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_COMMA =  psiElement().afterLeaf(
-            psiElement().withText(",").inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
-    );
+    private static final PsiElementPattern.Capture<PsiElement> AFTER_PARAM =  psiElement().withParent(LuaDocParamNameRef.class);
 
     // 在 extends 之后提示类型
-    private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_EXTENDS =  psiElement().afterLeaf(
-            psiElement().withElementType(LuaDocTypes.EXTENDS).inside(psiElement().withElementType(LuaDocTypes.CLASS_DEF))
-    );
+    private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_EXTENDS =  psiElement().withParent(LuaDocClassNameRef.class);
 
     // 在 @field 之后提示 public / protected
     private static final  PsiElementPattern.Capture<PsiElement> SHOW_ACCESS_MODIFIER =  psiElement().afterLeaf(
@@ -97,7 +85,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             }
         });
 
-        extend(CompletionType.BASIC, psiElement().andOr(SHOW_CLASS_AFTER_SHARP, SHOW_CLASS_AFTER_COMMA, SHOW_CLASS_AFTER_EXTENDS), new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SHOW_CLASS_AFTER_EXTENDS, new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 Project project = completionParameters.getPosition().getProject();
