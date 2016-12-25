@@ -36,7 +36,7 @@ public class LuaCompletionContributor extends CompletionContributor {
     private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_FIELD = psiElement().afterLeaf(
             psiElement().withText(".").withParent(LuaIndexExpr.class));
     private static final PsiElementPattern.Capture<PsiElement> IN_COMMENT = psiElement().inside(psiElement().withElementType(LuaTypes.DOC_COMMENT));
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement().withElementType(LuaTypes.ID).withParent(LuaClassFuncNameDef.class);
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement().withParent(LuaClassFuncNameDef.class);
 
     public LuaCompletionContributor() {
         //可以override
