@@ -22,7 +22,7 @@ public class LuaRequireReference extends PsiReferenceBase<LuaCallExpr> {
 
         PsiElement path = callExpr.getFirstStringArg();
 
-        if (path != null) {
+        if (path != null && path.getTextLength() > 2) {
             pathString = path.getText();
             pathString = pathString.substring(1, pathString.length() - 1);
 
