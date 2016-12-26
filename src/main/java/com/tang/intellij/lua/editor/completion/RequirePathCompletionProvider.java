@@ -14,6 +14,7 @@ import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaString;
+import com.tang.intellij.lua.psi.LuaFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -49,20 +50,22 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
                 for (PsiPackage subPackage : subPackages) {
                     String packageName = subPackage.getName();
                     if (packageName != null) {
-                        completionResultSet.addElement(LookupElementBuilder
+                        LookupElement lookupElement = LookupElementBuilder
                                 .create(packageName)
                                 .withIcon(AllIcons.Nodes.Package)
-                                .withInsertHandler(new PackageInsertHandler())
-                        );
+                                .withInsertHandler(new PackageInsertHandler());
+                        completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 2));
                     }
                 }
                 PsiFile[] files = psiPackage.getFiles(new ProjectAndLibrariesScope(file.getProject()));
                 for (PsiFile psiFile : files) {
-                    String fileName = FileUtil.getNameWithoutExtension(psiFile.getName());
-                    completionResultSet.addElement(LookupElementBuilder
-                            .create(fileName)
-                            .withIcon(LuaIcons.FILE)
-                    );
+                    if (psiFile instanceof LuaFile) {
+                        String fileName = FileUtil.getNameWithoutExtension(psiFile.getName());
+                        LookupElement lookupElement = LookupElementBuilder
+                                .create(fileName)
+                                .withIcon(LuaIcons.FILE);
+                        completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
+                    }
                 }
             }
         }
