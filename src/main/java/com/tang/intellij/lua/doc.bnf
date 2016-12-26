@@ -45,7 +45,8 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 //private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (global_def | param_def | return_def | tag_def | class_def | field_def | type_def) comment_string?
 
-type_set ::= '#'? class_name_ref (',' class_name_ref)*
+//todo : remove # ,
+type_set ::= '#'? class_name_ref (','? class_name_ref)*
 access_modifier ::= "protected" | "public"
 
 //--- define
