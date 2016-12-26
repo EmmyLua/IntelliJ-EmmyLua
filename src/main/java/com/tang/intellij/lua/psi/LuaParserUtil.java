@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.WhitespacesBinders;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.tree.IElementType;
@@ -72,11 +73,13 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
 
         if (begin != null) {
             PsiBuilder.Marker marker = builder_.mark();
+            marker.setCustomEdgeTokenBinders(WhitespacesBinders.GREEDY_LEFT_BINDER, null);
             if (begin == LuaTypes.RPAREN)
                 begin = LuaTypes.FUNCTION;
 
-            boolean r = matchStart(builder_, 0, begin, true);
+            matchStart(builder_, 0, begin, true);
             marker.collapse(LuaTypes.BLOCK);
+            marker.setCustomEdgeTokenBinders(null, WhitespacesBinders.GREEDY_RIGHT_BINDER);
         }
         return true;
     }
