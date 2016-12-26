@@ -3,12 +3,24 @@ package com.tang.intellij.lua.editor.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.codeInsight.template.Template;
+import com.intellij.codeInsight.template.TemplateManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaFuncBody;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * override supper
@@ -23,11 +35,41 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
             LuaType classType = methodDef.getClassType();
             if (classType != null) {
                 LuaType sup = classType.getSuperClass();
-                while (sup != null) {
-                    sup.addMethodCompletions(completionParameters, completionResultSet);
-                    sup = sup.getSuperClass();
-                }
+                addOverrideMethod(completionParameters, completionResultSet, sup);
             }
+        }
+    }
+
+    private void addOverrideMethod(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, LuaType sup) {
+        if (sup != null) {
+            Project project = completionParameters.getOriginalFile().getProject();
+            String clazzName = sup.getClassNameText();
+            Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+            for (LuaClassMethodDef def : list) {
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
+                        .withIcon(LuaIcons.CLASS_METHOD)
+                        .withInsertHandler(new OverrideInsertHandler(def.getFuncBody()))
+                        .withTypeText("override " + clazzName);
+
+                completionResultSet.addElement(elementBuilder);
+            }
+
+            sup = sup.getSuperClass();
+            addOverrideMethod(completionParameters, completionResultSet, sup);
+        }
+    }
+
+    static class OverrideInsertHandler extends FuncInsertHandler {
+        OverrideInsertHandler(LuaFuncBody funcBody) {
+            super(funcBody);
+        }
+
+        @Override
+        protected Template createTemplate(TemplateManager manager, List<LuaParamNameDef> paramNameDefList) {
+            Template template = super.createTemplate(manager, paramNameDefList);
+            template.addEndVariable();
+            template.addTextSegment("\nend");
+            return template;
         }
     }
 }

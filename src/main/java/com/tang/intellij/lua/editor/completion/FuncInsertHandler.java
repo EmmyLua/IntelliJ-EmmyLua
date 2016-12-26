@@ -21,6 +21,6 @@ public class FuncInsertHandler extends ArgsInsertHandler {
     protected List<LuaParamNameDef> getParams() {
         if (funcBody != null)
             return funcBody.getParamNameDefList();
-        return super.getParams();
+        return null;
     }
 }
