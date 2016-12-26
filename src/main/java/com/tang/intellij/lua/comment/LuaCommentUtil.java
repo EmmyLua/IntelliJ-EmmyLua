@@ -1,10 +1,8 @@
 package com.tang.intellij.lua.comment;
 
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
-import com.tang.intellij.lua.lang.LuaParserDefinition;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,18 +16,9 @@ public class LuaCommentUtil {
     @Nullable
     public static LuaCommentOwner findOwner(LuaDocPsiElement element) {
         LuaComment comment = findContainer(element);
-        PsiElement next = comment.getNextSibling();
-        while (true) {
-            if (next == null) return null;
-            if (next instanceof LuaCommentOwner)
-                return (LuaCommentOwner) next;
-            IElementType type = next.getNode().getElementType();
-            if (LuaParserDefinition.WHITE_SPACES.contains(type)) {
-                next = next.getNextSibling();
-            } else {
-                return null;
-            }
-        }
+        if (comment.getParent() instanceof LuaCommentOwner)
+            return (LuaCommentOwner) comment.getParent();
+        return null;
     }
 
     @NotNull
@@ -43,17 +32,6 @@ public class LuaCommentUtil {
     }
 
     public static LuaComment findComment(LuaCommentOwner element) {
-        PsiElement prev = element.getPrevSibling();
-        while (true) {
-            if (prev == null)
-                return null;
-            if (prev instanceof LuaComment)
-                return (LuaComment) prev;
-            IElementType type = prev.getNode().getElementType();
-            if (LuaParserDefinition.WHITE_SPACES.contains(type))
-                prev = prev.getPrevSibling();
-            else
-                return null;
-        }
+        return PsiTreeUtil.getChildOfType(element,  LuaComment.class);
     }
 }
