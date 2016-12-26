@@ -20,7 +20,7 @@ public class ClassFieldCompletionProvider extends CompletionProvider<CompletionP
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
 
-        if (element != null) {
+        if (element != null && element.getParent() instanceof LuaIndexExpr) {
             LuaIndexExpr indexExpr = (LuaIndexExpr) element.getParent();
             LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType();
             if (prefixTypeSet != null) {

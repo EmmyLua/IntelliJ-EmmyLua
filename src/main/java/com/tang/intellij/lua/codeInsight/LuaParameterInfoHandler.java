@@ -80,6 +80,8 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
 
     @Override
     public void updateUI(LuaFuncBodyOwner o, @NotNull ParameterInfoUIContext context) {
+        if (o == null)
+            return;
         List<LuaParamNameDef> defList = o.getParamNameDefList();
         if (defList != null) {
             StringBuilder sb = new StringBuilder();
