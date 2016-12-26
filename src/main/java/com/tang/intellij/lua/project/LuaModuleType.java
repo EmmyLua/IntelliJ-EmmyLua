@@ -32,23 +32,23 @@ public class LuaModuleType extends ModuleType<LuaModuleBuilder> {
     @NotNull
     @Override
     public String getName() {
-        return "lua module";
+        return "Lua";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "lua module description";
+        return "Lua module";
     }
 
     @Override
     public Icon getBigIcon() {
-        return LuaIcons.FILE;
+        return LuaIcons.MODULE;
     }
 
     @Override
     public Icon getNodeIcon(@Deprecated boolean b) {
-        return LuaIcons.FILE;
+        return LuaIcons.MODULE;
     }
 
     @Override
