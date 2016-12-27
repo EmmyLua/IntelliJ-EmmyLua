@@ -134,7 +134,7 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
 
             while (!skips.contains(type)) {
                 boolean isMatched = matchStart(builder, level + 1, type, false);
-                if (!isMatched || level == 0)
+                if (!isMatched)// || level == 0
                     break;
                 type = builder.getTokenType();
             }
