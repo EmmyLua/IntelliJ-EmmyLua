@@ -36,7 +36,7 @@ public class LuaTypeTable extends LuaType {
             LuaFieldList fieldList = tableConstructor.getFieldList();
             if (fieldList != null) {
                 for (LuaTableField field : fieldList.getTableFieldList()) {
-                    PsiElement id = field.getNameDef();
+                    PsiElement id = field.getNameIdentifier();
                     if (id != null) {
                         fieldStringList.add(id.getText());
                     }

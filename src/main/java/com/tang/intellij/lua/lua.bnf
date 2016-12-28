@@ -224,7 +224,15 @@ tableConstructor ::= '{' fieldList '}' {
 
 fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
 
-tableField ::= '[' expr ']' '=' expr | tableFieldNameDef '=' expr | expr { methods = [nameDef="tableFieldNameDef"] }
+tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
+    methods = [
+        getNameIdentifier setName getName getTextOffset
+        nameDef="tableFieldNameDef"
+    ]
+    implements = [
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
+}
 
 tableFieldSep ::= ',' | ';'
 
@@ -250,8 +258,5 @@ nameRef ::= ID | SELF {
     methods = [setName getName getReference resolve resolveType]
 }
 paramNameDef ::= ID | SELF {
-    extends = nameDef
-}
-tableFieldNameDef ::= ID {
     extends = nameDef
 }

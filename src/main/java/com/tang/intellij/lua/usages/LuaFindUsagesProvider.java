@@ -10,10 +10,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassName;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
 import com.tang.intellij.lua.lang.LuaParserDefinition;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaLocalFuncDef;
-import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,6 +54,8 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
             return "Class Function";
         if (psiElement instanceof LuaParamNameDef)
             return "Param";
+        if (psiElement instanceof LuaTableField)
+            return "Table Field";
         return "Name";
     }
 

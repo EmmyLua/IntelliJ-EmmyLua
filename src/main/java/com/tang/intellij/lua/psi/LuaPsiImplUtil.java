@@ -319,8 +319,7 @@ public class LuaPsiImplUtil {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
             for (LuaTableField field : fieldList.getTableFieldList()) {
-                LuaNameDef id = field.getNameDef();
-                if (id != null && fieldName.equals(id.getName()))
+                if (fieldName.equals(field.getName()))
                     return field;
             }
         }
@@ -370,5 +369,20 @@ public class LuaPsiImplUtil {
         PsiElement id = getNameIdentifier(localFuncDef);
         if (id != null) return id.getTextOffset();
         return localFuncDef.getTextOffset();
+    }
+
+    public static PsiElement getNameIdentifier(LuaTableField tableField) {
+        return tableField.getId();
+    }
+
+    public static String getName(LuaTableField tableField) {
+        PsiElement id = getNameIdentifier(tableField);
+        return id != null ? id.getText() : null;
+    }
+
+    public static int getTextOffset(LuaTableField tableField) {
+        PsiElement id = getNameIdentifier(tableField);
+        if (id != null) return id.getTextOffset();
+        return tableField.getTextOffset();
     }
 }

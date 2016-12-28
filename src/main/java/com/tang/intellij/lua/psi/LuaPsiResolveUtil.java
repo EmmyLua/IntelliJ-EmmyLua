@@ -132,7 +132,7 @@ public class LuaPsiResolveUtil {
                     LuaTypeTable tableType = (LuaTypeTable) type;
                     LuaTableField field = tableType.tableConstructor.findField(idString);
                     if (field != null) {
-                        return field.getNameDef();
+                        return field;
                     }
                 } else {
                     //属性
