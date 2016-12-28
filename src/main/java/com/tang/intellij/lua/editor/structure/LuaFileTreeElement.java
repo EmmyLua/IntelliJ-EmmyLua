@@ -107,6 +107,7 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
             @Override
             public void visitAssignStat(@NotNull LuaAssignStat o) {
                 super.visitAssignStat(o);
+                list.add(new LuaAssignTreeElement(o));
             }
 
             @Override

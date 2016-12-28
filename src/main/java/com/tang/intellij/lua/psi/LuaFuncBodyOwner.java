@@ -13,4 +13,8 @@ import org.jetbrains.annotations.Nullable;
 public interface LuaFuncBodyOwner extends LuaParametersOwner {
     @Nullable
     LuaFuncBody getFuncBody();
+
+    default String getParamFingerprint() {
+        return LuaPsiImplUtil.getParamFingerprint(this);
+    }
 }

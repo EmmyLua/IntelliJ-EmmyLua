@@ -310,4 +310,20 @@ public class LuaPsiImplUtil {
         list.add(forAStat.getParamNameDef());
         return list;
     }
+
+    static String getParamFingerprint(LuaFuncBodyOwner funcBodyOwner) {
+        List<LuaParamNameDef> nameDefList = getParamNameDefList(funcBodyOwner);
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        if (nameDefList != null) {
+            for (int i = 0; i < nameDefList.size(); i++) {
+                LuaParamNameDef nameDef = nameDefList.get(i);
+                if (i != 0)
+                    builder.append(", ");
+                builder.append(nameDef.getName());
+            }
+        }
+        builder.append(")");
+        return builder.toString();
+    }
 }

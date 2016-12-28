@@ -13,7 +13,7 @@ public class LuaClassMethodTreeElement extends LuaTreeElement<LuaClassMethodDef>
 
     LuaClassMethodTreeElement(LuaClassMethodDef methodDef) {
         super(methodDef, LuaIcons.CLASS_METHOD);
-        this.methodName = methodDef.getMethodName();
+        this.methodName = methodDef.getMethodName() + methodDef.getParamFingerprint();
     }
 
     @Override

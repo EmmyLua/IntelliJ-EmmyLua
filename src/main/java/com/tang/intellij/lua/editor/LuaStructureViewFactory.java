@@ -39,7 +39,7 @@ public class LuaStructureViewFactory implements PsiStructureViewFactory {
 
     class LuaStructureViewModel extends StructureViewModelBase implements StructureViewModel.ElementInfoProvider {
 
-        public LuaStructureViewModel(@NotNull PsiFile psiFile) {
+        LuaStructureViewModel(@NotNull PsiFile psiFile) {
             super(psiFile, new LuaFileTreeElement((LuaFile) psiFile));
             withSorters(new LuaAlphaSorter());
         }
