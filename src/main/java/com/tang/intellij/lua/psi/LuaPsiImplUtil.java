@@ -213,6 +213,13 @@ public class LuaPsiImplUtil {
         if (args != null) {
             PsiElement id = callExpr.getId(); //todo static : xxx.method
             if (id == null) { // local, global, static
+                LuaExpr expr = callExpr.getExpr();
+                if (expr instanceof LuaIndexExpr) {
+                    PsiElement resolve = LuaPsiResolveUtil.resolve((LuaIndexExpr) expr);
+                    if (resolve instanceof LuaFuncBodyOwner)
+                        return (LuaFuncBodyOwner) resolve;
+                }
+
                 LuaNameRef luaNameRef = PsiTreeUtil.getPrevSiblingOfType(args, LuaNameRef.class);
                 if (luaNameRef != null)
                     return LuaPsiResolveUtil.resolveFuncBodyOwner(luaNameRef);
