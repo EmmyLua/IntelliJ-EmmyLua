@@ -140,7 +140,6 @@ classMethodDef ::= 'function' classMethodName funcBody {
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaClassMember"
-        "com.tang.intellij.lua.psi.LuaFunction"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
     methods = [getComment getClassType getClassName getMethodName getParamNameDefList]
