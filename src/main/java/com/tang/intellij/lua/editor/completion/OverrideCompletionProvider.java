@@ -46,12 +46,15 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
             String clazzName = sup.getClassNameText();
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
             for (LuaClassMethodDef def : list) {
-                LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
-                        .withIcon(LuaIcons.CLASS_METHOD)
-                        .withInsertHandler(new OverrideInsertHandler(def.getFuncBody()))
-                        .withTypeText("override " + clazzName);
+                String methodName = def.getName();
+                if (methodName != null) {
+                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getName())
+                            .withIcon(LuaIcons.CLASS_METHOD)
+                            .withInsertHandler(new OverrideInsertHandler(def.getFuncBody()))
+                            .withTypeText("override " + clazzName);
 
-                completionResultSet.addElement(elementBuilder);
+                    completionResultSet.addElement(elementBuilder);
+                }
             }
 
             sup = sup.getSuperClass();

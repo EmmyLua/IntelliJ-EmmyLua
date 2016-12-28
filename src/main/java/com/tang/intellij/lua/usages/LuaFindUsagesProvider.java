@@ -4,12 +4,16 @@ import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
 import com.tang.intellij.lua.comment.psi.LuaDocClassName;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
 import com.tang.intellij.lua.lang.LuaParserDefinition;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.psi.LuaLocalFuncDef;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +33,7 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
 
     @Override
     public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-        return psiElement instanceof LuaNamedElement;
+        return psiElement instanceof PsiNamedElement;
     }
 
     @Nullable
@@ -45,11 +49,11 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
             return "Class";
         if (psiElement instanceof LuaDocFieldNameDef)
             return "Class Field";
-        if (psiElement instanceof LuaGlobalFuncNameDef)
+        if (psiElement instanceof LuaGlobalFuncDef)
             return "Global Function";
-        if (psiElement instanceof LuaLocalFuncNameDef)
+        if (psiElement instanceof LuaLocalFuncDef)
             return "Local Function";
-        if (psiElement instanceof LuaClassFuncNameDef)
+        if (psiElement instanceof LuaClassMethodDef)
             return "Class Function";
         if (psiElement instanceof LuaParamNameDef)
             return "Param";
@@ -59,8 +63,8 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getDescriptiveName(@NotNull PsiElement psiElement) {
-        if (psiElement instanceof LuaNamedElement) {
-            LuaNamedElement namedElement = (LuaNamedElement) psiElement;
+        if (psiElement instanceof PsiNamedElement) {
+            PsiNamedElement namedElement = (PsiNamedElement) psiElement;
             String name = namedElement.getName();
             if (name != null)
                 return name;

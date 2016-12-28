@@ -81,14 +81,18 @@ public class LuaPsiImplUtil {
         return LuaCommentUtil.findComment(declaration);
     }
 
-    /**
-     * 取方法体名
-     * @param classMethodDef def
-     * @return String
-     */
-    public static String getMethodName(LuaClassMethodDef classMethodDef) {
-        PsiElement postfixName = classMethodDef.getClassMethodName().getClassFuncNameDef();
-        return postfixName.getText();
+    public static String getName(LuaClassMethodDef classMethodDef) {
+        PsiElement identifier = getNameIdentifier(classMethodDef);
+        return identifier.getText();
+    }
+
+    public static PsiElement getNameIdentifier(LuaClassMethodDef classMethodDef) {
+        return classMethodDef.getClassMethodName().getId();
+    }
+
+    public static int getTextOffset(LuaClassMethodDef classMethodDef) {
+        PsiElement identifier = getNameIdentifier(classMethodDef);
+        return identifier.getTextOffset();
     }
 
     /**

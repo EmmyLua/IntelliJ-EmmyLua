@@ -34,7 +34,7 @@ public class CreateDocForMethodIntention extends ClassMethodBasedIntention {
         if (funcBody != null) {
             TemplateManager templateManager = TemplateManager.getInstance(methodDef.getProject());
             Template template = templateManager.createTemplate("", "");
-            template.addTextSegment("---" + methodDef.getMethodName());
+            template.addTextSegment("---" + methodDef.getName());
             MacroCallNode typeSuggest = new MacroCallNode(new SuggestTypeMacro());
 
             // params

@@ -34,7 +34,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
     @Override
     public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef luaClassMethodFuncDef, StubElement stubElement) {
         LuaClassMethodName methodName = luaClassMethodFuncDef.getClassMethodName();
-        PsiElement id = methodName.getClassFuncNameDef();
+        PsiElement id = luaClassMethodFuncDef.getNameIdentifier();
         PsiElement prefix = methodName.getNameRef();
         assert prefix != null;
         String clazzName = resolveClassName(prefix.getText(), luaClassMethodFuncDef);

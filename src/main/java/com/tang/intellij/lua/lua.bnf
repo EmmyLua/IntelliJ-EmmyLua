@@ -137,16 +137,17 @@ globalFuncDef ::= 'function' ID funcBody {
 private checkFuncPrefix ::= ID ('.' | ':') ID
 
 left funcPrefixRef ::= '.' <<repeat checkFuncPrefix 1>> nameRef
-classMethodName ::=  nameRef (funcPrefixRef)* (('.' classFuncNameDef) | (':' classFuncNameDef)) { pin = 3 }
+classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) { pin = 3 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
     implements = [
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaClassMember"
+        "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
-    methods = [getComment getClassType getClassName getMethodName getParamNameDefList]
+    methods = [getComment getClassType getClassName getParamNameDefList getNameIdentifier setName getName getTextOffset]
 }
 
 localFuncDef ::= 'local' 'function' ID funcBody {
@@ -238,13 +239,6 @@ fake name ::= ID {
         "com.tang.intellij.lua.psi.LuaNamedElement"
     ]
     methods = [setName getName]
-}
-fake funcNameDef ::= ID {
-    extends = name
-}
-//xx:func专用名
-classFuncNameDef ::= ID {
-    extends = funcNameDef
 }
 nameDef ::= ID {
     implements = ["com.tang.intellij.lua.psi.LuaTypeResolvable" "com.intellij.psi.PsiNameIdentifierOwner"]

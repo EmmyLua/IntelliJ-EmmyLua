@@ -27,7 +27,8 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
             LuaClassMethodDef methodDef = (LuaClassMethodDef) element;
             LuaType type = methodDef.getClassType();
             if (type != null) {
-                String methodName = methodDef.getMethodName();
+                String methodName = methodDef.getName();
+                assert methodName != null;
                 LuaType superType = type.getSuperClass();
                 Project project = methodDef.getProject();
                 GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
@@ -36,7 +37,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
                     Collection<LuaClassMethodDef> methods = LuaClassMethodIndex.getInstance().get(superTypeName, project, scope);
                     for (LuaClassMethodDef superMethodDef : methods) {
-                        if (methodName.equals(superMethodDef.getMethodName())) {
+                        if (methodName.equals(superMethodDef.getName())) {
 
                             NavigationGutterIconBuilder<PsiElement> builder =
                                     NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)

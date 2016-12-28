@@ -50,14 +50,17 @@ public class LuaClassType extends LuaType {
         String clazzName = getClassNameText();
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
         for (LuaClassMethodDef def : list) {
-            LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
-                    .withIcon(LuaIcons.CLASS_METHOD)
-                    .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
-                    .withTypeText(clazzName);
-            if (bold)
-                elementBuilder = elementBuilder.bold();
+            String methodName = def.getName();
+            if (methodName != null) {
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
+                        .withIcon(LuaIcons.CLASS_METHOD)
+                        .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
+                        .withTypeText(clazzName);
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
 
-            completionResultSet.addElement(elementBuilder);
+                completionResultSet.addElement(elementBuilder);
+            }
         }
 
         if (withSuper) {
@@ -71,15 +74,18 @@ public class LuaClassType extends LuaType {
         String clazzName = getClassNameText();
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
         for (LuaClassMethodDef def : list) {
-            LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getMethodName())
-                    .withIcon(LuaIcons.CLASS_METHOD)
-                    .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
-                    .withTypeText(clazzName)
-                    .withItemTextUnderlined(true);
-            if (bold)
-                elementBuilder = elementBuilder.bold();
+            String methodName = def.getName();
+            if (methodName != null) {
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
+                        .withIcon(LuaIcons.CLASS_METHOD)
+                        .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
+                        .withTypeText(clazzName)
+                        .withItemTextUnderlined(true);
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
 
-            completionResultSet.addElement(elementBuilder);
+                completionResultSet.addElement(elementBuilder);
+            }
         }
 
         if (withSuper) {
