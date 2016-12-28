@@ -12,6 +12,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.editor.completion.KeywordInsertHandler;
 import com.tang.intellij.lua.psi.LuaIndentRange;
 import com.tang.intellij.lua.psi.LuaTypes;
@@ -35,6 +37,15 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
     @Override
     public Result preprocessEnter(@NotNull PsiFile psiFile, @NotNull Editor editor, @NotNull Ref<Integer> caretOffsetRef, @NotNull Ref<Integer> caretAdvance, @NotNull DataContext dataContext, @Nullable EditorActionHandler editorActionHandler) {
         int caretOffset = caretOffsetRef.get();
+
+        //inside comment
+        LuaComment comment = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset, LuaComment.class, false);
+        if (comment != null) {
+            editor.getDocument().insertString(caretOffset, "\n---");
+            editor.getCaretModel().moveToOffset(caretOffset + 4);
+            return Result.Stop;
+        }
+
         PsiElement element = psiFile.findElementAt(caretOffset - 1);
         if (element != null) {
             boolean needAddEnd = false;
