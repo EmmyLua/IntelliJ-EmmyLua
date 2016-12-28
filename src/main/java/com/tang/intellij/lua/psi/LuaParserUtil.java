@@ -126,24 +126,16 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
                 return false;
             }
 
-            if (types.contains(type)) {
-                if (level != 0)
-                    builder.advanceLexer();
-                return true;
-            }
-
             while (!skips.contains(type)) {
+                if (types.contains(type)) {
+                    if (level != 0)
+                        builder.advanceLexer();
+                    return true;
+                }
                 boolean isMatched = matchStart(builder, level + 1, type, false);
-                if (!isMatched)// || level == 0
+                if (!isMatched)
                     break;
                 type = builder.getTokenType();
-            }
-
-            type = builder.getTokenType();
-            if (types.contains(type)) {
-                if (level != 0)
-                    builder.advanceLexer();
-                return true;
             }
 
             builder.advanceLexer();
