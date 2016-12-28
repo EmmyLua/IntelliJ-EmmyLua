@@ -53,6 +53,7 @@
         <codeInsight.parameterNameHints language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterHintsProvider"/>
         <!--<codeInsight.parameterInfo language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterInfoHandler"/>-->
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterHandlerDelegate" />
+        <backspaceHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaBackspaceHandlerDelegate"/>
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
         <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
