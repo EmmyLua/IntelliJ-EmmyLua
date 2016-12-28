@@ -43,7 +43,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitGlobalFuncDef(@NotNull LuaGlobalFuncDef o) {
-            PsiElement name = o.getGlobalFuncNameDef();
+            PsiElement name = o.getNameIdentifier();
             if (name != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(name, null);
                 annotation.setTextAttributes(LuaHighlightingData.FIELD);

@@ -6,7 +6,6 @@ import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaName;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 import com.tang.intellij.lua.stubs.impl.LuaGlobalFuncStubImpl;
@@ -30,11 +29,12 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
         return new LuaGlobalFuncDefImpl(luaGlobalFuncStub, LuaElementType.GLOBAL_FUNC_DEF);
     }
 
+    @NotNull
     @Override
     public LuaGlobalFuncStub createStub(@NotNull LuaGlobalFuncDef globalFuncDef, StubElement stubElement) {
-        LuaName nameRef = globalFuncDef.getGlobalFuncNameDef();
+        PsiElement nameRef = globalFuncDef.getNameIdentifier();
         assert nameRef != null;
-        return new LuaGlobalFuncStubImpl(nameRef.getName(), stubElement);
+        return new LuaGlobalFuncStubImpl(nameRef.getText(), stubElement);
     }
 
     @NotNull
@@ -48,7 +48,7 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
         PsiElement element = node.getPsi();
         if (element instanceof LuaGlobalFuncDef) {
             LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) element;
-            return globalFuncDef.getGlobalFuncNameDef() != null;
+            return globalFuncDef.getNameIdentifier() != null;
         }
         return false;
     }

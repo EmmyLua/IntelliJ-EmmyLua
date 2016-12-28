@@ -86,7 +86,6 @@
   implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
-  implements("globalFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner, com.tang.intellij.lua.psi.LuaDeclaration"
   implements("lambdaFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
   implements("doStat|whileStat|repeatStat|ifStat|funcBody") = "com.tang.intellij.lua.psi.LuaIndentRange"
@@ -124,9 +123,14 @@ ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else
 forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 methods = [getComment getParamNameDefList] }
 forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 methods = [getComment] }
 
-globalFuncDef ::= 'function' globalFuncNameDef funcBody {
+globalFuncDef ::= 'function' ID funcBody {
     pin = 1
-    methods = [getComment getName getPresentation getParamNameDefList]
+    implements = [
+        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+        "com.tang.intellij.lua.psi.LuaDeclaration"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
+    methods = [getComment getPresentation getParamNameDefList getNameIdentifier setName getName getTextOffset]
     stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFuncStub"
 }
 
@@ -237,10 +241,6 @@ fake name ::= ID {
 }
 fake funcNameDef ::= ID {
     extends = name
-}
-//全局函数专用名
-globalFuncNameDef ::= ID {
-    extends = funcNameDef
 }
 //xx:func专用名
 classFuncNameDef ::= ID {

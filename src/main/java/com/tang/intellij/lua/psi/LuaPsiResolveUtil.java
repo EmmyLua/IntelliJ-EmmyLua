@@ -106,9 +106,7 @@ public class LuaPsiResolveUtil {
         //global function
         if (resolveResult == null) {
             Project project = ref.getProject();
-            LuaGlobalFuncDef globalFuncDef = LuaGlobalFuncIndex.find(refName, project, new ProjectAndLibrariesScope(project));
-            if (globalFuncDef != null)
-                resolveResult = globalFuncDef.getGlobalFuncNameDef();
+            resolveResult = LuaGlobalFuncIndex.find(refName, project, new ProjectAndLibrariesScope(project));
         }
 
         PsiElement result = resolveResult;

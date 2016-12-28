@@ -131,8 +131,17 @@ public class LuaPsiImplUtil {
     public static String getName(LuaGlobalFuncDef globalFuncDef) {
         if (globalFuncDef.getStub() != null)
             return globalFuncDef.getStub().getName();
-        LuaName nameDef = globalFuncDef.getGlobalFuncNameDef();
-        return nameDef != null ? nameDef.getName() : null;
+        PsiElement id = getNameIdentifier(globalFuncDef);
+        return id != null ? id.getText() : null;
+    }
+
+    public static PsiElement getNameIdentifier(LuaGlobalFuncDef globalFuncDef) {
+        return globalFuncDef.getId();
+    }
+
+    public static int getTextOffset(LuaGlobalFuncDef globalFuncDef) {
+        PsiElement id = getNameIdentifier(globalFuncDef);
+        return id != null ? id.getTextOffset() : globalFuncDef.getTextOffset();
     }
 
     public static ItemPresentation getPresentation(LuaGlobalFuncDef globalFuncDef) {
