@@ -20,13 +20,13 @@ import java.util.List;
 public class LuaScriptBlock extends AbstractBlock {
 
     //格式化时
-    private TokenSet formattingSet = TokenSet.create(
+    private TokenSet fakeBlockSet = TokenSet.create(
             LuaTypes.BLOCK,
             LuaTypes.FIELD_LIST
     );
 
     //回车时
-    private TokenSet childAttrSet = TokenSet.orSet(formattingSet, TokenSet.create(
+    private TokenSet childAttrSet = TokenSet.orSet(fakeBlockSet, TokenSet.create(
             LuaTypes.IF_STAT,
             LuaTypes.DO_STAT,
             LuaTypes.FUNC_BODY,
@@ -60,12 +60,12 @@ public class LuaScriptBlock extends AbstractBlock {
         ASTNode node = parent.getFirstChildNode();
         IElementType parentType = parent.getElementType();
         Indent childIndent = Indent.getNoneIndent();
-        if (formattingSet.contains(parentType)) {
+        if (fakeBlockSet.contains(parentType)) {
             childIndent = Indent.getNormalIndent();
         }
 
         while (node != null) {
-            if (node.getElementType() == LuaTypes.BLOCK) {
+            if (fakeBlockSet.contains(node.getElementType())) {
                 buildChildren(node, results);
             } else if (shouldCreateBlockFor(node)) {
                 results.add(new LuaScriptBlock(node, null, null, childIndent, spacingBuilder));
