@@ -105,6 +105,11 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
             }
 
             @Override
+            public void visitAssignStat(@NotNull LuaAssignStat o) {
+                super.visitAssignStat(o);
+            }
+
+            @Override
             public void visitGlobalFuncDef(@NotNull LuaGlobalFuncDef o) {
                 list.add(new LuaGlobalFunctionTreeElement(o));
             }
@@ -117,6 +122,15 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
                     if (comment != null)
                         visitDocComment(comment);
                 }
+            }
+
+            @Override
+            public void visitLocalDef(@NotNull LuaLocalDef o) {
+                LuaComment comment = o.getComment();
+                if (comment != null)
+                    visitDocComment(comment);
+                else
+                    list.add(new LuaLocalDefTreeElement(o));
             }
         });
 
