@@ -40,7 +40,7 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
 
         //inside comment
         LuaComment comment = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset - 1, LuaComment.class, false);
-        if (comment != null) {
+        if (comment != null && caretOffset > comment.getTextOffset()) {
             editor.getDocument().insertString(caretOffset, "\n---");
             editor.getCaretModel().moveToOffset(caretOffset + 4);
             return Result.Stop;
