@@ -5,9 +5,9 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaField;
 import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableConstructor;
+import com.tang.intellij.lua.psi.LuaTableField;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class LuaTypeTable extends LuaType {
             fieldStringList = new ArrayList<>();
             LuaFieldList fieldList = tableConstructor.getFieldList();
             if (fieldList != null) {
-                for (LuaField field : fieldList.getFieldList()) {
+                for (LuaTableField field : fieldList.getTableFieldList()) {
                     PsiElement id = field.getNameDef();
                     if (id != null) {
                         fieldStringList.add(id.getText());

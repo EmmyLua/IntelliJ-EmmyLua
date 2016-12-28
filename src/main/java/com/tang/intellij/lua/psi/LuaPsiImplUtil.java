@@ -285,10 +285,10 @@ public class LuaPsiImplUtil {
         return null;
     }
 
-    public static LuaField findField(LuaTableConstructor table, String fieldName) {
+    public static LuaTableField findField(LuaTableConstructor table, String fieldName) {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
-            for (LuaField field : fieldList.getFieldList()) {
+            for (LuaTableField field : fieldList.getTableFieldList()) {
                 LuaNameDef id = field.getNameDef();
                 if (id != null && fieldName.equals(id.getName()))
                     return field;

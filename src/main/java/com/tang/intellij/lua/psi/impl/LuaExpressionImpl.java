@@ -46,7 +46,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             for (LuaType type : prefixType.getTypes()) {
                 if (type instanceof LuaTypeTable) {
                     LuaTypeTable table = (LuaTypeTable) type;
-                    LuaField field = table.tableConstructor.findField(propName);
+                    LuaTableField field = table.tableConstructor.findField(propName);
                     if (field != null) {
                         LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
                         if (expr != null) return expr.guessType();

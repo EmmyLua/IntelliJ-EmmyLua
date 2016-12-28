@@ -57,7 +57,7 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
             for (LuaType type : typeSet.getTypes()) {
                 if (type instanceof LuaTypeTable) { // 可能是 table 字段
                     LuaTypeTable tableType = (LuaTypeTable) type;
-                    LuaField field = tableType.tableConstructor.findField(idString);
+                    LuaTableField field = tableType.tableConstructor.findField(idString);
                     if (field != null) {
                         return field.getNameDef();
                     }

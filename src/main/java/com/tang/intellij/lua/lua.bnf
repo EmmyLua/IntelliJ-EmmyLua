@@ -207,16 +207,16 @@ funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...'
 
-tableConstructor ::= '{' (fieldList) '}' {
+tableConstructor ::= '{' fieldList '}' {
     pin = 1
     methods = [findField]
 }
 
-fieldList ::= (field (fieldSep field)* (fieldSep)?)?
+fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
 
-field ::= '[' expr ']' '=' expr | nameDef '=' expr | expr
+tableField ::= '[' expr ']' '=' expr | tableFieldNameDef '=' expr | expr { methods = [nameDef="tableFieldNameDef"] }
 
-fieldSep ::= ',' | ';'
+tableFieldSep ::= ',' | ';'
 
 binaryOp ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
      '<' | '<=' | '>' | '>=' | '==' | '~=' |
@@ -255,5 +255,8 @@ nameRef ::= ID | SELF {
     methods = [setName getName getReference resolve resolveType]
 }
 paramNameDef ::= ID | SELF {
+    extends = nameDef
+}
+tableFieldNameDef ::= ID {
     extends = nameDef
 }
