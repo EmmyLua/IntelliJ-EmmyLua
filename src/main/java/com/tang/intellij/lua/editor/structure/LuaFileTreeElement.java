@@ -8,11 +8,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaFile;
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaTypes;
-import com.tang.intellij.lua.psi.LuaVisitor;
+import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,7 +82,7 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
 
         file.acceptChildren(new LuaVisitor(){
 
-            public void visitDocComment(PsiElement comment) {
+            void visitDocComment(PsiElement comment) {
                 comment.acceptChildren(new LuaDocVisitor(){
                     @Override
                     public void visitClassDef(@NotNull LuaDocClassDef o) {
@@ -113,8 +111,11 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
 
             @Override
             public void visitElement(PsiElement element) {
-                if (element.getNode().getElementType() == LuaTypes.DOC_COMMENT) {
-                    visitDocComment(element);
+                if (element instanceof LuaCommentOwner) {
+                    LuaCommentOwner owner = (LuaCommentOwner) element;
+                    LuaComment comment = owner.getComment();
+                    if (comment != null)
+                        visitDocComment(comment);
                 }
             }
         });
