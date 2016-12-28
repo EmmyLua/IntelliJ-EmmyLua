@@ -63,18 +63,6 @@ public class LuaPsiTreeUtil {
     }
 
     /**
-     * 向上寻找 local function 定义
-     * @param current 当前搜导起点
-     * @param processor 处理器
-     */
-    public static void walkUpLocalFuncNameDef(PsiElement current, ElementProcessor<LuaName> processor) {
-        walkUpLocalFuncDef(current, localFuncDef -> {
-            LuaName nameDef = localFuncDef.getLocalFuncNameDef();
-            return nameDef == null || processor.accept(nameDef);
-        });
-    }
-
-    /**
      * 向上寻找 local 定义
      * @param current 当前搜导起点
      * @param processor 处理器

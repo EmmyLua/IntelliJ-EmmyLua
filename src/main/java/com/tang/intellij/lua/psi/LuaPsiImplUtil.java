@@ -3,6 +3,7 @@ package com.tang.intellij.lua.psi;
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -29,6 +30,15 @@ public class LuaPsiImplUtil {
         PsiElement oldId = identifier.getFirstChild();
         oldId.replace(newId);
         return newId;
+    }
+
+    public static PsiElement setName(PsiNameIdentifierOwner owner, String name) {
+        PsiElement oldId = owner.getNameIdentifier();
+        if (oldId != null) {
+            PsiElement newId = LuaElementFactory.createIdentifier(owner.getProject(), name);
+            oldId.replace(newId);
+        }
+        return owner;
     }
 
     @NotNull
@@ -325,5 +335,20 @@ public class LuaPsiImplUtil {
         }
         builder.append(")");
         return builder.toString();
+    }
+
+    public static PsiElement getNameIdentifier(LuaLocalFuncDef localFuncDef) {
+        return localFuncDef.getId();
+    }
+
+    public static String getName(LuaLocalFuncDef localFuncDef) {
+        PsiElement id = getNameIdentifier(localFuncDef);
+        return id != null ? id.getText() : null;
+    }
+
+    public static int getTextOffset(LuaLocalFuncDef localFuncDef) {
+        PsiElement id = getNameIdentifier(localFuncDef);
+        if (id != null) return id.getTextOffset();
+        return localFuncDef.getTextOffset();
     }
 }

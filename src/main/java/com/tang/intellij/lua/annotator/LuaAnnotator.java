@@ -34,7 +34,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
     class LuaElementVisitor extends LuaVisitor {
         @Override
         public void visitLocalFuncDef(@NotNull LuaLocalFuncDef o) {
-            PsiElement name = o.getLocalFuncNameDef();
+            PsiElement name = o.getNameIdentifier();
             if (name != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(name, null);
                 annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);

@@ -70,9 +70,9 @@ public class LuaCompletionContributor extends CompletionContributor {
                     return  true;
                 });
                 LuaPsiTreeUtil.walkUpLocalFuncDef(cur, localFuncDef -> {
-                    LuaLocalFuncNameDef nameDef = localFuncDef.getLocalFuncNameDef();
-                    if (nameDef != null) {
-                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getName())
+                    String name = localFuncDef.getName();
+                    if (name != null) {
+                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(localFuncDef.getName())
                                 .withInsertHandler(new FuncInsertHandler(localFuncDef.getFuncBody()))
                                 .withIcon(LuaIcons.LOCAL_FUNCTION);
                         completionResultSet.addElement(elementBuilder);

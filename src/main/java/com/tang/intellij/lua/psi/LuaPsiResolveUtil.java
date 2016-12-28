@@ -28,8 +28,7 @@ public class LuaPsiResolveUtil {
         //local 函数名
         if (funcBodyOwner == null) {
             LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
-                LuaName nameDef = localFuncDef.getLocalFuncNameDef();
-                if (nameDef != null && refName.equals(nameDef.getName())) {
+                if (refName.equals(localFuncDef.getName())) {
                     funcBodyOwner = localFuncDef;
                     return false;
                 }
@@ -74,8 +73,9 @@ public class LuaPsiResolveUtil {
 
         //local 函数名
         if (resolveResult == null) {
-            LuaPsiTreeUtil.walkUpLocalFuncNameDef(ref, nameDef -> {
-                if (refName.equals(nameDef.getName())) {
+            LuaPsiTreeUtil.walkUpLocalFuncDef(ref, nameDef -> {
+                String name= nameDef.getName();
+                if (refName.equals(name)) {
                     resolveResult = nameDef;
                     return false;
                 }
