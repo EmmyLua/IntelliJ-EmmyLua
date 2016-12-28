@@ -1,13 +1,25 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.WhitespacesAndCommentsBinder;
 import com.intellij.lang.WhitespacesBinders;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.tang.intellij.lua.lang.LuaParserDefinition;
 
 public class LuaParserUtil extends GeneratedParserUtilBase {
+
+    public static WhitespacesAndCommentsBinder MY_LEFT_COMMENT_BINDER = (list, b, tokenTextGetter) -> {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            IElementType type = list.get(i);
+            if (LuaParserDefinition.COMMENTS.contains(type)) {
+                return i;
+            }
+        }
+        return list.size();
+    };
 
     public static boolean repeat(PsiBuilder builder_, int level_, Parser parser, int times) {
         PsiBuilder.Marker marker = builder_.mark();

@@ -80,11 +80,12 @@
   ]
 
   implements("tableConstructor") = "com.tang.intellij.lua.psi.LuaIndentRange"
-  hooks("forAStat|forBStat") = [leftBinder="GREEDY_LEFT_BINDER"]
+  hooks("forAStat|forBStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
-  hooks("localDef|assignStat") = [leftBinder="GREEDY_LEFT_BINDER"]
+  hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
-  hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="GREEDY_LEFT_BINDER"]
+  hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
+  hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
   implements("globalFuncDef|localFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner, com.tang.intellij.lua.psi.LuaDeclaration"
   implements("lambdaFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
@@ -207,12 +208,12 @@ funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...'
 
-tableConstructor ::= '{' (fieldList)? '}' {
+tableConstructor ::= '{' (fieldList) '}' {
     pin = 1
     methods = [findField]
 }
 
-fieldList ::= field (fieldSep field)* (fieldSep)?
+fieldList ::= (field (fieldSep field)* (fieldSep)?)?
 
 field ::= '[' expr ']' '=' expr | nameDef '=' expr | expr
 
