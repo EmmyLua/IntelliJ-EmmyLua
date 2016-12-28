@@ -129,8 +129,8 @@ public class LuaPsiResolveUtil {
             }
         }
         //在Table字段里
-        else if (nameDef.getParent() instanceof LuaField) {
-            LuaField field = (LuaField) nameDef.getParent();
+        else if (nameDef.getParent() instanceof LuaTableField) {
+            LuaTableField field = (LuaTableField) nameDef.getParent();
             LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
             if (expr != null) return expr.guessType();
         }
