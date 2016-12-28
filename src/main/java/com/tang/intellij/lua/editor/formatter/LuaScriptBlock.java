@@ -4,8 +4,8 @@ import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.psi.LuaIndentRange;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,20 +52,26 @@ public class LuaScriptBlock extends AbstractBlock {
     @Override
     protected List<Block> buildChildren() {
         List<Block> blocks = new ArrayList<>();
-        ASTNode node = myNode.getFirstChildNode();
+        buildChildren(myNode, blocks);
+        return blocks;
+    }
+
+    private void buildChildren(ASTNode parent, List<Block> results) {
+        ASTNode node = parent.getFirstChildNode();
+        IElementType parentType = parent.getElementType();
+        Indent childIndent = Indent.getNoneIndent();
+        if (formattingSet.contains(parentType)) {
+            childIndent = Indent.getNormalIndent();
+        }
+
         while (node != null) {
-            if (shouldCreateBlockFor(node)) {
-                Indent childIndent = Indent.getNoneIndent();
-                if (formattingSet.contains(myNode.getElementType())) {
-                    childIndent = Indent.getNormalIndent();
-                }
-
-                blocks.add(new LuaScriptBlock(node, null, null, childIndent, spacingBuilder));
+            if (node.getElementType() == LuaTypes.BLOCK) {
+                buildChildren(node, results);
+            } else if (shouldCreateBlockFor(node)) {
+                results.add(new LuaScriptBlock(node, null, null, childIndent, spacingBuilder));
             }
-
             node = node.getTreeNext();
         }
-        return blocks;
     }
 
     @Nullable
