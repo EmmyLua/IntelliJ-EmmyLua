@@ -4,7 +4,6 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
@@ -42,7 +41,7 @@ public class LuaClassType extends LuaType {
 
     public String getClassNameText() {
         if (className == null)
-            className = classDef.getClassNameText();
+            className = classDef.getName();
         return className;
     }
 
@@ -100,11 +99,11 @@ public class LuaClassType extends LuaType {
         Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
 
         for (LuaClassField fieldName : list) {
-            PsiNamedElement nameDef = fieldName.getNameDef();
-            if (nameDef == null)
+            String name = fieldName.getName();
+            if (name == null)
                 continue;
 
-            LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getName())
+            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
                     .withIcon(LuaIcons.CLASS_FIELD)
                     .withTypeText(clazzName);
             if (bold)

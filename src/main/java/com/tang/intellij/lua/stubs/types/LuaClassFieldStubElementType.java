@@ -5,16 +5,14 @@ import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.comment.psi.LuaDocClassName;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaElementType;
-import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.LuaClassFieldStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassFieldStubImpl;
+import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -36,23 +34,22 @@ public class LuaClassFieldStubElementType extends IStubElementType<LuaClassField
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         LuaDocFieldDef element = (LuaDocFieldDef) node.getPsi();
-        return element.getNameDef() != null;
+        return element.getNameIdentifier() != null;
     }
 
     @NotNull
     @Override
     public LuaClassFieldStub createStub(@NotNull LuaDocFieldDef luaDocFieldDef, StubElement stubElement) {
         LuaComment comment = LuaCommentUtil.findContainer(luaDocFieldDef);
-        LuaDocFieldNameDef nameDef = luaDocFieldDef.getNameDef();
-        assert nameDef != null;
+        String name = luaDocFieldDef.getName();
+        assert name != null;
         LuaDocClassDef classDef = comment.getClassDef();
         String className = null;
         if (classDef != null) {
-            LuaDocClassName docClassName = classDef.getClassName();
-            className = docClassName.getName();
+            className = classDef.getName();
         }
 
-        return new LuaClassFieldStubImpl(stubElement, nameDef.getName(), StringRef.fromNullableString(className));
+        return new LuaClassFieldStubImpl(stubElement, name, StringRef.fromNullableString(className));
     }
 
     @NotNull

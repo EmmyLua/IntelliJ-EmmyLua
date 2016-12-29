@@ -25,7 +25,7 @@ public class LuaClassTreeElement extends LuaTreeElement<LuaDocClassDef> {
 
     LuaClassTreeElement(LuaDocClassDef docClassDef) {
         super(docClassDef, LuaIcons.CLASS);
-        this.className = docClassDef.getClassNameText();
+        this.className = docClassDef.getName();
     }
 
     @Override

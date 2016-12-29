@@ -86,7 +86,7 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
                 comment.acceptChildren(new LuaDocVisitor(){
                     @Override
                     public void visitClassDef(@NotNull LuaDocClassDef o) {
-                        String name = o.getClassNameText();
+                        String name = o.getName();
                         if (name != null) {
                             list.add(new LuaClassTreeElement(o));
                         }

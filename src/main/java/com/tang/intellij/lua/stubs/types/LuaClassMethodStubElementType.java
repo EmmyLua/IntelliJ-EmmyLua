@@ -111,7 +111,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
                     if (comment != null) {
                         LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
                         if (classDef != null) {
-                            clazzNameToSearch = classDef.getClassNameText();
+                            clazzNameToSearch = classDef.getName();
                             return false;
                         }
                     }
@@ -133,7 +133,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
                             if (comment != null) {
                                 LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
                                 if (classDef != null) {
-                                    clazzNameToSearch = classDef.getClassNameText();
+                                    clazzNameToSearch = classDef.getName();
                                     return false;
                                 }
                             }

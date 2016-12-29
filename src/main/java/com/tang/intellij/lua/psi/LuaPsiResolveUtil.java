@@ -138,7 +138,7 @@ public class LuaPsiResolveUtil {
                     //属性
                     LuaClassField fieldDef = type.findField(idString, project, scope);
                     if (fieldDef != null)
-                        return fieldDef.getNameDef();
+                        return fieldDef;
                     //方法
                     LuaClassMethodDef methodDef = type.findMethod(idString, project, scope);
                     if (methodDef != null)

@@ -24,10 +24,12 @@ public class DuplicateClassDeclaration extends LocalInspectionTool {
         return new LuaDocVisitor() {
             @Override
             public void visitClassDef(@NotNull LuaDocClassDef o) {
-                String name = o.getClassName().getName();
-                Collection<LuaDocClassDef> classDefs = LuaClassIndex.getInstance().get(name, o.getProject(), new ProjectAndLibrariesScope(o.getProject()));
-                if (classDefs.size() > 1) {
-                    holder.registerProblem(o.getClassName(), "Duplicate class", ProblemHighlightType.ERROR);
+                String name = o.getName();
+                if (name != null) {
+                    Collection<LuaDocClassDef> classDefs = LuaClassIndex.getInstance().get(name, o.getProject(), new ProjectAndLibrariesScope(o.getProject()));
+                    if (classDefs.size() > 1) {
+                        holder.registerProblem(o.getNameIdentifier(), "Duplicate class", ProblemHighlightType.ERROR);
+                    }
                 }
             }
         };

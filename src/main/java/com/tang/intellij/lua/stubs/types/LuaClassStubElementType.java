@@ -5,9 +5,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaElementType;
-import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import com.tang.intellij.lua.stubs.LuaClassDefStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassDefStubImpl;
+import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class LuaClassStubElementType extends IStubElementType<LuaClassDefStub, L
     @NotNull
     @Override
     public LuaClassDefStub createStub(@NotNull LuaDocClassDef luaDocClassDef, StubElement stubElement) {
-        return new LuaClassDefStubImpl(luaDocClassDef.getClassName().getText(), stubElement);
+        return new LuaClassDefStubImpl(luaDocClassDef.getName(), stubElement);
     }
 
     @NotNull

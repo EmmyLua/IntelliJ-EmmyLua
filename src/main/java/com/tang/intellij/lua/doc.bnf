@@ -17,25 +17,25 @@
   tokenTypeClass="com.tang.intellij.lua.comment.psi.LuaDocTokenType"
 
   tokens = [
-  ID = 'ID'
-  AT = '@'
-  SHARP = '#'
-  EQ = '='
-  COMMA = ','
-  TAG_NAME = 'TAG_NAME'
-  TAG_PARAM = 'param'
-  TAG_RETURN = 'return'
-  PROTECTED = 'protected'
-  PUBLIC = 'public'
-  CLASS = 'class'
-  EXTENDS = "extends"
-  INTERFACE = 'interface'
-  FIELD = 'field'
-  DEFINE = 'define'
-  DASHES = 'DASHES'
-  STRING_BEGIN = 'STRING_BEGIN'
-  STRING = 'STRING'
-  TYPE = 'type'
+        ID="regexp:[A-Za-z0-9_]+"
+        AT = '@'
+        SHARP = '#'
+        EQ = '='
+        COMMA = ','
+        TAG_NAME = 'TAG_NAME'
+        TAG_PARAM = 'param'
+        TAG_RETURN = 'return'
+        PROTECTED = 'protected'
+        PUBLIC = 'public'
+        CLASS = 'class'
+        EXTENDS = "extends"
+        INTERFACE = 'interface'
+        FIELD = 'field'
+        DEFINE = 'define'
+        DASHES = 'DASHES'
+        STRING_BEGIN = 'STRING_BEGIN'
+        STRING = 'STRING'
+        TYPE = 'type'
   ]
 }
 
@@ -56,17 +56,15 @@ global_def ::= DEFINE {
     methods = [resolveType]
 }
 
-//--- field def
-//@field name #TYPE
-field_name_def ::= ID {
-    implements = "com.tang.intellij.lua.comment.psi.LuaDocNamedElement"
-    methods = [setName getName]
-}
-field_def ::= FIELD access_modifier field_name_def type_set {
+field_def ::= FIELD access_modifier ID type_set {
     pin = 1
-    implements = ["com.tang.intellij.lua.psi.LuaClassField" "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"]
+    implements = [
+        "com.tang.intellij.lua.psi.LuaClassField"
+        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassFieldStub"
-    methods = [resolveType nameDef = "field_name_def" ]
+    methods = [resolveType getNameIdentifier setName getName getTextOffset]
 }
 
 //--- tag
@@ -89,18 +87,17 @@ return_def ::= TAG_RETURN type_list {
     methods = [resolveTypeAt]
 }
 
-//@class NAME extends CLASS_REF
-class_name ::= ID {
-    implements = "com.tang.intellij.lua.comment.psi.LuaDocNamedElement"
-    methods = [getName setName]
-}
 class_name_ref ::= ID {
     methods = [getReference resolveType]
 }
-class_def ::= CLASS class_name (EXTENDS class_name_ref)?  {
+class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
     pin = 2
+    implements = [
+        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassDefStub"
-    methods = [getClassNameText getSuperClass getSuperClasses getPresentation]
+    methods = [getSuperClass getSuperClasses getPresentation getNameIdentifier setName getName getTextOffset]
 }
 
 // @type CLASS_REF

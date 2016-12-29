@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
@@ -48,16 +49,32 @@ public class LuaDocPsiImplUtil {
         return null;
     }
 
-    @NotNull
-    public static String getName(LuaDocNamedElement className) {
-        return className.getText();
+    public static String getName(PsiNameIdentifierOwner identifierOwner) {
+        PsiElement id = identifierOwner.getNameIdentifier();
+        return id != null ? id.getText() : null;
     }
 
-    public static PsiElement setName(LuaDocNamedElement className, String newName) {
-        PsiElement newId = LuaElementFactory.createIdentifier(className.getProject(), newName);
-        PsiElement oldId = className.getFirstChild();
-        oldId.replace(newId);
-        return newId;
+    public static PsiElement setName(PsiNameIdentifierOwner identifierOwner, String newName) {
+        PsiElement oldId = identifierOwner.getNameIdentifier();
+        if (oldId != null) {
+            PsiElement newId = LuaElementFactory.createIdentifier(identifierOwner.getProject(), newName);
+            oldId.replace(newId);
+            return newId;
+        }
+        return identifierOwner;
+    }
+
+    public static int getTextOffset(PsiNameIdentifierOwner identifierOwner) {
+        PsiElement id = identifierOwner.getNameIdentifier();
+        return id != null ? id.getTextOffset() : 0;
+    }
+
+    public static PsiElement getNameIdentifier(LuaDocFieldDef fieldDef) {
+        return fieldDef.getId();
+    }
+
+    public static PsiElement getNameIdentifier(LuaDocClassDef classDef) {
+        return classDef.getId();
     }
 
     public static LuaTypeSet resolveType(LuaDocFieldDef fieldDef) {
@@ -130,7 +147,7 @@ public class LuaDocPsiImplUtil {
             @Nullable
             @Override
             public String getPresentableText() {
-                return classDef.getClassNameText();
+                return classDef.getName();
             }
 
             @Nullable
@@ -145,18 +162,6 @@ public class LuaDocPsiImplUtil {
                 return AllIcons.Nodes.Class;
             }
         };
-    }
-
-    /**
-     * 获取Class名称
-     * @param classDef class定义
-     * @return 类名
-     */
-    public static String getClassNameText(LuaDocClassDef classDef) {
-        if (classDef.getStub() != null) {
-            return classDef.getStub().getClassName();
-        }
-        return classDef.getClassName().getName();
     }
 
     /**

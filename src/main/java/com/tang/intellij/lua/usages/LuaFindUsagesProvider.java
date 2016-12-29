@@ -6,8 +6,8 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.comment.psi.LuaDocClassName;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldNameDef;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaParserDefinition;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.psi.*;
@@ -42,9 +42,9 @@ public class LuaFindUsagesProvider implements FindUsagesProvider {
     @NotNull
     @Override
     public String getType(@NotNull PsiElement psiElement) {
-        if (psiElement instanceof LuaDocClassName)
+        if (psiElement instanceof LuaDocClassDef)
             return "Class";
-        if (psiElement instanceof LuaDocFieldNameDef)
+        if (psiElement instanceof LuaDocFieldDef)
             return "Class Field";
         if (psiElement instanceof LuaGlobalFuncDef)
             return "Global Function";

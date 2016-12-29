@@ -1,7 +1,6 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.navigation.NavigationItem;
-import com.intellij.psi.PsiNamedElement;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 
 /**
@@ -10,5 +9,4 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
  */
 public interface LuaClassField extends LuaClassMember, NavigationItem {
     LuaTypeSet resolveType();
-    PsiNamedElement getNameDef();
 }

@@ -38,7 +38,7 @@ public class LuaClassNameReference extends PsiReferenceBase<LuaDocClassNameRef> 
         Collection<LuaDocClassDef> defs = LuaClassIndex.getInstance().get(name, myElement.getProject(), new ProjectAndLibrariesScope(myElement.getProject()));
         if (defs.size() > 0) {
             LuaDocClassDef def = defs.iterator().next();
-            return def.getClassName();
+            return def;
         }
         return null;
     }

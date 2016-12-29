@@ -74,10 +74,10 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
     }
 
     class LuaDocElementVisitor extends LuaDocVisitor {
-
         @Override
-        public void visitClassName(@NotNull LuaDocClassName o) {
-            Annotation annotation = myHolder.createInfoAnnotation(o, null);
+        public void visitClassDef(@NotNull LuaDocClassDef o) {
+            super.visitClassDef(o);
+            Annotation annotation = myHolder.createInfoAnnotation(o.getId(), null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.CLASS_NAME);
         }
 
@@ -88,13 +88,17 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         }
 
         @Override
-        public void visitParamNameRef(@NotNull LuaDocParamNameRef o) {
-            Annotation annotation = myHolder.createInfoAnnotation(o, null);
-            annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
+        public void visitFieldDef(@NotNull LuaDocFieldDef o) {
+            super.visitFieldDef(o);
+            PsiElement id = o.getNameIdentifier();
+            if (id != null) {
+                Annotation annotation = myHolder.createInfoAnnotation(id, null);
+                annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
+            }
         }
 
         @Override
-        public void visitFieldNameDef(@NotNull LuaDocFieldNameDef o) {
+        public void visitParamNameRef(@NotNull LuaDocParamNameRef o) {
             Annotation annotation = myHolder.createInfoAnnotation(o, null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
         }
