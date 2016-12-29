@@ -25,11 +25,11 @@ public class LuaBackspaceHandlerDelegate extends BackspaceHandlerDelegate {
             if (element != null) {
                 IElementType type = element.getNode().getElementType();
                 if (type == LuaDocTypes.DASHES) {
-                    int start = element.getTextOffset();
+                    int start = element.getTextOffset() - 1;
                     int end = element.getTextOffset() + element.getTextLength();
                     if (offset == end - 1) { //在 --- 最后面删的
-                        editor.getDocument().deleteString(start, end);
-                        editor.getCaretModel().moveToOffset(start - 1);
+                        editor.getDocument().deleteString(start, offset);
+                        editor.getCaretModel().moveToOffset(start);
                     }
                 }
             }
