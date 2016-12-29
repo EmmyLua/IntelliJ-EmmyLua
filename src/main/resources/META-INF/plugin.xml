@@ -2,10 +2,12 @@
     <id>com.tang</id>
     <name>Lua IDE</name>
     <version>1.0</version>
-    <vendor email="love.tangzx@qq.com" url="http://www.yourcompany.com">NULL</vendor>
+    <vendor email="love.tangzx@qq.com">tangzx</vendor>
 
     <description><![CDATA[
-    Just a lua plugin for IDEA
+    Just a lua plugin for IDEA<br>
+    QQ : 272669294<br>
+    QQGroup : 29850775
     ]]></description>
 
     <change-notes><![CDATA[
