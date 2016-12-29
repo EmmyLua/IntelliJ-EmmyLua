@@ -66,7 +66,7 @@ public class LuaDocPsiImplUtil {
 
     public static int getTextOffset(PsiNameIdentifierOwner identifierOwner) {
         PsiElement id = identifierOwner.getNameIdentifier();
-        return id != null ? id.getTextOffset() : 0;
+        return id != null ? id.getTextOffset() : identifierOwner.getNode().getStartOffset();
     }
 
     public static PsiElement getNameIdentifier(LuaDocFieldDef fieldDef) {

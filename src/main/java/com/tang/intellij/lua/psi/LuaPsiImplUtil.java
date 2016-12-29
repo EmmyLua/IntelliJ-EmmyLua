@@ -37,6 +37,7 @@ public class LuaPsiImplUtil {
         if (oldId != null) {
             PsiElement newId = LuaElementFactory.createIdentifier(owner.getProject(), name);
             oldId.replace(newId);
+            return newId;
         }
         return owner;
     }
@@ -81,18 +82,8 @@ public class LuaPsiImplUtil {
         return LuaCommentUtil.findComment(declaration);
     }
 
-    public static String getName(LuaClassMethodDef classMethodDef) {
-        PsiElement identifier = getNameIdentifier(classMethodDef);
-        return identifier.getText();
-    }
-
     public static PsiElement getNameIdentifier(LuaClassMethodDef classMethodDef) {
         return classMethodDef.getClassMethodName().getId();
-    }
-
-    public static int getTextOffset(LuaClassMethodDef classMethodDef) {
-        PsiElement identifier = getNameIdentifier(classMethodDef);
-        return identifier.getTextOffset();
     }
 
     /**
@@ -132,20 +123,8 @@ public class LuaPsiImplUtil {
         return null;
     }
 
-    public static String getName(LuaGlobalFuncDef globalFuncDef) {
-        if (globalFuncDef.getStub() != null)
-            return globalFuncDef.getStub().getName();
-        PsiElement id = getNameIdentifier(globalFuncDef);
-        return id != null ? id.getText() : null;
-    }
-
     public static PsiElement getNameIdentifier(LuaGlobalFuncDef globalFuncDef) {
         return globalFuncDef.getId();
-    }
-
-    public static int getTextOffset(LuaGlobalFuncDef globalFuncDef) {
-        PsiElement id = getNameIdentifier(globalFuncDef);
-        return id != null ? id.getTextOffset() : globalFuncDef.getTextOffset();
     }
 
     public static ItemPresentation getPresentation(LuaGlobalFuncDef globalFuncDef) {
@@ -360,29 +339,18 @@ public class LuaPsiImplUtil {
         return localFuncDef.getId();
     }
 
-    public static String getName(LuaLocalFuncDef localFuncDef) {
-        PsiElement id = getNameIdentifier(localFuncDef);
+    public static String getName(PsiNameIdentifierOwner identifierOwner) {
+        PsiElement id = identifierOwner.getNameIdentifier();
         return id != null ? id.getText() : null;
     }
 
-    public static int getTextOffset(LuaLocalFuncDef localFuncDef) {
-        PsiElement id = getNameIdentifier(localFuncDef);
+    public static int getTextOffset(PsiNameIdentifierOwner localFuncDef) {
+        PsiElement id = localFuncDef.getNameIdentifier();
         if (id != null) return id.getTextOffset();
-        return localFuncDef.getTextOffset();
+        return localFuncDef.getNode().getStartOffset();
     }
 
     public static PsiElement getNameIdentifier(LuaTableField tableField) {
         return tableField.getId();
-    }
-
-    public static String getName(LuaTableField tableField) {
-        PsiElement id = getNameIdentifier(tableField);
-        return id != null ? id.getText() : null;
-    }
-
-    public static int getTextOffset(LuaTableField tableField) {
-        PsiElement id = getNameIdentifier(tableField);
-        if (id != null) return id.getTextOffset();
-        return tableField.getTextOffset();
     }
 }

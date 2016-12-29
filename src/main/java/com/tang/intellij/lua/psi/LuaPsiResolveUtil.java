@@ -185,8 +185,9 @@ public class LuaPsiResolveUtil {
                 if (nameList != null && exprList != null) {
                     int index = nameList.getNameDefList().indexOf(nameDef);
                     if (index != -1) {
-                        LuaExpr expr = exprList.getExprList().get(index);
-                        if (expr != null) {
+                        List<LuaExpr> exprs = exprList.getExprList();
+                        if (index < exprs.size()) {
+                            LuaExpr expr = exprs.get(index);
                             return expr.guessType();
                         }
                     }
