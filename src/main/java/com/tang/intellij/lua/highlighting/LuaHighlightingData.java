@@ -76,12 +76,11 @@ public class LuaHighlightingData {
             TextAttributesKey.createTextAttributesKey(LOCAL_VAR_ID, LOCAL_VARIABLE);
     public static final TextAttributesKey UPVAL =
             TextAttributesKey.createTextAttributesKey(UPVAL_ID, CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
-    public static final TextAttributesKey PARAMETER =
-            TextAttributesKey.createTextAttributesKey(PARAMETER_ID, DefaultLanguageHighlighterColors.PARAMETER);
-    public static final TextAttributesKey GLOBAL_VAR =
-            TextAttributesKey.createTextAttributesKey(GLOBAL_VAR_ID, GLOBAL_VARIABLE);
+    public static final TextAttributesKey PARAMETER = UPVAL;
     public static final TextAttributesKey FIELD =
             TextAttributesKey.createTextAttributesKey(FIELD_ID, STATIC_FIELD);
+    public static final TextAttributesKey GLOBAL_FUNCTIION = FIELD;
+    public static final TextAttributesKey GLOBAL_VAR = GLOBAL_FUNCTIION;
 
     public static final TextAttributesKey TAIL_CALL =
             TextAttributesKey.createTextAttributesKey(TAIL_CALL_ID, HighlighterColors.TEXT);

@@ -46,7 +46,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement name = o.getNameIdentifier();
             if (name != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(name, null);
-                annotation.setTextAttributes(LuaHighlightingData.FIELD);
+                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTIION);
             }
         }
 
@@ -59,17 +59,29 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         @Override
         public void visitParamNameDef(@NotNull LuaParamNameDef o) {
             Annotation annotation = myHolder.createInfoAnnotation(o, null);
-            annotation.setTextAttributes(LuaHighlightingData.UPVAL);
+            annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
         }
 
         @Override
         public void visitNameRef(@NotNull LuaNameRef o) {
+            PsiElement id = o.getFirstChild();
+            if (id != null && id.getNode().getElementType() == LuaTypes.SELF)
+                return;
+
             PsiElement res = o.resolve();
             if (res instanceof LuaParamNameDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
-                annotation.setTextAttributes(LuaHighlightingData.UPVAL);
+                annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
+            } else if (res instanceof LuaGlobalFuncDef) {
+                Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTIION);
+            } else if (res instanceof LuaNameDef) { //Local
+                Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
+            } else/* if (res instanceof LuaNameRef) */{ // 未知的，视为Global
+                Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_VAR);
             }
-            super.visitNameRef(o);
         }
     }
 
