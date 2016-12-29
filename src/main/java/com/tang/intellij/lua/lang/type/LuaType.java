@@ -26,21 +26,18 @@ public class LuaType {
         return null;
     }
 
-    public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
-        addMethodCompletions(completionParameters, completionResultSet, true, true);
+    public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean useAsField) {
+        addMethodCompletions(completionParameters, completionResultSet, true, true, useAsField);
     }
 
-    protected void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+    protected void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper, boolean useAsField) {}
 
-    }
-
-    protected void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
-
-    }
+    protected void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {}
 
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         addFieldCompletions(completionParameters, completionResultSet, true, true);
         addStaticMethodCompletions(completionParameters, completionResultSet, true, true);
+        addMethodCompletions(completionParameters, completionResultSet, true);
     }
 
     protected void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {

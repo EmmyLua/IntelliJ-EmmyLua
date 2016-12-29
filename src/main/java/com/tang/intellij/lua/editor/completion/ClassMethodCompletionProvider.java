@@ -24,7 +24,7 @@ public class ClassMethodCompletionProvider extends CompletionProvider<Completion
             LuaCallExpr callExpr = (LuaCallExpr) element.getParent();
             LuaTypeSet luaTypeSet = callExpr.guessPrefixType();
             if (luaTypeSet != null) {
-                luaTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet));
+                luaTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet, false));
             }
         }
         //words in file

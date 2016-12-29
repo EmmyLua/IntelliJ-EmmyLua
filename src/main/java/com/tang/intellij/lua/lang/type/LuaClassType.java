@@ -45,7 +45,8 @@ public class LuaClassType extends LuaType {
         return className;
     }
 
-    protected void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+    @Override
+    protected void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper, boolean useAsField) {
         String clazzName = getClassNameText();
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
         for (LuaClassMethodDef def : list) {
@@ -53,8 +54,9 @@ public class LuaClassType extends LuaType {
             if (methodName != null) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
                         .withIcon(LuaIcons.CLASS_METHOD)
-                        .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
                         .withTypeText(clazzName);
+                if (!useAsField)
+                    elementBuilder = elementBuilder.withInsertHandler(new FuncInsertHandler(def.getFuncBody()));
                 if (bold)
                     elementBuilder = elementBuilder.bold();
 
@@ -65,7 +67,7 @@ public class LuaClassType extends LuaType {
         if (withSuper) {
             LuaType superType = getSuperClass();
             if (superType != null)
-                superType.addMethodCompletions(completionParameters, completionResultSet, false, true);
+                superType.addMethodCompletions(completionParameters, completionResultSet, false, true, useAsField);
         }
     }
 
