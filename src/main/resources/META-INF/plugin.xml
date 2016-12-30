@@ -68,6 +68,9 @@
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
 
+        <programRunner implementation="com.tang.intellij.lua.debugger.LuaDebuggerRunner"/>
+        <configurationType implementation="com.tang.intellij.lua.debugger.LuaConfigurationType"/>
+
         <intentionAction>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocIntentionAction</className>
             <descriptionDirectoryName>Create Parameter Doc</descriptionDirectoryName>
