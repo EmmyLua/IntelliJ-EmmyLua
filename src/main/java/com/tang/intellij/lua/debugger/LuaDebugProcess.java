@@ -79,7 +79,7 @@ public class LuaDebugProcess extends XDebugProcess implements MobServer.Listener
         XSourcePosition sourcePosition = breakpoint.getSourcePosition();
         if (sourcePosition != null) {
             String shortFilePath = breakpoint.getShortFilePath();
-            mobServer.addBreakpoint(shortFilePath, sourcePosition.getLine());
+            mobServer.addCommand(String.format("SETB %s %d", shortFilePath, sourcePosition.getLine()));
         }
     }
 

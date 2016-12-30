@@ -107,8 +107,4 @@ public class MobServer implements Runnable {
             commands.add(command);
         }
     }
-
-    public void addBreakpoint(String file, int line) {
-        addCommand(String.format("SETB %s %d", file, line));
-    }
 }
