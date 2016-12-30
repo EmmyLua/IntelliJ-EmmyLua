@@ -45,15 +45,19 @@ public class MobServer implements Runnable {
             threadSend = new Thread(() -> {
                 try {
                     OutputStreamWriter stream = new OutputStreamWriter(accept.getOutputStream());
-                    stream.write("STEP\n");
-                    stream.flush();
+                    boolean firstTime = true;
 
                     while (accept.isConnected()) {
                         String command;
                         synchronized (locker) {
-                            if (commands.size() > 0) {
+                            while (commands.size() > 0) {
                                 command = commands.poll();
                                 stream.write(command + "\n");
+                                stream.flush();
+                            }
+                            if (firstTime) {
+                                firstTime = false;
+                                stream.write("RUN\n");
                                 stream.flush();
                             }
                         }
