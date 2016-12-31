@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.debugger;
 
+import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XStackFrame;
@@ -13,11 +14,22 @@ import org.jetbrains.annotations.Nullable;
 public class LuaStackFrame extends XStackFrame {
 
     private LuaDebuggerEvaluator evaluator = new LuaDebuggerEvaluator();
+    private XSourcePosition position;
+
+    public LuaStackFrame(XSourcePosition position) {
+        this.position = position;
+    }
 
     @Nullable
     @Override
     public XDebuggerEvaluator getEvaluator() {
         return evaluator;
+    }
+
+    @Nullable
+    @Override
+    public XSourcePosition getSourcePosition() {
+        return position;
     }
 
     @Override

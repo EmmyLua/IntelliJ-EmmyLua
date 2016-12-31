@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.debugger;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -8,6 +9,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
+import com.tang.intellij.lua.debugger.commands.GetStackCommand;
 import com.tang.intellij.lua.debugger.mobdebug.MobServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +20,7 @@ import java.io.IOException;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaDebugProcess extends XDebugProcess implements MobServer.Listener {
+public class LuaDebugProcess extends XDebugProcess {
 
     private LuaDebuggerEditorsProvider editorsProvider;
     private MobServer mobServer;
@@ -79,7 +81,7 @@ public class LuaDebugProcess extends XDebugProcess implements MobServer.Listener
         XSourcePosition sourcePosition = breakpoint.getSourcePosition();
         if (sourcePosition != null) {
             String shortFilePath = breakpoint.getShortFilePath();
-            mobServer.addCommand(String.format("SETB %s %d", shortFilePath, sourcePosition.getLine()));
+            mobServer.addCommand(String.format("SETB %s %d", shortFilePath, sourcePosition.getLine() + 1));
         }
     }
 
@@ -87,17 +89,22 @@ public class LuaDebugProcess extends XDebugProcess implements MobServer.Listener
         XSourcePosition sourcePosition = breakpoint.getSourcePosition();
         if (sourcePosition != null) {
             String shortFilePath = breakpoint.getShortFilePath();
-            mobServer.addCommand(String.format("DELB %s %d", shortFilePath, sourcePosition.getLine()));
+            mobServer.addCommand(String.format("DELB %s %d", shortFilePath, sourcePosition.getLine() + 1));
         }
     }
 
-    @Override
     public void handleResp(int code, String[] params) {
         switch (code) {
             case 202:
-                getSession().breakpointReached(breakpoint, "test", new LuaSuspendContext());
-                getSession().showExecutionPoint();
+                mobServer.addCommand(new GetStackCommand(params));
                 break;
         }
+    }
+
+    public void setStack(LuaExecutionStack stack) {
+        ApplicationManager.getApplication().invokeLater(()-> {
+            getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(stack));
+            getSession().showExecutionPoint();
+        });
     }
 }

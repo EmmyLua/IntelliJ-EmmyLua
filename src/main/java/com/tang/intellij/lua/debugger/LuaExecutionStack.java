@@ -4,15 +4,20 @@ import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 /**
  *
  * Created by tangzx on 2016/12/31.
  */
 public class LuaExecutionStack extends XExecutionStack {
-    private LuaStackFrame frame = new LuaStackFrame();
+    private LuaStackFrame frame;
+    private List<LuaStackFrame> stackFrameList;
 
-    LuaExecutionStack() {
+    public LuaExecutionStack(List<LuaStackFrame> stackFrameList) {
         super("LuaStack");
+        this.stackFrameList = stackFrameList;
+        frame = stackFrameList.get(0);
     }
 
     @Nullable
@@ -23,6 +28,6 @@ public class LuaExecutionStack extends XExecutionStack {
 
     @Override
     public void computeStackFrames(int i, XStackFrameContainer xStackFrameContainer) {
-
+        xStackFrameContainer.addStackFrames(stackFrameList, true);
     }
 }

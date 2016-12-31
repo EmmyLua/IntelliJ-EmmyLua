@@ -12,11 +12,13 @@ public class LuaSuspendContext extends XSuspendContext {
 
     private LuaExecutionStack active;
 
+    public LuaSuspendContext(LuaExecutionStack stack) {
+        active = stack;
+    }
+
     @Nullable
     @Override
     public XExecutionStack getActiveExecutionStack() {
-        if (active == null)
-            active = new LuaExecutionStack();
         return active;
     }
 }

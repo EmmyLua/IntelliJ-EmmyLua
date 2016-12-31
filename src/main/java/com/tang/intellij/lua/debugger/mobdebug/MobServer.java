@@ -2,6 +2,9 @@ package com.tang.intellij.lua.debugger.mobdebug;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.util.io.BaseOutputReader;
+import com.tang.intellij.lua.debugger.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.commands.DebugCommand;
+import com.tang.intellij.lua.debugger.commands.DefaultCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +15,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.Future;
 
 /**
@@ -20,10 +24,6 @@ import java.util.concurrent.Future;
  * Created by TangZX on 2016/12/30.
  */
 public class MobServer implements Runnable {
-
-    public interface Listener {
-        void handleResp(int code, String[] params);
-    }
 
     class LuaDebugReader extends BaseOutputReader {
         LuaDebugReader(@NotNull InputStream inputStream, @Nullable Charset charset) {
@@ -33,10 +33,7 @@ public class MobServer implements Runnable {
 
         @Override
         protected void onTextAvailable(@NotNull String s) {
-            String[] list = s.split(" ");
-            String[] params = Arrays.copyOfRange(list, 1, list.length - 1);
-            int code = Integer.parseInt(list[0]);
-            MobServer.this.listener.handleResp(code, params);
+            MobServer.this.onResp(s);
         }
 
         @NotNull
@@ -50,11 +47,12 @@ public class MobServer implements Runnable {
     private ServerSocket server;
     private Thread thread;
     private Thread threadSend;
-    private Listener listener;
-    private PriorityQueue<String> commands = new PriorityQueue<>();
+    private LuaDebugProcess listener;
+    private Queue<DebugCommand> commands = new LinkedList<>();
     private LuaDebugReader debugReader;
+    private DebugCommand currentCommandWaitForResp;
 
-    public MobServer(Listener listener) {
+    public MobServer(LuaDebugProcess listener) {
         this.listener = listener;
     }
 
@@ -63,6 +61,19 @@ public class MobServer implements Runnable {
             server = new ServerSocket(8172);
         thread = new Thread(this);
         thread.start();
+    }
+
+    private void onResp(String data) {
+        data = data.substring(0, data.length() - 1);
+        if (currentCommandWaitForResp != null) {
+            currentCommandWaitForResp.handle(data);
+            currentCommandWaitForResp = null;
+        } else {
+            String[] list = data.split(" ");
+            String[] params = Arrays.copyOfRange(list, 1, list.length);
+            int code = Integer.parseInt(list[0]);
+            listener.handleResp(code, params);
+        }
     }
 
     @Override
@@ -77,12 +88,17 @@ public class MobServer implements Runnable {
                     boolean firstTime = true;
 
                     while (accept.isConnected()) {
-                        String command;
+                        DebugCommand command;
                         synchronized (locker) {
                             while (commands.size() > 0) {
-                                command = commands.poll();
-                                stream.write(command + "\n");
-                                stream.flush();
+                                if (currentCommandWaitForResp == null) {
+                                    command = commands.poll();
+                                    command.setDebugProcess(listener);
+                                    command.write(stream);
+                                    stream.write("\n");
+                                    stream.flush();
+                                    currentCommandWaitForResp = command;
+                                }
                             }
                             if (firstTime) {
                                 firstTime = false;
@@ -118,6 +134,10 @@ public class MobServer implements Runnable {
     }
 
     public void addCommand(String command) {
+        addCommand(new DefaultCommand(command));
+    }
+
+    public void addCommand(DebugCommand command) {
         synchronized (locker) {
             commands.add(command);
         }
