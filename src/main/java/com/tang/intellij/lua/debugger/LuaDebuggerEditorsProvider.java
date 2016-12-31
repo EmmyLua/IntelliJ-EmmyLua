@@ -8,6 +8,8 @@ import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.tang.intellij.lua.lang.LuaFileType;
+import com.tang.intellij.lua.psi.LuaElementFactory;
+import com.tang.intellij.lua.psi.LuaFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +30,9 @@ public class LuaDebuggerEditorsProvider extends XDebuggerEditorsProvider {
                                    @NotNull String s,
                                    @Nullable XSourcePosition xSourcePosition,
                                    @NotNull EvaluationMode evaluationMode) {
-        PsiDocumentManager documentManager = PsiDocumentManager.getInstance(project);
-        return null;
+        LuaFile file = LuaElementFactory.createFile(project, s);
+        Document document = PsiDocumentManager.getInstance(project).getDocument(file);
+        assert document != null;
+        return document;
     }
 }

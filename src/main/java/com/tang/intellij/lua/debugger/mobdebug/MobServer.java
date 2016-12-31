@@ -1,13 +1,19 @@
 package com.tang.intellij.lua.debugger.mobdebug;
 
-import java.io.BufferedReader;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.util.io.BaseOutputReader;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.PriorityQueue;
+import java.util.concurrent.Future;
 
 /**
  *
@@ -19,13 +25,34 @@ public class MobServer implements Runnable {
         void handleResp(int code, String[] params);
     }
 
+    class LuaDebugReader extends BaseOutputReader {
+        LuaDebugReader(@NotNull InputStream inputStream, @Nullable Charset charset) {
+            super(inputStream, charset);
+            start(getClass().getName());
+        }
+
+        @Override
+        protected void onTextAvailable(@NotNull String s) {
+            String[] list = s.split(" ");
+            String[] params = Arrays.copyOfRange(list, 1, list.length - 1);
+            int code = Integer.parseInt(list[0]);
+            MobServer.this.listener.handleResp(code, params);
+        }
+
+        @NotNull
+        @Override
+        protected Future<?> executeOnPooledThread(@NotNull Runnable runnable) {
+            return ApplicationManager.getApplication().executeOnPooledThread(runnable);
+        }
+    }
+
     private final Object locker = new Object();
     private ServerSocket server;
     private Thread thread;
     private Thread threadSend;
-    private Thread threadRecv;
     private Listener listener;
     private PriorityQueue<String> commands = new PriorityQueue<>();
+    private LuaDebugReader debugReader;
 
     public MobServer(Listener listener) {
         this.listener = listener;
@@ -42,6 +69,8 @@ public class MobServer implements Runnable {
     public void run() {
         try {
             final Socket accept = server.accept();
+            debugReader = new LuaDebugReader(accept.getInputStream(), Charset.defaultCharset());
+
             threadSend = new Thread(() -> {
                 try {
                     OutputStreamWriter stream = new OutputStreamWriter(accept.getOutputStream());
@@ -62,39 +91,25 @@ public class MobServer implements Runnable {
                             }
                         }
                     }
+
+                    System.out.println("disconnect");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             });
             threadSend.start();
-
-            threadRecv = new Thread(() -> {
-                try {
-                    InputStreamReader reader = new InputStreamReader(accept.getInputStream());
-                    BufferedReader bufferedReader = new BufferedReader(reader);
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        String[] list = line.split(" ");
-                        int code = Integer.parseInt(list[0]);
-                        String[] params = Arrays.copyOfRange(list, 1, list.length);
-                        listener.handleResp(code, params);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            threadRecv.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void stop() {
-        thread.interrupt();
+        if (thread != null)
+            thread.interrupt();
         if (threadSend != null)
             threadSend.interrupt();
-        if (threadRecv != null)
-            threadRecv.interrupt();
+        if (debugReader != null)
+            debugReader.stop();
         try {
             server.close();
         } catch (IOException e) {

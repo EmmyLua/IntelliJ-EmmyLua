@@ -96,6 +96,7 @@ public class LuaDebugProcess extends XDebugProcess implements MobServer.Listener
         switch (code) {
             case 202:
                 getSession().breakpointReached(breakpoint, "test", new LuaSuspendContext());
+                getSession().showExecutionPoint();
                 break;
         }
     }

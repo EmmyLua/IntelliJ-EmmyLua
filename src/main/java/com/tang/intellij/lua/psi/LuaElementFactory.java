@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by TangZX on 2016/11/24.
  */
 public class LuaElementFactory {
-    private static LuaFile createFile(Project project, String content) {
+    public static LuaFile createFile(Project project, String content) {
         String name = "dummy.lua";
         return (LuaFile) PsiFileFactory.getInstance(project).
                 createFileFromText(name, LuaLanguage.INSTANCE, content);
