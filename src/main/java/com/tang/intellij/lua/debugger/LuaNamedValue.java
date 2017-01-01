@@ -2,7 +2,7 @@ package com.tang.intellij.lua.debugger;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.frame.*;
 import com.tang.intellij.lua.debugger.commands.EvaluatorCommand;
 import com.tang.intellij.lua.lang.LuaIcons;
@@ -26,7 +26,7 @@ public class LuaNamedValue extends XNamedValue {
     private LuaNamedValue(String name, String desc, String type) {
         super(name);
 
-        if (!Objects.equals(type, "string")) {
+        if (!Objects.equals(type, "string") && desc.startsWith("\"")) {
             desc = desc.substring(1, desc.length() - 1);
         }
         this.desc = desc;
@@ -100,24 +100,23 @@ public class LuaNamedValue extends XNamedValue {
     }
 
     static LuaNamedValue createEvalValue(String name, String result) {
-        //do local _={"{name = \"aaa\"} --[[table: 00D5E990]]"};return _;end
-        //do local _={"function() --[[..skipped..]] end --[[function: 00B5CBF0]]"};return _;en
         Pattern pattern = Pattern.compile("\\{\"(.+)--\\[\\[(.+?)\\]\\]\"\\};return _;end");
         Matcher matcher = pattern.matcher(result);
         if (matcher.find()) {
-            String desc = matcher.group(2);
-            String type = "table";
-            if (desc.startsWith("function"))
-                type = "function";
-            return new LuaNamedValue(name, desc, type);
+            String tblString = matcher.group(1);
+            tblString = tblString.replace("\\\"", "\"");
+            Project project = LuaDebugProcess.getCurrent().getSession().getProject();
+            LuaFile file = LuaElementFactory.createFile(project, "local a = " + tblString);
+            LuaTableConstructor tableConstructor = PsiTreeUtil.findChildOfType(file, LuaTableConstructor.class);
+            return createEvalValue(tableConstructor);
         }
 
         //do local _={"123"};return _;end
-        pattern = Pattern.compile("\\{\"(.+)\"\\};return _;end");
+        /*pattern = Pattern.compile("\\{\"(.+)\"\\};return _;end");
         matcher = pattern.matcher(result);
         if (matcher.find()) {
             return new LuaNamedValue(name, matcher.group(1), "string");
-        }
+        }*/
         return new LuaNamedValue(name, "nil", "string");
     }
 

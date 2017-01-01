@@ -15,13 +15,14 @@ public class EvaluatorCommand extends DefaultCommand {
 
     private static String createExpr(String chunk, boolean getChildren) {
         String serFN = "local function se(o, children) " +
-                "if type(o) == 'string' then return { o, 'string' } " +
-                "elseif type(o) == 'number' then return { o, 'number' } " +
-                "elseif type(o) == 'table' then if not children then return { tostring(o), 'table' } end; " +
+                "if type(o) == 'string' then return { nil, o, 'string' } " +
+                "elseif type(o) == 'number' then return { nil, o, 'number' } " +
+                "elseif type(o) == 'table' then if not children then return { nil, tostring(o), 'table' } end; " +
                     "local r = {} " +
                     "for k, v in pairs(o) do " +
                         "r[k] = { k, tostring(v), type(v) } " +
                     "end return r " +
+                "elseif type(o) == 'function' then return { nil, tostring(o), 'function' } " +
                 "end end ";
         String exec = String.format("local function exec() %s end local data = exec() return se(data, %b)", chunk, getChildren);
         return serFN + exec;
