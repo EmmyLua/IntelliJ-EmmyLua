@@ -31,9 +31,7 @@ public class DefaultCommand extends DebugCommand {
 
     @Override
     public final boolean handle(String data) {
-        if (handleLines == 0) {
-
-        }
+        data = data.replace("--[[..skipped..]]", "");
         handle(handleLines, data);
         return requireRespLines == ++handleLines;
     }

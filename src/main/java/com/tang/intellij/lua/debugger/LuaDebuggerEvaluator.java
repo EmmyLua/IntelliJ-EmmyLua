@@ -13,7 +13,9 @@ import org.jetbrains.annotations.Nullable;
 public class LuaDebuggerEvaluator extends XDebuggerEvaluator {
     @Override
     public void evaluate(@NotNull String s, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
-        EvaluatorCommand evaluatorCommand = new EvaluatorCommand(s, xEvaluationCallback);
+        EvaluatorCommand evaluatorCommand = new EvaluatorCommand("return " + s, false, data -> {
+            xEvaluationCallback.evaluated(LuaNamedValue.createEvalValue(s, data));
+        });
         evaluatorCommand.exec();
     }
 }
