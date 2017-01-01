@@ -1,9 +1,12 @@
 package com.tang.intellij.lua.debugger;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.*;
+import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.tang.intellij.lua.debugger.commands.EvaluatorCommand;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.*;
@@ -22,13 +25,15 @@ public class LuaNamedValue extends XNamedValue {
 
     private String desc;
     private String type;
+    private XSourcePosition parentPosition;
 
-    private LuaNamedValue(String name, String desc, String type) {
+    private LuaNamedValue(XSourcePosition psiFile, String name, String desc, String type) {
         super(name);
 
         if (!Objects.equals(type, "string") && desc.startsWith("\"")) {
             desc = desc.substring(1, desc.length() - 1);
         }
+        this.parentPosition = psiFile;
         this.desc = desc;
         this.type = type;
     }
@@ -39,11 +44,20 @@ public class LuaNamedValue extends XNamedValue {
     }
 
     @Override
+    public void computeSourcePosition(@NotNull XNavigatable xNavigatable) {
+        if (parentPosition != null) {
+            VirtualFile file = parentPosition.getFile();
+            XSourcePosition position = XSourcePositionImpl.create(file, 3);
+            xNavigatable.setSourcePosition(position);
+        }
+    }
+
+    @Override
     public void computeChildren(@NotNull XCompositeNode node) {
         if (Objects.equals("table", type)) {
             String expr = "return " + getName();
             EvaluatorCommand command = new EvaluatorCommand(expr, true, (data)->{
-                XValueChildrenList list = createEvalValueList(data);
+                XValueChildrenList list = createEvalValueList(parentPosition, data);
                 if (list == null) list = XValueChildrenList.EMPTY;
                 node.addChildren(list, true);
             });
@@ -51,14 +65,14 @@ public class LuaNamedValue extends XNamedValue {
         } else super.computeChildren(node);
     }
 
-    public static LuaNamedValue createStack(LuaTableField info) {
+    public static LuaNamedValue createStack(XSourcePosition parentPosition, LuaTableField info) {
         String name = info.getName();
         assert name != null;
 
         VariableVisitor visitor = new VariableVisitor();
         info.acceptChildren(visitor);
 
-        return new LuaNamedValue(name, visitor.objectDesc, visitor.objectType);
+        return new LuaNamedValue(parentPosition, name, visitor.objectDesc, visitor.objectType);
     }
 
     static PsiElement getValueElement(LuaTableField field) {
@@ -99,7 +113,7 @@ public class LuaNamedValue extends XNamedValue {
         }
     }
 
-    static LuaNamedValue createEvalValue(String name, String result) {
+    static LuaNamedValue createEvalValue(XSourcePosition parentPosition, String name, String result) {
         Pattern pattern = Pattern.compile("\\{\"(.+)--\\[\\[(.+?)\\]\\]\"\\};return _;end");
         Matcher matcher = pattern.matcher(result);
         if (matcher.find()) {
@@ -108,7 +122,7 @@ public class LuaNamedValue extends XNamedValue {
             Project project = LuaDebugProcess.getCurrent().getSession().getProject();
             LuaFile file = LuaElementFactory.createFile(project, "local a = " + tblString);
             LuaTableConstructor tableConstructor = PsiTreeUtil.findChildOfType(file, LuaTableConstructor.class);
-            return createEvalValue(tableConstructor);
+            return createEvalValue(parentPosition, tableConstructor);
         }
 
         //do local _={"123"};return _;end
@@ -117,11 +131,11 @@ public class LuaNamedValue extends XNamedValue {
         if (matcher.find()) {
             return new LuaNamedValue(name, matcher.group(1), "string");
         }*/
-        return new LuaNamedValue(name, "nil", "string");
+        return new LuaNamedValue(parentPosition, name, "nil", "string");
     }
 
     //{\"table: 00AD00A8\", \"table\"}
-    private static LuaNamedValue createEvalValue(LuaTableConstructor tableConstructor) {
+    private static LuaNamedValue createEvalValue(XSourcePosition parentPosition, LuaTableConstructor tableConstructor) {
         LuaFieldList fieldList = tableConstructor.getFieldList();
         assert fieldList != null;
         List<LuaTableField> list = fieldList.getTableFieldList();
@@ -133,10 +147,10 @@ public class LuaNamedValue extends XNamedValue {
         if (name.startsWith("\"")) name = name.substring(1, name.length() - 1);
         if (type.startsWith("\"")) type = type.substring(1, type.length() - 1);
 
-        return new LuaNamedValue(name, value, type);
+        return new LuaNamedValue(parentPosition, name, value, type);
     }
 
-    private static XValueChildrenList createEvalValueList(String result) {
+    private static XValueChildrenList createEvalValueList(XSourcePosition psiFile, String result) {
         Pattern pattern = Pattern.compile("\\{\"(.+)--\\[\\[(.+?)\\]\\]\"\\};return _;end");
         Matcher matcher = pattern.matcher(result);
         if (matcher.find()) {
@@ -144,7 +158,7 @@ public class LuaNamedValue extends XNamedValue {
             tblString = tblString.replace("\\\"", "\"");
             Project project = LuaDebugProcess.getCurrent().getSession().getProject();
             LuaFile file = LuaElementFactory.createFile(project, "local a = " + tblString);
-            ValueListVisitor visitor = new ValueListVisitor();
+            ValueListVisitor visitor = new ValueListVisitor(psiFile);
             file.acceptChildren(visitor);
             return visitor.list;
         }
@@ -156,6 +170,12 @@ public class LuaNamedValue extends XNamedValue {
 
         XValueChildrenList list = new XValueChildrenList();
         int level;
+        private XSourcePosition parentPosition;
+
+        ValueListVisitor(XSourcePosition parentPosition) {
+
+            this.parentPosition = parentPosition;
+        }
 
         @Override
         public void visitElement(PsiElement element) {
@@ -166,7 +186,7 @@ public class LuaNamedValue extends XNamedValue {
         public void visitTableConstructor(@NotNull LuaTableConstructor o) {
             level++;
             if (level == 2)
-                list.add(createEvalValue(o));
+                list.add(createEvalValue(parentPosition, o));
             else
                 visitPsiElement(o);
             level--;

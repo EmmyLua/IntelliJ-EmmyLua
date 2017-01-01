@@ -144,7 +144,7 @@ public class GetStackCommand extends DebugCommand {
                     }
                     stackInfoIndex++;
                 } else {
-                    stackFrame.addValue(LuaNamedValue.createStack(o));
+                    stackFrame.addValue(LuaNamedValue.createStack(stackFrame.getSourcePosition(), o));
                 }
             } else super.visitTableField(o);
         }
