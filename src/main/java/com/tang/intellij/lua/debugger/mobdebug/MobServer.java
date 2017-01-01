@@ -46,7 +46,7 @@ public class MobServer implements Runnable {
     private final Object locker = new Object();
     private ServerSocket server;
     private Thread thread;
-    private Thread threadSend;
+    private Future threadSend;
     private LuaDebugProcess listener;
     private Queue<DebugCommand> commands = new LinkedList<>();
     private LuaDebugReader debugReader;
@@ -82,7 +82,7 @@ public class MobServer implements Runnable {
             final Socket accept = server.accept();
             debugReader = new LuaDebugReader(accept.getInputStream(), Charset.defaultCharset());
 
-            threadSend = new Thread(() -> {
+            threadSend = ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
                     OutputStreamWriter stream = new OutputStreamWriter(accept.getOutputStream());
                     boolean firstTime = true;
@@ -98,6 +98,8 @@ public class MobServer implements Runnable {
                                     stream.write("\n");
                                     stream.flush();
                                     currentCommandWaitForResp = command;
+                                } else {
+                                    Thread.sleep(5);
                                 }
                             }
                             if (firstTime) {
@@ -113,17 +115,17 @@ public class MobServer implements Runnable {
                     e.printStackTrace();
                 }
             });
-            threadSend.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public void stop() {
+        currentCommandWaitForResp = null;
         if (thread != null)
             thread.interrupt();
         if (threadSend != null)
-            threadSend.interrupt();
+            threadSend.cancel(true);
         if (debugReader != null)
             debugReader.stop();
         try {
