@@ -116,7 +116,7 @@ public class GetStackCommand extends DebugCommand {
                     if (psiFiles.length > 0) {
                         PsiFile file = psiFiles[0];
                         XSourcePosition position = XSourcePositionImpl.create(file.getVirtualFile(), line - 1);
-                        stackFrame = new LuaStackFrame(position);
+                        stackFrame = new LuaStackFrame(functionName, position);
                         stackFrameList.add(stackFrame);
                     }
                     return;
@@ -132,13 +132,18 @@ public class GetStackCommand extends DebugCommand {
                 String text = o.getText();
                 if (stackChildIndex == 0) {
                     switch (stackInfoIndex) {
-                        case 0: functionName = text.substring(1, text.length() - 1); break;
+                        case 0:
+                            if (text.startsWith("\""))
+                                functionName = text.substring(1, text.length() - 1);
+                            else
+                                functionName = text;
+                            break;
                         case 1: fileName = text.substring(1, text.length() - 1); break;
                         case 3: line = Integer.parseInt(text); break;
                     }
                     stackInfoIndex++;
                 } else {
-                    stackFrame.addValue(new LuaNamedValue(text));
+                    stackFrame.addValue(LuaNamedValue.create(o));
                 }
             } else super.visitTableField(o);
         }
