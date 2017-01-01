@@ -1,8 +1,14 @@
 package com.tang.intellij.lua.debugger;
 
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.*;
@@ -47,8 +53,24 @@ public class LuaNamedValue extends XNamedValue {
     public void computeSourcePosition(@NotNull XNavigatable xNavigatable) {
         if (parentPosition != null) {
             VirtualFile file = parentPosition.getFile();
-            XSourcePosition position = XSourcePositionImpl.create(file, 3);
-            xNavigatable.setSourcePosition(position);
+            Project project = LuaDebugProcess.getCurrent().getSession().getProject();
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+            FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(file);
+
+            if (psiFile != null && editor instanceof TextEditor) {
+                TextEditor textEditor = (TextEditor) editor;
+                Document document = textEditor.getEditor().getDocument();
+                int lineEndOffset = document.getLineStartOffset(parentPosition.getLine());
+                PsiElement element = psiFile.findElementAt(lineEndOffset);
+                LuaPsiTreeUtil.walkUpLocalNameDef(element, nameDef -> {
+                    if (myName.equals(nameDef.getName())) {
+                        XSourcePosition position = XSourcePositionImpl.createByElement(nameDef);
+                        xNavigatable.setSourcePosition(position);
+                        return false;
+                    }
+                    return true;
+                });
+            }
         }
     }
 
