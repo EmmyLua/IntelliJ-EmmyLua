@@ -64,9 +64,8 @@ public class MobServer implements Runnable {
     }
 
     private void onResp(String data) {
-        data = data.substring(0, data.length() - 1);
-        if (currentCommandWaitForResp != null) {
-            currentCommandWaitForResp.handle(data);
+        data = data.trim();
+        if (currentCommandWaitForResp != null && currentCommandWaitForResp.handle(data)) {
             currentCommandWaitForResp = null;
         } else {
             String[] list = data.split(" ");

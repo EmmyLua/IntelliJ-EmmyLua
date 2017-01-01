@@ -34,7 +34,7 @@ public class GetStackCommand extends DebugCommand {
     }
 
     @Override
-    public void handle(String data) {
+    public boolean handle(String data) {
         Pattern pattern = Pattern.compile("(\\d+) (\\w+) (.+)");
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
@@ -54,6 +54,7 @@ public class GetStackCommand extends DebugCommand {
                 debugProcess.setStack(new LuaExecutionStack(stackVisitor.stackFrameList));
             });
         }
+        return true;
     }
 
     class StackVisitor extends LuaVisitor {

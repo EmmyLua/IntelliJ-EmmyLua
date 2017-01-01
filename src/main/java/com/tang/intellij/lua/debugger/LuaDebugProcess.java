@@ -9,6 +9,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
+import com.tang.intellij.lua.debugger.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.commands.GetStackCommand;
 import com.tang.intellij.lua.debugger.mobdebug.MobServer;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public class LuaDebugProcess extends XDebugProcess {
 
     LuaDebugProcess(@NotNull XDebugSession session) {
         super(session);
+        current = this;
         editorsProvider = new LuaDebuggerEditorsProvider();
         mobServer = new MobServer(this);
         try {
@@ -35,6 +37,12 @@ public class LuaDebugProcess extends XDebugProcess {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static LuaDebugProcess current;
+
+    public static LuaDebugProcess getCurrent() {
+        return current;
     }
 
     @NotNull
@@ -96,7 +104,7 @@ public class LuaDebugProcess extends XDebugProcess {
     public void handleResp(int code, String[] params) {
         switch (code) {
             case 202:
-                mobServer.addCommand(new GetStackCommand());
+                runCommand(new GetStackCommand());
                 break;
         }
     }
@@ -106,5 +114,9 @@ public class LuaDebugProcess extends XDebugProcess {
             getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(stack));
             getSession().showExecutionPoint();
         });
+    }
+
+    public void runCommand(DebugCommand command) {
+        mobServer.addCommand(command);
     }
 }

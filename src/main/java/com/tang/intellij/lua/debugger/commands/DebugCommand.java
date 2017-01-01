@@ -18,5 +18,5 @@ public abstract class DebugCommand {
     }
 
     public abstract void write(OutputStreamWriter writer) throws IOException;
-    public abstract void handle(String data);
+    public abstract boolean handle(String data);
 }

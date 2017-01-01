@@ -1,5 +1,7 @@
 package com.tang.intellij.lua.debugger.commands;
 
+import com.tang.intellij.lua.debugger.LuaDebugProcess;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
@@ -10,10 +12,16 @@ import java.io.OutputStreamWriter;
 public class DefaultCommand extends DebugCommand {
 
     private String commandline;
+    private int requireRespLines;
+    private int handleLines;
 
     public DefaultCommand(String commandline) {
+        this(commandline, 1);
+    }
 
+    public DefaultCommand(String commandline, int requireRespLines) {
         this.commandline = commandline;
+        this.requireRespLines = requireRespLines;
     }
 
     @Override
@@ -22,7 +30,19 @@ public class DefaultCommand extends DebugCommand {
     }
 
     @Override
-    public void handle(String data) {
+    public final boolean handle(String data) {
+        if (handleLines == 0) {
 
+        }
+        handle(handleLines, data);
+        return requireRespLines == ++handleLines;
+    }
+
+    protected void handle(int index, String data) {
+
+    }
+
+    public void exec() {
+        LuaDebugProcess.getCurrent().runCommand(this);
     }
 }

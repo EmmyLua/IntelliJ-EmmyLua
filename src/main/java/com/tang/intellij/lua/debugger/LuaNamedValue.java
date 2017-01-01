@@ -17,7 +17,7 @@ public class LuaNamedValue extends XNamedValue {
 
     private String desc;
 
-    private LuaNamedValue(String name, String desc) {
+    public LuaNamedValue(String name, String desc) {
         super(name);
         this.desc = desc;
     }
