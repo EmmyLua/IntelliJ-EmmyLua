@@ -10,6 +10,7 @@ import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.tang.intellij.lua.debugger.LuaDebugProcess;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
+import com.tang.intellij.lua.debugger.LuaNamedValue;
 import com.tang.intellij.lua.debugger.LuaStackFrame;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -26,11 +27,6 @@ import java.util.regex.Pattern;
  * Created by tangzx on 2016/12/31.
  */
 public class GetStackCommand extends DebugCommand {
-    private String[] pauseInfo;
-
-    public GetStackCommand(String[] params) {
-        pauseInfo = params;
-    }
 
     @Override
     public void write(OutputStreamWriter writer) throws IOException {
@@ -55,19 +51,7 @@ public class GetStackCommand extends DebugCommand {
                 StackVisitor stackVisitor = new StackVisitor(debugProcess);
                 firstChild.accept(stackVisitor);
 
-                //top frame
-                List<LuaStackFrame> list = new ArrayList<>();
-                Project project = debugProcess.getSession().getProject();
-                PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, pauseInfo[1], new ProjectAndLibrariesScope(project));
-                if (psiFiles.length > 0) {
-                    int line = Integer.parseInt(pauseInfo[2]);
-                    PsiFile pauseFile = psiFiles[0];
-                    XSourcePosition position = XSourcePositionImpl.create(pauseFile.getVirtualFile(), line - 1);
-                    list.add(new LuaStackFrame(position));
-                }
-                list.addAll(stackVisitor.stackFrameList);
-
-                debugProcess.setStack(new LuaExecutionStack(list));
+                debugProcess.setStack(new LuaExecutionStack(stackVisitor.stackFrameList));
             });
         }
     }
@@ -101,9 +85,9 @@ public class GetStackCommand extends DebugCommand {
         public void visitTableConstructor(@NotNull LuaTableConstructor o) {
             tableLevel++;
             if (tableLevel == 2) {
-                isStackData = true;
                 stackChildIndex = -1;
             } else if (tableLevel == 3) {
+                isStackData = true;
                 stackChildIndex++;
             }
 
@@ -112,7 +96,7 @@ public class GetStackCommand extends DebugCommand {
                 visitFieldList(fieldList);
             }
 
-            if (tableLevel == 2) {
+            if (tableLevel == 3) {
                 isStackData = false;
             }
 
@@ -145,20 +129,18 @@ public class GetStackCommand extends DebugCommand {
         @Override
         public void visitTableField(@NotNull LuaTableField o) {
             if (isStackData) {
+                String text = o.getText();
                 if (stackChildIndex == 0) {
-                    String text = o.getText();
                     switch (stackInfoIndex) {
                         case 0: functionName = text.substring(1, text.length() - 1); break;
                         case 1: fileName = text.substring(1, text.length() - 1); break;
                         case 3: line = Integer.parseInt(text); break;
                     }
                     stackInfoIndex++;
-                    return;
-                } else if (stackChildIndex == 2) {
-                    //todo
+                } else {
+                    stackFrame.addValue(new LuaNamedValue(text));
                 }
-            }
-            super.visitTableField(o);
+            } else super.visitTableField(o);
         }
     }
 }

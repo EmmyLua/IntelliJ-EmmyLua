@@ -96,7 +96,7 @@ public class LuaDebugProcess extends XDebugProcess {
     public void handleResp(int code, String[] params) {
         switch (code) {
             case 202:
-                mobServer.addCommand(new GetStackCommand(params));
+                mobServer.addCommand(new GetStackCommand());
                 break;
         }
     }
