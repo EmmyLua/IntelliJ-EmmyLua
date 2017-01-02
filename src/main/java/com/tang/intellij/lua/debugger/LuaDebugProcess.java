@@ -104,7 +104,7 @@ public class LuaDebugProcess extends XDebugProcess {
     public void handleResp(int code, String[] params) {
         switch (code) {
             case 202:
-                runCommand(new GetStackCommand());
+                runCommand(new GetStackCommand(params));
                 break;
         }
     }

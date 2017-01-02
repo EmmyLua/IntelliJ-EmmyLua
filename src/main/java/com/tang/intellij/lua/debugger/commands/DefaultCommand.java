@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
 public class DefaultCommand extends DebugCommand {
 
     private String commandline;
-    private int requireRespLines;
+    protected int requireRespLines;
     private int handleLines;
 
     public DefaultCommand(String commandline) {
@@ -34,6 +34,11 @@ public class DefaultCommand extends DebugCommand {
         data = data.replace("--[[..skipped..]]", "");
         handle(handleLines, data);
         return requireRespLines == ++handleLines;
+    }
+
+    @Override
+    public int getRequireRespLines() {
+        return requireRespLines;
     }
 
     protected void handle(int index, String data) {

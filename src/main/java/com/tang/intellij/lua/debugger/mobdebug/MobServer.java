@@ -96,7 +96,8 @@ public class MobServer implements Runnable {
                                     command.write(stream);
                                     stream.write("\n");
                                     stream.flush();
-                                    currentCommandWaitForResp = command;
+                                    if (command.getRequireRespLines() > 0)
+                                        currentCommandWaitForResp = command;
                                 } else {
                                     Thread.sleep(5);
                                 }

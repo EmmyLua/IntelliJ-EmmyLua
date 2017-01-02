@@ -15,8 +15,6 @@ import com.tang.intellij.lua.debugger.LuaStackFrame;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,15 +24,30 @@ import java.util.regex.Pattern;
  *
  * Created by tangzx on 2016/12/31.
  */
-public class GetStackCommand extends DebugCommand {
+public class GetStackCommand extends DefaultCommand {
 
-    @Override
-    public void write(OutputStreamWriter writer) throws IOException {
-        writer.write("STACK");
+    private boolean hasError;
+    private String[] params;
+
+    public GetStackCommand(String[] params) {
+        super("STACK", 1);
+        this.params = params;
     }
 
     @Override
-    public boolean handle(String data) {
+    protected void handle(int index, String data) {
+        if (hasError) {
+            new DefaultCommand("SUSPEND", 0).exec();
+            debugProcess.setStack(new LuaExecutionStack(new ArrayList<>()));
+            return;
+        }
+
+        if (data.startsWith("401")) {
+            hasError = true;
+            requireRespLines++;
+            return;
+        }
+
         Pattern pattern = Pattern.compile("(\\d+) (\\w+) (.+)");
         Matcher matcher = pattern.matcher(data);
         if (matcher.find()) {
@@ -54,7 +67,6 @@ public class GetStackCommand extends DebugCommand {
                 debugProcess.setStack(new LuaExecutionStack(stackVisitor.stackFrameList));
             });
         }
-        return true;
     }
 
     class StackVisitor extends LuaVisitor {
@@ -67,7 +79,6 @@ public class GetStackCommand extends DebugCommand {
         String functionName;
         String fileName;
         int line;
-        int col;
 
         private List<LuaStackFrame> stackFrameList = new ArrayList<>();
         private LuaDebugProcess process;

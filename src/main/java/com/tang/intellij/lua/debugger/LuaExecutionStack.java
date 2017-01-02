@@ -17,7 +17,8 @@ public class LuaExecutionStack extends XExecutionStack {
     public LuaExecutionStack(List<LuaStackFrame> stackFrameList) {
         super("LuaStack");
         this.stackFrameList = stackFrameList;
-        frame = stackFrameList.get(0);
+        if (!stackFrameList.isEmpty())
+            frame = stackFrameList.get(0);
     }
 
     @Nullable
