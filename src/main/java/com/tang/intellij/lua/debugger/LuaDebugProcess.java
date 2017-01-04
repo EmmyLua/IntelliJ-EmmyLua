@@ -1,6 +1,11 @@
 package com.tang.intellij.lua.debugger;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -88,8 +93,25 @@ public class LuaDebugProcess extends XDebugProcess {
         this.breakpoint = breakpoint;
         XSourcePosition sourcePosition = breakpoint.getSourcePosition();
         if (sourcePosition != null) {
-            String shortFilePath = breakpoint.getShortFilePath();
-            mobServer.addCommand(String.format("SETB %s %d", shortFilePath, sourcePosition.getLine() + 1));
+            Project project = getSession().getProject();
+            VirtualFile file = sourcePosition.getFile();
+            String fileFullUrl = file.getUrl();
+            String fileShortUrl = null;
+
+            Module[] modules = ModuleManager.getInstance(project).getModules();
+            moduleLoop: for (Module module : modules) {
+                VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+                for (VirtualFile sourceRoot : sourceRoots) {
+                    String sourceRootUrl = sourceRoot.getUrl();
+                    if (fileFullUrl.startsWith(sourceRootUrl)) {
+                        fileShortUrl = fileFullUrl.substring(sourceRootUrl.length() + 1);
+                        System.out.println(fileShortUrl);
+                        break moduleLoop;
+                    }
+                }
+            }
+
+            mobServer.addCommand(String.format("SETB %s %d", fileShortUrl, sourcePosition.getLine() + 1));
         }
     }
 
