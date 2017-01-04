@@ -1,10 +1,7 @@
 package com.tang.intellij.lua.debugger;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
@@ -17,6 +14,7 @@ import com.intellij.xdebugger.frame.XSuspendContext;
 import com.tang.intellij.lua.debugger.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.commands.GetStackCommand;
 import com.tang.intellij.lua.debugger.mobdebug.MobServer;
+import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -95,23 +93,10 @@ public class LuaDebugProcess extends XDebugProcess {
         if (sourcePosition != null) {
             Project project = getSession().getProject();
             VirtualFile file = sourcePosition.getFile();
-            String fileFullUrl = file.getUrl();
-            String fileShortUrl = null;
-
-            Module[] modules = ModuleManager.getInstance(project).getModules();
-            moduleLoop: for (Module module : modules) {
-                VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
-                for (VirtualFile sourceRoot : sourceRoots) {
-                    String sourceRootUrl = sourceRoot.getUrl();
-                    if (fileFullUrl.startsWith(sourceRootUrl)) {
-                        fileShortUrl = fileFullUrl.substring(sourceRootUrl.length() + 1);
-                        System.out.println(fileShortUrl);
-                        break moduleLoop;
-                    }
-                }
+            String fileShortUrl = LuaFileUtil.getShortUrl(project, file);
+            if (fileShortUrl != null) {
+                mobServer.addCommand(String.format("SETB %s %d", fileShortUrl, sourcePosition.getLine() + 1));
             }
-
-            mobServer.addCommand(String.format("SETB %s %d", fileShortUrl, sourcePosition.getLine() + 1));
         }
     }
 

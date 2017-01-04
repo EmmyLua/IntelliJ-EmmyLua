@@ -2,10 +2,8 @@ package com.tang.intellij.lua.debugger.commands;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.search.FilenameIndex;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.tang.intellij.lua.debugger.LuaDebugProcess;
@@ -119,15 +117,14 @@ public class GetStackCommand extends DefaultCommand {
         public void visitFieldList(@NotNull LuaFieldList o) {
             if (isStackData) {
                 if (stackChildIndex == 0) {
-                    System.out.println(o.getText());
+                    //System.out.println(o.getText());
                     stackInfoIndex = 0;
                     super.visitFieldList(o);
 
                     Project project = process.getSession().getProject();
-                    PsiFile[] psiFiles = FilenameIndex.getFilesByName(project, fileName, new ProjectAndLibrariesScope(project));
-                    if (psiFiles.length > 0) {
-                        PsiFile file = psiFiles[0];
-                        XSourcePosition position = XSourcePositionImpl.create(file.getVirtualFile(), line - 1);
+                    VirtualFile virtualFile = LuaFileUtil.findFile(project, fileName);
+                    if (virtualFile != null) {
+                        XSourcePosition position = XSourcePositionImpl.create(virtualFile, line - 1);
                         stackFrame = new LuaStackFrame(functionName, position);
                         stackFrameList.add(stackFrame);
                     }
