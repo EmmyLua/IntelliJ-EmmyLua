@@ -41,7 +41,7 @@ STRING=[^\r\n\t\f]*
 ID=[A-Za-z0-9_]+
 AT=@
 //三个-以上
-DOC_DASHES = ----*
+DOC_DASHES = --+
 
 %state xTAG
 %state xTAG_NAME
@@ -50,7 +50,8 @@ DOC_DASHES = ----*
 %%
 
 <YYINITIAL> {
-    {WHITE_SPACE}              { return com.intellij.psi.TokenType.WHITE_SPACE; }
+    {EOL}                      { yybegin(YYINITIAL); return com.intellij.psi.TokenType.WHITE_SPACE;}
+    {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
     {DOC_DASHES}               { return DASHES; }
     "@"                        { yybegin(xTAG_NAME); return AT; }
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
@@ -58,7 +59,7 @@ DOC_DASHES = ----*
 
 <xTAG, xTAG_NAME> {
     {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
-    {LINE_WS}                  { return com.intellij.psi.TokenType.WHITE_SPACE; }
+    {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
 }
 
 <xTAG_NAME> {
@@ -85,5 +86,5 @@ DOC_DASHES = ----*
 }
 
 <xCOMMENT_STRING> {
- {STRING}                   { yybegin(YYINITIAL); return STRING; }
+    {STRING}                   { yybegin(YYINITIAL); return STRING; }
 }
