@@ -101,7 +101,7 @@ block ::= chunk
 private lazy_block ::= <<lazyBlock>>
 
 private stat ::=
-    funcCall |
+    funcCallExpr |
     assignStat |
     doStat |
     whileStat |
@@ -174,7 +174,10 @@ nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
-valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | funcCall | var | parenExpr
+valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | var | parenExpr
+
+// 最终产生 call expr | index expr | nameRef
+var ::= callOrIndexExpr | nameRef
 
 expr ::= unaryExpr | binaryExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
 
@@ -182,27 +185,15 @@ parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
 binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
 
-private prefixExpr ::= '(' expr ')' | nameRef
-
-private checkIndexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 }
-
-left indexExpr ::= '[' expr ']' | '.' ID {
-    pin(".*") = 1
-    methods = [guessPrefixType]
-}
-
-private check_args ::= STRING | <<fastCheckArgs>> | <<fastCheckTable>>
-private checkCallExpr ::= check_args | ':' ID check_args { pin(".*") = 1 }
-
+left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 methods = [guessPrefixType] }
 left callExpr ::= args | ':' ID args { pin(".*") = 1 methods = [guessPrefixType resolveFuncBodyOwner getFirstStringArg] }
 
-private suffixIndexExpr ::= callExpr | <<repeat checkIndexExpr 2>> indexExpr
-// 最终产生 index expr | nameRef
-var ::= prefixExpr (suffixIndexExpr)* indexExpr | nameRef
-
-private suffixCallExpr ::= <<repeat checkCallExpr 2>> callExpr | indexExpr
-// 最终产生 callExpr
-private funcCall ::= (prefixExpr (suffixCallExpr)*) callExpr
+private suffixExpr ::=  callExpr | indexExpr
+private prefixExpr ::= parenExpr | nameRef
+// 最终产生 callExpr | indexExpr
+private callOrIndexExpr ::= prefixExpr suffixExpr+
+// callExpr
+private funcCallExpr ::= callOrIndexExpr <<checkCallExpr>>
 
 args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
     pin(".*") = 1

@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.psi;
 
+import com.intellij.lang.LighterASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.WhitespacesAndCommentsBinder;
 import com.intellij.lang.WhitespacesBinders;
@@ -29,6 +30,11 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         }
         marker.rollbackTo();
         return r;
+    }
+
+    public static boolean checkCallExpr(PsiBuilder builder_, int level_) {
+        LighterASTNode marker = builder_.getLatestDoneMarker();
+        return marker != null && marker.getTokenType() == LuaTypes.CALL_EXPR;
     }
 
     public static boolean fastCheckArgs(PsiBuilder builder_, int level_) {
