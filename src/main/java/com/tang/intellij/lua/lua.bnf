@@ -186,7 +186,12 @@ unaryExpr ::= unaryOp expr { pin = 1 }
 binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
 
 left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 methods = [guessPrefixType] }
-left callExpr ::= args | ':' ID args { pin(".*") = 1 methods = [guessPrefixType resolveFuncBodyOwner getFirstStringArg] }
+
+args ::=  '(' (exprList)? ')' | tableConstructor | STRING { pin(".*") = 1 }
+private callExpr1 ::= args
+private callExpr2 ::= '.' ID args
+private callExpr3 ::= ':' ID args { pin = 1 }
+left callExpr ::= callExpr1 | callExpr2 | callExpr3 { methods = [guessPrefixType resolveFuncBodyOwner getFirstStringArg] }
 
 private suffixExpr ::=  callExpr | indexExpr
 private prefixExpr ::= parenExpr | nameRef
@@ -194,10 +199,6 @@ private prefixExpr ::= parenExpr | nameRef
 private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr
 private funcCallExpr ::= callOrIndexExpr <<checkCallExpr>>
-
-args ::=  '(' (exprList)? ')' | tableConstructor | STRING {
-    pin(".*") = 1
-}
 
 lambdaFuncDef ::= 'function' funcBody {
     pin = 1
