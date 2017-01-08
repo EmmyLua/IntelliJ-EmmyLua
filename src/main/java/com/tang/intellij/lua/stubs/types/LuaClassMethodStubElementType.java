@@ -37,6 +37,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         PsiElement id = luaClassMethodFuncDef.getNameIdentifier();
         PsiElement prefix = methodName.getNameRef();
         assert prefix != null;
+        assert id != null;
         String clazzName = resolveClassName(prefix.getText(), luaClassMethodFuncDef);
 
         PsiElement prev = id.getPrevSibling();
