@@ -18,10 +18,11 @@ import static com.tang.intellij.lua.editor.completion.LuaCompletionContributor.s
 public class ClassMethodCompletionProvider extends CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
-        PsiElement element = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
+        PsiElement element = completionParameters.getPosition();//ID
+        PsiElement parent = element.getParent();
 
-        if (element != null) {
-            LuaCallExpr callExpr = (LuaCallExpr) element.getParent();
+        if (parent instanceof LuaCallExpr) {
+            LuaCallExpr callExpr = (LuaCallExpr) parent;
             LuaTypeSet luaTypeSet = callExpr.guessPrefixType();
             if (luaTypeSet != null) {
                 luaTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet, false));

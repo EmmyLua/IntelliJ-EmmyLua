@@ -31,10 +31,10 @@ import static com.intellij.patterns.PlatformPatterns.psiElement;
  */
 public class LuaCompletionContributor extends CompletionContributor {
 
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_METHOD = psiElement().afterLeaf(
-            psiElement().withText(":").withParent(LuaCallExpr.class));
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_FIELD = psiElement().afterLeaf(
-            psiElement().withText(".").withParent(LuaIndexExpr.class));
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_METHOD = psiElement(LuaTypes.ID)
+            .withParent(LuaCallExpr.class);
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_FIELD = psiElement(LuaTypes.ID)
+            .withParent(LuaIndexExpr.class);
     private static final PsiElementPattern.Capture<PsiElement> IN_COMMENT = psiElement().inside(psiElement().withElementType(LuaTypes.DOC_COMMENT));
     private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement().withParent(LuaClassMethodName.class);
     private static final PsiElementPattern.Capture<PsiElement> SHOW_PATH = psiElement(LuaTypes.STRING).inside(
