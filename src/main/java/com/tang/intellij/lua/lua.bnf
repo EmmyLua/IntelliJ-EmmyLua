@@ -193,7 +193,8 @@ binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
 
 left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 methods = [guessPrefixType] }
 
-args ::=  '(' (exprList)? ')' | tableConstructor | STRING { pin(".*") = 1 }
+arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }
+args ::=  '(' (arg_expr_list)? ')' | tableConstructor | STRING { pin(".*") = 1 }
 private callExpr1 ::= args
 private callExpr2 ::= '.' ID args
 private callExpr3 ::= ':' ID args { pin = 1 }

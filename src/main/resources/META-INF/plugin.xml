@@ -95,9 +95,14 @@
                          level="ERROR"
                          groupName="Lua"/>
         <localInspection implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalAssignCanBeSimpler"
-                         displayName="Local Assign can be simpler"
+                         displayName="Local assign can be simpler"
                          enabledByDefault="true"
                          groupName="Lua"/>
+        <localInspection
+                displayName="Lua Standard Compliance"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaStandardComplianceInspection"/>
     </extensions>
 
     <application-components>
