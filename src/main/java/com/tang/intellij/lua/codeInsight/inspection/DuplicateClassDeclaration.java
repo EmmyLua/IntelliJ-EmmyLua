@@ -4,6 +4,7 @@ import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalInspectionToolSession;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
@@ -24,11 +25,11 @@ public class DuplicateClassDeclaration extends LocalInspectionTool {
         return new LuaDocVisitor() {
             @Override
             public void visitClassDef(@NotNull LuaDocClassDef o) {
-                String name = o.getName();
-                if (name != null) {
-                    Collection<LuaDocClassDef> classDefs = LuaClassIndex.getInstance().get(name, o.getProject(), new ProjectAndLibrariesScope(o.getProject()));
+                PsiElement identifier = o.getNameIdentifier();
+                if (identifier != null) {
+                    Collection<LuaDocClassDef> classDefs = LuaClassIndex.getInstance().get(identifier.getText(), o.getProject(), new ProjectAndLibrariesScope(o.getProject()));
                     if (classDefs.size() > 1) {
-                        holder.registerProblem(o.getNameIdentifier(), "Duplicate class", ProblemHighlightType.ERROR);
+                        holder.registerProblem(identifier, "Duplicate class", ProblemHighlightType.ERROR);
                     }
                 }
             }
