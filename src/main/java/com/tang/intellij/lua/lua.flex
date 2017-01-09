@@ -12,9 +12,42 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
         this(null);
     }
 
-    private int nBlockEQ = 0;
-    public boolean checkAhead(char c, int offset) {
+    private int nBrackets = 0;
+    private boolean checkAhead(char c, int offset) {
         return this.zzMarkedPos >= this.zzBuffer.length()?false:this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
+    }
+
+    private boolean checkBlock() {
+        nBrackets = 0;
+        if (checkAhead('[', 0)) {
+            int n = 0;
+            while (checkAhead('=', n + 1)) n++;
+            if (checkAhead('[', n + 1)) {
+                nBrackets = n;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int checkBlockRedundant() {
+        int redundant = 0;
+        if (nBrackets > 0) {
+            String cs = yytext().toString();
+            int n = 0;
+            while (cs.charAt(cs.length() - n - 2) == '=') n++;
+
+            if (n != nBrackets) {//invalid
+                redundant = -1;
+            } else {
+                StringBuilder s = new StringBuilder("]");
+                for (int i = 0; i < n; i++) s.append('=');
+                s.append(']');
+                int index = cs.indexOf(s.toString());
+                redundant = yylength() - index - nBrackets - 2;
+            }
+        }
+        return redundant;
     }
 %}
 
@@ -37,10 +70,7 @@ exp=[Ee][+-]?{n}
 NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 
 //Comments
-//[[ 与 ]] 中间的内容
-SS=([^\]]|\][^\]])*
-//--[[]]
-BLOCK_COMMENT=--\[=*\[{SS}\]=*\]
+BLOCK_COMMENT=--\[=*\[.*\]=*\]
 SHORT_COMMENT=--.*
 DOC_COMMENT=----*.*(\n---*.*)*
 
@@ -48,10 +78,11 @@ DOC_COMMENT=----*.*(\n---*.*)*
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
 SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 //[[]]
-LONG_STRING=\[=*\[{SS}\]\]
+LONG_STRING=\[=*\[.*\]=*\]
 
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
+%state xBLOCK_STRING
 %state xCOMMENT
 %state xBLOCK_COMMENT
 
@@ -59,15 +90,7 @@ LONG_STRING=\[=*\[{SS}\]\]
 <YYINITIAL> {
   {WHITE_SPACE}               { return com.intellij.psi.TokenType.WHITE_SPACE; }
   "--"                        {
-        boolean block = false;
-        if (checkAhead('[', 0)) {
-            int n = 0;
-            while (checkAhead('=', n + 1)) n++;
-            if (checkAhead('[', n + 1)) {
-                block = true;
-                nBlockEQ = n;
-            }
-        }
+        boolean block = checkBlock();
         if (block) { yypushback(yylength()); yybegin(xBLOCK_COMMENT); }
         else { yypushback(yylength()); yybegin(xCOMMENT); }
    }
@@ -123,7 +146,7 @@ LONG_STRING=\[=*\[{SS}\]\]
 
   "\""                        { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
   "'"                         { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
-  {LONG_STRING}               { return STRING; }
+  \[=*\[                      { yybegin(xBLOCK_STRING); yypushback(yylength()); checkBlock(); }
 
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
@@ -138,16 +161,10 @@ LONG_STRING=\[=*\[{SS}\]\]
 
 <xBLOCK_COMMENT> {
     {BLOCK_COMMENT}           {
-        boolean valid = true;
-        if (nBlockEQ > 0) {
-            CharSequence cs = yytext();
-            int n = 0;
-            while (cs.charAt(cs.length() - n - 2) == '=') n++;
-            if (n != nBlockEQ) {
-                valid = false;
-            }
-        }
-        if (valid) { yybegin(YYINITIAL);return BLOCK_COMMENT; }
+        int redundant = checkBlockRedundant();
+        if (redundant != -1) {
+            yypushback(redundant);
+            yybegin(YYINITIAL);return BLOCK_COMMENT; }
         else { yypushback(yylength()); yybegin(xCOMMENT); }
     }
     [^] { yypushback(yylength()); yybegin(xCOMMENT); }
@@ -159,4 +176,14 @@ LONG_STRING=\[=*\[{SS}\]\]
 
 <xSINGLE_QUOTED_STRING> {
     {SINGLE_QUOTED_STRING}    { yybegin(YYINITIAL); return STRING; }
+}
+
+<xBLOCK_STRING> {
+    {LONG_STRING}             {
+        int redundant = checkBlockRedundant();
+        if (redundant != -1) {
+            yypushback(redundant);
+        }
+        yybegin(YYINITIAL); return STRING;
+    }
 }
