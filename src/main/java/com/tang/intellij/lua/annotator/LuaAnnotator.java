@@ -52,7 +52,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitClassMethodName(@NotNull LuaClassMethodName o) {
-            Annotation annotation = myHolder.createInfoAnnotation(o, null);
+            Annotation annotation = myHolder.createInfoAnnotation(o.getId(), null);
             annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_METHOD);
         }
 
