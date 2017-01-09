@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.editor;
 
+import com.intellij.codeHighlighting.RainbowHighlighter;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
@@ -9,6 +10,7 @@ import com.intellij.openapi.options.colors.ColorSettingsPage;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,6 +39,20 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Table Fields", LuaHighlightingData.TABLE_FIELD)
     };
 
+    @NonNls
+    private static final Map<String, TextAttributesKey> ourTags;
+    static {
+        ourTags = RainbowHighlighter.createRainbowHLM();
+        ourTags.put("Parameters", LuaHighlightingData.PARAMETER);
+        ourTags.put("docTag", LuaHighlightingData.DOC_COMMENT_TAG);
+        ourTags.put("docTagValue", LuaHighlightingData.DOC_COMMENT_TAG_VALUE);
+        ourTags.put("localVar", LuaHighlightingData.LOCAL_VAR);
+        ourTags.put("globalVar", LuaHighlightingData.GLOBAL_VAR);
+        ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION);
+        ourTags.put("tableField", LuaHighlightingData.TABLE_FIELD);
+        ourTags.put("localVar", LuaHighlightingData.PARAMETER);
+    }
+
     @Nullable
     @Override
     public Icon getIcon() {
@@ -52,25 +68,26 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
     @NotNull
     @Override
     public String getDemoText() {
-        return "local var = nil -- a short comment\n" +
+        return "local <localVar>var</localVar> = nil -- a short comment\n" +
                 "--- doc comment\n" +
-                "--- @param par1 Par1Type @some strings\n" +
-                "function var:fun(par1, par2)\n" +
+                "--- @param <docTag>par1<docTag> Par1Type @some strings\n" +
+                "function var:fun(<Parameters>par1</Parameters>, <Parameters>par2</Parameters>)\n" +
                 "   return self.len + 2\n" +
                 "end\n" +
                 "\n" +
-                "function globalFun()\n" +
+                "function <globalFunction>globalFun</globalFunction>()\n" +
                 "   return \"string\"\n" +
                 "end\n" +
-                "globalVar = {\n" +
-                "   property = value\n" +
+                "\n" +
+                "<globalVar>globalVar</globalVar> = {\n" +
+                "   <tableField>property</tableField> = value\n" +
                 "}\n";
     }
 
     @Nullable
     @Override
     public Map<String, TextAttributesKey> getAdditionalHighlightingTagToDescriptorMap() {
-        return null;
+        return ourTags;
     }
 
     @NotNull
