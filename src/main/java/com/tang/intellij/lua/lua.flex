@@ -1,15 +1,15 @@
 package com.tang.intellij.lua.lexer;
-import com.intellij.lexer.*;
+
+import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.psi.LuaTokenType;
+
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 %%
 
 %{
-  private StringBuilder string = new StringBuilder();
   public _LuaLexer() {
-    this((java.io.Reader)null);
+    this(null);
   }
 %}
 
