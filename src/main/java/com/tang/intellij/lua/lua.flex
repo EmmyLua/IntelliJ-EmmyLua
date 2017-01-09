@@ -8,9 +8,14 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 %%
 
 %{
-  public _LuaLexer() {
-    this(null);
-  }
+    public _LuaLexer() {
+        this(null);
+    }
+
+    private int nBlockEQ = 0;
+    public boolean checkAhead(char c, int offset) {
+        return this.zzMarkedPos >= this.zzBuffer.length()?false:this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
+    }
 %}
 
 %public
@@ -35,7 +40,7 @@ NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 //[[ 与 ]] 中间的内容
 SS=([^\]]|\][^\]])*
 //--[[]]
-BLOCK_COMMENT=--+\[\[{SS}\]\]
+BLOCK_COMMENT=--\[=*\[{SS}\]=*\]
 SHORT_COMMENT=--.*
 DOC_COMMENT=----*.*(\n---*.*)*
 
@@ -47,13 +52,25 @@ LONG_STRING=\[=*\[{SS}\]\]
 
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
+%state xCOMMENT
+%state xBLOCK_COMMENT
 
 %%
 <YYINITIAL> {
   {WHITE_SPACE}               { return com.intellij.psi.TokenType.WHITE_SPACE; }
-  {BLOCK_COMMENT}             { return BLOCK_COMMENT; }
-  {DOC_COMMENT}               { return DOC_COMMENT; }
-  {SHORT_COMMENT}             { return SHORT_COMMENT; }
+  "--"                        {
+        boolean block = false;
+        if (checkAhead('[', 0)) {
+            int n = 0;
+            while (checkAhead('=', n + 1)) n++;
+            if (checkAhead('[', n + 1)) {
+                block = true;
+                nBlockEQ = n;
+            }
+        }
+        if (block) { yypushback(yylength()); yybegin(xBLOCK_COMMENT); }
+        else { yypushback(yylength()); yybegin(xCOMMENT); }
+   }
   "and"                       { return AND; }
   "break"                     { return BREAK; }
   "do"                        { return DO; }
@@ -112,6 +129,28 @@ LONG_STRING=\[=*\[{SS}\]\]
   {NUMBER}                    { return NUMBER; }
 
   [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<xCOMMENT> {
+    {DOC_COMMENT}             {yybegin(YYINITIAL);return DOC_COMMENT;}
+    {SHORT_COMMENT}           {yybegin(YYINITIAL);return SHORT_COMMENT;}
+}
+
+<xBLOCK_COMMENT> {
+    {BLOCK_COMMENT}           {
+        boolean valid = true;
+        if (nBlockEQ > 0) {
+            CharSequence cs = yytext();
+            int n = 0;
+            while (cs.charAt(cs.length() - n - 2) == '=') n++;
+            if (n != nBlockEQ) {
+                valid = false;
+            }
+        }
+        if (valid) { yybegin(YYINITIAL);return BLOCK_COMMENT; }
+        else { yypushback(yylength()); yybegin(xCOMMENT); }
+    }
+    [^] { yypushback(yylength()); yybegin(xCOMMENT); }
 }
 
 <xDOUBLE_QUOTED_STRING> {
