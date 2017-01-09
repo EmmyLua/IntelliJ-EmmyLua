@@ -1,8 +1,6 @@
 package com.tang.intellij.lua.highlighting;
 
-import com.intellij.execution.process.ConsoleHighlighter;
 import com.intellij.lexer.Lexer;
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
@@ -11,8 +9,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocTokenType;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
-
-import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
 /**
  * Created by tangzx
@@ -55,9 +51,6 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaDocTypes.FIELD
     );
 
-    private static final TextAttributesKey KEYWORD = createTextAttributesKey("LUA_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
-    private static final TextAttributesKey NUMBER = createTextAttributesKey("LUA_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
-
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
@@ -68,23 +61,29 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType type) {
         if (KEYWORD_TOKENS.contains(type))
-            return pack(KEYWORD);
+            return pack(LuaHighlightingData.KEYWORD);
         else if (type == LuaTypes.NUMBER)
-            return pack(NUMBER);
+            return pack(LuaHighlightingData.NUMBER);
         else if (type == LuaTypes.STRING)
-            return pack(DefaultLanguageHighlighterColors.STRING);
+            return pack(LuaHighlightingData.STRING);
+        else if (type == LuaTypes.BINARY_OP || type == LuaTypes.UNARY_OP)
+            return pack(LuaHighlightingData.OPERATORS);
+        else if (type == LuaTypes.LBRACK || type == LuaTypes.RBRACK)
+            return pack(LuaHighlightingData.BRACKETS);
+        else if (type == LuaTypes.LCURLY || type == LuaTypes.RCURLY)
+            return pack(LuaHighlightingData.BRACES);
         else if (PRIMITIVE_TYPE_SET.contains(type))
-            return pack(ConsoleHighlighter.CYAN_BRIGHT);
+            return pack(LuaHighlightingData.PRIMITIVE_TYPE);
         else if (type == LuaTypes.SELF)
             return pack(LuaHighlightingData.SELF);
 
         // for comment
         else if (type == LuaTypes.SHORT_COMMENT || type == LuaTypes.BLOCK_COMMENT)
-            return pack(DefaultLanguageHighlighterColors.LINE_COMMENT);
+            return pack(LuaHighlightingData.LINE_COMMENT);
         else if (DOC_KEYWORD_TOKENS.contains(type))
-            return pack(LuaHighlightingData.LUADOC_TAG);
+            return pack(LuaHighlightingData.DOC_COMMENT_TAG);
         else if (type instanceof LuaDocTokenType)
-            return pack(DefaultLanguageHighlighterColors.DOC_COMMENT);
+            return pack(LuaHighlightingData.DOC_COMMENT);
 
         return new TextAttributesKey[0];
     }

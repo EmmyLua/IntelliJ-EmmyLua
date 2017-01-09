@@ -68,6 +68,8 @@
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
 
+        <colorSettingsPage implementation="com.tang.intellij.lua.editor.LuaColorSettingsPage"/>
+
         <programRunner implementation="com.tang.intellij.lua.debugger.LuaDebuggerRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.LuaConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>

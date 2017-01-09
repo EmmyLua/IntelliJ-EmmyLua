@@ -46,7 +46,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement name = o.getNameIdentifier();
             if (name != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(name, null);
-                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTIION);
+                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTION);
             }
         }
 
@@ -74,7 +74,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
             } else if (res instanceof LuaGlobalFuncDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
-                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTIION);
+                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTION);
             } else if (res instanceof LuaNameDef) { //Local
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
@@ -105,14 +105,14 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement id = o.getNameIdentifier();
             if (id != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(id, null);
-                annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
+                annotation.setTextAttributes(LuaHighlightingData.DOC_COMMENT_TAG_VALUE);
             }
         }
 
         @Override
         public void visitParamNameRef(@NotNull LuaDocParamNameRef o) {
             Annotation annotation = myHolder.createInfoAnnotation(o, null);
-            annotation.setTextAttributes(DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
+            annotation.setTextAttributes(LuaHighlightingData.DOC_COMMENT_TAG_VALUE);
         }
     }
 }
