@@ -54,7 +54,7 @@
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCommentCompletionContributor"/>
         <codeInsight.lineMarkerProvider language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaLineMarkerProvider"/>
         <codeInsight.parameterNameHints language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterHintsProvider"/>
-        <!--<codeInsight.parameterInfo language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterInfoHandler"/>-->
+        <codeInsight.parameterInfo language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterInfoHandler"/>
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterHandlerDelegate" />
         <backspaceHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaBackspaceHandlerDelegate"/>
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />

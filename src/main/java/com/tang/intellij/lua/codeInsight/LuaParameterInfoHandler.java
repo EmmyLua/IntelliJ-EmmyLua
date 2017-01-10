@@ -47,9 +47,8 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
     }
 
     @Override
-    public void showParameterInfo(@NotNull LuaArgs luaPsiElement, @NotNull CreateParameterInfoContext context) {
-
-        context.showHint(luaPsiElement, luaPsiElement.getTextRange().getStartOffset() + 1, this);
+    public void showParameterInfo(@NotNull LuaArgs args, @NotNull CreateParameterInfoContext context) {
+        context.showHint(args, args.getTextRange().getStartOffset() + 1, this);
     }
 
     @Nullable
@@ -62,9 +61,10 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
     @Override
     public void updateParameterInfo(@NotNull LuaArgs args, @NotNull UpdateParameterInfoContext context) {
         LuaExprList exprList = args.getExprList();
-        int index = ParameterInfoUtils.getCurrentParameterIndex(exprList.getNode(), context.getOffset(), LuaTypes.COMMA);
-        System.out.println(index);
-        context.setCurrentParameter(index);
+        if (exprList != null) {
+            int index = ParameterInfoUtils.getCurrentParameterIndex(exprList.getNode(), context.getOffset(), LuaTypes.COMMA);
+            context.setCurrentParameter(index);
+        }
     }
 
     @Nullable
