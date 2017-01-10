@@ -8,7 +8,11 @@ import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.codeInsight.template.macro.SuggestVariableNameMacro;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.LuaTypes;
 
 import java.util.List;
 
@@ -18,6 +22,21 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
 
     @Override
     public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
+        int startOffset = insertionContext.getStartOffset();
+        PsiElement element = insertionContext.getFile().findElementAt(startOffset);
+        if (element != null) {
+            element = element.getNextSibling();
+            while (element instanceof PsiWhiteSpace) {
+                element = element.getNextSibling();
+            }
+            if (element != null) {
+                IElementType type = element.getNode().getElementType();
+                if (type == LuaTypes.LPAREN || type == LuaTypes.ARGS) {
+                    return;
+                }
+            }
+        }
+
         List<LuaParamNameDef> paramNameDefList = getParams();
         if (paramNameDefList != null) {
             TemplateManager manager = TemplateManager.getInstance(insertionContext.getProject());
