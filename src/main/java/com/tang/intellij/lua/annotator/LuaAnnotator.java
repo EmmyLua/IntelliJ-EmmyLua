@@ -4,7 +4,11 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.searches.ReferencesSearch;
+import com.intellij.util.Query;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.psi.*;
@@ -35,9 +39,16 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         @Override
         public void visitLocalFuncDef(@NotNull LuaLocalFuncDef o) {
             PsiElement name = o.getNameIdentifier();
+
             if (name != null) {
-                Annotation annotation = myHolder.createInfoAnnotation(name, null);
-                annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                Query<PsiReference> search = ReferencesSearch.search(o);
+                if (search.findFirst() == null) {
+                    Annotation annotation = myHolder.createWarningAnnotation(name, "Unused local function");
+                    annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
+                } else {
+                    Annotation annotation = myHolder.createInfoAnnotation(name, null);
+                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                }
             }
         }
 
@@ -58,8 +69,23 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitParamNameDef(@NotNull LuaParamNameDef o) {
-            Annotation annotation = myHolder.createInfoAnnotation(o, null);
-            annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
+            Query<PsiReference> search = ReferencesSearch.search(o);
+            if (search.findFirst() == null) {
+                Annotation annotation = myHolder.createWarningAnnotation(o, "Unused parameter : " + o.getText());
+                annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
+            } else {
+                Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
+            }
+        }
+
+        @Override
+        public void visitNameDef(@NotNull LuaNameDef o) {
+            Query<PsiReference> search = ReferencesSearch.search(o);
+            if (search.findFirst() == null) {
+                Annotation annotation = myHolder.createWarningAnnotation(o, "Unused local : " + o.getText());
+                annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
+            }
         }
 
         @Override
