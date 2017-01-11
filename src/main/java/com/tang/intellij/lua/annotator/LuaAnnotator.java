@@ -73,8 +73,8 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
             Query<PsiReference> search = ReferencesSearch.search(o);
             if (search.findFirst() == null) {
-                Annotation annotation = myHolder.createInfoAnnotation(o, "Unused parameter : " + o.getText());
-                annotation.setTextAttributes(CodeInsightColors.WEAK_WARNING_ATTRIBUTES);
+                myHolder.createInfoAnnotation(o, "Unused parameter : " + o.getText());
+                //annotation.setTextAttributes(CodeInsightColors.WEAK_WARNING_ATTRIBUTES);
             } else {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
