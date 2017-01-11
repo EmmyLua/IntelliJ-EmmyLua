@@ -2,7 +2,7 @@ package com.tang.intellij.lua.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-
+import com.intellij.psi.TokenType;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 %%
@@ -31,22 +31,14 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
     }
 
     private int checkBlockRedundant() {
-        int redundant = 0;
-        if (nBrackets > 0) {
-            String cs = yytext().toString();
-            int n = 0;
-            while (cs.charAt(cs.length() - n - 2) == '=') n++;
-
-            if (n != nBrackets) {//invalid
-                redundant = -1;
-            } else {
-                StringBuilder s = new StringBuilder("]");
-                for (int i = 0; i < n; i++) s.append('=');
-                s.append(']');
-                int index = cs.indexOf(s.toString());
-                redundant = yylength() - index - nBrackets - 2;
-            }
-        }
+        int redundant = -1;
+        String cs = yytext().toString();
+        StringBuilder s = new StringBuilder("]");
+        for (int i = 0; i < nBrackets; i++) s.append('=');
+        s.append(']');
+        int index = cs.indexOf(s.toString());
+        if (index > 0)
+            redundant = yylength() - index - nBrackets - 2;
         return redundant;
     }
 %}
@@ -70,7 +62,7 @@ exp=[Ee][+-]?{n}
 NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 
 //Comments
-BLOCK_COMMENT=--\[=*\[.*\]=*\]
+BLOCK_COMMENT=--\[=*\[[\s\S]*\]=*\]
 SHORT_COMMENT=--.*
 DOC_COMMENT=----*.*(\n---*.*)*
 
@@ -78,7 +70,7 @@ DOC_COMMENT=----*.*(\n---*.*)*
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
 SINGLE_QUOTED_STRING='([^\\'\r\n]|\\[^\r\n])*'?
 //[[]]
-LONG_STRING=\[=*\[.*\]=*\]
+LONG_STRING=\[=*\[[\s\S]*\]=*\]
 
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
@@ -88,7 +80,7 @@ LONG_STRING=\[=*\[.*\]=*\]
 
 %%
 <YYINITIAL> {
-  {WHITE_SPACE}               { return com.intellij.psi.TokenType.WHITE_SPACE; }
+  {WHITE_SPACE}               { return TokenType.WHITE_SPACE; }
   "--"                        {
         boolean block = checkBlock();
         if (block) { yypushback(yylength()); yybegin(xBLOCK_COMMENT); }
@@ -151,7 +143,7 @@ LONG_STRING=\[=*\[.*\]=*\]
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
 
-  [^] { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+  [^] { return TokenType.BAD_CHARACTER; }
 }
 
 <xCOMMENT> {
@@ -183,7 +175,9 @@ LONG_STRING=\[=*\[.*\]=*\]
         int redundant = checkBlockRedundant();
         if (redundant != -1) {
             yypushback(redundant);
+            yybegin(YYINITIAL); return STRING;
+        } else {
+            yybegin(YYINITIAL); return TokenType.BAD_CHARACTER;
         }
-        yybegin(YYINITIAL); return STRING;
     }
 }
