@@ -24,7 +24,7 @@ public class LuaPsiTreeUtil {
 
         for(PsiElement child = parent; child != null; child = child.getPrevSibling()) {
             if (cls.isInstance(child)) {
-                if (!processor.accept((T) child)) {
+                if (!processor.accept(cls.cast(child))) {
                     break;
                 }
             }
