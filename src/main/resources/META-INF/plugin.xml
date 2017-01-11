@@ -118,7 +118,7 @@
 
     <actions>
         <action class="com.tang.intellij.lua.actions.CreateLuaFileAction"
-                text="New Lua File"
+                text="Lua File"
                 id="lua.newFile">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
