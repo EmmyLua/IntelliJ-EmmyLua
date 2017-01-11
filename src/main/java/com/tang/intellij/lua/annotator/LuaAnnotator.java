@@ -69,10 +69,12 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitParamNameDef(@NotNull LuaParamNameDef o) {
+            if (o.textMatches("self")) return;
+
             Query<PsiReference> search = ReferencesSearch.search(o);
             if (search.findFirst() == null) {
-                Annotation annotation = myHolder.createWarningAnnotation(o, "Unused parameter : " + o.getText());
-                annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
+                Annotation annotation = myHolder.createInfoAnnotation(o, "Unused parameter : " + o.getText());
+                annotation.setTextAttributes(CodeInsightColors.WEAK_WARNING_ATTRIBUTES);
             } else {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
