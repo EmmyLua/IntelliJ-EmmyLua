@@ -10,6 +10,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBody;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -23,10 +24,17 @@ public class CreateReturnDocIntention extends ClassMethodBasedIntention {
         return comment == null || PsiTreeUtil.getChildrenOfType(comment, LuaDocReturnDef.class) != null;
     }
 
+    @Nls
+    @NotNull
+    @Override
+    public String getFamilyName() {
+        return getText();
+    }
+
     @NotNull
     @Override
     public String getText() {
-        return "Create Return Declaration";
+        return "Create return declaration";
     }
 
     @Override
@@ -45,7 +53,7 @@ public class CreateReturnDocIntention extends ClassMethodBasedIntention {
                 editor.getCaretModel().moveToOffset(comment.getTextOffset() + comment.getTextLength());
             } else {
                 template.addTextSegment("\n");
-                editor.getCaretModel().moveToOffset(methodDef.getTextOffset());
+                editor.getCaretModel().moveToOffset(methodDef.getNode().getStartOffset());
             }
             templateManager.startTemplate(editor, template);
         }

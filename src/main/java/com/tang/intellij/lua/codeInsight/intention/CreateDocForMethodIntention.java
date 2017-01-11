@@ -8,6 +8,7 @@ import com.intellij.openapi.editor.Editor;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBody;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
+import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -22,10 +23,17 @@ public class CreateDocForMethodIntention extends ClassMethodBasedIntention {
         return methodDef.getComment() == null || methodDef.getFuncBody() == null;
     }
 
+    @Nls
+    @NotNull
+    @Override
+    public String getFamilyName() {
+        return getText();
+    }
+
     @NotNull
     @Override
     public String getText() {
-        return "Create Doc";
+        return "Create doc";
     }
 
     @Override
@@ -43,14 +51,12 @@ public class CreateDocForMethodIntention extends ClassMethodBasedIntention {
                 template.addTextSegment(String.format("\n---@param %s ", parDef.getName()));
                 template.addVariable(parDef.getName(), typeSuggest, new TextExpression("table"), false);
             }
-            //return
-            /*template.addTextSegment("\n---@return ");
-            template.addVariable("returnType", typeSuggest, new TextExpression("table"), false);*/
 
             template.addEndVariable();
             template.addTextSegment("\n");
 
-            editor.getCaretModel().moveToOffset(methodDef.getTextOffset());
+            int textOffset = methodDef.getNode().getStartOffset();
+            editor.getCaretModel().moveToOffset(textOffset);
             templateManager.startTemplate(editor, template);
         }
     }

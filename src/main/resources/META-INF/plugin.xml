@@ -76,20 +76,24 @@
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
 
         <intentionAction>
-            <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocIntentionAction</className>
-            <descriptionDirectoryName>Create Parameter Doc</descriptionDirectoryName>
+            <category>Lua</category>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocIntention</className>
+            <descriptionDirectoryName>CreateParamDocIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
-            <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeDeclarationIntentionAction</className>
-            <descriptionDirectoryName>Create Type Declaration</descriptionDirectoryName>
+            <category>Lua</category>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeDeclarationIntention</className>
+            <descriptionDirectoryName>CreateTypeDeclarationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateReturnDocIntention</className>
-            <descriptionDirectoryName>Create Return Declaration</descriptionDirectoryName>
+            <descriptionDirectoryName>CreateReturnDocIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateDocForMethodIntention</className>
-            <descriptionDirectoryName>Create Doc For Method</descriptionDirectoryName>
+            <descriptionDirectoryName>CreateDocForMethodIntention</descriptionDirectoryName>
         </intentionAction>
 
         <localInspection implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
