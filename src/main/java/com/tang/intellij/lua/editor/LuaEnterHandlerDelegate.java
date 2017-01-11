@@ -2,11 +2,13 @@ package com.tang.intellij.lua.editor;
 
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -35,7 +37,12 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
     }
 
     @Override
-    public Result preprocessEnter(@NotNull PsiFile psiFile, @NotNull Editor editor, @NotNull Ref<Integer> caretOffsetRef, @NotNull Ref<Integer> caretAdvance, @NotNull DataContext dataContext, @Nullable EditorActionHandler editorActionHandler) {
+    public Result preprocessEnter(@NotNull PsiFile psiFile,
+                                  @NotNull Editor editor,
+                                  @NotNull Ref<Integer> caretOffsetRef,
+                                  @NotNull Ref<Integer> caretAdvance,
+                                  @NotNull DataContext dataContext,
+                                  @Nullable EditorActionHandler editorActionHandler) {
         int caretOffset = caretOffsetRef.get();
 
         //inside comment
@@ -72,12 +79,15 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
                 document.insertString(caretOffset, "\n" + endType.toString());
                 Project project = element.getProject();
 
+                final TextRange textRange = range.getTextRange();
                 PsiDocumentManager.getInstance(project).commitDocument(document);
-                CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
-                styleManager.adjustLineIndent(psiFile, range.getTextRange());
-                KeywordInsertHandler.autoIndent(endType, psiFile, project, document, caretOffset);
+                ApplicationManager.getApplication().runWriteAction(()-> {
+                    CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
+                    styleManager.adjustLineIndent(psiFile, textRange);
+                    KeywordInsertHandler.autoIndent(endType, psiFile, project, document, caretOffset);
+                });
+                return Result.Stop;
             }
-            return Result.DefaultForceIndent;
         }
 
         return Result.Continue;
