@@ -33,11 +33,11 @@ public class LuaFileStubElementType extends IStubFileElementType<LuaFileStub> {
                 return super.createStubForFile(file);
             }
 
-            @Override
+            /*@Override
             public boolean skipChildProcessingWhenBuildingStubs(@NotNull ASTNode parent, @NotNull ASTNode node) {
                 IElementType type = node.getElementType();
                 return type == LuaTypes.BLOCK;
-            }
+            }*/
         };
     }
 

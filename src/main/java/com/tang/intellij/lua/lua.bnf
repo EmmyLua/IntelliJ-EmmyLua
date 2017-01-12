@@ -234,7 +234,7 @@ private callOrIndexExpr ::= prefixExpr suffixExpr+
 private funcCallExpr ::= callOrIndexExpr <<checkCallExpr>>
 
 lambdaFuncDef ::= 'function' funcBody {
-    pin = 1
+    pin = 2
     methods = [getParamNameDefList]
 }
 
