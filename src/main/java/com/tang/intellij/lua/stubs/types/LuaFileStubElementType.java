@@ -1,6 +1,6 @@
 package com.tang.intellij.lua.stubs.types;
 
-import com.intellij.psi.PsiElement;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.StubBuilder;
 import com.intellij.psi.stubs.DefaultStubBuilder;
@@ -34,12 +34,9 @@ public class LuaFileStubElementType extends IStubFileElementType<LuaFileStub> {
             }
 
             @Override
-            protected boolean skipChildProcessingWhenBuildingStubs(@NotNull PsiElement parent, @NotNull PsiElement element) {
-                IElementType type = element.getNode().getElementType();
-                if (type == LuaTypes.BLOCK) {
-                    return true;
-                }
-                return false;
+            public boolean skipChildProcessingWhenBuildingStubs(@NotNull ASTNode parent, @NotNull ASTNode node) {
+                IElementType type = node.getElementType();
+                return type == LuaTypes.BLOCK;
             }
         };
     }

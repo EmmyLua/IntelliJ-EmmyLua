@@ -4,6 +4,7 @@ import com.intellij.psi.stubs.PsiFileStubImpl;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.tang.intellij.lua.lang.LuaParserDefinition;
 import com.tang.intellij.lua.psi.LuaFile;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -14,6 +15,7 @@ public class LuaFileStub extends PsiFileStubImpl<LuaFile> {
         super(file);
     }
 
+    @NotNull
     @Override
     public IStubFileElementType getType() {
         return LuaParserDefinition.FILE;
