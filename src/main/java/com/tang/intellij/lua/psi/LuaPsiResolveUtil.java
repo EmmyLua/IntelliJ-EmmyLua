@@ -9,6 +9,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaAnonymousType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.lang.type.LuaTypeTable;
@@ -192,6 +193,9 @@ public class LuaPsiResolveUtil {
                         }
                     }
                 }
+
+                //anonymous
+                return LuaTypeSet.create(LuaAnonymousType.create(nameDef));
             }
         }
         return null;
@@ -225,5 +229,9 @@ public class LuaPsiResolveUtil {
             }
         }
         return null;
+    }
+
+    public static String getAnonymousType(LuaNameDef nameDef) {
+        return nameDef.getName();
     }
 }

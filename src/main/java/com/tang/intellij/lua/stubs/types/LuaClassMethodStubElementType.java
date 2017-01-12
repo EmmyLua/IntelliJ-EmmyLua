@@ -115,6 +115,8 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
                             clazzNameToSearch = classDef.getName();
                             return false;
                         }
+                    } else {
+                        clazzNameToSearch = LuaPsiResolveUtil.getAnonymousType(nameDef);
                     }
                     return false;
                 }
