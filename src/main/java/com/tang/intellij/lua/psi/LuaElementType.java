@@ -54,6 +54,7 @@ public class LuaElementType extends IElementType {
     public static LuaClassFieldStubElementType CLASS_FIELD_DEF = new LuaClassFieldStubElementType();
     public static LuaGlobalFieldStubElementType GLOBAL_FIELD_DEF = new LuaGlobalFieldStubElementType();
     public static LuaClassStubElementType CLASS_DEF = new LuaClassStubElementType();
+    public static LuaTableStubElementType TABLE = new LuaTableStubElementType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
 
     static class LuaBlockElementType extends IReparseableElementType {

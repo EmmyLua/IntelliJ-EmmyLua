@@ -237,7 +237,8 @@ private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...'
 
 tableConstructor ::= '{' fieldList '}' {
     pin = 1
-    methods = [findField]
+    methods = [findField toString]
+    stubClass = "com.tang.intellij.lua.stubs.LuaTableStub"
 }
 
 fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
