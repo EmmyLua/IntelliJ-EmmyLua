@@ -34,7 +34,8 @@ public class LuaClassFieldStubElementType extends IStubElementType<LuaClassField
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         LuaDocFieldDef element = (LuaDocFieldDef) node.getPsi();
-        return element.getNameIdentifier() != null;
+        LuaComment comment = LuaCommentUtil.findContainer(element);
+        return comment.getClassDef() != null && element.getNameIdentifier() != null;
     }
 
     @NotNull
