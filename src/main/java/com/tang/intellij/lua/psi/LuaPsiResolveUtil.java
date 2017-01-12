@@ -174,28 +174,32 @@ public class LuaPsiResolveUtil {
         else {
             LuaLocalDef localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef.class);
             if (localDef != null) {
+                LuaTypeSet typeSet = null;
                 LuaComment comment = localDef.getComment();
                 if (comment != null) {
-                    LuaTypeSet typeSet = comment.guessType();
-                    if (typeSet != null) return typeSet;
+                    typeSet = comment.guessType();
                 }
 
                 //计算 expr 返回类型
-                LuaNameList nameList = localDef.getNameList();
-                LuaExprList exprList = localDef.getExprList();
-                if (nameList != null && exprList != null) {
-                    int index = nameList.getNameDefList().indexOf(nameDef);
-                    if (index != -1) {
-                        List<LuaExpr> exprs = exprList.getExprList();
-                        if (index < exprs.size()) {
-                            LuaExpr expr = exprs.get(index);
-                            return expr.guessType();
+                if (typeSet == null || typeSet.isEmpty()) {
+                    LuaNameList nameList = localDef.getNameList();
+                    LuaExprList exprList = localDef.getExprList();
+                    if (nameList != null && exprList != null) {
+                        int index = nameList.getNameDefList().indexOf(nameDef);
+                        if (index != -1) {
+                            List<LuaExpr> exprs = exprList.getExprList();
+                            if (index < exprs.size()) {
+                                LuaExpr expr = exprs.get(index);
+                                typeSet = expr.guessType();
+                            }
                         }
                     }
                 }
 
                 //anonymous
-                return LuaTypeSet.create(LuaAnonymousType.create(nameDef));
+                if (typeSet == null ||typeSet.isEmpty())
+                    typeSet = LuaTypeSet.create(LuaAnonymousType.create(nameDef));
+                return typeSet;
             }
         }
         return null;
