@@ -9,4 +9,5 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
  */
 public interface LuaClassField extends LuaClassMember, NavigationItem {
     LuaTypeSet resolveType();
+    String getFieldName();
 }

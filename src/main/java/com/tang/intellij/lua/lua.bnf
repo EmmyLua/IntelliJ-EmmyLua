@@ -202,7 +202,11 @@ exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | var | parenExpr
 
 // 最终产生 call expr | index expr | nameRef
-var ::= callOrIndexExpr | nameRef
+var ::= callOrIndexExpr | nameRef {
+    methods = [toString resolveType getFieldName]
+    implements = "com.tang.intellij.lua.psi.LuaClassField"
+    stubClass = "com.tang.intellij.lua.stubs.LuaVarStub"
+}
 
 expr ::= unaryExpr | binaryExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
 
@@ -210,7 +214,10 @@ parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
 binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
 
-left indexExpr ::= '[' expr ']' | '.' ID { pin(".*") = 1 methods = [guessPrefixType] }
+left indexExpr ::= '[' expr ']' | '.' ID {
+    pin(".*") = 1
+    methods = [guessPrefixType]
+}
 
 arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }
 args ::=  '(' (arg_expr_list)? ')' | tableConstructor | STRING { pin(".*") = 1 }

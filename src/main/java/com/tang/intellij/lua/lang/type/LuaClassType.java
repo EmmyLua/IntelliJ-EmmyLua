@@ -101,7 +101,7 @@ public class LuaClassType extends LuaType {
         Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, classDef.getProject(), new ProjectAndLibrariesScope(classDef.getProject()));
 
         for (LuaClassField fieldName : list) {
-            String name = fieldName.getName();
+            String name = fieldName.getFieldName();
             if (name == null)
                 continue;
 

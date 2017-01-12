@@ -359,4 +359,19 @@ public class LuaPsiImplUtil {
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
         return "[STUB]" + stubElement.getNode().getElementType().toString();
     }
+
+    public static LuaTypeSet resolveType(LuaVar var) {
+        return null;
+    }
+
+    public static String getFieldName(LuaVar var) {
+        LuaExpr expr = var.getExpr();
+        if (expr instanceof LuaIndexExpr) {
+            LuaIndexExpr luaIndexExpr = (LuaIndexExpr) expr;
+            PsiElement id = luaIndexExpr.getId();
+            if (id != null)
+                return id.getText();
+        }
+        return null;
+    }
 }

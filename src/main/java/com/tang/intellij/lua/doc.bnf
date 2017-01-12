@@ -70,6 +70,7 @@ field_def ::= FIELD access_modifier ID type_set {
         setName
         getName
         getTextOffset
+        getFieldName
         toString
     ]
 }

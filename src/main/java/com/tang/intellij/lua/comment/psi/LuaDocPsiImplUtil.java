@@ -204,4 +204,8 @@ public class LuaDocPsiImplUtil {
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
         return "[STUB]" + stubElement.getNode().getElementType().toString();
     }
+
+    public static String getFieldName(LuaDocFieldDef fieldDef) {
+        return fieldDef.getName();
+    }
 }
