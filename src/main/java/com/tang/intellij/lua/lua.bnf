@@ -136,7 +136,16 @@ globalFuncDef ::= 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    methods = [getComment getPresentation getParamNameDefList getNameIdentifier setName getName getTextOffset]
+    methods = [
+        getComment
+        getPresentation
+        getParamNameDefList
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+        toString
+    ]
     stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFuncStub"
 }
 
@@ -153,7 +162,17 @@ classMethodDef ::= 'function' classMethodName funcBody {
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
-    methods = [getComment getClassType getClassName getParamNameDefList getNameIdentifier setName getName getTextOffset]
+    methods = [
+        getComment
+        getClassType
+        getClassName
+        getParamNameDefList
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+        toString
+    ]
 }
 
 localFuncDef ::= 'local' 'function' ID funcBody {

@@ -6,7 +6,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
@@ -197,5 +199,9 @@ public class LuaDocPsiImplUtil {
      */
     public static LuaTypeSet guessType(LuaDocTypeDef typeDef) {
         return resolveDocTypeSet(typeDef.getTypeSet(), null);
+    }
+
+    public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
+        return "[STUB]" + stubElement.getNode().getElementType().toString();
     }
 }

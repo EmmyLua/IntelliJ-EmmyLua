@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 public class LuaClassStubElementType extends IStubElementType<LuaClassDefStub, LuaDocClassDef> {
     public LuaClassStubElementType() {
-        super("Class Stub", LuaLanguage.INSTANCE);
+        super("Class", LuaLanguage.INSTANCE);
     }
 
     @Override

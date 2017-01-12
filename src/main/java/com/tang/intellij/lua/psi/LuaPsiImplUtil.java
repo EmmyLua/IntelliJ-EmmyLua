@@ -5,7 +5,9 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
@@ -352,5 +354,9 @@ public class LuaPsiImplUtil {
 
     public static PsiElement getNameIdentifier(LuaTableField tableField) {
         return tableField.getId();
+    }
+
+    public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
+        return "[STUB]" + stubElement.getNode().getElementType().toString();
     }
 }

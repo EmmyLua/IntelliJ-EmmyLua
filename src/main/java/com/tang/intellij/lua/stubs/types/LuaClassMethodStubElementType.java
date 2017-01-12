@@ -22,7 +22,7 @@ import java.io.IOException;
  */
 public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMethodStub, LuaClassMethodDef> {
     public LuaClassMethodStubElementType() {
-        super("LuaClassMethodStubElementType", LuaLanguage.INSTANCE);
+        super("Class Method", LuaLanguage.INSTANCE);
     }
 
     @Override

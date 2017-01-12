@@ -64,7 +64,14 @@ field_def ::= FIELD access_modifier ID type_set {
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassFieldStub"
-    methods = [resolveType getNameIdentifier setName getName getTextOffset]
+    methods = [
+        resolveType
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+        toString
+    ]
 }
 
 //--- tag
@@ -97,7 +104,16 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassDefStub"
-    methods = [getSuperClass getSuperClasses getPresentation getNameIdentifier setName getName getTextOffset]
+    methods = [
+        getSuperClass
+        getSuperClasses
+        getPresentation
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+        toString
+    ]
 }
 
 // @type CLASS_REF

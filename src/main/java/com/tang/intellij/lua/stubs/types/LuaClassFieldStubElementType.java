@@ -23,7 +23,7 @@ import java.io.IOException;
  */
 public class LuaClassFieldStubElementType extends IStubElementType<LuaClassFieldStub, LuaDocFieldDef> {
     public LuaClassFieldStubElementType() {
-        super("Lua Field", LuaLanguage.INSTANCE);
+        super("Class Field", LuaLanguage.INSTANCE);
     }
 
     @Override

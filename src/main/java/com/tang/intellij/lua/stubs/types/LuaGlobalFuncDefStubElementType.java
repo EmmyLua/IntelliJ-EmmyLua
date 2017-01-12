@@ -21,7 +21,7 @@ import java.io.IOException;
 public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef> {
 
     public LuaGlobalFuncDefStubElementType() {
-        super("GLOBAL_FUNC_DEF", LuaLanguage.INSTANCE);
+        super("Global Function", LuaLanguage.INSTANCE);
     }
 
     @Override
