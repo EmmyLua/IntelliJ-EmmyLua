@@ -8,7 +8,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
  *
  * Created by tangzx on 2016/12/10.
  */
-public interface LuaClassFieldStub extends StubElement<LuaDocFieldDef> {
+public interface LuaDocClassFieldStub extends StubElement<LuaDocFieldDef> {
     String getName();
 
     StringRef getClassName();

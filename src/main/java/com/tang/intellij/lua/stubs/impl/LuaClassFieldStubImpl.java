@@ -5,13 +5,13 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.psi.LuaElementType;
-import com.tang.intellij.lua.stubs.LuaClassFieldStub;
+import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 
 /**
  *
  * Created by tangzx on 2016/12/10.
  */
-public class LuaClassFieldStubImpl extends StubBase<LuaDocFieldDef> implements LuaClassFieldStub {
+public class LuaClassFieldStubImpl extends StubBase<LuaDocFieldDef> implements LuaDocClassFieldStub {
     private String name;
     private StringRef className;
 

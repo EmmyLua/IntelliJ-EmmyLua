@@ -63,7 +63,7 @@ field_def ::= FIELD access_modifier ID type_set {
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaClassFieldStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocClassFieldStub"
     methods = [
         resolveType
         getNameIdentifier
