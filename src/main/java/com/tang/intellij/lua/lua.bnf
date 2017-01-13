@@ -86,7 +86,6 @@
   implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
-  implements("lambdaFuncDef") = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
   implements("doStat|whileStat|repeatStat|ifStat|funcBody") = "com.tang.intellij.lua.psi.LuaIndentRange"
   extends(".*Expr") = expr
@@ -199,7 +198,7 @@ nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
-valueExpr ::= nil | false | true | NUMBER | STRING | "..." | lambdaFuncDef | tableConstructor | var | parenExpr
+valueExpr ::= nil | false | true | NUMBER | STRING | "..." | closureFuncDef | tableConstructor | var | parenExpr
 
 // 最终产生 call expr | index expr | nameRef
 var ::= callOrIndexExpr | nameRef {
@@ -233,8 +232,9 @@ private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr
 private funcCallExpr ::= callOrIndexExpr <<checkCallExpr>>
 
-lambdaFuncDef ::= 'function' funcBody {
+closureFuncDef ::= 'function' funcBody {
     pin = 2
+    implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
     methods = [getParamNameDefList]
 }
 
