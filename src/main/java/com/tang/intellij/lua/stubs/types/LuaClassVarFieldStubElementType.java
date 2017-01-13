@@ -3,8 +3,6 @@ package com.tang.intellij.lua.stubs.types;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaExpr;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaVar;
@@ -47,13 +45,8 @@ public class LuaClassVarFieldStubElementType extends IStubElementType<LuaVarStub
         assert var.getExpr() instanceof LuaIndexExpr;
         LuaIndexExpr indexExpr = (LuaIndexExpr) var.getExpr();
         assert indexExpr.getId() != null;
-        LuaTypeSet set = indexExpr.guessPrefixType();
-        String typeName = null;
-        if (set != null) {
-            LuaType type = set.getType(0);
-            typeName = type.getClassNameText();
-        }
-        return new LuaClassVarFieldStubImpl(stubElement, this, typeName);
+
+        return new LuaClassVarFieldStubImpl(stubElement, this, indexExpr);
     }
 
     @NotNull
