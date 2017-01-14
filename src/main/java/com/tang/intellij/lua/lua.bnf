@@ -204,7 +204,7 @@ valueExpr ::= nil | false | true | NUMBER | STRING | "..." | closureFuncDef | ta
 var ::= callOrIndexExpr | nameRef {
     methods = [
         toString
-        resolveType
+        guessType
         getFieldName
 
         getName
@@ -272,7 +272,7 @@ tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
         toString
 
         getFieldName
-        resolveType
+        guessType
         nameDef = "tableFieldNameDef"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaTableFieldStub"
@@ -297,13 +297,13 @@ fake name ::= ID {
     methods = [setName getName]
 }
 nameDef ::= ID {
-    implements = ["com.tang.intellij.lua.psi.LuaTypeResolvable" "com.intellij.psi.PsiNameIdentifierOwner"]
-    methods = [resolveType getNameIdentifier]
+    implements = ["com.tang.intellij.lua.psi.LuaTypeGuessable" "com.intellij.psi.PsiNameIdentifierOwner"]
+    methods = [guessType getNameIdentifier]
     extends = name
 }
 nameRef ::= ID | SELF {
     implements = "com.tang.intellij.lua.psi.LuaNamedElement"
-    methods = [setName getName getReference resolve resolveType]
+    methods = [setName getName getReference resolve guessType]
 }
 paramNameDef ::= ID | SELF {
     extends = nameDef

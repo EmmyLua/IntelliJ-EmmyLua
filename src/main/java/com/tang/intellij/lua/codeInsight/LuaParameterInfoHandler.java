@@ -97,7 +97,7 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
                     start = sb.length();
                 sb.append(nameDef.getName());
 
-                LuaTypeSet typeSet = nameDef.resolveType(new SearchContext(o.getProject()));
+                LuaTypeSet typeSet = nameDef.guessType(new SearchContext(o.getProject()));
                 if (typeSet != null) {
                     sb.append(" : ");
                     List<LuaType> types = typeSet.getTypes();

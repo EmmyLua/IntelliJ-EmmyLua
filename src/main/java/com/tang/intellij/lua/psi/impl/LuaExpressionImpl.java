@@ -105,7 +105,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                 LuaVar luaVar = (LuaVar) firstChild;
                 LuaNameRef ref = luaVar.getNameRef();
                 if (ref != null)
-                    return ref.resolveType(context);
+                    return ref.guessType(context);
                 else if (luaVar.getExpr() != null)
                     return luaVar.getExpr().guessType(context);
             }

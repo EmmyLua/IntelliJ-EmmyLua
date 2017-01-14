@@ -159,7 +159,7 @@ public class LuaType {
         LuaTypeSet set = null;
         LuaClassField fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, context);
         if (fieldDef != null)
-            set = fieldDef.resolveType();
+            set = fieldDef.guessType(context);
         else {
             LuaType superType = getSuperClass();
             if (superType != null)

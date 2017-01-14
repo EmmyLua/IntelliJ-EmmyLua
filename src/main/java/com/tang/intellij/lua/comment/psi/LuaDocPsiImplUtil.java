@@ -80,7 +80,7 @@ public class LuaDocPsiImplUtil {
         return classDef.getId();
     }
 
-    public static LuaTypeSet resolveType(LuaDocFieldDef fieldDef) {
+    public static LuaTypeSet guessType(LuaDocFieldDef fieldDef, SearchContext context) {
         return resolveDocTypeSet(fieldDef.getTypeSet(), null);
     }
 
@@ -89,7 +89,7 @@ public class LuaDocPsiImplUtil {
      * @param docGlobalDef 全局定义
      * @return 类型集合
      */
-    public static LuaTypeSet resolveType(LuaDocGlobalDef docGlobalDef, SearchContext context) {
+    public static LuaTypeSet guessType(LuaDocGlobalDef docGlobalDef, SearchContext context) {
         LuaComment comment = LuaCommentUtil.findContainer(docGlobalDef);
         LuaDocTypeDef docTypeDef = comment.getTypeDef();
         if (docTypeDef != null) {
@@ -103,7 +103,7 @@ public class LuaDocPsiImplUtil {
      * @param paramDec 参数定义
      * @return 类型集合
      */
-    public static LuaTypeSet resolveType(LuaDocParamDef paramDec) {
+    public static LuaTypeSet guessType(LuaDocParamDef paramDec, SearchContext context) {
         LuaDocTypeSet docTypeSet = paramDec.getTypeSet();
         if (docTypeSet == null) return null;
         return resolveDocTypeSet(docTypeSet, null);

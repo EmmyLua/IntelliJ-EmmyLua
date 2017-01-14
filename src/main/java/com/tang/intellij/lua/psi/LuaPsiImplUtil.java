@@ -49,7 +49,7 @@ public class LuaPsiImplUtil {
         return identifier.getText();
     }
 
-    public static LuaTypeSet resolveType(LuaNameDef nameDef, SearchContext context) {
+    public static LuaTypeSet guessType(LuaNameDef nameDef, SearchContext context) {
         return LuaPsiResolveUtil.resolveType(nameDef, context);
     }
 
@@ -66,11 +66,11 @@ public class LuaPsiImplUtil {
         return LuaPsiResolveUtil.resolve(ref, new SearchContext(ref.getProject()));
     }
 
-    public static LuaTypeSet resolveType(LuaNameRef nameRef, SearchContext context) {
+    public static LuaTypeSet guessType(LuaNameRef nameRef, SearchContext context) {
         PsiElement target = LuaPsiResolveUtil.resolve(nameRef, context);
-        if (target instanceof LuaTypeResolvable) {
-            LuaTypeResolvable typeResolvable = (LuaTypeResolvable) target;
-            return typeResolvable.resolveType(context);
+        if (target instanceof LuaTypeGuessable) {
+            LuaTypeGuessable typeResolvable = (LuaTypeGuessable) target;
+            return typeResolvable.guessType(context);
         }
         return null;
     }
@@ -101,7 +101,7 @@ public class LuaPsiImplUtil {
         LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
         String clazzName = null;
         if (ref != null) {
-            LuaTypeSet typeSet = ref.resolveType(context);
+            LuaTypeSet typeSet = ref.guessType(context);
             if (typeSet != null && !typeSet.isEmpty()) {
                 clazzName = typeSet.getType(0).getClassNameText();
             }
@@ -117,7 +117,7 @@ public class LuaPsiImplUtil {
     public static LuaType getClassType(LuaClassMethodDef classMethodDef, SearchContext context) {
         LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
         if (ref != null) {
-            LuaTypeSet typeSet = ref.resolveType(context);
+            LuaTypeSet typeSet = ref.guessType(context);
             if (typeSet != null && !typeSet.isEmpty()) {
                 return typeSet.getType(0);
             }
@@ -160,8 +160,8 @@ public class LuaPsiImplUtil {
         LuaNameRef nameRef = callExpr.getNameRef();
         if (nameRef != null) { // 形如 xx:method, xx.method
             PsiElement def = LuaPsiResolveUtil.resolve(nameRef, context);
-            if (def instanceof LuaTypeResolvable) {
-                return ((LuaTypeResolvable) def).resolveType(context);
+            if (def instanceof LuaTypeGuessable) {
+                return ((LuaTypeGuessable) def).guessType(context);
             } else if (def instanceof LuaNameRef) {
                 // global
                 // --- @define
@@ -269,8 +269,8 @@ public class LuaPsiImplUtil {
         LuaNameRef nameRef = indexExpr.getNameRef();
         if (nameRef != null) {
             PsiElement def = LuaPsiResolveUtil.resolve(nameRef, context);
-            if (def instanceof LuaTypeResolvable) {
-                return ((LuaTypeResolvable) def).resolveType(context);
+            if (def instanceof LuaTypeGuessable) {
+                return ((LuaTypeGuessable) def).guessType(context);
             } else if (def instanceof LuaNameRef) { // TODO : Global assign
                 LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
                 if (luaAssignStat != null) {
@@ -356,7 +356,7 @@ public class LuaPsiImplUtil {
         return tableField.getId();
     }
 
-    public static LuaTypeSet resolveType(LuaTableField tableField) {
+    public static LuaTypeSet guessType(LuaTableField tableField, SearchContext context) {
         return null;
     }
 
@@ -368,7 +368,7 @@ public class LuaPsiImplUtil {
         return "[STUB]" + stubElement.getNode().getElementType().toString();
     }
 
-    public static LuaTypeSet resolveType(LuaVar var) {
+    public static LuaTypeSet guessType(LuaVar var, SearchContext context) {
         return null;
     }
 

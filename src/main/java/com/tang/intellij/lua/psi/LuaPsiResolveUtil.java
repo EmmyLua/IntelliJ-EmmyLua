@@ -144,7 +144,7 @@ public class LuaPsiResolveUtil {
                 if (comment != null) {
                     LuaDocParamDef paramDef = comment.getParamDef(nameDef.getText());
                     if (paramDef != null) {
-                        return paramDef.resolveType();
+                        return paramDef.guessType(context);
                     }
                 }
             }

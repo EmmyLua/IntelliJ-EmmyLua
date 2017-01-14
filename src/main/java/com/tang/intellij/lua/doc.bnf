@@ -52,8 +52,8 @@ access_modifier ::= "protected" | "public"
 //--- define
 global_def ::= DEFINE {
     stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFieldStub"
-    implements = "com.tang.intellij.lua.psi.LuaTypeResolvable, com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
-    methods = [resolveType]
+    implements = "com.tang.intellij.lua.psi.LuaTypeGuessable, com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+    methods = [guessType]
 }
 
 field_def ::= FIELD access_modifier ID type_set {
@@ -65,7 +65,7 @@ field_def ::= FIELD access_modifier ID type_set {
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocClassFieldStub"
     methods = [
-        resolveType
+        guessType
         getNameIdentifier
         setName
         getName
@@ -85,7 +85,7 @@ param_name_ref ::= ID {
 }
 param_def ::= TAG_PARAM param_name_ref type_set {
     pin = 1
-    methods = [resolveType]
+    methods = [guessType]
 }
 
 //--- return
