@@ -1,5 +1,6 @@
 package com.tang.intellij.lua.stubs.impl;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
@@ -41,6 +42,12 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
             }
         }
         return typeName;
+    }
+
+    @Override
+    public String getFieldName() {
+        PsiElement id = indexExpr.getId();
+        return id == null ? null : id.getText();
     }
 
 }

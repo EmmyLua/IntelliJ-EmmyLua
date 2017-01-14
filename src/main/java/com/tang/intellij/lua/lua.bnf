@@ -202,8 +202,20 @@ valueExpr ::= nil | false | true | NUMBER | STRING | "..." | closureFuncDef | ta
 
 // 最终产生 call expr | index expr | nameRef
 var ::= callOrIndexExpr | nameRef {
-    methods = [toString resolveType getFieldName]
-    implements = "com.tang.intellij.lua.psi.LuaClassField"
+    methods = [
+        toString
+        resolveType
+        getFieldName
+
+        getName
+        setName
+        getNameIdentifier
+        getTextOffset
+    ]
+    implements = [
+        "com.tang.intellij.lua.psi.LuaClassField"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
     stubClass = "com.tang.intellij.lua.stubs.LuaVarStub"
 }
 

@@ -76,8 +76,10 @@ public class LuaClassVarFieldStubElementType extends IStubElementType<LuaVarStub
     @Override
     public void indexStub(@NotNull LuaVarStub varStub, @NotNull IndexSink indexSink) {
         String typeName = varStub.getTypeName();
-        if (typeName != null) {
+        String fieldName = varStub.getFieldName();
+        if (typeName != null && fieldName != null) {
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName);
+            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName);
         }
     }
 }

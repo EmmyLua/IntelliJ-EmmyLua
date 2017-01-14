@@ -10,9 +10,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaAnonymousType;
+import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
@@ -118,15 +118,15 @@ public class LuaPsiResolveUtil {
         return result;
     }
 
-    public static PsiElement resolve(LuaIndexExpr myElement) {
-        PsiElement id = myElement.getId();
+    public static PsiElement resolve(LuaIndexExpr indexExpr) {
+        PsiElement id = indexExpr.getId();
         if (id == null)
             return null;
 
-        LuaTypeSet typeSet = myElement.guessPrefixType();
+        LuaTypeSet typeSet = indexExpr.guessPrefixType();
         if (typeSet != null) {
             String idString = id.getText();
-            Project project = myElement.getProject();
+            Project project = indexExpr.getProject();
             GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
             for (LuaType type : typeSet.getTypes()) {
                 if (type instanceof LuaTableType) { // 可能是 table 字段

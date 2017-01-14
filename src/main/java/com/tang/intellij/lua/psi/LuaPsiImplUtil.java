@@ -374,4 +374,12 @@ public class LuaPsiImplUtil {
         }
         return null;
     }
+
+    public static PsiElement getNameIdentifier(LuaVar var) {
+        LuaExpr expr = var.getExpr();
+        if (expr instanceof LuaIndexExpr) {
+            return ((LuaIndexExpr) expr).getId();
+        }
+        return null;
+    }
 }
