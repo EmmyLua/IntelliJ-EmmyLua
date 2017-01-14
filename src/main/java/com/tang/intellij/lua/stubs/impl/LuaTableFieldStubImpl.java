@@ -3,6 +3,9 @@ package com.tang.intellij.lua.stubs.impl;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.lang.type.LuaTableType;
+import com.tang.intellij.lua.psi.LuaTableConstructor;
 import com.tang.intellij.lua.psi.LuaTableField;
 import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 
@@ -28,11 +31,11 @@ public class LuaTableFieldStubImpl extends StubBase<LuaTableField> implements Lu
 
     @Override
     public String getTypeName() {
-        if (typeName != null)
-            return typeName;
-        if (tableField != null)
-            return "Table";
-        return null;
+        if (typeName == null && tableField != null) {
+            LuaTableConstructor tableConstructor = PsiTreeUtil.getParentOfType(tableField, LuaTableConstructor.class);
+            typeName = LuaTableType.getTypeName(tableConstructor);
+        }
+        return typeName;
     }
 
     @Override

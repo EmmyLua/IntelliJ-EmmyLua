@@ -32,13 +32,11 @@ public class LuaGlobalFieldIndex extends StringStubIndexExtension<LuaDocGlobalDe
     public int getVersion() { return LuaLanguage.INDEX_VERSION;}
 
     public static LuaDocGlobalDef find(String key, SearchContext context) {
-        try {
+        if (!context.isDumb()) {
             Collection<LuaDocGlobalDef> defs = LuaGlobalFieldIndex.getInstance().get(key, context.getProject(), context.getScope());
             if (!defs.isEmpty()) {
                 return defs.iterator().next();
             }
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
         }
         return null;
     }

@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl;
@@ -37,8 +38,14 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         LuaNameRef nameRef = methodName.getNameRef();
         assert nameRef != null;
         assert id != null;
+        String clazzName = nameRef.getText();
+
         LuaTypeSet typeSet = nameRef.guessType(new SearchContext(methodDef.getProject()).setCurrentStubFile(methodDef.getContainingFile()));
-        String clazzName = typeSet.getType(0).getClassNameText();
+        if (typeSet != null) {
+            LuaType type = typeSet.getFirst();
+            if (type != null)
+                clazzName = type.getClassNameText();
+        }
 
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;

@@ -25,17 +25,23 @@ public class LuaTableType extends LuaType {
         return new LuaTableType(tableElement);
     }
 
+    public static String getTypeName(LuaTableConstructor tableConstructor) {
+        return String.format("table@%d", tableConstructor.getNode().getStartOffset());
+    }
+
     public LuaTableConstructor tableConstructor;
     private List<String> fieldStringList;
+    private String clazzName;
 
     private LuaTableType(LuaTableConstructor tableElement) {
         super(tableElement);
         tableConstructor = tableElement;
+        clazzName = getTypeName(tableElement);
     }
 
     @Override
     public String getClassNameText() {
-        return String.format("table@%d", tableConstructor.getNode().getStartOffset());
+        return clazzName;
     }
 
     private void InitFieldList() {

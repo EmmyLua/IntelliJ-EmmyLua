@@ -1,7 +1,7 @@
 package com.tang.intellij.lua.search;
 
+import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
@@ -34,14 +34,17 @@ public class SearchContext {
     public GlobalSearchScope getScope() {
         if (scope == null) {
             scope = new ProjectAndLibrariesScope(project);
-            if (currentStubFile != null) {
-                VirtualFile virtualFile = currentStubFile.getViewProvider().getVirtualFile();
+            if (isDumb()) {
+                /*VirtualFile virtualFile = currentStubFile.getViewProvider().getVirtualFile();
                 GlobalSearchScope not = GlobalSearchScope.notScope(GlobalSearchScope.fileScope(project, virtualFile));
-                scope = scope.intersectWith(not);
+                scope = scope.intersectWith(not);*/
                 scope = GlobalSearchScope.EMPTY_SCOPE;
             }
         }
         return scope;
     }
 
+    public boolean isDumb() {
+        return DumbService.isDumb(project) || currentStubFile != null;
+    }
 }

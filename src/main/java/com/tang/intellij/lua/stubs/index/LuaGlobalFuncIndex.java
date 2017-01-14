@@ -33,13 +33,11 @@ public class LuaGlobalFuncIndex extends StringStubIndexExtension<LuaGlobalFuncDe
     }
 
     public static LuaGlobalFuncDef find(String key, SearchContext context) {
-        try {
+        if (!context.isDumb()) {
             Collection<LuaGlobalFuncDef> defs = LuaGlobalFuncIndex.getInstance().get(key, context.getProject(), context.getScope());
             if (!defs.isEmpty()) {
                 return defs.iterator().next();
             }
-        } catch (Exception ignored) {
-
         }
         return null;
     }
