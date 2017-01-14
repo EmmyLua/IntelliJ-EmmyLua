@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.lang.type;
 
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +43,13 @@ public class LuaTypeSet {
 
     public LuaType getType(int index) {
         return types.get(index);
+    }
+
+    @Nullable
+    public LuaType getFirst() {
+        if (isEmpty())
+            return null;
+        return types.get(0);
     }
 
     public boolean isEmpty() {
