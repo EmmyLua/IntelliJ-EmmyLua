@@ -17,16 +17,16 @@ import java.util.List;
  * Table 类型
  * Created by TangZX on 2016/12/4.
  */
-public class LuaTypeTable extends LuaType {
+public class LuaTableType extends LuaType {
 
-    public static LuaTypeTable create(LuaTableConstructor tableElement) {
-        return new LuaTypeTable(tableElement);
+    public static LuaTableType create(LuaTableConstructor tableElement) {
+        return new LuaTableType(tableElement);
     }
 
     public LuaTableConstructor tableConstructor;
     private List<String> fieldStringList;
 
-    private LuaTypeTable(LuaTableConstructor tableElement) {
+    private LuaTableType(LuaTableConstructor tableElement) {
         super(tableElement);
         tableConstructor = tableElement;
     }

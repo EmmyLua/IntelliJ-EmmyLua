@@ -12,7 +12,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaAnonymousType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.lang.type.LuaTypeTable;
+import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
@@ -129,8 +129,8 @@ public class LuaPsiResolveUtil {
             Project project = myElement.getProject();
             GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
             for (LuaType type : typeSet.getTypes()) {
-                if (type instanceof LuaTypeTable) { // 可能是 table 字段
-                    LuaTypeTable tableType = (LuaTypeTable) type;
+                if (type instanceof LuaTableType) { // 可能是 table 字段
+                    LuaTableType tableType = (LuaTableType) type;
                     LuaTableField field = tableType.tableConstructor.findField(idString);
                     if (field != null) {
                         return field;

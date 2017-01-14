@@ -11,7 +11,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.lang.type.LuaTypeTable;
+import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,8 +44,8 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         if (prefixType != null && !prefixType.isEmpty()) {
             String propName = id.getText();
             for (LuaType type : prefixType.getTypes()) {
-                if (type instanceof LuaTypeTable) {
-                    LuaTypeTable table = (LuaTypeTable) type;
+                if (type instanceof LuaTableType) {
+                    LuaTableType table = (LuaTableType) type;
                     LuaTableField field = table.tableConstructor.findField(propName);
                     if (field != null) {
                         LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
@@ -103,7 +103,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                 return ((LuaExpr) firstChild).guessType();
             }
             else if (firstChild instanceof LuaTableConstructor) {
-                return LuaTypeSet.create(LuaTypeTable.create((LuaTableConstructor) firstChild));
+                return LuaTypeSet.create(LuaTableType.create((LuaTableConstructor) firstChild));
             }
             else if (firstChild instanceof LuaVar) {
                 LuaVar luaVar = (LuaVar) firstChild;
