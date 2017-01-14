@@ -3,12 +3,11 @@ package com.tang.intellij.lua.stubs.types;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassMethodStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
@@ -32,13 +31,14 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
     @NotNull
     @Override
-    public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef luaClassMethodFuncDef, StubElement stubElement) {
-        LuaClassMethodName methodName = luaClassMethodFuncDef.getClassMethodName();
-        PsiElement id = luaClassMethodFuncDef.getNameIdentifier();
-        PsiElement prefix = methodName.getNameRef();
-        assert prefix != null;
+    public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef methodDef, StubElement stubElement) {
+        LuaClassMethodName methodName = methodDef.getClassMethodName();
+        PsiElement id = methodDef.getNameIdentifier();
+        LuaNameRef nameRef = methodName.getNameRef();
+        assert nameRef != null;
         assert id != null;
-        String clazzName = resolveClassName(prefix.getText(), luaClassMethodFuncDef);
+        LuaTypeSet typeSet = nameRef.guessType(new SearchContext(methodDef.getProject()).setCurrentStubFile(methodDef.getContainingFile()));
+        String clazzName = typeSet.getType(0).getClassNameText();
 
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
@@ -94,60 +94,5 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
                 indexSink.occurrence(LuaClassMethodIndex.KEY, className);
             }
         }
-    }
-
-    private static String clazzNameToSearch;
-    private static String resolveClassName(String prefixName, LuaClassMethodDef luaClassMethodFuncDef) {
-        clazzNameToSearch = null;
-
-        // 寻找Local定义
-        LuaPsiTreeUtil.walkTopLevelInFile(luaClassMethodFuncDef, LuaLocalDef.class, luaLocalDef -> {
-
-            LuaNameList nameList = luaLocalDef.getNameList();
-            if (nameList != null) {
-                LuaNameDef nameDef = PsiTreeUtil.findChildOfType(nameList, LuaNameDef.class);
-                if (nameDef != null && prefixName.equals(nameDef.getName())) {
-                    //find LuaDocClassDef in doc comment
-                    LuaComment comment = luaLocalDef.getComment();
-                    if (comment != null) {
-                        LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
-                        if (classDef != null) {
-                            clazzNameToSearch = classDef.getName();
-                            return false;
-                        }
-                    } else {
-                        clazzNameToSearch = LuaPsiResolveUtil.getAnonymousType(nameDef);
-                    }
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        //如果全局定义的对象的方法，则优先找本文件内的 assign stat
-        if (clazzNameToSearch == null) {
-            LuaPsiTreeUtil.walkTopLevelInFile(luaClassMethodFuncDef, LuaAssignStat.class, luaAssignStat -> {
-                LuaVarList varList = luaAssignStat.getVarList();
-                for (PsiElement child = varList.getFirstChild(); child != null; child = child.getNextSibling()) {
-                    if (child instanceof LuaVar) {
-                        LuaVar var = (LuaVar) child;
-                        if (var.getNameRef() != null && prefixName.equals(var.getNameRef().getName())) {
-                            LuaComment comment = luaAssignStat.getComment();
-                            if (comment != null) {
-                                LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
-                                if (classDef != null) {
-                                    clazzNameToSearch = classDef.getName();
-                                    return false;
-                                }
-                            }
-                        }
-                        break;
-                    }
-                }
-                return true;
-            });
-        }
-        //TODO search global index
-        return clazzNameToSearch;
     }
 }

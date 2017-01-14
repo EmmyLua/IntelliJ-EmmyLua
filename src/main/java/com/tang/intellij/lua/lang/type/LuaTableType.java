@@ -35,7 +35,7 @@ public class LuaTableType extends LuaType {
 
     @Override
     public String getClassNameText() {
-        return "table";
+        return String.format("table@%d", tableConstructor.getNode().getStartOffset());
     }
 
     private void InitFieldList() {

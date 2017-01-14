@@ -18,8 +18,9 @@ public class SearchContext {
 
     private Project project;
 
-    public void setCurrentStubFile(PsiFile currentStubFile) {
+    public SearchContext setCurrentStubFile(PsiFile currentStubFile) {
         this.currentStubFile = currentStubFile;
+        return this;
     }
 
     private PsiFile currentStubFile;
