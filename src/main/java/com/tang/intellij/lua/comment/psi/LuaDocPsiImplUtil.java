@@ -17,6 +17,7 @@ import com.tang.intellij.lua.lang.type.LuaClassType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaElementFactory;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,7 +89,7 @@ public class LuaDocPsiImplUtil {
      * @param docGlobalDef 全局定义
      * @return 类型集合
      */
-    public static LuaTypeSet resolveType(LuaDocGlobalDef docGlobalDef) {
+    public static LuaTypeSet resolveType(LuaDocGlobalDef docGlobalDef, SearchContext context) {
         LuaComment comment = LuaCommentUtil.findContainer(docGlobalDef);
         LuaDocTypeDef docTypeDef = comment.getTypeDef();
         if (docTypeDef != null) {

@@ -7,6 +7,7 @@ import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +45,7 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        PsiElement ref = LuaPsiResolveUtil.resolve(myElement);
+        PsiElement ref = LuaPsiResolveUtil.resolve(myElement, new SearchContext(myElement.getProject()));
         if (ref != null && ref.getNode().getTextRange().equals(myElement.getNode().getTextRange()))
             return null; // used as PsiNameIdentifierOwner
         return ref;

@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 import static com.tang.intellij.lua.editor.completion.LuaCompletionContributor.suggestWordsInFile;
@@ -23,7 +24,7 @@ public class ClassFieldCompletionProvider extends CompletionProvider<CompletionP
 
         if (parent instanceof LuaIndexExpr) {
             LuaIndexExpr indexExpr = (LuaIndexExpr) parent;
-            LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType();
+            LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType(new SearchContext(indexExpr.getProject()));
             if (prefixTypeSet != null) {
                 prefixTypeSet.getTypes().forEach(luaType -> luaType.addFieldCompletions(completionParameters, completionResultSet));
             }

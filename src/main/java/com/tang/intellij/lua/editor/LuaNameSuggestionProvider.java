@@ -7,6 +7,7 @@ import com.intellij.refactoring.rename.NameSuggestionProvider;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaNameDef;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -24,7 +25,7 @@ public class LuaNameSuggestionProvider implements NameSuggestionProvider {
     public SuggestedNameInfo getSuggestedNames(PsiElement psiElement, @Nullable PsiElement psiElement1, Set<String> set) {
         if (psiElement instanceof LuaNameDef) {
             LuaNameDef nameDef = (LuaNameDef) psiElement;
-            LuaTypeSet typeSet = nameDef.resolveType();
+            LuaTypeSet typeSet = nameDef.resolveType(new SearchContext(psiElement.getProject()));
             if (typeSet != null) {
                 Set<String> classNames = new HashSet<>();
 

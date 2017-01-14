@@ -5,12 +5,12 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.editor.completion.FuncInsertHandler;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
@@ -91,7 +91,7 @@ public class LuaType {
         String clazzName = getClassNameText();
         if (clazzName == null)
             return;
-        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, project, new ProjectAndLibrariesScope(project));
+        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, new SearchContext(project));
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
             if (methodName != null) {
@@ -155,52 +155,52 @@ public class LuaType {
         }
     }
 
-    public LuaTypeSet guessFieldType(String propName, Project project, GlobalSearchScope scope) {
+    public LuaTypeSet guessFieldType(String propName, SearchContext context) {
         LuaTypeSet set = null;
-        LuaClassField fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, project, scope);
+        LuaClassField fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, context);
         if (fieldDef != null)
             set = fieldDef.resolveType();
         else {
             LuaType superType = getSuperClass();
             if (superType != null)
-                set = superType.guessFieldType(propName, project, scope);
+                set = superType.guessFieldType(propName, context);
         }
 
         return set;
     }
 
-    public LuaClassField findField(String fieldName, Project project, GlobalSearchScope scope) {
+    public LuaClassField findField(String fieldName, SearchContext context) {
         String className = getClassNameText();
-        LuaClassField def = LuaClassFieldIndex.find(className, fieldName, project, scope);
+        LuaClassField def = LuaClassFieldIndex.find(className, fieldName, context);
         if (def == null) {
             LuaType superType = getSuperClass();
             if (superType != null)
-                def = superType.findField(fieldName, project, scope);
+                def = superType.findField(fieldName, context);
         }
         return def;
     }
 
-    public LuaClassMethodDef findMethod(String methodName, Project project, GlobalSearchScope scope) {
+    public LuaClassMethodDef findMethod(String methodName, SearchContext context) {
         String className = getClassNameText();
-        LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(className, methodName, project, scope);
+        LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(className, methodName, context);
         if (def == null) { // static
-            def = LuaClassMethodIndex.findStaticMethod(className, methodName, project, scope);
+            def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
         }
         if (def == null) { // super
             LuaType superType = getSuperClass();
             if (superType != null)
-                def = superType.findMethod(methodName, project, scope);
+                def = superType.findMethod(methodName, context);
         }
         return def;
     }
 
-    public LuaClassMethodDef findStaticMethod(String methodName, boolean withSuper, Project project, GlobalSearchScope scope) {
+    public LuaClassMethodDef findStaticMethod(String methodName, boolean withSuper, @NotNull SearchContext context) {
         String className = getClassNameText();
-        LuaClassMethodDef def = LuaClassMethodIndex.findStaticMethod(className, methodName, project, scope);
+        LuaClassMethodDef def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
         if (def == null && withSuper) {
             LuaType superType = getSuperClass();
             if (superType != null)
-                def = superType.findStaticMethod(methodName, true, project, scope);
+                def = superType.findStaticMethod(methodName, true, context);
         }
         return def;
     }

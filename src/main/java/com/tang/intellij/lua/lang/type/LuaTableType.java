@@ -3,14 +3,13 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableConstructor;
 import com.tang.intellij.lua.psi.LuaTableField;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -71,8 +70,8 @@ public class LuaTableType extends LuaType {
     }
 
     @Override
-    public LuaClassField findField(String fieldName, Project project, GlobalSearchScope scope) {
-        LuaClassField field = super.findField(fieldName, project, scope);
+    public LuaClassField findField(String fieldName, SearchContext context) {
+        LuaClassField field = super.findField(fieldName, context);
         if (field == null) {
             field = tableConstructor.findField(fieldName);
         }

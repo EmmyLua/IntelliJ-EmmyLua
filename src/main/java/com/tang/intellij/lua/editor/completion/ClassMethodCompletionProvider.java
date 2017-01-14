@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCallExpr;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 import static com.tang.intellij.lua.editor.completion.LuaCompletionContributor.suggestWordsInFile;
@@ -23,7 +24,7 @@ public class ClassMethodCompletionProvider extends CompletionProvider<Completion
 
         if (parent instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) parent;
-            LuaTypeSet luaTypeSet = callExpr.guessPrefixType();
+            LuaTypeSet luaTypeSet = callExpr.guessPrefixType(new SearchContext(callExpr.getProject()));
             if (luaTypeSet != null) {
                 luaTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet, false));
             }

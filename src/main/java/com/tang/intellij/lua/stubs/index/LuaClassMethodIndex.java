@@ -1,11 +1,10 @@
 package com.tang.intellij.lua.stubs.index;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -32,21 +31,21 @@ public class LuaClassMethodIndex extends StringStubIndexExtension<LuaClassMethod
         return KEY;
     }
 
-    public static Collection<LuaClassMethodDef> findStaticMethods(String className, Project project, GlobalSearchScope scope) {
+    public static Collection<LuaClassMethodDef> findStaticMethods(@NotNull String className, @NotNull SearchContext context) {
         String key = className + ".static";
-        return INSTANCE.get(key, project, scope);
+        return INSTANCE.get(key, context.getProject(), context.getScope());
     }
 
-    public static LuaClassMethodDef findStaticMethod(@NotNull String className, @NotNull String methodName, Project project, GlobalSearchScope scope) {
-        Collection<LuaClassMethodDef> collection = INSTANCE.get(className + ".static." + methodName, project, scope);
+    public static LuaClassMethodDef findStaticMethod(@NotNull String className, @NotNull String methodName, @NotNull SearchContext context) {
+        Collection<LuaClassMethodDef> collection = INSTANCE.get(className + ".static." + methodName, context.getProject(), context.getScope());
         if (collection.isEmpty())
             return null;
         else
             return collection.iterator().next();
     }
 
-    public static LuaClassMethodDef findMethodWithName(@NotNull String className, @NotNull String methodName, Project project, GlobalSearchScope scope) {
-        Collection<LuaClassMethodDef> collection = INSTANCE.get(className, project, scope);
+    public static LuaClassMethodDef findMethodWithName(@NotNull String className, @NotNull String methodName, @NotNull SearchContext context) {
+        Collection<LuaClassMethodDef> collection = INSTANCE.get(className, context.getProject(), context.getScope());
         for (LuaClassMethodDef methodDef : collection) {
             if (methodName.equals(methodDef.getName())) {
                 return methodDef;

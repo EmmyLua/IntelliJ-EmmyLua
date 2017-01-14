@@ -1,11 +1,10 @@
 package com.tang.intellij.lua.stubs.index;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -32,9 +31,9 @@ public class LuaGlobalFieldIndex extends StringStubIndexExtension<LuaDocGlobalDe
     @Override
     public int getVersion() { return LuaLanguage.INDEX_VERSION;}
 
-    public static LuaDocGlobalDef find(String key, Project project, GlobalSearchScope scope) {
+    public static LuaDocGlobalDef find(String key, SearchContext context) {
         try {
-            Collection<LuaDocGlobalDef> defs = LuaGlobalFieldIndex.getInstance().get(key, project, scope);
+            Collection<LuaDocGlobalDef> defs = LuaGlobalFieldIndex.getInstance().get(key, context.getProject(), context.getScope());
             if (!defs.isEmpty()) {
                 return defs.iterator().next();
             }

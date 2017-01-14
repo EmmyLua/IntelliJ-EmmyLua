@@ -3,9 +3,9 @@ package com.tang.intellij.lua.editor;
 import com.intellij.navigation.ChooseByNameContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.util.containers.HashSet;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ public class LuaSymbolNavigationContributor implements ChooseByNameContributor {
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String s, String s1, Project project, boolean b) {
-        LuaGlobalFuncDef def = LuaGlobalFuncIndex.find(s, project, new ProjectAndLibrariesScope(project));
+        LuaGlobalFuncDef def = LuaGlobalFuncIndex.find(s, new SearchContext(project));
         if (def == null)
             return NavigationItem.EMPTY_NAVIGATION_ITEM_ARRAY;
         else

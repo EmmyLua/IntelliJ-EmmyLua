@@ -8,6 +8,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaVar;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaVarStub;
 
 /**
@@ -35,7 +36,10 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
 
     public String getTypeName() {
         if (typeName == null) {
-            LuaTypeSet set = indexExpr.guessPrefixType();
+            SearchContext context = new SearchContext(indexExpr.getProject());
+            context.setCurrentStubFile(indexExpr.getContainingFile());
+
+            LuaTypeSet set = indexExpr.guessPrefixType(context);
             if (set != null) {
                 LuaType type = set.getType(0);
                 typeName = type.getClassNameText();

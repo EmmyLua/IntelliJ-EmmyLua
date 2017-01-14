@@ -269,10 +269,13 @@ tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
         getName
         getTextOffset
 
+        toString
+
         getFieldName
         resolveType
         nameDef = "tableFieldNameDef"
     ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaTableFieldStub"
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
         "com.intellij.psi.PsiNameIdentifierOwner"

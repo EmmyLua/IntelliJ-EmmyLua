@@ -10,6 +10,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +26,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
     protected void collectNavigationMarkers(@NotNull PsiElement element, Collection<? super RelatedItemLineMarkerInfo> result) {
         if (element instanceof LuaClassMethodDef) {
             LuaClassMethodDef methodDef = (LuaClassMethodDef) element;
-            LuaType type = methodDef.getClassType();
+            LuaType type = methodDef.getClassType(new SearchContext(element.getProject()));
             if (type != null) {
                 String methodName = methodDef.getName();
                 assert methodName != null;

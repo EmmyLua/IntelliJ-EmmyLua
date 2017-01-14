@@ -6,6 +6,7 @@ import com.intellij.codeInsight.hints.MethodInfo;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +27,7 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
         if (psiElement instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) psiElement;
             List<LuaParamNameDef> parameters = null;
-            LuaFuncBodyOwner methodDef = callExpr.resolveFuncBodyOwner();
+            LuaFuncBodyOwner methodDef = callExpr.resolveFuncBodyOwner(new SearchContext(psiElement.getProject()));
             if (methodDef != null) {
                 parameters = methodDef.getParamNameDefList();
             }

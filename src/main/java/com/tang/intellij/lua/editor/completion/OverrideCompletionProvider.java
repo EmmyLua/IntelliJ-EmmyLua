@@ -16,6 +16,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBody;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +33,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
         PsiElement id = completionParameters.getPosition();
         LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(id, LuaClassMethodDef.class);
         if (methodDef != null) {
-            LuaType classType = methodDef.getClassType();
+            LuaType classType = methodDef.getClassType(new SearchContext(methodDef.getProject()));
             if (classType != null) {
                 LuaType sup = classType.getSuperClass();
                 addOverrideMethod(completionParameters, completionResultSet, sup);

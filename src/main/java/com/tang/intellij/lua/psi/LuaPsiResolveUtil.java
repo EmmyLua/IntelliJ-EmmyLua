@@ -2,8 +2,6 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
@@ -12,6 +10,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaAnonymousType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +25,7 @@ public class LuaPsiResolveUtil {
 
     private static LuaFuncBodyOwner funcBodyOwner = null;
 
-    static LuaFuncBodyOwner resolveFuncBodyOwner(@NotNull LuaNameRef ref) {
+    static LuaFuncBodyOwner resolveFuncBodyOwner(@NotNull LuaNameRef ref, SearchContext context) {
         String refName = ref.getName();
         //local 函数名
         if (funcBodyOwner == null) {
@@ -41,8 +40,7 @@ public class LuaPsiResolveUtil {
 
         //global function
         if (funcBodyOwner == null) {
-            Project project = ref.getProject();
-            funcBodyOwner = LuaGlobalFuncIndex.find(refName, project, new ProjectAndLibrariesScope(project));
+            funcBodyOwner = LuaGlobalFuncIndex.find(refName, context);
         }
 
         LuaFuncBodyOwner temp = funcBodyOwner;
@@ -52,7 +50,7 @@ public class LuaPsiResolveUtil {
 
     private static PsiElement resolveResult;
 
-    public static PsiElement resolve(LuaNameRef ref) {
+    public static PsiElement resolve(LuaNameRef ref, SearchContext context) {
         String refName = ref.getName();
 
         if (refName.equals("self")) {
@@ -88,8 +86,7 @@ public class LuaPsiResolveUtil {
 
         //global field
         if (resolveResult == null) {
-            Project project = ref.getProject();
-            LuaDocGlobalDef globalDef = LuaGlobalFieldIndex.find(refName, project, new ProjectAndLibrariesScope(project));
+            LuaDocGlobalDef globalDef = LuaGlobalFieldIndex.find(refName, context);
             if (globalDef != null) {
                 LuaCommentOwner owner = LuaCommentUtil.findOwner(globalDef);
                 if (owner instanceof LuaAssignStat) {
@@ -108,8 +105,7 @@ public class LuaPsiResolveUtil {
 
         //global function
         if (resolveResult == null) {
-            Project project = ref.getProject();
-            resolveResult = LuaGlobalFuncIndex.find(refName, project, new ProjectAndLibrariesScope(project));
+            resolveResult = LuaGlobalFuncIndex.find(refName, context);
         }
 
         PsiElement result = resolveResult;
@@ -117,23 +113,21 @@ public class LuaPsiResolveUtil {
         return result;
     }
 
-    public static PsiElement resolve(LuaIndexExpr indexExpr) {
+    public static PsiElement resolve(LuaIndexExpr indexExpr, SearchContext context) {
         PsiElement id = indexExpr.getId();
         if (id == null)
             return null;
 
-        LuaTypeSet typeSet = indexExpr.guessPrefixType();
+        LuaTypeSet typeSet = indexExpr.guessPrefixType(context);
         if (typeSet != null) {
             String idString = id.getText();
-            Project project = indexExpr.getProject();
-            GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
             for (LuaType type : typeSet.getTypes()) {
                 //属性
-                LuaClassField fieldDef = type.findField(idString, project, scope);
+                LuaClassField fieldDef = type.findField(idString, context);
                 if (fieldDef != null)
                     return fieldDef;
                 //方法
-                LuaClassMethodDef methodDef = type.findMethod(idString, project, scope);
+                LuaClassMethodDef methodDef = type.findMethod(idString, context);
                 if (methodDef != null)
                     return methodDef;
             }
@@ -141,7 +135,7 @@ public class LuaPsiResolveUtil {
         return null;
     }
 
-    static LuaTypeSet resolveType(LuaNameDef nameDef) {
+    static LuaTypeSet resolveType(LuaNameDef nameDef, SearchContext context) {
         //作为函数参数，类型在函数注释里找
         if (nameDef instanceof LuaParamNameDef) {
             LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
@@ -159,7 +153,7 @@ public class LuaPsiResolveUtil {
         else if (nameDef.getParent() instanceof LuaTableField) {
             LuaTableField field = (LuaTableField) nameDef.getParent();
             LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
-            if (expr != null) return expr.guessType();
+            if (expr != null) return expr.guessType(context);
         }
         //变量声明，local x = 0
         else {
@@ -181,7 +175,7 @@ public class LuaPsiResolveUtil {
                             List<LuaExpr> exprs = exprList.getExprList();
                             if (index < exprs.size()) {
                                 LuaExpr expr = exprs.get(index);
-                                typeSet = expr.guessType();
+                                typeSet = expr.guessType(context);
                             }
                         }
                     }

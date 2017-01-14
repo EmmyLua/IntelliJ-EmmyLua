@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +42,7 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
         LuaArgs luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), LuaArgs.class, false);
         if (luaArgs != null) {
             LuaCallExpr callExpr = (LuaCallExpr) luaArgs.getParent();
-            context.setItemsToShow(new Object[] { callExpr.resolveFuncBodyOwner() });
+            context.setItemsToShow(new Object[] { callExpr.resolveFuncBodyOwner(new SearchContext(context.getProject())) });
         }
         return luaArgs;
     }
@@ -96,7 +97,7 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
                     start = sb.length();
                 sb.append(nameDef.getName());
 
-                LuaTypeSet typeSet = nameDef.resolveType();
+                LuaTypeSet typeSet = nameDef.resolveType(new SearchContext(o.getProject()));
                 if (typeSet != null) {
                     sb.append(" : ");
                     List<LuaType> types = typeSet.getTypes();

@@ -1,18 +1,16 @@
 package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,22 +23,22 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     }
 
     @Override
-    public LuaTypeSet guessType() {
+    public LuaTypeSet guessType(SearchContext context) {
         if (this instanceof LuaValueExpr)
-            return guessType((LuaValueExpr) this);
+            return guessType((LuaValueExpr) this, context);
         if (this instanceof LuaCallExpr)
-            return guessType((LuaCallExpr) this);
+            return guessType((LuaCallExpr) this, context);
         if (this instanceof LuaIndexExpr)
-            return guessType((LuaIndexExpr) this);
+            return guessType((LuaIndexExpr) this, context);
 
         return null;
     }
 
-    private LuaTypeSet guessType(LuaIndexExpr indexExpr) {
+    private LuaTypeSet guessType(LuaIndexExpr indexExpr, SearchContext context) {
         PsiElement id = indexExpr.getId();
         if (id == null) return null;
 
-        LuaTypeSet prefixType = indexExpr.guessPrefixType();
+        LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
         if (prefixType != null && !prefixType.isEmpty()) {
             String propName = id.getText();
             for (LuaType type : prefixType.getTypes()) {
@@ -49,12 +47,10 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                     LuaTableField field = table.tableConstructor.findField(propName);
                     if (field != null) {
                         LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
-                        if (expr != null) return expr.guessType();
+                        if (expr != null) return expr.guessType(context);
                     }
                 } else {
-                    Project project = indexExpr.getProject();
-                    GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
-                    LuaTypeSet typeSet = type.guessFieldType(propName, project, scope);
+                    LuaTypeSet typeSet = type.guessFieldType(propName, context);
                     if (typeSet != null)
                         return typeSet;
                 }
@@ -63,7 +59,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         return null;
     }
 
-    private LuaTypeSet guessType(LuaCallExpr luaCallExpr) {
+    private LuaTypeSet guessType(LuaCallExpr luaCallExpr, SearchContext context) {
         // xxx()
         LuaNameRef ref = luaCallExpr.getNameRef();
         if (ref != null) {
@@ -79,11 +75,11 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                 if (filePath != null)
                     file = LuaPsiResolveUtil.resolveRequireFile(filePath, luaCallExpr.getProject());
                 if (file != null)
-                    return file.getReturnedType();
+                    return file.getReturnedType(context);
             }
         }
         // find in comment
-        LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner();
+        LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner(context);
         if (bodyOwner instanceof LuaCommentOwner) {
             LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) bodyOwner);
             if (comment != null) {
@@ -96,11 +92,11 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         return null;
     }
 
-    private static LuaTypeSet guessType(LuaValueExpr valueExpr) {
+    private static LuaTypeSet guessType(LuaValueExpr valueExpr, SearchContext context) {
         PsiElement firstChild = valueExpr.getFirstChild();
         if (firstChild != null) {
             if (firstChild instanceof LuaExpr) {
-                return ((LuaExpr) firstChild).guessType();
+                return ((LuaExpr) firstChild).guessType(context);
             }
             else if (firstChild instanceof LuaTableConstructor) {
                 return LuaTypeSet.create(LuaTableType.create((LuaTableConstructor) firstChild));
@@ -109,9 +105,9 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                 LuaVar luaVar = (LuaVar) firstChild;
                 LuaNameRef ref = luaVar.getNameRef();
                 if (ref != null)
-                    return ref.resolveType();
+                    return ref.resolveType(context);
                 else if (luaVar.getExpr() != null)
-                    return luaVar.getExpr().guessType();
+                    return luaVar.getExpr().guessType(context);
             }
         }
         return null;
