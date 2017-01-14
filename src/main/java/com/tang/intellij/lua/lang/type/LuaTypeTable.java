@@ -27,7 +27,13 @@ public class LuaTypeTable extends LuaType {
     private List<String> fieldStringList;
 
     private LuaTypeTable(LuaTableConstructor tableElement) {
+        super(tableElement);
         tableConstructor = tableElement;
+    }
+
+    @Override
+    public String getClassNameText() {
+        return "table";
     }
 
     private void InitFieldList() {
@@ -46,7 +52,11 @@ public class LuaTypeTable extends LuaType {
     }
 
     @Override
-    protected void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+    protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
+                                       @NotNull CompletionResultSet completionResultSet,
+                                       boolean bold,
+                                       boolean withSuper) {
+        super.addFieldCompletions(completionParameters, completionResultSet, bold, withSuper);
         InitFieldList();
         for (String s : fieldStringList) {
             LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
