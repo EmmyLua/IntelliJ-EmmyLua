@@ -264,10 +264,17 @@ fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
 
 tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
     methods = [
-        getNameIdentifier setName getName getTextOffset
-        nameDef="tableFieldNameDef"
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+
+        getFieldName
+        resolveType
+        nameDef = "tableFieldNameDef"
     ]
     implements = [
+        "com.tang.intellij.lua.psi.LuaClassField"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
 }

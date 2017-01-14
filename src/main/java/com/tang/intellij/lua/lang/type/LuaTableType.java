@@ -3,8 +3,11 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.tang.intellij.lua.lang.LuaIcons;
+import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableConstructor;
 import com.tang.intellij.lua.psi.LuaTableField;
@@ -65,5 +68,14 @@ public class LuaTableType extends LuaType {
 
             completionResultSet.addElement(elementBuilder);
         }
+    }
+
+    @Override
+    public LuaClassField findField(String fieldName, Project project, GlobalSearchScope scope) {
+        LuaClassField field = super.findField(fieldName, project, scope);
+        if (field == null) {
+            field = tableConstructor.findField(fieldName);
+        }
+        return field;
     }
 }

@@ -10,7 +10,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaAnonymousType;
-import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
@@ -129,22 +128,14 @@ public class LuaPsiResolveUtil {
             Project project = indexExpr.getProject();
             GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
             for (LuaType type : typeSet.getTypes()) {
-                if (type instanceof LuaTableType) { // 可能是 table 字段
-                    LuaTableType tableType = (LuaTableType) type;
-                    LuaTableField field = tableType.tableConstructor.findField(idString);
-                    if (field != null) {
-                        return field;
-                    }
-                } else {
-                    //属性
-                    LuaClassField fieldDef = type.findField(idString, project, scope);
-                    if (fieldDef != null)
-                        return fieldDef;
-                    //方法
-                    LuaClassMethodDef methodDef = type.findMethod(idString, project, scope);
-                    if (methodDef != null)
-                        return methodDef;
-                }
+                //属性
+                LuaClassField fieldDef = type.findField(idString, project, scope);
+                if (fieldDef != null)
+                    return fieldDef;
+                //方法
+                LuaClassMethodDef methodDef = type.findMethod(idString, project, scope);
+                if (methodDef != null)
+                    return methodDef;
             }
         }
         return null;

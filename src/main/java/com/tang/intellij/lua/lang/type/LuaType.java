@@ -82,7 +82,37 @@ public class LuaType {
         }
     }
 
-    protected void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {}
+
+
+    protected void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+        Project project = getProject();
+        if (project == null)
+            return;
+        String clazzName = getClassNameText();
+        if (clazzName == null)
+            return;
+        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, project, new ProjectAndLibrariesScope(project));
+        for (LuaClassMethodDef def : list) {
+            String methodName = def.getName();
+            if (methodName != null) {
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
+                        .withIcon(LuaIcons.CLASS_METHOD)
+                        .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
+                        .withTypeText(clazzName)
+                        .withItemTextUnderlined(true);
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
+
+                completionResultSet.addElement(elementBuilder);
+            }
+        }
+
+        if (withSuper) {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                superType.addStaticMethodCompletions(completionParameters, completionResultSet, false, true);
+        }
+    }
 
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         addFieldCompletions(completionParameters, completionResultSet, true, true);
@@ -126,18 +156,52 @@ public class LuaType {
     }
 
     public LuaTypeSet guessFieldType(String propName, Project project, GlobalSearchScope scope) {
-        return null;
+        LuaTypeSet set = null;
+        LuaClassField fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, project, scope);
+        if (fieldDef != null)
+            set = fieldDef.resolveType();
+        else {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                set = superType.guessFieldType(propName, project, scope);
+        }
+
+        return set;
     }
 
     public LuaClassField findField(String fieldName, Project project, GlobalSearchScope scope) {
-        return null;
+        String className = getClassNameText();
+        LuaClassField def = LuaClassFieldIndex.find(className, fieldName, project, scope);
+        if (def == null) {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                def = superType.findField(fieldName, project, scope);
+        }
+        return def;
     }
 
     public LuaClassMethodDef findMethod(String methodName, Project project, GlobalSearchScope scope) {
-        return null;
+        String className = getClassNameText();
+        LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(className, methodName, project, scope);
+        if (def == null) { // static
+            def = LuaClassMethodIndex.findStaticMethod(className, methodName, project, scope);
+        }
+        if (def == null) { // super
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                def = superType.findMethod(methodName, project, scope);
+        }
+        return def;
     }
 
     public LuaClassMethodDef findStaticMethod(String methodName, boolean withSuper, Project project, GlobalSearchScope scope) {
-        return null;
+        String className = getClassNameText();
+        LuaClassMethodDef def = LuaClassMethodIndex.findStaticMethod(className, methodName, project, scope);
+        if (def == null && withSuper) {
+            LuaType superType = getSuperClass();
+            if (superType != null)
+                def = superType.findStaticMethod(methodName, true, project, scope);
+        }
+        return def;
     }
 }

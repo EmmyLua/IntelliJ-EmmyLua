@@ -356,6 +356,14 @@ public class LuaPsiImplUtil {
         return tableField.getId();
     }
 
+    public static LuaTypeSet resolveType(LuaTableField tableField) {
+        return null;
+    }
+
+    public static String getFieldName(LuaTableField tableField) {
+        return getName(tableField);
+    }
+
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
         return "[STUB]" + stubElement.getNode().getElementType().toString();
     }
