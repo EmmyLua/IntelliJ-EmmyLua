@@ -41,8 +41,9 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
 
             LuaTypeSet set = indexExpr.guessPrefixType(context);
             if (set != null) {
-                LuaType type = set.getType(0);
-                typeName = type.getClassNameText();
+                LuaType type = set.getFirst();
+                if (type != null)
+                    typeName = type.getClassNameText();
             }
         }
         return typeName;

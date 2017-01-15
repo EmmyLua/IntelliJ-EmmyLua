@@ -10,6 +10,7 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.type.LuaGlobalType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.reference.LuaNameReference;
@@ -269,23 +270,29 @@ public class LuaPsiImplUtil {
         LuaNameRef nameRef = indexExpr.getNameRef();
         if (nameRef != null) {
             PsiElement def = LuaPsiResolveUtil.resolve(nameRef, context);
-            if (def instanceof LuaTypeGuessable) {
+            if (def == null) { //也许是Global
+                return LuaTypeSet.create(LuaGlobalType.create(nameRef));
+            } else if (def instanceof LuaTypeGuessable) {
                 return ((LuaTypeGuessable) def).guessType(context);
-            } else if (def instanceof LuaNameRef) { // TODO : Global assign
+            } else if (def instanceof LuaNameRef) {
+                LuaTypeSet typeSet = null;
                 LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
                 if (luaAssignStat != null) {
                     LuaComment comment = luaAssignStat.getComment();
                     //优先从 Comment 猜
                     if (comment != null) {
-                        LuaTypeSet typeSet = comment.guessType();
-                        if (typeSet != null)
-                            return typeSet;
+                        typeSet = comment.guessType();
                     }
                     //再从赋值猜
-                    LuaExprList exprList = luaAssignStat.getExprList();
-                    if (exprList != null)
-                        return exprList.guessTypeAt(0, context);//TODO : multi
+                    if (typeSet == null) {
+                        LuaExprList exprList = luaAssignStat.getExprList();
+                        if (exprList != null)
+                            typeSet = exprList.guessTypeAt(0, context);//TODO : multi
+                    }
                 }
+                if (typeSet == null || typeSet.isEmpty()) //Global ???
+                    typeSet = LuaTypeSet.create(LuaGlobalType.create(nameRef));
+                return typeSet;
             }
         }
         else {

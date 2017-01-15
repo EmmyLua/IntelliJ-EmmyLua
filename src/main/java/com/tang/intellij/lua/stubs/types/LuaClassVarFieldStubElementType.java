@@ -20,7 +20,7 @@ import java.io.IOException;
  */
 public class LuaClassVarFieldStubElementType extends IStubElementType<LuaVarStub, LuaVar> {
     public LuaClassVarFieldStubElementType() {
-        super("Index Expr", LuaLanguage.INSTANCE);
+        super("Var", LuaLanguage.INSTANCE);
     }
 
     @Override
