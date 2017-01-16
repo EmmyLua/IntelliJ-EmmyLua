@@ -3,15 +3,12 @@ package com.tang.intellij.lua.psi;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaAnonymousType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,7 +82,7 @@ public class LuaPsiResolveUtil {
         }
 
         //global field
-        if (resolveResult == null) {
+        /*if (resolveResult == null) {
             LuaDocGlobalDef globalDef = LuaGlobalFieldIndex.find(refName, context);
             if (globalDef != null) {
                 LuaCommentOwner owner = LuaCommentUtil.findOwner(globalDef);
@@ -101,7 +98,7 @@ public class LuaPsiResolveUtil {
                     }
                 }
             }
-        }
+        }*/
 
         //global function
         if (resolveResult == null) {

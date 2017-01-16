@@ -6,7 +6,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocGlobalDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.stubs.LuaGlobalFieldStub;
 import com.tang.intellij.lua.stubs.impl.LuaGlobalFieldStubImpl;
 import org.jetbrains.annotations.NotNull;
@@ -77,9 +76,9 @@ public class LuaGlobalFieldStubElementType extends IStubElementType<LuaGlobalFie
 
     @Override
     public void indexStub(@NotNull LuaGlobalFieldStub luaGlobalFieldStub, @NotNull IndexSink indexSink) {
-        String[] names = luaGlobalFieldStub.getNames();
+        /*String[] names = luaGlobalFieldStub.getNames();
         for (String name : names) {
             indexSink.occurrence(LuaGlobalFieldIndex.KEY, name);
-        }
+        }*/
     }
 }
