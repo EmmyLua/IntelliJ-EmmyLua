@@ -56,7 +56,7 @@ public class LuaElementType extends IElementType {
     public static LuaClassStubElementType CLASS_DEF = new LuaClassStubElementType();
     public static LuaTableStubElementType TABLE = new LuaTableStubElementType();
     public static LuaTableFieldStubElementType TABLE_FIELD = new LuaTableFieldStubElementType();
-    public static LuaClassVarFieldStubElementType VAR = new LuaClassVarFieldStubElementType();
+    public static LuaVarStubElementType VAR = new LuaVarStubElementType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
 
     static class LuaBlockElementType extends IReparseableElementType {

@@ -18,8 +18,8 @@ import java.io.IOException;
  *
  * Created by tangzx on 2017/1/12.
  */
-public class LuaClassVarFieldStubElementType extends IStubElementType<LuaVarStub, LuaVar> {
-    public LuaClassVarFieldStubElementType() {
+public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> {
+    public LuaVarStubElementType() {
         super("Var", LuaLanguage.INSTANCE);
     }
 
