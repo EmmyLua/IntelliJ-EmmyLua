@@ -17,8 +17,8 @@ import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.stubs.index.LuaGlobalFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
+import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -92,7 +92,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                 }
 
                 //global fields
-                Collection<String> allGlobalFieldNames = LuaGlobalFieldIndex.getInstance().getAllKeys(project);
+                Collection<String> allGlobalFieldNames = LuaGlobalVarIndex.getInstance().getAllKeys(project);
                 for (String name : allGlobalFieldNames) {
                     completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(LuaIcons.GLOBAL_FIELD));
                 }

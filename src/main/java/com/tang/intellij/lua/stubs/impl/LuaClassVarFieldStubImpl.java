@@ -19,19 +19,33 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
 
     private LuaIndexExpr indexExpr;
     private String typeName;
+    private String fieldName;
+    private boolean isGlobal;
 
     public LuaClassVarFieldStubImpl(StubElement parent,
                                     IStubElementType elementType,
                                     LuaIndexExpr indexExpr) {
         super(parent, elementType);
         this.indexExpr = indexExpr;
+        this.isGlobal = false;
     }
 
     public LuaClassVarFieldStubImpl(StubElement stubElement,
                                     IStubElementType type,
-                                    String typeName) {
+                                    String typeName,
+                                    String fieldName) {
         super(stubElement, type);
+        this.isGlobal = false;
         this.typeName = typeName;
+        this.fieldName = fieldName;
+    }
+
+    public LuaClassVarFieldStubImpl(StubElement stubElement,
+                                    IStubElementType type,
+                                    String fieldName) {
+        super(stubElement, type);
+        this.isGlobal = true;
+        this.fieldName = fieldName;
     }
 
     public String getTypeName() {
@@ -51,8 +65,17 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
 
     @Override
     public String getFieldName() {
-        PsiElement id = indexExpr.getId();
-        return id == null ? null : id.getText();
+        if (fieldName == null) {
+            PsiElement id = indexExpr.getId();
+            if (id != null)
+                fieldName = id.getText();
+        }
+        return fieldName;
+    }
+
+    @Override
+    public boolean isGlobal() {
+        return isGlobal;
     }
 
 }

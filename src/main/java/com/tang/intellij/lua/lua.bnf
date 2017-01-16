@@ -213,6 +213,7 @@ var ::= callOrIndexExpr | nameRef {
         getTextOffset
     ]
     implements = [
+        "com.tang.intellij.lua.psi.LuaGlobalVar"
         "com.tang.intellij.lua.psi.LuaClassField"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]

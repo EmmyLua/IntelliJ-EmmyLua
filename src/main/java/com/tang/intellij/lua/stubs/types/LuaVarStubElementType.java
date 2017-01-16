@@ -2,15 +2,14 @@ package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.psi.LuaExpr;
-import com.tang.intellij.lua.psi.LuaIndexExpr;
-import com.tang.intellij.lua.psi.LuaVar;
-import com.tang.intellij.lua.psi.LuaVarList;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.impl.LuaVarImpl;
 import com.tang.intellij.lua.stubs.LuaVarStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassVarFieldStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
+import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -33,10 +32,21 @@ public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> 
     public boolean shouldCreateStub(ASTNode node) {
         LuaVar psi = (LuaVar) node.getPsi();
         if (psi.getParent() instanceof LuaVarList) {
+            LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(psi, LuaAssignStat.class);
+            assert assignStat != null;
+            if (assignStat.getExprList() == null) // 确定是XXX.XX = XXX 完整形式
+                return false;
+
             LuaExpr expr = psi.getExpr();
+            //XXX.XXX = ??
             if (expr instanceof LuaIndexExpr) {
                 LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
                 return indexExpr.getId() != null;
+            }
+            //XXX = ??
+            LuaNameRef nameRef = psi.getNameRef();
+            if (nameRef != null) {
+                return true;
             }
         }
         return false;
@@ -45,6 +55,9 @@ public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> 
     @NotNull
     @Override
     public LuaVarStub createStub(@NotNull LuaVar var, StubElement stubElement) {
+        if (var.getNameRef() != null)
+            return new LuaClassVarFieldStubImpl(stubElement, this, var.getNameRef().getText());
+
         assert var.getExpr() instanceof LuaIndexExpr;
         LuaIndexExpr indexExpr = (LuaIndexExpr) var.getExpr();
         assert indexExpr.getId() != null;
@@ -60,29 +73,43 @@ public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> 
 
     @Override
     public void serialize(@NotNull LuaVarStub varStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        String text = varStub.getTypeName();
-        stubOutputStream.writeBoolean(text != null);
-        if (text != null) {
-            stubOutputStream.writeUTFFast(text);
+        stubOutputStream.writeBoolean(varStub.isGlobal());
+        stubOutputStream.writeUTFFast(varStub.getFieldName());
+        if (!varStub.isGlobal()) {
+            String text = varStub.getTypeName();
+            stubOutputStream.writeBoolean(text != null);
+            if (text != null) {
+                stubOutputStream.writeUTFFast(text);
+            }
         }
     }
 
     @NotNull
     @Override
     public LuaVarStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        boolean hasType = stubInputStream.readBoolean();
-        String text = null;
-        if (hasType) text = stubInputStream.readUTFFast();
-        return new LuaClassVarFieldStubImpl(stubElement, this, text);
+        boolean isGlobal = stubInputStream.readBoolean();
+        String fieldName = stubInputStream.readUTFFast();
+        if (isGlobal) {
+            return new LuaClassVarFieldStubImpl(stubElement, this, fieldName);
+        } else {
+            boolean hasType = stubInputStream.readBoolean();
+            String text = null;
+            if (hasType) text = stubInputStream.readUTFFast();
+            return new LuaClassVarFieldStubImpl(stubElement, this, text);
+        }
     }
 
     @Override
     public void indexStub(@NotNull LuaVarStub varStub, @NotNull IndexSink indexSink) {
-        String typeName = varStub.getTypeName();
         String fieldName = varStub.getFieldName();
-        if (typeName != null && fieldName != null) {
-            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName);
-            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName);
+        if (varStub.isGlobal()) {
+            indexSink.occurrence(LuaGlobalVarIndex.KEY, fieldName);
+        } else {
+            String typeName = varStub.getTypeName();
+            if (typeName != null && fieldName != null) {
+                indexSink.occurrence(LuaClassFieldIndex.KEY, typeName);
+                indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName);
+            }
         }
     }
 }
