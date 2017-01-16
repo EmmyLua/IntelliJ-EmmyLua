@@ -6,6 +6,7 @@ import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaExpr;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaVar;
+import com.tang.intellij.lua.psi.LuaVarList;
 import com.tang.intellij.lua.psi.impl.LuaVarImpl;
 import com.tang.intellij.lua.stubs.LuaVarStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassVarFieldStubImpl;
@@ -31,10 +32,12 @@ public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> 
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         LuaVar psi = (LuaVar) node.getPsi();
-        LuaExpr expr = psi.getExpr();
-        if (expr instanceof LuaIndexExpr) {
-            LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
-            return indexExpr.getId() != null;
+        if (psi.getParent() instanceof LuaVarList) {
+            LuaExpr expr = psi.getExpr();
+            if (expr instanceof LuaIndexExpr) {
+                LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
+                return indexExpr.getId() != null;
+            }
         }
         return false;
     }
