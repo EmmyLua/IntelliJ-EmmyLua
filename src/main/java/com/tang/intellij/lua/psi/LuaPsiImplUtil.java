@@ -138,25 +138,9 @@ public class LuaPsiImplUtil {
      */
     public static LuaTypeSet guessPrefixType(LuaCallExpr callExpr, SearchContext context) {
         LuaNameRef nameRef = callExpr.getNameRef();
-        if (nameRef != null) { // 形如 xx:method, xx.method
-            PsiElement def = LuaPsiResolveUtil.resolve(nameRef, context);
-            if (def instanceof LuaTypeGuessable) {
-                return ((LuaTypeGuessable) def).guessType(context);
-            } else if (def instanceof LuaNameRef) {
-                // global
-                // --- @define
-                // --- @type XXX
-                // myGlobal = ...
-                LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
-                if (assignStat != null) {
-                    LuaComment comment = LuaCommentUtil.findComment(assignStat);
-                    if (comment != null) {
-                        return comment.guessType();
-                    }
-                }
-            }
-        }
-        else {
+        if (nameRef != null) {
+            return guessNameRefType(nameRef, context);
+        } else {
             LuaExpr prefix = (LuaExpr) callExpr.getFirstChild();
             if (prefix != null)
                 return prefix.guessType(context);
@@ -251,6 +235,17 @@ public class LuaPsiImplUtil {
     public static LuaTypeSet guessPrefixType(LuaIndexExpr indexExpr, SearchContext context) {
         LuaNameRef nameRef = indexExpr.getNameRef();
         if (nameRef != null) {
+            return guessNameRefType(nameRef, context);
+        } else {
+            LuaExpr prefix = (LuaExpr) indexExpr.getFirstChild();
+            if (prefix != null)
+                return prefix.guessType(context);
+        }
+        return null;
+    }
+
+    private static LuaTypeSet guessNameRefType(LuaNameRef nameRef, SearchContext context) {
+        if (nameRef != null) {
             PsiElement def = LuaPsiResolveUtil.resolve(nameRef, context);
             if (def == null) { //也许是Global
                 return LuaTypeSet.create(LuaGlobalType.create(nameRef));
@@ -281,11 +276,6 @@ public class LuaPsiImplUtil {
                 }
                 return typeSet;
             }
-        }
-        else {
-            LuaExpr prefix = (LuaExpr) indexExpr.getFirstChild();
-            if (prefix != null)
-                return prefix.guessType(context);
         }
         return null;
     }
