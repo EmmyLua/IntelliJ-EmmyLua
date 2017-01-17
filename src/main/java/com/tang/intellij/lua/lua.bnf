@@ -164,7 +164,6 @@ classMethodDef ::= 'function' classMethodName funcBody {
     methods = [
         getComment
         getClassType
-        getClassName
         getParamNameDefList
         getNameIdentifier
         setName

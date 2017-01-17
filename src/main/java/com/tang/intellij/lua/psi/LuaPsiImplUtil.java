@@ -90,27 +90,6 @@ public class LuaPsiImplUtil {
     }
 
     /**
-     * 寻找 class method 对应的类名
-     * @param classMethodDef def
-     * @return 类名
-     */
-    public static String getClassName(LuaClassMethodDef classMethodDef, SearchContext context) {
-        if (classMethodDef.getStub() != null) {
-            return classMethodDef.getStub().getClassName();
-        }
-
-        LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
-        String clazzName = null;
-        if (ref != null) {
-            LuaTypeSet typeSet = ref.guessType(context);
-            if (typeSet != null && !typeSet.isEmpty()) {
-                clazzName = typeSet.getType(0).getClassNameText();
-            }
-        }
-        return clazzName;
-    }
-
-    /**
      * 寻找对应的类
      * @param classMethodDef def
      * @return LuaType
@@ -119,8 +98,8 @@ public class LuaPsiImplUtil {
         LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
         if (ref != null) {
             LuaTypeSet typeSet = ref.guessType(context);
-            if (typeSet != null && !typeSet.isEmpty()) {
-                return typeSet.getType(0);
+            if (typeSet != null) {
+                return typeSet.getFirst();
             }
         }
         return null;
@@ -207,10 +186,13 @@ public class LuaPsiImplUtil {
                     return LuaPsiResolveUtil.resolveFuncBodyOwner(luaNameRef, context);
             } else {
                 LuaTypeSet typeSet = callExpr.guessPrefixType(context);
-                if (typeSet != null && !typeSet.isEmpty()) { //TODO multi-type
+                if (typeSet != null && !typeSet.isEmpty()) {
                     // class method
-                    LuaType type = typeSet.getType(0);
-                    return type.findMethod(id.getText(), context);
+                    for (LuaType type : typeSet.getTypes()) {
+                        LuaClassMethodDef method = type.findMethod(id.getText(), context);
+                        if (method != null)
+                            return method;
+                    }
                 }
             }
         }
