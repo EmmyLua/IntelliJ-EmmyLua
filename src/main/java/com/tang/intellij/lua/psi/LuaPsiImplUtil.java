@@ -290,8 +290,13 @@ public class LuaPsiImplUtil {
                             typeSet = exprList.guessTypeAt(0, context);//TODO : multi
                     }
                 }
-                if (typeSet == null || typeSet.isEmpty()) //Global ???
-                    typeSet = LuaTypeSet.create(LuaGlobalType.create(nameRef));
+                //同时是 Global ?
+                if (LuaPsiResolveUtil.resolveLocal(nameRef) == null) {
+                    if (typeSet == null || typeSet.isEmpty())
+                        typeSet = LuaTypeSet.create(LuaGlobalType.create(nameRef));
+                    else
+                        typeSet.addType(LuaGlobalType.create(nameRef));
+                }
                 return typeSet;
             }
         }
