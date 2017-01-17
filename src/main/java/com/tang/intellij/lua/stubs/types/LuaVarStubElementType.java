@@ -45,7 +45,7 @@ public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> 
             }
             //XXX = ??
             LuaNameRef nameRef = psi.getNameRef();
-            if (nameRef != null) {
+            if (nameRef != null && LuaPsiResolveUtil.resolveLocal(nameRef) == null) {
                 return true;
             }
         }

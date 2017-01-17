@@ -1,10 +1,12 @@
 package com.tang.intellij.lua.stubs.index;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import com.tang.intellij.lua.search.SearchContext;
+import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -33,11 +35,16 @@ public class LuaGlobalFuncIndex extends StringStubIndexExtension<LuaGlobalFuncDe
     }
 
     public static LuaGlobalFuncDef find(String key, SearchContext context) {
-        if (!context.isDumb()) {
-            Collection<LuaGlobalFuncDef> defs = LuaGlobalFuncIndex.getInstance().get(key, context.getProject(), context.getScope());
-            if (!defs.isEmpty()) {
-                return defs.iterator().next();
-            }
+        if (context.isDumb())
+            return null;
+
+        Collection<LuaGlobalFuncDef> defs = new SmartList<>();
+        StubIndex.getInstance().processElements(KEY, key, context.getProject(), context.getScope(), LuaGlobalFuncDef.class, (s) -> {
+            defs.add(s);
+            return true;
+        });
+        if (!defs.isEmpty()) {
+            return defs.iterator().next();
         }
         return null;
     }

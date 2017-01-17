@@ -26,7 +26,8 @@ public class LuaTableType extends LuaType {
     }
 
     public static String getTypeName(LuaTableConstructor tableConstructor) {
-        return String.format("table@%d", tableConstructor.getNode().getStartOffset());
+        String fileName = tableConstructor.getContainingFile().getName();
+        return String.format("%s/table@%d", fileName, tableConstructor.getNode().getStartOffset());
     }
 
     public LuaTableConstructor tableConstructor;

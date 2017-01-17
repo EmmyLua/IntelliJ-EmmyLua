@@ -66,6 +66,10 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
 
     @Override
     public void indexStub(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull IndexSink indexSink) {
+        String name = luaGlobalFuncStub.getName();
+        if ("WIRETYPE_TO_SKIPPER".equals(name)) {
+            System.out.println(name);
+        }
         indexSink.occurrence(LuaGlobalFuncIndex.KEY, luaGlobalFuncStub.getName());
     }
 }

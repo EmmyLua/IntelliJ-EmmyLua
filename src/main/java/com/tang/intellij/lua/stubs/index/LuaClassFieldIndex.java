@@ -33,6 +33,9 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     }
 
     public static LuaClassField find(@NotNull String key, @NotNull SearchContext context) {
+        if (context.isDumb())
+            return null;
+
         Collection<LuaClassField> list = INSTANCE.get(key, context.getProject(), context.getScope());
         if (!list.isEmpty())
             return list.iterator().next();

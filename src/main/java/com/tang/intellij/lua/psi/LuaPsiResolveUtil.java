@@ -10,6 +10,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
+import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -45,9 +46,7 @@ public class LuaPsiResolveUtil {
         return temp;
     }
 
-    private static PsiElement resolveResult;
-
-    public static PsiElement resolve(LuaNameRef ref, SearchContext context) {
+    public static PsiElement resolveLocal(LuaNameRef ref) {
         String refName = ref.getName();
 
         if (refName.equals("self")) {
@@ -81,24 +80,31 @@ public class LuaPsiResolveUtil {
             });
         }
 
+        PsiElement result = resolveResult;
+        resolveResult = null;
+        return result;
+    }
+
+    private static PsiElement resolveResult;
+
+    /**
+     * 查找这个引用
+     * @param ref 要查找的ref
+     * @param context context
+     * @return PsiElement
+     */
+    public static PsiElement resolve(LuaNameRef ref, SearchContext context) {
+        //search local
+        resolveResult = resolveLocal(ref);
+
+        String refName = ref.getName();
         //global field
-        /*if (resolveResult == null) {
-            LuaDocGlobalDef globalDef = LuaGlobalFieldIndex.find(refName, context);
-            if (globalDef != null) {
-                LuaCommentOwner owner = LuaCommentUtil.findOwner(globalDef);
-                if (owner instanceof LuaAssignStat) {
-                    LuaAssignStat assignStat = (LuaAssignStat) owner;
-                    List<LuaVar> varList = assignStat.getVarList().getVarList();
-                    for (LuaVar var : varList) {
-                        LuaNameRef nameRef = var.getNameRef();
-                        if (nameRef != null && nameRef.getText().equals(refName)) {
-                            resolveResult = nameRef;
-                            break;
-                        }
-                    }
-                }
+        if (resolveResult == null) {
+            LuaGlobalVar globalVar = LuaGlobalVarIndex.find(refName, context);
+            if (globalVar != null) {
+                resolveResult = globalVar.getNameRef();
             }
-        }*/
+        }
 
         //global function
         if (resolveResult == null) {
