@@ -21,8 +21,6 @@ import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 
 /**
@@ -64,14 +62,17 @@ public class LuaCompletionContributor extends CompletionContributor {
                 //local
                 PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
                 LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> {
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(nameDef.getText())
-                            .withIcon(LuaIcons.LOCAL_VAR);
-                    completionResultSet.addElement(elementBuilder);
+                    String name = nameDef.getText();
+                    if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
+                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
+                                .withIcon(LuaIcons.LOCAL_VAR);
+                        completionResultSet.addElement(elementBuilder);
+                    }
                     return  true;
                 });
                 LuaPsiTreeUtil.walkUpLocalFuncDef(cur, localFuncDef -> {
                     String name = localFuncDef.getName();
-                    if (name != null) {
+                    if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create(localFuncDef.getName())
                                 .withInsertHandler(new FuncInsertHandler(localFuncDef.getFuncBody()))
                                 .withIcon(LuaIcons.LOCAL_FUNCTION);
@@ -82,20 +83,24 @@ public class LuaCompletionContributor extends CompletionContributor {
 
                 //global functions
                 Project project = completionParameters.getOriginalFile().getProject();
-                Collection<String> list = LuaGlobalFuncIndex.getInstance().getAllKeys(project);
-                for (String name : list) {
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
-                            .withTypeText("Global Func")
-                            .withInsertHandler(new GlobalFuncInsertHandler(name, project))
-                            .withIcon(LuaIcons.GLOBAL_FUNCTION);
-                    completionResultSet.addElement(elementBuilder);
-                }
+                LuaGlobalFuncIndex.getInstance().processAllKeys(project, name -> {
+                    if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
+                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
+                                .withTypeText("Global Func")
+                                .withInsertHandler(new GlobalFuncInsertHandler(name, project))
+                                .withIcon(LuaIcons.GLOBAL_FUNCTION);
+                        completionResultSet.addElement(elementBuilder);
+                    }
+                    return true;
+                });
 
                 //global fields
-                Collection<String> allGlobalFieldNames = LuaGlobalVarIndex.getInstance().getAllKeys(project);
-                for (String name : allGlobalFieldNames) {
-                    completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(LuaIcons.GLOBAL_FIELD));
-                }
+                LuaGlobalVarIndex.getInstance().processAllKeys(project, name -> {
+                    if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
+                        completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(LuaIcons.GLOBAL_FIELD));
+                    }
+                    return true;
+                });
 
                 //key words
                 TokenSet keywords = TokenSet.orSet(LuaSyntaxHighlighter.KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET);
@@ -124,7 +129,9 @@ public class LuaCompletionContributor extends CompletionContributor {
             @Override
             public void visitElement(PsiElement element) {
                 if (element.getNode().getElementType() == LuaTypes.ID && element.getTextLength() > 2) {
-                    wordsInFileSet.add(element.getText());
+                    String text = element.getText();
+                    if (completionResultSet.getPrefixMatcher().prefixMatches(text))
+                        wordsInFileSet.add(text);
                 }
                 super.visitElement(element);
             }

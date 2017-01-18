@@ -43,7 +43,9 @@ public class LuaType {
         return element.getProject();
     }
 
-    public void addMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean useAsField) {
+    public void addMethodCompletions(@NotNull CompletionParameters completionParameters,
+                                     @NotNull CompletionResultSet completionResultSet,
+                                     boolean useAsField) {
         addMethodCompletions(completionParameters, completionResultSet, true, true, useAsField);
     }
 
@@ -62,7 +64,7 @@ public class LuaType {
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
-            if (methodName != null) {
+            if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
                         .withIcon(LuaIcons.CLASS_METHOD)
                         .withTypeText(clazzName);
@@ -82,9 +84,10 @@ public class LuaType {
         }
     }
 
-
-
-    protected void addStaticMethodCompletions(@NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper, SearchContext context) {
+    protected void addStaticMethodCompletions(@NotNull CompletionResultSet completionResultSet,
+                                              boolean bold,
+                                              boolean withSuper,
+                                              SearchContext context) {
         Project project = getProject();
         if (project == null)
             return;
@@ -94,7 +97,7 @@ public class LuaType {
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, context);
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
-            if (methodName != null) {
+            if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
                         .withIcon(LuaIcons.CLASS_METHOD)
                         .withInsertHandler(new FuncInsertHandler(def.getFuncBody()))
@@ -114,7 +117,9 @@ public class LuaType {
         }
     }
 
-    public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, SearchContext context) {
+    public void addFieldCompletions(@NotNull CompletionParameters completionParameters,
+                                    @NotNull CompletionResultSet completionResultSet,
+                                    SearchContext context) {
         addFieldCompletions(completionParameters, completionResultSet, true, true, context);
         addStaticMethodCompletions(completionResultSet, true, true, context);
         addMethodCompletions(completionParameters, completionResultSet, true);

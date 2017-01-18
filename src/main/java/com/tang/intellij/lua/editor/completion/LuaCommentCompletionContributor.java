@@ -20,7 +20,6 @@ import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
@@ -89,8 +88,12 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 Project project = completionParameters.getPosition().getProject();
-                Collection<String> collection = LuaClassIndex.getInstance().getAllKeys(project);
-                collection.forEach(className -> completionResultSet.addElement(LookupElementBuilder.create(className).withIcon(LuaIcons.CLASS)));
+                LuaClassIndex.getInstance().processAllKeys(project, className -> {
+                    if (completionResultSet.getPrefixMatcher().prefixMatches(className)) {
+                        completionResultSet.addElement(LookupElementBuilder.create(className).withIcon(LuaIcons.CLASS));
+                    }
+                    return true;
+                });
             }
         });
 
