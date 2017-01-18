@@ -47,7 +47,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                     annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
                 } else {
                     Annotation annotation = myHolder.createInfoAnnotation(name, null);
-                    annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+                    annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
                 }
             }
         }
@@ -103,7 +103,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             } else if (res instanceof LuaGlobalFuncDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTION);
-            } else if (res instanceof LuaNameDef) { //Local
+            } else if (res instanceof LuaNameDef || res instanceof LuaLocalFuncDef) { //Local
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
             } else/* if (res instanceof LuaNameRef) */{ // 未知的，视为Global
