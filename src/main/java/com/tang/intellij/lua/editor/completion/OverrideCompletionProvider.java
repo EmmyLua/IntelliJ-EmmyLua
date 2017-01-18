@@ -33,9 +33,10 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
         PsiElement id = completionParameters.getPosition();
         LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(id, LuaClassMethodDef.class);
         if (methodDef != null) {
-            LuaType classType = methodDef.getClassType(new SearchContext(methodDef.getProject()));
+            SearchContext context = new SearchContext(methodDef.getProject());
+            LuaType classType = methodDef.getClassType(context);
             if (classType != null) {
-                LuaType sup = classType.getSuperClass();
+                LuaType sup = classType.getSuperClass(context);
                 addOverrideMethod(completionParameters, completionResultSet, sup);
             }
         }
@@ -44,6 +45,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
     private void addOverrideMethod(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, LuaType sup) {
         if (sup != null) {
             Project project = completionParameters.getOriginalFile().getProject();
+            SearchContext context = new SearchContext(project);
             String clazzName = sup.getClassNameText();
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
             for (LuaClassMethodDef def : list) {
@@ -58,7 +60,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
                 }
             }
 
-            sup = sup.getSuperClass();
+            sup = sup.getSuperClass(context);
             addOverrideMethod(completionParameters, completionResultSet, sup);
         }
     }

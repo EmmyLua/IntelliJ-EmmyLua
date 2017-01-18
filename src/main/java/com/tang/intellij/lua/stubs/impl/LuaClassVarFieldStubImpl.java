@@ -4,10 +4,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.LuaIndexExpr;
-import com.tang.intellij.lua.psi.LuaVar;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaVarStub;
 
@@ -21,13 +21,36 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
     private String typeName;
     private String fieldName;
     private boolean isGlobal;
+    private boolean isValid;
+
+
+
+    public LuaClassVarFieldStubImpl(StubElement parent,
+                                    IStubElementType elementType) {
+        super(parent, elementType);
+        this.isValid = false;
+        this.isGlobal = false;
+    }
 
     public LuaClassVarFieldStubImpl(StubElement parent,
                                     IStubElementType elementType,
-                                    LuaIndexExpr indexExpr) {
+                                    LuaVar var) {
         super(parent, elementType);
-        this.indexExpr = indexExpr;
-        this.isGlobal = false;
+        //this.indexExpr = indexExpr;
+        this.isValid = checkValid(var);
+
+        if (this.isValid) {
+            if (var.getNameRef() != null) {
+                this.isGlobal = true;
+                this.fieldName = var.getNameRef().getText();
+            } else {
+                this.isGlobal = false;
+                assert var.getExpr() instanceof LuaIndexExpr;
+                LuaIndexExpr indexExpr = (LuaIndexExpr) var.getExpr();
+                assert indexExpr.getId() != null;
+                this.indexExpr = indexExpr;
+            }
+        }
     }
 
     public LuaClassVarFieldStubImpl(StubElement stubElement,
@@ -46,6 +69,27 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
         super(stubElement, type);
         this.isGlobal = true;
         this.fieldName = fieldName;
+    }
+
+    public boolean isValid() {
+        return isValid;
+    }
+
+    private boolean checkValid(LuaVar var) {
+        LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(var, LuaAssignStat.class);
+        assert assignStat != null;
+        if (assignStat.getExprList() == null) // 确定是XXX.XX = XXX 完整形式
+            return false;
+
+        LuaExpr expr = var.getExpr();
+        //XXX.XXX = ??
+        if (expr instanceof LuaIndexExpr) {
+            LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
+            return indexExpr.getId() != null;
+        }
+        //XXX = ??
+        LuaNameRef nameRef = var.getNameRef();
+        return nameRef != null && LuaPsiResolveUtil.resolveLocal(nameRef) == null;
     }
 
     public String getTypeName() {

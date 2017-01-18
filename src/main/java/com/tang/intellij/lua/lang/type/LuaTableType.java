@@ -64,8 +64,9 @@ public class LuaTableType extends LuaType {
     protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
                                        @NotNull CompletionResultSet completionResultSet,
                                        boolean bold,
-                                       boolean withSuper) {
-        super.addFieldCompletions(completionParameters, completionResultSet, bold, withSuper);
+                                       boolean withSuper,
+                                       SearchContext context) {
+        super.addFieldCompletions(completionParameters, completionResultSet, bold, withSuper, context);
         InitFieldList();
         for (String s : fieldStringList) {
             LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)

@@ -12,6 +12,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaTypes;
+import com.tang.intellij.lua.search.SearchContext;
 
 /**
  * Created by Tangzx on 2016/11/21.
@@ -74,13 +75,13 @@ public class LuaCommentImpl extends LazyParseablePsiElement implements LuaCommen
     }
 
     @Override
-    public LuaTypeSet guessType() {
+    public LuaTypeSet guessType(SearchContext context) {
         LuaDocClassDef classDef = getClassDef();
         if (classDef != null)
             return LuaTypeSet.create(classDef);
         LuaDocTypeDef typeDef = getTypeDef();
         if (typeDef != null)
-            return typeDef.guessType();
+            return typeDef.guessType(context);
         return null;
     }
 

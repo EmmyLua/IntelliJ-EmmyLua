@@ -79,8 +79,7 @@ public class LuaParserDefinition implements ParserDefinition {
         IElementType type = node.getElementType();
         if (type instanceof LuaDocElementType
                 || type == LuaElementType.CLASS_DEF
-                || type == LuaElementType.CLASS_FIELD_DEF
-                || type == LuaElementType.GLOBAL_FIELD_DEF) {
+                || type == LuaElementType.CLASS_FIELD_DEF) {
             return LuaDocTypes.Factory.createElement(node);
         }
         return LuaTypes.Factory.createElement(node);
@@ -115,8 +114,6 @@ public class LuaParserDefinition implements ParserDefinition {
             return LuaElementType.CLASS_DEF;
         if ("FIELD_DEF".equals(string))
             return LuaElementType.CLASS_FIELD_DEF;
-        else if ("GLOBAL_DEF".equals(string))
-            return LuaElementType.GLOBAL_FIELD_DEF;
 
         return new LuaDocElementType(string);
     }

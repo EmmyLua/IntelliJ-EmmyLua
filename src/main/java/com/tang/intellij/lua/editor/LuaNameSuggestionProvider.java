@@ -25,7 +25,8 @@ public class LuaNameSuggestionProvider implements NameSuggestionProvider {
     public SuggestedNameInfo getSuggestedNames(PsiElement psiElement, @Nullable PsiElement psiElement1, Set<String> set) {
         if (psiElement instanceof LuaNameDef) {
             LuaNameDef nameDef = (LuaNameDef) psiElement;
-            LuaTypeSet typeSet = nameDef.guessType(new SearchContext(psiElement.getProject()));
+            SearchContext context = new SearchContext(psiElement.getProject());
+            LuaTypeSet typeSet = nameDef.guessType(context);
             if (typeSet != null) {
                 Set<String> classNames = new HashSet<>();
 
@@ -35,7 +36,7 @@ public class LuaNameSuggestionProvider implements NameSuggestionProvider {
                         String className = cur.getClassNameText();
                         if (className != null)
                             classNames.add(className);
-                        cur = cur.getSuperClass();
+                        cur = cur.getSuperClass(context);
                     }
                 }
 

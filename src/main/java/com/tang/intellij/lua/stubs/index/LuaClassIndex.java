@@ -1,11 +1,10 @@
 package com.tang.intellij.lua.stubs.index;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -33,8 +32,10 @@ public class LuaClassIndex extends StringStubIndexExtension<LuaDocClassDef> {
         return KEY;
     }
 
-    public static LuaDocClassDef find(String name, Project project, GlobalSearchScope searchScope) {
-        Collection<LuaDocClassDef> list = getInstance().get(name, project, searchScope);
+    public static LuaDocClassDef find(String name, SearchContext context) {
+        if (context.isDumb())
+            return null;
+        Collection<LuaDocClassDef> list = getInstance().get(name, context.getProject(), context.getScope());
         if (!list.isEmpty()) return list.iterator().next();
         return null;
     }

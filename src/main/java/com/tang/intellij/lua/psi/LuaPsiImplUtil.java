@@ -258,7 +258,7 @@ public class LuaPsiImplUtil {
                     LuaComment comment = luaAssignStat.getComment();
                     //优先从 Comment 猜
                     if (comment != null) {
-                        typeSet = comment.guessType();
+                        typeSet = comment.guessType(context);
                     }
                     //再从赋值猜
                     if (typeSet == null) {

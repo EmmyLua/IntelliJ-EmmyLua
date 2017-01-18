@@ -3,8 +3,8 @@ package com.tang.intellij.lua.editor;
 import com.intellij.navigation.GotoClassContributor;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public class LuaClassNavigationContributor implements GotoClassContributor {
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String s, String s1, Project project, boolean b) {
-        LuaDocClassDef classDef = LuaClassIndex.find(s, project, new ProjectAndLibrariesScope(project));
+        LuaDocClassDef classDef = LuaClassIndex.find(s, new SearchContext(project));
         if (classDef == null)
             return new NavigationItem[0];
         else

@@ -48,6 +48,9 @@ public class LuaClassMethodIndex extends StringStubIndexExtension<LuaClassMethod
     }
 
     public static LuaClassMethodDef findMethodWithName(@NotNull String className, @NotNull String methodName, @NotNull SearchContext context) {
+        if (context.isDumb())
+            return null;
+
         Collection<LuaClassMethodDef> collection = INSTANCE.get(className, context.getProject(), context.getScope());
         for (LuaClassMethodDef methodDef : collection) {
             if (methodName.equals(methodDef.getName())) {

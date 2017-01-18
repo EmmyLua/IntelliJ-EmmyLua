@@ -1,6 +1,7 @@
 package com.tang.intellij.lua.lang.type;
 
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,9 +23,9 @@ public class LuaClassType extends LuaType {
     private String className;
     private LuaType superType;
 
-    public LuaType getSuperClass() {
+    public LuaType getSuperClass(SearchContext context) {
         if (superType == null)
-            superType = classDef.getSuperClass();
+            superType = classDef.getSuperClass(context);
         return superType;
     }
 

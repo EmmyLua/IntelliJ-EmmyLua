@@ -7,7 +7,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.StubBasedPsiElement;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,11 +40,10 @@ public class LuaDocPsiImplUtil {
         return new LuaClassNameReference(docClassNameRef);
     }
 
-    public static LuaType resolveType(LuaDocClassNameRef nameRef) {
+    public static LuaType resolveType(LuaDocClassNameRef nameRef, SearchContext context) {
         Project project = nameRef.getProject();
-        Collection<LuaDocClassDef> defs = LuaClassIndex.getInstance().get(nameRef.getText(), project, new ProjectAndLibrariesScope(project));
-        if (!defs.isEmpty()) {
-            LuaDocClassDef classDef = defs.iterator().next();
+        LuaDocClassDef classDef = LuaClassIndex.find(nameRef.getText(), context);
+        if (classDef != null) {
             return LuaClassType.create(classDef);
         }
         return null;
@@ -81,7 +78,7 @@ public class LuaDocPsiImplUtil {
     }
 
     public static LuaTypeSet guessType(LuaDocFieldDef fieldDef, SearchContext context) {
-        return resolveDocTypeSet(fieldDef.getTypeSet(), null);
+        return resolveDocTypeSet(fieldDef.getTypeSet(), null, context);
     }
 
     /**
@@ -93,7 +90,7 @@ public class LuaDocPsiImplUtil {
         LuaComment comment = LuaCommentUtil.findContainer(docGlobalDef);
         LuaDocTypeDef docTypeDef = comment.getTypeDef();
         if (docTypeDef != null) {
-            return resolveDocTypeSet(docTypeDef.getTypeSet(), null);
+            return resolveDocTypeSet(docTypeDef.getTypeSet(), null, context);
         }
         return null;
     }
@@ -106,7 +103,7 @@ public class LuaDocPsiImplUtil {
     public static LuaTypeSet guessType(LuaDocParamDef paramDec, SearchContext context) {
         LuaDocTypeSet docTypeSet = paramDec.getTypeSet();
         if (docTypeSet == null) return null;
-        return resolveDocTypeSet(docTypeSet, null);
+        return resolveDocTypeSet(docTypeSet, null, context);
     }
 
     /**
@@ -115,23 +112,23 @@ public class LuaDocPsiImplUtil {
      * @param index 索引
      * @return 类型集合
      */
-    public static LuaTypeSet resolveTypeAt(LuaDocReturnDef returnDef, int index) {
+    public static LuaTypeSet resolveTypeAt(LuaDocReturnDef returnDef, int index, SearchContext context) {
         LuaTypeSet typeSet = LuaTypeSet.create();
         LuaDocTypeList typeList = returnDef.getTypeList();
         if (typeList != null) {
             List<LuaDocTypeSet> typeSetList = typeList.getTypeSetList();
             LuaDocTypeSet docTypeSet = typeSetList.get(index);
-            resolveDocTypeSet(docTypeSet, typeSet);
+            resolveDocTypeSet(docTypeSet, typeSet, context);
         }
         return typeSet;
     }
 
-    private static LuaTypeSet resolveDocTypeSet(LuaDocTypeSet docTypeSet, LuaTypeSet typeSet) {
+    private static LuaTypeSet resolveDocTypeSet(LuaDocTypeSet docTypeSet, LuaTypeSet typeSet, SearchContext context) {
         if (typeSet == null) typeSet = LuaTypeSet.create();
         if (docTypeSet != null) {
             List<LuaDocClassNameRef> classNameRefList = docTypeSet.getClassNameRefList();
             for (LuaDocClassNameRef classNameRef : classNameRefList) {
-                LuaDocClassDef def = LuaClassIndex.find(classNameRef.getText(), docTypeSet.getProject(), new ProjectAndLibrariesScope(docTypeSet.getProject()));
+                LuaDocClassDef def = LuaClassIndex.find(classNameRef.getText(), context);
                 if (def != null) {
                     typeSet.addType(def);
                 }
@@ -172,13 +169,13 @@ public class LuaDocPsiImplUtil {
      * @param classDef class 定义
      * @return 超类集合
      */
-    public static LuaTypeSet getSuperClasses(LuaDocClassDef classDef) {
+    public static LuaTypeSet getSuperClasses(LuaDocClassDef classDef, SearchContext context) {
         LuaType type = LuaClassType.create(classDef);
-        LuaType supper = type.getSuperClass();
+        LuaType supper = type.getSuperClass(context);
         LuaTypeSet set = LuaTypeSet.create();
         while (supper != null) {
             set.addType(supper);
-            supper = supper.getSuperClass();
+            supper = supper.getSuperClass(context);
         }
         return set;
     }
@@ -188,9 +185,9 @@ public class LuaDocPsiImplUtil {
      * @param classDef class def
      * @return LuaType
      */
-    public static LuaType getSuperClass(LuaDocClassDef classDef) {
+    public static LuaType getSuperClass(LuaDocClassDef classDef, SearchContext context) {
         LuaDocClassNameRef supperRef = classDef.getClassNameRef();
-        return supperRef != null ? supperRef.resolveType() : null;
+        return supperRef != null ? supperRef.resolveType(context) : null;
     }
 
     /**
@@ -198,8 +195,8 @@ public class LuaDocPsiImplUtil {
      * @param typeDef 类型定义
      * @return 类型集合
      */
-    public static LuaTypeSet guessType(LuaDocTypeDef typeDef) {
-        return resolveDocTypeSet(typeDef.getTypeSet(), null);
+    public static LuaTypeSet guessType(LuaDocTypeDef typeDef, SearchContext context) {
+        return resolveDocTypeSet(typeDef.getTypeSet(), null, context);
     }
 
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {

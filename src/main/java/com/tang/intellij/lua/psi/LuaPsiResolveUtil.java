@@ -165,7 +165,7 @@ public class LuaPsiResolveUtil {
                 LuaTypeSet typeSet = null;
                 LuaComment comment = localDef.getComment();
                 if (comment != null) {
-                    typeSet = comment.guessType();
+                    typeSet = comment.guessType(context);
                 }
 
                 //计算 expr 返回类型

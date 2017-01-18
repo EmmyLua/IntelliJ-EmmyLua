@@ -85,7 +85,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             if (comment != null) {
                 LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
                 if (returnDef != null) {
-                    return returnDef.resolveTypeAt(0); //TODO : multi
+                    return returnDef.resolveTypeAt(0, context); //TODO : multi
                 }
             }
         }

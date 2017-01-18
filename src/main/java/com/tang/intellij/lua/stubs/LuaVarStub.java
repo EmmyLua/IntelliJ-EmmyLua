@@ -10,5 +10,6 @@ import com.tang.intellij.lua.psi.LuaVar;
 public interface LuaVarStub extends StubElement<LuaVar> {
     String getTypeName();
     String getFieldName();
+    boolean isValid();
     boolean isGlobal();
 }

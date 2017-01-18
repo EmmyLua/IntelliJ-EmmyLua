@@ -30,8 +30,9 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
             if (type != null) {
                 String methodName = methodDef.getName();
                 assert methodName != null;
-                LuaType superType = type.getSuperClass();
                 Project project = methodDef.getProject();
+                SearchContext context = new SearchContext(project);
+                LuaType superType = type.getSuperClass(context);
                 GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
                 while (superType != null) {
                     String superTypeName = superType.getClassNameText();
@@ -48,7 +49,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                             break;
                         }
                     }
-                    superType = superType.getSuperClass();
+                    superType = superType.getSuperClass(context);
                 }
             }
         }

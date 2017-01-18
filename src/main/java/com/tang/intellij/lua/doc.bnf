@@ -51,7 +51,6 @@ access_modifier ::= "protected" | "public"
 
 //--- define
 global_def ::= DEFINE {
-    stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFieldStub"
     implements = "com.tang.intellij.lua.psi.LuaTypeGuessable, com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
     methods = [guessType]
 }

@@ -30,7 +30,7 @@ public class LuaType {
         this.element = element;
     }
 
-    public LuaType getSuperClass() {
+    public LuaType getSuperClass(SearchContext context) {
         return null;
     }
 
@@ -76,7 +76,7 @@ public class LuaType {
         }
 
         if (withSuper) {
-            LuaType superType = getSuperClass();
+            LuaType superType = getSuperClass(new SearchContext(project));
             if (superType != null)
                 superType.addMethodCompletions(completionParameters, completionResultSet, false, true, useAsField);
         }
@@ -84,14 +84,14 @@ public class LuaType {
 
 
 
-    protected void addStaticMethodCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper) {
+    protected void addStaticMethodCompletions(@NotNull CompletionResultSet completionResultSet, boolean bold, boolean withSuper, SearchContext context) {
         Project project = getProject();
         if (project == null)
             return;
         String clazzName = getClassNameText();
         if (clazzName == null)
             return;
-        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, new SearchContext(project));
+        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, context);
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
             if (methodName != null) {
@@ -108,22 +108,23 @@ public class LuaType {
         }
 
         if (withSuper) {
-            LuaType superType = getSuperClass();
+            LuaType superType = getSuperClass(context);
             if (superType != null)
-                superType.addStaticMethodCompletions(completionParameters, completionResultSet, false, true);
+                superType.addStaticMethodCompletions(completionResultSet, false, true, context);
         }
     }
 
-    public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
-        addFieldCompletions(completionParameters, completionResultSet, true, true);
-        addStaticMethodCompletions(completionParameters, completionResultSet, true, true);
+    public void addFieldCompletions(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, SearchContext context) {
+        addFieldCompletions(completionParameters, completionResultSet, true, true, context);
+        addStaticMethodCompletions(completionResultSet, true, true, context);
         addMethodCompletions(completionParameters, completionResultSet, true);
     }
 
     protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
                                        @NotNull CompletionResultSet completionResultSet,
                                        boolean bold,
-                                       boolean withSuper) {
+                                       boolean withSuper,
+                                       SearchContext context) {
         String clazzName = getClassNameText();
         if (clazzName == null)
             return;
@@ -149,9 +150,9 @@ public class LuaType {
 
         // super
         if (withSuper) {
-            LuaType superType = getSuperClass();
+            LuaType superType = getSuperClass(context);
             if (superType != null)
-                superType.addFieldCompletions(completionParameters, completionResultSet, false, true);
+                superType.addFieldCompletions(completionParameters, completionResultSet, false, true, context);
         }
     }
 
@@ -161,7 +162,7 @@ public class LuaType {
         if (fieldDef != null)
             set = fieldDef.guessType(context);
         else {
-            LuaType superType = getSuperClass();
+            LuaType superType = getSuperClass(context);
             if (superType != null)
                 set = superType.guessFieldType(propName, context);
         }
@@ -173,7 +174,7 @@ public class LuaType {
         String className = getClassNameText();
         LuaClassField def = LuaClassFieldIndex.find(className, fieldName, context);
         if (def == null) {
-            LuaType superType = getSuperClass();
+            LuaType superType = getSuperClass(context);
             if (superType != null)
                 def = superType.findField(fieldName, context);
         }
@@ -187,7 +188,7 @@ public class LuaType {
             def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
         }
         if (def == null) { // super
-            LuaType superType = getSuperClass();
+            LuaType superType = getSuperClass(context);
             if (superType != null)
                 def = superType.findMethod(methodName, context);
         }
@@ -198,7 +199,7 @@ public class LuaType {
         String className = getClassNameText();
         LuaClassMethodDef def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
         if (def == null && withSuper) {
-            LuaType superType = getSuperClass();
+            LuaType superType = getSuperClass(context);
             if (superType != null)
                 def = superType.findStaticMethod(methodName, true, context);
         }
