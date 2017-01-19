@@ -63,8 +63,8 @@ public class LuaPsiImplUtil {
         return new LuaNameReference(ref);
     }
 
-    public static PsiElement resolve(LuaNameRef ref) {
-        return LuaPsiResolveUtil.resolve(ref, new SearchContext(ref.getProject()));
+    public static PsiElement resolve(LuaNameRef ref, SearchContext context) {
+        return LuaPsiResolveUtil.resolve(ref, context);
     }
 
     public static LuaTypeSet guessType(LuaNameRef nameRef, SearchContext context) {
@@ -268,7 +268,7 @@ public class LuaPsiImplUtil {
                     }
                 }
                 //同时是 Global ?
-                if (LuaPsiResolveUtil.resolveLocal(nameRef) == null) {
+                if (LuaPsiResolveUtil.resolveLocal(nameRef, context) == null) {
                     if (typeSet == null || typeSet.isEmpty())
                         typeSet = LuaTypeSet.create(LuaGlobalType.create(nameRef));
                     else

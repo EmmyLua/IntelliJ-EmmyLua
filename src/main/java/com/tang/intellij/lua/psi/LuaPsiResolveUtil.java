@@ -46,7 +46,7 @@ public class LuaPsiResolveUtil {
         return temp;
     }
 
-    public static PsiElement resolveLocal(LuaNameRef ref) {
+    public static PsiElement resolveLocal(LuaNameRef ref, SearchContext context) {
         String refName = ref.getName();
 
         if (refName.equals("self")) {
@@ -54,7 +54,7 @@ public class LuaPsiResolveUtil {
             if (classMethodFuncDef != null) {
                 LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
                 if (nameRef != null)
-                    return nameRef.resolve();
+                    return nameRef.resolve(context);
             }
             return null;
         }
@@ -95,7 +95,7 @@ public class LuaPsiResolveUtil {
      */
     public static PsiElement resolve(LuaNameRef ref, SearchContext context) {
         //search local
-        resolveResult = resolveLocal(ref);
+        resolveResult = resolveLocal(ref, context);
 
         String refName = ref.getName();
         //global field

@@ -12,6 +12,7 @@ import com.intellij.util.Query;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -96,7 +97,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             if (id != null && id.getNode().getElementType() == LuaTypes.SELF)
                 return;
 
-            PsiElement res = o.resolve();
+            PsiElement res = o.resolve(new SearchContext(o.getProject()));
             if (res instanceof LuaParamNameDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);

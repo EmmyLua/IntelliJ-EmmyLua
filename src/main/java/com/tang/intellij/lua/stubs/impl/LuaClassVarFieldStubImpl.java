@@ -89,7 +89,9 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
         }
         //XXX = ??
         LuaNameRef nameRef = var.getNameRef();
-        return nameRef != null && LuaPsiResolveUtil.resolveLocal(nameRef) == null;
+        SearchContext context = new SearchContext(var.getProject());
+        context.setCurrentStubFile(var.getContainingFile());
+        return nameRef != null && LuaPsiResolveUtil.resolveLocal(nameRef, context) == null;
     }
 
     public String getTypeName() {
