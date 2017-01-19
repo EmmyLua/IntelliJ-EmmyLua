@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
 import com.tang.intellij.lua.comment.psi.*;
@@ -70,7 +71,8 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitParamNameDef(@NotNull LuaParamNameDef o) {
-            if (o.textMatches("self")) return;
+            //TODO optimize search references
+            /*if (o.textMatches("self")) return;
 
             Query<PsiReference> search = ReferencesSearch.search(o);
             if (search.findFirst() == null) {
@@ -79,12 +81,13 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             } else {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
-            }
+            }*/
         }
 
         @Override
         public void visitNameDef(@NotNull LuaNameDef o) {
-            Query<PsiReference> search = ReferencesSearch.search(o);
+            GlobalSearchScope scope = GlobalSearchScope.fileScope(o.getProject(), o.getContainingFile().getVirtualFile());
+            Query<PsiReference> search = ReferencesSearch.search(o, scope);
             if (search.findFirst() == null) {
                 Annotation annotation = myHolder.createWarningAnnotation(o, "Unused local : " + o.getText());
                 annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
