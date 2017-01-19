@@ -10,6 +10,7 @@ import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 import com.tang.intellij.lua.stubs.impl.LuaGlobalFuncStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -67,9 +68,7 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
     @Override
     public void indexStub(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull IndexSink indexSink) {
         String name = luaGlobalFuncStub.getName();
-        if ("WIRETYPE_TO_SKIPPER".equals(name)) {
-            System.out.println(name);
-        }
-        indexSink.occurrence(LuaGlobalFuncIndex.KEY, luaGlobalFuncStub.getName());
+        indexSink.occurrence(LuaShortNameIndex.KEY, name);
+        indexSink.occurrence(LuaGlobalFuncIndex.KEY, name);
     }
 }

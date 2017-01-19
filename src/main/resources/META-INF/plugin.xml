@@ -66,6 +66,7 @@
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMethodIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassFieldIndex"/>
+        <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
 

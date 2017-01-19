@@ -8,6 +8,7 @@ import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.stubs.LuaClassDefStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassDefStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -52,5 +53,6 @@ public class LuaClassStubElementType extends IStubElementType<LuaClassDefStub, L
     @Override
     public void indexStub(@NotNull LuaClassDefStub luaClassDefStub, @NotNull IndexSink indexSink) {
         indexSink.occurrence(LuaClassIndex.KEY, luaClassDefStub.getClassName());
+        indexSink.occurrence(LuaShortNameIndex.KEY, luaClassDefStub.getClassName());
     }
 }

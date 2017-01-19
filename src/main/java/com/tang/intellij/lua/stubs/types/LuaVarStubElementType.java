@@ -10,6 +10,7 @@ import com.tang.intellij.lua.stubs.LuaVarStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassVarFieldStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -88,6 +89,7 @@ public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> 
             String fieldName = varStub.getFieldName();
             if (varStub.isGlobal()) {
                 indexSink.occurrence(LuaGlobalVarIndex.KEY, fieldName);
+                indexSink.occurrence(LuaShortNameIndex.KEY, fieldName);
             } else {
                 String typeName = varStub.getTypeName();
                 if (typeName != null && fieldName != null) {
