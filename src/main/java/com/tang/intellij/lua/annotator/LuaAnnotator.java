@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
+import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import com.tang.intellij.lua.psi.*;
@@ -70,8 +71,10 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitParamNameDef(@NotNull LuaParamNameDef o) {
-            //TODO optimize search references
-            if (o.textMatches("self")) return;
+            if (o.textMatches(Constants.WORD_SELF))
+                return;
+            if (o.textMatches(Constants.WORD_UNDERLINE))
+                return;
 
             Query<PsiReference> search = ReferencesSearch.search(o, o.getUseScope());
             if (search.findFirst() == null) {
@@ -85,6 +88,9 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitNameDef(@NotNull LuaNameDef o) {
+            if (o.textMatches(Constants.WORD_UNDERLINE))
+                return;
+
             Query<PsiReference> search = ReferencesSearch.search(o, o.getUseScope());
             if (search.findFirst() == null) {
                 Annotation annotation = myHolder.createWarningAnnotation(o, "Unused local : " + o.getText());
@@ -95,7 +101,9 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         @Override
         public void visitNameRef(@NotNull LuaNameRef o) {
             PsiElement id = o.getFirstChild();
-            if (id != null && id.getNode().getElementType() == LuaTypes.SELF)
+            if (id == null)
+                return;
+            if (id.getNode().getElementType() == LuaTypes.SELF)
                 return;
 
             PsiElement res = o.resolve(new SearchContext(o.getProject()));
