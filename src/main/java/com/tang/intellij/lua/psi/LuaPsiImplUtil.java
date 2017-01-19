@@ -6,6 +6,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.StubBasedPsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
@@ -56,6 +58,15 @@ public class LuaPsiImplUtil {
 
     public static PsiElement getNameIdentifier(LuaNameDef nameDef) {
         return nameDef.getFirstChild();
+    }
+
+    /**
+     * LuaNameDef 只可能在本文件中搜
+     * @param nameDef def
+     * @return SearchScope
+     */
+    public static SearchScope getUseScope(LuaNameDef nameDef) {
+        return GlobalSearchScope.fileScope(nameDef.getContainingFile());
     }
 
     @NotNull
@@ -323,6 +334,10 @@ public class LuaPsiImplUtil {
 
     public static PsiElement getNameIdentifier(LuaLocalFuncDef localFuncDef) {
         return localFuncDef.getId();
+    }
+
+    public static SearchScope getUseScope(LuaLocalFuncDef localFuncDef) {
+        return GlobalSearchScope.fileScope(localFuncDef.getContainingFile());
     }
 
     public static String getName(PsiNameIdentifierOwner identifierOwner) {

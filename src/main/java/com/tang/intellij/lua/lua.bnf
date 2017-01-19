@@ -180,7 +180,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    methods = [getComment getParamNameDefList getNameIdentifier setName getName getTextOffset]
+    methods = [getComment getParamNameDefList getNameIdentifier setName getName getTextOffset getUseScope]
 }
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
@@ -298,7 +298,7 @@ fake name ::= ID {
 }
 nameDef ::= ID {
     implements = ["com.tang.intellij.lua.psi.LuaTypeGuessable" "com.intellij.psi.PsiNameIdentifierOwner"]
-    methods = [guessType getNameIdentifier]
+    methods = [guessType getNameIdentifier getUseScope]
     extends = name
 }
 nameRef ::= ID | SELF {
