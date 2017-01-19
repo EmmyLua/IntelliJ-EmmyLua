@@ -51,7 +51,10 @@ public class LuaNameReference extends PsiReferenceBase<LuaNameRef> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        return LuaPsiResolveUtil.resolve(myElement, new SearchContext(myElement.getProject()));
+        PsiElement resolve = LuaPsiResolveUtil.resolve(myElement, new SearchContext(myElement.getProject()));
+        if (resolve == myElement) // LuaVar 全局定义中会发生
+            return null;
+        return resolve;
     }
 
     @Override

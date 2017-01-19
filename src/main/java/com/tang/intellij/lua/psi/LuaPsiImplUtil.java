@@ -405,4 +405,14 @@ public class LuaPsiImplUtil {
         }
         return null;
     }
+
+    @NotNull
+    public static PsiElement getNameIdentifier(LuaNameRef ref) {
+        return ref.getFirstChild();
+    }
+
+    @NotNull
+    public static String getName(LuaNameRef ref) {
+        return ref.getText();
+    }
 }
