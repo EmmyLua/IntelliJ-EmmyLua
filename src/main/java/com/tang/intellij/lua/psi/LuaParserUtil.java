@@ -48,9 +48,9 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         return r;
     }
 
-    public static boolean checkCallExpr(PsiBuilder builder_, int level_) {
+    public static boolean checkType(PsiBuilder builder_, int level_, IElementType type) {
         LighterASTNode marker = builder_.getLatestDoneMarker();
-        return marker != null && marker.getTokenType() == LuaTypes.CALL_EXPR;
+        return marker != null && marker.getTokenType() == type;
     }
 
     public static boolean fastCheckArgs(PsiBuilder builder_, int level_) {

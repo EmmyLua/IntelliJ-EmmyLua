@@ -258,7 +258,7 @@ private prefixExpr ::= parenExpr | nameRef
 // 最终产生 callExpr | indexExpr
 private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr
-private funcCallExpr ::= callOrIndexExpr <<checkCallExpr>>
+private funcCallExpr ::= callOrIndexExpr <<checkType 'CALL_EXPR'>>
 
 closureFuncDef ::= 'function' funcBody {
     pin = 2
