@@ -320,7 +320,7 @@ nameDef ::= ID {
 nameRef ::= ID | SELF {
     implements = ["com.tang.intellij.lua.psi.LuaPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner" ]
-    methods = [setName getName getNameIdentifier getReference resolve guessType]
+    methods = [setName getName getNameIdentifier getReferences resolve guessType]
 }
 paramNameDef ::= ID | SELF {
     extends = nameDef

@@ -18,10 +18,8 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNameIdentifierOwner;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.StubBasedPsiElement;
+import com.intellij.psi.*;
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StubElement;
@@ -85,9 +83,8 @@ public class LuaPsiImplUtil {
         return GlobalSearchScope.fileScope(nameDef.getContainingFile());
     }
 
-    @NotNull
-    public static PsiReference getReference(LuaNameRef ref) {
-        return new LuaNameReference(ref);
+    public static PsiReference[] getReferences(LuaPsiElement element) {
+        return ReferenceProvidersRegistry.getReferencesFromProviders(element, PsiReferenceService.Hints.NO_HINTS);
     }
 
     public static PsiElement resolve(LuaNameRef ref, SearchContext context) {
