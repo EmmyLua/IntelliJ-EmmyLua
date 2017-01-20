@@ -25,7 +25,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassFieldStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
@@ -44,7 +43,7 @@ public class LuaClassDocFieldStubElementType extends IStubElementType<LuaDocClas
 
     @Override
     public LuaDocFieldDef createPsi(@NotNull LuaDocClassFieldStub luaFieldStub) {
-        return new LuaDocFieldDefImpl(luaFieldStub, LuaElementType.CLASS_FIELD_DEF);
+        return new LuaDocFieldDefImpl(luaFieldStub, this);
     }
 
     @Override

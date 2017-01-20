@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi;
 import com.intellij.lang.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.ILazyParseableElementType;
 import com.intellij.psi.tree.IReparseableElementType;
@@ -65,13 +66,13 @@ public class LuaElementType extends IElementType {
         }
     };
 
-    public static LuaGlobalFuncDefStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncDefStubElementType();
-    public static LuaClassMethodStubElementType CLASS_METHOD_DEF = new LuaClassMethodStubElementType();
-    public static LuaClassDocFieldStubElementType CLASS_FIELD_DEF = new LuaClassDocFieldStubElementType();
-    public static LuaClassStubElementType CLASS_DEF = new LuaClassStubElementType();
-    public static LuaTableStubElementType TABLE = new LuaTableStubElementType();
-    public static LuaTableFieldStubElementType TABLE_FIELD = new LuaTableFieldStubElementType();
-    public static LuaVarStubElementType VAR = new LuaVarStubElementType();
+    public static IStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncDefStubElementType();
+    public static IStubElementType CLASS_METHOD_DEF = new LuaClassMethodStubElementType();
+    public static IStubElementType CLASS_FIELD_DEF = new LuaClassDocFieldStubElementType();
+    public static IStubElementType CLASS_DEF = new LuaClassStubElementType();
+    public static IStubElementType TABLE = new LuaTableStubElementType();
+    public static IStubElementType TABLE_FIELD = new LuaTableFieldStubElementType();
+    public static IStubElementType VAR = new LuaVarStubElementType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
 
     static class LuaBlockElementType extends IReparseableElementType {

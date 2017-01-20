@@ -22,7 +22,10 @@ import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaClassMethodName;
+import com.tang.intellij.lua.psi.LuaNameRef;
+import com.tang.intellij.lua.psi.LuaTypes;
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
@@ -43,7 +46,7 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
 
     @Override
     public LuaClassMethodDef createPsi(@NotNull LuaClassMethodStub luaClassMethodStub) {
-        return new LuaClassMethodDefImpl(luaClassMethodStub, LuaElementType.CLASS_METHOD_DEF);
+        return new LuaClassMethodDefImpl(luaClassMethodStub, this);
     }
 
     @NotNull

@@ -20,7 +20,6 @@ import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.stubs.LuaClassDefStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassDefStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
@@ -40,7 +39,7 @@ public class LuaClassStubElementType extends IStubElementType<LuaClassDefStub, L
 
     @Override
     public LuaDocClassDef createPsi(@NotNull LuaClassDefStub luaClassDefStub) {
-        return new LuaDocClassDefImpl(luaClassDefStub, LuaElementType.CLASS_DEF);
+        return new LuaDocClassDefImpl(luaClassDefStub, this);
     }
 
     @NotNull
