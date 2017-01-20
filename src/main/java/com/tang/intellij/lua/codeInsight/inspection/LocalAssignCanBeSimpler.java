@@ -27,7 +27,6 @@ import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,15 +69,11 @@ public class LocalAssignCanBeSimpler extends LocalInspectionTool {
             LuaNameList nameList = localDef.getNameList();
 
             assert nameList != null;
-            List<PsiElement> deleteList = new ArrayList<>();
-            PsiElement next = nameList.getNextSibling();
-            while (next != null) {
-                deleteList.add(next);
-                next = next.getNextSibling();
-            }
-            for (int i = deleteList.size() - 1; i >= 0; i--) {
-                deleteList.get(i).delete();
-            }
+            PsiElement assign = localDef.getAssign();
+            assert assign != null;
+            LuaExprList exprList = localDef.getExprList();
+            assert exprList != null;
+            localDef.deleteChildRange(assign, exprList);
         }
     }
 }

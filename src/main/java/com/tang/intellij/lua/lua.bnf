@@ -136,7 +136,7 @@ private stat_recover ::= !(ID
     | 'local' | 'do' | 'while' | 'repeat' | 'function' | 'if' | 'for' | 'return' | break
     | nil | true | false | STRING | NUMBER | SELF)
 
-assignStat ::= varList '=' exprList { pin = 1 methods = [getComment] }
+assignStat ::= varList '=' exprList { pin = 1 methods = [getComment assign = 'ASSIGN'] }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
 repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
@@ -200,7 +200,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
 }
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
-    methods = [getComment]
+    methods = [getComment assign = 'ASSIGN']
 }
 
 returnStat ::= return exprList?
