@@ -42,16 +42,4 @@ public class LuaElementFactory {
         assert (def != null);
         return def.getFirstChild();
     }
-
-    public static PsiElement createLineBreak(Project project) {
-        String content = "\n";
-        LuaFile file = createFile(project, content);
-        return file.getFirstChild();
-    }
-
-    public static PsiElement createParamDoc(Project project, String name) {
-        String content = String.format("---@param %s #table", name);
-        LuaFile file = createFile(project, content);
-        return file.getFirstChild();
-    }
 }
