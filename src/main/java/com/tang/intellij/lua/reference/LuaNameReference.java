@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * Created by tangzx on 2016/11/26.
  */
 public class LuaNameReference extends PsiReferenceBase<LuaNameRef> {
-    public LuaNameReference(LuaNameRef element) {
+    LuaNameReference(LuaNameRef element) {
         super(element);
     }
 

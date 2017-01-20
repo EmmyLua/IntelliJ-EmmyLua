@@ -29,7 +29,6 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaGlobalType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.reference.LuaNameReference;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -399,6 +398,8 @@ public class LuaPsiImplUtil {
         LuaExpr expr = var.getExpr();
         if (expr instanceof LuaIndexExpr) {
             return ((LuaIndexExpr) expr).getId();
+        } else if (var.getNameRef() != null) {
+            return var.getNameRef().getId();
         }
         return null;
     }
