@@ -16,9 +16,11 @@
 
 package com.tang.intellij.lua.psi;
 
-import com.intellij.lang.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.PsiBuilder;
+import com.intellij.lang.PsiBuilderFactory;
+import com.intellij.lang.PsiParser;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.ILazyParseableElementType;
@@ -45,14 +47,12 @@ public class LuaElementType extends IElementType {
 
         @Override
         public ASTNode parseContents(ASTNode chameleon) {
-            PsiElement parentElement = chameleon.getTreeParent().getPsi();
-            Project project = parentElement.getProject();
-            Language languageForParser = this.getLanguageForParser(parentElement);
+            Project project = chameleon.getPsi().getProject();
             PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
                     project,
                     chameleon,
                     new LuaDocLexerAdapter(),
-                    languageForParser,
+                    LuaLanguage.INSTANCE,
                     chameleon.getChars());
             PsiParser parser = new LuaDocParser();
             ASTNode node = parser.parse(this, builder);
@@ -83,18 +83,15 @@ public class LuaElementType extends IElementType {
 
         @Override
         public ASTNode parseContents(ASTNode chameleon) {
-            PsiElement psiFile = chameleon.getPsi();
-            assert psiFile != null;
-
-            Project project = psiFile.getProject();
+            Project project = chameleon.getPsi().getProject();
             PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
                     project,
                     chameleon,
                     new LuaLexerAdapter(),
                     LuaLanguage.INSTANCE,
                     chameleon.getText());
-            LuaParser luaParser = new LuaParser();
-            return luaParser.parse(LuaTypes.BLOCK, builder).getFirstChildNode();
+            PsiParser luaParser = new LuaParser();
+            return luaParser.parse(this, builder).getFirstChildNode();
         }
 
         @Nullable
