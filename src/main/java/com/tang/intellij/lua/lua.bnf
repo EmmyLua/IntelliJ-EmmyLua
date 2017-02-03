@@ -226,6 +226,7 @@ var ::= callOrIndexExpr | nameRef {
         setName
         getNameIdentifier
         getTextOffset
+        getPresentation
     ]
     implements = [
         "com.tang.intellij.lua.psi.LuaGlobalVar"

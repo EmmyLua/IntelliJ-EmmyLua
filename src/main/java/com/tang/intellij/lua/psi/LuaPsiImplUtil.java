@@ -26,10 +26,13 @@ import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaGlobalType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
+import com.tang.intellij.lua.stubs.LuaVarStub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -125,6 +128,13 @@ public class LuaPsiImplUtil {
 
     public static PsiElement getNameIdentifier(LuaGlobalFuncDef globalFuncDef) {
         return globalFuncDef.getId();
+    }
+
+    public static String getName(LuaGlobalFuncDef globalFuncDef) {
+        LuaGlobalFuncStub stub = globalFuncDef.getStub();
+        if (stub != null)
+            return stub.getName();
+        return getName((PsiNameIdentifierOwner)globalFuncDef);
     }
 
     public static ItemPresentation getPresentation(LuaGlobalFuncDef globalFuncDef) {
@@ -372,7 +382,7 @@ public class LuaPsiImplUtil {
     }
 
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
-        return "[STUB]" + stubElement.getNode().getElementType().toString();
+        return "[STUB]";// + stubElement.getNode().getElementType().toString();
     }
 
     public static LuaTypeSet guessType(LuaVar var, SearchContext context) {
@@ -388,6 +398,35 @@ public class LuaPsiImplUtil {
                 return id.getText();
         }
         return null;
+    }
+
+    public static String getName(LuaVar var) {
+        LuaVarStub stub = var.getStub();
+        if (stub != null)
+            return stub.getFieldName();
+        return getName((PsiNameIdentifierOwner) var);
+    }
+
+    public static ItemPresentation getPresentation(LuaVar var) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return var.getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                return var.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean b) {
+                return LuaIcons.CLASS_FIELD;
+            }
+        };
     }
 
     public static PsiElement getNameIdentifier(LuaVar var) {
