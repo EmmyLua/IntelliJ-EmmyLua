@@ -69,8 +69,10 @@ public class LuaPsiResolveUtil {
             LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodDef.class);
             if (classMethodFuncDef != null) {
                 LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
-                if (nameRef != null)
-                    return nameRef.resolve(context);
+                if (nameRef != null) {
+                    PsiElement resolve = nameRef.resolve(context);
+                    return resolve != null ? resolve : nameRef;
+                }
             }
             return null;
         }

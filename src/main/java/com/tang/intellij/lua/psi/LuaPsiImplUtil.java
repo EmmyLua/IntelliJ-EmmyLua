@@ -91,12 +91,7 @@ public class LuaPsiImplUtil {
     }
 
     public static LuaTypeSet guessType(LuaNameRef nameRef, SearchContext context) {
-        PsiElement target = LuaPsiResolveUtil.resolve(nameRef, context);
-        if (target instanceof LuaTypeGuessable) {
-            LuaTypeGuessable typeResolvable = (LuaTypeGuessable) target;
-            return typeResolvable.guessType(context);
-        }
-        return null;
+        return guessNameRefType(nameRef, context);
     }
 
     /**
@@ -275,6 +270,7 @@ public class LuaPsiImplUtil {
             } else if (def instanceof LuaTypeGuessable) {
                 return ((LuaTypeGuessable) def).guessType(context);
             } else if (def instanceof LuaNameRef) {
+                LuaNameRef newRef = (LuaNameRef) def;
                 LuaTypeSet typeSet = null;
                 LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
                 if (luaAssignStat != null) {
@@ -291,11 +287,11 @@ public class LuaPsiImplUtil {
                     }
                 }
                 //同时是 Global ?
-                if (LuaPsiResolveUtil.resolveLocal(nameRef, context) == null) {
+                if (LuaPsiResolveUtil.resolveLocal(newRef, context) == null) {
                     if (typeSet == null || typeSet.isEmpty())
-                        typeSet = LuaTypeSet.create(LuaGlobalType.create(nameRef));
+                        typeSet = LuaTypeSet.create(LuaGlobalType.create(newRef));
                     else
-                        typeSet.addType(LuaGlobalType.create(nameRef));
+                        typeSet.addType(LuaGlobalType.create(newRef));
                 }
                 return typeSet;
             }
