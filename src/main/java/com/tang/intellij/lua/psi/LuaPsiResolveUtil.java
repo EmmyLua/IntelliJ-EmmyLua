@@ -240,6 +240,9 @@ public class LuaPsiResolveUtil {
     }
 
     public static String getAnonymousType(LuaNameDef nameDef) {
-        return nameDef.getName();
+        String fileName = nameDef.getContainingFile().getName();
+        int startOffset = nameDef.getNode().getStartOffset();
+
+        return String.format("%s@(%d)%s", fileName, startOffset, nameDef.getName());
     }
 }

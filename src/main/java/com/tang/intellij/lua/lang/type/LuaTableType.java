@@ -43,7 +43,7 @@ public class LuaTableType extends LuaType {
 
     public static String getTypeName(LuaTableConstructor tableConstructor) {
         String fileName = tableConstructor.getContainingFile().getName();
-        return String.format("%s/table@%d", fileName, tableConstructor.getNode().getStartOffset());
+        return String.format("%s@(%d)table", fileName, tableConstructor.getNode().getStartOffset());
     }
 
     public LuaTableConstructor tableConstructor;
@@ -87,7 +87,7 @@ public class LuaTableType extends LuaType {
         for (String s : fieldStringList) {
             LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
                     .withIcon(LuaIcons.CLASS_FIELD)
-                    .withTypeText("Table");
+                    .withTypeText(getClassNameText());
 
             completionResultSet.addElement(elementBuilder);
         }
