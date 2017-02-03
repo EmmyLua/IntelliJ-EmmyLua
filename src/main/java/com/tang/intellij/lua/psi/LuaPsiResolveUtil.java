@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaAnonymousType;
@@ -65,7 +66,7 @@ public class LuaPsiResolveUtil {
     public static PsiElement resolveLocal(LuaNameRef ref, SearchContext context) {
         String refName = ref.getName();
 
-        if (refName.equals("self")) {
+        if (refName.equals(Constants.WORD_SELF)) {
             LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodDef.class);
             if (classMethodFuncDef != null) {
                 LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
