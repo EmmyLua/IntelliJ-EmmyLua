@@ -33,6 +33,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.stubs.LuaClassDefStub;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -154,6 +155,18 @@ public class LuaDocPsiImplUtil {
     }
 
     /**
+     * 优化：从stub中取名字
+     * @param classDef LuaDocClassDef
+     * @return string
+     */
+    public static String getName(LuaDocClassDef classDef) {
+        LuaClassDefStub stub = classDef.getStub();
+        if (stub != null)
+            return stub.getClassName();
+        return getName((PsiNameIdentifierOwner) classDef);
+    }
+
+    /**
      * for Goto Class
      * @param classDef class def
      * @return ItemPresentation
@@ -216,7 +229,7 @@ public class LuaDocPsiImplUtil {
     }
 
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
-        return "[STUB]" + stubElement.getNode().getElementType().toString();
+        return "[STUB]";// + stubElement.getNode().getElementType().toString();
     }
 
     public static String getFieldName(LuaDocFieldDef fieldDef) {
