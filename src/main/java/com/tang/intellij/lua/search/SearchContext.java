@@ -28,6 +28,11 @@ import com.intellij.psi.search.ProjectAndLibrariesScope;
  */
 public class SearchContext {
 
+    /**
+     * 在文件最后 return 嵌套的次数，防止死循环
+     */
+    public int lastReturnTimes;
+
     public Project getProject() {
         return project;
     }

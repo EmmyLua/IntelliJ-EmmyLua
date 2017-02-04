@@ -46,6 +46,10 @@ public class LuaFile extends PsiFileBase {
      * @return LuaTypeSet
      */
     public LuaTypeSet getReturnedType(SearchContext context) {
+        context.lastReturnTimes++;
+        //防止死循环
+        if (context.lastReturnTimes >= 5) return null;
+
         PsiElement lastChild = getLastChild();
         final LuaReturnStat[] last = {null};
         LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
