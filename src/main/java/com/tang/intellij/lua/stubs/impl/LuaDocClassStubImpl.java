@@ -20,17 +20,17 @@ import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.psi.LuaElementType;
-import com.tang.intellij.lua.stubs.LuaClassDefStub;
+import com.tang.intellij.lua.stubs.LuaDocClassStub;
 
 /**
  *
  * Created by tangzx on 2016/11/28.
  */
-public class LuaClassDefStubImpl extends StubBase<LuaDocClassDef> implements LuaClassDefStub {
+public class LuaDocClassStubImpl extends StubBase<LuaDocClassDef> implements LuaDocClassStub {
 
     private String className;
 
-    public LuaClassDefStubImpl(String className, StubElement parent) {
+    public LuaDocClassStubImpl(String className, StubElement parent) {
         super(parent, LuaElementType.CLASS_DEF);
         this.className = className;
     }

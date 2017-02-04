@@ -20,8 +20,8 @@ import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.stubs.LuaClassDefStub;
-import com.tang.intellij.lua.stubs.impl.LuaClassDefStubImpl;
+import com.tang.intellij.lua.stubs.LuaDocClassStub;
+import com.tang.intellij.lua.stubs.impl.LuaDocClassStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
@@ -32,20 +32,20 @@ import java.io.IOException;
  *
  * Created by tangzx on 2016/11/28.
  */
-public class LuaDocClassType extends IStubElementType<LuaClassDefStub, LuaDocClassDef> {
+public class LuaDocClassType extends IStubElementType<LuaDocClassStub, LuaDocClassDef> {
     public LuaDocClassType() {
         super("Class", LuaLanguage.INSTANCE);
     }
 
     @Override
-    public LuaDocClassDef createPsi(@NotNull LuaClassDefStub luaClassDefStub) {
-        return new LuaDocClassDefImpl(luaClassDefStub, this);
+    public LuaDocClassDef createPsi(@NotNull LuaDocClassStub luaDocClassStub) {
+        return new LuaDocClassDefImpl(luaDocClassStub, this);
     }
 
     @NotNull
     @Override
-    public LuaClassDefStub createStub(@NotNull LuaDocClassDef luaDocClassDef, StubElement stubElement) {
-        return new LuaClassDefStubImpl(luaDocClassDef.getName(), stubElement);
+    public LuaDocClassStub createStub(@NotNull LuaDocClassDef luaDocClassDef, StubElement stubElement) {
+        return new LuaDocClassStubImpl(luaDocClassDef.getName(), stubElement);
     }
 
     @NotNull
@@ -55,19 +55,19 @@ public class LuaDocClassType extends IStubElementType<LuaClassDefStub, LuaDocCla
     }
 
     @Override
-    public void serialize(@NotNull LuaClassDefStub luaClassDefStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        stubOutputStream.writeUTFFast(luaClassDefStub.getClassName());
+    public void serialize(@NotNull LuaDocClassStub luaDocClassStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
+        stubOutputStream.writeUTFFast(luaDocClassStub.getClassName());
     }
 
     @NotNull
     @Override
-    public LuaClassDefStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        return new LuaClassDefStubImpl(stubInputStream.readUTFFast(), stubElement);
+    public LuaDocClassStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
+        return new LuaDocClassStubImpl(stubInputStream.readUTFFast(), stubElement);
     }
 
     @Override
-    public void indexStub(@NotNull LuaClassDefStub luaClassDefStub, @NotNull IndexSink indexSink) {
-        indexSink.occurrence(LuaClassIndex.KEY, luaClassDefStub.getClassName());
-        indexSink.occurrence(LuaShortNameIndex.KEY, luaClassDefStub.getClassName());
+    public void indexStub(@NotNull LuaDocClassStub luaDocClassStub, @NotNull IndexSink indexSink) {
+        indexSink.occurrence(LuaClassIndex.KEY, luaDocClassStub.getClassName());
+        indexSink.occurrence(LuaShortNameIndex.KEY, luaDocClassStub.getClassName());
     }
 }

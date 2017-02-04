@@ -33,7 +33,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.LuaClassDefStub;
+import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
@@ -158,7 +158,7 @@ public class LuaDocPsiImplUtil {
      * @return string
      */
     public static String getName(LuaDocClassDef classDef) {
-        LuaClassDefStub stub = classDef.getStub();
+        LuaDocClassStub stub = classDef.getStub();
         if (stub != null)
             return stub.getClassName();
         return getName((PsiNameIdentifierOwner) classDef);

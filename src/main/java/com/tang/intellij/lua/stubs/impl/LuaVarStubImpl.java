@@ -31,7 +31,7 @@ import com.tang.intellij.lua.stubs.LuaVarStub;
  *
  * Created by tangzx on 2017/1/12.
  */
-public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVarStub {
+public class LuaVarStubImpl extends StubBase<LuaVar> implements LuaVarStub {
 
     private LuaIndexExpr indexExpr;
     private String typeName;
@@ -39,18 +39,16 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
     private boolean isGlobal;
     private boolean isValid;
 
-
-
-    public LuaClassVarFieldStubImpl(StubElement parent,
-                                    IStubElementType elementType) {
+    public LuaVarStubImpl(StubElement parent,
+                          IStubElementType elementType) {
         super(parent, elementType);
         this.isValid = false;
         this.isGlobal = false;
     }
 
-    public LuaClassVarFieldStubImpl(StubElement parent,
-                                    IStubElementType elementType,
-                                    LuaVar var) {
+    public LuaVarStubImpl(StubElement parent,
+                          IStubElementType elementType,
+                          LuaVar var) {
         super(parent, elementType);
         //this.indexExpr = indexExpr;
         this.isValid = checkValid(var);
@@ -69,19 +67,19 @@ public class LuaClassVarFieldStubImpl extends StubBase<LuaVar> implements LuaVar
         }
     }
 
-    public LuaClassVarFieldStubImpl(StubElement stubElement,
-                                    IStubElementType type,
-                                    String typeName,
-                                    String fieldName) {
+    public LuaVarStubImpl(StubElement stubElement,
+                          IStubElementType type,
+                          String typeName,
+                          String fieldName) {
         super(stubElement, type);
         this.isGlobal = false;
         this.typeName = typeName;
         this.fieldName = fieldName;
     }
 
-    public LuaClassVarFieldStubImpl(StubElement stubElement,
-                                    IStubElementType type,
-                                    String fieldName) {
+    public LuaVarStubImpl(StubElement stubElement,
+                          IStubElementType type,
+                          String fieldName) {
         super(stubElement, type);
         this.isGlobal = true;
         this.fieldName = fieldName;

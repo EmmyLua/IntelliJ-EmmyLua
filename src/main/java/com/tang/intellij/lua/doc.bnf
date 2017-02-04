@@ -119,7 +119,7 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaClassDefStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocClassStub"
     methods = [
         getSuperClass
         getSuperClasses

@@ -26,7 +26,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
-import com.tang.intellij.lua.stubs.impl.LuaClassFieldStubImpl;
+import com.tang.intellij.lua.stubs.impl.LuaDocClassFieldStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -65,7 +65,7 @@ public class LuaDocClassFieldType extends IStubElementType<LuaDocClassFieldStub,
             className = classDef.getName();
         }
 
-        return new LuaClassFieldStubImpl(stubElement, name, StringRef.fromNullableString(className));
+        return new LuaDocClassFieldStubImpl(stubElement, name, StringRef.fromNullableString(className));
     }
 
     @NotNull
@@ -85,7 +85,7 @@ public class LuaDocClassFieldType extends IStubElementType<LuaDocClassFieldStub,
     public LuaDocClassFieldStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
         String name = stubInputStream.readUTFFast();
         StringRef className = stubInputStream.readName();
-        return new LuaClassFieldStubImpl(stubElement, name, className);
+        return new LuaDocClassFieldStubImpl(stubElement, name, className);
     }
 
     @Override

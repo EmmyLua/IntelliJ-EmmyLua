@@ -23,7 +23,7 @@ import com.tang.intellij.lua.psi.LuaVar;
 import com.tang.intellij.lua.psi.LuaVarList;
 import com.tang.intellij.lua.psi.impl.LuaVarImpl;
 import com.tang.intellij.lua.stubs.LuaVarStub;
-import com.tang.intellij.lua.stubs.impl.LuaClassVarFieldStubImpl;
+import com.tang.intellij.lua.stubs.impl.LuaVarStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
@@ -54,7 +54,7 @@ public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
     @NotNull
     @Override
     public LuaVarStub createStub(@NotNull LuaVar var, StubElement stubElement) {
-        return new LuaClassVarFieldStubImpl(stubElement, this, var);
+        return new LuaVarStubImpl(stubElement, this, var);
     }
 
     @NotNull
@@ -87,15 +87,15 @@ public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
             boolean isGlobal = stubInputStream.readBoolean();
             String fieldName = stubInputStream.readUTFFast();
             if (isGlobal) {
-                return new LuaClassVarFieldStubImpl(stubElement, this, fieldName);
+                return new LuaVarStubImpl(stubElement, this, fieldName);
             } else {
                 boolean hasType = stubInputStream.readBoolean();
                 String text = null;
                 if (hasType) text = stubInputStream.readUTFFast();
-                return new LuaClassVarFieldStubImpl(stubElement, this, text, fieldName);
+                return new LuaVarStubImpl(stubElement, this, text, fieldName);
             }
         } else {
-            return new LuaClassVarFieldStubImpl(stubElement, this);
+            return new LuaVarStubImpl(stubElement, this);
         }
     }
 

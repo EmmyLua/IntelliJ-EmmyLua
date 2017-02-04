@@ -27,11 +27,11 @@ import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
  *
  * Created by tangzx on 2016/12/10.
  */
-public class LuaClassFieldStubImpl extends StubBase<LuaDocFieldDef> implements LuaDocClassFieldStub {
+public class LuaDocClassFieldStubImpl extends StubBase<LuaDocFieldDef> implements LuaDocClassFieldStub {
     private String name;
     private StringRef className;
 
-    public LuaClassFieldStubImpl(StubElement parent, String name, StringRef className) {
+    public LuaDocClassFieldStubImpl(StubElement parent, String name, StringRef className) {
         super(parent, LuaElementType.CLASS_FIELD_DEF);
         this.name = name;
         this.className = className;
