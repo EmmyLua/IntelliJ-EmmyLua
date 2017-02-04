@@ -74,7 +74,6 @@ public class LuaPsiResolveUtil {
                     return resolve != null ? resolve : nameRef;
                 }
             }
-            return null;
         }
 
         //local 变量, 参数

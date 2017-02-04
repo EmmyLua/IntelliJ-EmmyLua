@@ -327,7 +327,7 @@ fake name ::= ID {
     ]
     methods = [setName getName]
 }
-nameDef ::= ID {
+nameDef ::= ID | SELF {
     implements = ["com.tang.intellij.lua.psi.LuaTypeGuessable" "com.intellij.psi.PsiNameIdentifierOwner"]
     methods = [guessType getNameIdentifier getUseScope]
     extends = name
