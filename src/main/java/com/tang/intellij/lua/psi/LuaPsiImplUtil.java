@@ -341,7 +341,7 @@ public class LuaPsiImplUtil {
         return list;
     }
 
-    public static LuaTypeSet guessReturnType(LuaFuncBodyOwner owner, SearchContext searchContext) {
+    public static LuaTypeSet guessReturnTypeSet(LuaFuncBodyOwner owner, SearchContext searchContext) {
         if (owner instanceof StubBasedPsiElementBase) {
             StubBasedPsiElementBase stubElement = (StubBasedPsiElementBase) owner;
             StubElement stub = stubElement.getStub();
@@ -351,6 +351,10 @@ public class LuaPsiImplUtil {
             }
         }
 
+        return guessReturnTypeSetOriginal(owner, searchContext);
+    }
+
+    public static LuaTypeSet guessReturnTypeSetOriginal(LuaFuncBodyOwner owner, SearchContext searchContext) {
         if (owner instanceof LuaCommentOwner) {
             LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) owner);
             if (comment != null) {

@@ -19,11 +19,7 @@ package com.tang.intellij.lua.stubs.types;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.io.StringRef;
-import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
@@ -59,21 +55,10 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
         PsiElement nameRef = globalFuncDef.getNameIdentifier();
         assert nameRef != null;
         SearchContext searchContext = new SearchContext(globalFuncDef.getProject()).setCurrentStubFile(globalFuncDef.getContainingFile());
-        LuaTypeSet returnTypeSet = getReturnTypeSet(globalFuncDef, searchContext);
+        LuaTypeSet returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(globalFuncDef, searchContext);
         String[] params = LuaPsiImplUtil.getParamsOriginal(globalFuncDef);
 
         return new LuaGlobalFuncStubImpl(nameRef.getText(), params, returnTypeSet, stubElement);
-    }
-
-    private LuaTypeSet getReturnTypeSet(LuaGlobalFuncDef methodDef, SearchContext searchContext) {
-        LuaComment comment = LuaCommentUtil.findComment(methodDef);
-        if (comment != null) {
-            LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
-            if (returnDef != null) {
-                return returnDef.resolveTypeAt(0, searchContext); //TODO : multi
-            }
-        }
-        return LuaTypeSet.create();
     }
 
     @NotNull

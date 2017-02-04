@@ -19,11 +19,7 @@ package com.tang.intellij.lua.stubs.types;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.io.StringRef;
-import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -69,24 +65,13 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
                 clazzName = type.getClassNameText();
         }
 
-        LuaTypeSet returnTypeSet = getReturnTypeSet(methodDef, searchContext);
+        LuaTypeSet returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(methodDef, searchContext);
         String[] params = LuaPsiImplUtil.getParamsOriginal(methodDef);
 
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
 
         return new LuaClassMethodStubImpl(id.getText(), clazzName, params, returnTypeSet, isStatic, stubElement);
-    }
-
-    private LuaTypeSet getReturnTypeSet(LuaClassMethodDef methodDef, SearchContext searchContext) {
-        LuaComment comment = LuaCommentUtil.findComment(methodDef);
-        if (comment != null) {
-            LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
-            if (returnDef != null) {
-                return returnDef.resolveTypeAt(0, searchContext); //TODO : multi
-            }
-        }
-        return LuaTypeSet.create();
     }
 
     @NotNull
