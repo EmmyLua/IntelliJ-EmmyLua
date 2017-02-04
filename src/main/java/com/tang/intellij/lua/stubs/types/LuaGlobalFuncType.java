@@ -26,9 +26,8 @@ import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.LuaPsiImplUtil;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
@@ -38,7 +37,6 @@ import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  *
@@ -62,21 +60,9 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
         assert nameRef != null;
         SearchContext searchContext = new SearchContext(globalFuncDef.getProject()).setCurrentStubFile(globalFuncDef.getContainingFile());
         LuaTypeSet returnTypeSet = getReturnTypeSet(globalFuncDef, searchContext);
-        String[] params = getParams(globalFuncDef);
+        String[] params = LuaPsiImplUtil.getParamsOriginal(globalFuncDef);
 
         return new LuaGlobalFuncStubImpl(nameRef.getText(), params, returnTypeSet, stubElement);
-    }
-
-    private String[] getParams(LuaFuncBodyOwner funcBodyOwner) {
-        List<LuaParamNameDef> paramNameList = funcBodyOwner.getParamNameDefList();
-        if (paramNameList != null) {
-            String[] array = new String[paramNameList.size()];
-            for (int i = 0; i < paramNameList.size(); i++) {
-                array[i] = paramNameList.get(i).getText();
-            }
-            return array;
-        }
-        return new String[0];
     }
 
     private LuaTypeSet getReturnTypeSet(LuaGlobalFuncDef methodDef, SearchContext searchContext) {

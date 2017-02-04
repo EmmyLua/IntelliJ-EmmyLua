@@ -372,7 +372,19 @@ public class LuaPsiImplUtil {
                 return funcBodyOwnerStub.getParams();
             }
         }
-        return null;
+        return getParamsOriginal(owner);
+    }
+
+    public static String[] getParamsOriginal(LuaFuncBodyOwner funcBodyOwner) {
+        List<LuaParamNameDef> paramNameList = funcBodyOwner.getParamNameDefList();
+        if (paramNameList != null) {
+            String[] array = new String[paramNameList.size()];
+            for (int i = 0; i < paramNameList.size(); i++) {
+                array[i] = paramNameList.get(i).getText();
+            }
+            return array;
+        }
+        return new String[0];
     }
 
     static String getParamFingerprint(LuaFuncBodyOwner funcBodyOwner) {

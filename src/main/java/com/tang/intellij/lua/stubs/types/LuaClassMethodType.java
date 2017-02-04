@@ -36,7 +36,6 @@ import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  *
@@ -71,24 +70,12 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
         }
 
         LuaTypeSet returnTypeSet = getReturnTypeSet(methodDef, searchContext);
-        String[] params = getParams(methodDef);
+        String[] params = LuaPsiImplUtil.getParamsOriginal(methodDef);
 
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
 
         return new LuaClassMethodStubImpl(id.getText(), clazzName, params, returnTypeSet, isStatic, stubElement);
-    }
-
-    private String[] getParams(LuaFuncBodyOwner funcBodyOwner) {
-        List<LuaParamNameDef> paramNameList = funcBodyOwner.getParamNameDefList();
-        if (paramNameList != null) {
-            String[] array = new String[paramNameList.size()];
-            for (int i = 0; i < paramNameList.size(); i++) {
-                array[i] = paramNameList.get(i).getText();
-            }
-            return array;
-        }
-        return new String[0];
     }
 
     private LuaTypeSet getReturnTypeSet(LuaClassMethodDef methodDef, SearchContext searchContext) {
