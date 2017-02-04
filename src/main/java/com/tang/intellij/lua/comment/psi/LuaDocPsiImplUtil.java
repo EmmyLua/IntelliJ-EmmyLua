@@ -204,7 +204,7 @@ public class LuaDocPsiImplUtil {
         String clazzName = classDef.getName();
         assert clazzName != null;
         String superClassName = null;
-        LuaDocClassNameRef supperRef = classDef.getClassNameRef();
+        LuaDocClassNameRef supperRef = classDef.getSuperClassNameRef();
         if (supperRef != null)
             superClassName = supperRef.getText();
 

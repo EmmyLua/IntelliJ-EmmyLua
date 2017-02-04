@@ -47,7 +47,7 @@ public class LuaDocClassType extends IStubElementType<LuaDocClassStub, LuaDocCla
     @NotNull
     @Override
     public LuaDocClassStub createStub(@NotNull LuaDocClassDef luaDocClassDef, StubElement stubElement) {
-        LuaDocClassNameRef superClassNameRef = luaDocClassDef.getClassNameRef();
+        LuaDocClassNameRef superClassNameRef = luaDocClassDef.getSuperClassNameRef();
         String superClassName = superClassNameRef == null ? null : superClassNameRef.getText();
         return new LuaDocClassStubImpl(luaDocClassDef.getName(), superClassName, stubElement);
     }

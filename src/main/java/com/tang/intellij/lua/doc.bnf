@@ -129,6 +129,8 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
         getName
         getTextOffset
         toString
+
+        superClassNameRef = 'class_name_ref'
     ]
 }
 
