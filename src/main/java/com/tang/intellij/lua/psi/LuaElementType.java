@@ -66,13 +66,13 @@ public class LuaElementType extends IElementType {
         }
     };
 
-    public static IStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncDefStubElementType();
-    public static IStubElementType CLASS_METHOD_DEF = new LuaClassMethodStubElementType();
-    public static IStubElementType CLASS_FIELD_DEF = new LuaClassDocFieldStubElementType();
-    public static IStubElementType CLASS_DEF = new LuaClassStubElementType();
-    public static IStubElementType TABLE = new LuaTableStubElementType();
-    public static IStubElementType TABLE_FIELD = new LuaTableFieldStubElementType();
-    public static IStubElementType VAR = new LuaVarStubElementType();
+    public static IStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncType();
+    public static IStubElementType CLASS_METHOD_DEF = new LuaClassMethodType();
+    public static IStubElementType CLASS_FIELD_DEF = new LuaDocClassFieldType();
+    public static IStubElementType CLASS_DEF = new LuaDocClassType();
+    public static IStubElementType TABLE = new LuaTableType();
+    public static IStubElementType TABLE_FIELD = new LuaTableFieldType();
+    public static IStubElementType VAR = new LuaVarType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
 
     static class LuaBlockElementType extends IReparseableElementType {

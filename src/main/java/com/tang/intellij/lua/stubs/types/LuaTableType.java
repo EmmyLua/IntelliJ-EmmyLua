@@ -30,8 +30,8 @@ import java.io.IOException;
  * table
  * Created by tangzx on 2017/1/12.
  */
-public class LuaTableStubElementType extends IStubElementType<LuaTableStub, LuaTableConstructor> {
-    public LuaTableStubElementType() {
+public class LuaTableType extends IStubElementType<LuaTableStub, LuaTableConstructor> {
+    public LuaTableType() {
         super("Table", LuaLanguage.INSTANCE);
     }
 

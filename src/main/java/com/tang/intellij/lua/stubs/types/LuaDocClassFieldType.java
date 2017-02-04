@@ -36,8 +36,8 @@ import java.io.IOException;
  *
  * Created by tangzx on 2016/12/10.
  */
-public class LuaClassDocFieldStubElementType extends IStubElementType<LuaDocClassFieldStub, LuaDocFieldDef> {
-    public LuaClassDocFieldStubElementType() {
+public class LuaDocClassFieldType extends IStubElementType<LuaDocClassFieldStub, LuaDocFieldDef> {
+    public LuaDocClassFieldType() {
         super("Class Doc Field", LuaLanguage.INSTANCE);
     }
 

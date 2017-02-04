@@ -30,8 +30,8 @@ import org.jetbrains.annotations.NotNull;
  *
  * Created by tangzx on 2016/11/27.
  */
-public class LuaFileStubElementType extends IStubFileElementType<LuaFileStub> {
-    public LuaFileStubElementType() {
+public class LuaFileType extends IStubFileElementType<LuaFileStub> {
+    public LuaFileType() {
         super(LuaLanguage.INSTANCE);
     }
 

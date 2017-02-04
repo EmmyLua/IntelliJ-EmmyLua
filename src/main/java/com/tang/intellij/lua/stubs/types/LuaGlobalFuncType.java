@@ -40,9 +40,9 @@ import java.io.IOException;
  *
  * Created by tangzx on 2016/11/26.
  */
-public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef> {
+public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef> {
 
-    public LuaGlobalFuncDefStubElementType() {
+    public LuaGlobalFuncType() {
         super("Global Function", LuaLanguage.INSTANCE);
     }
 

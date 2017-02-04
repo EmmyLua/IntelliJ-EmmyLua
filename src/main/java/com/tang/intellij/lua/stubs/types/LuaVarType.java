@@ -35,8 +35,8 @@ import java.io.IOException;
  *
  * Created by tangzx on 2017/1/12.
  */
-public class LuaVarStubElementType extends IStubElementType<LuaVarStub, LuaVar> {
-    public LuaVarStubElementType() {
+public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
+    public LuaVarType() {
         super("Var", LuaLanguage.INSTANCE);
     }
 

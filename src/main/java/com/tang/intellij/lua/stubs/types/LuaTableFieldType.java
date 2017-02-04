@@ -32,8 +32,8 @@ import java.io.IOException;
  *
  * Created by tangzx on 2017/1/14.
  */
-public class LuaTableFieldStubElementType extends IStubElementType<LuaTableFieldStub, LuaTableField> {
-    public LuaTableFieldStubElementType() {
+public class LuaTableFieldType extends IStubElementType<LuaTableFieldStub, LuaTableField> {
+    public LuaTableFieldType() {
         super("Table Field", LuaLanguage.INSTANCE);
     }
 

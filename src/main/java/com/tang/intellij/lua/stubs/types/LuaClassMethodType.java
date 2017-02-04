@@ -43,8 +43,8 @@ import java.io.IOException;
  *
  * Created by tangzx on 2016/12/4.
  */
-public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMethodStub, LuaClassMethodDef> {
-    public LuaClassMethodStubElementType() {
+public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, LuaClassMethodDef> {
+    public LuaClassMethodType() {
         super("Class Method", LuaLanguage.INSTANCE);
     }
 

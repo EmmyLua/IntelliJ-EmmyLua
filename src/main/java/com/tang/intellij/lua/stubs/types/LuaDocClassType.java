@@ -32,8 +32,8 @@ import java.io.IOException;
  *
  * Created by tangzx on 2016/11/28.
  */
-public class LuaClassStubElementType extends IStubElementType<LuaClassDefStub, LuaDocClassDef> {
-    public LuaClassStubElementType() {
+public class LuaDocClassType extends IStubElementType<LuaClassDefStub, LuaDocClassDef> {
+    public LuaDocClassType() {
         super("Class", LuaLanguage.INSTANCE);
     }
 

@@ -36,7 +36,7 @@ import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.psi.LuaFile;
 import com.tang.intellij.lua.psi.LuaTokenType;
 import com.tang.intellij.lua.psi.LuaTypes;
-import com.tang.intellij.lua.stubs.types.LuaFileStubElementType;
+import com.tang.intellij.lua.stubs.types.LuaFileType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -49,7 +49,7 @@ public class LuaParserDefinition implements ParserDefinition {
     public static final TokenSet COMMENTS = TokenSet.create(LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT, LuaTypes.DOC_COMMENT);
     public static final TokenSet STRINGS =TokenSet.create(LuaTypes.STRING);
 
-    public static final LuaFileStubElementType FILE = new LuaFileStubElementType();
+    public static final LuaFileType FILE = new LuaFileType();
 
     @NotNull
     @Override
