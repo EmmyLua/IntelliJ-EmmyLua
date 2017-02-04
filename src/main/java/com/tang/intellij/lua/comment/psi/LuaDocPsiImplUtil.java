@@ -34,6 +34,7 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaClassDefStub;
+import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -230,6 +231,13 @@ public class LuaDocPsiImplUtil {
 
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
         return "[STUB]";// + stubElement.getNode().getElementType().toString();
+    }
+
+    public static String getName(LuaDocFieldDef fieldDef) {
+        LuaDocClassFieldStub stub = fieldDef.getStub();
+        if (stub != null)
+            return stub.getName();
+        return getName((PsiNameIdentifierOwner)fieldDef);
     }
 
     public static String getFieldName(LuaDocFieldDef fieldDef) {

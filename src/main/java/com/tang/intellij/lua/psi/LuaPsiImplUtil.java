@@ -31,6 +31,7 @@ import com.tang.intellij.lua.lang.type.LuaGlobalType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 import com.tang.intellij.lua.stubs.LuaVarStub;
 import org.jetbrains.annotations.NotNull;
@@ -108,6 +109,13 @@ public class LuaPsiImplUtil {
 
     public static PsiElement getNameIdentifier(LuaClassMethodDef classMethodDef) {
         return classMethodDef.getClassMethodName().getId();
+    }
+
+    public static String getName(LuaClassMethodDef classMethodDef) {
+        LuaClassMethodStub stub = classMethodDef.getStub();
+        if (stub != null)
+            return stub.getShortName();
+        return getName((PsiNameIdentifierOwner)classMethodDef);
     }
 
     /**
