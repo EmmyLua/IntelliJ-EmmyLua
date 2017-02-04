@@ -22,9 +22,12 @@ import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.comment.psi.LuaDocPsiImplUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.tang.intellij.lua.stubs.impl.LuaDocClassFieldStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
@@ -65,7 +68,10 @@ public class LuaDocClassFieldType extends IStubElementType<LuaDocClassFieldStub,
             className = classDef.getName();
         }
 
-        return new LuaDocClassFieldStubImpl(stubElement, name, StringRef.fromNullableString(className));
+        SearchContext searchContext = new SearchContext(luaDocFieldDef.getProject()).setCurrentStubFile(luaDocFieldDef.getContainingFile());
+        LuaTypeSet typeSet = LuaDocPsiImplUtil.resolveDocTypeSet(luaDocFieldDef.getTypeSet(), null, searchContext);
+
+        return new LuaDocClassFieldStubImpl(stubElement, name, className, typeSet);
     }
 
     @NotNull
@@ -76,22 +82,24 @@ public class LuaDocClassFieldType extends IStubElementType<LuaDocClassFieldStub,
 
     @Override
     public void serialize(@NotNull LuaDocClassFieldStub luaFieldStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        stubOutputStream.writeUTFFast(luaFieldStub.getName());
-        stubOutputStream.writeName(luaFieldStub.getClassName().toString());
+        stubOutputStream.writeName(luaFieldStub.getName());
+        stubOutputStream.writeName(luaFieldStub.getClassName());
+        LuaTypeSet.serialize(luaFieldStub.getType(), stubOutputStream);
     }
 
     @NotNull
     @Override
     public LuaDocClassFieldStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        String name = stubInputStream.readUTFFast();
+        StringRef name = stubInputStream.readName();
         StringRef className = stubInputStream.readName();
-        return new LuaDocClassFieldStubImpl(stubElement, name, className);
+        LuaTypeSet typeSet = LuaTypeSet.deserialize(stubInputStream);
+        return new LuaDocClassFieldStubImpl(stubElement, StringRef.toString(name), StringRef.toString(className), typeSet);
     }
 
     @Override
     public void indexStub(@NotNull LuaDocClassFieldStub luaFieldStub, @NotNull IndexSink indexSink) {
-        StringRef className = luaFieldStub.getClassName();
-        indexSink.occurrence(LuaClassFieldIndex.KEY, className.getString());
+        String className = luaFieldStub.getClassName();
+        indexSink.occurrence(LuaClassFieldIndex.KEY, className);
         indexSink.occurrence(LuaClassFieldIndex.KEY, className + "." + luaFieldStub.getName());
     }
 }

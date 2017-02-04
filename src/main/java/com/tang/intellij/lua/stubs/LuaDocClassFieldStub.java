@@ -17,8 +17,8 @@
 package com.tang.intellij.lua.stubs;
 
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 
 /**
  *
@@ -27,5 +27,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 public interface LuaDocClassFieldStub extends StubElement<LuaDocFieldDef> {
     String getName();
 
-    StringRef getClassName();
+    LuaTypeSet getType();
+
+    String getClassName();
 }

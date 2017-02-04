@@ -32,10 +32,7 @@ import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.LuaClassMethodStub;
-import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub;
-import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
-import com.tang.intellij.lua.stubs.LuaVarStub;
+import com.tang.intellij.lua.stubs.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -422,6 +419,9 @@ public class LuaPsiImplUtil {
     }
 
     public static String getFieldName(LuaTableField tableField) {
+        LuaTableFieldStub stub = tableField.getStub();
+        if (stub != null)
+            return stub.getFieldName();
         return getName(tableField);
     }
 

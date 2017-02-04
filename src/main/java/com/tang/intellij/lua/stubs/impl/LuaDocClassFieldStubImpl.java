@@ -18,8 +18,8 @@ package com.tang.intellij.lua.stubs.impl;
 
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 
@@ -29,12 +29,14 @@ import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
  */
 public class LuaDocClassFieldStubImpl extends StubBase<LuaDocFieldDef> implements LuaDocClassFieldStub {
     private String name;
-    private StringRef className;
+    private String className;
+    private LuaTypeSet type;
 
-    public LuaDocClassFieldStubImpl(StubElement parent, String name, StringRef className) {
+    public LuaDocClassFieldStubImpl(StubElement parent, String name, String className, LuaTypeSet type) {
         super(parent, LuaElementType.CLASS_FIELD_DEF);
         this.name = name;
         this.className = className;
+        this.type = type;
     }
 
     @Override
@@ -43,7 +45,12 @@ public class LuaDocClassFieldStubImpl extends StubBase<LuaDocFieldDef> implement
     }
 
     @Override
-    public StringRef getClassName() {
+    public LuaTypeSet getType() {
+        return type;
+    }
+
+    @Override
+    public String getClassName() {
         return className;
     }
 }

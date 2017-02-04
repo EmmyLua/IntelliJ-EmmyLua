@@ -93,6 +93,9 @@ public class LuaDocPsiImplUtil {
     }
 
     public static LuaTypeSet guessType(LuaDocFieldDef fieldDef, SearchContext context) {
+        LuaDocClassFieldStub stub = fieldDef.getStub();
+        if (stub != null)
+            return stub.getType();
         return resolveDocTypeSet(fieldDef.getTypeSet(), null, context);
     }
 
@@ -138,7 +141,7 @@ public class LuaDocPsiImplUtil {
         return typeSet;
     }
 
-    private static LuaTypeSet resolveDocTypeSet(LuaDocTypeSet docTypeSet, LuaTypeSet typeSet, SearchContext context) {
+    public static LuaTypeSet resolveDocTypeSet(LuaDocTypeSet docTypeSet, LuaTypeSet typeSet, SearchContext context) {
         if (typeSet == null) typeSet = LuaTypeSet.create();
         if (docTypeSet != null) {
             List<LuaDocClassNameRef> classNameRefList = docTypeSet.getClassNameRefList();
