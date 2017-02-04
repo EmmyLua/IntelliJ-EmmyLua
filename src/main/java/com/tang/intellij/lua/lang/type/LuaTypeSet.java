@@ -16,9 +16,14 @@
 
 package com.tang.intellij.lua.lang.type;
 
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,10 +62,6 @@ public class LuaTypeSet {
         return types;
     }
 
-    public LuaType getType(int index) {
-        return types.get(index);
-    }
-
     @Nullable
     public LuaType getFirst() {
         if (isEmpty())
@@ -74,5 +75,26 @@ public class LuaTypeSet {
 
     public void addType(LuaType type) {
         types.add(type);
+    }
+
+    public static void serialize(LuaTypeSet set, @NotNull StubOutputStream stubOutputStream) throws IOException {
+        stubOutputStream.writeInt(set.types.size());
+        for (int i = 0; i < set.types.size(); i++) {
+            LuaType type = set.types.get(i);
+            type.serialize(stubOutputStream);
+        }
+    }
+
+    public static LuaTypeSet deserialize(@NotNull StubInputStream stubInputStream) throws IOException {
+        LuaTypeSet set = LuaTypeSet.create();
+        int num = stubInputStream.readInt();
+        for (int i = 0; i < num; i++) {
+            StringRef classNameRef = stubInputStream.readName();
+            assert classNameRef != null;
+            StringRef superClassNameRef = stubInputStream.readName();
+            LuaType type = LuaType.create(classNameRef.getString(), StringRef.toString(superClassNameRef));
+            set.addType(type);
+        }
+        return set;
     }
 }

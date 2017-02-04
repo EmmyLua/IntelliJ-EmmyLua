@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs.impl;
 
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
@@ -30,12 +31,14 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
 
     private String shortName;
     private String className;
+    private LuaTypeSet returnTypeSet;
     private boolean isStatic;
 
-    public LuaClassMethodStubImpl(String shortName, String className, boolean isStatic, StubElement parent) {
+    public LuaClassMethodStubImpl(String shortName, String className, LuaTypeSet returnTypeSet, boolean isStatic, StubElement parent) {
         super(parent, LuaElementType.CLASS_METHOD_DEF);
         this.shortName = shortName;
         this.className = className;
+        this.returnTypeSet = returnTypeSet;
         this.isStatic = isStatic;
     }
 
@@ -52,5 +55,10 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
     @Override
     public boolean isStatic() {
         return isStatic;
+    }
+
+    @Override
+    public LuaTypeSet getReturnType() {
+        return returnTypeSet;
     }
 }

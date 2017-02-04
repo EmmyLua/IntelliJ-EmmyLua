@@ -146,10 +146,7 @@ public class LuaDocPsiImplUtil {
         if (docTypeSet != null) {
             List<LuaDocClassNameRef> classNameRefList = docTypeSet.getClassNameRefList();
             for (LuaDocClassNameRef classNameRef : classNameRefList) {
-                LuaDocClassDef def = LuaClassIndex.find(classNameRef.getText(), context);
-                if (def != null) {
-                    typeSet.addType(def);
-                }
+                typeSet.addType(LuaType.create(classNameRef.getText(), null));
             }
         }
         return typeSet;

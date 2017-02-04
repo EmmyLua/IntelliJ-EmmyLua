@@ -19,9 +19,6 @@ package com.tang.intellij.lua.psi.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -96,15 +93,8 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         }
         // find in comment
         LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner(context);
-        if (bodyOwner instanceof LuaCommentOwner) {
-            LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) bodyOwner);
-            if (comment != null) {
-                LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
-                if (returnDef != null) {
-                    return returnDef.resolveTypeAt(0, context); //TODO : multi
-                }
-            }
-        }
+        if (bodyOwner != null)
+            return bodyOwner.guessReturnType(context);
         return null;
     }
 

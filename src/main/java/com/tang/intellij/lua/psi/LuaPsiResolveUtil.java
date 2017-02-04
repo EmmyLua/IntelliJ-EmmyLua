@@ -22,7 +22,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
-import com.tang.intellij.lua.lang.type.LuaAnonymousType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
@@ -205,7 +204,7 @@ public class LuaPsiResolveUtil {
 
                 //anonymous
                 if (typeSet == null ||typeSet.isEmpty())
-                    typeSet = LuaTypeSet.create(LuaAnonymousType.create(nameDef));
+                    typeSet = LuaTypeSet.create(LuaType.createAnonymousType(nameDef));
                 return typeSet;
             }
         }

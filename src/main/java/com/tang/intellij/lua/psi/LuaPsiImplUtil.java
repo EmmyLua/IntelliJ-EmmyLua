@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.psi;
 
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.*;
@@ -25,13 +26,14 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.lang.type.LuaGlobalType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
+import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 import com.tang.intellij.lua.stubs.LuaVarStub;
 import org.jetbrains.annotations.NotNull;
@@ -284,7 +286,7 @@ public class LuaPsiImplUtil {
         if (nameRef != null) {
             PsiElement def = LuaPsiResolveUtil.resolve(nameRef, context);
             if (def == null) { //也许是Global
-                return LuaTypeSet.create(LuaGlobalType.create(nameRef));
+                return LuaTypeSet.create(LuaType.createGlobalType(nameRef));
             } else if (def instanceof LuaTypeGuessable) {
                 return ((LuaTypeGuessable) def).guessType(context);
             } else if (def instanceof LuaNameRef) {
@@ -307,9 +309,9 @@ public class LuaPsiImplUtil {
                 //同时是 Global ?
                 if (LuaPsiResolveUtil.resolveLocal(newRef, context) == null) {
                     if (typeSet == null || typeSet.isEmpty())
-                        typeSet = LuaTypeSet.create(LuaGlobalType.create(newRef));
+                        typeSet = LuaTypeSet.create(LuaType.createGlobalType(newRef));
                     else
-                        typeSet.addType(LuaGlobalType.create(newRef));
+                        typeSet.addType(LuaType.createGlobalType(newRef));
                 }
                 return typeSet;
             }
@@ -340,6 +342,28 @@ public class LuaPsiImplUtil {
         List<LuaParamNameDef> list = new ArrayList<>();
         list.add(forAStat.getParamNameDef());
         return list;
+    }
+
+    public static LuaTypeSet guessReturnType(LuaFuncBodyOwner owner, SearchContext searchContext) {
+        if (owner instanceof StubBasedPsiElementBase) {
+            StubBasedPsiElementBase stubElement = (StubBasedPsiElementBase) owner;
+            StubElement stub = stubElement.getStub();
+            if (stub instanceof LuaFuncBodyOwnerStub) {
+                LuaFuncBodyOwnerStub funcBodyOwnerStub = (LuaFuncBodyOwnerStub) stub;
+                return funcBodyOwnerStub.getReturnType();
+            }
+        }
+
+        if (owner instanceof LuaCommentOwner) {
+            LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) owner);
+            if (comment != null) {
+                LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
+                if (returnDef != null) {
+                    return returnDef.resolveTypeAt(0, searchContext); //TODO : multi
+                }
+            }
+        }
+        return null;
     }
 
     static String getParamFingerprint(LuaFuncBodyOwner funcBodyOwner) {

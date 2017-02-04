@@ -20,17 +20,18 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.tang.intellij.lua.editor.completion.FuncInsertHandler;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaClassField;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -39,40 +40,52 @@ import java.util.Collection;
  */
 public class LuaType {
 
-    private PsiElement element;
-
-    protected LuaType(PsiElement element) {
-
-        this.element = element;
+    public static LuaType create(@NotNull String typeName, @Nullable String superTypeName) {
+        LuaType type = new LuaType();
+        type.clazzName = typeName;
+        type.superClassName = superTypeName;
+        return type;
     }
+
+    public static LuaType createAnonymousType(LuaNameDef localDef) {
+        return create(LuaPsiResolveUtil.getAnonymousType(localDef), null);
+    }
+
+    public static LuaType createGlobalType(LuaNameRef ref) {
+        return create(ref.getText(), null);
+    }
+
+    protected LuaType() {
+    }
+
+    protected String clazzName;
+    protected String superClassName;
 
     public LuaType getSuperClass(SearchContext context) {
         return null;
     }
 
     public String getClassNameText() {
-        return null;
+        return clazzName;
     }
 
-    protected Project getProject() {
-        if (element == null) return null;
-        return element.getProject();
+    public void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
+        stubOutputStream.writeName(clazzName);
+        stubOutputStream.writeName(superClassName);
     }
 
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters,
                                      @NotNull CompletionResultSet completionResultSet,
                                      boolean useAsField) {
-        addMethodCompletions(completionParameters, completionResultSet, true, true, useAsField);
+        Project project = completionParameters.getEditor().getProject();
+        assert project != null;
+        addMethodCompletions(completionResultSet, project, true, useAsField);
     }
 
-    protected void addMethodCompletions(@NotNull CompletionParameters completionParameters,
-                                        @NotNull CompletionResultSet completionResultSet,
-                                        boolean bold,
-                                        boolean withSuper,
-                                        boolean useAsField) {
-        Project project = getProject();
-        if (project == null)
-            return;
+    private void addMethodCompletions(@NotNull CompletionResultSet completionResultSet,
+                                      @NotNull Project project,
+                                      boolean bold,
+                                      boolean useAsField) {
         String clazzName = getClassNameText();
         if (clazzName == null)
             return;
@@ -93,20 +106,14 @@ public class LuaType {
             }
         }
 
-        if (withSuper) {
-            LuaType superType = getSuperClass(new SearchContext(project));
-            if (superType != null)
-                superType.addMethodCompletions(completionParameters, completionResultSet, false, true, useAsField);
-        }
+        LuaType superType = getSuperClass(new SearchContext(project));
+        if (superType != null)
+            superType.addMethodCompletions(completionResultSet, project, false, useAsField);
     }
 
-    protected void addStaticMethodCompletions(@NotNull CompletionResultSet completionResultSet,
-                                              boolean bold,
-                                              boolean withSuper,
-                                              SearchContext context) {
-        Project project = getProject();
-        if (project == null)
-            return;
+    private void addStaticMethodCompletions(@NotNull CompletionResultSet completionResultSet,
+                                            boolean bold,
+                                            SearchContext context) {
         String clazzName = getClassNameText();
         if (clazzName == null)
             return;
@@ -126,31 +133,30 @@ public class LuaType {
             }
         }
 
-        if (withSuper) {
-            LuaType superType = getSuperClass(context);
-            if (superType != null)
-                superType.addStaticMethodCompletions(completionResultSet, false, true, context);
-        }
+        LuaType superType = getSuperClass(context);
+        if (superType != null)
+            superType.addStaticMethodCompletions(completionResultSet, false, context);
     }
 
     public void addFieldCompletions(@NotNull CompletionParameters completionParameters,
                                     @NotNull CompletionResultSet completionResultSet,
                                     SearchContext context) {
-        addFieldCompletions(completionParameters, completionResultSet, true, true, context);
-        addStaticMethodCompletions(completionResultSet, true, true, context);
+        Project project = completionParameters.getEditor().getProject();
+        assert project != null;
+
+        addFieldCompletions(completionParameters, completionResultSet, project, true, true, context);
+        addStaticMethodCompletions(completionResultSet, true, context);
         addMethodCompletions(completionParameters, completionResultSet, true);
     }
 
     protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
                                        @NotNull CompletionResultSet completionResultSet,
+                                       @NotNull Project project,
                                        boolean bold,
                                        boolean withSuper,
                                        SearchContext context) {
         String clazzName = getClassNameText();
         if (clazzName == null)
-            return;
-        Project project = getProject();
-        if (project == null)
             return;
 
         Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
@@ -173,7 +179,7 @@ public class LuaType {
         if (withSuper) {
             LuaType superType = getSuperClass(context);
             if (superType != null)
-                superType.addFieldCompletions(completionParameters, completionResultSet, false, true, context);
+                superType.addFieldCompletions(completionParameters, completionResultSet, project, false, true, context);
         }
     }
 
@@ -216,14 +222,14 @@ public class LuaType {
         return def;
     }
 
-    public LuaClassMethodDef findStaticMethod(String methodName, boolean withSuper, @NotNull SearchContext context) {
+    /*private LuaClassMethodDef findStaticMethod(String methodName, @NotNull SearchContext context) {
         String className = getClassNameText();
         LuaClassMethodDef def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
-        if (def == null && withSuper) {
+        if (def == null) {
             LuaType superType = getSuperClass(context);
             if (superType != null)
-                def = superType.findStaticMethod(methodName, true, context);
+                def = superType.findStaticMethod(methodName, context);
         }
         return def;
-    }
+    }*/
 }

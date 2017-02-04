@@ -19,9 +19,15 @@ package com.tang.intellij.lua.stubs.types;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 import com.tang.intellij.lua.stubs.impl.LuaGlobalFuncStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
@@ -50,7 +56,19 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
     public LuaGlobalFuncStub createStub(@NotNull LuaGlobalFuncDef globalFuncDef, StubElement stubElement) {
         PsiElement nameRef = globalFuncDef.getNameIdentifier();
         assert nameRef != null;
-        return new LuaGlobalFuncStubImpl(nameRef.getText(), stubElement);
+        SearchContext searchContext = new SearchContext(globalFuncDef.getProject()).setCurrentStubFile(globalFuncDef.getContainingFile());
+        return new LuaGlobalFuncStubImpl(nameRef.getText(), getReturnTypeSet(globalFuncDef, searchContext), stubElement);
+    }
+
+    private LuaTypeSet getReturnTypeSet(LuaGlobalFuncDef methodDef, SearchContext searchContext) {
+        LuaComment comment = LuaCommentUtil.findComment(methodDef);
+        if (comment != null) {
+            LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
+            if (returnDef != null) {
+                return returnDef.resolveTypeAt(0, searchContext); //TODO : multi
+            }
+        }
+        return LuaTypeSet.create();
     }
 
     @NotNull
@@ -72,12 +90,15 @@ public class LuaGlobalFuncDefStubElementType extends IStubElementType<LuaGlobalF
     @Override
     public void serialize(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
         stubOutputStream.writeUTF(luaGlobalFuncStub.getName());
+        LuaTypeSet.serialize(luaGlobalFuncStub.getReturnType(), stubOutputStream);
     }
 
     @NotNull
     @Override
     public LuaGlobalFuncStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        return new LuaGlobalFuncStubImpl(stubInputStream.readUTF(), stubElement);
+        String name = stubInputStream.readUTF();
+        LuaTypeSet returnTypeSet = LuaTypeSet.deserialize(stubInputStream);
+        return new LuaGlobalFuncStubImpl(name, returnTypeSet, stubElement);
     }
 
     @Override

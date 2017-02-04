@@ -19,6 +19,7 @@ package com.tang.intellij.lua.stubs.impl;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import com.tang.intellij.lua.psi.LuaTypes;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
@@ -30,14 +31,21 @@ import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 public class LuaGlobalFuncStubImpl extends StubBase<LuaGlobalFuncDef> implements LuaGlobalFuncStub {
 
     private String funcName;
+    private LuaTypeSet returnTypeSet;
 
-    public LuaGlobalFuncStubImpl(String name, StubElement parent) {
+    public LuaGlobalFuncStubImpl(String funcName, LuaTypeSet returnTypeSet, StubElement parent) {
         super(parent, (IStubElementType) LuaTypes.GLOBAL_FUNC_DEF);
-        funcName = name;
+        this.funcName = funcName;
+        this.returnTypeSet = returnTypeSet;
     }
 
     @Override
     public String getName() {
         return funcName;
+    }
+
+    @Override
+    public LuaTypeSet getReturnType() {
+        return returnTypeSet;
     }
 }

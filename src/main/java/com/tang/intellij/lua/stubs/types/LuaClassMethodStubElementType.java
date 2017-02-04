@@ -19,6 +19,10 @@ package com.tang.intellij.lua.stubs.types;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -58,18 +62,32 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         assert nameRef != null;
         assert id != null;
         String clazzName = nameRef.getText();
+        SearchContext searchContext = new SearchContext(methodDef.getProject()).setCurrentStubFile(methodDef.getContainingFile());
 
-        LuaTypeSet typeSet = nameRef.guessType(new SearchContext(methodDef.getProject()).setCurrentStubFile(methodDef.getContainingFile()));
+        LuaTypeSet typeSet = nameRef.guessType(searchContext);
         if (typeSet != null) {
             LuaType type = typeSet.getFirst();
             if (type != null)
                 clazzName = type.getClassNameText();
         }
 
+        LuaTypeSet returnTypeSet = getReturnTypeSet(methodDef, searchContext);
+
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
 
-        return new LuaClassMethodStubImpl(id.getText(), clazzName, isStatic, stubElement);
+        return new LuaClassMethodStubImpl(id.getText(), clazzName, returnTypeSet, isStatic, stubElement);
+    }
+
+    private LuaTypeSet getReturnTypeSet(LuaClassMethodDef methodDef, SearchContext searchContext) {
+        LuaComment comment = LuaCommentUtil.findComment(methodDef);
+        if (comment != null) {
+            LuaDocReturnDef returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef.class);
+            if (returnDef != null) {
+                return returnDef.resolveTypeAt(0, searchContext); //TODO : multi
+            }
+        }
+        return LuaTypeSet.create();
     }
 
     @NotNull
@@ -94,6 +112,8 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
             stubOutputStream.writeUTFFast(luaClassMethodStub.getClassName());
         }
         stubOutputStream.writeUTFFast(luaClassMethodStub.getShortName());
+        LuaTypeSet returnTypeSet = luaClassMethodStub.getReturnType();
+        LuaTypeSet.serialize(returnTypeSet, stubOutputStream);
         stubOutputStream.writeBoolean(luaClassMethodStub.isStatic());
     }
 
@@ -105,8 +125,9 @@ public class LuaClassMethodStubElementType extends IStubElementType<LuaClassMeth
         if (hasClassName)
             className = stubInputStream.readUTFFast();
         String shortName = stubInputStream.readUTFFast();
+        LuaTypeSet returnTypeSet = LuaTypeSet.deserialize(stubInputStream);
         boolean isStatic = stubInputStream.readBoolean();
-        return new LuaClassMethodStubImpl(shortName, className, isStatic, stubElement);
+        return new LuaClassMethodStubImpl(shortName, className, returnTypeSet, isStatic, stubElement);
     }
 
     @Override

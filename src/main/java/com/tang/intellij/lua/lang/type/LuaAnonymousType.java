@@ -26,12 +26,10 @@ import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
 public class LuaAnonymousType extends LuaType {
 
     private final String clazzName;
-    private LuaNameDef localDef;
 
-    private LuaAnonymousType(LuaNameDef localDef) {
-        super(localDef);
-        this.localDef = localDef;
-        this.clazzName = LuaPsiResolveUtil.getAnonymousType(localDef);
+    private LuaAnonymousType(String typeName) {
+        super();
+        this.clazzName = typeName;
     }
 
     @Override
@@ -40,6 +38,6 @@ public class LuaAnonymousType extends LuaType {
     }
 
     public static LuaAnonymousType create(LuaNameDef localDef) {
-        return new LuaAnonymousType(localDef);
+        return new LuaAnonymousType(LuaPsiResolveUtil.getAnonymousType(localDef));
     }
 }

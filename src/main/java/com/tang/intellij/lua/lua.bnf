@@ -160,6 +160,7 @@ globalFuncDef ::= 'function' ID funcBody {
         getName
         getTextOffset
         toString
+        guessReturnType
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFuncStub"
 }
@@ -186,6 +187,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         getName
         getTextOffset
         toString
+        guessReturnType
     ]
 }
 
@@ -196,7 +198,16 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    methods = [getComment getParamNameDefList getNameIdentifier setName getName getTextOffset getUseScope]
+    methods = [
+        getComment
+        getParamNameDefList
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+        getUseScope
+        guessReturnType
+    ]
 }
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
@@ -264,7 +275,7 @@ private funcCallExpr ::= callOrIndexExpr <<checkType 'CALL_EXPR'>>
 closureFuncDef ::= 'function' funcBody {
     pin = 2
     implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
-    methods = [getParamNameDefList]
+    methods = [getParamNameDefList guessReturnType]
 }
 
 funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }

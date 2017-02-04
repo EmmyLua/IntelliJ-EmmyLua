@@ -19,6 +19,7 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaClassField;
@@ -48,10 +49,8 @@ public class LuaTableType extends LuaType {
 
     public LuaTableConstructor tableConstructor;
     private List<String> fieldStringList;
-    private String clazzName;
 
     private LuaTableType(LuaTableConstructor tableElement) {
-        super(tableElement);
         tableConstructor = tableElement;
         clazzName = getTypeName(tableElement);
     }
@@ -79,10 +78,11 @@ public class LuaTableType extends LuaType {
     @Override
     protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
                                        @NotNull CompletionResultSet completionResultSet,
+                                       @NotNull Project project,
                                        boolean bold,
                                        boolean withSuper,
                                        SearchContext context) {
-        super.addFieldCompletions(completionParameters, completionResultSet, bold, withSuper, context);
+        super.addFieldCompletions(completionParameters, completionResultSet, project, bold, withSuper, context);
         InitFieldList();
         for (String s : fieldStringList) {
             LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)

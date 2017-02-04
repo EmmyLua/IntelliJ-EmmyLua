@@ -16,6 +16,8 @@
 
 package com.tang.intellij.lua.psi;
 
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -29,6 +31,12 @@ import org.jetbrains.annotations.Nullable;
 public interface LuaFuncBodyOwner extends LuaParametersOwner {
     @Nullable
     LuaFuncBody getFuncBody();
+
+    /**
+     * 返回类型
+     * @return LuaTypeSet
+     */
+    LuaTypeSet guessReturnType(SearchContext searchContext);
 
     default String getParamFingerprint() {
         return LuaPsiImplUtil.getParamFingerprint(this);

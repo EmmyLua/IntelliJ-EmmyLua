@@ -25,14 +25,14 @@ import com.tang.intellij.lua.psi.LuaNameRef;
 public class LuaGlobalType extends LuaType {
 
     public static LuaGlobalType create(LuaNameRef ref) {
-        return new LuaGlobalType(ref);
+        return new LuaGlobalType(ref.getText());
     }
 
     private String clazzName;
 
-    private LuaGlobalType(LuaNameRef ref) {
-        super(ref);
-        clazzName = ref.getText();
+    private LuaGlobalType(String typeName) {
+        super();
+        clazzName = typeName;
     }
 
     @Override

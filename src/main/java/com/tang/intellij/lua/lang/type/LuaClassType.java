@@ -31,23 +31,17 @@ public class LuaClassType extends LuaType {
     }
 
     private LuaClassType(LuaDocClassDef classDef) {
-        super(classDef);
+        super();
         this.classDef = classDef;
+        this.clazzName = classDef.getName();
     }
 
     private LuaDocClassDef classDef;
-    private String className;
     private LuaType superType;
 
     public LuaType getSuperClass(SearchContext context) {
         if (superType == null)
             superType = classDef.getSuperClass(context);
         return superType;
-    }
-
-    public String getClassNameText() {
-        if (className == null)
-            className = classDef.getName();
-        return className;
     }
 }

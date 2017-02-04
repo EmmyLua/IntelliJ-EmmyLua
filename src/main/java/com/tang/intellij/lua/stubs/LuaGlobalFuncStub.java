@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.stubs;
 
-import com.intellij.psi.stubs.StubElement;
 import com.sun.istack.internal.NotNull;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 
@@ -24,7 +23,7 @@ import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
  *
  * Created by tangzx on 2016/11/26.
  */
-public interface LuaGlobalFuncStub extends StubElement<LuaGlobalFuncDef> {
+public interface LuaGlobalFuncStub extends LuaFuncBodyOwnerStub<LuaGlobalFuncDef> {
     @NotNull
     String getName();
 }
