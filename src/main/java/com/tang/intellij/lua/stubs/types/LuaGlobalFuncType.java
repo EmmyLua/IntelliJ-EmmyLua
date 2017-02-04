@@ -20,12 +20,15 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
@@ -35,6 +38,7 @@ import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  *
@@ -57,7 +61,22 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
         PsiElement nameRef = globalFuncDef.getNameIdentifier();
         assert nameRef != null;
         SearchContext searchContext = new SearchContext(globalFuncDef.getProject()).setCurrentStubFile(globalFuncDef.getContainingFile());
-        return new LuaGlobalFuncStubImpl(nameRef.getText(), getReturnTypeSet(globalFuncDef, searchContext), stubElement);
+        LuaTypeSet returnTypeSet = getReturnTypeSet(globalFuncDef, searchContext);
+        String[] params = getParams(globalFuncDef);
+
+        return new LuaGlobalFuncStubImpl(nameRef.getText(), params, returnTypeSet, stubElement);
+    }
+
+    private String[] getParams(LuaFuncBodyOwner funcBodyOwner) {
+        List<LuaParamNameDef> paramNameList = funcBodyOwner.getParamNameDefList();
+        if (paramNameList != null) {
+            String[] array = new String[paramNameList.size()];
+            for (int i = 0; i < paramNameList.size(); i++) {
+                array[i] = paramNameList.get(i).getText();
+            }
+            return array;
+        }
+        return new String[0];
     }
 
     private LuaTypeSet getReturnTypeSet(LuaGlobalFuncDef methodDef, SearchContext searchContext) {
@@ -89,16 +108,32 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
 
     @Override
     public void serialize(@NotNull LuaGlobalFuncStub luaGlobalFuncStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        stubOutputStream.writeUTF(luaGlobalFuncStub.getName());
+        stubOutputStream.writeName(luaGlobalFuncStub.getName());
+
+        // params
+        String[] params = luaGlobalFuncStub.getParams();
+        stubOutputStream.writeByte(params.length);
+        for (String param : params) {
+            stubOutputStream.writeUTFFast(param);
+        }
+
         LuaTypeSet.serialize(luaGlobalFuncStub.getReturnType(), stubOutputStream);
     }
 
     @NotNull
     @Override
     public LuaGlobalFuncStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        String name = stubInputStream.readUTF();
+        StringRef name = stubInputStream.readName();
+
+        // params
+        int len = stubInputStream.readByte();
+        String[] params = new String[len];
+        for (int i = 0; i < len; i++) {
+            params[i] = stubInputStream.readUTFFast();
+        }
+
         LuaTypeSet returnTypeSet = LuaTypeSet.deserialize(stubInputStream);
-        return new LuaGlobalFuncStubImpl(name, returnTypeSet, stubElement);
+        return new LuaGlobalFuncStubImpl(StringRef.toString(name), params, returnTypeSet, stubElement);
     }
 
     @Override

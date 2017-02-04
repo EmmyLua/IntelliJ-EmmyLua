@@ -30,14 +30,12 @@ import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
-import com.tang.intellij.lua.psi.LuaFuncBody;
-import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * override supper
@@ -69,7 +67,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
                 if (methodName != null) {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getName())
                             .withIcon(LuaIcons.CLASS_METHOD)
-                            .withInsertHandler(new OverrideInsertHandler(def.getFuncBody()))
+                            .withInsertHandler(new OverrideInsertHandler(def))
                             .withTypeText("override " + clazzName);
 
                     completionResultSet.addElement(elementBuilder);
@@ -82,12 +80,12 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
     }
 
     static class OverrideInsertHandler extends FuncInsertHandler {
-        OverrideInsertHandler(LuaFuncBody funcBody) {
-            super(funcBody);
+        OverrideInsertHandler(LuaFuncBodyOwner funcBodyOwner) {
+            super(funcBodyOwner);
         }
 
         @Override
-        protected Template createTemplate(TemplateManager manager, List<LuaParamNameDef> paramNameDefList) {
+        protected Template createTemplate(TemplateManager manager, String[] paramNameDefList) {
             Template template = super.createTemplate(manager, paramNameDefList);
             template.addEndVariable();
             template.addTextSegment("\nend");

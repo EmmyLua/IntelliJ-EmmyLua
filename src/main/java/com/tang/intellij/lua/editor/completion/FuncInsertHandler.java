@@ -16,27 +16,21 @@
 
 package com.tang.intellij.lua.editor.completion;
 
-import com.tang.intellij.lua.psi.LuaFuncBody;
-import com.tang.intellij.lua.psi.LuaParamNameDef;
-
-import java.util.List;
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 
 /**
  *
  * Created by TangZX on 2016/12/20.
  */
 public class FuncInsertHandler extends ArgsInsertHandler {
-    private LuaFuncBody funcBody;
+    private LuaFuncBodyOwner funcBodyOwner;
 
-    public FuncInsertHandler(LuaFuncBody funcBody) {
-
-        this.funcBody = funcBody;
+    public FuncInsertHandler(LuaFuncBodyOwner funcBodyOwner) {
+        this.funcBodyOwner = funcBodyOwner;
     }
 
     @Override
-    protected List<LuaParamNameDef> getParams() {
-        if (funcBody != null)
-            return funcBody.getParamNameDefList();
-        return null;
+    protected String[] getParams() {
+        return funcBodyOwner.getParams();
     }
 }

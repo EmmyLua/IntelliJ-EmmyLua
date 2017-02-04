@@ -31,13 +31,15 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
 
     private String shortName;
     private String className;
+    private String[] params;
     private LuaTypeSet returnTypeSet;
     private boolean isStatic;
 
-    public LuaClassMethodStubImpl(String shortName, String className, LuaTypeSet returnTypeSet, boolean isStatic, StubElement parent) {
+    public LuaClassMethodStubImpl(String shortName, String className, String[] params, LuaTypeSet returnTypeSet, boolean isStatic, StubElement parent) {
         super(parent, LuaElementType.CLASS_METHOD_DEF);
         this.shortName = shortName;
         this.className = className;
+        this.params = params;
         this.returnTypeSet = returnTypeSet;
         this.isStatic = isStatic;
     }
@@ -60,5 +62,10 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
     @Override
     public LuaTypeSet getReturnType() {
         return returnTypeSet;
+    }
+
+    @Override
+    public String[] getParams() {
+        return params;
     }
 }

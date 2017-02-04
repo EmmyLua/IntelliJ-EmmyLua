@@ -12,10 +12,14 @@ import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 
+import java.util.List;
+
 /**
  * func body owner stub
  * Created by TangZX on 2017/2/4.
  */
 public interface LuaFuncBodyOwnerStub<T extends LuaFuncBodyOwner> extends StubElement<T> {
     LuaTypeSet getReturnType();
+
+    String[] getParams();
 }

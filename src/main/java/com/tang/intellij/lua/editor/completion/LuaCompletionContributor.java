@@ -90,7 +90,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                     String name = localFuncDef.getName();
                     if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create(localFuncDef.getName())
-                                .withInsertHandler(new FuncInsertHandler(localFuncDef.getFuncBody()))
+                                .withInsertHandler(new FuncInsertHandler(localFuncDef))
                                 .withIcon(LuaIcons.LOCAL_FUNCTION);
                         completionResultSet.addElement(elementBuilder);
                     }

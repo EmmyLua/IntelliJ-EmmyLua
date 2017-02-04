@@ -31,11 +31,13 @@ import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 public class LuaGlobalFuncStubImpl extends StubBase<LuaGlobalFuncDef> implements LuaGlobalFuncStub {
 
     private String funcName;
+    private String[] params;
     private LuaTypeSet returnTypeSet;
 
-    public LuaGlobalFuncStubImpl(String funcName, LuaTypeSet returnTypeSet, StubElement parent) {
+    public LuaGlobalFuncStubImpl(String funcName, String[] params, LuaTypeSet returnTypeSet, StubElement parent) {
         super(parent, (IStubElementType) LuaTypes.GLOBAL_FUNC_DEF);
         this.funcName = funcName;
+        this.params = params;
         this.returnTypeSet = returnTypeSet;
     }
 
@@ -47,5 +49,10 @@ public class LuaGlobalFuncStubImpl extends StubBase<LuaGlobalFuncDef> implements
     @Override
     public LuaTypeSet getReturnType() {
         return returnTypeSet;
+    }
+
+    @Override
+    public String[] getParams() {
+        return params;
     }
 }

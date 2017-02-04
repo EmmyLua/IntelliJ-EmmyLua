@@ -27,14 +27,11 @@ import com.intellij.codeInsight.template.macro.SuggestVariableNameMacro;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.psi.LuaParamNameDef;
 import com.tang.intellij.lua.psi.LuaTypes;
-
-import java.util.List;
 
 public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> {
 
-    protected abstract List<LuaParamNameDef> getParams();
+    protected abstract String[] getParams();
 
     @Override
     public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
@@ -53,7 +50,7 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
             }
         }
 
-        List<LuaParamNameDef> paramNameDefList = getParams();
+        String[] paramNameDefList = getParams();
         if (paramNameDefList != null) {
             TemplateManager manager = TemplateManager.getInstance(insertionContext.getProject());
             Template template = createTemplate(manager, paramNameDefList);
@@ -62,17 +59,17 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
         }
     }
 
-    protected Template createTemplate(TemplateManager manager, List<LuaParamNameDef> paramNameDefList) {
+    Template createTemplate(TemplateManager manager, String[] paramNameDefList) {
         Template template = manager.createTemplate("", "");
         template.addTextSegment("(");
 
         boolean isFirst = true;
         MacroCallNode name = new MacroCallNode(new SuggestVariableNameMacro());
 
-        for (LuaParamNameDef paramNameDef : paramNameDefList) {
+        for (String paramNameDef : paramNameDefList) {
             if (!isFirst)
                 template.addTextSegment(", ");
-            template.addVariable(paramNameDef.getName(), name, new TextExpression(paramNameDef.getName()), false);
+            template.addVariable(paramNameDef, name, new TextExpression(paramNameDef), false);
             isFirst = false;
         }
         template.addTextSegment(")");
