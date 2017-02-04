@@ -158,16 +158,9 @@ public class LuaPsiResolveUtil {
     static LuaTypeSet resolveType(LuaNameDef nameDef, SearchContext context) {
         //作为函数参数，类型在函数注释里找
         if (nameDef instanceof LuaParamNameDef) {
-            LuaCommentOwner owner = PsiTreeUtil.getParentOfType(nameDef, LuaCommentOwner.class);
-            if (owner != null) {
-                LuaComment comment = owner.getComment();
-                if (comment != null) {
-                    LuaDocParamDef paramDef = comment.getParamDef(nameDef.getText());
-                    if (paramDef != null) {
-                        return paramDef.guessType(context);
-                    }
-                }
-            }
+            LuaTypeSet typeSet = resolveParamType((LuaParamNameDef) nameDef, context);
+            if (typeSet != null)
+                return typeSet;
         }
         //在Table字段里
         else if (nameDef.getParent() instanceof LuaTableField) {
@@ -205,6 +198,26 @@ public class LuaPsiResolveUtil {
                 if (typeSet == null ||typeSet.isEmpty())
                     typeSet = LuaTypeSet.create(LuaType.createAnonymousType(nameDef));
                 return typeSet;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 找参数的类型
+     * @param paramNameDef param name
+     * @param context SearchContext
+     * @return LuaTypeSet
+     */
+    private static LuaTypeSet resolveParamType(LuaParamNameDef paramNameDef, SearchContext context) {
+        LuaCommentOwner owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner.class);
+        if (owner != null) {
+            LuaComment comment = owner.getComment();
+            if (comment != null) {
+                LuaDocParamDef paramDef = comment.getParamDef(paramNameDef.getText());
+                if (paramDef != null) {
+                    return paramDef.guessType(context);
+                }
             }
         }
         return null;
