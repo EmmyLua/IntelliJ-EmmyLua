@@ -121,8 +121,8 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocClassStub"
     methods = [
-        getSuperClass
-        getSuperClasses
+        getClassType
+        
         getPresentation
         getNameIdentifier
         setName

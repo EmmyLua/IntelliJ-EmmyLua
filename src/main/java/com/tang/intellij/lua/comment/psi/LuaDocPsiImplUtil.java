@@ -18,7 +18,6 @@ package com.tang.intellij.lua.comment.psi;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
@@ -28,13 +27,12 @@ import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference;
-import com.tang.intellij.lua.lang.type.LuaClassType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
+import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -59,10 +57,9 @@ public class LuaDocPsiImplUtil {
     }
 
     public static LuaType resolveType(LuaDocClassNameRef nameRef, SearchContext context) {
-        Project project = nameRef.getProject();
         LuaDocClassDef classDef = LuaClassIndex.find(nameRef.getText(), context);
         if (classDef != null) {
-            return LuaClassType.create(classDef);
+            return classDef.getClassType();
         }
         return null;
     }
@@ -146,7 +143,12 @@ public class LuaDocPsiImplUtil {
         if (docTypeSet != null) {
             List<LuaDocClassNameRef> classNameRefList = docTypeSet.getClassNameRefList();
             for (LuaDocClassNameRef classNameRef : classNameRefList) {
-                typeSet.addType(LuaType.create(classNameRef.getText(), null));
+                LuaDocClassDef def = LuaClassIndex.find(classNameRef.getText(), context);
+                if (def != null) {
+                    typeSet.addType(def.getClassType());
+                } else {
+                    typeSet.addType(LuaType.create(classNameRef.getText(), null));
+                }
             }
         }
         return typeSet;
@@ -191,30 +193,19 @@ public class LuaDocPsiImplUtil {
         };
     }
 
-    /**
-     * 获取所有超类
-     * @param classDef class 定义
-     * @return 超类集合
-     */
-    public static LuaTypeSet getSuperClasses(LuaDocClassDef classDef, SearchContext context) {
-        LuaType type = LuaClassType.create(classDef);
-        LuaType supper = type.getSuperClass(context);
-        LuaTypeSet set = LuaTypeSet.create();
-        while (supper != null) {
-            set.addType(supper);
-            supper = supper.getSuperClass(context);
-        }
-        return set;
-    }
+    public static LuaType getClassType(LuaDocClassDef classDef) {
+        LuaDocClassStub stub = classDef.getStub();
+        if (stub != null)
+            return stub.getClassType();
 
-    /**
-     * 获取父类
-     * @param classDef class def
-     * @return LuaType
-     */
-    public static LuaType getSuperClass(LuaDocClassDef classDef, SearchContext context) {
+        String clazzName = classDef.getName();
+        assert clazzName != null;
+        String superClassName = null;
         LuaDocClassNameRef supperRef = classDef.getClassNameRef();
-        return supperRef != null ? supperRef.resolveType(context) : null;
+        if (supperRef != null)
+            superClassName = supperRef.getText();
+
+        return LuaType.create(clazzName, superClassName);
     }
 
     /**

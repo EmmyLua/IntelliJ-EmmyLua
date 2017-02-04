@@ -19,6 +19,7 @@ package com.tang.intellij.lua.stubs.impl;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaElementType;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
 
@@ -29,14 +30,26 @@ import com.tang.intellij.lua.stubs.LuaDocClassStub;
 public class LuaDocClassStubImpl extends StubBase<LuaDocClassDef> implements LuaDocClassStub {
 
     private String className;
+    private String superClass;
 
-    public LuaDocClassStubImpl(String className, StubElement parent) {
+    public LuaDocClassStubImpl(String className, String superClass, StubElement parent) {
         super(parent, LuaElementType.CLASS_DEF);
         this.className = className;
+        this.superClass = superClass;
     }
 
     @Override
     public String getClassName() {
         return className;
+    }
+
+    @Override
+    public String getSuperClassName() {
+        return superClass;
+    }
+
+    @Override
+    public LuaType getClassType() {
+        return LuaType.create(className, superClass);
     }
 }

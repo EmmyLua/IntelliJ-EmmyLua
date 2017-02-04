@@ -17,7 +17,9 @@
 package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.psi.stubs.*;
+import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
@@ -45,7 +47,9 @@ public class LuaDocClassType extends IStubElementType<LuaDocClassStub, LuaDocCla
     @NotNull
     @Override
     public LuaDocClassStub createStub(@NotNull LuaDocClassDef luaDocClassDef, StubElement stubElement) {
-        return new LuaDocClassStubImpl(luaDocClassDef.getName(), stubElement);
+        LuaDocClassNameRef superClassNameRef = luaDocClassDef.getClassNameRef();
+        String superClassName = superClassNameRef == null ? null : superClassNameRef.getText();
+        return new LuaDocClassStubImpl(luaDocClassDef.getName(), superClassName, stubElement);
     }
 
     @NotNull
@@ -56,13 +60,16 @@ public class LuaDocClassType extends IStubElementType<LuaDocClassStub, LuaDocCla
 
     @Override
     public void serialize(@NotNull LuaDocClassStub luaDocClassStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        stubOutputStream.writeUTFFast(luaDocClassStub.getClassName());
+        stubOutputStream.writeName(luaDocClassStub.getClassName());
+        stubOutputStream.writeName(luaDocClassStub.getSuperClassName());
     }
 
     @NotNull
     @Override
     public LuaDocClassStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        return new LuaDocClassStubImpl(stubInputStream.readUTFFast(), stubElement);
+        StringRef className = stubInputStream.readName();
+        StringRef superClassName = stubInputStream.readName();
+        return new LuaDocClassStubImpl(StringRef.toString(className), StringRef.toString(superClassName), stubElement);
     }
 
     @Override

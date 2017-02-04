@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs;
 
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.lang.type.LuaType;
 
 /**
  *
@@ -25,4 +26,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
  */
 public interface LuaDocClassStub extends StubElement<LuaDocClassDef> {
     String getClassName();
+    String getSuperClassName();
+    LuaType getClassType();
 }

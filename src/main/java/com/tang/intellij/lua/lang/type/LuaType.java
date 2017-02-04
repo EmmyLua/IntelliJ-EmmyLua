@@ -22,11 +22,13 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.editor.completion.FuncInsertHandler;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
+import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,6 +64,11 @@ public class LuaType {
     protected String superClassName;
 
     public LuaType getSuperClass(SearchContext context) {
+        if (superClassName != null) {
+            LuaDocClassDef superClassDef = LuaClassIndex.find(superClassName, context);
+            if (superClassDef != null)
+                return superClassDef.getClassType();
+        }
         return null;
     }
 
@@ -69,7 +76,7 @@ public class LuaType {
         return clazzName;
     }
 
-    public void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
+    void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
         stubOutputStream.writeName(clazzName);
         stubOutputStream.writeName(superClassName);
     }
