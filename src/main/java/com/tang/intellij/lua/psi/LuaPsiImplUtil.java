@@ -422,6 +422,10 @@ public class LuaPsiImplUtil {
     }
 
     public static String getFieldName(LuaVar var) {
+        LuaVarStub stub = var.getStub();
+        if (stub != null)
+            return stub.getFieldName();
+
         LuaExpr expr = var.getExpr();
         if (expr instanceof LuaIndexExpr) {
             LuaIndexExpr luaIndexExpr = (LuaIndexExpr) expr;

@@ -229,6 +229,9 @@ public class LuaDocPsiImplUtil {
     }
 
     public static String getFieldName(LuaDocFieldDef fieldDef) {
+        LuaDocClassFieldStub stub = fieldDef.getStub();
+        if (stub != null)
+            return stub.getName();
         return fieldDef.getName();
     }
 }
