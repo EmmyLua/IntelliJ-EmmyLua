@@ -350,7 +350,7 @@ public class LuaPsiImplUtil {
             StubElement stub = stubElement.getStub();
             if (stub instanceof LuaFuncBodyOwnerStub) {
                 LuaFuncBodyOwnerStub funcBodyOwnerStub = (LuaFuncBodyOwnerStub) stub;
-                return funcBodyOwnerStub.getReturnType();
+                return funcBodyOwnerStub.getReturnTypeSet();
             }
         }
 

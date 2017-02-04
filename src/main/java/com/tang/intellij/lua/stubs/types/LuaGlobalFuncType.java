@@ -89,7 +89,7 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
             LuaParamInfo.serialize(param, stubOutputStream);
         }
 
-        LuaTypeSet.serialize(luaGlobalFuncStub.getReturnType(), stubOutputStream);
+        LuaTypeSet.serialize(luaGlobalFuncStub.getReturnTypeSet(), stubOutputStream);
     }
 
     @NotNull

@@ -48,7 +48,7 @@ public class LuaGlobalFuncStubImpl extends StubBase<LuaGlobalFuncDef> implements
     }
 
     @Override
-    public LuaTypeSet getReturnType() {
+    public LuaTypeSet getReturnTypeSet() {
         return returnTypeSet;
     }
 

@@ -18,7 +18,7 @@ import com.tang.intellij.lua.psi.LuaParamInfo;
  * Created by TangZX on 2017/2/4.
  */
 public interface LuaFuncBodyOwnerStub<T extends LuaFuncBodyOwner> extends StubElement<T> {
-    LuaTypeSet getReturnType();
+    LuaTypeSet getReturnTypeSet();
 
     LuaParamInfo[] getParams();
 }

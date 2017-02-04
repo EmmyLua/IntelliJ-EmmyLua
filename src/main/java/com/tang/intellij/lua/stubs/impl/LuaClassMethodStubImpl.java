@@ -61,7 +61,7 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
     }
 
     @Override
-    public LuaTypeSet getReturnType() {
+    public LuaTypeSet getReturnTypeSet() {
         return returnTypeSet;
     }
 

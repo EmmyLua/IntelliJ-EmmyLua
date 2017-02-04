@@ -101,7 +101,7 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
         }
 
         //return type set
-        LuaTypeSet returnTypeSet = luaClassMethodStub.getReturnType();
+        LuaTypeSet returnTypeSet = luaClassMethodStub.getReturnTypeSet();
         LuaTypeSet.serialize(returnTypeSet, stubOutputStream);
 
         // is static ?
