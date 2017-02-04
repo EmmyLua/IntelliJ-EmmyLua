@@ -22,8 +22,6 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.search.SearchContext;
@@ -42,28 +40,25 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
     protected void collectNavigationMarkers(@NotNull PsiElement element, Collection<? super RelatedItemLineMarkerInfo> result) {
         if (element instanceof LuaClassMethodDef) {
             LuaClassMethodDef methodDef = (LuaClassMethodDef) element;
-            LuaType type = methodDef.getClassType(new SearchContext(element.getProject()));
+            Project project = methodDef.getProject();
+            SearchContext context = new SearchContext(project);
+            LuaType type = methodDef.getClassType(context);
+
             if (type != null) {
                 String methodName = methodDef.getName();
                 assert methodName != null;
-                Project project = methodDef.getProject();
-                SearchContext context = new SearchContext(project);
                 LuaType superType = type.getSuperClass(context);
-                GlobalSearchScope scope = new ProjectAndLibrariesScope(project);
+
                 while (superType != null) {
                     String superTypeName = superType.getClassNameText();
-
-                    Collection<LuaClassMethodDef> methods = LuaClassMethodIndex.getInstance().get(superTypeName, project, scope);
-                    for (LuaClassMethodDef superMethodDef : methods) {
-                        if (methodName.equals(superMethodDef.getName())) {
-
-                            NavigationGutterIconBuilder<PsiElement> builder =
-                                    NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
-                                            .setTargets(superMethodDef)
-                                            .setTooltipText("Override in " + superTypeName);
-                            result.add(builder.createLineMarkerInfo(element));
-                            break;
-                        }
+                    LuaClassMethodDef superMethod = LuaClassMethodIndex.findMethodWithName(superTypeName, methodName, context);
+                    if (superMethod != null) {
+                        NavigationGutterIconBuilder<PsiElement> builder =
+                                NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
+                                        .setTargets(superMethod)
+                                        .setTooltipText("Override in " + superTypeName);
+                        result.add(builder.createLineMarkerInfo(element));
+                        break;
                     }
                     superType = superType.getSuperClass(context);
                 }
