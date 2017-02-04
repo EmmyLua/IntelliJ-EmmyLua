@@ -26,7 +26,10 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
+import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
+import com.tang.intellij.lua.comment.psi.LuaDocTypeSet;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
@@ -354,6 +357,7 @@ public class LuaPsiImplUtil {
         return guessReturnTypeSetOriginal(owner, searchContext);
     }
 
+    @NotNull
     public static LuaTypeSet guessReturnTypeSetOriginal(LuaFuncBodyOwner owner, SearchContext searchContext) {
         if (owner instanceof LuaCommentOwner) {
             LuaComment comment = LuaCommentUtil.findComment((LuaCommentOwner) owner);
@@ -364,10 +368,10 @@ public class LuaPsiImplUtil {
                 }
             }
         }
-        return null;
+        return LuaTypeSet.create();
     }
 
-    public static String[] getParams(LuaFuncBodyOwner owner) {
+    public static LuaParamInfo[] getParams(LuaFuncBodyOwner owner) {
         if (owner instanceof StubBasedPsiElementBase) {
             StubBasedPsiElementBase stubElement = (StubBasedPsiElementBase) owner;
             StubElement stub = stubElement.getStub();
@@ -379,16 +383,39 @@ public class LuaPsiImplUtil {
         return getParamsOriginal(owner);
     }
 
-    public static String[] getParamsOriginal(LuaFuncBodyOwner funcBodyOwner) {
+    public static LuaParamInfo[] getParamsOriginal(LuaFuncBodyOwner funcBodyOwner) {
+        LuaComment comment = null;
+        if (funcBodyOwner instanceof LuaCommentOwner) {
+            comment = LuaCommentUtil.findComment((LuaCommentOwner) funcBodyOwner);
+        }
+
         List<LuaParamNameDef> paramNameList = funcBodyOwner.getParamNameDefList();
         if (paramNameList != null) {
-            String[] array = new String[paramNameList.size()];
+            LuaParamInfo[] array = new LuaParamInfo[paramNameList.size()];
             for (int i = 0; i < paramNameList.size(); i++) {
-                array[i] = paramNameList.get(i).getText();
+                LuaParamInfo paramInfo = new LuaParamInfo();
+                String paramName = paramNameList.get(i).getText();
+                paramInfo.setName(paramName);
+                // param types
+                if (comment != null) {
+                    LuaDocParamDef paramDef = comment.getParamDef(paramName);
+                    if (paramDef != null) {
+                        LuaDocTypeSet luaDocTypeSet = paramDef.getTypeSet();
+                        if (luaDocTypeSet != null) {
+                            List<LuaDocClassNameRef> classNameRefList = luaDocTypeSet.getClassNameRefList();
+                            String[] types = new String[classNameRefList.size()];
+                            for (int j = 0; j < classNameRefList.size(); j++) {
+                                types[j] = classNameRefList.get(j).getText();
+                            }
+                            paramInfo.setTypes(types);
+                        }
+                    }
+                }
+                array[i] = paramInfo;
             }
             return array;
         }
-        return new String[0];
+        return new LuaParamInfo[0];
     }
 
     static String getParamFingerprint(LuaFuncBodyOwner funcBodyOwner) {

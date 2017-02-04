@@ -18,6 +18,7 @@ package com.tang.intellij.lua.editor.completion;
 
 import com.intellij.openapi.project.Project;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 
@@ -35,7 +36,7 @@ public class GlobalFuncInsertHandler extends ArgsInsertHandler {
     }
 
     @Override
-    protected String[] getParams() {
+    protected LuaParamInfo[] getParams() {
         LuaGlobalFuncDef luaGlobalFuncDef = LuaGlobalFuncIndex.find(globalFuncName, new SearchContext(project));
         if (luaGlobalFuncDef != null) {
             return luaGlobalFuncDef.getParams();

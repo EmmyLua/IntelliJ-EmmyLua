@@ -94,7 +94,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         // find in comment
         LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner(context);
         if (bodyOwner != null)
-            return bodyOwner.guessReturnType(context);
+            return bodyOwner.guessReturnTypeSet(context);
         return null;
     }
 

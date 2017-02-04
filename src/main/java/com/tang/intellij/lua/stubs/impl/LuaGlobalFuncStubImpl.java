@@ -21,6 +21,7 @@ import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.psi.LuaTypes;
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 
@@ -31,10 +32,10 @@ import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 public class LuaGlobalFuncStubImpl extends StubBase<LuaGlobalFuncDef> implements LuaGlobalFuncStub {
 
     private String funcName;
-    private String[] params;
+    private LuaParamInfo[] params;
     private LuaTypeSet returnTypeSet;
 
-    public LuaGlobalFuncStubImpl(String funcName, String[] params, LuaTypeSet returnTypeSet, StubElement parent) {
+    public LuaGlobalFuncStubImpl(String funcName, LuaParamInfo[] params, LuaTypeSet returnTypeSet, StubElement parent) {
         super(parent, (IStubElementType) LuaTypes.GLOBAL_FUNC_DEF);
         this.funcName = funcName;
         this.params = params;
@@ -52,7 +53,7 @@ public class LuaGlobalFuncStubImpl extends StubBase<LuaGlobalFuncDef> implements
     }
 
     @Override
-    public String[] getParams() {
+    public LuaParamInfo[] getParams() {
         return params;
     }
 }

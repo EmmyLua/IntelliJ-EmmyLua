@@ -27,11 +27,12 @@ import com.intellij.codeInsight.template.macro.SuggestVariableNameMacro;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.psi.LuaTypes;
 
 public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> {
 
-    protected abstract String[] getParams();
+    protected abstract LuaParamInfo[] getParams();
 
     @Override
     public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
@@ -50,7 +51,7 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
             }
         }
 
-        String[] paramNameDefList = getParams();
+        LuaParamInfo[] paramNameDefList = getParams();
         if (paramNameDefList != null) {
             TemplateManager manager = TemplateManager.getInstance(insertionContext.getProject());
             Template template = createTemplate(manager, paramNameDefList);
@@ -59,17 +60,17 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
         }
     }
 
-    Template createTemplate(TemplateManager manager, String[] paramNameDefList) {
+    Template createTemplate(TemplateManager manager, LuaParamInfo[] paramNameDefList) {
         Template template = manager.createTemplate("", "");
         template.addTextSegment("(");
 
         boolean isFirst = true;
         MacroCallNode name = new MacroCallNode(new SuggestVariableNameMacro());
 
-        for (String paramNameDef : paramNameDefList) {
+        for (LuaParamInfo paramNameDef : paramNameDefList) {
             if (!isFirst)
                 template.addTextSegment(", ");
-            template.addVariable(paramNameDef, name, new TextExpression(paramNameDef), false);
+            template.addVariable(paramNameDef.getName(), name, new TextExpression(paramNameDef.getName()), false);
             isFirst = false;
         }
         template.addTextSegment(")");

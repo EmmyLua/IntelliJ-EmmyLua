@@ -23,6 +23,7 @@ import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.psi.LuaPsiImplUtil;
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl;
 import com.tang.intellij.lua.search.SearchContext;
@@ -56,7 +57,7 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
         assert nameRef != null;
         SearchContext searchContext = new SearchContext(globalFuncDef.getProject()).setCurrentStubFile(globalFuncDef.getContainingFile());
         LuaTypeSet returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(globalFuncDef, searchContext);
-        String[] params = LuaPsiImplUtil.getParamsOriginal(globalFuncDef);
+        LuaParamInfo[] params = LuaPsiImplUtil.getParamsOriginal(globalFuncDef);
 
         return new LuaGlobalFuncStubImpl(nameRef.getText(), params, returnTypeSet, stubElement);
     }
@@ -82,10 +83,10 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
         stubOutputStream.writeName(luaGlobalFuncStub.getName());
 
         // params
-        String[] params = luaGlobalFuncStub.getParams();
+        LuaParamInfo[] params = luaGlobalFuncStub.getParams();
         stubOutputStream.writeByte(params.length);
-        for (String param : params) {
-            stubOutputStream.writeUTFFast(param);
+        for (LuaParamInfo param : params) {
+            LuaParamInfo.serialize(param, stubOutputStream);
         }
 
         LuaTypeSet.serialize(luaGlobalFuncStub.getReturnType(), stubOutputStream);
@@ -98,9 +99,9 @@ public class LuaGlobalFuncType extends IStubElementType<LuaGlobalFuncStub, LuaGl
 
         // params
         int len = stubInputStream.readByte();
-        String[] params = new String[len];
+        LuaParamInfo[] params = new LuaParamInfo[len];
         for (int i = 0; i < len; i++) {
-            params[i] = stubInputStream.readUTFFast();
+            params[i] = LuaParamInfo.deserialize(stubInputStream);
         }
 
         LuaTypeSet returnTypeSet = LuaTypeSet.deserialize(stubInputStream);

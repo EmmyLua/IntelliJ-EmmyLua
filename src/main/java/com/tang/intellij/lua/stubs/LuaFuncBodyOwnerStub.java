@@ -11,8 +11,7 @@ package com.tang.intellij.lua.stubs;
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
-
-import java.util.List;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 
 /**
  * func body owner stub
@@ -21,5 +20,5 @@ import java.util.List;
 public interface LuaFuncBodyOwnerStub<T extends LuaFuncBodyOwner> extends StubElement<T> {
     LuaTypeSet getReturnType();
 
-    String[] getParams();
+    LuaParamInfo[] getParams();
 }

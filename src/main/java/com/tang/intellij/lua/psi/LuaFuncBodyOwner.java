@@ -20,8 +20,6 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-
 /**
  * #local function
  * #function
@@ -38,9 +36,9 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner {
      * 返回类型
      * @return LuaTypeSet
      */
-    LuaTypeSet guessReturnType(SearchContext searchContext);
+    LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
-    String[] getParams();
+    LuaParamInfo[] getParams();
 
     default String getParamFingerprint() {
         return LuaPsiImplUtil.getParamFingerprint(this);

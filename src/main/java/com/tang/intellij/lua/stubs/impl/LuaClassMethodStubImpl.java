@@ -21,6 +21,7 @@ import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaElementType;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 
 /**
@@ -31,11 +32,11 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
 
     private String shortName;
     private String className;
-    private String[] params;
+    private LuaParamInfo[] params;
     private LuaTypeSet returnTypeSet;
     private boolean isStatic;
 
-    public LuaClassMethodStubImpl(String shortName, String className, String[] params, LuaTypeSet returnTypeSet, boolean isStatic, StubElement parent) {
+    public LuaClassMethodStubImpl(String shortName, String className, LuaParamInfo[] params, LuaTypeSet returnTypeSet, boolean isStatic, StubElement parent) {
         super(parent, LuaElementType.CLASS_METHOD_DEF);
         this.shortName = shortName;
         this.className = className;
@@ -65,7 +66,7 @@ public class LuaClassMethodStubImpl extends StubBase<LuaClassMethodDef> implemen
     }
 
     @Override
-    public String[] getParams() {
+    public LuaParamInfo[] getParams() {
         return params;
     }
 }

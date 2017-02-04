@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.editor.completion;
 
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 
 /**
  *
@@ -30,7 +31,7 @@ public class FuncInsertHandler extends ArgsInsertHandler {
     }
 
     @Override
-    protected String[] getParams() {
+    protected LuaParamInfo[] getParams() {
         return funcBodyOwner.getParams();
     }
 }

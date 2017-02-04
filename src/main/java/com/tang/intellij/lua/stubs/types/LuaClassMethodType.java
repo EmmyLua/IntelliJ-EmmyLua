@@ -66,7 +66,7 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
         }
 
         LuaTypeSet returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(methodDef, searchContext);
-        String[] params = LuaPsiImplUtil.getParamsOriginal(methodDef);
+        LuaParamInfo[] params = LuaPsiImplUtil.getParamsOriginal(methodDef);
 
         PsiElement prev = id.getPrevSibling();
         boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
@@ -94,10 +94,10 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
         stubOutputStream.writeName(luaClassMethodStub.getShortName());
 
         // params
-        String[] params = luaClassMethodStub.getParams();
+        LuaParamInfo[] params = luaClassMethodStub.getParams();
         stubOutputStream.writeByte(params.length);
-        for (String param : params) {
-            stubOutputStream.writeUTFFast(param);
+        for (LuaParamInfo param : params) {
+            LuaParamInfo.serialize(param, stubOutputStream);
         }
 
         //return type set
@@ -116,9 +116,9 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
 
         // params
         int len = stubInputStream.readByte();
-        String[] params = new String[len];
+        LuaParamInfo[] params = new LuaParamInfo[len];
         for (int i = 0; i < len; i++) {
-            params[i] = stubInputStream.readUTFFast();
+            params[i] = LuaParamInfo.deserialize(stubInputStream);
         }
 
         LuaTypeSet returnTypeSet = LuaTypeSet.deserialize(stubInputStream);

@@ -31,6 +31,7 @@ import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
+import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +86,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
         }
 
         @Override
-        protected Template createTemplate(TemplateManager manager, String[] paramNameDefList) {
+        protected Template createTemplate(TemplateManager manager, LuaParamInfo[] paramNameDefList) {
             Template template = super.createTemplate(manager, paramNameDefList);
             template.addEndVariable();
             template.addTextSegment("\nend");
