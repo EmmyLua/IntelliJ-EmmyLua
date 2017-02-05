@@ -1,8 +1,8 @@
 Lua IDE for IntelliJ IDEA
 
-[Download](/../../releases)
+[![Documentation Status](https://readthedocs.org/projects/intellij-lua/badge/?version=latest)](http://intellij-lua.readthedocs.io/en/latest/?badge=latest)
 
-[Read the Docs](http://intellij-lua.readthedocs.io/en/latest/)
+[Download](/../../releases)
 
 ![snapshot](http://git.oschina.net/uploads/images/2017/0205/154051_382def6d_5199.png)
 
