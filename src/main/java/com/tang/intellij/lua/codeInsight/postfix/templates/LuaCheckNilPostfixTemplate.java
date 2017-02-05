@@ -37,4 +37,9 @@ public class LuaCheckNilPostfixTemplate extends StringBasedPostfixTemplate {
     public String getTemplateString(@NotNull PsiElement psiElement) {
         return "if $expr$ == nil then\n$END$\nend";
     }
+
+    @Override
+    protected PsiElement getElementToRemove(PsiElement expr) {
+        return expr;
+    }
 }

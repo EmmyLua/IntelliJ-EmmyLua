@@ -37,4 +37,9 @@ public class LuaIfPostfixTemplate extends StringBasedPostfixTemplate {
     public String getTemplateString(@NotNull PsiElement psiElement) {
         return "if $expr$ then\n$END$\nend";
     }
+
+    @Override
+    protected PsiElement getElementToRemove(PsiElement expr) {
+        return expr;
+    }
 }

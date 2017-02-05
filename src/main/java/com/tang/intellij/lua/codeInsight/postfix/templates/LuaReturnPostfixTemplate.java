@@ -37,4 +37,9 @@ public class LuaReturnPostfixTemplate extends StringBasedPostfixTemplate {
     public String getTemplateString(@NotNull PsiElement psiElement) {
         return "return $expr$";
     }
+
+    @Override
+    protected PsiElement getElementToRemove(PsiElement expr) {
+        return expr;
+    }
 }
