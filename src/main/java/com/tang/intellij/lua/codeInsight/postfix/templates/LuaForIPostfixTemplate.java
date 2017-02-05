@@ -25,18 +25,18 @@ import org.jetbrains.annotations.Nullable;
 import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorTopmost;
 
 /**
- * for i = 1, n do end
+ * for k, v in expr do end
  * Created by tangzx on 2017/2/5.
  */
-public class LuaForAPostfixTemplate extends StringBasedPostfixTemplate {
-    public LuaForAPostfixTemplate() {
-        super("for", "for i = 1, expr do end", selectorTopmost(Conditions.alwaysTrue()));
+public class LuaForIPostfixTemplate extends StringBasedPostfixTemplate {
+    public LuaForIPostfixTemplate() {
+        super("fori", "for i, v in ipairs(expr) do end", selectorTopmost(Conditions.alwaysTrue()));
     }
 
     @Nullable
     @Override
     public String getTemplateString(@NotNull PsiElement psiElement) {
-        return "for i = 1, $expr$ do\n$END$\nend";
+        return "for i, v in ipairs($expr$) do\n$END$\nend";
     }
 
     @Override
