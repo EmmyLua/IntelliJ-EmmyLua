@@ -7,7 +7,7 @@ Lua IDE for IntelliJ IDEA
 feature | progress
 ------- | -------
 Syntax highlighting | ok
-Highlighting Global | ok
+Highlighting global | ok
 Highlighting local/param | ok
 Find usages | ok
 Rename(Shift + F6) | ok
@@ -27,12 +27,11 @@ Name suggestion for refactor | 60%
 Modules support | 80%
 Quick Documentation(Ctrl + Q) | 50%
 Live templates | 10%
-Postfix completion templates | 10%
+Postfix completion templates | 60%
 Code formatter | 90%
 Code intentions | 20%
 Code inspections | 20%
 Lua Standard Library/API | 50%
 Debugger | 50%
-Module support | 0%
 Lua 5.3 | 0%
 ... .etc |
