@@ -169,7 +169,12 @@ globalFuncDef ::= 'function' ID funcBody {
 private checkFuncPrefix ::= ID ('.' | ':') ID
 
 left funcPrefixRef ::= '.' <<repeat checkFuncPrefix 1>> nameRef
-classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) { pin = 3 }
+classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) {
+    pin = 3
+    methods = [
+        dot = 'DOT'
+    ]
+}
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
     implements = [
@@ -190,6 +195,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         toString
         guessReturnTypeSet
         getParams
+        isStatic
     ]
 }
 

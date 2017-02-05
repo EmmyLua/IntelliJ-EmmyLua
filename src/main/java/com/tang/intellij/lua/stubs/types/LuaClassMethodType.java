@@ -68,8 +68,7 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
         LuaTypeSet returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(methodDef, searchContext);
         LuaParamInfo[] params = LuaPsiImplUtil.getParamsOriginal(methodDef);
 
-        PsiElement prev = id.getPrevSibling();
-        boolean isStatic = prev.getNode().getElementType() == LuaTypes.DOT;
+        boolean isStatic = methodName.getDot() != null;
 
         return new LuaClassMethodStubImpl(id.getText(), clazzName, params, returnTypeSet, isStatic, stubElement);
     }

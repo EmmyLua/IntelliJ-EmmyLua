@@ -120,6 +120,14 @@ public class LuaPsiImplUtil {
         return getName((PsiNameIdentifierOwner)classMethodDef);
     }
 
+    public static boolean isStatic(LuaClassMethodDef classMethodDef) {
+        LuaClassMethodStub stub = classMethodDef.getStub();
+        if (stub != null)
+            return stub.isStatic();
+
+        return classMethodDef.getClassMethodName().getDot() != null;
+    }
+
     /**
      * 寻找对应的类
      * @param classMethodDef def
