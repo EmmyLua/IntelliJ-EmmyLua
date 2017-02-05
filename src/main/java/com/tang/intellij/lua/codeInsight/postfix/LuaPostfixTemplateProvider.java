@@ -21,6 +21,7 @@ import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateProvid
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.containers.ContainerUtil;
+import com.tang.intellij.lua.codeInsight.postfix.templates.LuaForAPostfixTemplate;
 import com.tang.intellij.lua.codeInsight.postfix.templates.LuaLocalPostfixTemplate;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +37,8 @@ public class LuaPostfixTemplateProvider implements PostfixTemplateProvider {
 
     public LuaPostfixTemplateProvider() {
         templates = ContainerUtil.newHashSet(
-                new LuaLocalPostfixTemplate()
+                new LuaLocalPostfixTemplate(),
+                new LuaForAPostfixTemplate()
         );
     }
 
