@@ -20,22 +20,36 @@ import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateExpres
 import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateExpressionSelectorBase;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.Condition;
+import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
 import com.tang.intellij.lua.psi.LuaExpr;
+import com.tang.intellij.lua.psi.LuaVar;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class LuaPostfixUtils {
 
+    public static PostfixTemplateExpressionSelector selectorTopmost() {
+        return selectorTopmost(Conditions.alwaysTrue());
+    }
+
     public static PostfixTemplateExpressionSelector selectorTopmost(Condition<PsiElement> additionalFilter) {
         return new PostfixTemplateExpressionSelectorBase(additionalFilter) {
             @Override
             protected List<PsiElement> getNonFilteredExpressions(@NotNull PsiElement psiElement, @NotNull Document document, int i) {
-                LuaExpr luaExpr = PsiTreeUtil.getParentOfType(psiElement, LuaExpr.class);
-                return ContainerUtil.createMaybeSingletonList(luaExpr);
+                PsiElement expr = PsiTreeUtil.getParentOfType(psiElement, LuaExpr.class);
+                if (expr == null) {
+                    expr = PsiTreeUtil.getParentOfType(psiElement, LuaVar.class);
+                }
+                /*if (expr == null) {
+                    if (psiElement.getNode().getElementType() == LuaTypes.NUMBER) {
+                        expr = psiElement;
+                    }
+                }*/
+                return ContainerUtil.createMaybeSingletonList(expr);
             }
         };
     }
