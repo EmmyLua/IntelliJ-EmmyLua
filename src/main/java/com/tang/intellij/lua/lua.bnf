@@ -114,6 +114,8 @@ private stat_or_comment ::= comment | stat ';'?
 private chunk ::= stat_or_comment* (lastStat ';'?)?
 block ::= chunk
 private lazy_block ::= <<lazyBlock>>
+//末完成的，报错
+uncompleted ::= valueExpr
 
 private stat ::=
     funcCallExpr |
@@ -128,7 +130,8 @@ private stat ::=
     globalFuncDef |
     localFuncDef |
     localDef |
-    lastStat {
+    lastStat |
+    uncompleted {
         recoverWhile = stat_recover
     }
 private stat_recover ::= !(ID

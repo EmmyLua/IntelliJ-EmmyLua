@@ -54,6 +54,12 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
     }
 
     class LuaElementVisitor extends LuaVisitor {
+
+        @Override
+        public void visitUncompleted(@NotNull LuaUncompleted o) {
+            myHolder.createErrorAnnotation(o, "Uncompleted");
+        }
+
         @Override
         public void visitLocalFuncDef(@NotNull LuaLocalFuncDef o) {
             PsiElement name = o.getNameIdentifier();
