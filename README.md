@@ -32,6 +32,7 @@ Code formatter | 90%
 Code intentions | 20%
 Code inspections | 20%
 Lua Standard Library/API | 50%
+Debugger | 50%
 Module support | 0%
 Lua 5.3 | 0%
 ... .etc |
