@@ -39,3 +39,5 @@ Lua Standard Library/API | 50%
 Debugger | 50%
 Lua 5.3 | 0%
 ... .etc |
+
+[![Analytics](https://ga-beacon.appspot.com/UA-91454571-1/IntelliJ-Lua/main)](https://github.com/tangzx/IntelliJ-Lua)
