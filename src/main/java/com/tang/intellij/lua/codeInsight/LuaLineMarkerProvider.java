@@ -57,7 +57,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                                 NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
                                         .setTargets(superMethod)
                                         .setTooltipText("Override in " + superTypeName);
-                        result.add(builder.createLineMarkerInfo(element));
+                        result.add(builder.createLineMarkerInfo(methodDef.getClassMethodName()));
                         break;
                     }
                     superType = superType.getSuperClass(context);
