@@ -16,12 +16,19 @@
 
 package com.tang.intellij.lua.psi;
 
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
 
 /**
  *
@@ -61,4 +68,17 @@ public class LuaFileUtil {
         return fileShortUrl;
     }
 
+    @Nullable
+    public static VirtualFile getPluginVirtualDirectory() {
+        IdeaPluginDescriptor descriptor = PluginManager.getPlugin(PluginId.getId("com.tang"));
+        if (descriptor != null) {
+            File pluginPath = descriptor.getPath();
+
+            String url = VfsUtil.pathToUrl(pluginPath.getAbsolutePath());
+
+            return VirtualFileManager.getInstance().findFileByUrl(url);
+        }
+
+        return null;
+    }
 }

@@ -133,7 +133,9 @@
     </extensions>
 
     <application-components>
-        <!-- Add your application components here -->
+        <component>
+            <implementation-class>com.tang.intellij.lua.project.StdSDK</implementation-class>
+        </component>
     </application-components>
 
     <project-components>

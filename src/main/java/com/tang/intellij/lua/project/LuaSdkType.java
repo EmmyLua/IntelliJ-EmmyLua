@@ -30,6 +30,12 @@ import java.io.File;
  * Created by tangzx on 2016/12/24.
  */
 public class LuaSdkType extends SdkType {
+
+    @NotNull
+    public static LuaSdkType getInstance() {
+        return SdkType.findInstance(LuaSdkType.class);
+    }
+
     public LuaSdkType() {
         super("Lua SDK");
     }
