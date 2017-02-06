@@ -17,9 +17,14 @@
 package com.tang.intellij.lua.project;
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.util.projectWizard.SdkSettingsStep;
+import com.intellij.ide.util.projectWizard.SettingsStep;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * lua ModuleBuilder
@@ -34,5 +39,12 @@ public class LuaModuleBuilder extends ModuleBuilder {
     @Override
     public ModuleType getModuleType() {
         return LuaModuleType.getInstance();
+    }
+
+    @Override
+    public ModuleWizardStep modifyProjectTypeStep(@NotNull SettingsStep settingsStep) {
+        return new SdkSettingsStep(settingsStep, this, sdkTypeId -> LuaSdkType.getInstance() == sdkTypeId) {
+
+        };
     }
 }
