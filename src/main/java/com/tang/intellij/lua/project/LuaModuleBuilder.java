@@ -31,8 +31,15 @@ import org.jetbrains.annotations.NotNull;
  * Created by tangzx on 2016/12/24.
  */
 public class LuaModuleBuilder extends ModuleBuilder {
+    private Sdk selectedSDK;
+
     @Override
     public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
+        if (selectedSDK != null)
+            rootModel.setSdk(selectedSDK);
+        else
+            rootModel.inheritSdk();
+
         doAddContentEntry(rootModel);
     }
 
@@ -45,6 +52,11 @@ public class LuaModuleBuilder extends ModuleBuilder {
     public ModuleWizardStep modifyProjectTypeStep(@NotNull SettingsStep settingsStep) {
         return new SdkSettingsStep(settingsStep, this, sdkTypeId -> LuaSdkType.getInstance() == sdkTypeId) {
 
+            @Override
+            public void updateDataModel() {
+                super.updateDataModel();
+                LuaModuleBuilder.this.selectedSDK = myJdkComboBox.getSelectedJdk();
+            }
         };
     }
 }
