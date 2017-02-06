@@ -401,6 +401,7 @@ public class LuaPsiImplUtil {
         return LuaTypeSet.create();
     }
 
+    @NotNull
     public static LuaParamInfo[] getParams(LuaFuncBodyOwner owner) {
         if (owner instanceof StubBasedPsiElementBase) {
             StubBasedPsiElementBase stubElement = (StubBasedPsiElementBase) owner;
@@ -413,6 +414,7 @@ public class LuaPsiImplUtil {
         return getParamsOriginal(owner);
     }
 
+    @NotNull
     public static LuaParamInfo[] getParamsOriginal(LuaFuncBodyOwner funcBodyOwner) {
         LuaComment comment = null;
         if (funcBodyOwner instanceof LuaCommentOwner) {

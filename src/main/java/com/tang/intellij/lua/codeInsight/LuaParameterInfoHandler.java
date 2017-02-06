@@ -20,14 +20,10 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.lang.parameterInfo.*;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  *
@@ -58,7 +54,13 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
         LuaArgs luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.getOffset(), LuaArgs.class, false);
         if (luaArgs != null) {
             LuaCallExpr callExpr = (LuaCallExpr) luaArgs.getParent();
-            context.setItemsToShow(new Object[] { callExpr.resolveFuncBodyOwner(new SearchContext(context.getProject())) });
+            LuaFuncBodyOwner bodyOwner = callExpr.resolveFuncBodyOwner(new SearchContext(context.getProject()));
+            if (bodyOwner != null) {
+                LuaParamInfo[] params = bodyOwner.getParams();
+                if (params.length == 0)
+                    return null;
+                context.setItemsToShow(new Object[]{bodyOwner});
+            }
         }
         return luaArgs;
     }
@@ -99,31 +101,26 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
     public void updateUI(LuaFuncBodyOwner o, @NotNull ParameterInfoUIContext context) {
         if (o == null)
             return;
-        List<LuaParamNameDef> defList = o.getParamNameDefList();
-        if (defList != null) {
+        LuaParamInfo[] paramInfos = o.getParams();
+        if (paramInfos.length > 0) {
             StringBuilder sb = new StringBuilder();
             int index = context.getCurrentParameterIndex();
             int start = 0, end = 0;
 
-            for (int i = 0; i < defList.size(); i++) {
-                LuaParamNameDef nameDef = defList.get(i);
+            for (int i = 0; i < paramInfos.length; i++) {
+                LuaParamInfo paramInfo = paramInfos[i];
                 if (i > 0)
                     sb.append(", ");
                 if (i == index)
                     start = sb.length();
-                sb.append(nameDef.getName());
+                sb.append(paramInfo.getName());
 
-                LuaTypeSet typeSet = nameDef.guessType(new SearchContext(o.getProject()));
-                if (typeSet != null) {
+                String[] types = paramInfo.getTypes();
+                if (types != null && types.length > 0) {
                     sb.append(" : ");
-                    List<LuaType> types = typeSet.getTypes();
-                    for (int j = 0; j < types.size(); j++) {
-                        LuaType type = types.get(j);
-                        if (type.getClassNameText() != null) {
-                            if (j > 0)
-                                sb.append(" | ");
-                            sb.append(type.getClassNameText());
-                        }
+                    for (int j = 0; j < types.length; j++) {
+                        if (j > 0) sb.append("|");
+                        sb.append(types[i]);
                     }
                 }
 
