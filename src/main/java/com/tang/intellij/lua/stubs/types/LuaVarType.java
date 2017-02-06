@@ -105,7 +105,6 @@ public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
             String fieldName = varStub.getFieldName();
             if (varStub.isGlobal()) {
                 indexSink.occurrence(LuaGlobalVarIndex.KEY, fieldName);
-                indexSink.occurrence(LuaShortNameIndex.KEY, fieldName);
             } else {
                 String typeName = varStub.getTypeName();
                 if (typeName != null && fieldName != null) {
@@ -113,6 +112,8 @@ public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
                     indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName);
                 }
             }
+            if (fieldName != null)
+                indexSink.occurrence(LuaShortNameIndex.KEY, fieldName);
         }
     }
 }

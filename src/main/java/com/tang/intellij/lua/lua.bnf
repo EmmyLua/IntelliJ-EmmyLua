@@ -199,6 +199,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         guessReturnTypeSet
         getParams
         isStatic
+        getPresentation
     ]
 }
 

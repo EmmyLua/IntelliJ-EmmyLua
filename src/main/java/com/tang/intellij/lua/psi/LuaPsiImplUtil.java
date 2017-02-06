@@ -128,6 +128,28 @@ public class LuaPsiImplUtil {
         return classMethodDef.getClassMethodName().getDot() != null;
     }
 
+    public static ItemPresentation getPresentation(LuaClassMethodDef classMethodDef) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return classMethodDef.getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                return classMethodDef.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean b) {
+                return LuaIcons.CLASS_METHOD;
+            }
+        };
+    }
+
     /**
      * 寻找对应的类
      * @param classMethodDef def

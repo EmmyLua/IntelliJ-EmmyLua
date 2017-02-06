@@ -29,6 +29,7 @@ import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.tang.intellij.lua.stubs.impl.LuaClassMethodStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -129,12 +130,14 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
     public void indexStub(@NotNull LuaClassMethodStub luaClassMethodStub, @NotNull IndexSink indexSink) {
         String className = luaClassMethodStub.getClassName();
         if (className != null) {
+            String shortName = luaClassMethodStub.getShortName();
             if (luaClassMethodStub.isStatic()) {
                 indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static");
-                indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + luaClassMethodStub.getShortName());
+                indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + shortName);
             } else {
                 indexSink.occurrence(LuaClassMethodIndex.KEY, className);
             }
+            indexSink.occurrence(LuaShortNameIndex.KEY, shortName);
         }
     }
 }
