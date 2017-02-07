@@ -17,7 +17,6 @@ Go to definition(Ctrl + Mouse) | ok
 Go to symbol(Ctrl + Alt + Shift + N) | ok
 Go to class(Ctrl + N) | ok
 Go to file(Ctrl + Shift + N) | ok
-Go to definition | ok
 Parameter name hints | ok
 Keyword completion | ok
 Basic completion | ok
@@ -31,11 +30,11 @@ Name suggestion for refactor | 60%
 Modules support | 80%
 Quick Documentation(Ctrl + Q) | 50%
 Live templates | 10%
-Postfix completion templates | 60%
+Postfix completion templates | ok
 Code formatter | 90%
 Code intentions | 20%
 Code inspections | 20%
-Lua Standard Library/API | 50%
+Lua Standard Library/API | ok
 Debugger | 50%
 Lua 5.3 | 0%
 ... .etc |
