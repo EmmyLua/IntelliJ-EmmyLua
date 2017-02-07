@@ -1,4 +1,4 @@
-Lua IDE for IntelliJ IDEA
+Lua IDE for IntelliJ IDEA (requires `IDEA 2016.3.4 +`)
 
 [![Documentation Status](https://readthedocs.org/projects/intellij-lua/badge/?version=latest)](http://intellij-lua.readthedocs.io/en/latest/?badge=latest)
 
@@ -38,5 +38,3 @@ Lua Standard Library/API | ok
 Debugger | 50%
 Lua 5.3 | 0%
 ... .etc |
-
-[![Analytics](https://ga-beacon.appspot.com/UA-91454571-1/IntelliJ-Lua/main)](https://github.com/tangzx/IntelliJ-Lua)
