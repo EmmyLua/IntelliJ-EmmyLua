@@ -131,10 +131,10 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             return matchEnd(begin, advanced, builder ,level, skips, TokenSet.create(LuaTypes.END));
         }
         //--
-        else if (begin == LuaTypes.FOR) {
+        /*else if (begin == LuaTypes.FOR) {
             TokenSet skips = TokenSet.create(LuaTypes.DO);
             return matchEnd(begin, advanced, builder ,level, skips, TokenSet.create(LuaTypes.END));
-        }
+        }*/
         else if (begin == LuaTypes.THEN) {
             if (level == 0)
                 return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(LuaTypes.ELSE, LuaTypes.ELSEIF, LuaTypes.END));
