@@ -38,7 +38,7 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 STRING=[^\r\n\t\f]*
-ID=[A-Za-z0-9_]+
+ID=[A-Za-z0-9_\.]+
 AT=@
 //三个-以上
 DOC_DASHES = --+
