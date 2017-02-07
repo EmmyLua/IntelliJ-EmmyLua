@@ -44,7 +44,9 @@ public class LuaPostfixTemplateProvider implements PostfixTemplateProvider {
                 new LuaCheckNilPostfixTemplate(),
                 new LuaCheckIfNotNilPostfixTemplate(),
                 new LuaReturnPostfixTemplate(),
-                new LuaPrintPostfixTemplate()
+                new LuaPrintPostfixTemplate(),
+                new LuaIncreasePostfixTemplate(),
+                new LuaDecreasePostfixTemplate()
         );
     }
 
