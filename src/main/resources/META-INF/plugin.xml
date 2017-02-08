@@ -137,6 +137,11 @@
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.RemoveUnusedLocal"/>
+        <localInspection
+                displayName="Empty if body"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyForBody"/>
     </extensions>
 
     <application-components>
