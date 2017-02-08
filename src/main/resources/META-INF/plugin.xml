@@ -138,10 +138,10 @@
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.RemoveUnusedLocal"/>
         <localInspection
-                displayName="Empty if body"
+                displayName="Empty body"
                 enabledByDefault="true"
                 groupName="Lua"
-                implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyForBody"/>
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyBody"/>
     </extensions>
 
     <application-components>
