@@ -10,6 +10,7 @@ package com.tang.intellij.lua.codeInsight.inspection;
 
 import com.intellij.codeInspection.*;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiReference;
@@ -38,14 +39,16 @@ public class RemoveUnusedLocal extends LocalInspectionTool {
                 if (nameList != null) {
                     List<LuaNameDef> nameDefList = nameList.getNameDefList();
                     if (nameDefList.size() == 1) {
-                        LuaNameDef nameDef = nameDefList.get(0);
+                        LuaNameDef name = nameDefList.get(0);
 
-                        if (nameDef.textMatches(Constants.WORD_UNDERLINE))
+                        if (name.textMatches(Constants.WORD_UNDERLINE))
                             return;
 
-                        Query<PsiReference> search = ReferencesSearch.search(nameDef, nameDef.getUseScope());
+                        Query<PsiReference> search = ReferencesSearch.search(name, name.getUseScope());
                         if (search.findFirst() == null) {
-                            holder.registerProblem(o, "Remove unused local", new Fix());
+                            int offset = name.getNode().getStartOffset() - o.getNode().getStartOffset();
+                            TextRange textRange = new TextRange(offset, offset + name.getTextLength());
+                            holder.registerProblem(o, textRange,"Remove unused local", new Fix());
                         }
                     }
                 }
@@ -58,7 +61,10 @@ public class RemoveUnusedLocal extends LocalInspectionTool {
                 if (name != null) {
                     Query<PsiReference> search = ReferencesSearch.search(o, o.getUseScope());
                     if (search.findFirst() == null) {
-                        holder.registerProblem(o, "Remove unused local function", new Fix());
+                        int offset = name.getNode().getStartOffset() - o.getNode().getStartOffset();
+                        TextRange textRange = new TextRange(offset, offset + name.getTextLength());
+
+                        holder.registerProblem(o, textRange,"Remove unused local function", new Fix());
                     }
                 }
             }
