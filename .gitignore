@@ -1,7 +1,9 @@
 /out
+/build
 /*.ipr
 /*.iws
 gen
+.gradle
 .idea
 *.skeleton
 *.java~

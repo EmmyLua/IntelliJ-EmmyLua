@@ -44,9 +44,14 @@ public class StdSDK implements ApplicationComponent {
 
             VirtualFile dir  = LuaFileUtil.getPluginVirtualDirectory();
             if (dir != null) {
-                dir = dir.findChild("classes");
-                if (dir != null) {
-                    VirtualFile library = dir.findChild("std");
+                VirtualFile library = dir.findChild("std");
+                if (library == null) {
+                    dir = dir.findChild("classes");
+                    if (dir != null) {
+                        library = dir.findChild("std");
+                    }
+                }
+                if (library != null) {
                     sdkModificator.addRoot(library, OrderRootType.CLASSES);
                 }
             }

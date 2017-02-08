@@ -14,16 +14,29 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs;
+apply plugin :"java"
 
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import org.jetbrains.annotations.NotNull;
+dependencies {
+	compile fileTree(dir:"${System.env['IDEA_HOME']}/lib", includes:["*.jar"])
+}
 
-/**
- *
- * Created by tangzx on 2016/11/26.
- */
-public interface LuaGlobalFuncStub extends LuaFuncBodyOwnerStub<LuaGlobalFuncDef> {
-    @NotNull
-    String getName();
+sourceSets {
+    main {
+        java.srcDirs 'src', 'gen'
+    }
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+task buildZip (type: Zip, dependsOn: [jar]) {
+	baseName = 'LuaIDE'
+	destinationDir = file(".")
+	from (tasks['jar'].outputs) {
+		into '/LuaIDE/lib'
+	}
+	from (fileTree(dir:'src/main/resources/', includes:['std/**'])) {
+		into '/LuaIDE/'
+	}
 }
