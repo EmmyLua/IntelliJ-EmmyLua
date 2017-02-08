@@ -9,7 +9,9 @@
 package com.tang.intellij.lua.codeInsight.inspection;
 
 import com.intellij.codeInspection.*;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
@@ -49,7 +51,12 @@ public class EmptyForBody extends LocalInspectionTool {
             public void visitForAStat(@NotNull LuaForAStat o) {
                 LuaBlock block = PsiTreeUtil.findChildOfType(o, LuaBlock.class);
                 if (!isValidBlock(block)) {
-                    holder.registerProblem(o, "Empty for body", new Fix());
+                    ASTNode forNode = o.getNode().findChildByType(LuaTypes.FOR);
+                    assert forNode != null;
+
+                    PsiElement forElement = forNode.getPsi();
+                    TextRange range = new TextRange(forElement.getStartOffsetInParent(), forNode.getTextLength());
+                    holder.registerProblem(o, range,"Empty for body", new Fix());
                 }
             }
 
@@ -57,7 +64,12 @@ public class EmptyForBody extends LocalInspectionTool {
             public void visitForBStat(@NotNull LuaForBStat o) {
                 LuaBlock block = PsiTreeUtil.findChildOfType(o, LuaBlock.class);
                 if (!isValidBlock(block)) {
-                    holder.registerProblem(o, "Empty for body", new Fix());
+                    ASTNode forNode = o.getNode().findChildByType(LuaTypes.FOR);
+                    assert forNode != null;
+
+                    PsiElement forElement = forNode.getPsi();
+                    TextRange range = new TextRange(forElement.getStartOffsetInParent(), forNode.getTextLength());
+                    holder.registerProblem(o, range,"Empty for body", new Fix());
                 }
             }
 
