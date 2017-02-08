@@ -232,6 +232,7 @@ public class LuaPsiResolveUtil {
     public static LuaFile resolveRequireFile(String pathString, Project project) {
         if (pathString == null)
             return null;
+        pathString = pathString.replace('/', '.');
 
         int lastDot = pathString.lastIndexOf('.');
         String packagePath = "";

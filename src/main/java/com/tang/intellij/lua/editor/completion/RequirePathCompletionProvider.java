@@ -48,7 +48,7 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
         if (cur != null) {
             LuaString ls = LuaString.getContent(cur.getText());
             int textOffset = completionParameters.getOffset() - cur.getTextOffset() - ls.start;
-            String content = ls.value.substring(0, textOffset);
+            String content = ls.value.substring(0, textOffset).replace('/', '.'); //统一用.来处理，aaa.bbb.ccc
 
             int last = content.lastIndexOf(PATH_SPLITTER);
             String prefixPackage = "";
