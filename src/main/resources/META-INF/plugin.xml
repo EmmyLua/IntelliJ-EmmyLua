@@ -17,11 +17,11 @@
 <idea-plugin version="2">
     <id>com.tang</id>
     <name>Lua IDE</name>
-    <version>1.0</version>
+    <version>1.0.2</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
 
     <description><![CDATA[
-    Just a lua plugin for IDEA<br>
+    A lua plugin for IDEA<br>
     QQ : 272669294<br>
     QQGroup : 29850775
     ]]></description>
