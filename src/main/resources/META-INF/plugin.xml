@@ -116,20 +116,27 @@
             <descriptionDirectoryName>CreateDocForMethodIntention</descriptionDirectoryName>
         </intentionAction>
 
-        <localInspection implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
-                         displayName="Duplicate Class"
-                         enabledByDefault="true"
-                         level="ERROR"
-                         groupName="Lua"/>
-        <localInspection implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalAssignCanBeSimpler"
-                         displayName="Local assign can be simpler"
-                         enabledByDefault="true"
-                         groupName="Lua"/>
+        <localInspection
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
+                displayName="Duplicate Class"
+                enabledByDefault="true"
+                level="ERROR"
+                groupName="Lua"/>
+        <localInspection
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalAssignCanBeSimpler"
+                displayName="Local assign can be simpler"
+                enabledByDefault="true"
+                groupName="Lua"/>
         <localInspection
                 displayName="Lua Standard Compliance"
                 enabledByDefault="true"
                 groupName="Lua"
-                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaStandardComplianceInspection"/>
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaStandardCompliance"/>
+        <localInspection
+                displayName="Remove Unused"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.RemoveUnusedLocal"/>
     </extensions>
 
     <application-components>

@@ -35,7 +35,7 @@ import java.util.Optional;
  *
  * Created by tangzx on 2017/1/8.
  */
-public class LuaStandardComplianceInspection extends LocalInspectionTool implements LuaTypes {
+public class LuaStandardCompliance extends LocalInspectionTool implements LuaTypes {
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly, @NotNull LocalInspectionToolSession session) {

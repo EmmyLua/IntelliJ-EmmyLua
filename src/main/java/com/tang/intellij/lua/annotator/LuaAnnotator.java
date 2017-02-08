@@ -20,7 +20,6 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
@@ -65,14 +64,8 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement name = o.getNameIdentifier();
 
             if (name != null) {
-                Query<PsiReference> search = ReferencesSearch.search(o);
-                if (search.findFirst() == null) {
-                    Annotation annotation = myHolder.createWarningAnnotation(name, "Unused local function");
-                    annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
-                } else {
-                    Annotation annotation = myHolder.createInfoAnnotation(name, null);
-                    annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
-                }
+                Annotation annotation = myHolder.createInfoAnnotation(name, null);
+                annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
             }
         }
 
@@ -105,18 +98,6 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             } else {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
-            }
-        }
-
-        @Override
-        public void visitNameDef(@NotNull LuaNameDef o) {
-            if (o.textMatches(Constants.WORD_UNDERLINE))
-                return;
-
-            Query<PsiReference> search = ReferencesSearch.search(o, o.getUseScope());
-            if (search.findFirst() == null) {
-                Annotation annotation = myHolder.createWarningAnnotation(o, "Unused local : " + o.getText());
-                annotation.setTextAttributes(CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES);
             }
         }
 
