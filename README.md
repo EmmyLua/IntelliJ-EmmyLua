@@ -4,6 +4,8 @@ Lua IDE for IntelliJ IDEA (requires `IDEA 2016.3`)
 
 [Download](/../../releases)
 
+QQ交流群：`29850775`
+
 ![snapshot](http://git.oschina.net/uploads/images/2017/0205/154051_382def6d_5199.png)
 
 feature | progress
