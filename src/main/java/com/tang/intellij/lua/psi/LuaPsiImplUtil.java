@@ -455,19 +455,12 @@ public class LuaPsiImplUtil {
     }
 
     static String getParamFingerprint(LuaFuncBodyOwner funcBodyOwner) {
-        List<LuaParamNameDef> nameDefList = getParamNameDefList(funcBodyOwner);
-        StringBuilder builder = new StringBuilder();
-        builder.append("(");
-        if (nameDefList != null) {
-            for (int i = 0; i < nameDefList.size(); i++) {
-                LuaParamNameDef nameDef = nameDefList.get(i);
-                if (i != 0)
-                    builder.append(", ");
-                builder.append(nameDef.getName());
-            }
+        LuaParamInfo[] params = funcBodyOwner.getParams();
+        String[] list = new String[params.length];
+        for (int i = 0; i < params.length; i++) {
+            list[i] = params[i].getName();
         }
-        builder.append(")");
-        return builder.toString();
+        return "(" + String.join(", ", list) + ")";
     }
 
     public static PsiElement getNameIdentifier(LuaLocalFuncDef localFuncDef) {

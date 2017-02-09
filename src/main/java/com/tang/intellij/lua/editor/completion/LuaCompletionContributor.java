@@ -33,6 +33,7 @@ import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
@@ -91,7 +92,8 @@ public class LuaCompletionContributor extends CompletionContributor {
                     if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create(localFuncDef.getName())
                                 .withInsertHandler(new FuncInsertHandler(localFuncDef))
-                                .withIcon(LuaIcons.LOCAL_FUNCTION);
+                                .withIcon(LuaIcons.LOCAL_FUNCTION)
+                                .withTailText(localFuncDef.getParamFingerprint());
                         completionResultSet.addElement(elementBuilder);
                     }
                     return true;
@@ -99,13 +101,18 @@ public class LuaCompletionContributor extends CompletionContributor {
 
                 //global functions
                 Project project = completionParameters.getOriginalFile().getProject();
+                SearchContext context = new SearchContext(project);
                 LuaGlobalFuncIndex.getInstance().processAllKeys(project, name -> {
                     if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
-                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
-                                .withTypeText("Global Func")
-                                .withInsertHandler(new GlobalFuncInsertHandler(name, project))
-                                .withIcon(LuaIcons.GLOBAL_FUNCTION);
-                        completionResultSet.addElement(elementBuilder);
+                        LuaGlobalFuncDef globalFuncDef = LuaGlobalFuncIndex.find(name, context);
+                        if (globalFuncDef != null) {
+                            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
+                                    .withTypeText("Global Func")
+                                    .withInsertHandler(new GlobalFuncInsertHandler(name, project))
+                                    .withIcon(LuaIcons.GLOBAL_FUNCTION)
+                                    .withTailText(globalFuncDef.getParamFingerprint());
+                            completionResultSet.addElement(elementBuilder);
+                        }
                     }
                     return true;
                 });

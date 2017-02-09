@@ -107,7 +107,8 @@ public class LuaType {
             if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
                         .withIcon(LuaIcons.CLASS_METHOD)
-                        .withTypeText(clazzName);
+                        .withTypeText(clazzName)
+                        .withTailText(def.getParamFingerprint());
                 if (!useAsField)
                     elementBuilder = elementBuilder.withInsertHandler(new FuncInsertHandler(def));
                 if (bold)
@@ -136,7 +137,8 @@ public class LuaType {
                         .withIcon(LuaIcons.CLASS_METHOD)
                         .withInsertHandler(new FuncInsertHandler(def))
                         .withTypeText(clazzName)
-                        .withItemTextUnderlined(true);
+                        .withItemTextUnderlined(true)
+                        .withTailText(def.getParamFingerprint());
                 if (bold)
                     elementBuilder = elementBuilder.bold();
 
