@@ -62,8 +62,13 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
     @Override
     public PsiElement resolve() {
         PsiElement ref = LuaPsiResolveUtil.resolve(myElement, new SearchContext(myElement.getProject()));
-        if (ref != null && ref.getNode().getTextRange().equals(myElement.getNode().getTextRange()))
-            return null; // used as PsiNameIdentifierOwner
+        if (ref != null) {
+            if (ref.getContainingFile().equals(myElement.getContainingFile())) { //优化，不要去解析 Node Tree
+                if (ref.getNode().getTextRange().equals(myElement.getNode().getTextRange())) {
+                    return null;//自己引用自己
+                }
+            }
+        }
         return ref;
     }
 
