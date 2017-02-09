@@ -90,7 +90,8 @@ public class SearchContext {
     }
 
     public static int TYPE_FILE_RETURN = 0;
-    public static int TYPE_BODYOWNER = 1;
+    public static int TYPE_BODY_OWNER = 1;
+    public static int TYPE_VALUE_EXPR = 2;
 
     public static SearchContext wrapDeadLock(SearchContext parent, int type, @NotNull Object o) {
         return new SearchContext(parent, type, o);

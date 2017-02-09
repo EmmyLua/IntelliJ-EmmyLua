@@ -222,7 +222,7 @@ public class LuaPsiImplUtil {
      * @return LuaFuncBodyOwner
      */
     public static LuaFuncBodyOwner resolveFuncBodyOwner(LuaCallExpr callExpr, SearchContext context) {
-        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_BODYOWNER, callExpr);
+        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_BODY_OWNER, callExpr);
         if (context.isDeadLock(1))
             return null;
 

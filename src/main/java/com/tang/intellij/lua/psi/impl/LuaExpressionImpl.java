@@ -99,6 +99,10 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     }
 
     private static LuaTypeSet guessType(LuaValueExpr valueExpr, SearchContext context) {
+        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_VALUE_EXPR, valueExpr);
+        if (context.isDeadLock(1))
+            return null;
+
         PsiElement firstChild = valueExpr.getFirstChild();
         if (firstChild != null) {
             if (firstChild instanceof LuaExpr) {
