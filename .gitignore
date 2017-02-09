@@ -1,7 +1,7 @@
-/out
-/build
-/*.ipr
-/*.iws
+out
+build
 gen
+.idea/workspace.xml
+.idea/misc.xml
 .gradle
 *.skeleton
