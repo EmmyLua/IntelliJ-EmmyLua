@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -28,44 +29,70 @@ import com.intellij.psi.search.ProjectAndLibrariesScope;
  */
 public class SearchContext {
 
-    /**
-     * 在文件最后 return 嵌套的次数，防止死循环
-     */
-    public int lastReturnTimes;
+    private PsiFile currentStubFile;
+    private GlobalSearchScope scope;
+    private Project project;
+    private SearchContext parent;
+    private int type = -1;
+    private Object obj;
+
+    public SearchContext(Project project) {
+        this.project = project;
+    }
+
+    public SearchContext(SearchContext parent, int type, @NotNull Object o) {
+        this(parent.getProject());
+        this.parent = parent;
+        assert type >= 0;
+        this.type = type;
+        this.obj = o;
+        setCurrentStubFile(parent.currentStubFile);
+    }
 
     public Project getProject() {
         return project;
     }
-
-    private Project project;
 
     public SearchContext setCurrentStubFile(PsiFile currentStubFile) {
         this.currentStubFile = currentStubFile;
         return this;
     }
 
-    private PsiFile currentStubFile;
-
-    public SearchContext(Project project) {
-        this.project = project;
-    }
-
-    private GlobalSearchScope scope;
-
     public GlobalSearchScope getScope() {
         if (scope == null) {
-            scope = new ProjectAndLibrariesScope(project);
-            if (isDumb()) {
-                /*VirtualFile virtualFile = currentStubFile.getViewProvider().getVirtualFile();
-                GlobalSearchScope not = GlobalSearchScope.notScope(GlobalSearchScope.fileScope(project, virtualFile));
-                scope = scope.intersectWith(not);*/
-                scope = GlobalSearchScope.EMPTY_SCOPE;
+            if (parent != null) {
+                scope = parent.getScope();
+            } else {
+                scope = new ProjectAndLibrariesScope(project);
+                if (isDumb()) {
+                    scope = GlobalSearchScope.EMPTY_SCOPE;
+                }
             }
         }
         return scope;
     }
 
+    public boolean isDeadLock(int times) {
+        if (type == -1) return false;
+        int matchTimes = 0;
+        SearchContext cur = parent;
+        while (cur != null) {
+            if (cur.type == type && cur.obj == obj) {
+                matchTimes++;
+            }
+            cur = cur.parent;
+        }
+        return matchTimes >= times;
+    }
+
     public boolean isDumb() {
         return DumbService.isDumb(project) || currentStubFile != null;
+    }
+
+    public static int TYPE_FILE_RETURN = 0;
+    public static int TYPE_BODYOWNER = 1;
+
+    public static SearchContext wrapDeadLock(SearchContext parent, int type, @NotNull Object o) {
+        return new SearchContext(parent, type, o);
     }
 }

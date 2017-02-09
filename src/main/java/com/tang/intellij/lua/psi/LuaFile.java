@@ -46,9 +46,9 @@ public class LuaFile extends PsiFileBase {
      * @return LuaTypeSet
      */
     public LuaTypeSet getReturnedType(SearchContext context) {
-        context.lastReturnTimes++;
+        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_FILE_RETURN, this);
         //防止死循环
-        if (context.lastReturnTimes >= 5) return null;
+        if (context.isDeadLock(5)) return null;
 
         PsiElement lastChild = getLastChild();
         final LuaReturnStat[] last = {null};

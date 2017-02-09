@@ -222,6 +222,10 @@ public class LuaPsiImplUtil {
      * @return LuaFuncBodyOwner
      */
     public static LuaFuncBodyOwner resolveFuncBodyOwner(LuaCallExpr callExpr, SearchContext context) {
+        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_BODYOWNER, callExpr);
+        if (context.isDeadLock(1))
+            return null;
+
         LuaArgs args = callExpr.getArgs();
         if (args != null) {
             PsiElement id = callExpr.getId(); //todo static : xxx.method
