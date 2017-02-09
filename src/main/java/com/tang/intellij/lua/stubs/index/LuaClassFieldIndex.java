@@ -18,7 +18,10 @@ package com.tang.intellij.lua.stubs.index;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +62,38 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     }
 
     public static LuaClassField find(@NotNull String className, @NotNull String fieldName, @NotNull SearchContext context) {
-        return find(className + "." + fieldName, context);
+        if (context.isDumb())
+            return null;
+
+        String key = className + "." + fieldName;
+        Collection<LuaClassField> list = INSTANCE.get(key, context.getProject(), context.getScope());
+
+        //LuaDocFieldDef 最佳
+        for (LuaClassField field : list) {
+            if (field instanceof LuaDocFieldDef)
+                return field;
+        }
+
+        // from supper
+        LuaDocClassDef classDef = LuaClassIndex.find(className, context);
+        if (classDef != null) {
+            LuaType type = classDef.getClassType();
+            if (type != null) {
+                String superClassName = type.getSuperClassName();
+                if (superClassName != null) {
+                    LuaClassField fieldFromSupper = find(superClassName, fieldName, context);
+                    if (fieldFromSupper != null)
+                        return fieldFromSupper;
+                }
+            }
+        }
+
+        if (!list.isEmpty())
+            return list.iterator().next();
+        return null;
+    }
+
+    public static LuaClassField find(LuaType type, String fieldName, SearchContext context) {
+        return find(type.getClassNameText(), fieldName, context);
     }
 }

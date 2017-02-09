@@ -72,6 +72,10 @@ public class LuaType {
         return null;
     }
 
+    public String getSuperClassName() {
+        return superClassName;
+    }
+
     public String getClassNameText() {
         return clazzName;
     }
@@ -192,7 +196,7 @@ public class LuaType {
 
     public LuaTypeSet guessFieldType(String propName, SearchContext context) {
         LuaTypeSet set = null;
-        LuaClassField fieldDef = LuaClassFieldIndex.find(getClassNameText(), propName, context);
+        LuaClassField fieldDef = LuaClassFieldIndex.find(this, propName, context);
         if (fieldDef != null)
             set = fieldDef.guessType(context);
         else {
@@ -205,8 +209,7 @@ public class LuaType {
     }
 
     public LuaClassField findField(String fieldName, SearchContext context) {
-        String className = getClassNameText();
-        LuaClassField def = LuaClassFieldIndex.find(className, fieldName, context);
+        LuaClassField def = LuaClassFieldIndex.find(this, fieldName, context);
         if (def == null) {
             LuaType superType = getSuperClass(context);
             if (superType != null)
