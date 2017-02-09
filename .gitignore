@@ -4,7 +4,4 @@
 /*.iws
 gen
 .gradle
-.idea
 *.skeleton
-*.java~
-_*Lexer.java
