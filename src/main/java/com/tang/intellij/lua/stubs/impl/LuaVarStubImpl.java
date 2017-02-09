@@ -117,7 +117,7 @@ public class LuaVarStubImpl extends StubBase<LuaVar> implements LuaVarStub {
             if (set != null) {
                 LuaType type = set.getFirst();
                 if (type != null)
-                    typeName = type.getClassNameText();
+                    typeName = type.getClassName();
             }
         }
         return typeName;

@@ -50,7 +50,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                 LuaType superType = type.getSuperClass(context);
 
                 while (superType != null) {
-                    String superTypeName = superType.getClassNameText();
+                    String superTypeName = superType.getClassName();
                     LuaClassMethodDef superMethod = LuaClassMethodIndex.findMethodWithName(superTypeName, methodName, context);
                     if (superMethod != null) {
                         NavigationGutterIconBuilder<PsiElement> builder =

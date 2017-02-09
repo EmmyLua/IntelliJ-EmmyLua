@@ -76,7 +76,7 @@ public class LuaType {
         return superClassName;
     }
 
-    public String getClassNameText() {
+    public String getClassName() {
         return clazzName;
     }
 
@@ -97,7 +97,7 @@ public class LuaType {
                                       @NotNull Project project,
                                       boolean bold,
                                       boolean useAsField) {
-        String clazzName = getClassNameText();
+        String clazzName = getClassName();
         if (clazzName == null)
             return;
 
@@ -125,7 +125,7 @@ public class LuaType {
     private void addStaticMethodCompletions(@NotNull CompletionResultSet completionResultSet,
                                             boolean bold,
                                             SearchContext context) {
-        String clazzName = getClassNameText();
+        String clazzName = getClassName();
         if (clazzName == null)
             return;
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, context);
@@ -166,7 +166,7 @@ public class LuaType {
                                        boolean bold,
                                        boolean withSuper,
                                        SearchContext context) {
-        String clazzName = getClassNameText();
+        String clazzName = getClassName();
         if (clazzName == null)
             return;
 
@@ -219,7 +219,7 @@ public class LuaType {
     }
 
     public LuaClassMethodDef findMethod(String methodName, SearchContext context) {
-        String className = getClassNameText();
+        String className = getClassName();
         LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(className, methodName, context);
         if (def == null) { // static
             def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
@@ -233,7 +233,7 @@ public class LuaType {
     }
 
     /*private LuaClassMethodDef findStaticMethod(String methodName, @NotNull SearchContext context) {
-        String className = getClassNameText();
+        String className = getClassName();
         LuaClassMethodDef def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
         if (def == null) {
             LuaType superType = getSuperClass(context);

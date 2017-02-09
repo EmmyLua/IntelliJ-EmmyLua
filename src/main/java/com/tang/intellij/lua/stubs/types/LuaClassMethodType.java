@@ -63,7 +63,7 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
         if (typeSet != null) {
             LuaType type = typeSet.getFirst();
             if (type != null)
-                clazzName = type.getClassNameText();
+                clazzName = type.getClassName();
         }
 
         LuaTypeSet returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(methodDef, searchContext);

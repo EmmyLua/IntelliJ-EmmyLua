@@ -36,7 +36,7 @@ public class LuaGlobalType extends LuaType {
     }
 
     @Override
-    public String getClassNameText() {
+    public String getClassName() {
         return clazzName;
     }
 }

@@ -49,7 +49,7 @@ public class LuaNameSuggestionProvider implements NameSuggestionProvider {
                 for (LuaType type : typeSet.getTypes()) {
                     LuaType cur = type;
                     while (cur != null) {
-                        String className = cur.getClassNameText();
+                        String className = cur.getClassName();
                         if (className != null)
                             classNames.add(className);
                         cur = cur.getSuperClass(context);

@@ -61,7 +61,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
         if (sup != null) {
             Project project = completionParameters.getOriginalFile().getProject();
             SearchContext context = new SearchContext(project);
-            String clazzName = sup.getClassNameText();
+            String clazzName = sup.getClassName();
             Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
             for (LuaClassMethodDef def : list) {
                 String methodName = def.getName();

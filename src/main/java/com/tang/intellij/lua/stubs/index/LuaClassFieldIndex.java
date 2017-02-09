@@ -94,6 +94,6 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     }
 
     public static LuaClassField find(LuaType type, String fieldName, SearchContext context) {
-        return find(type.getClassNameText(), fieldName, context);
+        return find(type.getClassName(), fieldName, context);
     }
 }

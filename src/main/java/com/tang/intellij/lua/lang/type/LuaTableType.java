@@ -56,7 +56,7 @@ public class LuaTableType extends LuaType {
     }
 
     @Override
-    public String getClassNameText() {
+    public String getClassName() {
         return clazzName;
     }
 
@@ -87,7 +87,7 @@ public class LuaTableType extends LuaType {
         for (String s : fieldStringList) {
             LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
                     .withIcon(LuaIcons.CLASS_FIELD)
-                    .withTypeText(getClassNameText());
+                    .withTypeText(getClassName());
 
             completionResultSet.addElement(elementBuilder);
         }

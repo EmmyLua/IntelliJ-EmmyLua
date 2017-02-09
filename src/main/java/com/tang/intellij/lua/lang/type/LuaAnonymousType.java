@@ -33,7 +33,7 @@ public class LuaAnonymousType extends LuaType {
     }
 
     @Override
-    public String getClassNameText() {
+    public String getClassName() {
         return clazzName;
     }
 
