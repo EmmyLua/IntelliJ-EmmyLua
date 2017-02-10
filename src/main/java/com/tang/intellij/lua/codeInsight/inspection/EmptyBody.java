@@ -62,8 +62,9 @@ public class EmptyBody extends EmptyBodyBase {
             assert forNode != null;
 
             PsiElement forElement = forNode.getPsi();
-            TextRange range = new TextRange(forElement.getStartOffsetInParent(), forNode.getTextLength());
-            holder.registerProblem(o, range, message, new Fix(familyName));
+            int offset = forElement.getNode().getStartOffset() - o.getNode().getStartOffset();
+            TextRange textRange = new TextRange(offset, offset + forElement.getTextLength());
+            holder.registerProblem(o, textRange, message, new Fix(familyName));
         }
     }
 
