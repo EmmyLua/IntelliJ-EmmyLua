@@ -1,7 +1,12 @@
 out
 build
 gen
-.idea/workspace.xml
-.idea/misc.xml
-.gradle
+.idea
+!.idea/IntelliJ-Lua.iml
+!.idea/modules.xml
 *.skeleton
+*Lexer.java
+*Lexer.java~
+.gradle
+LuaIDE*.zip
+jflex*.jar
