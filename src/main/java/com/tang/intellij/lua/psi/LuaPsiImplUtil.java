@@ -155,6 +155,7 @@ public class LuaPsiImplUtil {
      * @param classMethodDef def
      * @return LuaType
      */
+    @Nullable
     public static LuaType getClassType(LuaClassMethodDef classMethodDef, SearchContext context) {
         LuaNameRef ref = classMethodDef.getClassMethodName().getNameRef();
         if (ref != null) {

@@ -60,8 +60,8 @@ public class LuaType {
     protected LuaType() {
     }
 
-    protected String clazzName;
-    protected String superClassName;
+    String clazzName;
+    private String superClassName;
 
     public LuaType getSuperClass(SearchContext context) {
         if (superClassName != null) {
@@ -220,6 +220,7 @@ public class LuaType {
         return def;
     }
 
+    @Nullable
     public LuaClassMethodDef findMethod(String methodName, SearchContext context) {
         String className = getClassName();
         LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(className, methodName, context);

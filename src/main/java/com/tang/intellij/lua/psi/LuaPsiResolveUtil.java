@@ -212,12 +212,41 @@ public class LuaPsiResolveUtil {
     private static LuaTypeSet resolveParamType(LuaParamNameDef paramNameDef, SearchContext context) {
         LuaCommentOwner owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner.class);
         if (owner != null) {
+            String paramName = paramNameDef.getText();
             LuaComment comment = owner.getComment();
             if (comment != null) {
-                LuaDocParamDef paramDef = comment.getParamDef(paramNameDef.getText());
+                LuaDocParamDef paramDef = comment.getParamDef(paramName);
                 if (paramDef != null) {
                     return paramDef.guessType(context);
                 }
+            }
+
+            // 如果是个类方法，则有可能在父类里
+            if (owner instanceof LuaClassMethodDef) {
+                LuaClassMethodDef classMethodDef = (LuaClassMethodDef) owner;
+                LuaType classType = classMethodDef.getClassType(context);
+                String methodName = classMethodDef.getName();
+                while (classType != null){
+                    classType = classType.getSuperClass(context);
+                    if (classType != null) {
+                        LuaClassMethodDef superMethod = classType.findMethod(methodName, context);
+                        if (superMethod != null) {
+                            LuaParamInfo[] params = superMethod.getParams();//todo : 优化
+                            for (LuaParamInfo param : params) {
+                                if (paramName.equals(param.getName())) {
+                                    String[] types = param.getTypes();
+                                    if (types.length > 0) {
+                                        LuaTypeSet set = LuaTypeSet.create();
+                                        for (String type : types) {
+                                            set.addType(LuaType.create(type, null));
+                                        }
+                                        return set;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
             }
         }
         return null;
