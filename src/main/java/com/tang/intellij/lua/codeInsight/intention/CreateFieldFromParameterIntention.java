@@ -9,6 +9,7 @@ import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
@@ -43,7 +44,13 @@ public class CreateFieldFromParameterIntention extends BaseIntentionAction {
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile psiFile) {
         LuaParamNameDef paramNameDef = getLuaParamNameDef(editor, psiFile);
-        return paramNameDef != null;
+        if (paramNameDef == null)
+            return false;
+        PsiElement parent = paramNameDef.getParent();
+        if (parent == null)
+            return false;
+        parent = parent.getParent();
+        return parent instanceof LuaClassMethodDef;
     }
 
     private LuaParamNameDef getLuaParamNameDef(Editor editor, PsiFile psiFile) {
