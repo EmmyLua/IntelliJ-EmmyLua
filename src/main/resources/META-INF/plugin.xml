@@ -147,6 +147,9 @@
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyBody"/>
+        
+        <defaultLiveTemplatesProvider implementation="com.tang.intellij.lua.codeInsight.LuaLiveTemplatesProvider"/>
+        <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.LuaCodeTemplateContextType"/>
     </extensions>
 
     <application-components>
