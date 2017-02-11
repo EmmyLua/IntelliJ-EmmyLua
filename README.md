@@ -6,7 +6,7 @@ Lua IDE for IntelliJ IDEA (requires `IDEA 2016.3`)
 
 QQ交流群：`29850775`
 
-![snapshot](http://git.oschina.net/uploads/images/2017/0205/154051_382def6d_5199.png)
+![snapshot](http://git.oschina.net/uploads/images/2017/0211/161001_5dfa4d0f_5199.gif)
 
 feature | progress
 ------- | -------
