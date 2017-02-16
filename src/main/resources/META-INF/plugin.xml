@@ -89,8 +89,12 @@
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
 
+        <!-- color -->
         <colorSettingsPage implementation="com.tang.intellij.lua.editor.LuaColorSettingsPage"/>
+        <additionalTextAttributes scheme="Default" file="colorSchemes/Default.xml"/>
+        <additionalTextAttributes scheme="Darcula" file="colorSchemes/Darcula.xml"/>
 
+        <!-- debugger -->
         <programRunner implementation="com.tang.intellij.lua.debugger.LuaDebuggerRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.LuaConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>

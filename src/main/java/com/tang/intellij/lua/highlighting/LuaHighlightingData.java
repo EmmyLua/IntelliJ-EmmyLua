@@ -64,6 +64,8 @@ public class LuaHighlightingData {
     private static final String LUADOC_TAG_ID = "LUA_LUADOC_TAG";
     @NonNls
     private static final String LUADOC_VALUE_ID = "LUA_LUADOC_VALUE";
+    @NonNls
+    private static final String UP_VALUE_ID = "LUA_UP_VALUE";
 
     public static TextAttributesKey DOC_COMMENT_TAG =
             TextAttributesKey.createTextAttributesKey(LUADOC_TAG_ID, DefaultLanguageHighlighterColors.DOC_COMMENT_TAG);
@@ -103,4 +105,6 @@ public class LuaHighlightingData {
             TextAttributesKey.createTextAttributesKey(OPERATORS_ID, DefaultLanguageHighlighterColors.OPERATION_SIGN);
     public static final TextAttributesKey PRIMITIVE_TYPE =
             TextAttributesKey.createTextAttributesKey("LUA_PRIMITIVE_TYPE", ConsoleHighlighter.CYAN_BRIGHT);
+    public static TextAttributesKey UP_VALUE =
+            TextAttributesKey.createTextAttributesKey(UP_VALUE_ID);
 }

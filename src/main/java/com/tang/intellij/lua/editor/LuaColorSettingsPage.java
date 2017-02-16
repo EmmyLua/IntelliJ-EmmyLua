@@ -52,7 +52,8 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Local Variables", LuaHighlightingData.LOCAL_VAR),
             new AttributesDescriptor("Global Variables", LuaHighlightingData.GLOBAL_VAR),
             new AttributesDescriptor("Global Functions", LuaHighlightingData.GLOBAL_FUNCTION),
-            new AttributesDescriptor("Table Fields", LuaHighlightingData.TABLE_FIELD)
+            new AttributesDescriptor("Table Fields", LuaHighlightingData.TABLE_FIELD),
+            new AttributesDescriptor("Up Value", LuaHighlightingData.UP_VALUE),
     };
 
     @NonNls
