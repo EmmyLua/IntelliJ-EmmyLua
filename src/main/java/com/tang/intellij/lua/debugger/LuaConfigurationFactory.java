@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LuaConfigurationFactory extends ConfigurationFactory {
 
-    protected LuaConfigurationFactory(LuaConfigurationType type) {
+    LuaConfigurationFactory(LuaConfigurationType type) {
         super(type);
     }
 

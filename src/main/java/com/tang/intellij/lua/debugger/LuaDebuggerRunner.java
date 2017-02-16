@@ -45,7 +45,7 @@ public class LuaDebuggerRunner extends GenericProgramRunner {
 
     @Override
     public boolean canRun(@NotNull String s, @NotNull RunProfile runProfile) {
-        return true;
+        return runProfile instanceof LuaRunConfiguration;
     }
 
     @Nullable
