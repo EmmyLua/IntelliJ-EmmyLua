@@ -55,6 +55,7 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
                 .after(COMMA).spaces(1) //,<SPACE>
                 .after(TABLE_FIELD_SEP).spaces(1) // { 1,<SPACE>2 }
                 .before(BLOCK).blankLines(0)
+                .afterInside(RPAREN, FUNC_BODY).lineBreakInCode()
                 .between(FUNCTION, FUNC_BODY).none()
                 .between(FUNCTION, NAME_DEF).spaces(1) //function<SPACE>name()
                 .around(BINARY_OP).spaces(1)

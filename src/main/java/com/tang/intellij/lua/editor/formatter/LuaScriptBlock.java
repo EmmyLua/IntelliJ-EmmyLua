@@ -49,6 +49,7 @@ public class LuaScriptBlock extends AbstractBlock {
             LuaTypes.FOR_A_STAT,
             LuaTypes.FOR_B_STAT,
             LuaTypes.REPEAT_STAT,
+            LuaTypes.WHILE_STAT,
             LuaTypes.TABLE_CONSTRUCTOR
     ));
 
