@@ -104,11 +104,7 @@ public class LuaPsiResolveUtil {
     }
 
     @Nullable
-    public static PsiElement resolveUpvalue(@NotNull LuaNameRef ref, @NotNull SearchContext context) {
-        String refName = ref.getName();
-        if (refName.equals(Constants.WORD_SELF))
-            return null;
-
+    public static PsiElement resolveUpValue(@NotNull LuaNameRef ref, @NotNull SearchContext context) {
         LuaFuncBody funcBody = PsiTreeUtil.getParentOfType(ref, LuaFuncBody.class);
         if (funcBody == null)
             return null;

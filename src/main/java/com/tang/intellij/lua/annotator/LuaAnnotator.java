@@ -106,16 +106,16 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement id = o.getFirstChild();
             if (id == null)
                 return;
-            if (id.getNode().getElementType() == LuaTypes.SELF)
-                return;
 
             //up value
-            PsiElement upvalue = LuaPsiResolveUtil.resolveUpvalue(o, new SearchContext(o.getProject()));
-            if (upvalue != null) {
+            PsiElement upValue = LuaPsiResolveUtil.resolveUpValue(o, new SearchContext(o.getProject()));
+            if (upValue != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.UP_VALUE);
-                return;
             }
+
+            if (id.getNode().getElementType() == LuaTypes.SELF)
+                return;
 
             PsiElement res = o.resolve(new SearchContext(o.getProject()));
             if (res instanceof LuaParamNameDef) {
