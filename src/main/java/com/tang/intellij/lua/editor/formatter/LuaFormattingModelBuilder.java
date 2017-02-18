@@ -38,7 +38,8 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
     @Override
     public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
         return FormattingModelProvider.createFormattingModelForPsiFile(element.getContainingFile(),
-                new LuaScriptBlock(element.getNode(),
+                new LuaScriptBlock(null,
+                        element.getNode(),
                         Wrap.createWrap(WrapType.NONE, false),
                         Alignment.createAlignment(),
                         Indent.getNoneIndent(),

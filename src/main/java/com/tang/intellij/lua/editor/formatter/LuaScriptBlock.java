@@ -22,12 +22,13 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 /**
  *
@@ -35,31 +36,38 @@ import java.util.List;
  */
 public class LuaScriptBlock extends AbstractBlock {
 
-    //格式化时
+    //不创建 ASTBlock
     private TokenSet fakeBlockSet = TokenSet.create(
-            LuaTypes.BLOCK,
-            LuaTypes.FIELD_LIST
+            BLOCK,
+            FIELD_LIST
     );
 
     //回车时
     private TokenSet childAttrSet = TokenSet.orSet(fakeBlockSet, TokenSet.create(
-            LuaTypes.IF_STAT,
-            LuaTypes.DO_STAT,
-            LuaTypes.FUNC_BODY,
-            LuaTypes.FOR_A_STAT,
-            LuaTypes.FOR_B_STAT,
-            LuaTypes.REPEAT_STAT,
-            LuaTypes.WHILE_STAT,
-            LuaTypes.TABLE_CONSTRUCTOR
+            IF_STAT,
+            DO_STAT,
+            FUNC_BODY,
+            FOR_A_STAT,
+            FOR_B_STAT,
+            REPEAT_STAT,
+            WHILE_STAT,
+            TABLE_CONSTRUCTOR
     ));
 
     private SpacingBuilder spacingBuilder;
     private Indent indent;
+    private LuaScriptBlock parent;
 
-    LuaScriptBlock(@NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, Indent indent, SpacingBuilder spacingBuilder) {
+    private Alignment callAlignment;
+
+    LuaScriptBlock(LuaScriptBlock parent, @NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, Indent indent, SpacingBuilder spacingBuilder) {
         super(node, wrap, alignment);
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
+        this.parent = parent;
+
+        if (node.getElementType() == CALL_EXPR)
+            callAlignment = Alignment.createAlignment(true);
     }
 
     private static boolean shouldCreateBlockFor(ASTNode node) {
@@ -82,13 +90,31 @@ public class LuaScriptBlock extends AbstractBlock {
         }
 
         while (node != null) {
-            if (fakeBlockSet.contains(node.getElementType())) {
+            IElementType nodeElementType = node.getElementType();
+            if (fakeBlockSet.contains(nodeElementType)) {
                 buildChildren(node, results);
             } else if (shouldCreateBlockFor(node)) {
-                results.add(new LuaScriptBlock(node, null, null, childIndent, spacingBuilder));
+                Alignment alignment = null;
+                if (parentType == CALL_EXPR) {
+                    if (nodeElementType == COLON || nodeElementType == DOT) {
+                        alignment = getTopmostCallAlignment();
+                    }
+                }
+                results.add(new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder));
             }
             node = node.getTreeNext();
         }
+    }
+
+    @Nullable
+    private Alignment getTopmostCallAlignment() {
+        Alignment alignment = null;
+        LuaScriptBlock callNode = this;
+        while (callNode != null && callNode.callAlignment != null) {
+            alignment = callNode.callAlignment;
+            callNode = callNode.parent;
+        }
+        return alignment;
     }
 
     @Nullable
