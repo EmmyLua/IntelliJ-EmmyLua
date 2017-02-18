@@ -5,8 +5,6 @@ gen
 !.idea/IntelliJ-Lua.iml
 !.idea/modules.xml
 *.skeleton
-*Lexer.java
-*Lexer.java~
 .gradle
 LuaIDE*.zip
 jflex*.jar
