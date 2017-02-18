@@ -66,7 +66,8 @@ public class LuaScriptBlock extends AbstractBlock {
         this.indent = indent;
         this.parent = parent;
 
-        if (node.getElementType() == CALL_EXPR)
+        IElementType elementType = node.getElementType();
+        if (elementType == CALL_EXPR || elementType == INDEX_EXPR)
             callAlignment = Alignment.createAlignment(true);
     }
 
@@ -95,7 +96,7 @@ public class LuaScriptBlock extends AbstractBlock {
                 buildChildren(node, results);
             } else if (shouldCreateBlockFor(node)) {
                 Alignment alignment = null;
-                if (parentType == CALL_EXPR) {
+                if (parentType == CALL_EXPR || parentType == INDEX_EXPR) {
                     if (nodeElementType == COLON || nodeElementType == DOT) {
                         alignment = getTopmostCallAlignment();
                     }
