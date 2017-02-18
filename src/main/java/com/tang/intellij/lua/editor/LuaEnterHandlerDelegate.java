@@ -66,6 +66,14 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
         if (comment != null && caretOffset > comment.getTextOffset()) {
             editor.getDocument().insertString(caretOffset, "\n---");
             editor.getCaretModel().moveToOffset(caretOffset + 4);
+
+            Project project = comment.getProject();
+            final TextRange textRange = comment.getTextRange();
+            PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
+            ApplicationManager.getApplication().runWriteAction(()-> {
+                CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
+                styleManager.adjustLineIndent(psiFile, textRange);
+            });
             return Result.Stop;
         }
 
