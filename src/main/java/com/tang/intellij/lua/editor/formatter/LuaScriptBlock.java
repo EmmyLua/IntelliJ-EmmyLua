@@ -59,12 +59,20 @@ public class LuaScriptBlock extends AbstractBlock {
     private LuaScriptBlock parent;
 
     private Alignment callAlignment;
+    private Alignment assignAlignment;
 
-    LuaScriptBlock(LuaScriptBlock parent, @NotNull ASTNode node, @Nullable Wrap wrap, @Nullable Alignment alignment, Indent indent, SpacingBuilder spacingBuilder) {
+    LuaScriptBlock(LuaScriptBlock parent,
+                   @NotNull ASTNode node,
+                   @Nullable Wrap wrap,
+                   @Nullable Alignment alignment,
+                   Indent indent,
+                   SpacingBuilder spacingBuilder) {
         super(node, wrap, alignment);
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
         this.parent = parent;
+
+        assignAlignment = Alignment.createAlignment(true);
 
         IElementType elementType = node.getElementType();
         if (elementType == CALL_EXPR || elementType == INDEX_EXPR)
@@ -99,6 +107,14 @@ public class LuaScriptBlock extends AbstractBlock {
                 if (parentType == CALL_EXPR || parentType == INDEX_EXPR) {
                     if (nodeElementType == COLON || nodeElementType == DOT) {
                         alignment = getTopmostCallAlignment();
+                    }
+                } else if (parentType == LOCAL_DEF || parentType == ASSIGN_STAT) {
+                    if (nodeElementType == ASSIGN) {
+                        alignment = this.parent.assignAlignment;
+                    }
+                } else if (parentType == TABLE_FIELD) {
+                    if (nodeElementType == ASSIGN) {
+                        alignment = this.parent.parent.assignAlignment;
                     }
                 }
                 results.add(new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder));
