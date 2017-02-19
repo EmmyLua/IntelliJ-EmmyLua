@@ -57,6 +57,7 @@
         <lang.psiStructureViewFactory language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaStructureViewFactory"/>
         <lang.commenter language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaCommenter"/>
         <lang.quoteHandler language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.editorActions.LuaQuoteHandler"/>
+        <highlightErrorFilter implementation="com.tang.intellij.lua.highlighting.LuaHighlightErrorFilter"/>
 
         <!--rename-->
         <lang.refactoringSupport language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaRefactoringSupportProvider"/>
