@@ -22,6 +22,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.tang.intellij.lua.psi.LuaExpr;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,6 +61,7 @@ public class LuaScriptBlock extends AbstractBlock {
 
     private Alignment callAlignment;
     private Alignment assignAlignment;
+    private Alignment paramAlignment;
 
     LuaScriptBlock(LuaScriptBlock parent,
                    @NotNull ASTNode node,
@@ -77,6 +79,8 @@ public class LuaScriptBlock extends AbstractBlock {
         IElementType elementType = node.getElementType();
         if (elementType == CALL_EXPR || elementType == INDEX_EXPR)
             callAlignment = Alignment.createAlignment(true);
+        else if (elementType == FUNC_BODY || elementType == EXPR_LIST)
+            paramAlignment = Alignment.createAlignment(true);
     }
 
     private static boolean shouldCreateBlockFor(ASTNode node) {
@@ -116,6 +120,13 @@ public class LuaScriptBlock extends AbstractBlock {
                     if (nodeElementType == ASSIGN) {
                         alignment = this.parent.parent.assignAlignment;
                     }
+                } else if (parentType == FUNC_BODY) {
+                    if (nodeElementType == PARAM_NAME_DEF) {
+                        alignment = this.paramAlignment;
+                    }
+                } else if (parentType == EXPR_LIST) {
+                    if (node.getPsi() instanceof LuaExpr)
+                        alignment = this.paramAlignment;
                 }
                 results.add(new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder));
             }
