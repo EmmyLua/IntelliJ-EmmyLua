@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor;
+package com.tang.intellij.lua.codeInsight;
 
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -30,8 +30,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.editor.completion.KeywordInsertHandler;
 import com.tang.intellij.lua.psi.LuaIndentRange;
 import com.tang.intellij.lua.psi.LuaTypes;
@@ -39,10 +37,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * 回车时的自动缩进
+ * 回车时的自动补全
  * Created by tangzx on 2016/11/26.
  */
-public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
+public class LuaEnterAfterUnmatchedBraceHandler implements EnterHandlerDelegate {
 
     private static IElementType getEnd(IElementType range) {
         if (range == LuaTypes.TABLE_CONSTRUCTOR)
@@ -60,22 +58,6 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
                                   @NotNull DataContext dataContext,
                                   @Nullable EditorActionHandler editorActionHandler) {
         int caretOffset = caretOffsetRef.get();
-
-        //inside comment
-        LuaComment comment = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset - 1, LuaComment.class, false);
-        if (comment != null && caretOffset > comment.getTextOffset()) {
-            editor.getDocument().insertString(caretOffset, "\n---");
-            editor.getCaretModel().moveToOffset(caretOffset + 4);
-
-            Project project = comment.getProject();
-            final TextRange textRange = comment.getTextRange();
-            PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument());
-            ApplicationManager.getApplication().runWriteAction(()-> {
-                CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
-                styleManager.adjustLineIndent(psiFile, textRange);
-            });
-            return Result.Stop;
-        }
 
         PsiElement element = psiFile.findElementAt(caretOffset - 1);
         if (element != null) {
@@ -105,7 +87,7 @@ public class LuaEnterHandlerDelegate implements EnterHandlerDelegate {
 
                 final TextRange textRange = range.getTextRange();
                 PsiDocumentManager.getInstance(project).commitDocument(document);
-                ApplicationManager.getApplication().runWriteAction(()-> {
+                ApplicationManager.getApplication().runWriteAction(() -> {
                     CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
                     styleManager.adjustLineIndent(psiFile, textRange);
                     KeywordInsertHandler.autoIndent(endType, psiFile, project, document, caretOffset);

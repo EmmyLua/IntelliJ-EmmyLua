@@ -74,7 +74,9 @@
         <codeInsight.parameterInfo language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterInfoHandler"/>
         <codeInsight.template.postfixTemplateProvider language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.postfix.LuaPostfixTemplateProvider"/>
 
-        <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterHandlerDelegate" />
+        <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterAfterUnmatchedBraceHandler" />
+        <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterInDocHandler"/>
+
         <backspaceHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaBackspaceHandlerDelegate"/>
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
         <problemFileHighlightFilter implementation="com.tang.intellij.lua.highlighting.LuaProblemFileHighlightFilter"/>
