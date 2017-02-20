@@ -28,7 +28,6 @@ import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -103,19 +102,28 @@ public class LuaPsiResolveUtil {
         return result;
     }
 
-    @Nullable
-    public static PsiElement resolveUpValue(@NotNull LuaNameRef ref, @NotNull SearchContext context) {
+    public static boolean isUpValue(@NotNull LuaNameRef ref, @NotNull SearchContext context) {
         LuaFuncBody funcBody = PsiTreeUtil.getParentOfType(ref, LuaFuncBody.class);
         if (funcBody == null)
-            return null;
+            return false;
+
+        String refName = ref.getName();
+        if (refName.equals(Constants.WORD_SELF)) {
+            LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodDef.class);
+            if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
+                LuaFuncBody methodFuncBody = classMethodFuncDef.getFuncBody();
+                if (methodFuncBody != null)
+                    return methodFuncBody.getTextOffset() < funcBody.getTextOffset();
+            }
+        }
 
         PsiElement resolve = resolveLocal(ref, context);
         if (resolve != null) {
             if (!funcBody.getTextRange().contains(resolve.getTextRange()))
-                return resolve;
+                return true;
         }
 
-        return null;
+        return false;
     }
 
     private static PsiElement resolveResult;

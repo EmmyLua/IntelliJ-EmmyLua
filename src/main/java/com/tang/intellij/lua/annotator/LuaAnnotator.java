@@ -108,8 +108,8 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                 return;
 
             //up value
-            PsiElement upValue = LuaPsiResolveUtil.resolveUpValue(o, new SearchContext(o.getProject()));
-            if (upValue != null) {
+            boolean upValue = LuaPsiResolveUtil.isUpValue(o, new SearchContext(o.getProject()));
+            if (upValue) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.UP_VALUE);
             }
