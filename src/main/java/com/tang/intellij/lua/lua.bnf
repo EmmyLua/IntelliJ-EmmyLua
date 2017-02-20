@@ -294,7 +294,7 @@ closureFuncDef ::= 'function' funcBody {
 funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...' { recoverWhile = parList_recover }
-private parList_recover ::= !(')')
+private parList_recover ::= !(')'|'in')
 
 tableConstructor ::= '{' fieldList '}' {
     pin = 1
