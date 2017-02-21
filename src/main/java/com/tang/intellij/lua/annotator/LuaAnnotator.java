@@ -70,6 +70,16 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         }
 
         @Override
+        public void visitTableField(@NotNull LuaTableField o) {
+            super.visitTableField(o);
+            PsiElement id = o.getId();
+            if (id != null) {
+                Annotation annotation = myHolder.createInfoAnnotation(id, null);
+                annotation.setTextAttributes(LuaHighlightingData.TABLE_FIELD);
+            }
+        }
+
+        @Override
         public void visitGlobalFuncDef(@NotNull LuaGlobalFuncDef o) {
             PsiElement name = o.getNameIdentifier();
             if (name != null) {

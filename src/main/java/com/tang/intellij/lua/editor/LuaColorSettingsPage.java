@@ -68,6 +68,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
         ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION);
         ourTags.put("tableField", LuaHighlightingData.TABLE_FIELD);
         ourTags.put("localVar", LuaHighlightingData.PARAMETER);
+        ourTags.put("upValue", LuaHighlightingData.UP_VALUE);
     }
 
     @Nullable
@@ -85,15 +86,15 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
     @NotNull
     @Override
     public String getDemoText() {
-        return "local <localVar>var</localVar> = nil -- a short comment\n" +
+        return "local <localVar>var</localVar> = 1 -- a short comment\n" +
                 "--- doc comment\n" +
-                "--- @param <docTag>par1<docTag> Par1Type @some strings\n" +
+                "--- @param <docTagValue>par1</docTagValue> Par1Type @some strings\n" +
                 "function var:fun(<Parameters>par1</Parameters>, <Parameters>par2</Parameters>)\n" +
                 "   return self.len + 2\n" +
                 "end\n" +
                 "\n" +
                 "function <globalFunction>globalFun</globalFunction>()\n" +
-                "   return \"string\"\n" +
+                "   return \"string\" .. <upValue>var</upValue>\n" +
                 "end\n" +
                 "\n" +
                 "<globalVar>globalVar</globalVar> = {\n" +
