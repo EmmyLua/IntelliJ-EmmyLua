@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.tang.intellij.lua.lang.LuaParserDefinition.COMMENTS;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 /**
@@ -55,10 +56,12 @@ public class LuaScriptBlock extends AbstractBlock {
             TABLE_CONSTRUCTOR
     ));
 
+    private IElementType elementType;
     private SpacingBuilder spacingBuilder;
     private Indent indent;
     private LuaScriptBlock parent;
 
+    private Alignment alignment;
     private Alignment callAlignment;
     private Alignment assignAlignment;
     private Alignment paramAlignment;
@@ -70,13 +73,14 @@ public class LuaScriptBlock extends AbstractBlock {
                    Indent indent,
                    SpacingBuilder spacingBuilder) {
         super(node, wrap, alignment);
+        this.alignment = alignment;
         this.spacingBuilder = spacingBuilder;
         this.indent = indent;
         this.parent = parent;
+        this.elementType = node.getElementType();
 
         assignAlignment = Alignment.createAlignment(true);
 
-        IElementType elementType = node.getElementType();
         if (elementType == CALL_EXPR || elementType == INDEX_EXPR)
             callAlignment = Alignment.createAlignment(true);
         else if (elementType == FUNC_BODY || elementType == EXPR_LIST)
@@ -87,11 +91,39 @@ public class LuaScriptBlock extends AbstractBlock {
         return node.getTextRange().getLength() != 0 && node.getElementType() != TokenType.WHITE_SPACE;
     }
 
+    private LuaScriptBlock findChildBlockBy(IElementType type) {
+        for (Block b : getSubBlocks()) {
+            LuaScriptBlock block = ((LuaScriptBlock) b);
+            if (block.elementType == type)
+                return block;
+        }
+        return null;
+    }
+
     @Override
     protected List<Block> buildChildren() {
         List<Block> blocks = new ArrayList<>();
         buildChildren(myNode, blocks);
+        checkAlignment(blocks);
         return blocks;
+    }
+
+    private void checkAlignment(List<Block> blocks) {
+        Alignment assignAlignment = null;
+        for (Block b : blocks) {
+            LuaScriptBlock block = (LuaScriptBlock) b;
+            IElementType elementType = block.elementType;
+            if (elementType == LOCAL_DEF || elementType == ASSIGN_STAT) {
+                LuaScriptBlock assBlock = block.findChildBlockBy(ASSIGN);
+                if (assBlock != null) {
+                    if (assignAlignment == null)
+                        assignAlignment = assBlock.assignAlignment;
+                    assBlock.alignment = assignAlignment;
+                }
+            } else if (!COMMENTS.contains(elementType)) {
+                assignAlignment = null;
+            }
+        }
     }
 
     private void buildChildren(ASTNode parent, List<Block> results) {
@@ -111,10 +143,6 @@ public class LuaScriptBlock extends AbstractBlock {
                 if (parentType == CALL_EXPR || parentType == INDEX_EXPR) {
                     if (nodeElementType == COLON || nodeElementType == DOT) {
                         alignment = getTopmostCallAlignment();
-                    }
-                } else if (parentType == LOCAL_DEF || parentType == ASSIGN_STAT) {
-                    if (nodeElementType == ASSIGN) {
-                        alignment = this.parent.assignAlignment;
                     }
                 } else if (parentType == TABLE_FIELD) {
                     if (nodeElementType == ASSIGN) {
@@ -151,6 +179,12 @@ public class LuaScriptBlock extends AbstractBlock {
         return spacingBuilder.getSpacing(this, block, block1);
     }
 
+    @Nullable
+    @Override
+    public Alignment getAlignment() {
+        return alignment;
+    }
+
     @Override
     public boolean isLeaf() {
         return myNode.getFirstChildNode() == null;
@@ -164,7 +198,7 @@ public class LuaScriptBlock extends AbstractBlock {
     @NotNull
     @Override
     public ChildAttributes getChildAttributes(int newChildIndex) {
-        if (childAttrSet.contains(myNode.getElementType()))
+        if (childAttrSet.contains(elementType))
             return new ChildAttributes(Indent.getNormalIndent(), null);
         return new ChildAttributes(Indent.getNoneIndent(), null);
     }
