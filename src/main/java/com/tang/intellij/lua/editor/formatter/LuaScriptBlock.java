@@ -125,7 +125,7 @@ public class LuaScriptBlock extends AbstractBlock {
                         alignment = this.paramAlignment;
                     }
                 } else if (parentType == EXPR_LIST) {
-                    if (node.getPsi() instanceof LuaExpr)
+                    if (parent.getTreeParent().getElementType() == ARGS && node.getPsi() instanceof LuaExpr)
                         alignment = this.paramAlignment;
                 }
                 results.add(new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder));
