@@ -64,7 +64,7 @@ NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 //Comments
 BLOCK_COMMENT=--\[=*\[[\s\S]*\]=*\]
 SHORT_COMMENT=--.*
-DOC_COMMENT=----*.*(\n{LINE_WS}*---*.*)*
+DOC_COMMENT=----*.*(\n{LINE_WS}*----*.*)*
 
 //Strings
 DOUBLE_QUOTED_STRING=\"([^\\\"\r\n]|\\[^\r\n])*\"?
