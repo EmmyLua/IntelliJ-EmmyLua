@@ -37,7 +37,7 @@ public class CreateReturnDocIntention extends ClassMethodBasedIntention {
     @Override
     protected boolean isAvailable(LuaClassMethodDef methodDef, Editor editor) {
         LuaComment comment = methodDef.getComment();
-        return comment == null || PsiTreeUtil.getChildrenOfType(comment, LuaDocReturnDef.class) != null;
+        return comment == null || PsiTreeUtil.getChildrenOfType(comment, LuaDocReturnDef.class) == null;
     }
 
     @Nls
