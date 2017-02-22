@@ -25,7 +25,9 @@ import com.intellij.psi.impl.source.tree.ElementType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
-public class LuaParserUtil extends GeneratedParserUtilBase implements LuaTypes {
+import static com.tang.intellij.lua.psi.LuaTypes.*;
+
+public class LuaParserUtil extends GeneratedParserUtilBase {
 
     public static WhitespacesAndCommentsBinder MY_LEFT_COMMENT_BINDER = (list, b, tokenTextGetter) -> {
         for (int i = list.size() - 1; i >= 0; i--) {
