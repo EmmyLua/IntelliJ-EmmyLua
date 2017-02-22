@@ -33,7 +33,7 @@ public class LuaBraceMatcher implements PairedBraceMatcher {
             new BracePair(LuaTypes.LPAREN, LuaTypes.RPAREN, true),  //()
             new BracePair(LuaTypes.DO, LuaTypes.END, true),         //do end
             new BracePair(LuaTypes.IF, LuaTypes.END, true),         //if end
-            new BracePair(LuaTypes.REPEAT, LuaTypes.UNTIL, true),   //if end
+            new BracePair(LuaTypes.REPEAT, LuaTypes.UNTIL, true),   //repeat until
             new BracePair(LuaTypes.FUNCTION, LuaTypes.END, true)    //function end
     };
 
