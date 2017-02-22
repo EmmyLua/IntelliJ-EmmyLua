@@ -72,7 +72,7 @@ public class LuaEnterInDocHandler implements EnterHandlerDelegate {
             });
             return Result.Stop;
         }
-        return null;
+        return Result.Continue;
     }
 
     @Override

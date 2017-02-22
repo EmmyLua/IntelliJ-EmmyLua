@@ -78,6 +78,7 @@
 
         <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterAfterUnmatchedBraceHandler" />
         <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterInDocHandler"/>
+        <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterBetweenBracesHandler"/>
 
         <backspaceHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaBackspaceHandlerDelegate"/>
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
