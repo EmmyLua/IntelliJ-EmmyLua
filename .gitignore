@@ -8,5 +8,3 @@ gen
 .gradle
 LuaIDE*.zip
 jflex*.jar
-.idea/workspace.xml
-jflex-1.7.0-SNAPSHOT.jar
