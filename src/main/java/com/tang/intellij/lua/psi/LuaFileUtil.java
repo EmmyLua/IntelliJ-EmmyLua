@@ -69,6 +69,23 @@ public class LuaFileUtil {
     }
 
     @Nullable
+    public static VirtualFile getSourceRoot(Project project, VirtualFile file) {
+        String fileFullUrl = file.getUrl();
+
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        for (Module module : modules) {
+            VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+            for (VirtualFile sourceRoot : sourceRoots) {
+                String sourceRootUrl = sourceRoot.getUrl();
+                if (fileFullUrl.startsWith(sourceRootUrl)) {
+                    return sourceRoot;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     public static VirtualFile getPluginVirtualDirectory() {
         IdeaPluginDescriptor descriptor = PluginManager.getPlugin(PluginId.getId("com.tang"));
         if (descriptor != null) {

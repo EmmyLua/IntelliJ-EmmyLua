@@ -22,10 +22,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.LogicalRoot;
-import com.intellij.util.LogicalRootsManager;
 import com.intellij.util.ObjectUtils;
 import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -47,8 +46,7 @@ public class LuaQualifiedNameProvider implements QualifiedNameProvider {
             VirtualFile virtualFile = file.getVirtualFile();
             Project project = file.getProject();
 
-            final LogicalRoot logicalRoot = LogicalRootsManager.getLogicalRootsManager(project).findLogicalRoot(virtualFile);
-            VirtualFile logicalRootFile = logicalRoot != null ? logicalRoot.getVirtualFile() : null;
+            VirtualFile logicalRootFile = LuaFileUtil.getSourceRoot(project, virtualFile);
             if (logicalRootFile != null && !virtualFile.equals(logicalRootFile)) {
                 String value = ObjectUtils.assertNotNull(VfsUtilCore.getRelativePath(virtualFile, logicalRootFile, '.'));
                 int lastDot = value.lastIndexOf('.');
