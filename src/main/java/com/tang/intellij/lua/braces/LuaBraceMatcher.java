@@ -31,6 +31,7 @@ public class LuaBraceMatcher implements PairedBraceMatcher {
     private static final BracePair[] PAIRS = new BracePair[]{
             new BracePair(LuaTypes.LCURLY, LuaTypes.RCURLY, true),  //{}
             new BracePair(LuaTypes.LPAREN, LuaTypes.RPAREN, true),  //()
+            new BracePair(LuaTypes.LBRACK, LuaTypes.RBRACK, true),  //[]
             new BracePair(LuaTypes.DO, LuaTypes.END, true),         //do end
             new BracePair(LuaTypes.IF, LuaTypes.END, true),         //if end
             new BracePair(LuaTypes.REPEAT, LuaTypes.UNTIL, true),   //repeat until
