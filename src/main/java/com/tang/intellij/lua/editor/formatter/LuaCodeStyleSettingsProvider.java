@@ -18,20 +18,15 @@ package com.tang.intellij.lua.editor.formatter;
 
 import com.intellij.application.options.CodeStyleAbstractConfigurable;
 import com.intellij.application.options.CodeStyleAbstractPanel;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.editor.highlighter.EditorHighlighter;
-import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.application.options.TabbedLanguageCodeStylePanel;
+import com.intellij.lang.Language;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsProvider;
 import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
-import com.tang.intellij.lua.lang.LuaFileType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
 
 /**
  *
@@ -51,50 +46,15 @@ public class LuaCodeStyleSettingsProvider extends CodeStyleSettingsProvider {
 
             @Override
             protected CodeStyleAbstractPanel createPanel(CodeStyleSettings codeStyleSettings) {
-                return new CodeStyleAbstractPanel(codeStyleSettings) {
-
+                final Language language = LuaLanguage.INSTANCE;
+                final CodeStyleSettings currentSettings = getCurrentSettings();
+                return new TabbedLanguageCodeStylePanel(language, currentSettings, settings) {
                     @Override
-                    protected int getRightMargin() {
-                        return 0;
-                    }
-
-                    @Nullable
-                    @Override
-                    protected EditorHighlighter createHighlighter(EditorColorsScheme editorColorsScheme) {
-                        return null;
-                    }
-
-                    @NotNull
-                    @Override
-                    protected FileType getFileType() {
-                        return LuaFileType.INSTANCE;
-                    }
-
-                    @Nullable
-                    @Override
-                    protected String getPreviewText() {
-                        return null;
-                    }
-
-                    @Override
-                    public void apply(CodeStyleSettings codeStyleSettings) throws ConfigurationException {
-
-                    }
-
-                    @Override
-                    public boolean isModified(CodeStyleSettings codeStyleSettings) {
-                        return false;
-                    }
-
-                    @Nullable
-                    @Override
-                    public JComponent getPanel() {
-                        return null;
-                    }
-
-                    @Override
-                    protected void resetImpl(CodeStyleSettings codeStyleSettings) {
-
+                    protected void initTabs(CodeStyleSettings settings) {
+                        addIndentOptionsTab(settings);
+                        addSpacesTab(settings);
+                        addBlankLinesTab(settings);
+                        addWrappingAndBracesTab(settings);
                     }
                 };
             }
