@@ -21,6 +21,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
@@ -54,11 +55,12 @@ public class LuaCompletionContributor extends CompletionContributor {
             .withParent(LuaParamNameDef.class);
     private static final PsiElementPattern.Capture<PsiElement> IN_FUNC_NAME = psiElement(LuaTypes.ID)
             .withParent(LuaFuncBodyOwner.class);
-    private static final PsiElementPattern.Capture<PsiElement> IN_COMMENT = psiElement().inside(psiElement().withElementType(LuaTypes.DOC_COMMENT));
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement().withParent(LuaClassMethodName.class);
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_PATH = psiElement(LuaTypes.STRING).inside(
-            psiElement(LuaTypes.ARGS).afterLeaf("require")
-    );
+    private static final PsiElementPattern.Capture<PsiElement> IN_COMMENT = psiElement()
+            .inside(PsiComment.class);
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement()
+            .withParent(LuaClassMethodName.class);
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_PATH = psiElement(LuaTypes.STRING)
+            .inside(psiElement(LuaTypes.ARGS).afterLeaf("require"));
 
     public LuaCompletionContributor() {
         //可以override
