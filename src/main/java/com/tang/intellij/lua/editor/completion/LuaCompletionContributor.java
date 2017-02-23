@@ -50,6 +50,10 @@ public class LuaCompletionContributor extends CompletionContributor {
             .withParent(LuaCallExpr.class);
     private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_FIELD = psiElement(LuaTypes.ID)
             .withParent(LuaIndexExpr.class);
+    private static final PsiElementPattern.Capture<PsiElement> IN_PARAM_NAME = psiElement(LuaTypes.ID)
+            .withParent(LuaParamNameDef.class);
+    private static final PsiElementPattern.Capture<PsiElement> IN_FUNC_NAME = psiElement(LuaTypes.ID)
+            .withParent(LuaFuncBodyOwner.class);
     private static final PsiElementPattern.Capture<PsiElement> IN_COMMENT = psiElement().inside(psiElement().withElementType(LuaTypes.DOC_COMMENT));
     private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement().withParent(LuaClassMethodName.class);
     private static final PsiElementPattern.Capture<PsiElement> SHOW_PATH = psiElement(LuaTypes.STRING).inside(
@@ -73,6 +77,8 @@ public class LuaCompletionContributor extends CompletionContributor {
                 .andNot(SHOW_CLASS_METHOD)
                 .andNot(SHOW_CLASS_FIELD)
                 .andNot(IN_COMMENT)
+                .andNot(IN_FUNC_NAME)
+                .andNot(IN_PARAM_NAME)
                 .andNot(SHOW_OVERRIDE), new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
