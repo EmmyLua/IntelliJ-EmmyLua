@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class LuaFoldingBuilder implements FoldingBuilder {
 
-    static final String HOLDER_TEXT = "...";
+    private static final String HOLDER_TEXT = "...";
 
     @NotNull
     @Override
@@ -71,6 +71,16 @@ public class LuaFoldingBuilder implements FoldingBuilder {
         }
         else if (type == LuaTypes.DOC_COMMENT) {
             descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
+        }
+        else if (type == LuaTypes.REGION) {
+            ASTNode treeNext = node.getTreeNext();
+            while (treeNext != null) {
+                if (treeNext.getElementType() == LuaTypes.ENDREGION) {
+                    descriptors.add(new FoldingDescriptor(node, new TextRange(node.getStartOffset(), treeNext.getStartOffset() + treeNext.getTextLength())));
+                    break;
+                }
+                treeNext = treeNext.getTreeNext();
+            }
         }
 
         for (ASTNode child : node.getChildren(null)) {
@@ -116,6 +126,7 @@ public class LuaFoldingBuilder implements FoldingBuilder {
         IElementType type = astNode.getElementType();
         if (type == LuaTypes.BLOCK) return HOLDER_TEXT;
         else if (type == LuaTypes.DOC_COMMENT) return "/** ... */";
+        else if (type == LuaTypes.REGION) return "... region";
         return null;
     }
 

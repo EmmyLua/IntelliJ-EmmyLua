@@ -81,6 +81,8 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
 %%
 <YYINITIAL> {
   {WHITE_SPACE}               { return TokenType.WHITE_SPACE; }
+  "--region"                  { return REGION; }
+  "--endregion"               { return ENDREGION; }
   "--"                        {
         boolean block = checkBlock();
         if (block) { yypushback(yylength()); yybegin(xBLOCK_COMMENT); }

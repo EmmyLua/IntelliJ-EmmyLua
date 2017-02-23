@@ -98,7 +98,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(LuaHighlightingData.LINE_COMMENT);
         else if (DOC_KEYWORD_TOKENS.contains(type))
             return pack(LuaHighlightingData.DOC_COMMENT_TAG);
-        else if (type instanceof LuaDocTokenType)
+        else if (type instanceof LuaDocTokenType || type == LuaTypes.REGION || type == LuaTypes.ENDREGION)
             return pack(LuaHighlightingData.DOC_COMMENT);
 
         return new TextAttributesKey[0];

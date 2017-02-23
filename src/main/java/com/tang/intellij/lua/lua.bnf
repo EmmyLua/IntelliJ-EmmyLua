@@ -58,6 +58,8 @@
         UNTIL = "until"
         WHILE = "while"
         SELF = "self"
+        REGION = "REGION"
+        ENDREGION = "ENDREGION"
 
         SHEBANG = "#!"
         ELLIPSIS = "..."
@@ -109,7 +111,7 @@
 
 luaFile ::= stat_or_comment*
 
-private comment ::= SHORT_COMMENT | DOC_COMMENT | BLOCK_COMMENT
+private comment ::= SHORT_COMMENT | DOC_COMMENT | BLOCK_COMMENT | REGION | ENDREGION
 private stat_or_comment ::= comment | stat ';'?
 private chunk ::= stat_or_comment* (lastStat ';'?)?
 block ::= chunk
