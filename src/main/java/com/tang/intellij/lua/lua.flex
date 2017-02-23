@@ -62,6 +62,8 @@ exp=[Ee][+-]?{n}
 NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 
 //Comments
+REGION_START =--region({LINE_WS}+[^\r\n]*)*
+REGION_END =--endregion({LINE_WS}+[^\r\n]*)*
 BLOCK_COMMENT=--\[=*\[[\s\S]*\]=*\]
 SHORT_COMMENT=--.*
 DOC_COMMENT=----*.*(\n{LINE_WS}*----*.*)*
@@ -81,8 +83,8 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
 %%
 <YYINITIAL> {
   {WHITE_SPACE}               { return TokenType.WHITE_SPACE; }
-  "--region"                  { return REGION; }
-  "--endregion"               { return ENDREGION; }
+  {REGION_START}              { return REGION; }
+  {REGION_END}                { return ENDREGION; }
   "--"                        {
         boolean block = checkBlock();
         if (block) { yypushback(yylength()); yybegin(xBLOCK_COMMENT); }

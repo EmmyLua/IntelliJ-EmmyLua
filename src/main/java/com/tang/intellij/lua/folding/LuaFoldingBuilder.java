@@ -126,7 +126,13 @@ public class LuaFoldingBuilder implements FoldingBuilder {
         IElementType type = astNode.getElementType();
         if (type == LuaTypes.BLOCK) return HOLDER_TEXT;
         else if (type == LuaTypes.DOC_COMMENT) return "/** ... */";
-        else if (type == LuaTypes.REGION) return "... region";
+        else if (type == LuaTypes.REGION) {
+            String text = astNode.getText();
+            int index = text.indexOf("--region");
+            text = text.substring(index + 8).trim();
+            if (text.length() > 0) return text;
+            else return astNode.getText();
+        }
         return null;
     }
 
