@@ -13,6 +13,7 @@ feature | progress
 Syntax highlighting | ok
 Highlighting global | ok
 Highlighting local/param | ok
+Highlighting up value | ok
 Find usages | ok
 Rename(Shift + F6) | ok
 Go to definition(Ctrl + Mouse) | ok
@@ -32,11 +33,12 @@ Name suggestion for refactor | 60%
 Modules support | 80%
 Quick Documentation(Ctrl + Q) | 50%
 Live templates | 10%
-Postfix completion templates | ok
+Postfix completion templates | 11
 Code formatter | 90%
-Code intentions | 20%
-Code inspections | 20%
+Code intentions | 6
+Code inspections | 6
 Lua Standard Library/API | ok
+Region folding | ok
 Debugger | 50%
 Lua 5.3 | 0%
 ... .etc |
