@@ -73,11 +73,15 @@ public class LuaFoldingBuilder implements FoldingBuilder {
             descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
         }
         else if (type == LuaTypes.REGION) {
+            int level = 0;
             ASTNode treeNext = node.getTreeNext();
             while (treeNext != null) {
-                if (treeNext.getElementType() == LuaTypes.ENDREGION) {
+                IElementType treeNextElementType = treeNext.getElementType();
+                if (treeNextElementType == LuaTypes.ENDREGION && level-- == 0) {
                     descriptors.add(new FoldingDescriptor(node, new TextRange(node.getStartOffset(), treeNext.getStartOffset() + treeNext.getTextLength())));
                     break;
+                } else if (treeNextElementType == LuaTypes.REGION) {
+                    level++;
                 }
                 treeNext = treeNext.getTreeNext();
             }
