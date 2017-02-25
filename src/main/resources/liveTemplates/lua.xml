@@ -19,4 +19,24 @@
             <option name="LUA_CODE" value="true" />
         </context>
     </template>
+
+    <template resource-bundle="LuaBundle" key="livetemplate.description.fori"
+              name="fori" toReformat="true" toShortenFQNames="true"
+              value="for $VAR$ = 1, $EXPR$ do&#10;$END$&#10;end">
+        <variable name="VAR" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true" />
+        <variable name="EXPR" expression="" defaultValue="&quot;10&quot;" alwaysStopAt="true" />
+        <context>
+            <option name="LUA_CODE" value="true" />
+        </context>
+    </template>
+
+    <template resource-bundle="LuaBundle" key="livetemplate.description.closure"
+              name="closure" toReformat="true" toShortenFQNames="true"
+              value="function($PARAMS$)&#10;$END$&#10;end">
+        <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true" />
+        <context>
+            <option name="LUA_CODE" value="true" />
+        </context>
+    </template>
+
 </templateSet>
