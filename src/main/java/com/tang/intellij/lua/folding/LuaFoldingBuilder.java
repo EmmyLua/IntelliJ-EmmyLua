@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.folding;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.folding.CustomFoldingBuilder;
 import com.intellij.lang.folding.FoldingBuilder;
 import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.lang.folding.NamedFoldingDescriptor;
@@ -30,25 +31,28 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.psi.LuaBlock;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by tangzx
  * Date : 2015/11/16.
  */
-public class LuaFoldingBuilder implements FoldingBuilder {
+public class LuaFoldingBuilder extends CustomFoldingBuilder implements FoldingBuilder {
 
     private static final String HOLDER_TEXT = "...";
 
-    @NotNull
     @Override
-    public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
-        List<FoldingDescriptor> descriptors = new ArrayList<>();
-        collectDescriptorsRecursively(node, document, descriptors);
-        return descriptors.toArray(new FoldingDescriptor[descriptors.size()]);
+    protected void buildLanguageFoldRegions(@NotNull List<FoldingDescriptor> list, @NotNull PsiElement psiElement, @NotNull Document document, boolean b) {
+        collectDescriptorsRecursively(psiElement.getNode(), document, list);
+    }
+
+    @Override
+    protected String getLanguagePlaceholderText(@NotNull ASTNode astNode, @NotNull TextRange textRange) {
+        IElementType type = astNode.getElementType();
+        if (type == LuaTypes.BLOCK) return HOLDER_TEXT;
+        else if (type == LuaTypes.DOC_COMMENT) return "/** ... */";
+        return null;
     }
 
     private  void collectDescriptorsRecursively(@NotNull ASTNode node,
@@ -71,20 +75,6 @@ public class LuaFoldingBuilder implements FoldingBuilder {
         }
         else if (type == LuaTypes.DOC_COMMENT) {
             descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
-        }
-        else if (type == LuaTypes.REGION) {
-            int level = 0;
-            ASTNode treeNext = node.getTreeNext();
-            while (treeNext != null) {
-                IElementType treeNextElementType = treeNext.getElementType();
-                if (treeNextElementType == LuaTypes.ENDREGION && level-- == 0) {
-                    descriptors.add(new FoldingDescriptor(node, new TextRange(node.getStartOffset(), treeNext.getStartOffset() + treeNext.getTextLength())));
-                    break;
-                } else if (treeNextElementType == LuaTypes.REGION) {
-                    level++;
-                }
-                treeNext = treeNext.getTreeNext();
-            }
         }
 
         for (ASTNode child : node.getChildren(null)) {
@@ -124,24 +114,8 @@ public class LuaFoldingBuilder implements FoldingBuilder {
         return false;
     }
 
-    @Nullable
     @Override
-    public String getPlaceholderText(@NotNull ASTNode astNode) {
-        IElementType type = astNode.getElementType();
-        if (type == LuaTypes.BLOCK) return HOLDER_TEXT;
-        else if (type == LuaTypes.DOC_COMMENT) return "/** ... */";
-        else if (type == LuaTypes.REGION) {
-            String text = astNode.getText();
-            int index = text.indexOf("--region");
-            text = text.substring(index + 8).trim();
-            if (text.length() > 0) return text;
-            else return astNode.getText();
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isCollapsedByDefault(@NotNull ASTNode astNode) {
-        return false;
+    protected boolean isRegionCollapsedByDefault(@NotNull ASTNode astNode) {
+        return astNode.getElementType() == LuaTypes.REGION;
     }
 }

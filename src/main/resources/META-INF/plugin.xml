@@ -93,6 +93,8 @@
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
 
+        <lang.surroundDescriptor language="Lua" implementationClass="com.tang.intellij.lua.editor.surroundWith.LuaSurroundDescriptor"/>
+
         <!-- color -->
         <colorSettingsPage implementation="com.tang.intellij.lua.editor.LuaColorSettingsPage"/>
         <additionalTextAttributes scheme="Default" file="colorSchemes/Default.xml"/>
