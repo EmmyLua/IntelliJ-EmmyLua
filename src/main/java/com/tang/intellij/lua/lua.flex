@@ -183,4 +183,5 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
             yybegin(YYINITIAL); return TokenType.BAD_CHARACTER;
         }
     }
+    [^] { return TokenType.BAD_CHARACTER; }
 }
