@@ -17,9 +17,11 @@
 package com.tang.intellij.lua.highlighting;
 
 import com.intellij.lexer.FlexAdapter;
+import com.intellij.lexer.HtmlHighlightingLexer;
 import com.intellij.lexer.LayeredLexer;
 import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.comment.lexer.LuaDocLexerAdapter;
+import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.lexer._LuaStringLexer;
 import com.tang.intellij.lua.psi.LuaElementType;
@@ -32,7 +34,13 @@ import com.tang.intellij.lua.psi.LuaTypes;
 class LuaFileLexer extends LayeredLexer {
     LuaFileLexer() {
         super(new LuaLexerAdapter());
-        registerLayer(new LuaDocLexerAdapter(), LuaElementType.DOC_COMMENT);
+
+        LayeredLexer docLexer = new LayeredLexer(new LuaDocLexerAdapter());
+        HtmlHighlightingLexer htmlLexer = new HtmlHighlightingLexer(null);
+        htmlLexer.setHasNoEmbeddments(true);
+        docLexer.registerSelfStoppingLayer(htmlLexer, new IElementType[] {LuaDocTypes.STRING}, IElementType.EMPTY_ARRAY);
+        registerSelfStoppingLayer(docLexer, new IElementType[] { LuaElementType.DOC_COMMENT }, IElementType.EMPTY_ARRAY);
+
         registerSelfStoppingLayer(new FlexAdapter(new _LuaStringLexer()), new IElementType[] { LuaTypes.STRING }, IElementType.EMPTY_ARRAY);
     }
 }
