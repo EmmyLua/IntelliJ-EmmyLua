@@ -16,13 +16,16 @@
 
 package com.tang.intellij.lua.highlighting;
 
+import com.intellij.ide.highlighter.JavaHighlightingColors;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
+import com.intellij.psi.StringEscapesTokenTypes;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.tang.intellij.lua.comment.psi.LuaDocTokenType;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
+import com.tang.intellij.lua.psi.LuaStringTypes;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -98,6 +101,16 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(LuaHighlightingData.DOC_COMMENT_TAG);
         else if (type instanceof LuaDocTokenType || type == LuaTypes.REGION || type == LuaTypes.ENDREGION)
             return pack(LuaHighlightingData.DOC_COMMENT);
+
+        //for string
+        else if (type == LuaStringTypes.NEXT_LINE)
+            return pack(JavaHighlightingColors.VALID_STRING_ESCAPE);
+        else if (type == StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN)
+            return pack(JavaHighlightingColors.VALID_STRING_ESCAPE);
+        else if (type == StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN)
+            return pack(JavaHighlightingColors.INVALID_STRING_ESCAPE);
+        else if (type == LuaStringTypes.INVALID_NEXT_LINE)
+            return pack(JavaHighlightingColors.INVALID_STRING_ESCAPE);
 
         return new TextAttributesKey[0];
     }

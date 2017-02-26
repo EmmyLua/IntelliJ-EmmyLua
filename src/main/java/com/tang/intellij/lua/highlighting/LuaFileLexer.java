@@ -16,18 +16,23 @@
 
 package com.tang.intellij.lua.highlighting;
 
+import com.intellij.lexer.FlexAdapter;
 import com.intellij.lexer.LayeredLexer;
+import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.comment.lexer.LuaDocLexerAdapter;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
+import com.tang.intellij.lua.lexer._LuaStringLexer;
 import com.tang.intellij.lua.psi.LuaElementType;
+import com.tang.intellij.lua.psi.LuaTypes;
 
 /**
  * for highlight
  * Created by tangzx on 2016/11/29.
  */
-public class LuaFileLexer extends LayeredLexer {
-    public LuaFileLexer() {
+class LuaFileLexer extends LayeredLexer {
+    LuaFileLexer() {
         super(new LuaLexerAdapter());
         registerLayer(new LuaDocLexerAdapter(), LuaElementType.DOC_COMMENT);
+        registerSelfStoppingLayer(new FlexAdapter(new _LuaStringLexer()), new IElementType[] { LuaTypes.STRING }, IElementType.EMPTY_ARRAY);
     }
 }
