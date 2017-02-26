@@ -20,7 +20,9 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Query;
@@ -123,6 +125,15 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             }
 
             PsiElement res = o.resolve(new SearchContext(o.getProject()));
+            if (res != null) {
+                PsiFile containingFile = res.getContainingFile();
+                PsiDirectory directory = containingFile.getContainingDirectory();
+                if (directory.getName().equals("std")) {
+                    Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                    annotation.setTextAttributes(LuaHighlightingData.STD);
+                }
+            }
+
             if (res instanceof LuaParamNameDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);

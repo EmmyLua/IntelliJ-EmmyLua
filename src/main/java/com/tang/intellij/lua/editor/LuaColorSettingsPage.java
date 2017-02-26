@@ -54,6 +54,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Global Functions", LuaHighlightingData.GLOBAL_FUNCTION),
             new AttributesDescriptor("Table Fields", LuaHighlightingData.TABLE_FIELD),
             new AttributesDescriptor("Up Value", LuaHighlightingData.UP_VALUE),
+            new AttributesDescriptor("Std api", LuaHighlightingData.STD),
     };
 
     @NonNls
@@ -69,6 +70,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
         ourTags.put("tableField", LuaHighlightingData.TABLE_FIELD);
         ourTags.put("localVar", LuaHighlightingData.PARAMETER);
         ourTags.put("upValue", LuaHighlightingData.UP_VALUE);
+        ourTags.put("std", LuaHighlightingData.STD);
     }
 
     @Nullable
@@ -90,6 +92,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
                 "--- doc comment\n" +
                 "--- @param <docTagValue>par1</docTagValue> Par1Type @some strings\n" +
                 "function var:fun(<Parameters>par1</Parameters>, <Parameters>par2</Parameters>)\n" +
+                "   <std>print</std>('hello')" +
                 "   return self.len + 2\n" +
                 "end\n" +
                 "\n" +

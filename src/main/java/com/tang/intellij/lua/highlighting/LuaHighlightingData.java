@@ -107,4 +107,6 @@ public class LuaHighlightingData {
             TextAttributesKey.createTextAttributesKey("LUA_PRIMITIVE_TYPE", ConsoleHighlighter.CYAN_BRIGHT);
     public static TextAttributesKey UP_VALUE =
             TextAttributesKey.createTextAttributesKey(UP_VALUE_ID);
+    public static TextAttributesKey STD =
+            TextAttributesKey.createTextAttributesKey("STD");
 }
