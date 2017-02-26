@@ -96,8 +96,6 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitParamNameDef(@NotNull LuaParamNameDef o) {
-            if (o.textMatches(Constants.WORD_SELF))
-                return;
             if (o.textMatches(Constants.WORD_UNDERLINE))
                 return;
 
@@ -124,9 +122,6 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                 annotation.setTextAttributes(LuaHighlightingData.UP_VALUE);
             }
 
-            if (id.getNode().getElementType() == LuaTypes.SELF)
-                return;
-
             PsiElement res = o.resolve(new SearchContext(o.getProject()));
             if (res instanceof LuaParamNameDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
@@ -135,8 +130,13 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTION);
             } else if (res instanceof LuaNameDef || res instanceof LuaLocalFuncDef) { //Local
-                Annotation annotation = myHolder.createInfoAnnotation(o, null);
-                annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
+                if (id.textMatches(Constants.WORD_SELF)) {
+                    Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                    annotation.setTextAttributes(LuaHighlightingData.SELF);
+                } else {
+                    Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                    annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
+                }
             } else/* if (res instanceof LuaNameRef) */{ // 未知的，视为Global
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.GLOBAL_VAR);

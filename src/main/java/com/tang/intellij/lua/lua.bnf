@@ -57,7 +57,6 @@
         TRUE = "true"
         UNTIL = "until"
         WHILE = "while"
-        SELF = "self"
         REGION = "REGION"
         ENDREGION = "ENDREGION"
 
@@ -140,7 +139,7 @@ private stat ::=
 private stat_recover ::= !(ID
     | ',' | ';'
     | 'local' | 'do' | 'while' | 'repeat' | 'function' | 'if' | 'for' | 'return' | break
-    | nil | true | false | STRING | NUMBER | SELF)
+    | nil | true | false | STRING | NUMBER)
 
 assignStat ::= varList '=' exprList { pin = 1 methods = [getComment assign = 'ASSIGN'] }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
@@ -344,16 +343,16 @@ fake name ::= ID {
     ]
     methods = [setName getName]
 }
-nameDef ::= ID | SELF {
+nameDef ::= ID {
     implements = ["com.tang.intellij.lua.psi.LuaTypeGuessable" "com.intellij.psi.PsiNameIdentifierOwner"]
     methods = [guessType getNameIdentifier getUseScope]
     extends = name
 }
-nameRef ::= ID | SELF {
+nameRef ::= ID {
     implements = ["com.tang.intellij.lua.psi.LuaPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner" ]
     methods = [setName getName getNameIdentifier getReferences resolve guessType]
 }
-paramNameDef ::= ID | SELF {
+paramNameDef ::= ID {
     extends = nameDef
 }

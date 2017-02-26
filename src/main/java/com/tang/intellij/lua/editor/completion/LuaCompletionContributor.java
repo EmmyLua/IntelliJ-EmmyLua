@@ -30,6 +30,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.containers.HashSet;
+import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.LuaLanguage;
@@ -135,12 +136,12 @@ public class LuaCompletionContributor extends CompletionContributor {
 
                 //key words
                 TokenSet keywords = TokenSet.orSet(LuaSyntaxHighlighter.KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET);
-                keywords = TokenSet.orSet(TokenSet.create(LuaTypes.SELF), keywords);
                 for (IElementType keyWordToken : keywords.getTypes()) {
                     completionResultSet.addElement(LookupElementBuilder.create(keyWordToken)
                             .withInsertHandler(new KeywordInsertHandler(keyWordToken))
                     );
                 }
+                completionResultSet.addElement(LookupElementBuilder.create(Constants.WORD_SELF));
 
                 //words in file
                 suggestWordsInFile(completionParameters, processingContext, completionResultSet);

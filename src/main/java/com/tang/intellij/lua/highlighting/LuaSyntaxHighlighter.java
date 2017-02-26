@@ -90,8 +90,6 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(LuaHighlightingData.BRACES);
         else if (PRIMITIVE_TYPE_SET.contains(type))
             return pack(LuaHighlightingData.PRIMITIVE_TYPE);
-        else if (type == LuaTypes.SELF)
-            return pack(LuaHighlightingData.SELF);
 
         // for comment
         else if (type == LuaTypes.SHORT_COMMENT || type == LuaTypes.BLOCK_COMMENT)
