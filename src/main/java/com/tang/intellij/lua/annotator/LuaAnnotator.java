@@ -141,17 +141,17 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             } else if (res instanceof LuaGlobalFuncDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTION);
-            } else if (res instanceof LuaNameDef || res instanceof LuaLocalFuncDef) { //Local
+            } else {
                 if (id.textMatches(Constants.WORD_SELF)) {
                     Annotation annotation = myHolder.createInfoAnnotation(o, null);
                     annotation.setTextAttributes(LuaHighlightingData.SELF);
-                } else {
+                } else if (res instanceof LuaNameDef || res instanceof LuaLocalFuncDef) { //Local
                     Annotation annotation = myHolder.createInfoAnnotation(o, null);
                     annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
+                } else/* if (res instanceof LuaNameRef) */ { // 未知的，视为Global
+                    Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                    annotation.setTextAttributes(LuaHighlightingData.GLOBAL_VAR);
                 }
-            } else/* if (res instanceof LuaNameRef) */{ // 未知的，视为Global
-                Annotation annotation = myHolder.createInfoAnnotation(o, null);
-                annotation.setTextAttributes(LuaHighlightingData.GLOBAL_VAR);
             }
         }
     }
