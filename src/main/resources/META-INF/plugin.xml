@@ -109,6 +109,7 @@
         <programRunner implementation="com.tang.intellij.lua.debugger.LuaDebuggerRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.LuaConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
+        <xdebugger.localAttachDebuggerProvider implementation="com.tang.intellij.lua.debugger.attach.LuaLocalAttachDebuggerProvider"/>
 
         <intentionAction>
             <category>Lua</category>
