@@ -29,7 +29,7 @@ import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selector
  */
 public class LuaReturnPostfixTemplate extends StringBasedPostfixTemplate {
     public LuaReturnPostfixTemplate() {
-        super("ret", "return expr", selectorTopmost());
+        super("return", "return expr", selectorTopmost());
     }
 
     @Nullable

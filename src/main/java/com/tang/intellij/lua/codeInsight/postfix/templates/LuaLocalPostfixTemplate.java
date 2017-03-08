@@ -33,7 +33,7 @@ import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selector
 public class LuaLocalPostfixTemplate extends StringBasedPostfixTemplate {
 
     public LuaLocalPostfixTemplate() {
-        super("var", "local inst = expr", selectorTopmost(Conditions.alwaysTrue()));
+        super("local", "local inst = expr", selectorTopmost(Conditions.alwaysTrue()));
     }
 
     @Nullable
