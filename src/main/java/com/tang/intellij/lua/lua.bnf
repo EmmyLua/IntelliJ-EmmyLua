@@ -109,12 +109,10 @@
   extends(".*Expr") = expr
 }
 
-luaFile ::= stat_or_comment*
+luaFile ::= stat_semi*
 
-private comment ::= SHORT_COMMENT | DOC_COMMENT | BLOCK_COMMENT | REGION | ENDREGION
-private stat_or_comment ::= comment | stat ';'?
-private chunk ::= stat_or_comment* (lastStat ';'?)?
-block ::= chunk
+private stat_semi ::= stat ';'?
+block ::= stat_semi* (lastStat ';'?)?
 private lazy_block ::= <<lazyBlock>>
 //末完成的，报错
 uncompleted ::= valueExpr
