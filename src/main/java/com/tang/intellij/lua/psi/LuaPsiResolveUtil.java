@@ -66,12 +66,15 @@ public class LuaPsiResolveUtil {
         String refName = ref.getName();
 
         if (refName.equals(Constants.WORD_SELF)) {
-            LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(ref, LuaClassMethodDef.class);
-            if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
-                LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
-                if (nameRef != null) {
-                    PsiElement resolve = nameRef.resolve(context);
-                    return resolve != null ? resolve : nameRef;
+            LuaBlock block = PsiTreeUtil.getParentOfType(ref, LuaBlock.class);
+            if (block != null) {
+                LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef.class);
+                if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
+                    LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
+                    if (nameRef != null) {
+                        PsiElement resolve = nameRef.resolve(context);
+                        return resolve != null ? resolve : nameRef;
+                    }
                 }
             }
         }
