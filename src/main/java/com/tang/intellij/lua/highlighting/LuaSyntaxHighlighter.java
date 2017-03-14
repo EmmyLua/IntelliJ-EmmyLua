@@ -57,10 +57,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaTypes.RETURN,
             LuaTypes.THEN,
             LuaTypes.UNTIL,
-            LuaTypes.WHILE,
-
-            LuaTypes.SEMI,
-            LuaTypes.COMMA
+            LuaTypes.WHILE
     );
     public static final TokenSet PRIMITIVE_TYPE_SET = TokenSet.create(
             LuaTypes.FALSE,
@@ -102,6 +99,21 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             ourMap1.put(idx, JavaHighlightingColors.DOC_COMMENT);
             ourMap2.put(idx, JavaHighlightingColors.DOC_COMMENT_MARKUP);
         }
+
+        //key words
+        fillMap(ourMap1, KEYWORD_TOKENS, LuaHighlightingData.KEYWORD);
+        fillMap(ourMap1, LuaHighlightingData.KEYWORD, LuaTypes.SEMI, LuaTypes.COMMA);
+        fillMap(ourMap1, LuaHighlightingData.OPERATORS, LuaTypes.BINARY_OP, LuaTypes.UNARY_OP);
+        fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaTypes.LBRACK, LuaTypes.LBRACK);
+        fillMap(ourMap1, LuaHighlightingData.BRACES, LuaTypes.LCURLY, LuaTypes.RCURLY);
+        //comment
+        fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT);
+        fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION);
+        fillMap(ourMap1, DOC_KEYWORD_TOKENS, LuaHighlightingData.DOC_COMMENT_TAG);
+        //primitive types
+        fillMap(ourMap1, LuaHighlightingData.NUMBER, LuaTypes.NUMBER);
+        fillMap(ourMap1, LuaHighlightingData.STRING, LuaTypes.STRING);
+        fillMap(ourMap1, PRIMITIVE_TYPE_SET, LuaHighlightingData.PRIMITIVE_TYPE);
     }
 
     @NotNull
@@ -113,29 +125,8 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType type) {
-        if (KEYWORD_TOKENS.contains(type))
-            return pack(LuaHighlightingData.KEYWORD);
-        else if (type == LuaTypes.NUMBER)
-            return pack(LuaHighlightingData.NUMBER);
-        else if (type == LuaTypes.STRING)
-            return pack(LuaHighlightingData.STRING);
-        else if (type == LuaTypes.BINARY_OP || type == LuaTypes.UNARY_OP)
-            return pack(LuaHighlightingData.OPERATORS);
-        else if (type == LuaTypes.LBRACK || type == LuaTypes.RBRACK)
-            return pack(LuaHighlightingData.BRACKETS);
-        else if (type == LuaTypes.LCURLY || type == LuaTypes.RCURLY)
-            return pack(LuaHighlightingData.BRACES);
-        else if (PRIMITIVE_TYPE_SET.contains(type))
-            return pack(LuaHighlightingData.PRIMITIVE_TYPE);
-
-        // for comment
-        else if (type == LuaTypes.SHORT_COMMENT || type == LuaTypes.BLOCK_COMMENT)
-            return pack(LuaHighlightingData.LINE_COMMENT);
-        else if (DOC_KEYWORD_TOKENS.contains(type))
-            return pack(LuaHighlightingData.DOC_COMMENT_TAG);
-        else if (type instanceof LuaDocTokenType || type == LuaTypes.REGION || type == LuaTypes.ENDREGION)
+        if (type instanceof LuaDocTokenType)
             return pack(LuaHighlightingData.DOC_COMMENT);
-
         //for string
         else if (type == LuaStringTypes.NEXT_LINE)
             return pack(JavaHighlightingColors.VALID_STRING_ESCAPE);
