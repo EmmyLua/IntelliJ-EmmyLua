@@ -26,9 +26,9 @@ import com.intellij.ide.util.treeView.smartTree.SorterUtil;
 import com.intellij.lang.PsiStructureViewFactory;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
-import com.tang.intellij.lua.editor.structure.LuaClassFieldTreeElement;
-import com.tang.intellij.lua.editor.structure.LuaClassMethodTreeElement;
-import com.tang.intellij.lua.editor.structure.LuaFileTreeElement;
+import com.tang.intellij.lua.editor.structure.LuaClassFieldElement;
+import com.tang.intellij.lua.editor.structure.LuaClassMethodElement;
+import com.tang.intellij.lua.editor.structure.LuaFileElement;
 import com.tang.intellij.lua.psi.LuaFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,7 +56,7 @@ public class LuaStructureViewFactory implements PsiStructureViewFactory {
     class LuaStructureViewModel extends StructureViewModelBase implements StructureViewModel.ElementInfoProvider {
 
         LuaStructureViewModel(@NotNull PsiFile psiFile) {
-            super(psiFile, new LuaFileTreeElement((LuaFile) psiFile));
+            super(psiFile, new LuaFileElement((LuaFile) psiFile));
             withSorters(new LuaAlphaSorter());
         }
 
@@ -79,9 +79,9 @@ public class LuaStructureViewFactory implements PsiStructureViewFactory {
         @Override
         public Comparator getComparator() {
             return (o1, o2) -> {
-                if (o1 instanceof LuaClassFieldTreeElement && o2 instanceof LuaClassMethodTreeElement)
+                if (o1 instanceof LuaClassFieldElement && o2 instanceof LuaClassMethodElement)
                     return -1;
-                else if (o1 instanceof LuaClassMethodTreeElement && o2 instanceof LuaClassFieldTreeElement)
+                else if (o1 instanceof LuaClassMethodElement && o2 instanceof LuaClassFieldElement)
                     return 1;
 
                 String s1 = SorterUtil.getStringPresentation(o1);

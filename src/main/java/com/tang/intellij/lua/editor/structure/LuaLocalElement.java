@@ -24,9 +24,9 @@ import com.tang.intellij.lua.psi.LuaLocalDef;
  *
  * Created by TangZX on 2016/12/28.
  */
-public class LuaLocalDefTreeElement extends LuaTreeElement<LuaLocalDef> {
+public class LuaLocalElement extends LuaTreeElement<LuaLocalDef> {
 
-    LuaLocalDefTreeElement(LuaLocalDef localDef) {
+    LuaLocalElement(LuaLocalDef localDef) {
         super(localDef, LuaIcons.LOCAL_VAR);
     }
 

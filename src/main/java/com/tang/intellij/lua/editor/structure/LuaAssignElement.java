@@ -16,25 +16,20 @@
 
 package com.tang.intellij.lua.editor.structure;
 
-import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaClassField;
+import com.intellij.icons.AllIcons;
+import com.tang.intellij.lua.psi.LuaAssignStat;
 
 /**
  *
- * Created by TangZX on 2016/12/13.
+ * Created by TangZX on 2016/12/28.
  */
-public class LuaClassFieldTreeElement extends LuaTreeElement<LuaClassField> {
-    private String fieldName;
-
-    LuaClassFieldTreeElement(LuaClassField fieldDef) {
-        super(fieldDef, LuaIcons.CLASS_FIELD);
-        fieldName = fieldDef.getName();
-        if (fieldName == null)
-            fieldName = "unknown";
+public class LuaAssignElement extends LuaTreeElement<LuaAssignStat> {
+    LuaAssignElement(LuaAssignStat target) {
+        super(target, AllIcons.Nodes.ClassInitializer);
     }
 
     @Override
     protected String getPresentableText() {
-        return  fieldName;
+        return element.getVarList().getText();
     }
 }

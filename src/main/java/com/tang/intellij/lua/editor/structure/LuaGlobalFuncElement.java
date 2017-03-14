@@ -17,23 +17,23 @@
 package com.tang.intellij.lua.editor.structure;
 
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 
 /**
  *
  * Created by TangZX on 2016/12/13.
  */
-public class LuaClassMethodTreeElement extends LuaTreeElement<LuaClassMethodDef> {
+public class LuaGlobalFuncElement extends LuaTreeElement<LuaGlobalFuncDef> {
 
-    private String methodName;
+    private String globalFuncName;
 
-    LuaClassMethodTreeElement(LuaClassMethodDef methodDef) {
-        super(methodDef, LuaIcons.CLASS_METHOD);
-        this.methodName = methodDef.getName() + methodDef.getParamFingerprint();
+    LuaGlobalFuncElement(LuaGlobalFuncDef globalFuncDef) {
+        super(globalFuncDef, LuaIcons.GLOBAL_FUNCTION);
+        globalFuncName = globalFuncDef.getName();
     }
 
     @Override
     protected String getPresentableText() {
-        return methodName;
+        return globalFuncName;
     }
 }

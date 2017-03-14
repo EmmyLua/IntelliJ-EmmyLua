@@ -38,11 +38,11 @@ import java.util.List;
  *
  * Created by TangZX on 2016/12/13.
  */
-public class LuaFileTreeElement implements StructureViewTreeElement {
+public class LuaFileElement implements StructureViewTreeElement {
 
     private LuaFile file;
 
-    public LuaFileTreeElement(LuaFile file) {
+    public LuaFileElement(LuaFile file) {
 
         this.file = file;
     }
@@ -104,7 +104,7 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
                     public void visitClassDef(@NotNull LuaDocClassDef o) {
                         String name = o.getName();
                         if (name != null) {
-                            list.add(new LuaClassTreeElement(o));
+                            list.add(new LuaClassElement(o));
                         }
                     }
 
@@ -123,12 +123,12 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
             @Override
             public void visitAssignStat(@NotNull LuaAssignStat o) {
                 super.visitAssignStat(o);
-                list.add(new LuaAssignTreeElement(o));
+                list.add(new LuaAssignElement(o));
             }
 
             @Override
             public void visitGlobalFuncDef(@NotNull LuaGlobalFuncDef o) {
-                list.add(new LuaGlobalFunctionTreeElement(o));
+                list.add(new LuaGlobalFuncElement(o));
             }
 
             @Override
@@ -147,7 +147,17 @@ public class LuaFileTreeElement implements StructureViewTreeElement {
                 if (comment != null)
                     visitDocComment(comment);
                 else
-                    list.add(new LuaLocalDefTreeElement(o));
+                    list.add(new LuaLocalElement(o));
+            }
+
+            @Override
+            public void visitLocalFuncDef(@NotNull LuaLocalFuncDef o) {
+                list.add(new LuaLocalFuncElement(o));
+            }
+
+            @Override
+            public void visitClassMethodDef(@NotNull LuaClassMethodDef o) {
+                list.add(new LuaClassMethodElement(o));
             }
         });
 
