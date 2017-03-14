@@ -30,6 +30,6 @@ public class LuaAssignElement extends LuaTreeElement<LuaAssignStat> {
 
     @Override
     protected String getPresentableText() {
-        return element.getVarList().getText();
+        return element.getVarList().getText() + " = ...";
     }
 }
