@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
+import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaVar;
 import com.tang.intellij.lua.psi.LuaVarList;
@@ -68,7 +69,7 @@ public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
         stubOutputStream.writeBoolean(varStub.isValid());
         if (varStub.isValid()) {
             stubOutputStream.writeBoolean(varStub.isGlobal());
-            stubOutputStream.writeUTFFast(varStub.getFieldName());
+            stubOutputStream.writeName(varStub.getFieldName());
             if (!varStub.isGlobal()) {
                 String text = varStub.getTypeName();
                 stubOutputStream.writeBoolean(text != null);
@@ -85,14 +86,14 @@ public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
         boolean isValid = stubInputStream.readBoolean();
         if (isValid) {
             boolean isGlobal = stubInputStream.readBoolean();
-            String fieldName = stubInputStream.readUTFFast();
+            StringRef fieldName = stubInputStream.readName();
             if (isGlobal) {
-                return new LuaVarStubImpl(stubElement, this, fieldName);
+                return new LuaVarStubImpl(stubElement, this, StringRef.toString(fieldName));
             } else {
                 boolean hasType = stubInputStream.readBoolean();
                 String text = null;
                 if (hasType) text = stubInputStream.readUTFFast();
-                return new LuaVarStubImpl(stubElement, this, text, fieldName);
+                return new LuaVarStubImpl(stubElement, this, text, StringRef.toString(fieldName));
             }
         } else {
             return new LuaVarStubImpl(stubElement, this);

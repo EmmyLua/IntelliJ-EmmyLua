@@ -50,7 +50,7 @@ public class LuaParamInfo {
 
     public static LuaParamInfo deserialize(StubInputStream stubInputStream) throws IOException {
         LuaParamInfo paramInfo = new LuaParamInfo();
-        paramInfo.setName(stubInputStream.readUTFFast());
+        paramInfo.setName(StringRef.toString(stubInputStream.readName()));
         int len = stubInputStream.readByte();
         String[] types = new String[len];
         for (int i = 0; i < len; i++) {
@@ -61,7 +61,7 @@ public class LuaParamInfo {
     }
 
     public static void serialize(LuaParamInfo param, StubOutputStream stubOutputStream) throws IOException {
-        stubOutputStream.writeUTFFast(param.getName());
+        stubOutputStream.writeName(param.getName());
         stubOutputStream.writeByte(param.types.length);
         for (int i = 0; i < param.types.length; i++) {
             stubOutputStream.writeName(param.types[i]);

@@ -24,7 +24,7 @@ import com.intellij.lang.Language;
  */
 public class LuaLanguage extends Language {
 
-    public static final int INDEX_VERSION = 5;
+    public static final int INDEX_VERSION = 6;
 
     public static final LuaLanguage INSTANCE = new LuaLanguage();
 

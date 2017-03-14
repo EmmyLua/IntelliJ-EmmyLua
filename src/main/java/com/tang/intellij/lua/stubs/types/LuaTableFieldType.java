@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
+import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaTableField;
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl;
@@ -63,17 +64,17 @@ public class LuaTableFieldType extends IStubElementType<LuaTableFieldStub, LuaTa
     @Override
     public void serialize(@NotNull LuaTableFieldStub fieldStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
         String typeName = fieldStub.getTypeName();
-        stubOutputStream.writeUTFFast(typeName);
+        stubOutputStream.writeName(typeName);
         String fieldName = fieldStub.getFieldName();
-        stubOutputStream.writeUTFFast(fieldName);
+        stubOutputStream.writeName(fieldName);
     }
 
     @NotNull
     @Override
     public LuaTableFieldStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
-        String typeName = stubInputStream.readUTFFast();
-        String fieldName = stubInputStream.readUTFFast();
-        return new LuaTableFieldStubImpl(typeName, fieldName, stubElement, this);
+        StringRef typeName = stubInputStream.readName();
+        StringRef fieldName = stubInputStream.readName();
+        return new LuaTableFieldStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), stubElement, this);
     }
 
     @Override
