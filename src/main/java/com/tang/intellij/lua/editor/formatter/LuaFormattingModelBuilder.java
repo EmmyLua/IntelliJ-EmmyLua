@@ -65,7 +65,9 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
                 .around(BINARY_OP).spaces(1)
                 .around(UNARY_OP).spaces(1)
                 .around(ASSIGN).lineBreakOrForceSpace(false, true) // = 号两头不能换行
-                .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1);
+                .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
+                .before(COMMA).spaces(0)
+                .before(SEMI).spaces(0);
     }
 
     @Nullable
