@@ -70,7 +70,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
                             .withIcon(LuaIcons.CLASS_METHOD)
                             .withInsertHandler(new OverrideInsertHandler(def))
                             .withTypeText("override " + clazzName)
-                            .withTailText(def.getParamFingerprint());
+                            .withTailText(def.getParamSignature());
 
                     completionResultSet.addElement(elementBuilder);
                 }

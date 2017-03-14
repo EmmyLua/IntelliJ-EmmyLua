@@ -108,7 +108,7 @@ public class LuaType {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
                         .withIcon(LuaIcons.CLASS_METHOD)
                         .withTypeText(clazzName)
-                        .withTailText(def.getParamFingerprint());
+                        .withTailText(def.getParamSignature());
                 if (!useAsField)
                     elementBuilder = elementBuilder.withInsertHandler(new FuncInsertHandler(def));
                 if (bold)
@@ -138,7 +138,7 @@ public class LuaType {
                         .withInsertHandler(new FuncInsertHandler(def))
                         .withTypeText(clazzName)
                         .withItemTextUnderlined(true)
-                        .withTailText(def.getParamFingerprint());
+                        .withTailText(def.getParamSignature());
                 if (bold)
                     elementBuilder = elementBuilder.bold();
 

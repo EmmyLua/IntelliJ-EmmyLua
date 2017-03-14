@@ -455,7 +455,7 @@ public class LuaPsiImplUtil {
         return new LuaParamInfo[0];
     }
 
-    static String getParamFingerprint(LuaFuncBodyOwner funcBodyOwner) {
+    static String getParamSignature(LuaFuncBodyOwner funcBodyOwner) {
         LuaParamInfo[] params = funcBodyOwner.getParams();
         String[] list = new String[params.length];
         for (int i = 0; i < params.length; i++) {

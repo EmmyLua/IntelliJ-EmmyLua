@@ -102,7 +102,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create(localFuncDef.getName())
                                 .withInsertHandler(new FuncInsertHandler(localFuncDef))
                                 .withIcon(LuaIcons.LOCAL_FUNCTION)
-                                .withTailText(localFuncDef.getParamFingerprint());
+                                .withTailText(localFuncDef.getParamSignature());
                         completionResultSet.addElement(elementBuilder);
                     }
                     return true;
@@ -119,7 +119,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                                     .withTypeText("Global Func")
                                     .withInsertHandler(new GlobalFuncInsertHandler(name, project))
                                     .withIcon(LuaIcons.GLOBAL_FUNCTION)
-                                    .withTailText(globalFuncDef.getParamFingerprint());
+                                    .withTailText(globalFuncDef.getParamSignature());
                             completionResultSet.addElement(elementBuilder);
                         }
                     }

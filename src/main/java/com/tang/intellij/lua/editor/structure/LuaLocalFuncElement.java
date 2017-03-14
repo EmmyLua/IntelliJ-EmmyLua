@@ -29,7 +29,7 @@ public class LuaLocalFuncElement extends LuaTreeElement<LuaLocalFuncDef> {
 
     LuaLocalFuncElement(LuaLocalFuncDef target) {
         super(target, LuaIcons.LOCAL_FUNCTION);
-        name = "local " + element.getName() + element.getParamFingerprint();
+        name = "local " + element.getName() + element.getParamSignature();
     }
 
     @Override

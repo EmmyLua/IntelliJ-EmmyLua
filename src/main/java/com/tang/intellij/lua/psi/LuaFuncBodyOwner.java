@@ -42,7 +42,7 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner {
     @NotNull
     LuaParamInfo[] getParams();
 
-    default String getParamFingerprint() {
-        return LuaPsiImplUtil.getParamFingerprint(this);
+    default String getParamSignature() {
+        return LuaPsiImplUtil.getParamSignature(this);
     }
 }
