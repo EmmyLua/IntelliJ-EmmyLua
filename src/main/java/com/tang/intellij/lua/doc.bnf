@@ -38,8 +38,11 @@
         SHARP = '#'
         EQ = '='
         COMMA = ','
+        EXTENDS = ':'
+        OR = '|'
         TAG_NAME = 'TAG_NAME'
         TAG_PARAM = 'param'
+        OPTIONAL = 'optional'
         TAG_RETURN = 'return'
         PROTECTED = 'protected'
         PUBLIC = 'public'
@@ -59,7 +62,7 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def) comment_string?
 
 //todo : remove # ,
-type_set ::= '#'? class_name_ref (','? class_name_ref)*
+type_set ::= '#'? class_name_ref ((','|'|')? class_name_ref)*
 access_modifier ::= "protected" | "public"
 
 field_def ::= FIELD access_modifier ID type_set {
@@ -89,9 +92,9 @@ tag_def ::= TAG_NAME tag_value? { pin = 1 }
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_def ::= TAG_PARAM param_name_ref type_set {
+param_def ::= TAG_PARAM OPTIONAL? param_name_ref type_set {
     pin = 1
-    methods = [guessType]
+    methods = [guessType optional = 'OPTIONAL']
 }
 
 //--- return

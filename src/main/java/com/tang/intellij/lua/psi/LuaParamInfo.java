@@ -29,6 +29,7 @@ import java.io.IOException;
  */
 public class LuaParamInfo {
 
+    private boolean isOptional;
     private String name;
     private String[] types = new String[0];
 
@@ -51,6 +52,7 @@ public class LuaParamInfo {
     public static LuaParamInfo deserialize(StubInputStream stubInputStream) throws IOException {
         LuaParamInfo paramInfo = new LuaParamInfo();
         paramInfo.setName(StringRef.toString(stubInputStream.readName()));
+        paramInfo.setOptional(stubInputStream.readBoolean());
         int len = stubInputStream.readByte();
         String[] types = new String[len];
         for (int i = 0; i < len; i++) {
@@ -62,9 +64,18 @@ public class LuaParamInfo {
 
     public static void serialize(LuaParamInfo param, StubOutputStream stubOutputStream) throws IOException {
         stubOutputStream.writeName(param.getName());
+        stubOutputStream.writeBoolean(param.isOptional());
         stubOutputStream.writeByte(param.types.length);
         for (int i = 0; i < param.types.length; i++) {
             stubOutputStream.writeName(param.types[i]);
         }
+    }
+
+    public boolean isOptional() {
+        return isOptional;
+    }
+
+    public void setOptional(boolean optional) {
+        isOptional = optional;
     }
 }

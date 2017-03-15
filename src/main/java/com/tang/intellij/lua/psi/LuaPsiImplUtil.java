@@ -437,6 +437,7 @@ public class LuaPsiImplUtil {
                 if (comment != null) {
                     LuaDocParamDef paramDef = comment.getParamDef(paramName);
                     if (paramDef != null) {
+                        paramInfo.setOptional(paramDef.getOptional() != null);
                         LuaDocTypeSet luaDocTypeSet = paramDef.getTypeSet();
                         if (luaDocTypeSet != null) {
                             List<LuaDocClassNameRef> classNameRefList = luaDocTypeSet.getClassNameRefList();

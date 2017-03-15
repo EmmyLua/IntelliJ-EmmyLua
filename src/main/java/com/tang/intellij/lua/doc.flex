@@ -77,6 +77,8 @@ DOC_DASHES = --+
     ","                        { return COMMA; }
     "#"                        { return SHARP; }
     ":"                        { return EXTENDS;}
+    "|"                        { return OR; }
+    "optional"                 { return OPTIONAL; }
     "protected"                { yybegin(xTAG); return PROTECTED; }
     "public"                   { yybegin(xTAG); return PUBLIC; }
     {ID}                       { return ID; }
