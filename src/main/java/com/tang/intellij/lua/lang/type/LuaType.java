@@ -118,6 +118,7 @@ public class LuaType {
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
                                 .withIcon(LuaIcons.CLASS_METHOD)
                                 .withTypeText(clazzName)
+                                .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
                                 .withTailText(signature);
                         if (bold)
                             elementBuilder = elementBuilder.bold();
