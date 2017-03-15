@@ -41,6 +41,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -460,9 +461,54 @@ public class LuaPsiImplUtil {
         LuaParamInfo[] params = funcBodyOwner.getParams();
         String[] list = new String[params.length];
         for (int i = 0; i < params.length; i++) {
-            list[i] = params[i].getName();
+            LuaParamInfo lpi = params[i];
+            String s = lpi.getName();
+            if (lpi.isOptional())
+                s = "[" + s + "]";
+            list[i] = s;
         }
         return "(" + String.join(", ", list) + ")";
+    }
+
+    public interface OptionalFuncProcessor {
+        void accept(String signature, int mask);
+    }
+
+    private static HashSet<Integer> sets = new HashSet<>();
+    public static void processOptional(LuaParamInfo[] params, OptionalFuncProcessor processor) {
+        sets.clear();
+        processOptionalFunc(params, processor);
+    }
+    private static void processOptionalFunc(LuaParamInfo[] params, OptionalFuncProcessor processor) {
+        int mask = 0;
+        String signature = "(";
+
+        for (int i = 0; i < params.length; i++) {
+            LuaParamInfo info = params[i];
+            if (info != null) {
+                if (mask > 0) {
+                    signature += ", " + info.getName();
+                } else {
+                    signature += info.getName();
+                }
+                mask = mask | (1 << i);
+            }
+        }
+
+        signature += ")";
+        processor.accept(signature, mask);
+        sets.add(mask);
+        for (int i = 0; i < params.length; i++) {
+            LuaParamInfo info = params[i];
+            if (info != null && info.isOptional()) {
+                int s = mask ^ (1 << i);
+                if (!sets.contains(s)) {
+                    params[i] = null;
+                    processOptionalFunc(params, processor);
+                    params[i] = info;
+                }
+            }
+        }
     }
 
     public static PsiElement getNameIdentifier(LuaLocalFuncDef localFuncDef) {
