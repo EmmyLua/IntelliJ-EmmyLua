@@ -34,6 +34,13 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
 
     protected abstract LuaParamInfo[] getParams();
 
+    protected int mask = -1;
+
+    public ArgsInsertHandler withMask(int mask) {
+        this.mask = mask;
+        return this;
+    }
+
     @Override
     public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
         int startOffset = insertionContext.getStartOffset();
@@ -67,7 +74,10 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
         boolean isFirst = true;
         MacroCallNode name = new MacroCallNode(new SuggestVariableNameMacro());
 
-        for (LuaParamInfo paramNameDef : paramNameDefList) {
+        for (int i = 0; i < paramNameDefList.length; i++) {
+            if ((mask & (1 << i)) == 0) continue;
+
+            LuaParamInfo paramNameDef = paramNameDefList[i];
             if (!isFirst)
                 template.addTextSegment(", ");
             template.addVariable(paramNameDef.getName(), name, new TextExpression(paramNameDef.getName()), false);

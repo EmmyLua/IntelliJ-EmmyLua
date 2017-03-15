@@ -105,16 +105,25 @@ public class LuaType {
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
             if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
-                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
-                        .withIcon(LuaIcons.CLASS_METHOD)
-                        .withTypeText(clazzName)
-                        .withTailText(def.getParamSignature());
-                if (!useAsField)
-                    elementBuilder = elementBuilder.withInsertHandler(new FuncInsertHandler(def));
-                if (bold)
-                    elementBuilder = elementBuilder.bold();
-
-                completionResultSet.addElement(elementBuilder);
+                if (useAsField) {
+                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
+                            .withIcon(LuaIcons.CLASS_METHOD)
+                            .withTypeText(clazzName)
+                            .withTailText(def.getParamSignature());
+                    if (bold)
+                        elementBuilder = elementBuilder.bold();
+                    completionResultSet.addElement(elementBuilder);
+                } else {
+                    LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
+                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
+                                .withIcon(LuaIcons.CLASS_METHOD)
+                                .withTypeText(clazzName)
+                                .withTailText(signature);
+                        if (bold)
+                            elementBuilder = elementBuilder.bold();
+                        completionResultSet.addElement(elementBuilder);
+                    });
+                }
             }
         }
 
@@ -133,16 +142,18 @@ public class LuaType {
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
             if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
-                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
-                        .withIcon(LuaIcons.CLASS_METHOD)
-                        .withInsertHandler(new FuncInsertHandler(def))
-                        .withTypeText(clazzName)
-                        .withItemTextUnderlined(true)
-                        .withTailText(def.getParamSignature());
-                if (bold)
-                    elementBuilder = elementBuilder.bold();
+                LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
+                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
+                            .withIcon(LuaIcons.CLASS_METHOD)
+                            .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
+                            .withTypeText(clazzName)
+                            .withItemTextUnderlined(true)
+                            .withTailText(signature);
+                    if (bold)
+                        elementBuilder = elementBuilder.bold();
 
-                completionResultSet.addElement(elementBuilder);
+                    completionResultSet.addElement(elementBuilder);
+                });
             }
         }
 

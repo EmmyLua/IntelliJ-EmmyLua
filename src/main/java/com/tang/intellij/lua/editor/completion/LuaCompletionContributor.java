@@ -99,11 +99,13 @@ public class LuaCompletionContributor extends CompletionContributor {
                 LuaPsiTreeUtil.walkUpLocalFuncDef(cur, localFuncDef -> {
                     String name = localFuncDef.getName();
                     if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
-                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(localFuncDef.getName())
-                                .withInsertHandler(new FuncInsertHandler(localFuncDef))
-                                .withIcon(LuaIcons.LOCAL_FUNCTION)
-                                .withTailText(localFuncDef.getParamSignature());
-                        completionResultSet.addElement(elementBuilder);
+                        LuaPsiImplUtil.processOptional(localFuncDef.getParams(), (signature, mask) -> {
+                            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name + signature, name)
+                                    .withInsertHandler(new FuncInsertHandler(localFuncDef).withMask(mask))
+                                    .withIcon(LuaIcons.LOCAL_FUNCTION)
+                                    .withTailText(signature);
+                            completionResultSet.addElement(elementBuilder);
+                        });
                     }
                     return true;
                 });
@@ -115,12 +117,14 @@ public class LuaCompletionContributor extends CompletionContributor {
                     if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                         LuaGlobalFuncDef globalFuncDef = LuaGlobalFuncIndex.find(name, context);
                         if (globalFuncDef != null) {
-                            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
-                                    .withTypeText("Global Func")
-                                    .withInsertHandler(new GlobalFuncInsertHandler(name, project))
-                                    .withIcon(LuaIcons.GLOBAL_FUNCTION)
-                                    .withTailText(globalFuncDef.getParamSignature());
-                            completionResultSet.addElement(elementBuilder);
+                            LuaPsiImplUtil.processOptional(globalFuncDef.getParams(), (signature, mask) -> {
+                                LookupElementBuilder elementBuilder = LookupElementBuilder.create(name + signature, name)
+                                        .withTypeText("Global Func")
+                                        .withInsertHandler(new GlobalFuncInsertHandler(name, project).withMask(mask))
+                                        .withIcon(LuaIcons.GLOBAL_FUNCTION)
+                                        .withTailText(signature);
+                                completionResultSet.addElement(elementBuilder);
+                            });
                         }
                     }
                     return true;
