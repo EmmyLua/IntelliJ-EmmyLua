@@ -19,6 +19,8 @@ string = {}
 --- ..., `s[j]`. The default value for `i` is 1; the default value for `j`
 --- is `i`.
 --- Note that numerical codes are not necessarily portable across platforms.
+---@param optional i number
+---@param optional j number
 function string.byte(s, i, j) end
 
 ---
@@ -157,6 +159,7 @@ function string.lower(s) end
 --- it returns nil. If `pattern` specifies no captures, then the whole match
 --- is returned. A third, optional numerical argument `init` specifies where
 --- to start the search; its default value is 1 and can be negative.
+---@param optional init number
 function string.match(s, pattern, init) end
 
 ---

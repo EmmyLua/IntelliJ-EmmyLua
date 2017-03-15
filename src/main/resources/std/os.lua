@@ -63,6 +63,7 @@ function os.execute(command) end
 ---
 --- Calls the C function `exit`, with an optional `code`, to terminate the
 --- host program. The default value for `code` is the success code.
+---@param optional code number
 function os.exit(code) end
 
 ---
@@ -92,6 +93,7 @@ function os.rename(oldname, newname) end
 --- the current locale is set to the standard C locale.
 --- When called with nil as the first argument, this function only returns
 --- the name of the current locale for the given category.
+---@param optional category string
 function os.setlocale(locale, category) end
 
 ---

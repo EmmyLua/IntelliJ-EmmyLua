@@ -20,6 +20,8 @@ table = {}
 --- `sep` is the empty string, the default for `i` is 1, and the default for
 --- `j` is the length of the table. If `i` is greater than `j`, returns the
 --- empty string.
+---@param optional i number
+---@param optional j number
 function table.concat(t, sep, i, j) return { "", 1 } end
 
 ---
@@ -27,6 +29,7 @@ function table.concat(t, sep, i, j) return { "", 1 } end
 --- other elements to open space, if necessary. The default value for `pos` is
 --- `n+1`, where `n` is the length of the table (see §2.5.5), so that a call
 --- `table.insert(t,x)` inserts `x` at the end of table `t`.
+---@param optional pos number
 function table.insert(t, pos, value) end
 
 ---
@@ -41,6 +44,7 @@ function table.maxn(t) return 0 end
 --- element. The default value for `pos` is `n`, where `n` is the length of the
 --- table, so that a call `table.remove(t)` removes the last element of table
 --- `t`.
+---@param optional pos number
 function table.remove(t, pos) end
 
 ---

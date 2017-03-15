@@ -54,6 +54,7 @@ function dofile(filename) end
 --- `error` function was called. Level 2 points the error to where the function
 --- that called `error` was called; and so on. Passing a level 0 avoids the
 --- addition of error position information to the message.
+---@param optional level number
 function error(message, level) end
 
 ---
@@ -69,6 +70,7 @@ function error(message, level) end
 --- stack level: Level 1 is the function calling `getfenv`. If the given
 --- function is not a Lua function, or if `f` is 0, `getfenv` returns the
 --- global environment. The default for `f` is 1.
+---@param optional f number
 function getfenv(f) end
 
 ---
@@ -94,6 +96,7 @@ function ipairs(t) end
 --- is the global environment.
 --- `chunkname` is used as the chunk name for error messages and debug
 --- information. When absent, it defaults to "`=(load)`".
+---@param optional chunkname string
 function load(func, chunkname) end
 
 ---
@@ -106,6 +109,7 @@ function loadfile(filename) end
 --- To load and run a given string, use the idiom
 --- assert(loadstring(s))()
 --- When absent, `chunkname` defaults to the given string.
+---@param optional chunkname string
 function loadstring(string, chunkname) end
 
 ---
@@ -203,6 +207,7 @@ function setmetatable(table, metatable) end
 --- 11, and so forth, with '`Z`' representing 35. In base 10 (the default),
 --- the number can have a decimal part, as well as an optional exponent part
 --- (see §2.1). In other bases, only unsigned integers are accepted.
+---@param optional base number
 function tonumber(e, base) end
 
 ---
