@@ -128,7 +128,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             if (res != null) { //std api highlighting
                 PsiFile containingFile = res.getContainingFile();
                 PsiDirectory directory = containingFile.getContainingDirectory();
-                if (directory.getName().equals("std")) {
+                if (directory != null && "std".equals(directory.getName())) {
                     Annotation annotation = myHolder.createInfoAnnotation(o, null);
                     annotation.setTextAttributes(LuaHighlightingData.STD);
                     return;
