@@ -109,11 +109,6 @@ public class LuaFileElement implements StructureViewTreeElement {
                     }
 
                     @Override
-                    public void visitGlobalDef(@NotNull LuaDocGlobalDef o) {
-
-                    }
-
-                    @Override
                     public void visitFieldDef(@NotNull LuaDocFieldDef o) {
 
                     }

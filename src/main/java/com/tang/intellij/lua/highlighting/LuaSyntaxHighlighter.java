@@ -65,12 +65,10 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaTypes.TRUE
     );
     public static final TokenSet DOC_KEYWORD_TOKENS = TokenSet.create(
-            LuaDocTypes.TAG_NAME,
             LuaDocTypes.TAG_PARAM,
             LuaDocTypes.TAG_RETURN,
             LuaDocTypes.CLASS,
             LuaDocTypes.TYPE,
-            LuaDocTypes.DEFINE,
             LuaDocTypes.FIELD
     );
 
@@ -110,6 +108,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
         fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT);
         fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION);
         fillMap(ourMap1, DOC_KEYWORD_TOKENS, LuaHighlightingData.DOC_COMMENT_TAG);
+        fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT_TAG, LuaDocTypes.TAG_NAME);
         //primitive types
         fillMap(ourMap1, LuaHighlightingData.NUMBER, LuaTypes.NUMBER);
         fillMap(ourMap1, LuaHighlightingData.STRING, LuaTypes.STRING);

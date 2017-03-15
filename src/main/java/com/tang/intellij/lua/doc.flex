@@ -64,11 +64,9 @@ DOC_DASHES = --+
 
 <xTAG_NAME> {
     "field"                    { yybegin(xTAG); return FIELD; }
-    "define"                   { yybegin(xTAG); return DEFINE; }
     "return"                   { yybegin(xTAG); return TAG_RETURN; }
     "param"                    { yybegin(xTAG); return TAG_PARAM; }
     "class"                    { yybegin(xTAG); return CLASS; }
-    "interface"                { yybegin(xTAG); return INTERFACE; }
     "type"                     { yybegin(xTAG); return TYPE;}
     {ID}                       { yybegin(xTAG); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
