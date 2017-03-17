@@ -104,7 +104,10 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType type) {
-        if (type instanceof LuaDocTokenType)
+        if (ourMap1.containsKey(type))
+            return pack(ourMap1.get(type), ourMap2.get(type));
+        //comment default
+        else if (type instanceof LuaDocTokenType)
             return pack(LuaHighlightingData.DOC_COMMENT);
         //for string
         else if (type == LuaStringTypes.NEXT_LINE)
@@ -115,8 +118,6 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE);
         else if (type == LuaStringTypes.INVALID_NEXT_LINE)
             return pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE);
-        else {
-            return pack(ourMap1.get(type), ourMap2.get(type));
-        }
+        return pack(null);
     }
 }

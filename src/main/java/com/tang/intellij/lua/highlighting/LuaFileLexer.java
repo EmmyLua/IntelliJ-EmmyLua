@@ -36,9 +36,9 @@ class LuaFileLexer extends LayeredLexer {
         super(new LuaLexerAdapter());
 
         LayeredLexer docLexer = new LayeredLexer(new LuaDocLexerAdapter());
-        HtmlHighlightingLexer htmlLexer = new HtmlHighlightingLexer(null);
-        htmlLexer.setHasNoEmbeddments(true);
-        docLexer.registerSelfStoppingLayer(htmlLexer, new IElementType[] {LuaDocTypes.STRING}, IElementType.EMPTY_ARRAY);
+        //HtmlHighlightingLexer htmlLexer = new HtmlHighlightingLexer(null);
+        //htmlLexer.setHasNoEmbeddments(true);
+        //docLexer.registerSelfStoppingLayer(htmlLexer, new IElementType[] {LuaDocTypes.STRING}, IElementType.EMPTY_ARRAY);
         registerSelfStoppingLayer(docLexer, new IElementType[] { LuaElementType.DOC_COMMENT }, IElementType.EMPTY_ARRAY);
 
         registerSelfStoppingLayer(new FlexAdapter(new _LuaStringLexer()), new IElementType[] { LuaTypes.STRING }, IElementType.EMPTY_ARRAY);
