@@ -68,7 +68,7 @@ public class LuaSurroundDescriptor implements SurroundDescriptor {
                 }
                 break;
             }
-            if (parent instanceof PsiCodeBlock) break;
+            //if (parent instanceof PsiCodeBlock) break;
             if (parent instanceof PsiCodeFragment) break;
             if (parent == null || parent instanceof PsiFile)
                 return PsiElement.EMPTY_ARRAY;
@@ -91,10 +91,10 @@ public class LuaSurroundDescriptor implements SurroundDescriptor {
         //if (endOffset != element2.getTextRange().getEndOffset())
         //    return PsiElement.EMPTY_ARRAY;
 
-        if (parent instanceof PsiCodeBlock && parent.getParent() instanceof PsiBlockStatement &&
-                element1 == ((PsiCodeBlock)parent).getLBrace() && element2 == ((PsiCodeBlock)parent).getRBrace()) {
+        /*if (parent instanceof PsiCodeBlock && parent.getParent() instanceof PsiBlockStatement &&
+                element1 == ((PsiCodeBlock) parent).getLBrace() && element2 == ((PsiCodeBlock) parent).getRBrace()) {
             return new PsiElement[]{parent.getParent()};
-        }
+        }*/
 
         PsiElement[] children = parent.getChildren();
         ArrayList<PsiElement> array = new ArrayList<>();
