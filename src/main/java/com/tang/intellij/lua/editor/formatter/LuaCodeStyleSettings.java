@@ -24,7 +24,9 @@ import com.tang.intellij.lua.lang.LuaLanguage;
  * LuaCodeStyleSettings
  * Created by tangzx on 2017/2/22.
  */
-class LuaCodeStyleSettings extends CustomCodeStyleSettings {
+public class LuaCodeStyleSettings extends CustomCodeStyleSettings {
+
+    public boolean SPACE_AFTER_TABLE_FIELD_SEP = true;
 
     LuaCodeStyleSettings(CodeStyleSettings container) {
         super(LuaLanguage.INSTANCE.getID(), container);

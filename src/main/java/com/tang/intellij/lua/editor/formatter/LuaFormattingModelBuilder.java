@@ -48,25 +48,27 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
     }
 
     private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
+        final LuaCodeStyleSettings luaCodeStyleSettings = settings.getCustomSettings(LuaCodeStyleSettings.class);
+
         return new SpacingBuilder(settings, LuaLanguage.INSTANCE)
                 .before(END).lineBreakInCode()
                 .after(DO).lineBreakInCode()
                 .after(THEN).lineBreakInCode()
                 .after(LOCAL).spaces(1) //local<SPACE>
-                .after(COMMA).spaces(1) //,<SPACE>
+                .after(COMMA).spaces(settings.SPACE_AFTER_COMMA ? 1 : 0) //,<SPACE>
                 .between(LCURLY, TABLE_FIELD).spaces(1) // {<SPACE>1, 2 }
                 .between(TABLE_FIELD, RCURLY).spaces(1) // { 1, 2<SPACE>}
-                .after(TABLE_FIELD_SEP).spaces(1) // { 1,<SPACE>2 }
+                .after(TABLE_FIELD_SEP).spaces(luaCodeStyleSettings.SPACE_AFTER_TABLE_FIELD_SEP ? 1 : 0) // { 1,<SPACE>2 }
                 .before(BLOCK).blankLines(0)
                 .afterInside(RPAREN, FUNC_BODY).lineBreakInCode()
                 .between(FUNCTION, FUNC_BODY).none()
                 .between(FUNCTION, NAME_DEF).spaces(1) //function<SPACE>name()
                 .between(VALUE_EXPR, COMMA).lineBreakOrForceSpace(false, false)
-                .around(BINARY_OP).spaces(1)
+                .around(BINARY_OP).spaces(settings.SPACE_AROUND_ASSIGNMENT_OPERATORS ? 1 : 0)
                 .around(UNARY_OP).spaces(1)
-                .around(ASSIGN).lineBreakOrForceSpace(false, true) // = 号两头不能换行
+                .around(ASSIGN).lineBreakOrForceSpace(false, settings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
-                .before(COMMA).spaces(0)
+                .before(COMMA).spaces(settings.SPACE_BEFORE_COMMA ? 1 : 0)
                 .before(SEMI).spaces(0);
     }
 

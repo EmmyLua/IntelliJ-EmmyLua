@@ -51,10 +51,10 @@ public class LuaCodeStyleSettingsProvider extends CodeStyleSettingsProvider {
                 return new TabbedLanguageCodeStylePanel(language, currentSettings, settings) {
                     @Override
                     protected void initTabs(CodeStyleSettings settings) {
-                        addIndentOptionsTab(settings);
+                        //addIndentOptionsTab(settings);
                         addSpacesTab(settings);
-                        addBlankLinesTab(settings);
-                        addWrappingAndBracesTab(settings);
+                        //addBlankLinesTab(settings);
+                        //addWrappingAndBracesTab(settings);
                     }
                 };
             }

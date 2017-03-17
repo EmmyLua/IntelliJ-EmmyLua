@@ -16,10 +16,14 @@
 
 package com.tang.intellij.lua.editor.formatter;
 
+import com.intellij.application.options.CodeStyleAbstractPanel;
 import com.intellij.lang.Language;
+import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable;
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import org.jetbrains.annotations.NotNull;
+
+import static com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_OTHER;
 
 /**
  *
@@ -34,6 +38,16 @@ public class LuaLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSetti
 
     @Override
     public String getCodeSample(@NotNull SettingsType settingsType) {
-        return "local a";
+        return CodeStyleAbstractPanel.readFromFile(this.getClass(), "preview.lua.template");
+    }
+
+    @Override
+    public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
+        if (settingsType == SettingsType.SPACING_SETTINGS) {
+            consumer.showCustomOption(LuaCodeStyleSettings.class, "SPACE_AFTER_TABLE_FIELD_SEP", "After field sep", SPACES_OTHER);
+            consumer.showStandardOptions("SPACE_AROUND_ASSIGNMENT_OPERATORS",
+                    "SPACE_BEFORE_COMMA",
+                    "SPACE_AFTER_COMMA");
+        }
     }
 }

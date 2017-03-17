@@ -1,0 +1,15 @@
+local var = 1 -- a short comment
+--- doc comment
+--- @param par1 Par1Type @some strings
+function var:fun(par1, par2)
+   print('hello')
+   return self.len + 2
+end
+
+function globalFun()
+   return "string" .. var
+end
+
+globalVar = {
+   property = value
+}
