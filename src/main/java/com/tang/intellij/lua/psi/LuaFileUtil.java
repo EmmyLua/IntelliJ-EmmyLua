@@ -26,6 +26,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.util.SmartList;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -48,6 +49,21 @@ public class LuaFileUtil {
             }
         }
         return null;
+    }
+
+    public static VirtualFile[] getPackages(Project project, String shortUrl) {
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        SmartList<VirtualFile> list = new SmartList<>();
+        for (Module module : modules) {
+            String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
+            for (String sourceRoot : sourceRoots) {
+                VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + shortUrl);
+                if (file != null) {
+                    list.add(file);
+                }
+            }
+        }
+        return list.toArray(new VirtualFile[list.size()]);
     }
 
     public static String getShortUrl(Project project, VirtualFile file) {

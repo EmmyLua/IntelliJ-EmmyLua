@@ -21,16 +21,17 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
-import com.intellij.psi.JavaPsiFacade;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiPackage;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.psi.PsiManager;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaString;
 import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -58,29 +59,27 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
 
             completionResultSet = completionResultSet.withPrefixMatcher(postfix);
 
+            Project project = file.getProject();
             // add packages / files
-            JavaPsiFacade facade = JavaPsiFacade.getInstance(file.getProject());
-            PsiPackage psiPackage = facade.findPackage(prefixPackage);
-            if (psiPackage != null) {
-                PsiPackage[] subPackages = psiPackage.getSubPackages();
-                for (PsiPackage subPackage : subPackages) {
-                    String packageName = subPackage.getName();
-                    if (packageName != null) {
+            VirtualFile[] packages = LuaFileUtil.getPackages(project, prefixPackage.replace('.', '/'));
+            for (VirtualFile dir : packages) {
+                VirtualFile[] children = dir.getChildren();
+                for (VirtualFile child : children) {
+                    if (child.isDirectory()) {
                         LookupElement lookupElement = LookupElementBuilder
-                                .create(packageName)
+                                .create(child.getName())
                                 .withIcon(AllIcons.Nodes.Package)
                                 .withInsertHandler(new PackageInsertHandler());
                         completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 2));
-                    }
-                }
-                PsiFile[] files = psiPackage.getFiles(new ProjectAndLibrariesScope(file.getProject()));
-                for (PsiFile psiFile : files) {
-                    if (psiFile instanceof LuaFile) {
-                        String fileName = FileUtil.getNameWithoutExtension(psiFile.getName());
-                        LookupElement lookupElement = LookupElementBuilder
-                                .create(fileName)
-                                .withIcon(LuaIcons.FILE);
-                        completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
+                    } else {
+                        PsiFile psiFile = PsiManager.getInstance(project).findFile(child);
+                        if (psiFile instanceof LuaFile) {
+                            String fileName = FileUtil.getNameWithoutExtension(psiFile.getName());
+                            LookupElement lookupElement = LookupElementBuilder
+                                    .create(fileName)
+                                    .withIcon(LuaIcons.FILE);
+                            completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
+                        }
                     }
                 }
             }
