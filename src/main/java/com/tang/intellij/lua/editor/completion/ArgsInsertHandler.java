@@ -21,9 +21,7 @@ import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
-import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TextExpression;
-import com.intellij.codeInsight.template.macro.SuggestVariableNameMacro;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.tree.IElementType;
@@ -72,7 +70,6 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
         template.addTextSegment("(");
 
         boolean isFirst = true;
-        MacroCallNode name = new MacroCallNode(new SuggestVariableNameMacro());
 
         for (int i = 0; i < paramNameDefList.length; i++) {
             if ((mask & (1 << i)) == 0) continue;
@@ -80,7 +77,7 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
             LuaParamInfo paramNameDef = paramNameDefList[i];
             if (!isFirst)
                 template.addTextSegment(", ");
-            template.addVariable(paramNameDef.getName(), name, new TextExpression(paramNameDef.getName()), false);
+            template.addVariable(paramNameDef.getName(), new TextExpression(paramNameDef.getName()), new TextExpression(paramNameDef.getName()), true);
             isFirst = false;
         }
         template.addTextSegment(")");

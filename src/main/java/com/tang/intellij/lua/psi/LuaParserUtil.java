@@ -21,7 +21,7 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.WhitespacesAndCommentsBinder;
 import com.intellij.lang.WhitespacesBinders;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
-import com.intellij.psi.impl.source.tree.ElementType;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
@@ -103,7 +103,7 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
     public static boolean lazyBlock(PsiBuilder builder_, int level_) {
         int i = 0;
         IElementType begin=  builder_.rawLookup(--i);
-        while (begin == ElementType.WHITE_SPACE)
+        while (begin == TokenType.WHITE_SPACE)
             begin = builder_.rawLookup(--i);
 
         if (begin != null) {

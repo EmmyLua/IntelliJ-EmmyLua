@@ -21,7 +21,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.impl.source.tree.ElementType;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.util.ProcessingContext;
@@ -49,7 +49,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
     // 在 @ 之后提示 param class type ...
     private static final PsiElementPattern.Capture<PsiElement> SHOW_DOC_TAG = psiElement().afterLeaf(
             psiElement().withText("@")
-                    .afterSiblingSkipping(psiElement().withElementType(ElementType.WHITE_SPACE), psiElement().withElementType(LuaDocTypes.DASHES))
+                    .afterSiblingSkipping(psiElement().withElementType(TokenType.WHITE_SPACE), psiElement().withElementType(LuaDocTypes.DASHES))
     );
 
     // 在 @param 之后提示方法的参数

@@ -16,14 +16,13 @@
 
 package com.tang.intellij.lua.highlighting;
 
-import com.intellij.ide.highlighter.JavaHighlightingColors;
 import com.intellij.lexer.Lexer;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.StringEscapesTokenTypes;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.psi.xml.XmlTokenType;
 import com.tang.intellij.lua.comment.psi.LuaDocTokenType;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.psi.LuaStringTypes;
@@ -79,25 +78,6 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
         ourMap1 = new HashMap<>();
         ourMap2 = new HashMap<>();
 
-        ourMap1.put(XmlTokenType.XML_DATA_CHARACTERS, JavaHighlightingColors.DOC_COMMENT);
-        ourMap1.put(XmlTokenType.XML_REAL_WHITE_SPACE, JavaHighlightingColors.DOC_COMMENT);
-        ourMap1.put(XmlTokenType.TAG_WHITE_SPACE, JavaHighlightingColors.DOC_COMMENT);
-
-        ourMap1.put(StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN, JavaHighlightingColors.VALID_STRING_ESCAPE);
-        ourMap1.put(StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN, JavaHighlightingColors.INVALID_STRING_ESCAPE);
-        ourMap1.put(StringEscapesTokenTypes.INVALID_UNICODE_ESCAPE_TOKEN, JavaHighlightingColors.INVALID_STRING_ESCAPE);
-
-        IElementType[] javaDocMarkup = {
-                XmlTokenType.XML_START_TAG_START, XmlTokenType.XML_END_TAG_START, XmlTokenType.XML_TAG_END, XmlTokenType.XML_EMPTY_ELEMENT_END,
-                XmlTokenType.TAG_WHITE_SPACE, XmlTokenType.XML_TAG_NAME, XmlTokenType.XML_NAME, XmlTokenType.XML_ATTRIBUTE_VALUE_TOKEN,
-                XmlTokenType.XML_ATTRIBUTE_VALUE_START_DELIMITER, XmlTokenType.XML_ATTRIBUTE_VALUE_END_DELIMITER, XmlTokenType.XML_CHAR_ENTITY_REF,
-                XmlTokenType.XML_EQ
-        };
-        for (IElementType idx : javaDocMarkup) {
-            ourMap1.put(idx, JavaHighlightingColors.DOC_COMMENT);
-            ourMap2.put(idx, JavaHighlightingColors.DOC_COMMENT_MARKUP);
-        }
-
         //key words
         fillMap(ourMap1, KEYWORD_TOKENS, LuaHighlightingData.KEYWORD);
         fillMap(ourMap1, LuaHighlightingData.KEYWORD, LuaTypes.SEMI, LuaTypes.COMMA);
@@ -128,13 +108,13 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             return pack(LuaHighlightingData.DOC_COMMENT);
         //for string
         else if (type == LuaStringTypes.NEXT_LINE)
-            return pack(JavaHighlightingColors.VALID_STRING_ESCAPE);
+            return pack(DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE);
         else if (type == StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN)
-            return pack(JavaHighlightingColors.VALID_STRING_ESCAPE);
+            return pack(DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE);
         else if (type == StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN)
-            return pack(JavaHighlightingColors.INVALID_STRING_ESCAPE);
+            return pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE);
         else if (type == LuaStringTypes.INVALID_NEXT_LINE)
-            return pack(JavaHighlightingColors.INVALID_STRING_ESCAPE);
+            return pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE);
         else {
             return pack(ourMap1.get(type), ourMap2.get(type));
         }

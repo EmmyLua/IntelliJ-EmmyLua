@@ -17,7 +17,10 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
@@ -288,24 +291,13 @@ public class LuaPsiResolveUtil {
     public static LuaFile resolveRequireFile(String pathString, Project project) {
         if (pathString == null)
             return null;
-        pathString = pathString.replace('/', '.');
-
-        int lastDot = pathString.lastIndexOf('.');
-        String packagePath = "";
-        String fileName = pathString;
-        if (lastDot != -1) {
-            fileName = pathString.substring(lastDot + 1);
-            packagePath = pathString.substring(0, lastDot);
-        }
+        String fileName = pathString.replace('.', '/');
         fileName += ".lua";
-        PsiPackage psiPackage = JavaPsiFacade.getInstance(project).findPackage(packagePath);
-        if (psiPackage != null) {
-            PsiDirectory[] directories = psiPackage.getDirectories();
-            for (PsiDirectory directory : directories) {
-                PsiFile file = directory.findFile(fileName);
-                if (file instanceof LuaFile)
-                    return (LuaFile) file;
-            }
+        VirtualFile f = LuaFileUtil.findFile(project, fileName);
+        if (f != null) {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(f);
+            if (psiFile instanceof LuaFile)
+                return (LuaFile) psiFile;
         }
         return null;
     }
