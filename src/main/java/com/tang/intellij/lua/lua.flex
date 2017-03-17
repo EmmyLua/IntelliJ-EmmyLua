@@ -70,7 +70,7 @@ DOC_COMMENT=----*.*(\n{LINE_WS}*----*.*)*
 
 //Strings
 DOUBLE_QUOTED_STRING=\"([^\\\"]|\\\S|\\[\r\n])*\"?  //\"([^\\\"\r\n]|\\[^\r\n])*\"?
-SINGLE_QUOTED_STRING='([^\']|\\\S|\\[\r\n])*'?      //'([^\\'\r\n]|\\[^\r\n])*'?
+SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 //[[]]
 LONG_STRING=\[=*\[[\s\S]*\]=*\]
 
