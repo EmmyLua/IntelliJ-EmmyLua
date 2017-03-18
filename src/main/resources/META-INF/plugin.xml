@@ -72,6 +72,7 @@
         <codeInsight.parameterNameHints language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterHintsProvider"/>
         <codeInsight.parameterInfo language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterInfoHandler"/>
         <codeInsight.template.postfixTemplateProvider language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.postfix.LuaPostfixTemplateProvider"/>
+        <highlightUsagesHandlerFactory implementation="com.tang.intellij.lua.codeInsight.highlighting.LuaHighlightUsagesHandlerFactory"/>
 
         <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterAfterUnmatchedBraceHandler" />
         <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterInDocHandler"/>
