@@ -42,7 +42,7 @@ public class LuaAutoIndentHandler extends TypedHandlerDelegate {
 
         IElementType type = iterator.getTokenType();
 
-        KeywordInsertHandler.autoIndent(type, file, project, editor.getDocument(), caretModel.getOffset());
+        KeywordInsertHandler.handleInsert(type, file, editor);
 
         return super.charTyped(c, project, editor, file);
     }
