@@ -80,10 +80,12 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
 
         //key words
         fillMap(ourMap1, KEYWORD_TOKENS, LuaHighlightingData.KEYWORD);
-        fillMap(ourMap1, LuaHighlightingData.KEYWORD, LuaTypes.SEMI, LuaTypes.COMMA);
+        fillMap(ourMap1, LuaHighlightingData.SEMICOLON, LuaTypes.SEMI);
+        fillMap(ourMap1, LuaHighlightingData.COMMA, LuaTypes.COMMA);
         fillMap(ourMap1, LuaHighlightingData.OPERATORS, LuaTypes.BINARY_OP, LuaTypes.UNARY_OP);
-        fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaTypes.LBRACK, LuaTypes.LBRACK);
+        fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaTypes.LBRACK, LuaTypes.RBRACK);
         fillMap(ourMap1, LuaHighlightingData.BRACES, LuaTypes.LCURLY, LuaTypes.RCURLY);
+        fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaTypes.LPAREN, LuaTypes.RPAREN);
         //comment
         fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT);
         fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION);

@@ -39,11 +39,17 @@ import java.util.Map;
  */
 public class LuaColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] ourAttributeDescriptors = new AttributesDescriptor[] {
-            new AttributesDescriptor("KeyWords", LuaHighlightingData.KEYWORD),
+            new AttributesDescriptor("Keywords", LuaHighlightingData.KEYWORD),
             new AttributesDescriptor("self", LuaHighlightingData.SELF),
             new AttributesDescriptor("String", LuaHighlightingData.STRING),
+            new AttributesDescriptor("nil/true/false", LuaHighlightingData.PRIMITIVE_TYPE),
             new AttributesDescriptor("Number", LuaHighlightingData.NUMBER),
             new AttributesDescriptor("Operators", LuaHighlightingData.OPERATORS),
+            new AttributesDescriptor("Brackets", LuaHighlightingData.BRACKETS),
+            new AttributesDescriptor("Braces", LuaHighlightingData.BRACES),
+            new AttributesDescriptor("Parentheses", LuaHighlightingData.PARENTHESES),
+            new AttributesDescriptor("Semicolon", LuaHighlightingData.SEMICOLON),
+            new AttributesDescriptor("Comma", LuaHighlightingData.COMMA),
             new AttributesDescriptor("Parameters", LuaHighlightingData.PARAMETER),
             new AttributesDescriptor("Line Comment", LuaHighlightingData.LINE_COMMENT),
             new AttributesDescriptor("Doc Comment", LuaHighlightingData.DOC_COMMENT),
@@ -54,7 +60,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Global Functions", LuaHighlightingData.GLOBAL_FUNCTION),
             new AttributesDescriptor("Table Fields", LuaHighlightingData.TABLE_FIELD),
             new AttributesDescriptor("Up Value", LuaHighlightingData.UP_VALUE),
-            new AttributesDescriptor("Std api", LuaHighlightingData.STD),
+            new AttributesDescriptor("Std api", LuaHighlightingData.STD_API),
     };
 
     @NonNls
@@ -70,7 +76,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
         ourTags.put("tableField", LuaHighlightingData.TABLE_FIELD);
         ourTags.put("localVar", LuaHighlightingData.PARAMETER);
         ourTags.put("upValue", LuaHighlightingData.UP_VALUE);
-        ourTags.put("std", LuaHighlightingData.STD);
+        ourTags.put("std", LuaHighlightingData.STD_API);
     }
 
     @Nullable

@@ -20,93 +20,54 @@ import com.intellij.execution.process.ConsoleHighlighter;
 import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import org.jetbrains.annotations.NonNls;
-
-import static com.intellij.openapi.editor.DefaultLanguageHighlighterColors.LOCAL_VARIABLE;
-import static com.intellij.openapi.editor.DefaultLanguageHighlighterColors.STATIC_FIELD;
 
 /**
  *
  * Created by TangZX on 2016/11/22.
  */
 public class LuaHighlightingData {
-    @NonNls
-    private static final String KEYWORD_ID = "LUA_KEYWORD";
-    @NonNls
-    private static final String LINE_COMMENT_ID = "LUA_LINE_COMMENT";
-    @NonNls
-    private static final String DOC_COMMENT_ID = "LUA_DOC_COMMENT";
-    @NonNls
-    private static final String NUMBER_ID = "LUA_NUMBER";
-    @NonNls
-    private static final String STRING_ID = "LUA_STRING";
-    @NonNls
-    private static final String LONGSTRING_ID = "LUA_LONGSTRING";
-    @NonNls
-    private static final String LONGSTRING_BRACES_ID = "LUA_LONGSTRING_BRACES";
-    @NonNls
-    private static final String BRACES_ID = "LUA_BRACES";
-    @NonNls
-    private static final String BRACKETS_ID = "LUA_BRACKETS";
-    @NonNls
-    private static final String LOCAL_VAR_ID = "LUA_LOCAL_VAR";
-    @NonNls
-    private static final String GLOBAL_VAR_ID = "LUA_GLOBAL_VAR";
-    @NonNls
-    private static final String GLOBAL_FUNCTION_ID = "LUA_GLOBAL_FUNCTION_ID";
-    @NonNls
-    private static final String TABLE_FIELD_ID = "LUA_FIELD";
-    @NonNls
-    private static final String PARAMETER_ID = "LUA_PARAMETER";
-    @NonNls
-    private static final String OPERATORS_ID = "LUA_OPERATORS";
-    @NonNls
-    private static final String LUADOC_TAG_ID = "LUA_LUADOC_TAG";
-    @NonNls
-    private static final String LUADOC_VALUE_ID = "LUA_LUADOC_VALUE";
-    @NonNls
-    private static final String UP_VALUE_ID = "LUA_UP_VALUE";
-
     public static TextAttributesKey DOC_COMMENT_TAG =
-            TextAttributesKey.createTextAttributesKey(LUADOC_TAG_ID, DefaultLanguageHighlighterColors.DOC_COMMENT_TAG);
+            TextAttributesKey.createTextAttributesKey("LUA_DOC_TAG", DefaultLanguageHighlighterColors.DOC_COMMENT_TAG);
     public static TextAttributesKey DOC_COMMENT_TAG_VALUE =
-            TextAttributesKey.createTextAttributesKey(LUADOC_VALUE_ID, DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
+            TextAttributesKey.createTextAttributesKey("LUA_DOC_VALUE", DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE);
     public static final TextAttributesKey LOCAL_VAR =
-            TextAttributesKey.createTextAttributesKey(LOCAL_VAR_ID, LOCAL_VARIABLE);
+            TextAttributesKey.createTextAttributesKey("LUA_LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
     public static final TextAttributesKey PARAMETER =
-            TextAttributesKey.createTextAttributesKey(PARAMETER_ID, CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
+            TextAttributesKey.createTextAttributesKey("LUA_PARAMETER", CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
     public static final TextAttributesKey TABLE_FIELD =
-            TextAttributesKey.createTextAttributesKey(TABLE_FIELD_ID, STATIC_FIELD);
+            TextAttributesKey.createTextAttributesKey("LUA_FIELD", DefaultLanguageHighlighterColors.METADATA);
     public static final TextAttributesKey GLOBAL_FUNCTION =
-            TextAttributesKey.createTextAttributesKey(GLOBAL_FUNCTION_ID, STATIC_FIELD);
+            TextAttributesKey.createTextAttributesKey("LUA_GLOBAL_FUNCTION_ID", DefaultLanguageHighlighterColors.STATIC_FIELD);
     public static final TextAttributesKey GLOBAL_VAR =
-            TextAttributesKey.createTextAttributesKey(GLOBAL_VAR_ID, STATIC_FIELD);
+            TextAttributesKey.createTextAttributesKey("LUA_GLOBAL_VAR", DefaultLanguageHighlighterColors.STATIC_FIELD);
     public static final TextAttributesKey KEYWORD =
-            TextAttributesKey.createTextAttributesKey(KEYWORD_ID, DefaultLanguageHighlighterColors.KEYWORD);
+            TextAttributesKey.createTextAttributesKey("LUA_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
     public static final TextAttributesKey SELF =
-            TextAttributesKey.createTextAttributesKey("SELF", CustomHighlighterColors.CUSTOM_KEYWORD2_ATTRIBUTES);
+            TextAttributesKey.createTextAttributesKey("LUA_SELF", CustomHighlighterColors.CUSTOM_KEYWORD2_ATTRIBUTES);
     public static final TextAttributesKey LINE_COMMENT =
-            TextAttributesKey.createTextAttributesKey(LINE_COMMENT_ID, DefaultLanguageHighlighterColors.LINE_COMMENT);
+            TextAttributesKey.createTextAttributesKey("LUA_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
     public static final TextAttributesKey DOC_COMMENT =
-            TextAttributesKey.createTextAttributesKey(DOC_COMMENT_ID, DefaultLanguageHighlighterColors.DOC_COMMENT);
+            TextAttributesKey.createTextAttributesKey("LUA_DOC_COMMENT", DefaultLanguageHighlighterColors.DOC_COMMENT);
     public static final TextAttributesKey NUMBER =
-            TextAttributesKey.createTextAttributesKey(NUMBER_ID, DefaultLanguageHighlighterColors.NUMBER);
+            TextAttributesKey.createTextAttributesKey("LUA_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
     public static final TextAttributesKey STRING =
-            TextAttributesKey.createTextAttributesKey(STRING_ID, DefaultLanguageHighlighterColors.STRING);
-    public static final TextAttributesKey LONGSTRING =
-            TextAttributesKey.createTextAttributesKey(LONGSTRING_ID, DefaultLanguageHighlighterColors.STRING);
-    public static final TextAttributesKey LONGSTRING_BRACES =
-            TextAttributesKey.createTextAttributesKey(LONGSTRING_BRACES_ID, DefaultLanguageHighlighterColors.STRING);
+            TextAttributesKey.createTextAttributesKey("LUA_STRING", DefaultLanguageHighlighterColors.STRING);
     public static final TextAttributesKey BRACKETS =
-            TextAttributesKey.createTextAttributesKey(BRACKETS_ID, DefaultLanguageHighlighterColors.BRACKETS);
+            TextAttributesKey.createTextAttributesKey("LUA_BRACKETS", DefaultLanguageHighlighterColors.BRACKETS);
     public static final TextAttributesKey BRACES =
-            TextAttributesKey.createTextAttributesKey(BRACES_ID, DefaultLanguageHighlighterColors.BRACES);
+            TextAttributesKey.createTextAttributesKey("LUA_BRACES", DefaultLanguageHighlighterColors.BRACES);
+    public static final TextAttributesKey PARENTHESES =
+            TextAttributesKey.createTextAttributesKey("LUA_PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
     public static final TextAttributesKey OPERATORS =
-            TextAttributesKey.createTextAttributesKey(OPERATORS_ID, DefaultLanguageHighlighterColors.OPERATION_SIGN);
+            TextAttributesKey.createTextAttributesKey("LUA_OPERATORS", DefaultLanguageHighlighterColors.OPERATION_SIGN);
+    public static final TextAttributesKey SEMICOLON =
+            TextAttributesKey.createTextAttributesKey("LUA_SEMICOLON", DefaultLanguageHighlighterColors.SEMICOLON);
+    public static final TextAttributesKey COMMA =
+            TextAttributesKey.createTextAttributesKey("LUA_COMMA", DefaultLanguageHighlighterColors.COMMA);
     public static final TextAttributesKey PRIMITIVE_TYPE =
             TextAttributesKey.createTextAttributesKey("LUA_PRIMITIVE_TYPE", ConsoleHighlighter.CYAN_BRIGHT);
     public static TextAttributesKey UP_VALUE =
-            TextAttributesKey.createTextAttributesKey(UP_VALUE_ID);
-    public static TextAttributesKey STD =
-            TextAttributesKey.createTextAttributesKey("STD");
+            TextAttributesKey.createTextAttributesKey("LUA_UP_VALUE");
+    public static TextAttributesKey STD_API =
+            TextAttributesKey.createTextAttributesKey("LUA_STD_API");
 }
