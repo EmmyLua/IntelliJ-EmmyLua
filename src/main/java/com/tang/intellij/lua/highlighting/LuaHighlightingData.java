@@ -34,7 +34,7 @@ public class LuaHighlightingData {
             TextAttributesKey.createTextAttributesKey("LUA_LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
     public static final TextAttributesKey PARAMETER =
             TextAttributesKey.createTextAttributesKey("LUA_PARAMETER", CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES);
-    public static final TextAttributesKey TABLE_FIELD =
+    public static final TextAttributesKey FIELD =
             TextAttributesKey.createTextAttributesKey("LUA_FIELD", DefaultLanguageHighlighterColors.METADATA);
     public static final TextAttributesKey GLOBAL_FUNCTION =
             TextAttributesKey.createTextAttributesKey("LUA_GLOBAL_FUNCTION_ID", DefaultLanguageHighlighterColors.STATIC_FIELD);

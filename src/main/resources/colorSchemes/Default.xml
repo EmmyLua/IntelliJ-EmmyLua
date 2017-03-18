@@ -7,7 +7,7 @@
             <option name="EFFECT_TYPE" value="1"/>
         </value>
     </option>
-    <option name="STD">
+    <option name="LUA_STD_API">
         <value>
             <option name="FOREGROUND" value="CC542E"/>
             <option name="EFFECT_TYPE" value="2"/>

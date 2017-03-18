@@ -58,7 +58,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Local Variables", LuaHighlightingData.LOCAL_VAR),
             new AttributesDescriptor("Global Variables", LuaHighlightingData.GLOBAL_VAR),
             new AttributesDescriptor("Global Functions", LuaHighlightingData.GLOBAL_FUNCTION),
-            new AttributesDescriptor("Table Fields", LuaHighlightingData.TABLE_FIELD),
+            new AttributesDescriptor("Field", LuaHighlightingData.FIELD),
             new AttributesDescriptor("Up Value", LuaHighlightingData.UP_VALUE),
             new AttributesDescriptor("Std api", LuaHighlightingData.STD_API),
     };
@@ -73,7 +73,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
         ourTags.put("localVar", LuaHighlightingData.LOCAL_VAR);
         ourTags.put("globalVar", LuaHighlightingData.GLOBAL_VAR);
         ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION);
-        ourTags.put("tableField", LuaHighlightingData.TABLE_FIELD);
+        ourTags.put("tableField", LuaHighlightingData.FIELD);
         ourTags.put("localVar", LuaHighlightingData.PARAMETER);
         ourTags.put("upValue", LuaHighlightingData.UP_VALUE);
         ourTags.put("std", LuaHighlightingData.STD_API);

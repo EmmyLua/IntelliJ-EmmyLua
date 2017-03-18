@@ -93,7 +93,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement id = o.getId();
             if (id != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(id, null);
-                annotation.setTextAttributes(LuaHighlightingData.TABLE_FIELD);
+                annotation.setTextAttributes(LuaHighlightingData.FIELD);
             }
         }
 
@@ -169,6 +169,26 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                     annotation.setTextAttributes(LuaHighlightingData.GLOBAL_VAR);
                 }
             }
+        }
+
+        @Override
+        public void visitIndexExpr(@NotNull LuaIndexExpr o) {
+            PsiElement id = o.getId();
+            if (id != null) {
+                Annotation annotation = myHolder.createInfoAnnotation(id, null);
+                annotation.setTextAttributes(LuaHighlightingData.FIELD);
+            }
+            super.visitIndexExpr(o);
+        }
+
+        @Override
+        public void visitCallExpr(@NotNull LuaCallExpr o) {
+            PsiElement id = o.getId();
+            if (id != null) {
+                Annotation annotation = myHolder.createInfoAnnotation(id, null);
+                annotation.setTextAttributes(LuaHighlightingData.FIELD);
+            }
+            super.visitCallExpr(o);
         }
     }
 
