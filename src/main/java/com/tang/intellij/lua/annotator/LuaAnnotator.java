@@ -72,6 +72,22 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         }
 
         @Override
+        public void visitLocalDef(@NotNull LuaLocalDef o) {
+            LuaNameList nameList = o.getNameList();
+            if (nameList != null) {
+                PsiElement child = nameList.getFirstChild();
+                while (child != null) {
+                    if (child instanceof LuaNameDef) {
+                        Annotation annotation = myHolder.createInfoAnnotation(child, null);
+                        annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
+                    }
+                    child = child.getNextSibling();
+                }
+            }
+            super.visitLocalDef(o);
+        }
+
+        @Override
         public void visitTableField(@NotNull LuaTableField o) {
             super.visitTableField(o);
             PsiElement id = o.getId();
