@@ -120,7 +120,7 @@ public class LuaParameterInfoHandler implements ParameterInfoHandler<LuaArgs, Lu
                     sb.append(" : ");
                     for (int j = 0; j < types.length; j++) {
                         if (j > 0) sb.append("|");
-                        sb.append(types[i]);
+                        sb.append(types[j]);
                     }
                 }
 
