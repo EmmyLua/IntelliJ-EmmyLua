@@ -47,6 +47,16 @@ DOC_DASHES = --+
 %state xTAG_NAME
 %state xCOMMENT_STRING
 
+%state xPARAM_NAME
+%state xFIELD_NAME
+
+%state xCLASS_NAME
+%state xCLASS_EXTEND
+%state xCLASS_SUPER
+
+%state xTYPE_SET
+%state xTYPE_OR
+
 %%
 
 <YYINITIAL> {
@@ -63,24 +73,60 @@ DOC_DASHES = --+
 }
 
 <xTAG_NAME> {
-    "field"                    { yybegin(xTAG); return FIELD; }
-    "return"                   { yybegin(xTAG); return TAG_RETURN; }
-    "param"                    { yybegin(xTAG); return TAG_PARAM; }
-    "class"                    { yybegin(xTAG); return CLASS; }
-    "type"                     { yybegin(xTAG); return TYPE;}
+    "field"                    { yybegin(xFIELD_NAME); return FIELD; }
+    "return"                   { yybegin(xTYPE_SET); return TAG_RETURN; }
+    "param"                    { yybegin(xPARAM_NAME); return TAG_PARAM; }
+    "class"                    { yybegin(xCLASS_NAME); return CLASS; }
+    "type"                     { yybegin(xTYPE_SET); return TYPE;}
     {ID}                       { yybegin(xTAG); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 
+<xCLASS_NAME, xCLASS_EXTEND, xCLASS_SUPER, xFIELD_NAME, xPARAM_NAME, xTYPE_SET, xTYPE_OR> {
+    {LINE_WS}+      { return com.intellij.psi.TokenType.WHITE_SPACE; }
+}
+
+<xCLASS_NAME> {
+    {ID}            { yybegin(xCLASS_EXTEND); return ID; }
+}
+<xCLASS_EXTEND> {
+    ":"             { yybegin(xCLASS_SUPER); return EXTENDS;}
+    .               { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
+}
+<xCLASS_SUPER> {
+    {ID}            { yybegin(xCOMMENT_STRING); return ID; }
+    .               { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
+}
+
+<xFIELD_NAME> {
+    "protected"     { return PROTECTED; }
+    "public"        { return PUBLIC; }
+    {ID}            { yybegin(xTYPE_SET); return ID; }
+}
+
+<xPARAM_NAME> {
+    "optional"      { return OPTIONAL; }
+    {ID}            { yybegin(xTYPE_SET); return ID; }
+}
+
+<xTYPE_SET> {
+    {ID}            { yybegin(xTYPE_OR); return ID; }
+}
+
+<xTYPE_OR> {
+    "|"             { yybegin(xTYPE_SET); return OR; }
+    .               { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
+}
+
 <xTAG> {
-    "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
-    ","                        { return COMMA; }
-    "#"                        { return SHARP; }
-    ":"                        { return EXTENDS;}
-    "|"                        { return OR; }
-    "optional"                 { return OPTIONAL; }
-    "protected"                { yybegin(xTAG); return PROTECTED; }
-    "public"                   { yybegin(xTAG); return PUBLIC; }
+    //"@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
+    //","                        { return COMMA; }
+    //"#"                        { return SHARP; }
+    //":"                        { return EXTENDS;}
+    //"|"                        { return OR; }
+    //"optional"                 { return OPTIONAL; }
+    //"protected"                { yybegin(xTAG); return PROTECTED; }
+    //"public"                   { yybegin(xTAG); return PUBLIC; }
     {ID}                       { return ID; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

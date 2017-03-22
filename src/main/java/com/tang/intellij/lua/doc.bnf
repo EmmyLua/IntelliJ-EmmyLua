@@ -62,7 +62,7 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def) comment_string?
 
 //todo : remove # ,
-type_set ::= '#'? class_name_ref ((','|'|')? class_name_ref)*
+type_set ::= '#'? class_name_ref ('|' class_name_ref)*
 access_modifier ::= "protected" | "public"
 
 field_def ::= FIELD access_modifier ID type_set {
@@ -131,4 +131,4 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
 // @type CLASS_REF
 type_def ::= TYPE type_set { pin = 1 methods = [guessType] }
 
-comment_string ::= STRING_BEGIN STRING? { pin = 1 }
+comment_string ::= STRING
