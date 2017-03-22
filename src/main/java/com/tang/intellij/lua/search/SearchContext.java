@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.tang.intellij.lua.lang.GuessTypeKind;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -35,6 +36,7 @@ public class SearchContext {
     private SearchContext parent;
     private int type = -1;
     private Object obj;
+    private int guessTypeKind = GuessTypeKind.Standard;
 
     public SearchContext(Project project) {
         this.project = project;
@@ -46,7 +48,16 @@ public class SearchContext {
         assert type >= 0;
         this.type = type;
         this.obj = o;
+        this.guessTypeKind = parent.guessTypeKind;
         setCurrentStubFile(parent.currentStubFile);
+    }
+
+    public void setGuessTypeKind(int value) {
+        guessTypeKind = value;
+    }
+
+    public boolean isGuessTypeKind(int kind) {
+        return (guessTypeKind & kind) == kind;
     }
 
     public Project getProject() {
