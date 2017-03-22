@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.psi;
 
+import com.intellij.codeInsight.completion.impl.CamelHumpMatcher;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -25,9 +26,11 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.lang.GuessTypeKind;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
@@ -227,6 +230,23 @@ public class LuaPsiResolveUtil {
                 //anonymous
                 if (typeSet == null ||typeSet.isEmpty())
                     typeSet = LuaTypeSet.create(LuaType.createAnonymousType(nameDef));
+
+                if (context.isGuessTypeKind(GuessTypeKind.FromName)) {
+                    String str = nameDef.getText();
+                    if (str.length() > 2) {
+                        final LuaTypeSet set = typeSet;
+                        CamelHumpMatcher matcher = new CamelHumpMatcher(str, false);
+                        LuaClassIndex.getInstance().processAllKeys(context.getProject(), (cls)->{
+                            if (matcher.prefixMatches(cls)) {
+                                LuaType type = LuaType.create(cls, null);
+                                type.setUnreliable(true);
+                                set.addType(type);
+                            }
+                            return true;
+                        });
+                    }
+                }
+
                 return typeSet;
             }
         }

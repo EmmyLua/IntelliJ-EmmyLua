@@ -60,6 +60,8 @@ public class LuaType {
     protected LuaType() {
     }
 
+    // 模糊匹配的结果
+    private boolean isUnreliable;
     String clazzName;
     private String superClassName;
 
@@ -245,6 +247,14 @@ public class LuaType {
                 def = superType.findMethod(methodName, context);
         }
         return def;
+    }
+
+    public boolean isUnreliable() {
+        return isUnreliable;
+    }
+
+    public void setUnreliable(boolean unreliable) {
+        isUnreliable = unreliable;
     }
 
     /*private LuaClassMethodDef findStaticMethod(String methodName, @NotNull SearchContext context) {
