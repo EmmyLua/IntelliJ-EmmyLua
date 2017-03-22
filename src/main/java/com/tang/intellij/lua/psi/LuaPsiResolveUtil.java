@@ -34,6 +34,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -188,24 +189,23 @@ public class LuaPsiResolveUtil {
         return null;
     }
 
+    @Nullable
     static LuaTypeSet resolveType(LuaNameDef nameDef, SearchContext context) {
+        LuaTypeSet typeSet = null;
         //作为函数参数，类型在函数注释里找
         if (nameDef instanceof LuaParamNameDef) {
-            LuaTypeSet typeSet = resolveParamType((LuaParamNameDef) nameDef, context);
-            if (typeSet != null)
-                return typeSet;
+            typeSet = resolveParamType((LuaParamNameDef) nameDef, context);
         }
         //在Table字段里
         else if (nameDef.getParent() instanceof LuaTableField) {
             LuaTableField field = (LuaTableField) nameDef.getParent();
             LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
-            if (expr != null) return expr.guessType(context);
+            if (expr != null) typeSet = expr.guessType(context);
         }
         //变量声明，local x = 0
         else {
             LuaLocalDef localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef.class);
             if (localDef != null) {
-                LuaTypeSet typeSet = null;
                 LuaComment comment = localDef.getComment();
                 if (comment != null) {
                     typeSet = comment.guessType(context);
@@ -230,27 +230,27 @@ public class LuaPsiResolveUtil {
                 //anonymous
                 if (typeSet == null ||typeSet.isEmpty())
                     typeSet = LuaTypeSet.create(LuaType.createAnonymousType(nameDef));
-
-                if (context.isGuessTypeKind(GuessTypeKind.FromName)) {
-                    String str = nameDef.getText();
-                    if (str.length() > 2) {
-                        final LuaTypeSet set = typeSet;
-                        CamelHumpMatcher matcher = new CamelHumpMatcher(str, false);
-                        LuaClassIndex.getInstance().processAllKeys(context.getProject(), (cls)->{
-                            if (matcher.prefixMatches(cls)) {
-                                LuaType type = LuaType.create(cls, null);
-                                type.setUnreliable(true);
-                                set.addType(type);
-                            }
-                            return true;
-                        });
-                    }
-                }
-
-                return typeSet;
             }
         }
-        return null;
+
+        if (typeSet != null) {
+            if (context.isGuessTypeKind(GuessTypeKind.FromName)) {
+                String str = nameDef.getText();
+                if (str.length() > 2) {
+                    final LuaTypeSet set = typeSet;
+                    CamelHumpMatcher matcher = new CamelHumpMatcher(str, false);
+                    LuaClassIndex.getInstance().processAllKeys(context.getProject(), (cls) -> {
+                        if (matcher.prefixMatches(cls)) {
+                            LuaType type = LuaType.create(cls, null);
+                            type.setUnreliable(true);
+                            set.addType(type);
+                        }
+                        return true;
+                    });
+                }
+            }
+        }
+        return typeSet;
     }
 
     /**
@@ -296,7 +296,7 @@ public class LuaPsiResolveUtil {
                             }
                         }
                     }
-                };
+                }
             }
         }
         return null;
