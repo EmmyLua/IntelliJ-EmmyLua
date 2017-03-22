@@ -53,7 +53,11 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
     );
 
     // 在 @param 之后提示方法的参数
-    private static final PsiElementPattern.Capture<PsiElement> AFTER_PARAM =  psiElement().withParent(LuaDocParamNameRef.class);
+    private static final PsiElementPattern.Capture<PsiElement> AFTER_PARAM = psiElement().withParent(LuaDocParamNameRef.class);
+
+    // 在 @param 之后提示 optional
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_OPTIONAL = psiElement().afterLeaf(
+            psiElement(LuaDocTypes.TAG_PARAM));
 
     // 在 extends 之后提示类型
     private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_EXTENDS =  psiElement().withParent(LuaDocClassNameRef.class);
@@ -71,6 +75,13 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                 for (IElementType type : set.getTypes()) {
                     completionResultSet.addElement(LookupElementBuilder.create(type));
                 }
+            }
+        });
+
+        extend(CompletionType.BASIC, SHOW_OPTIONAL, new CompletionProvider<CompletionParameters>() {
+            @Override
+            protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                completionResultSet.addElement(LookupElementBuilder.create("optional"));
             }
         });
 
