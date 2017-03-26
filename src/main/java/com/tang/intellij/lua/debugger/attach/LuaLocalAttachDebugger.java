@@ -31,7 +31,6 @@ public class LuaLocalAttachDebugger implements XLocalAttachDebugger {
     private ProcessInfo processInfo;
 
     LuaLocalAttachDebugger(ProcessInfo processInfo) {
-
         this.processInfo = processInfo;
     }
 
@@ -43,6 +42,6 @@ public class LuaLocalAttachDebugger implements XLocalAttachDebugger {
 
     @Override
     public void attachDebugSession(@NotNull Project project, @NotNull ProcessInfo processInfo) throws ExecutionException {
-
+        new LuaAttachDebugRunner(processInfo).launch();
     }
 }

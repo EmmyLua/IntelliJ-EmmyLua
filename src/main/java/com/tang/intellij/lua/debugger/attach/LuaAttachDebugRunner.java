@@ -1,0 +1,103 @@
+/*
+ * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.tang.intellij.lua.debugger.attach;
+
+import com.intellij.execution.ExecutionException;
+import com.intellij.execution.configurations.RunProfile;
+import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.process.ProcessInfo;
+import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.execution.runners.GenericProgramRunner;
+import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.xdebugger.XDebugProcess;
+import com.intellij.xdebugger.XDebugProcessStarter;
+import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XDebuggerManager;
+import com.tang.intellij.lua.debugger.LuaRunConfiguration;
+import com.tang.intellij.lua.psi.LuaFileUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+/**
+ *
+ * Created by tangzx on 2017/3/26.
+ */
+public class LuaAttachDebugRunner extends GenericProgramRunner {
+    private ProcessInfo processInfo;
+    private String pid;
+    private static final String ID = "luaAttachRunner";
+
+    LuaAttachDebugRunner(ProcessInfo processInfo) {
+        this.processInfo = processInfo;
+        pid = String.valueOf(processInfo.getPid());
+    }
+
+    private XDebugSession createSession(RunProfileState state, ExecutionEnvironment environment) throws ExecutionException {
+        XDebuggerManager manager = XDebuggerManager.getInstance(environment.getProject());
+        return manager.startSession(environment, new XDebugProcessStarter() {
+            @NotNull
+            @Override
+            public XDebugProcess start(@NotNull XDebugSession xDebugSession) throws ExecutionException {
+                return new LuaAttachDebugProcess(xDebugSession);
+            }
+        });
+    }
+
+    @Nullable
+    @Override
+    protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment environment) throws ExecutionException {
+        XDebugSession session = createSession(state, environment);
+        return session.getRunContentDescriptor();
+    }
+
+    XDebugSession launch() {
+        VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
+        if (pluginVirtualDirectory != null) {
+            String exe = pluginVirtualDirectory.getPath() + "/classes/debugger/windows/x64/Debugger.exe";
+            ProcessBuilder processBuilder = new ProcessBuilder(exe);
+            try {
+                Process process = processBuilder.start();
+                OutputStream outputStream = process.getOutputStream();
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+                writer.write(String.valueOf(processInfo.getPid()));
+                writer.write('\n');
+                writer.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public String getRunnerId() {
+        return ID;
+    }
+
+    @Override
+    public boolean canRun(@NotNull String s, @NotNull RunProfile runProfile) {
+        return runProfile instanceof LuaRunConfiguration;
+    }
+}
