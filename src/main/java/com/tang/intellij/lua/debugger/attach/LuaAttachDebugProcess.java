@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.attach;
 
+import com.intellij.execution.process.ProcessInfo;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
@@ -30,10 +31,15 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LuaAttachDebugProcess extends XDebugProcess {
     private LuaDebuggerEditorsProvider editorsProvider;
+    private ProcessInfo processInfo;
+    private LuaAttachBridge bridge;
 
-    protected LuaAttachDebugProcess(@NotNull XDebugSession session) {
+    LuaAttachDebugProcess(@NotNull XDebugSession session, ProcessInfo processInfo) {
         super(session);
+        this.processInfo = processInfo;
         editorsProvider = new LuaDebuggerEditorsProvider();
+        bridge = new LuaAttachBridge(processInfo);
+        bridge.start();
     }
 
     @NotNull
@@ -50,5 +56,10 @@ public class LuaAttachDebugProcess extends XDebugProcess {
     @Override
     public void startStepInto(@Nullable XSuspendContext context) {
         super.startStepInto(context);
+    }
+
+    @Override
+    public void stop() {
+        bridge.stop();
     }
 }

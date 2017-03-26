@@ -19,6 +19,10 @@ package com.tang.intellij.lua.debugger.attach;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.project.Project;
+import com.intellij.xdebugger.XDebugProcess;
+import com.intellij.xdebugger.XDebugProcessStarter;
+import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XDebuggerManager;
 import com.intellij.xdebugger.attach.XLocalAttachDebugger;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,6 +46,12 @@ public class LuaLocalAttachDebugger implements XLocalAttachDebugger {
 
     @Override
     public void attachDebugSession(@NotNull Project project, @NotNull ProcessInfo processInfo) throws ExecutionException {
-        new LuaAttachDebugRunner(processInfo).launch();
+        XDebuggerManager.getInstance(project).startSessionAndShowTab(String.valueOf(processInfo.getPid()), null, new XDebugProcessStarter() {
+            @NotNull
+            @Override
+            public XDebugProcess start(@NotNull XDebugSession xDebugSession) throws ExecutionException {
+                return new LuaAttachDebugProcess(xDebugSession, processInfo);
+            }
+        });
     }
 }

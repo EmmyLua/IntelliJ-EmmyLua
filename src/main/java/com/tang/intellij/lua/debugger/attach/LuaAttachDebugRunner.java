@@ -52,7 +52,7 @@ public class LuaAttachDebugRunner extends GenericProgramRunner {
         pid = String.valueOf(processInfo.getPid());
     }
 
-    private XDebugSession createSession(RunProfileState state, ExecutionEnvironment environment) throws ExecutionException {
+    /*private XDebugSession createSession(RunProfileState state, ExecutionEnvironment environment) throws ExecutionException {
         XDebuggerManager manager = XDebuggerManager.getInstance(environment.getProject());
         return manager.startSession(environment, new XDebugProcessStarter() {
             @NotNull
@@ -68,7 +68,7 @@ public class LuaAttachDebugRunner extends GenericProgramRunner {
     protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment environment) throws ExecutionException {
         XDebugSession session = createSession(state, environment);
         return session.getRunContentDescriptor();
-    }
+    }*/
 
     XDebugSession launch() {
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
