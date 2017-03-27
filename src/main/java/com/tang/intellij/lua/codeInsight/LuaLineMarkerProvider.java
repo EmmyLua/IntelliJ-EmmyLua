@@ -22,8 +22,10 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaClassMethodName;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
@@ -38,8 +40,9 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
 
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, Collection<? super RelatedItemLineMarkerInfo> result) {
-        if (element instanceof LuaClassMethodDef) {
-            LuaClassMethodDef methodDef = (LuaClassMethodDef) element;
+        if (element instanceof LuaClassMethodName) {
+            LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(element, LuaClassMethodDef.class);
+            assert methodDef != null;
             Project project = methodDef.getProject();
             SearchContext context = new SearchContext(project);
             LuaType type = methodDef.getClassType(context);
