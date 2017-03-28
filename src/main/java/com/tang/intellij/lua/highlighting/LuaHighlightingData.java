@@ -70,4 +70,8 @@ public class LuaHighlightingData {
             TextAttributesKey.createTextAttributesKey("LUA_UP_VALUE");
     public static TextAttributesKey STD_API =
             TextAttributesKey.createTextAttributesKey("LUA_STD_API");
+    public static final TextAttributesKey INSTANCE_METHOD =
+            TextAttributesKey.createTextAttributesKey("LUA_INSTANCE_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD);
+    public static final TextAttributesKey STATIC_METHOD =
+            TextAttributesKey.createTextAttributesKey("LUA_STATIC_METHOD", DefaultLanguageHighlighterColors.STATIC_METHOD);
 }

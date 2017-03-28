@@ -279,7 +279,15 @@ args ::=  '(' (arg_expr_list)? ')' | tableConstructor | STRING { pin(".*") = 1 }
 private callExpr1 ::= args
 private callExpr2 ::= '.' ID args
 private callExpr3 ::= ':' ID args { pin = 1 }
-left callExpr ::= callExpr1 | callExpr2 | callExpr3 { methods = [guessPrefixType resolveFuncBodyOwner getFirstStringArg] implements = "com.tang.intellij.lua.psi.LuaPsiStatement" }
+left callExpr ::= callExpr1 | callExpr2 | callExpr3 {
+    methods = [
+        guessPrefixType
+        resolveFuncBodyOwner
+        getFirstStringArg
+        colon = "COLON"
+    ]
+    implements = "com.tang.intellij.lua.psi.LuaPsiStatement"
+}
 
 private suffixExpr ::=  callExpr | indexExpr
 private prefixExpr ::= parenExpr | nameRef

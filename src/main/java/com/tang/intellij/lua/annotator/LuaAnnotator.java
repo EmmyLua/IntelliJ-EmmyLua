@@ -109,7 +109,11 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         @Override
         public void visitClassMethodName(@NotNull LuaClassMethodName o) {
             Annotation annotation = myHolder.createInfoAnnotation(o.getId(), null);
-            annotation.setTextAttributes(DefaultLanguageHighlighterColors.INSTANCE_METHOD);
+            if (o.getDot() != null) {
+                annotation.setTextAttributes(LuaHighlightingData.STATIC_METHOD);
+            } else {
+                annotation.setTextAttributes(LuaHighlightingData.INSTANCE_METHOD);
+            }
         }
 
         @Override
@@ -186,7 +190,11 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement id = o.getId();
             if (id != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(id, null);
-                annotation.setTextAttributes(LuaHighlightingData.FIELD);
+                if (o.getColon() != null) {
+                    annotation.setTextAttributes(LuaHighlightingData.INSTANCE_METHOD);
+                } else {
+                    annotation.setTextAttributes(LuaHighlightingData.STATIC_METHOD);
+                }
             }
             super.visitCallExpr(o);
         }

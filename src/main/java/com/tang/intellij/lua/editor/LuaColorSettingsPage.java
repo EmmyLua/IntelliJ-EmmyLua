@@ -61,6 +61,8 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
             new AttributesDescriptor("Field", LuaHighlightingData.FIELD),
             new AttributesDescriptor("Up Value", LuaHighlightingData.UP_VALUE),
             new AttributesDescriptor("Std api", LuaHighlightingData.STD_API),
+            new AttributesDescriptor("Instance Methods", LuaHighlightingData.INSTANCE_METHOD),
+            new AttributesDescriptor("Static Methods", LuaHighlightingData.STATIC_METHOD),
     };
 
     @NonNls
