@@ -185,4 +185,13 @@
         </action>
     </actions>
 
+    <extensionPoints>
+        <extensionPoint qualifiedName="com.tang.intellij.lua.luaClassInheritorsSearch" interface="com.intellij.util.QueryExecutor"/>
+        <extensionPoint qualifiedName="com.tang.intellij.lua.luaAllClassesSearch" interface="com.intellij.util.QueryExecutor"/>
+    </extensionPoints>
+
+    <extensions defaultExtensionNs="com.tang.intellij.lua">
+        <luaClassInheritorsSearch implementation="com.tang.intellij.lua.psi.search.LuaClassInheritorsSearchExecutor"/>
+        <luaAllClassesSearch implementation="com.tang.intellij.lua.psi.search.LuaAllClassesSearchExecutor"/>
+    </extensions>
 </idea-plugin>
