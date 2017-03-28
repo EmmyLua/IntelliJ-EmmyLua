@@ -45,7 +45,7 @@ public class LuaLocalPostfixTemplate extends StringBasedPostfixTemplate {
     @Override
     public void setVariables(@NotNull Template template, @NotNull PsiElement element) {
         super.setVariables(template, element);
-        template.addVariable("inst", new TextExpression("test"), true);
+        template.addVariable("inst", new TextExpression("inst"), true);
     }
 
     @Override
