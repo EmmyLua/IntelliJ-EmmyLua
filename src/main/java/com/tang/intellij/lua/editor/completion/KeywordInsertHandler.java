@@ -19,9 +19,7 @@ package com.tang.intellij.lua.editor.completion;
 import com.intellij.codeInsight.completion.InsertHandler;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -30,7 +28,6 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.psi.LuaIndentRange;
-import com.tang.intellij.lua.psi.LuaTypes;
 
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
@@ -48,16 +45,10 @@ public class KeywordInsertHandler implements InsertHandler<LookupElement> {
     @Override
     public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
         PsiFile file = insertionContext.getFile();
-        handleInsert(keyWordToken, file, insertionContext.getEditor());
-    }
-
-    public static void handleInsert(IElementType type, PsiFile file, Editor editor) {
-        CaretModel caretModel = editor.getCaretModel();
-        if (type == LuaTypes.THEN || type == LuaTypes.DO) {
-            editor.getDocument().insertString(caretModel.getOffset(), " end");
-        } else {
-            autoIndent(type, file, file.getProject(), editor.getDocument(), caretModel.getOffset());
-        }
+        Project project = insertionContext.getProject();
+        Document document = insertionContext.getDocument();
+        int offset = insertionContext.getStartOffset();
+        autoIndent(keyWordToken, file, project, document, offset);
     }
 
     public static void autoIndent(IElementType keyWordToken, PsiFile file, Project project, Document document, int offset) {
