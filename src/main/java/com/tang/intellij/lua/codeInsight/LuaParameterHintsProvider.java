@@ -16,9 +16,9 @@
 
 package com.tang.intellij.lua.codeInsight;
 
+import com.intellij.codeInsight.hints.HintInfo;
 import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider;
-import com.intellij.codeInsight.hints.MethodInfo;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.psi.*;
@@ -66,20 +66,14 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
 
     @Nullable
     @Override
-    public MethodInfo getMethodInfo(PsiElement psiElement) {
-        if (psiElement instanceof LuaCallExpr) {
-            List<String> list = new ArrayList<>();
-            return new MethodInfo("MethodInfo", list);
-        }
+    public HintInfo getHintInfo(PsiElement psiElement) {
         return null;
     }
 
     @NotNull
     @Override
     public Set<String> getDefaultBlackList() {
-        Set<String> stringSet = new HashSet<>();
-        stringSet.add("test");
-        return stringSet;
+        return new HashSet<>();
     }
 
     @Nullable

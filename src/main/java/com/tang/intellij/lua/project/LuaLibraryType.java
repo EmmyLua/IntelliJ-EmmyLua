@@ -20,7 +20,6 @@ import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.libraries.DummyLibraryProperties;
-import com.intellij.openapi.roots.libraries.LibraryProperties;
 import com.intellij.openapi.roots.libraries.LibraryType;
 import com.intellij.openapi.roots.libraries.NewLibraryConfiguration;
 import com.intellij.openapi.roots.libraries.ui.LibraryEditorComponent;
@@ -58,7 +57,7 @@ public class LuaLibraryType extends LibraryType<DummyLibraryProperties> {
 
     @Nullable
     @Override
-    public Icon getIcon(@Nullable LibraryProperties properties) {
+    public Icon getIcon(@Nullable DummyLibraryProperties properties) {
         return LuaIcons.FILE;
     }
 
