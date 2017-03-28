@@ -20,7 +20,6 @@ import com.intellij.codeInsight.highlighting.HighlightUsagesHandlerBase;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Consumer;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
@@ -34,10 +33,12 @@ import java.util.List;
  */
 public class LuaHighlightExitPointsHandler extends HighlightUsagesHandlerBase<PsiElement> {
     private LuaReturnStat target;
+    private LuaFuncBody funcBody;
 
-    LuaHighlightExitPointsHandler(@NotNull Editor editor, @NotNull PsiFile file, LuaReturnStat psiElement) {
+    LuaHighlightExitPointsHandler(@NotNull Editor editor, @NotNull PsiFile file, @NotNull LuaReturnStat psiElement, @NotNull LuaFuncBody funcBody) {
         super(editor, file);
         target = psiElement;
+        this.funcBody = funcBody;
     }
 
     @Override
@@ -52,9 +53,8 @@ public class LuaHighlightExitPointsHandler extends HighlightUsagesHandlerBase<Ps
 
     @Override
     public void computeUsages(List<PsiElement> list) {
-        LuaFuncBody body = PsiTreeUtil.getParentOfType(target, LuaFuncBody.class);
-        if (body != null) {
-            body.acceptChildren(new LuaVisitor() {
+        if (funcBody != null) {
+            funcBody.acceptChildren(new LuaVisitor() {
                 @Override
                 public void visitReturnStat(@NotNull LuaReturnStat o) {
                     addOccurrence(o);

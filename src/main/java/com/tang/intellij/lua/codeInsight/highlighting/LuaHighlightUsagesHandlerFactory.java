@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.psi.LuaFuncBody;
 import com.tang.intellij.lua.psi.LuaReturnStat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,10 @@ public class LuaHighlightUsagesHandlerFactory extends HighlightUsagesHandlerFact
                                                                    @NotNull PsiElement psiElement) {
         LuaReturnStat returnStat = PsiTreeUtil.getParentOfType(psiElement, LuaReturnStat.class);
         if (returnStat != null) {
-            return new LuaHighlightExitPointsHandler(editor, psiFile, returnStat);
+            LuaFuncBody funcBody = PsiTreeUtil.getParentOfType(returnStat, LuaFuncBody.class);
+            if (funcBody != null) {
+                return new LuaHighlightExitPointsHandler(editor, psiFile, returnStat, funcBody);
+            }
         }
         return null;
     }
