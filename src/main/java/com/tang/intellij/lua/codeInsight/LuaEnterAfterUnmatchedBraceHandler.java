@@ -30,7 +30,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.editor.completion.KeywordInsertHandler;
 import com.tang.intellij.lua.psi.LuaIndentRange;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
@@ -62,46 +62,37 @@ public class LuaEnterAfterUnmatchedBraceHandler implements EnterHandlerDelegate 
         PsiElement element = psiFile.findElementAt(caretOffset - 1);
         if (element != null) {
             boolean needAddEnd = false;
-            PsiElement range = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset, LuaIndentRange.class, false);
+            PsiElement range = null;
             PsiElement cur = element;
             while (true) {
                 PsiElement searched = cur.getParent();
-                if (searched == null || searched instanceof PsiFile)
-                    break;
+                if (searched == null || searched instanceof PsiFile) break;
                 if (searched instanceof LuaIndentRange) {
                     IElementType endType = getEnd(searched.getNode().getElementType());
                     PsiElement lastChild = searched.getLastChild();
                     if (lastChild.getNode().getElementType() != endType) {
                         needAddEnd = true;
+                        range = searched;
                         break;
                     }
                 }
                 cur = searched;
             }
 
-            if (range != null) {
+            if (needAddEnd) {
                 IElementType endType = getEnd(range.getNode().getElementType());
                 Document document = editor.getDocument();
-                boolean oneLine = false;
+                document.insertString(caretOffset, "\n" + endType.toString());
+                Project project = element.getProject();
+
                 final TextRange textRange = range.getTextRange();
-
-                if (needAddEnd) {
-                    document.insertString(caretOffset, "\n" + endType.toString());
-                } else {
-                    oneLine = !range.textContains('\n');
-                    if (oneLine) {
-                        document.insertString(caretOffset, "\n");
-                    }
-                }
-                if (needAddEnd || oneLine) {
-                    Project project = element.getProject();
-
-                    PsiDocumentManager.getInstance(project).commitDocument(document);
-                    ApplicationManager.getApplication().runWriteAction(() -> {
-                        CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
-                        styleManager.adjustLineIndent(psiFile, textRange);
-                    });
-                }
+                PsiDocumentManager.getInstance(project).commitDocument(document);
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
+                    styleManager.adjustLineIndent(psiFile, textRange);
+                    KeywordInsertHandler.autoIndent(endType, psiFile, project, document, caretOffset);
+                });
+                return Result.Stop;
             }
         }
 
