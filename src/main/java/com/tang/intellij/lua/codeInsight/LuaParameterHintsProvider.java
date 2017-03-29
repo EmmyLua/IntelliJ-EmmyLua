@@ -62,12 +62,15 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                 if (luaExprList != null) {
                     List<LuaExpr> exprList = luaExprList.getExprList();
                     int paramIndex = 0;
-                    for (int i = 0; i < exprList.size() && paramIndex < parameters.size(); i++) {
-                        LuaExpr expr = exprList.get(i);
-                        if (i == 0 && isInstanceMethodUsedAsStaticMethod)
-                            list.add(new InlayInfo("self", expr.getTextOffset()));
-                        else
-                            list.add(new InlayInfo(parameters.get(paramIndex++).getName(), expr.getTextOffset()));
+                    int paramCount = parameters.size();
+                    int argIndex = 0;
+                    if (isInstanceMethodUsedAsStaticMethod && exprList.size() > 0) {
+                        LuaExpr expr = exprList.get(argIndex++);
+                        list.add(new InlayInfo("self", expr.getTextOffset()));
+                    }
+                    for (; argIndex < exprList.size() && paramIndex < paramCount; argIndex++) {
+                        LuaExpr expr = exprList.get(argIndex);
+                        list.add(new InlayInfo(parameters.get(paramIndex++).getName(), expr.getTextOffset()));
                     }
                 }
             }
