@@ -20,7 +20,6 @@ import com.intellij.openapi.application.QueryExecutorBase;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.util.Processor;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,21 +29,20 @@ import java.util.Collection;
  * LuaClassInheritorsSearchExecutor
  * Created by tangzx on 2017/3/28.
  */
-public class LuaClassInheritorsSearchExecutor extends QueryExecutorBase<LuaType, LuaClassInheritorsSearch.SearchParameters> {
+public class LuaClassInheritorsSearchExecutor extends QueryExecutorBase<LuaDocClassDef, LuaClassInheritorsSearch.SearchParameters> {
 
     @Override
-    public void processQuery(@NotNull LuaClassInheritorsSearch.SearchParameters searchParameters, @NotNull Processor<LuaType> processor) {
+    public void processQuery(@NotNull LuaClassInheritorsSearch.SearchParameters searchParameters, @NotNull Processor<LuaDocClassDef> processor) {
         DumbService.getInstance(searchParameters.getProject()).runReadActionInSmartMode(() -> {
             processInheritors(searchParameters, processor);
         });
     }
 
-    private boolean processInheritors(LuaClassInheritorsSearch.SearchParameters searchParameters, Processor<LuaType> processor) {
+    private boolean processInheritors(LuaClassInheritorsSearch.SearchParameters searchParameters, Processor<LuaDocClassDef> processor) {
         String typeName = searchParameters.getTypeName();
         Collection<LuaDocClassDef> classDefs = LuaSuperClassIndex.getInstance().get(typeName, searchParameters.getProject(), searchParameters.getSearchScope());
         for (LuaDocClassDef classDef : classDefs) {
-            LuaType classType = classDef.getClassType();
-            if (!processor.process(classType))
+            if (!processor.process(classDef))
                 return false;
         }
         return true;

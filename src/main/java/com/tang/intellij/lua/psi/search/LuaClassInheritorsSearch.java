@@ -18,17 +18,16 @@ package com.tang.intellij.lua.psi.search;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.searches.ExtensibleQueryFactory;
 import com.intellij.util.Query;
-import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import org.jetbrains.annotations.NotNull;
 
 /**
  *
  * Created by tangzx on 2017/3/28.
  */
-public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaType, LuaClassInheritorsSearch.SearchParameters> {
+public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaDocClassDef, LuaClassInheritorsSearch.SearchParameters> {
 
     private static LuaClassInheritorsSearch INSTANCE = new LuaClassInheritorsSearch();
 
@@ -62,7 +61,7 @@ public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaType, Lu
         super("com.tang.intellij.lua");
     }
 
-    public static Query<LuaType> search(@NotNull GlobalSearchScope searchScope, @NotNull Project project, final String typeName) {
+    public static Query<LuaDocClassDef> search(@NotNull GlobalSearchScope searchScope, @NotNull Project project, final String typeName) {
         SearchParameters parameters = new SearchParameters(searchScope, project, typeName);
         return INSTANCE.createUniqueResultsQuery(parameters);
     }

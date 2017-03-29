@@ -75,11 +75,11 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
             LuaDocClassDef docClassDef = (LuaDocClassDef) element;
             LuaType classType = docClassDef.getClassType();
             Project project = element.getProject();
-            Query<LuaType> query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.getClassName());
-            LuaType first = query.findFirst();
-            if (first != null) {
+            Query<LuaDocClassDef> query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.getClassName());
+            Collection<LuaDocClassDef> all = query.findAll();
+            if (!all.isEmpty()) {
                 NavigationGutterIconBuilder<PsiElement> builder =
-                        NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridenMethod);
+                        NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridenMethod).setTargets(all);
                 result.add(builder.createLineMarkerInfo(docClassDef));
             }
         }
