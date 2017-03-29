@@ -36,12 +36,14 @@ public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaDocClass
         private GlobalSearchScope searchScope;
         private Project project;
         private String typeName;
+        private boolean deep;
 
-        SearchParameters(GlobalSearchScope searchScope, Project project, String typeName) {
+        SearchParameters(GlobalSearchScope searchScope, Project project, String typeName, boolean deep) {
             this.searchScope = searchScope;
             this.project = project;
 
             this.typeName = typeName;
+            this.deep = deep;
         }
 
         public String getTypeName() {
@@ -55,6 +57,10 @@ public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaDocClass
         public Project getProject() {
             return project;
         }
+
+        public boolean isDeep() {
+            return deep;
+        }
     }
 
     private LuaClassInheritorsSearch() {
@@ -62,7 +68,11 @@ public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaDocClass
     }
 
     public static Query<LuaDocClassDef> search(@NotNull GlobalSearchScope searchScope, @NotNull Project project, final String typeName) {
-        SearchParameters parameters = new SearchParameters(searchScope, project, typeName);
+        return search(searchScope, project, typeName, true);
+    }
+
+    public static Query<LuaDocClassDef> search(@NotNull GlobalSearchScope searchScope, @NotNull Project project, final String typeName, boolean deep) {
+        SearchParameters parameters = new SearchParameters(searchScope, project, typeName, deep);
         return INSTANCE.createUniqueResultsQuery(parameters);
     }
 }

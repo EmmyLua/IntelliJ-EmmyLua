@@ -31,14 +31,20 @@ public class LuaOverridingMethodsSearch extends ExtensibleQueryFactory<LuaClassM
     static class SearchParameters {
 
         private LuaClassMethodDef method;
+        private boolean deep;
 
-        SearchParameters(LuaClassMethodDef methodDef) {
+        SearchParameters(LuaClassMethodDef methodDef, boolean deep) {
 
             method = methodDef;
+            this.deep = deep;
         }
 
         public LuaClassMethodDef getMethod() {
             return method;
+        }
+
+        public boolean isDeep() {
+            return deep;
         }
     }
 
@@ -47,6 +53,10 @@ public class LuaOverridingMethodsSearch extends ExtensibleQueryFactory<LuaClassM
     }
 
     public static Query<LuaClassMethodDef> search(@NotNull LuaClassMethodDef methodDef) {
-        return INSTANCE.createUniqueResultsQuery(new SearchParameters(methodDef));
+        return search(methodDef, true);
+    }
+
+    public static Query<LuaClassMethodDef> search(@NotNull LuaClassMethodDef methodDef, boolean deep) {
+        return INSTANCE.createUniqueResultsQuery(new SearchParameters(methodDef, deep));
     }
 }

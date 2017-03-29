@@ -42,13 +42,17 @@ public class LuaOverridingMethodsSearchExecutor implements QueryExecutor<LuaClas
         String methodName = method.getName();
         if (type != null && methodName != null) {
             GlobalSearchScope scope = GlobalSearchScope.allScope(project);
-            Query<LuaDocClassDef> search = LuaClassInheritorsSearch.search(scope, project, type.getClassName());
+            Query<LuaDocClassDef> search = LuaClassInheritorsSearch.search(scope, project, type.getClassName(), searchParameters.isDeep());
 
             return search.forEach(luaClass -> {
                 String name = luaClass.getName();
-                if (name == null) return false;
-                LuaClassMethodDef methodDef = LuaClassMethodIndex.findMethodWithName(name, methodName, context);
-                return methodDef != null && processor.process(methodDef);
+                if (name != null) {
+                    LuaClassMethodDef methodDef = LuaClassMethodIndex.findMethodWithName(name, methodName, context);
+                    if (methodDef != null) {
+                        return processor.process(methodDef);
+                    }
+                }
+                return true;
             });
         }
         return false;
