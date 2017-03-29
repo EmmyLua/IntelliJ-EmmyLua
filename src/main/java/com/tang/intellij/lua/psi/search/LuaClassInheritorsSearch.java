@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi.search;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.searches.ExtensibleQueryFactory;
 import com.intellij.util.Query;
@@ -33,11 +34,11 @@ public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaType, Lu
 
     public static class SearchParameters {
 
-        private SearchScope searchScope;
+        private GlobalSearchScope searchScope;
         private Project project;
         private String typeName;
 
-        SearchParameters(SearchScope searchScope, Project project, String typeName) {
+        SearchParameters(GlobalSearchScope searchScope, Project project, String typeName) {
             this.searchScope = searchScope;
             this.project = project;
 
@@ -48,7 +49,7 @@ public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaType, Lu
             return typeName;
         }
 
-        public SearchScope getSearchScope() {
+        public GlobalSearchScope getSearchScope() {
             return searchScope;
         }
 
@@ -61,7 +62,7 @@ public class LuaClassInheritorsSearch extends ExtensibleQueryFactory<LuaType, Lu
         super("com.tang.intellij.lua");
     }
 
-    public static Query<LuaType> search(@NotNull SearchScope searchScope, @NotNull Project project, final String typeName) {
+    public static Query<LuaType> search(@NotNull GlobalSearchScope searchScope, @NotNull Project project, final String typeName) {
         SearchParameters parameters = new SearchParameters(searchScope, project, typeName);
         return INSTANCE.createUniqueResultsQuery(parameters);
     }

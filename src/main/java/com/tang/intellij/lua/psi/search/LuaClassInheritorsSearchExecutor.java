@@ -17,10 +17,14 @@
 package com.tang.intellij.lua.psi.search;
 
 import com.intellij.openapi.application.QueryExecutorBase;
+import com.intellij.openapi.project.DumbService;
 import com.intellij.util.Processor;
-import com.intellij.util.Query;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 /**
  * LuaClassInheritorsSearchExecutor
@@ -30,9 +34,19 @@ public class LuaClassInheritorsSearchExecutor extends QueryExecutorBase<LuaType,
 
     @Override
     public void processQuery(@NotNull LuaClassInheritorsSearch.SearchParameters searchParameters, @NotNull Processor<LuaType> processor) {
-        Query<LuaType> search = LuaAllClassesSearch.search(searchParameters.getSearchScope(), searchParameters.getProject());
-        search.forEach(luaType -> {
-            
+        DumbService.getInstance(searchParameters.getProject()).runReadActionInSmartMode(() -> {
+            processInheritors(searchParameters, processor);
         });
+    }
+
+    private boolean processInheritors(LuaClassInheritorsSearch.SearchParameters searchParameters, Processor<LuaType> processor) {
+        String typeName = searchParameters.getTypeName();
+        Collection<LuaDocClassDef> classDefs = LuaSuperClassIndex.getInstance().get(typeName, searchParameters.getProject(), searchParameters.getSearchScope());
+        for (LuaDocClassDef classDef : classDefs) {
+            LuaType classType = classDef.getClassType();
+            if (!processor.process(classType))
+                return false;
+        }
+        return true;
     }
 }
