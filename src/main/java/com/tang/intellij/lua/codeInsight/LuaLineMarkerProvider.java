@@ -30,6 +30,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaClassMethodName;
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
+import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +52,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
             SearchContext context = new SearchContext(project);
             LuaType type = methodDef.getClassType(context);
 
+            //OverridingMethod
             if (type != null) {
                 String methodName = methodDef.getName();
                 assert methodName != null;
@@ -69,6 +71,15 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     }
                     superType = superType.getSuperClass(context);
                 }
+            }
+
+            // OverridenMethod
+            Query<LuaClassMethodDef> search = LuaOverridingMethodsSearch.search(methodDef);
+            Collection<LuaClassMethodDef> all = search.findAll();
+            if (!all.isEmpty()) {
+                NavigationGutterIconBuilder<PsiElement> builder =
+                        NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridenMethod).setTargets(all);
+                result.add(builder.createLineMarkerInfo(element));
             }
         }
         else if (element instanceof LuaDocClassDef) {
