@@ -177,6 +177,7 @@ classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) {
     pin = 3
     methods = [
         dot = 'DOT'
+        colon = 'COLON'
     ]
 }
 classMethodDef ::= 'function' classMethodName funcBody {

@@ -44,8 +44,16 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
             LuaCallExpr callExpr = (LuaCallExpr) psiElement;
             List<LuaParamNameDef> parameters = null;
             LuaFuncBodyOwner methodDef = callExpr.resolveFuncBodyOwner(new SearchContext(psiElement.getProject()));
+
+            // 是否是 inst:method() 被用为 inst.method(self) 形式
+            boolean isInstanceMethodUsedAsStaticMethod = false;
             if (methodDef != null) {
                 parameters = methodDef.getParamNameDefList();
+                if (methodDef instanceof LuaClassMethodDef) {
+                    LuaClassMethodDef classMethodDef = (LuaClassMethodDef) methodDef;
+                    LuaClassMethodName classMethodName = classMethodDef.getClassMethodName();
+                    isInstanceMethodUsedAsStaticMethod = classMethodName.getColon() != null && callExpr.getColon() == null;
+                }
             }
 
             LuaArgs args = callExpr.getArgs();
@@ -53,9 +61,13 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                 LuaExprList luaExprList = args.getExprList();
                 if (luaExprList != null) {
                     List<LuaExpr> exprList = luaExprList.getExprList();
-                    for (int i = 0; i < exprList.size() && i < parameters.size(); i++) {
+                    int paramIndex = 0;
+                    for (int i = 0; i < exprList.size() && paramIndex < parameters.size(); i++) {
                         LuaExpr expr = exprList.get(i);
-                        list.add(new InlayInfo(parameters.get(i).getName(), expr.getTextOffset()));
+                        if (i == 0 && isInstanceMethodUsedAsStaticMethod)
+                            list.add(new InlayInfo("self", expr.getTextOffset()));
+                        else
+                            list.add(new InlayInfo(parameters.get(paramIndex++).getName(), expr.getTextOffset()));
                     }
                 }
             }
