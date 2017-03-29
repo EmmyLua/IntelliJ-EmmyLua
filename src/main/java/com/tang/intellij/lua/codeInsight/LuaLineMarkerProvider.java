@@ -22,10 +22,14 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Query;
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaClassMethodName;
+import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
@@ -65,6 +69,18 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                     }
                     superType = superType.getSuperClass(context);
                 }
+            }
+        }
+        else if (element instanceof LuaDocClassDef) {
+            LuaDocClassDef docClassDef = (LuaDocClassDef) element;
+            LuaType classType = docClassDef.getClassType();
+            Project project = element.getProject();
+            Query<LuaType> query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.getClassName());
+            LuaType first = query.findFirst();
+            if (first != null) {
+                NavigationGutterIconBuilder<PsiElement> builder =
+                        NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridenMethod);
+                result.add(builder.createLineMarkerInfo(docClassDef));
             }
         }
     }
