@@ -52,6 +52,7 @@ public class LuaFoldingBuilder extends CustomFoldingBuilder implements FoldingBu
         IElementType type = astNode.getElementType();
         if (type == LuaTypes.BLOCK) return HOLDER_TEXT;
         else if (type == LuaTypes.DOC_COMMENT) return "/** ... */";
+        else if (type == LuaTypes.TABLE_CONSTRUCTOR) return  "{ ... }";
         return null;
     }
 
@@ -74,6 +75,9 @@ public class LuaFoldingBuilder extends CustomFoldingBuilder implements FoldingBu
             }
         }
         else if (type == LuaTypes.DOC_COMMENT) {
+            descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
+        }
+        else if (type == LuaTypes.TABLE_CONSTRUCTOR) {
             descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
         }
 
