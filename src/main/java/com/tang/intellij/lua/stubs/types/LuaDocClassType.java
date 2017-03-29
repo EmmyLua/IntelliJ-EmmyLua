@@ -22,10 +22,12 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.tang.intellij.lua.stubs.impl.LuaDocClassStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
+import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -74,7 +76,13 @@ public class LuaDocClassType extends IStubElementType<LuaDocClassStub, LuaDocCla
 
     @Override
     public void indexStub(@NotNull LuaDocClassStub luaDocClassStub, @NotNull IndexSink indexSink) {
-        indexSink.occurrence(LuaClassIndex.KEY, luaDocClassStub.getClassName());
-        indexSink.occurrence(LuaShortNameIndex.KEY, luaDocClassStub.getClassName());
+        LuaType classType = luaDocClassStub.getClassType();
+        indexSink.occurrence(LuaClassIndex.KEY, classType.getClassName());
+        indexSink.occurrence(LuaShortNameIndex.KEY, classType.getClassName());
+
+        String superClassName = classType.getSuperClassName();
+        if (superClassName != null) {
+            indexSink.occurrence(LuaSuperClassIndex.KEY, superClassName);
+        }
     }
 }
