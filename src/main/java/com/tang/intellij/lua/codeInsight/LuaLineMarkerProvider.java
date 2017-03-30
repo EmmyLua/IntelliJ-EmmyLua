@@ -27,14 +27,18 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.editor.markup.SeparatorPlacement;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Function;
+import com.intellij.util.FunctionUtil;
 import com.intellij.util.Query;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.psi.LuaCallExpr;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaClassMethodName;
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch;
 import com.tang.intellij.lua.search.SearchContext;
@@ -151,6 +155,30 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
                         subclassTooltipProvider,
                         subclassNavigator,
                         GutterIconRenderer.Alignment.CENTER));
+            }
+        }
+        else if (element instanceof LuaCallExpr) {
+            LuaCallExpr callExpr = (LuaCallExpr) element;
+            PsiReference reference = callExpr.getReference();
+            if (reference != null) {
+                PsiElement resolve = reference.resolve();
+                if (resolve != null) {
+                    PsiElement cur = callExpr;
+                    while (cur != null) {
+                        LuaFuncBodyOwner bodyOwner = PsiTreeUtil.getParentOfType(cur, LuaFuncBodyOwner.class);
+                        if (bodyOwner == resolve) {
+                            result.add(new LineMarkerInfo<>(element,
+                                    element.getTextRange(),
+                                    AllIcons.Gutter.RecursiveMethod,
+                                    Pass.LINE_MARKERS,
+                                    FunctionUtil.constant("Recursive call"),
+                                    null,
+                                    GutterIconRenderer.Alignment.RIGHT));
+                            break;
+                        }
+                        cur = bodyOwner;
+                    }
+                }
             }
         }
     }

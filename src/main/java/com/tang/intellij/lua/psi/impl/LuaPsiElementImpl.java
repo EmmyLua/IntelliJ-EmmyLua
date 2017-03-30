@@ -38,4 +38,13 @@ public class LuaPsiElementImpl extends ASTWrapperPsiElement implements LuaPsiEle
     public PsiReference[] getReferences() {
         return ReferenceProvidersRegistry.getReferencesFromProviders(this, PsiReferenceService.Hints.NO_HINTS);
     }
+
+    @Override
+    public PsiReference getReference() {
+        PsiReference[] references = getReferences();
+
+        if (references.length > 0)
+            return references[0];
+        return null;
+    }
 }
