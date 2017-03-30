@@ -23,11 +23,187 @@
     <description><![CDATA[
     A lua plugin for IDEA<br>
     QQ : 272669294<br>
-    QQGroup : 29850775
+    QQGroup : 29850775<br>
+    <table>
+        <thead>
+        <tr>
+            <th>feature</th>
+            <th>progress</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Syntax highlighting</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Highlighting global</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Highlighting local/param</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Highlighting up value</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Find usages</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Rename(Shift + F6)</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Go to definition(Ctrl + Mouse)</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Go to symbol(Ctrl + Alt + Shift + N)</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Go to class(Ctrl + N)</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Go to file(Ctrl + Shift + N)</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Parameter name hints</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Keyword completion</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Basic completion</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Structure view</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Brace Matching</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Comment in/out</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Color settings page</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Doc based type/class annotation</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Method override line marker</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Name suggestion for refactor</td>
+            <td>60%</td>
+        </tr>
+        <tr>
+            <td>Modules support</td>
+            <td>80%</td>
+        </tr>
+        <tr>
+            <td>Quick Documentation(Ctrl + Q)</td>
+            <td>50%</td>
+        </tr>
+        <tr>
+            <td>Live templates</td>
+            <td>10%</td>
+        </tr>
+        <tr>
+            <td>Postfix completion templates</td>
+            <td>11</td>
+        </tr>
+        <tr>
+            <td>Code formatter</td>
+            <td>90%</td>
+        </tr>
+        <tr>
+            <td>Code intentions</td>
+            <td>6</td>
+        </tr>
+        <tr>
+            <td>Code inspections</td>
+            <td>6</td>
+        </tr>
+        <tr>
+            <td>Lua Standard Library/API</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Region folding</td>
+            <td>ok</td>
+        </tr>
+        <tr>
+            <td>Debugger</td>
+            <td>50%</td>
+        </tr>
+        <tr>
+            <td>Lua 5.3</td>
+            <td>0%</td>
+        </tr>
+        <tr>
+            <td>... .etc</td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
     ]]></description>
 
     <change-notes><![CDATA[
-
+    <h1>1.0.6</h1>
+    <ul>
+        <li>function exit points(return code segement) highlighting</li>
+        <li>upgrade for IDEA-2017.1</li>
+        <li>'optional' keyword completion</li>
+        <li>improve highlighting</li>
+    </ul>
+    <h1>1.0.5</h1>
+    <ul>
+        <li>optional param support <code>---@param optional myParam MyType</code></li>
+        <li>improve highlighting</li>
+        <li>improve StructureView</li>
+        <li>bug fix : error parse single quoted string: '\\'</li>
+        <li>enable plugin in all products(PhpStorm, WebStorm ...)</li>
+    </ul>
+    <h1>1.0.4</h1>
+    <ul>
+        <li>quote handler</li>
+        <li>formatting</li>
+        <li>[  ] highlight matching</li>
+        <li>region folding support</li>
+        <li>escape token in string highlighting</li>
+        <li>fix StackOverflowError : function self:method() self.xx = 0 end</li>
+    </ul>
+    <h1>1.0.3</h1>
+    <ul>
+        <li>bug fix</li>
+        <li>up value highlighting</li>
+        <li>add 2 live templates</li>
+        <li>add 1 intention</li>
+        <li>completion list view now shows function param info</li>
+    </ul>
+    <h1>1.0.2</h1>
+    <ul>
+        <li>bug fix</li>
+        <li>std sdk</li>
+        <li>add 2 postfix completions</li>
+        <li>add 3 inspections</li>
+    </ul>
     ]]>
     </change-notes>
 
