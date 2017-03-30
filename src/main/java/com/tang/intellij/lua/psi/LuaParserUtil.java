@@ -119,39 +119,38 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         return true;
     }
 
+    private static TokenSet END_SET = TokenSet.create(END);
+    private static TokenSet IF_SKIPS = TokenSet.create(THEN, ELSE, ELSEIF);
+    private static TokenSet REPEAT_TYPES = TokenSet.create(UNTIL);
+    private static TokenSet THEN_TYPES1 = TokenSet.create(ELSE, ELSEIF, END);
+    private static TokenSet THEN_SKIPS2 = TokenSet.create(ELSE, ELSEIF);
+
     private static boolean matchStart(PsiBuilder builder, int level, IElementType begin, boolean advanced) {
         if (begin == DO) {
-            return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(END));
+            return matchEnd(advanced, builder, level, TokenSet.EMPTY, END_SET);
         }
         else if (begin == REPEAT) {
-            return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(UNTIL));
+            return matchEnd(advanced, builder, level, TokenSet.EMPTY, REPEAT_TYPES);
         }
-        //--
         else if (begin == IF) {
-            TokenSet skips = TokenSet.create(THEN, ELSE, ELSEIF);
-            return matchEnd(begin, advanced, builder ,level, skips, TokenSet.create(END));
+            return matchEnd(advanced, builder ,level, IF_SKIPS, END_SET);
         }
-        //--
-        /*else if (begin == FOR) {
-            TokenSet skips = TokenSet.create(DO);
-            return matchEnd(begin, advanced, builder ,level, skips, TokenSet.create(END));
-        }*/
         else if (begin == THEN) {
             if (level == 0)
-                return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(ELSE, ELSEIF, END));
+                return matchEnd(advanced, builder, level, TokenSet.EMPTY, THEN_TYPES1);
             else
-                return matchEnd(begin, advanced, builder, level, TokenSet.create(ELSE, ELSEIF), TokenSet.create(END));
+                return matchEnd(advanced, builder, level, THEN_SKIPS2, END_SET);
         }
         else if (begin == ELSE) {
-            return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(END));
+            return matchEnd(advanced, builder, level, TokenSet.EMPTY, END_SET);
         }
         else if (begin == FUNCTION) {
-            return matchEnd(begin, advanced, builder, level, TokenSet.EMPTY, TokenSet.create(END));
+            return matchEnd(advanced, builder, level, TokenSet.EMPTY, END_SET);
         }
         return false;
     }
 
-    private static boolean matchEnd(IElementType start, boolean advanced, PsiBuilder builder, int level, TokenSet skips, TokenSet types) {
+    private static boolean matchEnd(boolean advanced, PsiBuilder builder, int level, TokenSet skips, TokenSet types) {
         if (!advanced)
             builder.advanceLexer();
         IElementType type = builder.getTokenType();
