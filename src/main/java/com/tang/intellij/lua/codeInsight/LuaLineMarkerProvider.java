@@ -46,6 +46,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, Collection<? super RelatedItemLineMarkerInfo> result) {
         if (element instanceof LuaClassMethodName) {
+            LuaClassMethodName classMethodName = (LuaClassMethodName) element;
             LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(element, LuaClassMethodDef.class);
             assert methodDef != null;
             Project project = methodDef.getProject();
@@ -66,7 +67,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
                                 NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
                                         .setTargets(superMethod)
                                         .setTooltipText("Override in " + superTypeName);
-                        result.add(builder.createLineMarkerInfo(methodDef.getClassMethodName()));
+                        result.add(builder.createLineMarkerInfo(classMethodName.getId()));
                         break;
                     }
                     superType = superType.getSuperClass(context);
@@ -79,7 +80,7 @@ public class LuaLineMarkerProvider extends RelatedItemLineMarkerProvider {
             if (!all.isEmpty()) {
                 NavigationGutterIconBuilder<PsiElement> builder =
                         NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridenMethod).setTargets(all);
-                result.add(builder.createLineMarkerInfo(element));
+                result.add(builder.createLineMarkerInfo(classMethodName.getId()));
             }
         }
         else if (element instanceof LuaDocClassDef) {
