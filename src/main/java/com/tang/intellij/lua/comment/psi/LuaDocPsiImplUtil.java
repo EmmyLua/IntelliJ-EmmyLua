@@ -23,8 +23,6 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.stubs.StubElement;
-import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference;
 import com.tang.intellij.lua.lang.type.LuaType;
@@ -98,21 +96,7 @@ public class LuaDocPsiImplUtil {
             return stub.getType();
         return resolveDocTypeSet(fieldDef.getTypeSet(), null, context);
     }
-
-    /**
-     * 猜测全局定义的类型
-     * @param docGlobalDef 全局定义
-     * @return 类型集合
-     */
-    public static LuaTypeSet guessType(LuaDocGlobalDef docGlobalDef, SearchContext context) {
-        LuaComment comment = LuaCommentUtil.findContainer(docGlobalDef);
-        LuaDocTypeDef docTypeDef = comment.getTypeDef();
-        if (docTypeDef != null) {
-            return resolveDocTypeSet(docTypeDef.getTypeSet(), null, context);
-        }
-        return null;
-    }
-
+    
     /**
      * 猜测参数的类型
      * @param paramDec 参数定义
