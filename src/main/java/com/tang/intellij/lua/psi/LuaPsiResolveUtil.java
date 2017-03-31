@@ -46,7 +46,7 @@ public class LuaPsiResolveUtil {
 
     private static LuaFuncBodyOwner funcBodyOwner = null;
 
-    static LuaFuncBodyOwner resolveFuncBodyOwner(@NotNull LuaNameRef ref, SearchContext context) {
+    static LuaFuncBodyOwner resolveFuncBodyOwner(@NotNull LuaNameExpr ref, SearchContext context) {
         String refName = ref.getName();
         //local 函数名
         if (funcBodyOwner == null) {
@@ -69,7 +69,7 @@ public class LuaPsiResolveUtil {
         return temp;
     }
 
-    public static PsiElement resolveLocal(LuaNameRef ref, SearchContext context) {
+    public static PsiElement resolveLocal(LuaNameExpr ref, SearchContext context) {
         String refName = ref.getName();
 
         if (refName.equals(Constants.WORD_SELF)) {
@@ -77,7 +77,7 @@ public class LuaPsiResolveUtil {
             if (block != null) {
                 LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef.class);
                 if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
-                    LuaNameRef nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
+                    LuaNameExpr nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
                     if (nameRef != null) {
                         PsiElement resolve = nameRef.resolve(context);
                         return resolve != null ? resolve : nameRef;
@@ -112,7 +112,7 @@ public class LuaPsiResolveUtil {
         return result;
     }
 
-    public static boolean isUpValue(@NotNull LuaNameRef ref, @NotNull SearchContext context) {
+    public static boolean isUpValue(@NotNull LuaNameExpr ref, @NotNull SearchContext context) {
         LuaFuncBody funcBody = PsiTreeUtil.getParentOfType(ref, LuaFuncBody.class);
         if (funcBody == null)
             return false;
@@ -144,7 +144,7 @@ public class LuaPsiResolveUtil {
      * @param context context
      * @return PsiElement
      */
-    public static PsiElement resolve(LuaNameRef ref, SearchContext context) {
+    public static PsiElement resolve(LuaNameExpr ref, SearchContext context) {
         //search local
         resolveResult = resolveLocal(ref, context);
 

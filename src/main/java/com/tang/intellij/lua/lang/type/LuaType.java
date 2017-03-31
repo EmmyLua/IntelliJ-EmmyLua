@@ -53,7 +53,7 @@ public class LuaType {
         return create(LuaPsiResolveUtil.getAnonymousType(localDef), null);
     }
 
-    public static LuaType createGlobalType(LuaNameRef ref) {
+    public static LuaType createGlobalType(LuaNameExpr ref) {
         return create(ref.getText(), null);
     }
 

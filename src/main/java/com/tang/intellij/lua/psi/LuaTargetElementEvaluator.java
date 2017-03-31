@@ -38,8 +38,8 @@ public class LuaTargetElementEvaluator extends TargetElementEvaluatorEx2 {
     @Nullable
     @Override
     public PsiElement adjustTargetElement(Editor editor, int offset, int flags, @NotNull PsiElement targetElement) {
-        if (targetElement instanceof LuaNameRef && !(targetElement.getParent() instanceof LuaVar)) {
-            PsiElement element = LuaPsiResolveUtil.resolveLocal((LuaNameRef) targetElement, new SearchContext(editor.getProject()));
+        if (targetElement instanceof LuaNameExpr && !(targetElement.getParent() instanceof LuaVar)) {
+            PsiElement element = LuaPsiResolveUtil.resolveLocal((LuaNameExpr) targetElement, new SearchContext(editor.getProject()));
             return element == null ? null : targetElement;
         }
         return targetElement;

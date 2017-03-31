@@ -48,8 +48,6 @@ import static com.intellij.patterns.PlatformPatterns.psiElement;
  */
 public class LuaCompletionContributor extends CompletionContributor {
 
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_METHOD = psiElement(LuaTypes.ID)
-            .withParent(LuaCallExpr.class);
     private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_FIELD = psiElement(LuaTypes.ID)
             .withParent(LuaIndexExpr.class);
     private static final PsiElementPattern.Capture<PsiElement> IN_PARAM_NAME = psiElement(LuaTypes.ID)
@@ -67,17 +65,13 @@ public class LuaCompletionContributor extends CompletionContributor {
         //可以override
         extend(CompletionType.BASIC, SHOW_OVERRIDE, new OverrideCompletionProvider());
 
-        //提示方法
-        extend(CompletionType.BASIC, SHOW_CLASS_METHOD, new ClassMethodCompletionProvider());
-
-        //提示属性
+        //提示属性, 提示方法
         extend(CompletionType.BASIC, SHOW_CLASS_FIELD, new ClassFieldCompletionProvider());
 
         extend(CompletionType.BASIC, SHOW_PATH, new RequirePathCompletionProvider());
 
         //提示全局函数,local变量,local函数
         extend(CompletionType.BASIC, psiElement().inside(LuaFile.class)
-                .andNot(SHOW_CLASS_METHOD)
                 .andNot(SHOW_CLASS_FIELD)
                 .andNot(IN_COMMENT)
                 .andNot(IN_FUNC_NAME)

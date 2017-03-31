@@ -102,7 +102,7 @@ public class LuaVarStubImpl extends StubBase<LuaVar> implements LuaVarStub {
             return indexExpr.getId() != null;
         }
         //XXX = ??
-        LuaNameRef nameRef = var.getNameRef();
+        LuaNameExpr nameRef = var.getNameRef();
         SearchContext context = new SearchContext(var.getProject());
         context.setCurrentStubFile(var.getContainingFile());
         return nameRef != null && LuaPsiResolveUtil.resolveLocal(nameRef, context) == null;

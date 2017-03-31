@@ -24,5 +24,5 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface LuaGlobalVar extends LuaPsiElement {
     @Nullable
-    LuaNameRef getNameRef();
+    LuaNameExpr getNameRef();
 }

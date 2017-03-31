@@ -53,7 +53,7 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
     public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef methodDef, StubElement stubElement) {
         LuaClassMethodName methodName = methodDef.getClassMethodName();
         PsiElement id = methodDef.getNameIdentifier();
-        LuaNameRef nameRef = methodName.getNameRef();
+        LuaNameExpr nameRef = methodName.getNameRef();
         assert nameRef != null;
         assert id != null;
         String clazzName = nameRef.getText();
