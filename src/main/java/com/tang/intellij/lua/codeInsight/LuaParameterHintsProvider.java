@@ -52,7 +52,7 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                 if (methodDef instanceof LuaClassMethodDef) {
                     LuaClassMethodDef classMethodDef = (LuaClassMethodDef) methodDef;
                     LuaClassMethodName classMethodName = classMethodDef.getClassMethodName();
-                    isInstanceMethodUsedAsStaticMethod = classMethodName.getColon() != null && callExpr.getColon() == null;
+                    isInstanceMethodUsedAsStaticMethod = classMethodName.getColon() != null && callExpr.isStaticMethodCall();
                 }
             }
 

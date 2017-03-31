@@ -134,8 +134,6 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         @Override
         public void visitNameExpr(@NotNull LuaNameExpr o) {
             PsiElement id = o.getFirstChild();
-            if (id == null)
-                return;
 
             //up value
             boolean upValue = LuaPsiResolveUtil.isUpValue(o, new SearchContext(o.getProject()));
@@ -180,27 +178,17 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             PsiElement id = o.getId();
             if (id != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(id, null);
-                annotation.setTextAttributes(LuaHighlightingData.FIELD);
-            }
-            super.visitIndexExpr(o);
-        }
-
-        @Override
-        public void visitCallExpr(@NotNull LuaCallExpr o) {
-            LuaExpr expr = o.getExpr();
-            if (expr instanceof LuaIndexExpr) {
-                LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
-                PsiElement id = indexExpr.getId();
-                if (id != null) {
-                    Annotation annotation = myHolder.createInfoAnnotation(id, null);
-                    if (o.isMethodCall()) {
+                if (o.getParent() instanceof LuaCallExpr) {
+                    if (o.getColon() != null) {
                         annotation.setTextAttributes(LuaHighlightingData.INSTANCE_METHOD);
                     } else {
                         annotation.setTextAttributes(LuaHighlightingData.STATIC_METHOD);
                     }
+                } else {
+                    annotation.setTextAttributes(LuaHighlightingData.FIELD);
                 }
             }
-            super.visitCallExpr(o);
+            super.visitIndexExpr(o);
         }
     }
 
