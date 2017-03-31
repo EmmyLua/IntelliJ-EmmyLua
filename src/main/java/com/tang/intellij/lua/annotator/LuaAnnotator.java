@@ -187,15 +187,16 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
 
         @Override
         public void visitCallExpr(@NotNull LuaCallExpr o) {
-            PsiElement id = o.getId();
+            //TODO implement it
+            /*PsiElement id = o.getId();
             if (id != null) {
                 Annotation annotation = myHolder.createInfoAnnotation(id, null);
-                if (o.getColon() != null) {
+                if (o.isMethodCall()) {
                     annotation.setTextAttributes(LuaHighlightingData.INSTANCE_METHOD);
                 } else {
                     annotation.setTextAttributes(LuaHighlightingData.STATIC_METHOD);
                 }
-            }
+            }*/
             super.visitCallExpr(o);
         }
     }

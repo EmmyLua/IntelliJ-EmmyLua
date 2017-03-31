@@ -270,9 +270,13 @@ parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
 binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
 
-left indexExpr ::= '[' expr ']' | '.' ID {
+left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1
-    methods = [guessPrefixType]
+    methods = [
+        guessPrefixType
+        dot = 'DOT'
+        colon = 'COLON'
+    ]
 }
 
 arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }
@@ -280,18 +284,22 @@ args ::=  '(' (arg_expr_list)? ')' | tableConstructor | STRING { pin(".*") = 1 }
 private callExpr1 ::= args
 private callExpr2 ::= '.' ID args
 private callExpr3 ::= ':' ID args { pin = 1 }
-left callExpr ::= callExpr1 | callExpr2 | callExpr3 {
+left callExpr ::= callExpr1 {
     methods = [
         guessPrefixType
         resolveFuncBodyOwner
         getFirstStringArg
-        colon = "COLON"
+
+        isStaticMethodCall
+        isMethodCall
+        isFunctionCall
     ]
     implements = "com.tang.intellij.lua.psi.LuaPsiStatement"
 }
 
-private suffixExpr ::=  callExpr | indexExpr
-private prefixExpr ::= parenExpr | nameRef
+nameExpr ::= ID
+private suffixExpr ::=  indexExpr | callExpr
+private prefixExpr ::= parenExpr | nameExpr
 // 最终产生 callExpr | indexExpr
 private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr

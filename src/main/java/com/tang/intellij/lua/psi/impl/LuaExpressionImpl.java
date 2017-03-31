@@ -74,7 +74,7 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
 
     private LuaTypeSet guessType(LuaCallExpr luaCallExpr, SearchContext context) {
         // xxx()
-        LuaNameRef ref = luaCallExpr.getNameRef();
+        LuaExpr ref = luaCallExpr.getExpr();
         if (ref != null) {
             // 从 require 'xxx' 中获取返回类型
             if (ref.textMatches("require")) {

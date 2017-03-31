@@ -207,14 +207,9 @@ public class LuaPsiImplUtil {
      * @return LuaTypeSet
      */
     public static LuaTypeSet guessPrefixType(LuaCallExpr callExpr, SearchContext context) {
-        LuaNameRef nameRef = callExpr.getNameRef();
-        if (nameRef != null) {
-            return guessNameRefType(nameRef, context);
-        } else {
-            LuaExpr prefix = (LuaExpr) callExpr.getFirstChild();
-            if (prefix != null)
-                return prefix.guessType(context);
-        }
+        LuaExpr prefix = (LuaExpr) callExpr.getFirstChild();
+        if (prefix != null)
+            return prefix.guessType(context);
         return null;
     }
 
@@ -228,9 +223,10 @@ public class LuaPsiImplUtil {
         if (context.isDeadLock(1))
             return null;
 
-        LuaArgs args = callExpr.getArgs();
+        //TODO implement it
+        /*LuaArgs args = callExpr.getArgs();
         if (args != null) {
-            PsiElement id = callExpr.getId(); //todo static : xxx.method
+            PsiElement id = callExpr.getId();
             if (id == null) { // local, global, static
                 LuaExpr expr = callExpr.getExpr();
                 if (expr instanceof LuaIndexExpr) {
@@ -253,7 +249,7 @@ public class LuaPsiImplUtil {
                     }
                 }
             }
-        }
+        }*/
         return null;
     }
 
@@ -293,6 +289,20 @@ public class LuaPsiImplUtil {
         return null;
     }
 
+    public static boolean isStaticMethodCall(LuaCallExpr callExpr) {
+        LuaExpr expr = callExpr.getExpr();
+        return expr instanceof LuaIndexExpr && ((LuaIndexExpr) expr).getColon() == null;
+    }
+
+    public static boolean isMethodCall(LuaCallExpr callExpr) {
+        LuaExpr expr = callExpr.getExpr();
+        return expr instanceof LuaIndexExpr && ((LuaIndexExpr) expr).getColon() != null;
+    }
+
+    public static boolean isFunctionCall(LuaCallExpr callExpr) {
+        return callExpr.getExpr() instanceof LuaNameExpr;
+    }
+
     public static LuaTypeSet guessTypeAt(LuaExprList list, int index, SearchContext context) {
         int cur = 0;
         for (PsiElement child = list.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -307,14 +317,9 @@ public class LuaPsiImplUtil {
     }
 
     public static LuaTypeSet guessPrefixType(LuaIndexExpr indexExpr, SearchContext context) {
-        LuaNameRef nameRef = indexExpr.getNameRef();
-        if (nameRef != null) {
-            return guessNameRefType(nameRef, context);
-        } else {
-            LuaExpr prefix = (LuaExpr) indexExpr.getFirstChild();
-            if (prefix != null)
-                return prefix.guessType(context);
-        }
+        LuaExpr prefix = (LuaExpr) indexExpr.getFirstChild();
+        if (prefix != null)
+            return prefix.guessType(context);
         return null;
     }
 

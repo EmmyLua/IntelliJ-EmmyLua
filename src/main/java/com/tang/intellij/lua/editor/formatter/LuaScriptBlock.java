@@ -140,7 +140,7 @@ public class LuaScriptBlock extends AbstractBlock {
                 buildChildren(node, results);
             } else if (shouldCreateBlockFor(node)) {
                 Alignment alignment = null;
-                if (parentType == CALL_EXPR || parentType == INDEX_EXPR) {
+                /*if (parentType == CALL_EXPR || parentType == INDEX_EXPR) {
                     if (nodeElementType == COLON || nodeElementType == DOT) {
                         alignment = getTopmostCallAlignment();
                     }
@@ -155,7 +155,7 @@ public class LuaScriptBlock extends AbstractBlock {
                 } else if (parentType == EXPR_LIST) {
                     if (parent.getTreeParent().getElementType() == ARGS && node.getPsi() instanceof LuaExpr)
                         alignment = this.paramAlignment;
-                }
+                }*/
                 results.add(new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder));
             }
             node = node.getTreeNext();

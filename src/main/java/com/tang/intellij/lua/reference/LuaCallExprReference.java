@@ -45,7 +45,7 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
         PsiElement newId = LuaElementFactory.createIdentifier(myElement.getProject(), newElementName);
-        PsiElement oldId = expr.getId();
+        PsiElement oldId = expr.getExpr();
         assert oldId != null;
         oldId.replace(newId);
         return newId;
@@ -58,7 +58,7 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
 
     @Override
     public TextRange getRangeInElement() {
-        PsiElement id = expr.getId();
+        PsiElement id = expr.getExpr();
         assert id != null;
         return new TextRange(id.getStartOffsetInParent(), id.getStartOffsetInParent() + id.getTextLength());
     }
@@ -66,7 +66,8 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        PsiElement id = expr.getId();
+        //TODO implement it
+        /*PsiElement id = expr.getId();
         if (id != null) {
             SearchContext context = new SearchContext(myElement.getProject());
             LuaTypeSet typeSet = expr.guessPrefixType(context);
@@ -83,7 +84,7 @@ public class LuaCallExprReference extends PsiReferenceBase<LuaCallExpr> {
                         return field;
                 }
             }
-        }
+        }*/
         return null;
     }
 
