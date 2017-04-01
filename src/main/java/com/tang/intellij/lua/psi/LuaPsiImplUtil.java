@@ -502,7 +502,7 @@ public class LuaPsiImplUtil {
     }
 
     public static LuaNameExpr getNameRef(LuaVar var) {
-        return PsiTreeUtil.findChildOfType(var, LuaNameExpr.class);
+        return PsiTreeUtil.getChildOfType(var, LuaNameExpr.class);
     }
 
     public static String getFieldName(LuaVar var) {

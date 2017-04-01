@@ -50,17 +50,16 @@ public class LuaVarStubImpl extends StubBase<LuaVar> implements LuaVarStub {
                           IStubElementType elementType,
                           LuaVar var) {
         super(parent, elementType);
-        //this.indexExpr = indexExpr;
         this.isValid = checkValid(var);
 
         if (this.isValid) {
-            if (var.getNameRef() != null) {
+            LuaExpr expr = var.getExpr();
+            if (expr instanceof LuaNameExpr) {
                 this.isGlobal = true;
-                this.fieldName = var.getNameRef().getText();
+                this.fieldName = expr.getText();
             } else {
                 this.isGlobal = false;
-                assert var.getExpr() instanceof LuaIndexExpr;
-                LuaIndexExpr indexExpr = (LuaIndexExpr) var.getExpr();
+                LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
                 assert indexExpr.getId() != null;
                 this.indexExpr = indexExpr;
             }
@@ -100,12 +99,13 @@ public class LuaVarStubImpl extends StubBase<LuaVar> implements LuaVarStub {
         if (expr instanceof LuaIndexExpr) {
             LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
             return indexExpr.getId() != null;
+        } else {
+            //XXX = ??
+            LuaNameExpr nameRef = (LuaNameExpr) expr;
+            SearchContext context = new SearchContext(var.getProject());
+            context.setCurrentStubFile(var.getContainingFile());
+            return LuaPsiResolveUtil.resolveLocal(nameRef, context) == null;
         }
-        //XXX = ??
-        LuaNameExpr nameRef = var.getNameRef();
-        SearchContext context = new SearchContext(var.getProject());
-        context.setCurrentStubFile(var.getContainingFile());
-        return nameRef != null && LuaPsiResolveUtil.resolveLocal(nameRef, context) == null;
     }
 
     public String getTypeName() {
