@@ -20,10 +20,7 @@ import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 /**
  * debug bridge
@@ -32,10 +29,40 @@ import java.io.OutputStreamWriter;
 class LuaAttachBridge {
     private String pid;
     private Process process;
+    private BufferedWriter writer;
+    private BufferedReader reader;
+    private Thread writerThread;
+    private Thread readerThread;
+    private boolean isRunning;
 
     LuaAttachBridge(ProcessInfo processInfo) {
         pid = String.valueOf(processInfo.getPid());
     }
+
+    private Runnable readProcess = new Runnable() {
+        @Override
+        public void run() {
+            while (isRunning) {
+                try {
+                    String line = reader.readLine();
+                    int size = Integer.parseInt(line) + 3;
+                    char[] buff = new char[size];
+                    int read = reader.read(buff, 0, size);
+                    assert read == size;
+                    String s = String.copyValueOf(buff);
+                    System.out.println(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    stop();
+                    break;
+                }
+            }
+        }
+    };
+
+    private Runnable writeProcess = () -> {
+
+    };
 
     public void start() {
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
@@ -44,21 +71,36 @@ class LuaAttachBridge {
             ProcessBuilder processBuilder = new ProcessBuilder(exe);
             try {
                 process = processBuilder.start();
-                OutputStream outputStream = process.getOutputStream();
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+                writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+                reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
                 writer.write(pid);
                 writer.write('\n');
                 writer.flush();
+
+                readerThread = new Thread(readProcess);
+                readerThread.start();
+                writerThread = new Thread(writeProcess);
+                writerThread.start();
+                isRunning = true;
             } catch (IOException e) {
                 e.printStackTrace();
+                isRunning = false;
             }
-
         }
     }
 
     public void stop() {
         if (process != null) {
             process.destroy();
+            process = null;
+            isRunning = false;
+        }
+        if (writerThread != null) {
+            writerThread.interrupt();
+        }
+        if (readerThread != null) {
+            readerThread.interrupt();
         }
     }
 }
