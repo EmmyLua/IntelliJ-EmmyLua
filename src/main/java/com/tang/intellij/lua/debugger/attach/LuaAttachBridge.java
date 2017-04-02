@@ -45,7 +45,10 @@ class LuaAttachBridge {
             while (isRunning) {
                 try {
                     String line = reader.readLine();
-                    int size = Integer.parseInt(line) + 3;
+                    if (line == null || "".equals(line))
+                        continue;
+
+                    int size = Integer.parseInt(line);
                     char[] buff = new char[size];
                     int read = reader.read(buff, 0, size);
                     assert read == size;
