@@ -19,6 +19,7 @@ package com.tang.intellij.lua.debugger.attach.value;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,6 +34,8 @@ import java.io.ByteArrayInputStream;
  * Created by tangzx on 2017/4/2.
  */
 public abstract class LuaXValue extends XValue {
+    protected LuaAttachDebugProcess process;
+
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
 
@@ -46,20 +49,20 @@ public abstract class LuaXValue extends XValue {
         return toString();
     }
 
-    public static LuaXValue parse(String data) {
+    public static LuaXValue parse(String data, LuaAttachDebugProcess process) {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
             Document document = documentBuilder.parse(new ByteArrayInputStream(data.getBytes()));
             Element root = document.getDocumentElement();
-            return parse(root);
+            return parse(root, process);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static LuaXValue parse(Node node) {
+    public static LuaXValue parse(Node node, LuaAttachDebugProcess process) {
         String nodeName = node.getNodeName();
         LuaXValue value = null;
         switch (nodeName) {
@@ -73,8 +76,14 @@ public abstract class LuaXValue extends XValue {
                 value = new LuaXFunction();
                 break;
         }
-        if (value != null)
+        if (value != null) {
+            value.setProcess(process);
             value.doParse(node);
+        }
         return value;
+    }
+
+    public void setProcess(LuaAttachDebugProcess process) {
+        this.process = process;
     }
 }

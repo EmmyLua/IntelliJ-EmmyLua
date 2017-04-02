@@ -47,6 +47,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
     private ProcessInfo processInfo;
     private LuaAttachBridge bridge;
     private Map<XSourcePosition, XLineBreakpoint> registeredBreakpoints = new ConcurrentHashMap<>();
+    private Map<Integer, LoadedScript> loadedScriptMap = new ConcurrentHashMap<>();
 
     LuaAttachDebugProcess(@NotNull XDebugSession session, ProcessInfo processInfo) {
         super(session);
@@ -128,6 +129,9 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
     private void onLoadScript(LuaAttachLoadScriptProto proto) {
         VirtualFile file = LuaFileUtil.findFile(getSession().getProject(), proto.getName());
         if (file != null) {
+            LoadedScript script = new LoadedScript(file, proto.getIndex(), proto.getName());
+            loadedScriptMap.put(proto.getIndex(), script);
+
             for (XSourcePosition pos : registeredBreakpoints.keySet()) {
                 if (file.equals(pos.getFile())) {
                     bridge.send(String.format("setb %d %d", proto.getIndex(), pos.getLine()));
@@ -137,18 +141,41 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
         bridge.send("done");
     }
 
+    @Nullable
+    public LoadedScript getScript(int index) {
+        return loadedScriptMap.get(index);
+    }
+
     @NotNull
     @Override
     public XBreakpointHandler<?>[] getBreakpointHandlers() {
         return new XBreakpointHandler[] { new XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>>(LuaLineBreakpointType.class) {
             @Override
             public void registerBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint) {
-                registeredBreakpoints.put(breakpoint.getSourcePosition(), breakpoint);
+                XSourcePosition sourcePosition = breakpoint.getSourcePosition();
+                if (sourcePosition != null) {
+                    registeredBreakpoints.put(sourcePosition, breakpoint);
+                    for (LoadedScript script : loadedScriptMap.values()) {
+                        if (script.getFile().equals(sourcePosition.getFile())) {
+                            bridge.send(String.format("setb %d %d", script.getIndex(), sourcePosition.getLine()));
+                            break;
+                        }
+                    }
+                }
             }
 
             @Override
             public void unregisterBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint, boolean temporary) {
-
+                XSourcePosition sourcePosition = breakpoint.getSourcePosition();
+                if (sourcePosition != null) {
+                    registeredBreakpoints.remove(sourcePosition);
+                    for (LoadedScript script : loadedScriptMap.values()) {
+                        if (script.getFile().equals(sourcePosition.getFile())) {
+                            bridge.send(String.format("setb %d %d", script.getIndex(), sourcePosition.getLine()));
+                            break;
+                        }
+                    }
+                }
             }
         } };
     }

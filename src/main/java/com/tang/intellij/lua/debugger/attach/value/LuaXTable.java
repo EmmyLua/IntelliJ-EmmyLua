@@ -61,11 +61,11 @@ public class LuaXTable extends LuaXValue {
             Node content = item.getFirstChild();
             switch (item.getNodeName()) {
                 case "key":
-                    LuaXValue keyV = LuaXValue.parse(content);
+                    LuaXValue keyV = LuaXValue.parse(content, process);
                     key = keyV.toKeyString();
                     break;
                 case "data":
-                    value = LuaXValue.parse(content);
+                    value = LuaXValue.parse(content, process);
                     break;
             }
         }

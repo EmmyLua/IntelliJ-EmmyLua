@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.attach.value;
 
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.tang.intellij.lua.debugger.attach.LoadedScript;
 import com.tang.intellij.lua.lang.LuaIcons;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Node;
@@ -48,7 +49,12 @@ public class LuaXFunction extends LuaXValue {
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
         String info;
         if (line >= 0 && script >= 0) {
-            info = String.format("line:%d, script:%d", getLine(), getScript());
+            LoadedScript loadedScript = process.getScript(this.script);
+            if (loadedScript != null) {
+                info = String.format("line:%d, script:%s", getLine(), loadedScript.getName());
+            } else {
+                info = "unknown source";
+            }
         } else {
             info = "native";
         }
