@@ -27,10 +27,10 @@ import java.util.List;
  * Created by tangzx on 2016/12/31.
  */
 public class LuaExecutionStack extends XExecutionStack {
-    private LuaStackFrame frame;
-    private List<LuaStackFrame> stackFrameList;
+    private XStackFrame frame;
+    private List<XStackFrame> stackFrameList;
 
-    public LuaExecutionStack(List<LuaStackFrame> stackFrameList) {
+    public LuaExecutionStack(List<XStackFrame> stackFrameList) {
         super("LuaStack");
         this.stackFrameList = stackFrameList;
         if (!stackFrameList.isEmpty())

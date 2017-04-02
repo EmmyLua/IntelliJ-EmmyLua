@@ -30,9 +30,7 @@ import com.intellij.xdebugger.frame.XSuspendContext;
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
 import com.tang.intellij.lua.debugger.LuaLineBreakpointType;
 import com.tang.intellij.lua.debugger.LuaSuspendContext;
-import com.tang.intellij.lua.debugger.attach.protos.LuaAttachBreakProto;
-import com.tang.intellij.lua.debugger.attach.protos.LuaAttachLoadScriptProto;
-import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto;
+import com.tang.intellij.lua.debugger.attach.protos.*;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * Created by tangzx on 2017/3/26.
  */
-public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBridge.ProtoHandler {
+public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
     private LuaDebuggerEditorsProvider editorsProvider;
     private ProcessInfo processInfo;
     private LuaAttachBridge bridge;
@@ -56,6 +54,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
         editorsProvider = new LuaDebuggerEditorsProvider();
         bridge = new LuaAttachBridge(processInfo);
         bridge.setProtoHandler(this);
+        bridge.setProtoFactory(this);
         bridge.start();
     }
 
@@ -78,6 +77,11 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
     @Override
     public void stop() {
         bridge.stop();
+    }
+
+    @Override
+    public void resume(@Nullable XSuspendContext context) {
+        bridge.send("run");
     }
 
     @Override
@@ -107,12 +111,18 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
             if (file.equals(pos.getFile()) && proto.getLine() == pos.getLine()) {
                 final XLineBreakpoint breakpoint = registeredBreakpoints.get(pos);
                 ApplicationManager.getApplication().invokeLater(()-> {
-                    getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(null));
+                    getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(proto.getStack()));
                     getSession().showExecutionPoint();
                 });
-                break;
+                return;
             }
         }
+
+        //position reached
+        ApplicationManager.getApplication().invokeLater(()-> {
+            getSession().positionReached(new LuaSuspendContext(proto.getStack()));
+            getSession().showExecutionPoint();
+        });
     }
 
     private void onLoadScript(LuaAttachLoadScriptProto proto) {
@@ -141,5 +151,32 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
 
             }
         } };
+    }
+
+    @Override
+    public LuaAttachProto createProto(int type) {
+        LuaAttachProto proto;
+        switch (type) {
+            case LuaAttachProto.Message:
+                proto = new LuaAttachMessageProto();
+                break;
+            case LuaAttachProto.LoadScript:
+                proto = new LuaAttachLoadScriptProto();
+                break;
+            case LuaAttachProto.SetBreakpoint:
+                proto = new LuaAttachSetBreakpointProto();
+                break;
+            case LuaAttachProto.Break:
+                proto = new LuaAttachBreakProto();
+                break;
+            default:
+                proto = new LuaAttachProto(type);
+        }
+        proto.setProcess(this);
+        return proto;
+    }
+
+    public LuaAttachBridge getBridge() {
+        return bridge;
     }
 }

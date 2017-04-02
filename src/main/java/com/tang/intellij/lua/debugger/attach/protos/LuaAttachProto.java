@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.attach.protos;
 
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -38,6 +39,7 @@ public class LuaAttachProto {
     public static final int NameVM              = 10;   // Sent when the name of a VM is set.
 
     private int type;
+    private LuaAttachDebugProcess process;
 
     public LuaAttachProto(int type) {
         this.type = type;
@@ -55,5 +57,13 @@ public class LuaAttachProto {
 
     public int getType() {
         return type;
+    }
+
+    public LuaAttachDebugProcess getProcess() {
+        return process;
+    }
+
+    public void setProcess(LuaAttachDebugProcess process) {
+        this.process = process;
     }
 }

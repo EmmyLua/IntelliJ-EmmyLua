@@ -18,7 +18,7 @@ package com.tang.intellij.lua.debugger.attach;
 
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.tang.intellij.lua.debugger.attach.protos.*;
+import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -42,13 +42,21 @@ class LuaAttachBridge {
     private Thread readerThread;
     private boolean isRunning;
     private ProtoHandler protoHandler;
+    private ProtoFactory protoFactory;
 
     void setProtoHandler(ProtoHandler protoHandler) {
         this.protoHandler = protoHandler;
     }
 
+    void setProtoFactory(ProtoFactory protoFactory) {
+        this.protoFactory = protoFactory;
+    }
+
     public interface ProtoHandler {
         void handle(LuaAttachProto proto);
+    }
+    public interface ProtoFactory {
+        LuaAttachProto createProto(int type);
     }
 
     LuaAttachBridge(ProcessInfo processInfo) {
@@ -70,7 +78,7 @@ class LuaAttachBridge {
                     assert read == size;
                     String s = String.copyValueOf(buff);
                     LuaAttachProto proto = parse(s);
-                    System.out.println(s);
+                    //System.out.println(s);
                     if (protoHandler != null && proto != null)
                         protoHandler.handle(proto);
                 } catch (IOException e) {
@@ -126,7 +134,7 @@ class LuaAttachBridge {
         }
     }
 
-    public void send(String data) {
+    void send(String data) {
         try {
             writer.write(data);
             writer.write('\n');
@@ -158,23 +166,7 @@ class LuaAttachBridge {
     }
 
     private LuaAttachProto createProto(int type, Element root) throws Exception {
-        LuaAttachProto proto;
-        switch (type) {
-            case LuaAttachProto.Message:
-                proto = new LuaAttachMessageProto();
-                break;
-            case LuaAttachProto.LoadScript:
-                proto = new LuaAttachLoadScriptProto();
-                break;
-            case LuaAttachProto.SetBreakpoint:
-                proto = new LuaAttachSetBreakpointProto();
-                break;
-            case LuaAttachProto.Break:
-                proto = new LuaAttachBreakProto();
-                break;
-            default:
-                proto = new LuaAttachProto(type);
-        }
+        LuaAttachProto proto = protoFactory.createProto(type);
         proto.doParse(root);
         return proto;
     }

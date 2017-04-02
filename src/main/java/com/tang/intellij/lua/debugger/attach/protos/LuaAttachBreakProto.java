@@ -16,7 +16,19 @@
 
 package com.tang.intellij.lua.debugger.attach.protos;
 
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.xdebugger.XSourcePosition;
+import com.intellij.xdebugger.frame.XStackFrame;
+import com.intellij.xdebugger.impl.XSourcePositionImpl;
+import com.tang.intellij.lua.debugger.LuaExecutionStack;
+import com.tang.intellij.lua.debugger.attach.LuaAttackStackFrame;
+import com.tang.intellij.lua.psi.LuaFileUtil;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -25,19 +37,51 @@ import org.w3c.dom.Node;
 public class LuaAttachBreakProto extends LuaAttachProto {
     private int line;
     private String name;
+    private LuaExecutionStack stack;
 
     public LuaAttachBreakProto() {
         super(Break);
+    }
+
+    public LuaExecutionStack getStack() {
+        return stack;
     }
 
     @Override
     protected void eachData(Node item) {
         super.eachData(item);
         String name = item.getNodeName();
-        if (name.equals("name")) {
-            this.name = item.getTextContent();
-        } else if (name.equals("line")) {
-            this.line = Integer.parseInt(item.getTextContent());
+        switch (name) {
+            case "name":
+                this.name = item.getTextContent();
+                break;
+            case "line":
+                this.line = Integer.parseInt(item.getTextContent());
+                break;
+            case "stacks":
+                NodeList stackNodes = item.getChildNodes();
+                List<XStackFrame> frames = new ArrayList<>();
+                for (int i = 0; i < stackNodes.getLength(); i++) {
+                    Node stackNode = stackNodes.item(i);
+                    NamedNodeMap stackFrameAttrs = stackNode.getAttributes();
+                    Node function = stackFrameAttrs.getNamedItem("function");
+                    Node scriptNameNode = stackFrameAttrs.getNamedItem("script_name");
+                    Node lineNode = stackFrameAttrs.getNamedItem("line");
+                    String scriptName = null;
+                    XSourcePosition position = null;
+                    if (scriptNameNode != null) {
+                        scriptName = scriptNameNode.getTextContent();
+                        // find source position
+                        VirtualFile file = LuaFileUtil.findFile(getProcess().getSession().getProject(), scriptName);
+                        if (file != null) {
+                            position = XSourcePositionImpl.create(file, Integer.parseInt(lineNode.getTextContent()));
+                        }
+                    }
+                    LuaAttackStackFrame frame = new LuaAttackStackFrame(getProcess(), position, function.getTextContent(), scriptName);
+                    frames.add(frame);
+                }
+                stack = new LuaExecutionStack(frames);
+                break;
         }
     }
 
