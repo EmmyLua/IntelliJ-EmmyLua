@@ -18,8 +18,10 @@ package com.tang.intellij.lua.debugger.attach;
 
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.tang.intellij.lua.debugger.attach.protos.LuaAttachEvalResultProto;
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto;
 import com.tang.intellij.lua.psi.LuaFileUtil;
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -28,6 +30,8 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * debug bridge
@@ -43,6 +47,8 @@ class LuaAttachBridge {
     private boolean isRunning;
     private ProtoHandler protoHandler;
     private ProtoFactory protoFactory;
+    private int evalIdCounter = 0;
+    private Map<Integer, EvalCallback> callbackMap = new HashMap<>();
 
     void setProtoHandler(ProtoHandler protoHandler) {
         this.protoHandler = protoHandler;
@@ -57,6 +63,10 @@ class LuaAttachBridge {
     }
     public interface ProtoFactory {
         LuaAttachProto createProto(int type);
+    }
+
+    public interface EvalCallback {
+        void onResult(LuaAttachEvalResultProto result);
     }
 
     LuaAttachBridge(ProcessInfo processInfo) {
@@ -76,11 +86,11 @@ class LuaAttachBridge {
                     char[] buff = new char[size];
                     int read = reader.read(buff, 0, size);
                     assert read == size;
-                    String s = String.copyValueOf(buff);
-                    LuaAttachProto proto = parse(s);
-                    //System.out.println(s);
-                    if (protoHandler != null && proto != null)
-                        protoHandler.handle(proto);
+                    String data = String.copyValueOf(buff);
+                    LuaAttachProto proto = parse(data);
+
+                    if (proto != null)
+                        handleProto(proto);
                 } catch (IOException e) {
                     e.printStackTrace();
                     stop();
@@ -89,6 +99,20 @@ class LuaAttachBridge {
             }
         }
     };
+
+    private void handleProto(LuaAttachProto proto) {
+        if (proto.getType() == LuaAttachProto.EvalResult) {
+            handleEvalCallback((LuaAttachEvalResultProto)proto);
+        } else if (protoHandler != null)
+            protoHandler.handle(proto);
+    }
+
+    private void handleEvalCallback(LuaAttachEvalResultProto proto) {
+        EvalCallback callback = callbackMap.remove(proto.getEvalId());
+        if (callback != null) {
+            callback.onResult(proto);
+        }
+    }
 
     private Runnable writeProcess = () -> {
 
@@ -169,5 +193,11 @@ class LuaAttachBridge {
         LuaAttachProto proto = protoFactory.createProto(type);
         proto.doParse(root);
         return proto;
+    }
+
+    void eval(String expr, @NotNull EvalCallback callback) {
+        int id = evalIdCounter++;
+        callbackMap.put(id, callback);
+        send(String.format("eval %d %s", id, expr));
     }
 }

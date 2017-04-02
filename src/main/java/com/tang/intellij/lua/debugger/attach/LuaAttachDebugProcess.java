@@ -169,6 +169,9 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
             case LuaAttachProto.Break:
                 proto = new LuaAttachBreakProto();
                 break;
+            case LuaAttachProto.EvalResult:
+                proto = new LuaAttachEvalResultProto();
+                break;
             default:
                 proto = new LuaAttachProto(type);
         }

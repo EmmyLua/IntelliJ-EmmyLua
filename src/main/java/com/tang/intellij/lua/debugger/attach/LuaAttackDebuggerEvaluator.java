@@ -34,5 +34,12 @@ public class LuaAttackDebuggerEvaluator extends XDebuggerEvaluator {
 
     @Override
     public void evaluate(@NotNull String express, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
+        process.getBridge().eval(express, result -> {
+            if (result.isSuccess()) {
+                xEvaluationCallback.evaluated(result.getXValue());
+            } else {
+                xEvaluationCallback.errorOccurred("error");
+            }
+        });
     }
 }

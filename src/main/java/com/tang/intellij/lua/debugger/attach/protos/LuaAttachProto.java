@@ -37,6 +37,7 @@ public class LuaAttachProto {
     public static final int Message             = 9;    // Event containing a string message from the debugger.
     public static final int SessionEnd          = 8;    // This is used internally and shouldn't be sent.
     public static final int NameVM              = 10;   // Sent when the name of a VM is set.
+    public static final int EvalResult          = 100;
 
     private int type;
     private LuaAttachDebugProcess process;
