@@ -77,7 +77,7 @@ public class LuaAttachBreakProto extends LuaAttachProto {
                             position = XSourcePositionImpl.create(file, Integer.parseInt(lineNode.getTextContent()));
                         }
                     }
-                    LuaAttackStackFrame frame = new LuaAttackStackFrame(getProcess(), position, function.getTextContent(), scriptName);
+                    LuaAttackStackFrame frame = new LuaAttackStackFrame(getProcess(), position, function.getTextContent(), scriptName, i);
                     frames.add(frame);
                 }
                 stack = new LuaExecutionStack(frames);

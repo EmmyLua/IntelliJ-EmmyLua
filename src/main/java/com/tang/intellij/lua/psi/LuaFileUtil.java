@@ -38,6 +38,9 @@ import java.io.File;
 public class LuaFileUtil {
 
     public static VirtualFile findFile(Project project, String shortUrl) {
+        if (!shortUrl.toLowerCase().endsWith(".lua"))
+            shortUrl = shortUrl + ".lua";
+
         shortUrl = shortUrl.replace('\\', '/');
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {

@@ -195,9 +195,9 @@ class LuaAttachBridge {
         return proto;
     }
 
-    void eval(String expr, @NotNull EvalCallback callback) {
+    void eval(String expr, int stack, @NotNull EvalCallback callback) {
         int id = evalIdCounter++;
         callbackMap.put(id, callback);
-        send(String.format("eval %d %s", id, expr));
+        send(String.format("eval %d %d %s", id, stack, expr));
     }
 }

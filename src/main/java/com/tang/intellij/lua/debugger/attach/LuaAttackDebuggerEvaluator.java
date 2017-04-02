@@ -27,14 +27,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LuaAttackDebuggerEvaluator extends XDebuggerEvaluator {
     private LuaAttachDebugProcess process;
+    private LuaAttackStackFrame stackFrame;
 
-    LuaAttackDebuggerEvaluator(LuaAttachDebugProcess process) {
+    LuaAttackDebuggerEvaluator(LuaAttachDebugProcess process, LuaAttackStackFrame stackFrame) {
         this.process = process;
+        this.stackFrame = stackFrame;
     }
 
     @Override
     public void evaluate(@NotNull String express, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
-        process.getBridge().eval(express, result -> {
+        process.getBridge().eval(express, stackFrame.getStack(), result -> {
             if (result.isSuccess()) {
                 xEvaluationCallback.evaluated(result.getXValue());
             } else {

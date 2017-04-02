@@ -34,13 +34,15 @@ public class LuaAttackStackFrame extends XStackFrame {
     private XSourcePosition position;
     private String function;
     private String scriptName;
+    private int stack;
     private LuaAttackDebuggerEvaluator evaluator;
 
-    public LuaAttackStackFrame(LuaAttachDebugProcess process, XSourcePosition position, String function, String scriptName) {
+    public LuaAttackStackFrame(LuaAttachDebugProcess process, XSourcePosition position, String function, String scriptName, int stack) {
         this.process = process;
         this.position = position;
         this.function = function;
         this.scriptName = scriptName;
+        this.stack = stack;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class LuaAttackStackFrame extends XStackFrame {
     @Override
     public XDebuggerEvaluator getEvaluator() {
         if (evaluator == null) {
-            evaluator = new LuaAttackDebuggerEvaluator(process);
+            evaluator = new LuaAttackDebuggerEvaluator(process, this);
         }
         return evaluator;
     }
@@ -68,5 +70,9 @@ public class LuaAttackStackFrame extends XStackFrame {
     @Override
     public XSourcePosition getSourcePosition() {
         return position;
+    }
+
+    public int getStack() {
+        return stack;
     }
 }
