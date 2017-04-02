@@ -38,6 +38,7 @@ import java.io.File;
 public class LuaFileUtil {
 
     public static VirtualFile findFile(Project project, String shortUrl) {
+        shortUrl = shortUrl.replace('\\', '/');
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();

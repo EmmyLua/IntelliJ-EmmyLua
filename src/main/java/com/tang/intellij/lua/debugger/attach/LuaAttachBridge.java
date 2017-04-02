@@ -18,8 +18,15 @@ package com.tang.intellij.lua.debugger.attach;
 
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.tang.intellij.lua.debugger.attach.protos.*;
 import com.tang.intellij.lua.psi.LuaFileUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 
 /**
@@ -34,6 +41,15 @@ class LuaAttachBridge {
     private Thread writerThread;
     private Thread readerThread;
     private boolean isRunning;
+    private ProtoHandler protoHandler;
+
+    void setProtoHandler(ProtoHandler protoHandler) {
+        this.protoHandler = protoHandler;
+    }
+
+    public interface ProtoHandler {
+        void handle(LuaAttachProto proto);
+    }
 
     LuaAttachBridge(ProcessInfo processInfo) {
         pid = String.valueOf(processInfo.getPid());
@@ -53,7 +69,10 @@ class LuaAttachBridge {
                     int read = reader.read(buff, 0, size);
                     assert read == size;
                     String s = String.copyValueOf(buff);
+                    LuaAttachProto proto = parse(s);
                     System.out.println(s);
+                    if (protoHandler != null && proto != null)
+                        protoHandler.handle(proto);
                 } catch (IOException e) {
                     e.printStackTrace();
                     stop();
@@ -105,5 +124,58 @@ class LuaAttachBridge {
         if (readerThread != null) {
             readerThread.interrupt();
         }
+    }
+
+    public void send(String data) {
+        try {
+            writer.write(data);
+            writer.write('\n');
+            writer.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private LuaAttachProto parse(String data) {
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
+            data = "<data>" + data + "</data>";
+            Document document = documentBuilder.parse(new ByteArrayInputStream(data.getBytes()));
+            Element root = document.getDocumentElement();
+            NodeList childNodes = root.getChildNodes();
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Node item = childNodes.item(i);
+                if (item.getNodeName().equals("type")) {
+                    int type = Integer.parseInt(item.getTextContent());
+                    return createProto(type, root);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private LuaAttachProto createProto(int type, Element root) throws Exception {
+        LuaAttachProto proto;
+        switch (type) {
+            case LuaAttachProto.Message:
+                proto = new LuaAttachMessageProto();
+                break;
+            case LuaAttachProto.LoadScript:
+                proto = new LuaAttachLoadScriptProto();
+                break;
+            case LuaAttachProto.SetBreakpoint:
+                proto = new LuaAttachSetBreakpointProto();
+                break;
+            case LuaAttachProto.Break:
+                proto = new LuaAttachBreakProto();
+                break;
+            default:
+                proto = new LuaAttachProto(type);
+        }
+        proto.doParse(root);
+        return proto;
     }
 }
