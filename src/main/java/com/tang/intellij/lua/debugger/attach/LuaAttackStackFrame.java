@@ -50,7 +50,7 @@ public class LuaAttackStackFrame extends XStackFrame {
         if (function != null) {
             component.append(function, SimpleTextAttributes.REGULAR_ATTRIBUTES);
             if (scriptName != null)
-                component.append(scriptName, SimpleTextAttributes.GRAY_ATTRIBUTES);
+                component.append(String.format("(%s)", scriptName), SimpleTextAttributes.GRAY_ATTRIBUTES);
         } else {
             component.append("invalid", SimpleTextAttributes.REGULAR_ATTRIBUTES);
         }
@@ -60,7 +60,7 @@ public class LuaAttackStackFrame extends XStackFrame {
     @Nullable
     @Override
     public XDebuggerEvaluator getEvaluator() {
-        if (evaluator == null) {
+        if (evaluator == null && scriptName != null) {
             evaluator = new LuaAttackDebuggerEvaluator(process, this);
         }
         return evaluator;

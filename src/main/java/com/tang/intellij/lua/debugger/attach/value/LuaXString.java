@@ -51,4 +51,9 @@ public class LuaXString extends LuaXValue {
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
         xValueNode.setPresentation(null, type, data, false);
     }
+
+    @Override
+    public String toKeyString() {
+        return data;
+    }
 }

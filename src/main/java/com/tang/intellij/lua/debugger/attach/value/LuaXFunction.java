@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.attach.value;
 
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.tang.intellij.lua.lang.LuaIcons;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Node;
 
@@ -27,14 +28,38 @@ import org.w3c.dom.Node;
  */
 public class LuaXFunction extends LuaXValue {
 
+    private int line;
+    private int script;
+
     @Override
     public void doParse(Node node) {
         super.doParse(node);
-
+        Node child = node.getFirstChild();
+        while (child != null) {
+            switch (child.getNodeName()) {
+                case "line": line = Integer.parseInt(child.getTextContent()); break;
+                case "script": script = Integer.parseInt(child.getTextContent()); break;
+            }
+            child = child.getNextSibling();
+        }
     }
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
-        xValueNode.setPresentation(null, "function", "value", false);
+        String info;
+        if (line >= 0 && script >= 0) {
+            info = String.format("line:%d, script:%d", getLine(), getScript());
+        } else {
+            info = "native";
+        }
+        xValueNode.setPresentation(LuaIcons.LOCAL_FUNCTION, info, "function", false);
+    }
+
+    public int getLine() {
+        return line;
+    }
+
+    public int getScript() {
+        return script;
     }
 }

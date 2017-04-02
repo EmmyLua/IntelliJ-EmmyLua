@@ -42,6 +42,10 @@ public abstract class LuaXValue extends XValue {
 
     }
 
+    public String toKeyString() {
+        return toString();
+    }
+
     public static LuaXValue parse(String data) {
         DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
         try {
@@ -55,7 +59,7 @@ public abstract class LuaXValue extends XValue {
         return null;
     }
 
-    private static LuaXValue parse(Node node) {
+    public static LuaXValue parse(Node node) {
         String nodeName = node.getNodeName();
         LuaXValue value = null;
         switch (nodeName) {
