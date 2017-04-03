@@ -95,11 +95,12 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
                 LuaAttachLoadScriptProto loadScriptProto = (LuaAttachLoadScriptProto) proto;
                 onLoadScript(loadScriptProto);
                 break;
-            case LuaAttachProto.SessionEnd:
-                bridge.stop();
-                break;
             case LuaAttachProto.Break:
                 onBreak((LuaAttachBreakProto) proto);
+                break;
+            case LuaAttachProto.SessionEnd:
+            case LuaAttachProto.DestroyVM:
+                getSession().stop();
                 break;
         }
     }
