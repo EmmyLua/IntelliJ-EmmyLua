@@ -23,7 +23,7 @@ import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
 import com.tang.intellij.lua.debugger.attach.LoadedScript;
-import com.tang.intellij.lua.debugger.attach.LuaAttackStackFrame;
+import com.tang.intellij.lua.debugger.attach.LuaAttachStackFrame;
 import com.tang.intellij.lua.debugger.attach.value.LuaXValue;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.w3c.dom.NamedNodeMap;
@@ -68,7 +68,7 @@ public class LuaAttachBreakProto extends LuaAttachProto {
     }
 
     private void parseStack(Node item) {
-        LuaAttackStackFrame top = null;
+        LuaAttachStackFrame top = null;
         List<XStackFrame> frames = new ArrayList<>();
         Node stackNode = item.getFirstChild();
         int stackIndex = 0;
@@ -91,7 +91,7 @@ public class LuaAttachBreakProto extends LuaAttachProto {
                 }
             }
             XValueChildrenList childrenList = parseValue(stackNode);
-            LuaAttackStackFrame frame = new LuaAttackStackFrame(this, childrenList, position, functionNode.getTextContent(), scriptName, stackIndex);
+            LuaAttachStackFrame frame = new LuaAttachStackFrame(this, childrenList, position, functionNode.getTextContent(), scriptName, stackIndex);
             frames.add(frame);
 
             if (top == null) {

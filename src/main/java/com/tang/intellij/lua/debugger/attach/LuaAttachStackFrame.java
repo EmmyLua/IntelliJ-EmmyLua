@@ -32,16 +32,16 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by tangzx on 2017/4/2.
  */
-public class LuaAttackStackFrame extends XStackFrame {
+public class LuaAttachStackFrame extends XStackFrame {
     private LuaAttachDebugProcess process;
     private XValueChildrenList childrenList;
     private XSourcePosition position;
     private String function;
     private String scriptName;
     private int stack;
-    private LuaAttackDebuggerEvaluator evaluator;
+    private LuaAttachDebuggerEvaluator evaluator;
 
-    public LuaAttackStackFrame(LuaAttachBreakProto proto, XValueChildrenList childrenList, XSourcePosition position, String function, String scriptName, int stack) {
+    public LuaAttachStackFrame(LuaAttachBreakProto proto, XValueChildrenList childrenList, XSourcePosition position, String function, String scriptName, int stack) {
         this.process = proto.getProcess();
         this.childrenList = childrenList;
         this.position = position;
@@ -71,7 +71,7 @@ public class LuaAttackStackFrame extends XStackFrame {
     @Override
     public XDebuggerEvaluator getEvaluator() {
         if (evaluator == null && scriptName != null) {
-            evaluator = new LuaAttackDebuggerEvaluator(process, this);
+            evaluator = new LuaAttachDebuggerEvaluator(process, this);
         }
         return evaluator;
     }

@@ -25,11 +25,11 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by tangzx on 2017/4/2.
  */
-public class LuaAttackDebuggerEvaluator extends XDebuggerEvaluator {
+public class LuaAttachDebuggerEvaluator extends XDebuggerEvaluator {
     private LuaAttachDebugProcess process;
-    private LuaAttackStackFrame stackFrame;
+    private LuaAttachStackFrame stackFrame;
 
-    LuaAttackDebuggerEvaluator(LuaAttachDebugProcess process, LuaAttackStackFrame stackFrame) {
+    LuaAttachDebuggerEvaluator(LuaAttachDebugProcess process, LuaAttachStackFrame stackFrame) {
         this.process = process;
         this.stackFrame = stackFrame;
     }
