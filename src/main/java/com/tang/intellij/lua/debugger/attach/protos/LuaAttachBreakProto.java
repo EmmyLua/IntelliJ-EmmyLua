@@ -119,6 +119,7 @@ public class LuaAttachBreakProto extends LuaAttachProto {
                         break;
                     }
                 }
+                value.setName(name);
                 list.add(name, value);
             }
             valueNode = valueNode.getNextSibling();
