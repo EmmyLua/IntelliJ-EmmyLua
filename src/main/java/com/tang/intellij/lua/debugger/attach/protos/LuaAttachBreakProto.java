@@ -19,9 +19,12 @@ package com.tang.intellij.lua.debugger.attach.protos;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.XStackFrame;
+import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
+import com.tang.intellij.lua.debugger.attach.LoadedScript;
 import com.tang.intellij.lua.debugger.attach.LuaAttackStackFrame;
+import com.tang.intellij.lua.debugger.attach.value.LuaXValue;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -59,30 +62,68 @@ public class LuaAttachBreakProto extends LuaAttachProto {
                 this.line = Integer.parseInt(item.getTextContent());
                 break;
             case "stacks":
-                NodeList stackNodes = item.getChildNodes();
-                List<XStackFrame> frames = new ArrayList<>();
-                for (int i = 0; i < stackNodes.getLength(); i++) {
-                    Node stackNode = stackNodes.item(i);
-                    NamedNodeMap stackFrameAttrs = stackNode.getAttributes();
-                    Node function = stackFrameAttrs.getNamedItem("function");
-                    Node scriptNameNode = stackFrameAttrs.getNamedItem("script_name");
-                    Node lineNode = stackFrameAttrs.getNamedItem("line");
-                    String scriptName = null;
-                    XSourcePosition position = null;
-                    if (scriptNameNode != null) {
-                        scriptName = scriptNameNode.getTextContent();
-                        // find source position
-                        VirtualFile file = LuaFileUtil.findFile(getProcess().getSession().getProject(), scriptName);
-                        if (file != null) {
-                            position = XSourcePositionImpl.create(file, Integer.parseInt(lineNode.getTextContent()));
-                        }
-                    }
-                    LuaAttackStackFrame frame = new LuaAttackStackFrame(getProcess(), position, function.getTextContent(), scriptName, i);
-                    frames.add(frame);
-                }
-                stack = new LuaExecutionStack(frames);
+                parseStack(item);
                 break;
         }
+    }
+
+    private void parseStack(Node item) {
+        LuaAttackStackFrame top = null;
+        List<XStackFrame> frames = new ArrayList<>();
+        Node stackNode = item.getFirstChild();
+        int stackIndex = 0;
+        while (stackNode != null) {
+            NamedNodeMap attributes = stackNode.getAttributes();
+            Node functionNode = attributes.getNamedItem("function");
+            Node scriptIndexNode = attributes.getNamedItem("script_index");
+            Node lineNode = attributes.getNamedItem("line");
+
+            LoadedScript script = getProcess().getScript(Integer.parseInt(scriptIndexNode.getTextContent()));
+            String scriptName = null;
+            int line = Integer.parseInt(lineNode.getTextContent());
+            XSourcePosition position = null;
+            if (script != null) {
+                scriptName = script.getName();
+                // find source position
+                VirtualFile file = LuaFileUtil.findFile(getProcess().getSession().getProject(), scriptName);
+                if (file != null) {
+                    position = XSourcePositionImpl.create(file, line);
+                }
+            }
+            XValueChildrenList childrenList = parseValue(stackNode);
+            LuaAttackStackFrame frame = new LuaAttackStackFrame(this, childrenList, position, functionNode.getTextContent(), scriptName, stackIndex);
+            frames.add(frame);
+
+            if (top == null) {
+                this.line = line;
+                this.name = scriptName;
+                top = frame;
+            }
+            stackNode = stackNode.getNextSibling();
+        }
+        stack = new LuaExecutionStack(frames);
+    }
+
+    private XValueChildrenList parseValue(Node stackNode) {
+        XValueChildrenList list = new XValueChildrenList();
+        Node valueNode = stackNode.getFirstChild();
+        while (valueNode != null) {
+            LuaXValue value = LuaXValue.parse(valueNode, getProcess());
+            if (value != null) {
+                String name = "unknown";
+                NodeList valueNodeChildNodes = valueNode.getChildNodes();
+                for (int i = 0; i < valueNodeChildNodes.getLength(); i++) {
+                    Node item = valueNodeChildNodes.item(i);
+                    if (item.getNodeName().equals("name")) {
+                        name = item.getTextContent();
+                        break;
+                    }
+                }
+                list.add(name, value);
+            }
+            valueNode = valueNode.getNextSibling();
+        }
+        return list;
     }
 
     public int getLine() {

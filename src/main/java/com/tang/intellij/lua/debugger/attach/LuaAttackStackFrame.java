@@ -21,7 +21,10 @@ import com.intellij.ui.ColoredTextContainer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
+import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XStackFrame;
+import com.intellij.xdebugger.frame.XValueChildrenList;
+import com.tang.intellij.lua.debugger.attach.protos.LuaAttachBreakProto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,18 +34,25 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LuaAttackStackFrame extends XStackFrame {
     private LuaAttachDebugProcess process;
+    private XValueChildrenList childrenList;
     private XSourcePosition position;
     private String function;
     private String scriptName;
     private int stack;
     private LuaAttackDebuggerEvaluator evaluator;
 
-    public LuaAttackStackFrame(LuaAttachDebugProcess process, XSourcePosition position, String function, String scriptName, int stack) {
-        this.process = process;
+    public LuaAttackStackFrame(LuaAttachBreakProto proto, XValueChildrenList childrenList, XSourcePosition position, String function, String scriptName, int stack) {
+        this.process = proto.getProcess();
+        this.childrenList = childrenList;
         this.position = position;
         this.function = function;
         this.scriptName = scriptName;
         this.stack = stack;
+    }
+
+    @Override
+    public void computeChildren(@NotNull XCompositeNode node) {
+        node.addChildren(childrenList, true);
     }
 
     @Override
