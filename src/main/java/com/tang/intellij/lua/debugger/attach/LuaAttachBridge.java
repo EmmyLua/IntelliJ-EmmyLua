@@ -81,6 +81,8 @@ class LuaAttachBridge {
             while (isRunning) {
                 try {
                     String line = reader.readLine();
+                    if (line == null)
+                        break;
                     if (readProto) {
                         if (line.startsWith("[end]")) {
                             readProto = false;
@@ -99,10 +101,10 @@ class LuaAttachBridge {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    stop();
                     break;
                 }
             }
+            stop(false);
         }
     };
 
@@ -151,7 +153,12 @@ class LuaAttachBridge {
     }
 
     public void stop() {
-        send("detach");
+        stop(true);
+    }
+
+    public void stop(boolean detach) {
+        if (detach)
+            send("detach");
         if (process != null) {
             process.destroy();
             process = null;
