@@ -151,6 +151,7 @@ class LuaAttachBridge {
     }
 
     public void stop() {
+        send("detach");
         if (process != null) {
             process.destroy();
             process = null;
