@@ -91,7 +91,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
         switch (type) {
             case LuaAttachProto.Message:
                 LuaAttachMessageProto messageProto = (LuaAttachMessageProto) proto;
-                System.out.println(messageProto.getMessage());
+                messageProto.outputToConsole();
                 break;
             case LuaAttachProto.LoadScript:
                 LuaAttachLoadScriptProto loadScriptProto = (LuaAttachLoadScriptProto) proto;

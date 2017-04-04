@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.attach.protos;
 
+import com.intellij.execution.ui.ConsoleViewContentType;
 import org.w3c.dom.Node;
 
 /**
@@ -24,6 +25,11 @@ import org.w3c.dom.Node;
  */
 public class LuaAttachMessageProto extends LuaAttachProto {
     private String message;
+    private int messageType = Normal;
+
+    public static final int Normal          = 0;
+    public static final int Warning         = 1;
+    public static final int Error           = 2;
 
     public LuaAttachMessageProto() {
         super(Message);
@@ -34,10 +40,23 @@ public class LuaAttachMessageProto extends LuaAttachProto {
         super.eachData(item);
         if (item.getNodeName().equals("message")) {
             this.message = item.getTextContent();
+        } else if (item.getNodeName().equals("message_type")) {
+            this.messageType = Integer.parseInt(item.getTextContent());
         }
     }
 
     public String getMessage() {
         return message;
+    }
+
+    public void outputToConsole() {
+        ConsoleViewContentType contentType = ConsoleViewContentType.SYSTEM_OUTPUT;
+        if (messageType == Normal)
+            contentType = ConsoleViewContentType.NORMAL_OUTPUT;
+        else if (messageType == Warning)
+            contentType = ConsoleViewContentType.SYSTEM_OUTPUT;
+        else if (messageType == Error)
+            contentType = ConsoleViewContentType.ERROR_OUTPUT;
+        getProcess().getSession().getConsoleView().print(message + '\n', contentType);
     }
 }

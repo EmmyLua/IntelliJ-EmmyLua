@@ -46,7 +46,8 @@ public class LuaLocalAttachDebugger implements XLocalAttachDebugger {
 
     @Override
     public void attachDebugSession(@NotNull Project project, @NotNull ProcessInfo processInfo) throws ExecutionException {
-        XDebuggerManager.getInstance(project).startSessionAndShowTab(String.valueOf(processInfo.getPid()), null, new XDebugProcessStarter() {
+        String displayName = String.format("%s(PID:%d)", processInfo.getExecutableDisplayName(), processInfo.getPid());
+        XDebuggerManager.getInstance(project).startSessionAndShowTab(displayName, null, new XDebugProcessStarter() {
             @NotNull
             @Override
             public XDebugProcess start(@NotNull XDebugSession xDebugSession) throws ExecutionException {
