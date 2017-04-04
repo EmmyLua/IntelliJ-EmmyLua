@@ -90,6 +90,8 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
         int type = proto.getType();
         switch (type) {
             case LuaAttachProto.Message:
+                LuaAttachMessageProto messageProto = (LuaAttachMessageProto) proto;
+                System.out.println(messageProto.getMessage());
                 break;
             case LuaAttachProto.LoadScript:
                 LuaAttachLoadScriptProto loadScriptProto = (LuaAttachLoadScriptProto) proto;
