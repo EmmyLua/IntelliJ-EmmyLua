@@ -25,6 +25,7 @@ import org.w3c.dom.Node;
 public class LuaAttachLoadScriptProto extends LuaAttachProto {
     private String name;
     private int index;
+    private String source;
 
     public LuaAttachLoadScriptProto() {
         super(LoadScript);
@@ -34,11 +35,16 @@ public class LuaAttachLoadScriptProto extends LuaAttachProto {
     protected void eachData(Node item) {
         super.eachData(item);
         String name = item.getNodeName();
-        if (name.equals("name")) {
-            this.name = item.getTextContent();
-        }
-        else if (name.equals("index")) {
-            this.index = Integer.parseInt(item.getTextContent());
+        switch (name) {
+            case "name":
+                this.name = item.getTextContent();
+                break;
+            case "index":
+                this.index = Integer.parseInt(item.getTextContent());
+                break;
+            case "source":
+                this.source = item.getTextContent();
+                break;
         }
     }
 
@@ -48,5 +54,9 @@ public class LuaAttachLoadScriptProto extends LuaAttachProto {
 
     public int getIndex() {
         return index;
+    }
+
+    public String getSource() {
+        return source;
     }
 }
