@@ -76,21 +76,27 @@ class LuaAttachBridge {
     private Runnable readProcess = new Runnable() {
         @Override
         public void run() {
+            boolean readProto = false;
+            StringBuilder sb = null;
             while (isRunning) {
                 try {
                     String line = reader.readLine();
-                    if (line == null || "".equals(line))
-                        continue;
-
-                    int size = Integer.parseInt(line);
-                    char[] buff = new char[size];
-                    int read = reader.read(buff, 0, size);
-                    assert read == size;
-                    String data = String.copyValueOf(buff);
-                    LuaAttachProto proto = parse(data);
-
-                    if (proto != null)
-                        handleProto(proto);
+                    if (readProto) {
+                        if (line.startsWith("[end]")) {
+                            readProto = false;
+                            String data = sb.toString();
+                            LuaAttachProto proto = parse(data);
+                            if (proto != null)
+                                handleProto(proto);
+                        } else {
+                            sb.append(line);
+                        }
+                    } else {
+                        readProto = line.startsWith("[start]");
+                        if (readProto) {
+                            sb = new StringBuilder();
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     stop();
