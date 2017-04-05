@@ -22,7 +22,6 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
-import com.tang.intellij.lua.comment.psi.LuaDocGlobalDef;
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaIcons;
