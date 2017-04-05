@@ -20,6 +20,7 @@ import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachEvalResultProto;
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto;
+import com.tang.intellij.lua.debugger.attach.value.LuaXValue;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Document;
@@ -37,7 +38,7 @@ import java.util.Map;
  * debug bridge
  * Created by tangzx on 2017/3/26.
  */
-class LuaAttachBridge {
+public class LuaAttachBridge {
     private String pid;
     private Process process;
     private BufferedWriter writer;
@@ -48,7 +49,7 @@ class LuaAttachBridge {
     private ProtoHandler protoHandler;
     private ProtoFactory protoFactory;
     private int evalIdCounter = 0;
-    private Map<Integer, EvalCallback> callbackMap = new HashMap<>();
+    private Map<Integer, EvalInfo> callbackMap = new HashMap<>();
 
     void setProtoHandler(ProtoHandler protoHandler) {
         this.protoHandler = protoHandler;
@@ -67,6 +68,11 @@ class LuaAttachBridge {
 
     public interface EvalCallback {
         void onResult(LuaAttachEvalResultProto result);
+    }
+
+    class EvalInfo {
+        public EvalCallback callback;
+        public String expr;
     }
 
     LuaAttachBridge(ProcessInfo processInfo) {
@@ -116,9 +122,12 @@ class LuaAttachBridge {
     }
 
     private void handleEvalCallback(LuaAttachEvalResultProto proto) {
-        EvalCallback callback = callbackMap.remove(proto.getEvalId());
-        if (callback != null) {
-            callback.onResult(proto);
+        EvalInfo info = callbackMap.remove(proto.getEvalId());
+        if (info != null) {
+            LuaXValue xValue = proto.getXValue();
+            if (xValue != null)
+                xValue.setName(info.expr);
+            info.callback.onResult(proto);
         }
     }
 
@@ -198,6 +207,7 @@ class LuaAttachBridge {
                 }
             }
         } catch (Exception e) {
+            System.out.println(data);
             e.printStackTrace();
         }
         return null;
@@ -209,9 +219,12 @@ class LuaAttachBridge {
         return proto;
     }
 
-    void eval(String expr, int stack, @NotNull EvalCallback callback) {
+    public void eval(String expr, int stack, int depth, @NotNull EvalCallback callback) {
         int id = evalIdCounter++;
-        callbackMap.put(id, callback);
-        send(String.format("eval %d %d %s", id, stack, expr));
+        EvalInfo info = new  EvalInfo();
+        info.callback = callback;
+        info.expr = expr;
+        callbackMap.put(id, info);
+        send(String.format("eval %d %d %d %s", id, stack, depth, expr));
     }
 }

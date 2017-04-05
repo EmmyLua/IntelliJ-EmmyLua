@@ -48,6 +48,7 @@ import java.io.ByteArrayInputStream;
 public abstract class LuaXValue extends XValue {
     protected LuaAttachDebugProcess process;
     protected String name;
+    protected LuaXValue parent;
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
@@ -134,5 +135,13 @@ public abstract class LuaXValue extends XValue {
                 }
             }
         }
+    }
+
+    public LuaXValue getParent() {
+        return parent;
+    }
+
+    public void setParent(LuaXValue parent) {
+        this.parent = parent;
     }
 }

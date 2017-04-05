@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.debugger.attach.protos;
 
-import com.intellij.xdebugger.frame.XValue;
 import com.tang.intellij.lua.debugger.attach.value.LuaXValue;
 import org.w3c.dom.Node;
 
@@ -28,7 +27,7 @@ public class LuaAttachEvalResultProto extends LuaAttachProto {
 
     private boolean success;
     private int evalId;
-    private XValue value;
+    private LuaXValue value;
 
     public LuaAttachEvalResultProto() {
         super(EvalResult);
@@ -58,7 +57,7 @@ public class LuaAttachEvalResultProto extends LuaAttachProto {
         return evalId;
     }
 
-    public XValue getXValue() {
+    public LuaXValue getXValue() {
         return value;
     }
 }
