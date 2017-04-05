@@ -21,6 +21,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.xdebugger.XSourcePosition;
+import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.tang.intellij.lua.debugger.LuaDebugProcess;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
@@ -94,7 +95,7 @@ public class GetStackCommand extends DefaultCommand {
         String fileName;
         int line;
 
-        private List<LuaStackFrame> stackFrameList = new ArrayList<>();
+        private List<XStackFrame> stackFrameList = new ArrayList<>();
         private LuaDebugProcess process;
 
         StackVisitor(LuaDebugProcess process) {
