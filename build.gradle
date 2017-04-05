@@ -36,7 +36,7 @@ task buildZip (type: Zip, dependsOn: [jar]) {
 	from (tasks['jar'].outputs) {
 		into '/LuaIDE/lib'
 	}
-	from (fileTree(dir:'src/main/resources/', includes:['std/**'])) {
+	from (fileTree(dir:'src/main/resources/', includes:['std/**', 'debugger/**'])) {
 		into '/LuaIDE/'
 	}
 }
