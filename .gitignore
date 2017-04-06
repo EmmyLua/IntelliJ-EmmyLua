@@ -8,3 +8,6 @@ gen
 .gradle
 LuaIDE*.zip
 jflex*.jar
+*.diff
+*.dll
+*.exe
