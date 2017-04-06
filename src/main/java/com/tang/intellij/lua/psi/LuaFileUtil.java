@@ -121,4 +121,18 @@ public class LuaFileUtil {
 
         return null;
     }
+
+    @Nullable
+    public static String getPluginVirtualFile(String path) {
+        VirtualFile directory = getPluginVirtualDirectory();
+        if (directory != null) {
+            String fullPath = directory.getPath() + "/classes/" + path;
+            if (new File(fullPath).exists())
+                return fullPath;
+            fullPath = directory.getPath() + "/" + path;
+            if (new File(fullPath).exists())
+                return fullPath;
+        }
+        return null;
+    }
 }

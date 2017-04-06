@@ -44,18 +44,21 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
     private LuaDebuggerEditorsProvider editorsProvider;
-    private ProcessInfo processInfo;
     private LuaAttachBridge bridge;
     private Map<XSourcePosition, XLineBreakpoint> registeredBreakpoints = new ConcurrentHashMap<>();
     private Map<Integer, LoadedScript> loadedScriptMap = new ConcurrentHashMap<>();
 
     LuaAttachDebugProcess(@NotNull XDebugSession session, ProcessInfo processInfo) {
         super(session);
-        this.processInfo = processInfo;
         editorsProvider = new LuaDebuggerEditorsProvider();
-        bridge = new LuaAttachBridge(processInfo);
+        bridge = new LuaAttachBridge(processInfo, session);
         bridge.setProtoHandler(this);
         bridge.setProtoFactory(this);
+    }
+
+    @Override
+    public void sessionInitialized() {
+        super.sessionInitialized();
         bridge.start();
     }
 
