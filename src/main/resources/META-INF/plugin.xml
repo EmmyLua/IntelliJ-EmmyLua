@@ -14,10 +14,10 @@
   ~ limitations under the License.
   -->
 
-<idea-plugin version="2">
+<idea-plugin>
     <id>com.tang</id>
     <name>Lua IDE</name>
-    <version>1.0.6</version>
+    <version>1.1.0</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
 
     <description><![CDATA[

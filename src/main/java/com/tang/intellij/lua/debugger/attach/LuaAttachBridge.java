@@ -139,6 +139,9 @@ public class LuaAttachBridge {
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
         if (pluginVirtualDirectory != null) {
             String exe = pluginVirtualDirectory.getPath() + "/classes/debugger/windows/x64/Debugger.exe";
+            if (!new File(exe).exists())
+                exe = pluginVirtualDirectory.getPath() + "/debugger/windows/x64/Debugger.exe";
+
             ProcessBuilder processBuilder = new ProcessBuilder(exe);
             try {
                 process = processBuilder.start();
