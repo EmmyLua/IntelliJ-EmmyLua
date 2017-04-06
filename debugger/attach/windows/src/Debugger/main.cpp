@@ -107,16 +107,6 @@ void mainLoop() {
 
 int main(int argc, char** argv)
 {
-	if (argc == 2)
-	{
-		char* pid_str = argv[1];
-		DWORD processId = atoi(pid_str);
-		HANDLE m_process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
-		BOOL is32;
-		IsWow64Process(m_process, &is32);
-		return is32;
-	}
-
 	inst.SetEventHandler(handler);
 
 	doAttach();
