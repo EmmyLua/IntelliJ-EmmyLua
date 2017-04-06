@@ -109,8 +109,11 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
 
     private void onBreak(LuaAttachBreakProto proto) {
         VirtualFile file = LuaFileUtil.findFile(getSession().getProject(), proto.getName());
-        if (file == null)
+        if (file == null) {
+            bridge.send("run");
             return;
+        }
+
         for (XSourcePosition pos : registeredBreakpoints.keySet()) {
             if (file.equals(pos.getFile()) && proto.getLine() == pos.getLine()) {
                 final XLineBreakpoint breakpoint = registeredBreakpoints.get(pos);

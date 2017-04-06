@@ -27,6 +27,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.SmartList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -37,7 +38,9 @@ import java.io.File;
  */
 public class LuaFileUtil {
 
-    public static VirtualFile findFile(Project project, String shortUrl) {
+    public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
+        if (shortUrl == null)
+            return null;
         if (!shortUrl.toLowerCase().endsWith(".lua"))
             shortUrl = shortUrl + ".lua";
 
