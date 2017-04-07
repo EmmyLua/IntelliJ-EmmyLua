@@ -711,7 +711,7 @@ bool DebugFrontend::Evaluate(size_t vm, int evalId, const char* expression, unsi
 
 	wxDebugEvent event(EventId_EvalResult, vm);
 	event.SetMessageString(result);
-	event.SetEvalResult(success);
+	event.SetEvalResult(success == 1);
 	event.SetEvalId(evalId);
 	m_eventHandler->AddPendingEvent(event);
 

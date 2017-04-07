@@ -313,9 +313,7 @@ int DecodaOutput(lua_State* L)
 {
 	unsigned long api = 0;
 	int result;
-	bool stdcall;
-	
-	assert(false, "TODO get api");
+	assert(false);//TODO get api
 	result = DecodaOutputWorker(api, L);
 	return result;
 }
@@ -337,7 +335,7 @@ int CPCallHandler(lua_State* L)
 	unsigned long api = 0;
 	int result;
 
-	assert(false, "TODO: get api");
+	assert(false);//TODO get api
 	result = CPCallHandlerWorker(api, L);
 	return result;
 }
@@ -1348,7 +1346,7 @@ HMODULE WINAPI LoadLibraryExW_intercept(LPCWSTR fileName, HANDLE hFile, DWORD dw
 
 }
 
-void lua_call_worker(unsigned long api, lua_State* L, int nargs, int nresults, bool& stdcall)
+void lua_call_worker(unsigned long api, lua_State* L, int nargs, int nresults)
 {
 	DebugBackend::Get().AttachState(api, L);
 
@@ -1366,8 +1364,6 @@ void lua_call_worker(unsigned long api, lua_State* L, int nargs, int nresults, b
 // calling convention at run-time and removes and extra argument from the stack.
 void lua_call_intercept(lua_State* L, int nargs, int nresults)
 {
-
-	bool stdcall;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
 	unsigned long api = (unsigned long)lp;
@@ -1375,10 +1371,10 @@ void lua_call_intercept(lua_State* L, int nargs, int nresults)
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	lua_call_worker(api, L, nargs, nresults, stdcall);
+	lua_call_worker(api, L, nargs, nresults);
 }
 
-void lua_callk_worker(unsigned long api, lua_State* L, int nargs, int nresults, int ctk, lua_CFunction k, bool& stdcall)
+void lua_callk_worker(unsigned long api, lua_State* L, int nargs, int nresults, int ctk, lua_CFunction k)
 {
 	DebugBackend::Get().AttachState(api, L);
 
@@ -1392,14 +1388,11 @@ void lua_callk_worker(unsigned long api, lua_State* L, int nargs, int nresults, 
 		lua_error_dll(api, L);
 	}
 }
-#pragma auto_inline()
 
 // This function cannot be called like a normal function. It changes its
 // calling convention at run-time and removes and extra argument from the stack.
 void lua_callk_intercept(lua_State* L, int nargs, int nresults, int ctx, lua_CFunction k)
 {
-
-	bool stdcall;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
 	unsigned long api = (unsigned long)lp;
@@ -1407,7 +1400,7 @@ void lua_callk_intercept(lua_State* L, int nargs, int nresults, int ctx, lua_CFu
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	lua_callk_worker(api, L, nargs, nresults, ctx, k, stdcall);
+	lua_callk_worker(api, L, nargs, nresults, ctx, k);
 }
 
 int lua_pcall_worker(unsigned long api, lua_State* L, int nargs, int nresults, int errfunc)
