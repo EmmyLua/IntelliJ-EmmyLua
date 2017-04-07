@@ -68,7 +68,6 @@ public class LuaAttachBreakProto extends LuaAttachProto {
     }
 
     private void parseStack(Node item) {
-        LuaAttachStackFrame top = null;
         List<XStackFrame> frames = new ArrayList<>();
         Node stackNode = item.getFirstChild();
         int stackIndex = 0;
@@ -88,17 +87,18 @@ public class LuaAttachBreakProto extends LuaAttachProto {
                 VirtualFile file = LuaFileUtil.findFile(getProcess().getSession().getProject(), scriptName);
                 if (file != null) {
                     position = XSourcePositionImpl.create(file, line);
+
+                    if (name == null) {
+                        this.line = line;
+                        this.name = scriptName;
+                    }
                 }
             }
             XValueChildrenList childrenList = parseValue(stackNode);
             LuaAttachStackFrame frame = new LuaAttachStackFrame(this, childrenList, position, functionNode.getTextContent(), scriptName, stackIndex);
             frames.add(frame);
 
-            if (top == null) {
-                this.line = line;
-                this.name = scriptName;
-                top = frame;
-            }
+            stackIndex++;
             stackNode = stackNode.getNextSibling();
         }
         stack = new LuaExecutionStack(frames);
