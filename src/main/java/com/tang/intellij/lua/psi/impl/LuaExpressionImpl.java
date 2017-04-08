@@ -46,6 +46,15 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             return guessType((LuaIndexExpr) this, context);
         if (this instanceof LuaNameExpr)
             return guessType((LuaNameExpr) this, context);
+        if (this instanceof LuaParenExpr)
+            return guessType((LuaParenExpr) this, context);
+        return null;
+    }
+
+    private LuaTypeSet guessType(LuaParenExpr luaParenExpr, SearchContext context) {
+        LuaExpr inner = luaParenExpr.getExpr();
+        if (inner != null)
+            return inner.guessType(context);
         return null;
     }
 
