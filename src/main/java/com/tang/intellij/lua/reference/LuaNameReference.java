@@ -21,7 +21,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.psi.LuaElementFactory;
-import com.tang.intellij.lua.psi.LuaNameRef;
+import com.tang.intellij.lua.psi.LuaNameExpr;
 import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by tangzx on 2016/11/26.
  */
-public class LuaNameReference extends PsiReferenceBase<LuaNameRef> {
-    LuaNameReference(LuaNameRef element) {
+public class LuaNameReference extends PsiReferenceBase<LuaNameExpr> {
+    LuaNameReference(LuaNameExpr element) {
         super(element);
     }
 

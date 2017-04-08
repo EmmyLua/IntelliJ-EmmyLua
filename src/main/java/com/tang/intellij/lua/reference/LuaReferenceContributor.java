@@ -18,10 +18,7 @@ package com.tang.intellij.lua.reference;
 
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
-import com.tang.intellij.lua.psi.LuaCallExpr;
-import com.tang.intellij.lua.psi.LuaIndexExpr;
-import com.tang.intellij.lua.psi.LuaNameRef;
-import com.tang.intellij.lua.psi.LuaTypes;
+import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
@@ -36,7 +33,7 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
         psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.CALL_EXPR), new CallExprReferenceProvider());
         psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.INDEX_EXPR), new IndexExprReferenceProvider());
         psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.FUNC_PREFIX_REF), new IndexExprReferenceProvider());
-        psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.NAME_REF), new NameReferenceProvider());
+        psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.NAME_EXPR), new NameReferenceProvider());
     }
 
     class CallExprReferenceProvider extends PsiReferenceProvider {
@@ -45,17 +42,13 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
         @Override
         public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
             LuaCallExpr expr = (LuaCallExpr) psiElement;
-            LuaNameRef nameRef = expr.getNameRef();
-            if (nameRef != null) {
+            LuaExpr nameRef = expr.getExpr();
+            if (nameRef instanceof LuaNameExpr) {
                 if (nameRef.getText().equals("require")) {
                     return new PsiReference[] { new LuaRequireReference(expr) };
                 }
             }
-
-            PsiElement id = expr.getId();
-            if (id == null)
-                return PsiReference.EMPTY_ARRAY;
-            return new PsiReference[]{ new LuaCallExprReference(expr) };
+            return PsiReference.EMPTY_ARRAY;
         }
     }
 
@@ -77,7 +70,7 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
         @NotNull
         @Override
         public PsiReference[] getReferencesByElement(@NotNull PsiElement psiElement, @NotNull ProcessingContext processingContext) {
-            return new PsiReference[] { new LuaNameReference((LuaNameRef) psiElement) };
+            return new PsiReference[] { new LuaNameReference((LuaNameExpr) psiElement) };
         }
     }
 }

@@ -173,11 +173,12 @@ globalFuncDef ::= 'function' ID funcBody {
 private checkFuncPrefix ::= ID ('.' | ':') ID
 
 left funcPrefixRef ::= '.' <<repeat checkFuncPrefix 1>> ID { extends = indexExpr }
-classMethodName ::=  nameRef (funcPrefixRef)* (('.' ID) | (':' ID)) {
+classMethodName ::=  nameExpr (funcPrefixRef)* (('.' ID) | (':' ID)) {
     pin = 3
     methods = [
         dot = 'DOT'
         colon = 'COLON'
+        getNameRef
     ]
 }
 classMethodDef ::= 'function' classMethodName funcBody {
@@ -244,7 +245,7 @@ exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 valueExpr ::= nil | false | true | NUMBER | STRING | "..." | closureFuncDef | tableConstructor | var | parenExpr
 
 // 最终产生 call expr | index expr | nameRef
-var ::= callOrIndexExpr | nameRef {
+var ::= callOrIndexExpr | nameExpr {
     methods = [
         toString
         guessType
@@ -255,6 +256,8 @@ var ::= callOrIndexExpr | nameRef {
         getNameIdentifier
         getTextOffset
         getPresentation
+
+        getNameRef
     ]
     implements = [
         "com.tang.intellij.lua.psi.LuaGlobalVar"
@@ -270,28 +273,32 @@ parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
 binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
 
-left indexExpr ::= '[' expr ']' | '.' ID {
+left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1
-    methods = [guessPrefixType]
+    methods = [
+        guessPrefixType
+        dot = 'DOT'
+        colon = 'COLON'
+    ]
 }
 
 arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }
 args ::=  '(' (arg_expr_list)? ')' | tableConstructor | STRING { pin(".*") = 1 }
-private callExpr1 ::= args
-private callExpr2 ::= '.' ID args
-private callExpr3 ::= ':' ID args { pin = 1 }
-left callExpr ::= callExpr1 | callExpr2 | callExpr3 {
+left callExpr ::= args {
     methods = [
         guessPrefixType
         resolveFuncBodyOwner
         getFirstStringArg
-        colon = "COLON"
+
+        isStaticMethodCall
+        isMethodCall
+        isFunctionCall
     ]
     implements = "com.tang.intellij.lua.psi.LuaPsiStatement"
 }
 
-private suffixExpr ::=  callExpr | indexExpr
-private prefixExpr ::= parenExpr | nameRef
+private suffixExpr ::= indexExpr | callExpr
+private prefixExpr ::= parenExpr | nameExpr
 // 最终产生 callExpr | indexExpr
 private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr
@@ -355,10 +362,10 @@ nameDef ::= ID {
     methods = [guessType getNameIdentifier getUseScope]
     extends = name
 }
-nameRef ::= ID {
+nameExpr ::= ID {
     implements = ["com.tang.intellij.lua.psi.LuaPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner" ]
-    methods = [setName getName getNameIdentifier getReferences resolve guessType]
+    methods = [setName getName getNameIdentifier getReferences resolve]
 }
 paramNameDef ::= ID {
     extends = nameDef

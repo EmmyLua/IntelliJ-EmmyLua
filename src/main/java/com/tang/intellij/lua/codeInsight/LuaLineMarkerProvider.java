@@ -35,10 +35,7 @@ import com.intellij.util.FunctionUtil;
 import com.intellij.util.Query;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.psi.LuaCallExpr;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
-import com.tang.intellij.lua.psi.LuaClassMethodName;
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch;
 import com.tang.intellij.lua.search.SearchContext;
@@ -159,7 +156,8 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
         }
         else if (element instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) element;
-            PsiReference reference = callExpr.getReference();
+            LuaExpr expr = callExpr.getExpr();
+            PsiReference reference = expr.getReference();
             if (reference != null) {
                 PsiElement resolve = reference.resolve();
                 if (resolve != null) {

@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -43,7 +44,8 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             return guessType((LuaCallExpr) this, context);
         if (this instanceof LuaIndexExpr)
             return guessType((LuaIndexExpr) this, context);
-
+        if (this instanceof LuaNameExpr)
+            return guessType((LuaNameExpr) this, context);
         return null;
     }
 
@@ -74,22 +76,20 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
 
     private LuaTypeSet guessType(LuaCallExpr luaCallExpr, SearchContext context) {
         // xxx()
-        LuaNameRef ref = luaCallExpr.getNameRef();
-        if (ref != null) {
-            // 从 require 'xxx' 中获取返回类型
-            if (ref.textMatches("require")) {
-                String filePath = null;
-                PsiElement string = luaCallExpr.getFirstStringArg();
-                if (string != null) {
-                    filePath = string.getText();
-                    filePath = filePath.substring(1, filePath.length() - 1);
-                }
-                LuaFile file = null;
-                if (filePath != null)
-                    file = LuaPsiResolveUtil.resolveRequireFile(filePath, luaCallExpr.getProject());
-                if (file != null)
-                    return file.getReturnedType(context);
+        LuaExpr ref = luaCallExpr.getExpr();
+        // 从 require 'xxx' 中获取返回类型
+        if (ref.textMatches("require")) {
+            String filePath = null;
+            PsiElement string = luaCallExpr.getFirstStringArg();
+            if (string != null) {
+                filePath = string.getText();
+                filePath = filePath.substring(1, filePath.length() - 1);
             }
+            LuaFile file = null;
+            if (filePath != null)
+                file = LuaPsiResolveUtil.resolveRequireFile(filePath, luaCallExpr.getProject());
+            if (file != null)
+                return file.getReturnedType(context);
         }
         // find in comment
         LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner(context);
@@ -113,12 +113,43 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             }
             else if (firstChild instanceof LuaVar) {
                 LuaVar luaVar = (LuaVar) firstChild;
-                LuaNameRef ref = luaVar.getNameRef();
-                if (ref != null)
-                    return ref.guessType(context);
-                else if (luaVar.getExpr() != null)
-                    return luaVar.getExpr().guessType(context);
+                return luaVar.getExpr().guessType(context);
             }
+        }
+        return null;
+    }
+
+    private static LuaTypeSet guessType(@NotNull LuaNameExpr nameRef, SearchContext context) {
+        PsiElement def = LuaPsiResolveUtil.resolve(nameRef, context);
+        if (def == null) { //也许是Global
+            return LuaTypeSet.create(LuaType.createGlobalType(nameRef));
+        } else if (def instanceof LuaTypeGuessable) {
+            return ((LuaTypeGuessable) def).guessType(context);
+        } else if (def instanceof LuaNameExpr) {
+            LuaNameExpr newRef = (LuaNameExpr) def;
+            LuaTypeSet typeSet = null;
+            LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
+            if (luaAssignStat != null) {
+                LuaComment comment = luaAssignStat.getComment();
+                //优先从 Comment 猜
+                if (comment != null) {
+                    typeSet = comment.guessType(context);
+                }
+                //再从赋值猜
+                if (typeSet == null) {
+                    LuaExprList exprList = luaAssignStat.getExprList();
+                    if (exprList != null)
+                        typeSet = exprList.guessTypeAt(0, context);//TODO : multi
+                }
+            }
+            //同时是 Global ?
+            if (LuaPsiResolveUtil.resolveLocal(newRef, context) == null) {
+                if (typeSet == null || typeSet.isEmpty())
+                    typeSet = LuaTypeSet.create(LuaType.createGlobalType(newRef));
+                else
+                    typeSet.addType(LuaType.createGlobalType(newRef));
+            }
+            return typeSet;
         }
         return null;
     }

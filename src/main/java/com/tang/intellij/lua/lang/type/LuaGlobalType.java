@@ -16,7 +16,7 @@
 
 package com.tang.intellij.lua.lang.type;
 
-import com.tang.intellij.lua.psi.LuaNameRef;
+import com.tang.intellij.lua.psi.LuaNameExpr;
 
 /**
  *
@@ -24,7 +24,7 @@ import com.tang.intellij.lua.psi.LuaNameRef;
  */
 public class LuaGlobalType extends LuaType {
 
-    public static LuaGlobalType create(LuaNameRef ref) {
+    public static LuaGlobalType create(LuaNameExpr ref) {
         return new LuaGlobalType(ref.getText());
     }
 
