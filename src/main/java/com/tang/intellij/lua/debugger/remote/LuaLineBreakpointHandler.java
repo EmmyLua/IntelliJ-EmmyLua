@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
+import com.tang.intellij.lua.debugger.LuaLineBreakpointType;
 import org.jetbrains.annotations.NotNull;
 
 /**

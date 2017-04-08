@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -29,7 +29,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.*;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
-import com.tang.intellij.lua.debugger.commands.EvaluatorCommand;
+import com.tang.intellij.lua.debugger.remote.commands.EvaluatorCommand;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;

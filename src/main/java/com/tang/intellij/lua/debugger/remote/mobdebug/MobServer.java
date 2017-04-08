@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.mobdebug;
+package com.tang.intellij.lua.debugger.remote.mobdebug;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.util.io.BaseOutputReader;
-import com.tang.intellij.lua.debugger.LuaDebugProcess;
-import com.tang.intellij.lua.debugger.commands.DebugCommand;
-import com.tang.intellij.lua.debugger.commands.DefaultCommand;
+import com.tang.intellij.lua.debugger.remote.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
+import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

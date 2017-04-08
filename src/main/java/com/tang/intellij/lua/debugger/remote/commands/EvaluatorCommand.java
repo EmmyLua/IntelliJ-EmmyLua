@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.commands;
+package com.tang.intellij.lua.debugger.remote.commands;
 
 import com.intellij.openapi.application.ApplicationManager;
 

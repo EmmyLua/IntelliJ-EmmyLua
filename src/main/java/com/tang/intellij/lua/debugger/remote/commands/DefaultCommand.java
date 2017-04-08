@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.commands;
+package com.tang.intellij.lua.debugger.remote.commands;
 
-import com.tang.intellij.lua.debugger.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.remote.LuaDebugProcess;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

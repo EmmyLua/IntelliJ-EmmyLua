@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -27,9 +27,12 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
-import com.tang.intellij.lua.debugger.commands.DebugCommand;
-import com.tang.intellij.lua.debugger.commands.GetStackCommand;
-import com.tang.intellij.lua.debugger.mobdebug.MobServer;
+import com.tang.intellij.lua.debugger.LuaExecutionStack;
+import com.tang.intellij.lua.debugger.LuaSuspendContext;
+import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
+import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
+import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand;
+import com.tang.intellij.lua.debugger.remote.mobdebug.MobServer;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

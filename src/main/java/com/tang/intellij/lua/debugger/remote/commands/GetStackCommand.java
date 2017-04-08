@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.commands;
+package com.tang.intellij.lua.debugger.remote.commands;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -23,10 +23,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
-import com.tang.intellij.lua.debugger.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.remote.LuaDebugProcess;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
-import com.tang.intellij.lua.debugger.LuaNamedValue;
-import com.tang.intellij.lua.debugger.LuaStackFrame;
+import com.tang.intellij.lua.debugger.remote.LuaNamedValue;
+import com.tang.intellij.lua.debugger.remote.LuaStackFrame;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 

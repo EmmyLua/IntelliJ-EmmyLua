@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
-import com.tang.intellij.lua.debugger.commands.EvaluatorCommand;
+import com.tang.intellij.lua.debugger.remote.commands.EvaluatorCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

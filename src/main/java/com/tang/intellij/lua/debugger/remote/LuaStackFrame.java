@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTextContainer;

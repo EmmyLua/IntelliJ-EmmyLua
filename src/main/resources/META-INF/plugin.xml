@@ -283,8 +283,8 @@
         <langCodeStyleSettingsProvider implementation="com.tang.intellij.lua.editor.formatter.LuaLanguageCodeStyleSettingsProvider"/>
 
         <!-- debugger -->
-        <programRunner implementation="com.tang.intellij.lua.debugger.LuaDebuggerRunner"/>
-        <configurationType implementation="com.tang.intellij.lua.debugger.LuaConfigurationType"/>
+        <programRunner implementation="com.tang.intellij.lua.debugger.remote.LuaDebuggerRunner"/>
+        <configurationType implementation="com.tang.intellij.lua.debugger.remote.LuaConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
         <xdebugger.localAttachDebuggerProvider implementation="com.tang.intellij.lua.debugger.attach.LuaLocalAttachDebuggerProvider"/>
 
