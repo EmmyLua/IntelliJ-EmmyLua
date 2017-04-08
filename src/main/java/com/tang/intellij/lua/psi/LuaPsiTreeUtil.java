@@ -80,56 +80,57 @@ public class LuaPsiTreeUtil {
 
     /**
      * 向上寻找 local 定义
-     * @param current 当前搜导起点
+     * @param element 当前搜索起点
      * @param processor 处理器
      */
-    public static void walkUpLocalNameDef(PsiElement current, ElementProcessor<LuaNameDef> processor) {
-        if (current == null || processor == null)
+    public static void walkUpLocalNameDef(PsiElement element, ElementProcessor<LuaNameDef> processor) {
+        if (element == null || processor == null)
             return;
         boolean continueSearch = true;
-        // 跳过类似
-        // local name
-        // function(name) end //skip
-        // name = nil
-        //
-        // for i, name in paris(name) do end // skip
         boolean searchParList = false;
-        PsiElement curr = current;
+
+        PsiElement curr = element;
         do {
-            // 跳过类似
-            // local name = name //skip
-            boolean searchLocalDef = true;
             PsiElement next = curr.getPrevSibling();
             if (next == null) {
-                searchLocalDef = false;
                 next = curr.getParent();
             }
             curr = next;
-            //check if we can search in params
-            if (!searchParList && curr instanceof LuaBlock) {
-                LuaBlock block = (LuaBlock) curr;
-                searchParList = block.getNode().getStartOffset() <= curr.getNode().getStartOffset();
-            }
 
             if (curr instanceof LuaLocalDef) {
-                if (searchLocalDef) {
+                // 跳过类似
+                // local name = name //skip
+                if (!curr.getNode().getTextRange().contains(element.getNode().getTextRange())) {
                     LuaNameList nameList = ((LuaLocalDef) curr).getNameList();
                     continueSearch = resolveInNameList(nameList, processor);
                 }
-            }
-            else if (curr instanceof LuaFuncBody) {
-                //参数部分
-                if (searchParList) continueSearch = resolveInFuncBody((LuaFuncBody) curr, processor);
-            }
-            // for name = x, y do end
-            else if (curr instanceof LuaForAStat) {
-                LuaForAStat forAStat = (LuaForAStat) curr;
-                if (searchParList) continueSearch = processor.accept(forAStat.getParamNameDef());
-            }
-            // for name in xxx do end
-            else if (curr instanceof LuaForBStat) {
-                LuaForBStat forBStat = (LuaForBStat) curr;
-                if (searchParList) continueSearch = resolveInNameList(forBStat.getParamNameDefList(), processor);
+            } else {
+                //check if we can search in params
+                //
+                // local name
+                // function(name) end //skip this `name`
+                // name = nil
+                //
+                // for i, name in paris(name) do end // skip first `name`
+                if (!searchParList && curr instanceof LuaBlock) {
+                    LuaBlock block = (LuaBlock) curr;
+                    searchParList = block.getNode().getStartOffset() <= curr.getNode().getStartOffset();
+                }
+
+                if (curr instanceof LuaFuncBody) {
+                    //参数部分
+                    if (searchParList) continueSearch = resolveInFuncBody((LuaFuncBody) curr, processor);
+                }
+                // for name = x, y do end
+                else if (curr instanceof LuaForAStat) {
+                    LuaForAStat forAStat = (LuaForAStat) curr;
+                    if (searchParList) continueSearch = processor.accept(forAStat.getParamNameDef());
+                }
+                // for name in xxx do end
+                else if (curr instanceof LuaForBStat) {
+                    LuaForBStat forBStat = (LuaForBStat) curr;
+                    if (searchParList) continueSearch = resolveInNameList(forBStat.getParamNameDefList(), processor);
+                }
             }
         } while (continueSearch && !(curr instanceof PsiFile));
     }
