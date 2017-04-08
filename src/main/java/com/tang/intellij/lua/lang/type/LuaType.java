@@ -20,6 +20,7 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
@@ -51,8 +52,8 @@ public class LuaType {
         return type;
     }
 
-    public static LuaType createAnonymousType(LuaNameDef localDef) {
-        LuaType type = create(LuaPsiResolveUtil.getAnonymousType(localDef), null);
+    public static LuaType createAnonymousType(PsiElement element) {
+        LuaType type = create(LuaPsiResolveUtil.getAnonymousType(element), null);
         type.isAnonymous = true;
         return type;
     }

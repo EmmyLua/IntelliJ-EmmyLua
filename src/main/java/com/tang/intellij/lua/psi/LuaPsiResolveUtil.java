@@ -23,6 +23,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
@@ -74,10 +75,10 @@ public class LuaPsiResolveUtil {
             if (block != null) {
                 LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef.class);
                 if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
-                    LuaNameExpr nameRef = classMethodFuncDef.getClassMethodName().getNameRef();
-                    if (nameRef != null) {
-                        PsiElement resolve = nameRef.resolve(context);
-                        return resolve != null ? resolve : nameRef;
+                    LuaExpr nameRef = classMethodFuncDef.getClassMethodName().getExpr();
+                    PsiReference reference = nameRef.getReference();
+                    if (reference != null) {
+                        return reference.resolve();
                     }
                 }
             }
@@ -313,10 +314,10 @@ public class LuaPsiResolveUtil {
         return null;
     }
 
-    public static String getAnonymousType(LuaNameDef nameDef) {
-        String fileName = nameDef.getContainingFile().getName();
-        int startOffset = nameDef.getNode().getStartOffset();
+    public static String getAnonymousType(PsiElement element) {
+        String fileName = element.getContainingFile().getName();
+        int startOffset = element.getNode().getStartOffset();
 
-        return String.format("%s@(%d)%s", fileName, startOffset, nameDef.getName());
+        return String.format("%s@(%d)%s", fileName, startOffset, element.getText());
     }
 }

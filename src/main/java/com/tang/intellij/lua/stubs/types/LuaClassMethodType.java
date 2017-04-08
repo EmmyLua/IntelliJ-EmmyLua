@@ -53,13 +53,12 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
     public LuaClassMethodStub createStub(@NotNull LuaClassMethodDef methodDef, StubElement stubElement) {
         LuaClassMethodName methodName = methodDef.getClassMethodName();
         PsiElement id = methodDef.getNameIdentifier();
-        LuaNameExpr nameRef = methodName.getNameRef();
-        assert nameRef != null;
+        LuaExpr expr = methodName.getExpr();
         assert id != null;
-        String clazzName = nameRef.getText();
+        String clazzName = expr.getText();
         SearchContext searchContext = new SearchContext(methodDef.getProject()).setCurrentStubFile(methodDef.getContainingFile());
 
-        LuaTypeSet typeSet = nameRef.guessType(searchContext);
+        LuaTypeSet typeSet = expr.guessType(searchContext);
         if (typeSet != null) {
             LuaType type = typeSet.getFirst();
             if (type != null)
@@ -84,8 +83,7 @@ public class LuaClassMethodType extends IStubElementType<LuaClassMethodStub, Lua
     public boolean shouldCreateStub(ASTNode node) {
         //确定是完整的，并且是 class:method, class.method 形式的， 否则会报错
         LuaClassMethodDef psi = (LuaClassMethodDef) node.getPsi();
-        LuaClassMethodName classMethodName = psi.getClassMethodName();
-        return classMethodName.getNameRef() != null && psi.getFuncBody() != null;
+        return psi.getFuncBody() != null;
     }
 
     @Override

@@ -154,18 +154,12 @@ public class LuaPsiImplUtil {
      */
     @Nullable
     public static LuaType getClassType(LuaClassMethodDef classMethodDef, SearchContext context) {
-        LuaNameExpr ref = classMethodDef.getClassMethodName().getNameRef();
-        if (ref != null) {
-            LuaTypeSet typeSet = ref.guessType(context);
-            if (typeSet != null) {
-                return typeSet.getFirst();
-            }
+        LuaExpr expr = classMethodDef.getClassMethodName().getExpr();
+        LuaTypeSet typeSet = expr.guessType(context);
+        if (typeSet != null) {
+            return typeSet.getFirst();
         }
         return null;
-    }
-
-    public static LuaNameExpr getNameRef(LuaClassMethodName name) {
-        return PsiTreeUtil.findChildOfType(name, LuaNameExpr.class);
     }
 
     public static PsiElement getNameIdentifier(LuaGlobalFuncDef globalFuncDef) {
@@ -483,6 +477,10 @@ public class LuaPsiImplUtil {
     }
 
     public static LuaTypeSet guessType(LuaTableField tableField, SearchContext context) {
+        PsiElement lastChild = tableField.getLastChild();
+        if (lastChild instanceof LuaExpr) {
+            return ((LuaExpr)lastChild).guessType(context);
+        }
         return null;
     }
 

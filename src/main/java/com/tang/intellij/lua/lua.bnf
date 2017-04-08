@@ -178,7 +178,6 @@ classMethodName ::=  nameExpr (funcPrefixRef)* (('.' ID) | (':' ID)) {
     methods = [
         dot = 'DOT'
         colon = 'COLON'
-        getNameRef
     ]
 }
 classMethodDef ::= 'function' classMethodName funcBody {
