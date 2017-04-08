@@ -104,7 +104,7 @@ public class LuaScriptBlock extends AbstractBlock {
     protected List<Block> buildChildren() {
         List<Block> blocks = new ArrayList<>();
         buildChildren(myNode, blocks);
-        checkAlignment(blocks);
+        //checkAlignment(blocks);
         return blocks;
     }
 
