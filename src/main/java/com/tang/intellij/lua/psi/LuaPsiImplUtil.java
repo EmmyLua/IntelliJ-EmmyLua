@@ -492,7 +492,7 @@ public class LuaPsiImplUtil {
     }
 
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
-        return "[STUB]";// + stubElement.getNode().getElementType().toString();
+        return "STUB:[" + stubElement.getClass().getSimpleName() + "]";
     }
 
     public static LuaTypeSet guessType(LuaVar var, SearchContext context) {
