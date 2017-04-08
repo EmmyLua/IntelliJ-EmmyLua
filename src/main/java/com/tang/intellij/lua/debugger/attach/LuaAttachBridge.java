@@ -188,6 +188,9 @@ public class LuaAttachBridge {
     private void stop(boolean detach) {
         if (detach)
             send("detach");
+        writer = null;
+        reader = null;
+        isRunning = false;
         if (process != null) {
             process.destroy();
             process = null;
@@ -202,12 +205,15 @@ public class LuaAttachBridge {
     }
 
     void send(String data) {
-        try {
-            writer.write(data);
-            writer.write('\n');
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (writer != null) {
+            try {
+                writer.write(data);
+                writer.write('\n');
+                writer.flush();
+            } catch (IOException e) {
+                writer = null;
+                session.stop();
+            }
         }
     }
 
@@ -227,8 +233,8 @@ public class LuaAttachBridge {
                 }
             }
         } catch (Exception e) {
+            System.out.println("Parse exception:");
             System.out.println(data);
-            e.printStackTrace();
         }
         return null;
     }
