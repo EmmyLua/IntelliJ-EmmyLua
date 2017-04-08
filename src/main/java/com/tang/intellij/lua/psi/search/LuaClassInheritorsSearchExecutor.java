@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi.search;
 
 import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.util.Ref;
 import com.intellij.util.Processor;
 import com.intellij.util.QueryExecutor;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
@@ -44,10 +45,10 @@ public class LuaClassInheritorsSearchExecutor implements QueryExecutor<LuaDocCla
 
     @Override
     public boolean execute(@NotNull LuaClassInheritorsSearch.SearchParameters searchParameters, @NotNull Processor<LuaDocClassDef> processor) {
-        boolean[] ret = new boolean[] { false };
+        final Ref<Boolean> ref = Ref.create();
         DumbService.getInstance(searchParameters.getProject()).runReadActionInSmartMode(() -> {
-            ret[0] = processInheritors(searchParameters, searchParameters.getTypeName(), processor);
+            ref.set(processInheritors(searchParameters, searchParameters.getTypeName(), processor));
         });
-        return ret[0];
+        return ref.get();
     }
 }

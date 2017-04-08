@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.codeInsight.completion.impl.CamelHumpMatcher;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -65,7 +66,7 @@ public class LuaPsiResolveUtil {
     }
 
     public static PsiElement resolveLocal(LuaNameExpr ref, SearchContext context) {
-        PsiElement[] ret = new PsiElement[] { null };
+        final Ref<PsiElement> ret = Ref.create();
         String refName = ref.getName();
 
         if (refName.equals(Constants.WORD_SELF)) {
@@ -85,25 +86,25 @@ public class LuaPsiResolveUtil {
         //local 变量, 参数
         LuaPsiTreeUtil.walkUpLocalNameDef(ref, nameDef -> {
             if (refName.equals(nameDef.getName())) {
-                ret[0] = nameDef;
+                ret.set(nameDef);
                 return false;
             }
             return true;
         });
 
         //local 函数名
-        if (ret[0] == null) {
+        if (ret.isNull()) {
             LuaPsiTreeUtil.walkUpLocalFuncDef(ref, nameDef -> {
                 String name= nameDef.getName();
                 if (refName.equals(name)) {
-                    ret[0] = nameDef;
+                    ret.set(nameDef);
                     return false;
                 }
                 return true;
             });
         }
 
-        return ret[0];
+        return ret.get();
     }
 
     public static boolean isUpValue(@NotNull LuaNameExpr ref, @NotNull SearchContext context) {
