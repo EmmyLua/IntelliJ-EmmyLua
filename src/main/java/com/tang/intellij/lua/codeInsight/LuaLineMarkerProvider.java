@@ -52,7 +52,7 @@ import java.util.List;
  */
 public class LuaLineMarkerProvider implements LineMarkerProvider {
 
-    private static final Function<LuaClassMethodDef, String> overridingMethodTooltipProvider = (classMethodDef) -> {
+    private static final Function<LuaClassMethodName, String> overridingMethodTooltipProvider = (classMethodDef) -> {
         final StringBuilder builder = new StringBuilder("<html>Is overridden in:");
         String name = classMethodDef.getName();
         if (name != null) {
@@ -60,23 +60,26 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
         return builder.toString();
     };
 
-    private static final LuaLineMarkerNavigator<LuaClassMethodDef> overridingMethodNavigator = new LuaLineMarkerNavigator<LuaClassMethodDef>() {
+    private static final LuaLineMarkerNavigator<LuaClassMethodName, LuaClassMethodDef> overridingMethodNavigator = new LuaLineMarkerNavigator<LuaClassMethodName, LuaClassMethodDef>() {
 
         @Override
-        protected String getTitle(LuaClassMethodDef elt) {
+        protected String getTitle(LuaClassMethodName elt) {
             return "Choose Overriding Method of " + elt.getName();
         }
 
-        @NotNull
+        @Nullable
         @Override
-        protected Query<LuaClassMethodDef> search(LuaClassMethodDef elt) {
-            return LuaOverridingMethodsSearch.search(elt);
+        protected Query<LuaClassMethodDef> search(LuaClassMethodName elt) {
+            LuaClassMethodDef def = PsiTreeUtil.getParentOfType(elt, LuaClassMethodDef.class);
+            if (def == null)
+                return null;
+            return LuaOverridingMethodsSearch.search(def);
         }
     };
 
     private static final Function<LuaDocClassDef, String> subclassTooltipProvider = LuaDocClassDef::getName;
 
-    private static final LuaLineMarkerNavigator<LuaDocClassDef> subclassNavigator = new LuaLineMarkerNavigator<LuaDocClassDef>() {
+    private static final LuaLineMarkerNavigator<LuaDocClassDef, LuaDocClassDef> subclassNavigator = new LuaLineMarkerNavigator<LuaDocClassDef, LuaDocClassDef>() {
         @Override
         protected String getTitle(LuaDocClassDef elt) {
             return "Choose Subclass of " + elt.getName();
@@ -124,8 +127,8 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
             // OverridenMethod
             Query<LuaClassMethodDef> search = LuaOverridingMethodsSearch.search(methodDef);
             if (search.findFirst() != null) {
-                result.add(new LineMarkerInfo<>(methodDef,
-                        classMethodNameId.getTextRange(),
+                result.add(new LineMarkerInfo<>(classMethodName,
+                        classMethodName.getTextRange(),
                         AllIcons.Gutter.OverridenMethod,
                         Pass.LINE_MARKERS,
                         overridingMethodTooltipProvider,
@@ -134,7 +137,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
             }
 
             //line separator
-            LineMarkerInfo lineSeparator = new LineMarkerInfo<>(methodDef, methodDef.getNode().getStartOffset(), null, Pass.LINE_MARKERS, null, null);
+            LineMarkerInfo lineSeparator = new LineMarkerInfo<>(classMethodName, classMethodName.getNode().getStartOffset(), null, Pass.LINE_MARKERS, null, null);
             lineSeparator.separatorColor = EditorColorsManager.getInstance().getGlobalScheme().getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
             lineSeparator.separatorPlacement = SeparatorPlacement.TOP;
             result.add(lineSeparator);
