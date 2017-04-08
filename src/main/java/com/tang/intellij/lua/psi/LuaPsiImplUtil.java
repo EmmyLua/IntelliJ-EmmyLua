@@ -498,7 +498,11 @@ public class LuaPsiImplUtil {
     }
 
     public static LuaTypeSet guessType(LuaVar var, SearchContext context) {
-        return var.getExpr().guessType(context);
+        LuaExpr expr = var.getExpr();
+        //TODO stack overflow
+        if (expr instanceof LuaIndexExpr)
+            return null;
+        return expr.guessType(context);
     }
 
     public static LuaNameExpr getNameRef(LuaVar var) {
