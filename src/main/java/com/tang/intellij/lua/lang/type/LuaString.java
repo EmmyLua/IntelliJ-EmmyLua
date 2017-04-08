@@ -32,19 +32,19 @@ public class LuaString {
      * 获取 lua 字符串的内容，
      * "value"
      * 'value'
-     * [[value]] todo
+     * [[value]]
      * @param text string element
      * @return value of String
      */
     public static LuaString getContent(String text) {
         LuaString content = new LuaString();
         if (text.startsWith("[")) {
-            Pattern pattern = Pattern.compile("\\[\\[(.+?)\\]\\]");
+            Pattern pattern = Pattern.compile("\\[(=*)\\[(.*)]\\1]");
             Matcher matcher = pattern.matcher(text);
             if (matcher.find()) {
-                String contentString = matcher.group(1);
-                content.start = 2;
-                content.end = text.length() - 2;
+                String contentString = matcher.group(2);
+                content.start = matcher.start(2);
+                content.end = matcher.end(2);
                 content.value = contentString;
             }
         } else {
