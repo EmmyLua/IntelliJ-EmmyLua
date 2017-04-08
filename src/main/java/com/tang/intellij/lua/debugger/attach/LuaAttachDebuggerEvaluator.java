@@ -16,6 +16,14 @@
 
 package com.tang.intellij.lua.debugger.attach;
 
+import com.intellij.debugger.impl.DebuggerUtilsEx;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.project.IndexNotReadyException;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
@@ -43,5 +51,21 @@ public class LuaAttachDebuggerEvaluator extends XDebuggerEvaluator {
                 xEvaluationCallback.errorOccurred("error");
             }
         });
+    }
+
+    @Nullable
+    @Override
+    public TextRange getExpressionRangeAtOffset(Project project, Document document, int offset, boolean sideEffectsAllowed) {
+        final Ref<TextRange> currentRange = Ref.create(null);
+        PsiDocumentManager.getInstance(project).commitAndRunReadAction(() -> {
+            try {
+                PsiElement elementAtCursor = DebuggerUtilsEx.findElementAt(PsiDocumentManager.getInstance(project).getPsiFile(document), offset);
+                if (elementAtCursor == null || !elementAtCursor.isValid()) {
+                    return;
+                }
+                currentRange.set(elementAtCursor.getTextRange());
+            } catch (IndexNotReadyException ignored) {}
+        });
+        return currentRange.get();
     }
 }
