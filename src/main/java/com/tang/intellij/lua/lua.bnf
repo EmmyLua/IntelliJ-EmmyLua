@@ -241,7 +241,9 @@ nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
-valueExpr ::= nil | false | true | NUMBER | STRING | "..." | closureFuncDef | tableConstructor | var | parenExpr
+literalExpr ::= nil | false | true | NUMBER | STRING | "..."
+
+valueExpr ::= literalExpr | closureFuncDef | tableConstructor | var | parenExpr
 
 // 最终产生 call expr | index expr | nameRef
 var ::= callOrIndexExpr | nameExpr {
@@ -270,7 +272,7 @@ expr ::= unaryExpr | binaryExpr | valueExpr { mixin = "com.tang.intellij.lua.psi
 
 parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
-binaryExpr ::= valueExpr binaryOp expr { pin = 2 }
+binaryExpr ::= expr binaryOp expr { pin = 2 }
 
 left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1
