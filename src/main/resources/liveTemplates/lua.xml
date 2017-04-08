@@ -24,7 +24,7 @@
               name="for-loop" toReformat="true" toShortenFQNames="true"
               value="for $VAR$ = 1, $EXPR$ do&#10;$END$&#10;end">
         <variable name="VAR" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true" />
-        <variable name="EXPR" expression="" defaultValue="&quot;10&quot;" alwaysStopAt="true" />
+        <variable name="EXPR" expression="SuggestFirstLuaVarName()" defaultValue="&quot;10&quot;" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
         </context>
@@ -35,7 +35,7 @@
               value="for $VAR1$, $VAR2$ in iparis($EXPR$) do&#10;$END$&#10;end">
         <variable name="VAR1" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true" />
         <variable name="VAR2" expression="" defaultValue="&quot;v&quot;" alwaysStopAt="true" />
-        <variable name="EXPR" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="EXPR" expression="SuggestFirstLuaVarName()" defaultValue="" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
         </context>
@@ -46,7 +46,7 @@
               value="for $VAR1$, $VAR2$ in paris($EXPR$) do&#10;$END$&#10;end">
         <variable name="VAR1" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true" />
         <variable name="VAR2" expression="" defaultValue="&quot;v&quot;" alwaysStopAt="true" />
-        <variable name="EXPR" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="EXPR" expression="SuggestFirstLuaVarName()" defaultValue="" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
         </context>
@@ -55,7 +55,7 @@
     <template resource-bundle="LuaBundle" key="livetemplate.description.if-end"
               name="if-end" toReformat="true" toShortenFQNames="true"
               value="if $VAR$ then&#10;$END$&#10;end">
-        <variable name="VAR" expression="" defaultValue="&quot;true&quot;" alwaysStopAt="true" />
+        <variable name="VAR" expression="SuggestFirstLuaVarName()" defaultValue="&quot;true&quot;" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
         </context>

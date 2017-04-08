@@ -343,6 +343,7 @@
         
         <defaultLiveTemplatesProvider implementation="com.tang.intellij.lua.codeInsight.LuaLiveTemplatesProvider"/>
         <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.LuaCodeTemplateContextType"/>
+        <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestFirstLuaVarNameMacro"/>
     </extensions>
 
     <application-components>
