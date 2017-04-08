@@ -87,23 +87,29 @@ public class LuaPsiTreeUtil {
         if (current == null || processor == null)
             return;
         boolean continueSearch = true;
+        // 跳过类似
+        // local name
+        // function(name) end //skip
+        // name = nil
+        //
+        // for i, name in paris(name) do end // skip
+        boolean searchParList = false;
         PsiElement curr = current;
         do {
             // 跳过类似
             // local name = name //skip
             boolean searchLocalDef = true;
-            // 跳过类似
-            // local name
-            // function(name) end //skip
-            // name = nil
-            boolean searchParList = false;
             PsiElement next = curr.getPrevSibling();
             if (next == null) {
                 searchLocalDef = false;
-                searchParList = true;
                 next = curr.getParent();
             }
             curr = next;
+            //check if we can search in params
+            if (!searchParList && curr instanceof LuaBlock) {
+                LuaBlock block = (LuaBlock) curr;
+                searchParList = block.getNode().getStartOffset() <= curr.getNode().getStartOffset();
+            }
 
             if (curr instanceof LuaLocalDef) {
                 if (searchLocalDef) {
