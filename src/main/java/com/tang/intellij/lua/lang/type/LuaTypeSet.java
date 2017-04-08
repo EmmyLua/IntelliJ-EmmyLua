@@ -18,7 +18,6 @@ package com.tang.intellij.lua.lang.type;
 
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
-import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,10 +84,8 @@ public class LuaTypeSet {
         LuaTypeSet set = LuaTypeSet.create();
         int num = stubInputStream.readInt();
         for (int i = 0; i < num; i++) {
-            StringRef classNameRef = stubInputStream.readName();
-            assert classNameRef != null;
-            StringRef superClassNameRef = stubInputStream.readName();
-            LuaType type = LuaType.create(classNameRef.getString(), StringRef.toString(superClassNameRef));
+            LuaType type = new LuaType();
+            type.deserialize(stubInputStream);
             set.addType(type);
         }
         return set;

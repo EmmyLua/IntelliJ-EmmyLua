@@ -21,7 +21,9 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
+import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.editor.completion.FuncInsertHandler;
 import com.tang.intellij.lua.lang.LuaIcons;
@@ -50,7 +52,9 @@ public class LuaType {
     }
 
     public static LuaType createAnonymousType(LuaNameDef localDef) {
-        return create(LuaPsiResolveUtil.getAnonymousType(localDef), null);
+        LuaType type = create(LuaPsiResolveUtil.getAnonymousType(localDef), null);
+        type.isAnonymous = true;
+        return type;
     }
 
     public static LuaType createGlobalType(LuaNameExpr ref) {
@@ -62,6 +66,7 @@ public class LuaType {
 
     // 模糊匹配的结果
     private boolean isUnreliable;
+    private boolean isAnonymous;
     String clazzName;
     private String superClassName;
 
@@ -83,8 +88,15 @@ public class LuaType {
     }
 
     void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
+        stubOutputStream.writeBoolean(isAnonymous);
         stubOutputStream.writeName(clazzName);
         stubOutputStream.writeName(superClassName);
+    }
+
+    void deserialize(@NotNull StubInputStream stubInputStream) throws IOException {
+        isAnonymous = stubInputStream.readBoolean();
+        clazzName = StringRef.toString(stubInputStream.readName());
+        superClassName = StringRef.toString(stubInputStream.readName());
     }
 
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters,
@@ -255,6 +267,10 @@ public class LuaType {
 
     public void setUnreliable(boolean unreliable) {
         isUnreliable = unreliable;
+    }
+
+    public boolean isAnonymous() {
+        return isAnonymous;
     }
 
     /*private LuaClassMethodDef findStaticMethod(String methodName, @NotNull SearchContext context) {
