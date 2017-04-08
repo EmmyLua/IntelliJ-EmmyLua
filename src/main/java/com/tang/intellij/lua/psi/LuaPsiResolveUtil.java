@@ -44,32 +44,28 @@ import java.util.List;
  */
 public class LuaPsiResolveUtil {
 
-    private static LuaFuncBodyOwner funcBodyOwner = null;
-
     static LuaFuncBodyOwner resolveFuncBodyOwner(@NotNull LuaNameExpr ref, SearchContext context) {
         String refName = ref.getName();
+        LuaFuncBodyOwner[] ret = new LuaFuncBodyOwner[] { null };
         //local 函数名
-        if (funcBodyOwner == null) {
-            LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
-                if (refName.equals(localFuncDef.getName())) {
-                    funcBodyOwner = localFuncDef;
-                    return false;
-                }
-                return true;
-            });
-        }
+        LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
+            if (refName.equals(localFuncDef.getName())) {
+                ret[0] = localFuncDef;
+                return false;
+            }
+            return true;
+        });
 
         //global function
-        if (funcBodyOwner == null) {
-            funcBodyOwner = LuaGlobalFuncIndex.find(refName, context);
+        if (ret[0] == null) {
+            ret[0] = LuaGlobalFuncIndex.find(refName, context);
         }
 
-        LuaFuncBodyOwner temp = funcBodyOwner;
-        funcBodyOwner = null;
-        return temp;
+        return ret[0];
     }
 
     public static PsiElement resolveLocal(LuaNameExpr ref, SearchContext context) {
+        PsiElement[] ret = new PsiElement[] { null };
         String refName = ref.getName();
 
         if (refName.equals(Constants.WORD_SELF)) {
@@ -89,27 +85,25 @@ public class LuaPsiResolveUtil {
         //local 变量, 参数
         LuaPsiTreeUtil.walkUpLocalNameDef(ref, nameDef -> {
             if (refName.equals(nameDef.getName())) {
-                resolveResult = nameDef;
+                ret[0] = nameDef;
                 return false;
             }
             return true;
         });
 
         //local 函数名
-        if (resolveResult == null) {
+        if (ret[0] == null) {
             LuaPsiTreeUtil.walkUpLocalFuncDef(ref, nameDef -> {
                 String name= nameDef.getName();
                 if (refName.equals(name)) {
-                    resolveResult = nameDef;
+                    ret[0] = nameDef;
                     return false;
                 }
                 return true;
             });
         }
 
-        PsiElement result = resolveResult;
-        resolveResult = null;
-        return result;
+        return ret[0];
     }
 
     public static boolean isUpValue(@NotNull LuaNameExpr ref, @NotNull SearchContext context) {
@@ -136,8 +130,6 @@ public class LuaPsiResolveUtil {
         return false;
     }
 
-    private static PsiElement resolveResult;
-
     /**
      * 查找这个引用
      * @param ref 要查找的ref
@@ -146,7 +138,7 @@ public class LuaPsiResolveUtil {
      */
     public static PsiElement resolve(LuaNameExpr ref, SearchContext context) {
         //search local
-        resolveResult = resolveLocal(ref, context);
+        PsiElement resolveResult = resolveLocal(ref, context);
 
         String refName = ref.getName();
         //global field
@@ -162,9 +154,7 @@ public class LuaPsiResolveUtil {
             resolveResult = LuaGlobalFuncIndex.find(refName, context);
         }
 
-        PsiElement result = resolveResult;
-        resolveResult = null;
-        return result;
+        return resolveResult;
     }
 
     public static PsiElement resolve(LuaIndexExpr indexExpr, SearchContext context) {
