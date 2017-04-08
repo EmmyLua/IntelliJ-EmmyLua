@@ -423,22 +423,22 @@ public class LuaPsiImplUtil {
     }
     private static void processOptionalFunc(LuaParamInfo[] params, OptionalFuncProcessor processor) {
         int mask = 0;
-        String signature = "(";
+        StringBuilder signature = new StringBuilder("(");
 
         for (int i = 0; i < params.length; i++) {
             LuaParamInfo info = params[i];
             if (info != null) {
                 if (mask > 0) {
-                    signature += ", " + info.getName();
+                    signature.append(", ").append(info.getName());
                 } else {
-                    signature += info.getName();
+                    signature.append(info.getName());
                 }
                 mask = mask | (1 << i);
             }
         }
 
-        signature += ")";
-        processor.accept(signature, mask);
+        signature.append(")");
+        processor.accept(signature.toString(), mask);
         sets.add(mask);
         for (int i = 0; i < params.length; i++) {
             LuaParamInfo info = params[i];

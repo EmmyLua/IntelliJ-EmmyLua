@@ -21,6 +21,7 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
+import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
@@ -56,8 +57,8 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                 }
             }
 
-            LuaArgs args = callExpr.getArgs();
-            if (args != null && parameters != null) {
+            if (parameters != null) {
+                LuaArgs args = callExpr.getArgs();
                 LuaExprList luaExprList = args.getExprList();
                 if (luaExprList != null) {
                     List<LuaExpr> exprList = luaExprList.getExprList();
@@ -66,7 +67,7 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                     int argIndex = 0;
                     if (isInstanceMethodUsedAsStaticMethod && exprList.size() > 0) {
                         LuaExpr expr = exprList.get(argIndex++);
-                        list.add(new InlayInfo("self", expr.getTextOffset()));
+                        list.add(new InlayInfo(Constants.WORD_SELF, expr.getTextOffset()));
                     }
                     for (; argIndex < exprList.size() && paramIndex < paramCount; argIndex++) {
                         LuaExpr expr = exprList.get(argIndex);
