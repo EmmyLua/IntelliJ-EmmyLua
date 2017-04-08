@@ -65,7 +65,8 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
                 .between(FUNCTION, NAME_DEF).spaces(1) //function<SPACE>name()
                 .between(VALUE_EXPR, COMMA).lineBreakOrForceSpace(false, false)
                 .around(BINARY_OP).spaces(settings.SPACE_AROUND_ASSIGNMENT_OPERATORS ? 1 : 0)
-                .around(UNARY_OP).spaces(1)
+                .after(UNARY_OP).none() //#myTable, -2 ...
+                .before(UNARY_OP).spaces(1)
                 .around(ASSIGN).lineBreakOrForceSpace(false, settings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
                 .before(COMMA).spaces(settings.SPACE_BEFORE_COMMA ? 1 : 0)
