@@ -135,13 +135,6 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         public void visitNameExpr(@NotNull LuaNameExpr o) {
             PsiElement id = o.getFirstChild();
 
-            //up value
-            boolean upValue = LuaPsiResolveUtil.isUpValue(o, new SearchContext(o.getProject()));
-            if (upValue) {
-                Annotation annotation = myHolder.createInfoAnnotation(o, null);
-                annotation.setTextAttributes(LuaHighlightingData.UP_VALUE);
-            }
-
             PsiElement res = o.resolve(new SearchContext(o.getProject()));
             if (res != null) { //std api highlighting
                 PsiFile containingFile = res.getContainingFile();
@@ -156,6 +149,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
             if (res instanceof LuaParamNameDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.PARAMETER);
+                checkUpValue(o);
             } else if (res instanceof LuaGlobalFuncDef) {
                 Annotation annotation = myHolder.createInfoAnnotation(o, null);
                 annotation.setTextAttributes(LuaHighlightingData.GLOBAL_FUNCTION);
@@ -163,13 +157,23 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                 if (id.textMatches(Constants.WORD_SELF)) {
                     Annotation annotation = myHolder.createInfoAnnotation(o, null);
                     annotation.setTextAttributes(LuaHighlightingData.SELF);
+                    checkUpValue(o);
                 } else if (res instanceof LuaNameDef || res instanceof LuaLocalFuncDef) { //Local
                     Annotation annotation = myHolder.createInfoAnnotation(o, null);
                     annotation.setTextAttributes(LuaHighlightingData.LOCAL_VAR);
+                    checkUpValue(o);
                 } else/* if (res instanceof LuaNameRef) */ { // 未知的，视为Global
                     Annotation annotation = myHolder.createInfoAnnotation(o, null);
                     annotation.setTextAttributes(LuaHighlightingData.GLOBAL_VAR);
                 }
+            }
+        }
+
+        private void checkUpValue(@NotNull LuaNameExpr o) {
+            boolean upValue = LuaPsiResolveUtil.isUpValue(o, new SearchContext(o.getProject()));
+            if (upValue) {
+                Annotation annotation = myHolder.createInfoAnnotation(o, null);
+                annotation.setTextAttributes(LuaHighlightingData.UP_VALUE);
             }
         }
 
