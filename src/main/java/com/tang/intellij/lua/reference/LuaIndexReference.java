@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/12/4.
  */
-public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
+public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> implements LuaReference {
 
     private PsiElement id;
 
@@ -61,7 +61,12 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        PsiElement ref = LuaPsiResolveUtil.resolve(myElement, new SearchContext(myElement.getProject()));
+        return resolve(new SearchContext(myElement.getProject()));
+    }
+
+    @Override
+    public PsiElement resolve(SearchContext context) {
+        PsiElement ref = LuaPsiResolveUtil.resolve(myElement, context);
         if (ref != null) {
             if (ref.getContainingFile().equals(myElement.getContainingFile())) { //优化，不要去解析 Node Tree
                 if (ref.getNode().getTextRange().equals(myElement.getNode().getTextRange())) {

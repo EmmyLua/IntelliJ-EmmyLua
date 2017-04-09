@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by tangzx on 2016/11/26.
  */
-public class LuaNameReference extends PsiReferenceBase<LuaNameExpr> {
+public class LuaNameReference extends PsiReferenceBase<LuaNameExpr> implements LuaReference {
     LuaNameReference(LuaNameExpr element) {
         super(element);
     }
@@ -51,7 +51,12 @@ public class LuaNameReference extends PsiReferenceBase<LuaNameExpr> {
     @Nullable
     @Override
     public PsiElement resolve() {
-        PsiElement resolve = LuaPsiResolveUtil.resolve(myElement, new SearchContext(myElement.getProject()));
+        return resolve(new SearchContext(myElement.getProject()));
+    }
+
+    @Override
+    public PsiElement resolve(SearchContext context) {
+        PsiElement resolve = LuaPsiResolveUtil.resolve(myElement, context);
         if (resolve == myElement) // LuaVar 全局定义中会发生
             return null;
         return resolve;

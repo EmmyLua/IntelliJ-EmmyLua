@@ -31,6 +31,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.GuessTypeKind;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.reference.LuaReference;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
@@ -77,8 +78,8 @@ public class LuaPsiResolveUtil {
                 if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
                     LuaExpr nameRef = classMethodFuncDef.getClassMethodName().getExpr();
                     PsiReference reference = nameRef.getReference();
-                    if (reference != null) {
-                        return reference.resolve();
+                    if (reference instanceof LuaReference) {
+                        return ((LuaReference) reference).resolve(context);
                     }
                 }
             }
