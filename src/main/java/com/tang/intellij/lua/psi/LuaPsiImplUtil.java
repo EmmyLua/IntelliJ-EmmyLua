@@ -251,8 +251,8 @@ public class LuaPsiImplUtil {
             LuaExprList exprList = args.getExprList();
             if (exprList != null) {
                 List<LuaExpr> list = exprList.getExprList();
-                if (list.size() == 1 && list.get(0) instanceof LuaValueExpr) {
-                    LuaValueExpr valueExpr = (LuaValueExpr) list.get(0);
+                if (list.size() == 1 && list.get(0) instanceof LuaLiteralExpr) {
+                    LuaLiteralExpr valueExpr = (LuaLiteralExpr) list.get(0);
                     PsiElement node = valueExpr.getFirstChild();
                     if (node.getNode().getElementType() == LuaTypes.STRING) {
                         path = node;
