@@ -76,23 +76,28 @@ public class LuaPsiResolveUtil {
             if (block != null) {
                 LuaClassMethodDef classMethodFuncDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef.class);
                 if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
-                    LuaExpr nameRef = classMethodFuncDef.getClassMethodName().getExpr();
-                    PsiReference reference = nameRef.getReference();
+                    LuaExpr expr = classMethodFuncDef.getClassMethodName().getExpr();
+                    PsiReference reference = expr.getReference();
                     if (reference instanceof LuaReference) {
-                        return ((LuaReference) reference).resolve(context);
+                        PsiElement resolve = ((LuaReference) reference).resolve(context);
+                        ret.set(resolve);
                     }
+                    if (ret.isNull() && expr instanceof LuaNameExpr)
+                        ret.set(expr);
                 }
             }
         }
 
         //local 变量, 参数
-        LuaPsiTreeUtil.walkUpLocalNameDef(ref, nameDef -> {
-            if (refName.equals(nameDef.getName())) {
-                ret.set(nameDef);
-                return false;
-            }
-            return true;
-        });
+        if (ret.isNull()) {
+            LuaPsiTreeUtil.walkUpLocalNameDef(ref, nameDef -> {
+                if (refName.equals(nameDef.getName())) {
+                    ret.set(nameDef);
+                    return false;
+                }
+                return true;
+            });
+        }
 
         //local 函数名
         if (ret.isNull()) {
