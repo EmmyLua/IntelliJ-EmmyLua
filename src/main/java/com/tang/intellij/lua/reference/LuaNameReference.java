@@ -32,19 +32,23 @@ import org.jetbrains.annotations.Nullable;
  * Created by tangzx on 2016/11/26.
  */
 public class LuaNameReference extends PsiReferenceBase<LuaNameExpr> implements LuaReference {
+    private PsiElement id;
+
     LuaNameReference(LuaNameExpr element) {
         super(element);
+        id = element.getId();
     }
 
     @Override
     public TextRange getRangeInElement() {
-        return new TextRange(0, myElement.getTextLength());
+        int start = id.getTextOffset() - myElement.getTextOffset();
+        return new TextRange(start, start + id.getTextLength());
     }
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
         PsiElement newId = LuaElementFactory.createIdentifier(myElement.getProject(), newElementName);
-        myElement.getFirstChild().replace(newId);
+        id.replace(newId);
         return newId;
     }
 
