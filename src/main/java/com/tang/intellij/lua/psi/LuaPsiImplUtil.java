@@ -563,7 +563,7 @@ public class LuaPsiImplUtil {
 
     @NotNull
     public static PsiElement getNameIdentifier(LuaNameExpr ref) {
-        return ref.getFirstChild();
+        return ref.getId();
     }
 
     @NotNull
