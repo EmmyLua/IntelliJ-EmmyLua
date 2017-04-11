@@ -80,7 +80,7 @@ public class LuaCompletionContributor extends CompletionContributor {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 //local
-                PsiElement cur = completionParameters.getOriginalFile().findElementAt(completionParameters.getOffset() - 1);
+                PsiElement cur = completionParameters.getPosition();
                 LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> {
                     String name = nameDef.getText();
                     if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
@@ -105,7 +105,7 @@ public class LuaCompletionContributor extends CompletionContributor {
                 });
 
                 //global functions
-                Project project = completionParameters.getOriginalFile().getProject();
+                Project project = cur.getProject();
                 SearchContext context = new SearchContext(project);
                 LuaGlobalFuncIndex.getInstance().processAllKeys(project, name -> {
                     if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
@@ -142,12 +142,12 @@ public class LuaCompletionContributor extends CompletionContributor {
                 completionResultSet.addElement(LookupElementBuilder.create(Constants.WORD_SELF));
 
                 //words in file
-                suggestWordsInFile(completionParameters, processingContext, completionResultSet);
+                suggestWordsInFile(completionParameters, completionResultSet);
             }
         });
     }
 
-    static void suggestWordsInFile(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+    static void suggestWordsInFile(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         HashSet<String> wordsInFileSet = new HashSet<>();
         PsiFile file = completionParameters.getOriginalFile();
         file.acceptChildren(new LuaVisitor() {

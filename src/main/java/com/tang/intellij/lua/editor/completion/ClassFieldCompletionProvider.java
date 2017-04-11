@@ -49,6 +49,6 @@ public class ClassFieldCompletionProvider extends CompletionProvider<CompletionP
             }
         }
         //words in file
-        suggestWordsInFile(completionParameters, processingContext, completionResultSet);
+        suggestWordsInFile(completionParameters, completionResultSet);
     }
 }
