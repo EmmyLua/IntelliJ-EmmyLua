@@ -251,11 +251,6 @@ var ::= callOrIndexExpr | nameExpr {
         toString
         guessType
         getFieldName
-
-        getName
-        setName
-        getNameIdentifier
-        getTextOffset
         getPresentation
 
         getNameRef
@@ -263,7 +258,6 @@ var ::= callOrIndexExpr | nameExpr {
     implements = [
         "com.tang.intellij.lua.psi.LuaGlobalVar"
         "com.tang.intellij.lua.psi.LuaClassField"
-        "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaVarStub"
 }
