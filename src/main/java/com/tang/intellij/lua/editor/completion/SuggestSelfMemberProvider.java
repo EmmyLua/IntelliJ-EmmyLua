@@ -41,16 +41,20 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                                   @NotNull CompletionResultSet completionResultSet) {
         PsiElement position = completionParameters.getPosition();
         LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(position, LuaClassMethodDef.class);
-        if (methodDef != null) {
+        if (methodDef != null && !methodDef.isStatic()) {
             SearchContext searchContext = new SearchContext(position.getProject());
             LuaType type = methodDef.getClassType(searchContext);
             if (type != null) {
                 type.processFields(completionParameters, searchContext, (curType, field) -> {
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create("self." + field.getFieldName())
-                            .withIcon(LuaIcons.CLASS_FIELD);
-                    if (curType == type)
-                        elementBuilder = elementBuilder.bold();
-                    completionResultSet.addElement(elementBuilder);
+                    String fieldName = field.getFieldName();
+                    if (fieldName != null) {
+                        LookupElementBuilder elementBuilder = LookupElementBuilder.create("self." + fieldName)
+                                .withIcon(LuaIcons.CLASS_FIELD)
+                                .withTypeText(curType.getDisplayName());
+                        if (curType == type)
+                            elementBuilder = elementBuilder.bold();
+                        completionResultSet.addElement(elementBuilder);
+                    }
                 });
 
                 type.processMethods(completionParameters, searchContext, (curType, def) -> {
@@ -59,7 +63,7 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                         LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
                             LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, "self:" + methodName)
                                     .withIcon(LuaIcons.CLASS_METHOD)
-                                    .withTypeText(type.getClassName())
+                                    .withTypeText(curType.getDisplayName())
                                     .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
                                     .withTailText(signature);
                             if (curType == type)
