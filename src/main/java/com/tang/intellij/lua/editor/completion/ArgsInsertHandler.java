@@ -51,13 +51,17 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
             EditorEx ex = (EditorEx) editor;
             HighlighterIterator iterator = ex.getHighlighter().createIterator(startOffset);
             iterator.advance();
-            IElementType tokenType = iterator.getTokenType();
-            while (tokenType == TokenType.WHITE_SPACE) {
-                iterator.advance();
-                tokenType = iterator.getTokenType();
+            if (!iterator.atEnd()) {
+                IElementType tokenType = iterator.getTokenType();
+                while (tokenType == TokenType.WHITE_SPACE) {
+                    iterator.advance();
+                    if (iterator.atEnd())
+                        break;
+                    tokenType = iterator.getTokenType();
+                }
+                if (tokenType == LuaTypes.LPAREN)
+                    return;
             }
-            if (tokenType == LuaTypes.LPAREN)
-                return;
         }
 
         LuaParamInfo[] paramNameDefList = getParams();
