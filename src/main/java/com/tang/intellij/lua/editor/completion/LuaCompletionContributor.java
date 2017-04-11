@@ -70,7 +70,7 @@ public class LuaCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, IN_CLASS_METHOD, new SuggestSelfMemberProvider());
 
         //提示属性, 提示方法
-        extend(CompletionType.BASIC, SHOW_CLASS_FIELD, new ClassFieldCompletionProvider());
+        extend(CompletionType.BASIC, SHOW_CLASS_FIELD, new ClassMemberCompletionProvider());
 
         extend(CompletionType.BASIC, SHOW_PATH, new RequirePathCompletionProvider());
 

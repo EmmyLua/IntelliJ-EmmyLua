@@ -37,7 +37,7 @@ import static com.tang.intellij.lua.editor.completion.LuaCompletionContributor.s
  *
  * Created by tangzx on 2016/12/25.
  */
-public class ClassFieldCompletionProvider extends CompletionProvider<CompletionParameters> {
+public class ClassMemberCompletionProvider extends CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
         PsiElement element = completionParameters.getPosition();
