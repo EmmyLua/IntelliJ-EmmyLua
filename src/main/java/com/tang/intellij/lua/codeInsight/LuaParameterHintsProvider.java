@@ -71,7 +71,9 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                     }
                     for (; argIndex < exprList.size() && paramIndex < paramCount; argIndex++) {
                         LuaExpr expr = exprList.get(argIndex);
-                        list.add(new InlayInfo(parameters.get(paramIndex++).getName(), expr.getTextOffset()));
+                        if (expr instanceof LuaLiteralExpr)
+                            list.add(new InlayInfo(parameters.get(paramIndex).getName(), expr.getTextOffset()));
+                        paramIndex++;
                     }
                 }
             }
