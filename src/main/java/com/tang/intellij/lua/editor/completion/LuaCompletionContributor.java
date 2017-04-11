@@ -59,6 +59,7 @@ public class LuaCompletionContributor extends CompletionContributor {
     private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement()
             .withParent(LuaClassMethodName.class);
     private static final PsiElementPattern.Capture<PsiElement> IN_CLASS_METHOD = psiElement(LuaTypes.ID)
+            .withParent(LuaNameExpr.class)
             .inside(LuaClassMethodDef.class);
     private static final PsiElementPattern.Capture<PsiElement> SHOW_PATH = psiElement(LuaTypes.STRING)
             .inside(psiElement(LuaTypes.ARGS).afterLeaf("require"));
