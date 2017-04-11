@@ -21,10 +21,7 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
-import com.intellij.openapi.editor.markup.SeparatorPlacement;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -137,10 +134,10 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
             }
 
             //line separator
-            LineMarkerInfo lineSeparator = new LineMarkerInfo<>(classMethodName, classMethodName.getNode().getStartOffset(), null, Pass.LINE_MARKERS, null, null);
+            /*LineMarkerInfo lineSeparator = new LineMarkerInfo<>(classMethodName, classMethodName.getNode().getStartOffset(), null, Pass.LINE_MARKERS, null, null);
             lineSeparator.separatorColor = EditorColorsManager.getInstance().getGlobalScheme().getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
             lineSeparator.separatorPlacement = SeparatorPlacement.TOP;
-            result.add(lineSeparator);
+            result.add(lineSeparator);*/
         }
         else if (element instanceof LuaDocClassDef) {
             LuaDocClassDef docClassDef = (LuaDocClassDef) element;
