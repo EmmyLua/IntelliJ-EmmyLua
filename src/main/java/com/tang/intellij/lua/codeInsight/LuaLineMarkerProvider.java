@@ -36,6 +36,7 @@ import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,11 +50,18 @@ import java.util.List;
  */
 public class LuaLineMarkerProvider implements LineMarkerProvider {
 
-    private static final Function<LuaClassMethodName, String> overridingMethodTooltipProvider = (classMethodDef) -> {
+    private static final Function<LuaClassMethodName, String> overridingMethodTooltipProvider = (methodName) -> {
         final StringBuilder builder = new StringBuilder("<html>Is overridden in:");
-        String name = classMethodDef.getName();
-        if (name != null) {
-        }
+        LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(methodName, LuaClassMethodDef.class);
+        assert methodDef != null;
+        LuaOverridingMethodsSearch.search(methodDef).forEach(luaClassMethodDef -> {
+            LuaClassMethodStub stub = luaClassMethodDef.getStub();
+            if (stub != null) {
+                builder.append("<br>");
+                builder.append(stub.getClassName());
+            }
+        });
+
         return builder.toString();
     };
 
