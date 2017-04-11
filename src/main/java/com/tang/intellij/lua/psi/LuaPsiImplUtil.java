@@ -157,7 +157,7 @@ public class LuaPsiImplUtil {
         LuaExpr expr = classMethodDef.getClassMethodName().getExpr();
         LuaTypeSet typeSet = expr.guessType(context);
         if (typeSet != null) {
-            return typeSet.getFirst();
+            return typeSet.getPerfect();
         }
         return null;
     }

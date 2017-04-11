@@ -58,7 +58,11 @@ public class LuaTypeSet {
     }
 
     @Nullable
-    public LuaType getFirst() {
+    public LuaType getPerfect() {
+        for (LuaType type : types) {
+            if (!type.isAnonymous())
+                return type;
+        }
         if (isEmpty())
             return null;
         return types.get(0);

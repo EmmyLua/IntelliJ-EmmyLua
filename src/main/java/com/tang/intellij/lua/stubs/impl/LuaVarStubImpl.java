@@ -115,7 +115,7 @@ public class LuaVarStubImpl extends StubBase<LuaVar> implements LuaVarStub {
 
             LuaTypeSet set = indexExpr.guessPrefixType(context);
             if (set != null) {
-                LuaType type = set.getFirst();
+                LuaType type = set.getPerfect();
                 if (type != null)
                     typeName = type.getClassName();
             }
