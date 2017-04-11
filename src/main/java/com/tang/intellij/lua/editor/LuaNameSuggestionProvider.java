@@ -50,7 +50,7 @@ public class LuaNameSuggestionProvider implements NameSuggestionProvider {
                     LuaType cur = type;
                     while (cur != null) {
                         String className = cur.getClassName();
-                        if (className != null)
+                        if (className != null && !cur.isAnonymous())
                             classNames.add(className);
                         cur = cur.getSuperClass(context);
                     }
