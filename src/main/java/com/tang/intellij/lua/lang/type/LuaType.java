@@ -100,6 +100,53 @@ public class LuaType {
         superClassName = StringRef.toString(stubInputStream.readName());
     }
 
+    public interface Processor<T> {
+        void process(LuaType type, T t);
+    }
+
+    public void processFields(@NotNull CompletionParameters completionParameters,
+                              @NotNull SearchContext context,
+                              Processor<LuaClassField> processor) {
+        String clazzName = getClassName();
+        if (clazzName == null)
+            return;
+        Project project = completionParameters.getEditor().getProject();
+        assert project != null;
+
+        Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+
+        for (LuaClassField field : list) {
+            processor.process(this, field);
+        }
+
+        // super
+        LuaType superType = getSuperClass(context);
+        if (superType != null)
+            superType.processFields(completionParameters, context, processor);
+    }
+
+    public void processMethods(@NotNull CompletionParameters completionParameters,
+                               @NotNull SearchContext context,
+                               Processor<LuaClassMethodDef> processor) {
+        String clazzName = getClassName();
+        if (clazzName == null)
+            return;
+        Project project = completionParameters.getEditor().getProject();
+        assert project != null;
+
+        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+        for (LuaClassMethodDef def : list) {
+            String methodName = def.getName();
+            if (methodName != null) {
+                processor.process(this, def);
+            }
+        }
+
+        LuaType superType = getSuperClass(context);
+        if (superType != null)
+            superType.processMethods(completionParameters, context, processor);
+    }
+
     public void addMethodCompletions(@NotNull CompletionParameters completionParameters,
                                      @NotNull CompletionResultSet completionResultSet,
                                      boolean useAsField) {
@@ -184,20 +231,20 @@ public class LuaType {
         Project project = completionParameters.getEditor().getProject();
         assert project != null;
 
-        addFieldCompletions(completionParameters, completionResultSet, project, true, true, context);
+        addFieldCompletions(completionParameters, completionResultSet, true, context);
         addStaticMethodCompletions(completionResultSet, true, context);
         addMethodCompletions(completionParameters, completionResultSet, true);
     }
 
     protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
-                                       @NotNull CompletionResultSet completionResultSet,
-                                       @NotNull Project project,
-                                       boolean bold,
-                                       boolean withSuper,
-                                       SearchContext context) {
+                                     @NotNull CompletionResultSet completionResultSet,
+                                     boolean bold,
+                                     SearchContext context) {
         String clazzName = getClassName();
         if (clazzName == null)
             return;
+        Project project = completionParameters.getEditor().getProject();
+        assert project != null;
 
         Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
 
@@ -216,11 +263,9 @@ public class LuaType {
         }
 
         // super
-        if (withSuper) {
-            LuaType superType = getSuperClass(context);
-            if (superType != null)
-                superType.addFieldCompletions(completionParameters, completionResultSet, project, false, true, context);
-        }
+        LuaType superType = getSuperClass(context);
+        if (superType != null)
+            superType.addFieldCompletions(completionParameters, completionResultSet, false, context);
     }
 
     public LuaTypeSet guessFieldType(String propName, SearchContext context) {

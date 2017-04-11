@@ -58,12 +58,16 @@ public class LuaCompletionContributor extends CompletionContributor {
             .inside(PsiComment.class);
     private static final PsiElementPattern.Capture<PsiElement> SHOW_OVERRIDE = psiElement()
             .withParent(LuaClassMethodName.class);
+    private static final PsiElementPattern.Capture<PsiElement> IN_CLASS_METHOD = psiElement(LuaTypes.ID)
+            .inside(LuaClassMethodDef.class);
     private static final PsiElementPattern.Capture<PsiElement> SHOW_PATH = psiElement(LuaTypes.STRING)
             .inside(psiElement(LuaTypes.ARGS).afterLeaf("require"));
 
     public LuaCompletionContributor() {
         //可以override
         extend(CompletionType.BASIC, SHOW_OVERRIDE, new OverrideCompletionProvider());
+
+        extend(CompletionType.BASIC, IN_CLASS_METHOD, new SuggestSelfMemberProvider());
 
         //提示属性, 提示方法
         extend(CompletionType.BASIC, SHOW_CLASS_FIELD, new ClassFieldCompletionProvider());
