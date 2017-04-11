@@ -19,10 +19,15 @@ package com.tang.intellij.lua.editor.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.psi.LuaClassField;
+import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
+import com.tang.intellij.lua.psi.LuaPsiImplUtil;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,13 +47,91 @@ public class ClassFieldCompletionProvider extends CompletionProvider<CompletionP
             LuaIndexExpr indexExpr = (LuaIndexExpr) parent;
             LuaTypeSet prefixTypeSet = indexExpr.guessPrefixType(new SearchContext(indexExpr.getProject()));
             if (prefixTypeSet != null) {
-                if (indexExpr.getColon() != null)
-                    prefixTypeSet.getTypes().forEach(luaType -> luaType.addMethodCompletions(completionParameters, completionResultSet, false));
-                else
-                    prefixTypeSet.getTypes().forEach(luaType -> luaType.addFieldCompletions(completionParameters, completionResultSet, new SearchContext(indexExpr.getProject())));
+                if (indexExpr.getColon() != null) {
+                    prefixTypeSet.getTypes().forEach(luaType -> {
+                        SearchContext context = new SearchContext(indexExpr.getProject());
+                        luaType.processMethods(completionParameters, context, (curType, def) -> {
+                            String className = curType.getDisplayName();
+                            addMethod(completionResultSet, curType == luaType, false, className, def);
+                        });
+                    });
+                } else {
+                    prefixTypeSet.getTypes().forEach(luaType -> {
+                        SearchContext context = new SearchContext(indexExpr.getProject());
+                        luaType.processMethods(completionParameters, context, (curType, def) -> {
+                            String className = curType.getDisplayName();
+                            addMethod(completionResultSet, curType == luaType, true, className, def);
+                        });
+                        luaType.processFields(completionParameters, context, (curType, field) -> {
+                            String className = curType.getDisplayName();
+                            addField(completionResultSet, curType == luaType, className, field);
+                        });
+                        luaType.processStaticMethods(completionParameters, context, (curType, def) -> {
+                            addStaticMethod(completionResultSet, curType == luaType, curType.getDisplayName(), def);
+                        });
+                    });
+                }
             }
         }
         //words in file
         suggestWordsInFile(completionParameters, completionResultSet);
+    }
+
+    private void addField(@NotNull CompletionResultSet completionResultSet, boolean bold, String clazzName, LuaClassField field) {
+        String name = field.getFieldName();
+        if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
+
+            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
+                    .withIcon(LuaIcons.CLASS_FIELD)
+                    .withTypeText(clazzName);
+            if (bold)
+                elementBuilder = elementBuilder.bold();
+
+            completionResultSet.addElement(elementBuilder);
+        }
+    }
+
+    private void addMethod(@NotNull CompletionResultSet completionResultSet, boolean bold, boolean useAsField, String clazzName, LuaClassMethodDef def) {
+        String methodName = def.getName();
+        if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
+            if (useAsField) {
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
+                        .withIcon(LuaIcons.CLASS_METHOD)
+                        .withTypeText(clazzName)
+                        .withTailText(def.getParamSignature());
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
+                completionResultSet.addElement(elementBuilder);
+            } else {
+                LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
+                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
+                            .withIcon(LuaIcons.CLASS_METHOD)
+                            .withTypeText(clazzName)
+                            .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
+                            .withTailText(signature);
+                    if (bold)
+                        elementBuilder = elementBuilder.bold();
+                    completionResultSet.addElement(elementBuilder);
+                });
+            }
+        }
+    }
+
+    private void addStaticMethod(@NotNull CompletionResultSet completionResultSet, boolean bold, String clazzName, LuaClassMethodDef def) {
+        String methodName = def.getName();
+        if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
+            LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
+                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
+                        .withIcon(LuaIcons.CLASS_METHOD)
+                        .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
+                        .withTypeText(clazzName)
+                        .withItemTextUnderlined(true)
+                        .withTailText(signature);
+                if (bold)
+                    elementBuilder = elementBuilder.bold();
+
+                completionResultSet.addElement(elementBuilder);
+            });
+        }
     }
 }

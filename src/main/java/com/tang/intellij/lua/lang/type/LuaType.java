@@ -17,8 +17,6 @@
 package com.tang.intellij.lua.lang.type;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
@@ -26,9 +24,10 @@ import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.editor.completion.FuncInsertHandler;
-import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.LuaClassField;
+import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaNameExpr;
+import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
@@ -67,7 +66,7 @@ public class LuaType {
 
     // 模糊匹配的结果
     private boolean isUnreliable;
-    private boolean isAnonymous;
+    protected boolean isAnonymous;
     String clazzName;
     private String superClassName;
 
@@ -86,6 +85,10 @@ public class LuaType {
 
     public String getClassName() {
         return clazzName;
+    }
+
+    public String getDisplayName() {
+        return isAnonymous() ? "" : getClassName();
     }
 
     void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
@@ -147,125 +150,23 @@ public class LuaType {
             superType.processMethods(completionParameters, context, processor);
     }
 
-    public void addMethodCompletions(@NotNull CompletionParameters completionParameters,
-                                     @NotNull CompletionResultSet completionResultSet,
-                                     boolean useAsField) {
-        Project project = completionParameters.getEditor().getProject();
-        assert project != null;
-        addMethodCompletions(completionResultSet, project, true, useAsField);
-    }
-
-    private void addMethodCompletions(@NotNull CompletionResultSet completionResultSet,
-                                      @NotNull Project project,
-                                      boolean bold,
-                                      boolean useAsField) {
-        String clazzName = getClassName();
-        if (clazzName == null)
-            return;
-
-        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
-        for (LuaClassMethodDef def : list) {
-            String methodName = def.getName();
-            if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
-                if (useAsField) {
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
-                            .withIcon(LuaIcons.CLASS_METHOD)
-                            .withTypeText(clazzName)
-                            .withTailText(def.getParamSignature());
-                    if (bold)
-                        elementBuilder = elementBuilder.bold();
-                    completionResultSet.addElement(elementBuilder);
-                } else {
-                    LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
-                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
-                                .withIcon(LuaIcons.CLASS_METHOD)
-                                .withTypeText(clazzName)
-                                .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
-                                .withTailText(signature);
-                        if (bold)
-                            elementBuilder = elementBuilder.bold();
-                        completionResultSet.addElement(elementBuilder);
-                    });
-                }
-            }
-        }
-
-        LuaType superType = getSuperClass(new SearchContext(project));
-        if (superType != null)
-            superType.addMethodCompletions(completionResultSet, project, false, useAsField);
-    }
-
-    private void addStaticMethodCompletions(@NotNull CompletionResultSet completionResultSet,
-                                            boolean bold,
-                                            SearchContext context) {
+    public void processStaticMethods(@NotNull CompletionParameters completionParameters,
+                                     @NotNull SearchContext context,
+                                     Processor<LuaClassMethodDef> processor) {
         String clazzName = getClassName();
         if (clazzName == null)
             return;
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, context);
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
-            if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
-                LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
-                            .withIcon(LuaIcons.CLASS_METHOD)
-                            .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
-                            .withTypeText(clazzName)
-                            .withItemTextUnderlined(true)
-                            .withTailText(signature);
-                    if (bold)
-                        elementBuilder = elementBuilder.bold();
-
-                    completionResultSet.addElement(elementBuilder);
-                });
+            if (methodName != null) {
+                processor.process(this, def);
             }
         }
 
         LuaType superType = getSuperClass(context);
         if (superType != null)
-            superType.addStaticMethodCompletions(completionResultSet, false, context);
-    }
-
-    public void addFieldCompletions(@NotNull CompletionParameters completionParameters,
-                                    @NotNull CompletionResultSet completionResultSet,
-                                    SearchContext context) {
-        Project project = completionParameters.getEditor().getProject();
-        assert project != null;
-
-        addFieldCompletions(completionParameters, completionResultSet, true, context);
-        addStaticMethodCompletions(completionResultSet, true, context);
-        addMethodCompletions(completionParameters, completionResultSet, true);
-    }
-
-    protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
-                                     @NotNull CompletionResultSet completionResultSet,
-                                     boolean bold,
-                                     SearchContext context) {
-        String clazzName = getClassName();
-        if (clazzName == null)
-            return;
-        Project project = completionParameters.getEditor().getProject();
-        assert project != null;
-
-        Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
-
-        for (LuaClassField fieldName : list) {
-            String name = fieldName.getFieldName();
-            if (name == null)
-                continue;
-
-            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
-                    .withIcon(LuaIcons.CLASS_FIELD)
-                    .withTypeText(clazzName);
-            if (bold)
-                elementBuilder = elementBuilder.bold();
-
-            completionResultSet.addElement(elementBuilder);
-        }
-
-        // super
-        LuaType superType = getSuperClass(context);
-        if (superType != null)
-            superType.addFieldCompletions(completionParameters, completionResultSet, false, context);
+            superType.processStaticMethods(completionParameters, context, processor);
     }
 
     public LuaTypeSet guessFieldType(String propName, SearchContext context) {

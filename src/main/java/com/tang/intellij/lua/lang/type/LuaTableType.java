@@ -17,10 +17,6 @@
 package com.tang.intellij.lua.lang.type;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableConstructor;
@@ -47,11 +43,12 @@ public class LuaTableType extends LuaType {
     }
 
     public LuaTableConstructor tableConstructor;
-    private List<String> fieldStringList;
+    private List<LuaTableField> tableFields;
 
     private LuaTableType(LuaTableConstructor tableElement) {
         tableConstructor = tableElement;
         clazzName = getTypeName(tableElement);
+        isAnonymous = true;
     }
 
     @Override
@@ -59,35 +56,30 @@ public class LuaTableType extends LuaType {
         return clazzName;
     }
 
+    @Override
+    public String getDisplayName() {
+        return "table";
+    }
+
     private void InitFieldList() {
-        if (fieldStringList == null) {
-            fieldStringList = new ArrayList<>();
+        if (tableFields == null) {
+            tableFields = new ArrayList<>();
             LuaFieldList fieldList = tableConstructor.getFieldList();
             if (fieldList != null) {
-                for (LuaTableField field : fieldList.getTableFieldList()) {
-                    PsiElement id = field.getNameIdentifier();
-                    if (id != null) {
-                        fieldStringList.add(id.getText());
-                    }
-                }
+                tableFields.addAll(fieldList.getTableFieldList());
             }
         }
     }
 
     @Override
-    protected void addFieldCompletions(@NotNull CompletionParameters completionParameters,
-                                       @NotNull CompletionResultSet completionResultSet,
-                                       boolean bold,
-                                       SearchContext context) {
-        super.addFieldCompletions(completionParameters, completionResultSet, bold, context);
+    public void processFields(@NotNull CompletionParameters completionParameters,
+                              @NotNull SearchContext context,
+                              Processor<LuaClassField> processor) {
         InitFieldList();
-        for (String s : fieldStringList) {
-            LookupElementBuilder elementBuilder = LookupElementBuilder.create(s)
-                    .withIcon(LuaIcons.CLASS_FIELD)
-                    .withTypeText(getClassName());
-
-            completionResultSet.addElement(elementBuilder);
+        for (LuaTableField field : tableFields) {
+            processor.process(this, field);
         }
+        super.processFields(completionParameters, context, processor);
     }
 
     @Override
