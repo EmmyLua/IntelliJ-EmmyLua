@@ -22,8 +22,11 @@ import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.TextExpression;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.psi.LuaTypes;
@@ -43,25 +46,26 @@ public abstract class ArgsInsertHandler implements InsertHandler<LookupElement> 
     public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
         int startOffset = insertionContext.getStartOffset();
         PsiElement element = insertionContext.getFile().findElementAt(startOffset);
+        Editor editor = insertionContext.getEditor();
         if (element != null) {
-            element = element.getNextSibling();
-            while (element instanceof PsiWhiteSpace) {
-                element = element.getNextSibling();
+            EditorEx ex = (EditorEx) editor;
+            HighlighterIterator iterator = ex.getHighlighter().createIterator(startOffset);
+            iterator.advance();
+            IElementType tokenType = iterator.getTokenType();
+            while (tokenType == TokenType.WHITE_SPACE) {
+                iterator.advance();
+                tokenType = iterator.getTokenType();
             }
-            if (element != null) {
-                IElementType type = element.getNode().getElementType();
-                if (type == LuaTypes.LPAREN || type == LuaTypes.ARGS) {
-                    return;
-                }
-            }
+            if (tokenType == LuaTypes.LPAREN)
+                return;
         }
 
         LuaParamInfo[] paramNameDefList = getParams();
         if (paramNameDefList != null) {
             TemplateManager manager = TemplateManager.getInstance(insertionContext.getProject());
             Template template = createTemplate(manager, paramNameDefList);
-            insertionContext.getEditor().getCaretModel().moveToOffset(insertionContext.getSelectionEndOffset());
-            manager.startTemplate(insertionContext.getEditor(), template);
+            editor.getCaretModel().moveToOffset(insertionContext.getSelectionEndOffset());
+            manager.startTemplate(editor, template);
         }
     }
 
