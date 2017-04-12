@@ -35,10 +35,7 @@ import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.LuaClassMethodStub;
-import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub;
-import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
-import com.tang.intellij.lua.stubs.LuaTableFieldStub;
+import com.tang.intellij.lua.stubs.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -327,6 +324,13 @@ public class LuaPsiImplUtil {
         };
     }
 
+    public static String getName(LuaIndexExpr indexExpr) {
+        LuaIndexStub stub = indexExpr.getStub();
+        if (stub != null)
+            return stub.getFieldName();
+        return getName((PsiNameIdentifierOwner)indexExpr);
+    }
+
     public static LuaTableField findField(LuaTableConstructor table, String fieldName) {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
@@ -533,22 +537,18 @@ public class LuaPsiImplUtil {
         return expr.guessType(context);
     }
 
-    public static LuaNameExpr getNameRef(LuaVar var) {
-        return PsiTreeUtil.getChildOfType(var, LuaNameExpr.class);
-    }
-
-    public static ItemPresentation getPresentation(LuaNameExpr var) {
+    public static ItemPresentation getPresentation(LuaNameExpr nameExpr) {
         return new ItemPresentation() {
             @NotNull
             @Override
             public String getPresentableText() {
-                return var.getName();
+                return nameExpr.getName();
             }
 
             @NotNull
             @Override
             public String getLocationString() {
-                return var.getContainingFile().getName();
+                return nameExpr.getContainingFile().getName();
             }
 
             @Nullable
@@ -559,23 +559,16 @@ public class LuaPsiImplUtil {
         };
     }
 
-    public static PsiElement getNameIdentifier(LuaVar var) {
-        LuaExpr expr = var.getExpr();
-        if (expr instanceof LuaIndexExpr) {
-            return ((LuaIndexExpr) expr).getId();
-        } else if (var.getNameRef() != null) {
-            return var.getNameRef().getId();
-        }
-        return null;
-    }
-
     @NotNull
     public static PsiElement getNameIdentifier(LuaNameExpr ref) {
         return ref.getId();
     }
 
     @NotNull
-    public static String getName(LuaNameExpr ref) {
-        return ref.getText();
+    public static String getName(LuaNameExpr nameExpr) {
+        LuaNameStub stub = nameExpr.getStub();
+        if (stub != null)
+            return stub.getName();
+        return nameExpr.getText();
     }
 }

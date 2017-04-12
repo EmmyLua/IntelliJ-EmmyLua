@@ -249,8 +249,6 @@ valueExpr ::= literalExpr | closureFuncDef | tableConstructor | var | parenExpr
 var ::= callOrIndexExpr | nameExpr {
     methods = [
         guessType
-
-        getNameRef
     ]
 }
 
