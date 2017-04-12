@@ -27,6 +27,7 @@ import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.tang.intellij.lua.stubs.impl.LuaIndexStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -92,6 +93,7 @@ public class LuaIndexType extends IStubElementType<LuaIndexStub, LuaIndexExpr> {
         if (typeName != null && fieldName != null) {
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName);
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName);
+            indexSink.occurrence(LuaShortNameIndex.KEY, fieldName);
         }
     }
 }
