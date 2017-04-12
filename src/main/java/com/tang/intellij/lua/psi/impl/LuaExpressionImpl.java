@@ -42,8 +42,6 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             return guessType((LuaValueExpr) this, context);
         if (this instanceof LuaCallExpr)
             return guessType((LuaCallExpr) this, context);
-        if (this instanceof LuaIndexExpr)
-            return guessType((LuaIndexExpr) this, context);
         if (this instanceof LuaNameExpr)
             return guessType((LuaNameExpr) this, context);
         if (this instanceof LuaParenExpr)
@@ -55,31 +53,6 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         LuaExpr inner = luaParenExpr.getExpr();
         if (inner != null)
             return inner.guessType(context);
-        return null;
-    }
-
-    private LuaTypeSet guessType(LuaIndexExpr indexExpr, SearchContext context) {
-        PsiElement id = indexExpr.getId();
-        if (id == null) return null;
-
-        LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
-        if (prefixType != null && !prefixType.isEmpty()) {
-            String propName = id.getText();
-            for (LuaType type : prefixType.getTypes()) {
-                if (type instanceof LuaTableType) {
-                    LuaTableType table = (LuaTableType) type;
-                    LuaTableField field = table.tableConstructor.findField(propName);
-                    if (field != null) {
-                        LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
-                        if (expr != null) return expr.guessType(context);
-                    }
-                } else {
-                    LuaTypeSet typeSet = type.guessFieldType(propName, context);
-                    if (typeSet != null)
-                        return typeSet;
-                }
-            }
-        }
         return null;
     }
 

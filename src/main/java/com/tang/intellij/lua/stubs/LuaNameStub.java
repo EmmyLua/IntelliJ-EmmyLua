@@ -17,15 +17,13 @@
 package com.tang.intellij.lua.stubs;
 
 import com.intellij.psi.stubs.StubElement;
-import com.tang.intellij.lua.psi.LuaVar;
+import com.tang.intellij.lua.psi.LuaNameExpr;
 
 /**
- * xxx.xx = value
- * Created by tangzx on 2017/1/12.
+ * name stub
+ * Created by TangZX on 2017/4/12.
  */
-public interface LuaVarStub extends StubElement<LuaVar> {
-    String getTypeName();
-    String getFieldName();
-    boolean isValid();
+public interface LuaNameStub extends StubElement<LuaNameExpr> {
+    String getName();
     boolean isGlobal();
 }

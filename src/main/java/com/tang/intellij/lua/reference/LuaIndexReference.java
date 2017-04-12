@@ -42,7 +42,7 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> implements
 
     @Override
     public TextRange getRangeInElement() {
-        int start = id.getTextOffset() - myElement.getTextOffset();
+        int start = id.getNode().getStartOffset() - myElement.getNode().getStartOffset();
         return new TextRange(start, start + id.getTextLength());
     }
 
