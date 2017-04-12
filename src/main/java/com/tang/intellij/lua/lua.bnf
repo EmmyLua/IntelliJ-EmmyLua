@@ -248,18 +248,10 @@ valueExpr ::= literalExpr | closureFuncDef | tableConstructor | var | parenExpr
 // 最终产生 call expr | index expr | nameRef
 var ::= callOrIndexExpr | nameExpr {
     methods = [
-        toString
         guessType
-        getFieldName
-        getPresentation
 
         getNameRef
     ]
-    implements = [
-        "com.tang.intellij.lua.psi.LuaGlobalVar"
-        "com.tang.intellij.lua.psi.LuaClassField"
-    ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaVarStub"
 }
 
 expr ::= unaryExpr | binaryExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
@@ -275,6 +267,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         setName
         getName
         getTextOffset
+        getPresentation
         toString
 
         guessPrefixType
@@ -371,7 +364,18 @@ nameDef ::= ID {
 nameExpr ::= ID {
     implements = ["com.tang.intellij.lua.psi.LuaPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner" ]
-    methods = [setName getName getNameIdentifier getReferences resolve]
+    methods = [
+        setName
+        getName
+        getNameIdentifier
+        getPresentation
+        getReferences
+        resolve
+
+        toString
+    ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaNameExpressionImpl"
+    stubClass = "com.tang.intellij.lua.stubs.LuaNameStub"
 }
 paramNameDef ::= ID {
     extends = nameDef

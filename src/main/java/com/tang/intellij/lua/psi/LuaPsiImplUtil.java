@@ -35,7 +35,10 @@ import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.*;
+import com.tang.intellij.lua.stubs.LuaClassMethodStub;
+import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub;
+import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
+import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -302,6 +305,28 @@ public class LuaPsiImplUtil {
         return indexExpr.getId();
     }
 
+    public static ItemPresentation getPresentation(LuaIndexExpr indexExpr) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return indexExpr.getName();
+            }
+
+            @NotNull
+            @Override
+            public String getLocationString() {
+                return indexExpr.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean b) {
+                return LuaIcons.CLASS_FIELD;
+            }
+        };
+    }
+
     public static LuaTableField findField(LuaTableConstructor table, String fieldName) {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
@@ -512,31 +537,9 @@ public class LuaPsiImplUtil {
         return PsiTreeUtil.getChildOfType(var, LuaNameExpr.class);
     }
 
-    public static String getFieldName(LuaVar var) {
-        LuaVarStub stub = var.getStub();
-        if (stub != null)
-            return stub.getFieldName();
-
-        LuaExpr expr = var.getExpr();
-        if (expr instanceof LuaIndexExpr) {
-            LuaIndexExpr luaIndexExpr = (LuaIndexExpr) expr;
-            PsiElement id = luaIndexExpr.getId();
-            if (id != null)
-                return id.getText();
-        }
-        return null;
-    }
-
-    public static String getName(LuaVar var) {
-        LuaVarStub stub = var.getStub();
-        if (stub != null)
-            return stub.getFieldName();
-        return getName((PsiNameIdentifierOwner) var);
-    }
-
-    public static ItemPresentation getPresentation(LuaVar var) {
+    public static ItemPresentation getPresentation(LuaNameExpr var) {
         return new ItemPresentation() {
-            @Nullable
+            @NotNull
             @Override
             public String getPresentableText() {
                 return var.getName();

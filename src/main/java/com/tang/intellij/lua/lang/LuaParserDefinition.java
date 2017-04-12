@@ -112,10 +112,10 @@ public class LuaParserDefinition implements ParserDefinition {
             return LuaElementType.TABLE;
         else if ("TABLE_FIELD".equals(string))
             return LuaElementType.TABLE_FIELD;
-        else if ("VAR".equals(string))
-            return LuaElementType.VAR;
         else if ("INDEX_EXPR".equals(string))
             return LuaElementType.INDEX;
+        else if ("NAME_EXPR".equals(string))
+            return LuaElementType.NAME;
 
         return new LuaElementType(string);
     }
