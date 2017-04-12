@@ -169,20 +169,6 @@ public class LuaType {
             superType.processStaticMethods(completionParameters, context, processor);
     }
 
-    public LuaTypeSet guessFieldType(String propName, SearchContext context) {
-        LuaTypeSet set = null;
-        LuaClassField fieldDef = LuaClassFieldIndex.find(this, propName, context);
-        if (fieldDef != null)
-            set = fieldDef.guessType(context);
-        else {
-            LuaType superType = getSuperClass(context);
-            if (superType != null)
-                set = superType.guessFieldType(propName, context);
-        }
-
-        return set;
-    }
-
     public LuaClassField findField(String fieldName, SearchContext context) {
         LuaClassField def = LuaClassFieldIndex.find(this, fieldName, context);
         if (def == null) {

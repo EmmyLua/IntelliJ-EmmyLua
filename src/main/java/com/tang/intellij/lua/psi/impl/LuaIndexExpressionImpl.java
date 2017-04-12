@@ -31,7 +31,9 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
+import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *
@@ -69,10 +71,7 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
 
     @Override
     public LuaTypeSet guessType(SearchContext context) {
-        return guessType((LuaIndexExpr)this, context);
-    }
-
-    private LuaTypeSet guessType(LuaIndexExpr indexExpr, SearchContext context) {
+        LuaIndexExpr indexExpr = (LuaIndexExpr) this;
         PsiElement id = indexExpr.getId();
         if (id == null) return null;
 
@@ -88,13 +87,30 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
                         if (expr != null) return expr.guessType(context);
                     }
                 } else {
-                    LuaTypeSet typeSet = type.guessFieldType(propName, context);
+                    LuaTypeSet typeSet = guessFieldType(propName, type, context);
                     if (typeSet != null)
                         return typeSet;
                 }
             }
         }
         return null;
+    }
+
+    @Nullable
+    private LuaTypeSet guessFieldType(String fieldName, LuaType type, SearchContext context) {
+        LuaClassField fieldDef = LuaClassFieldIndex.find(type, fieldName, context);
+        if (fieldDef == this)
+            return null;
+
+        LuaTypeSet set = null;
+        if (fieldDef != null)
+            set = fieldDef.guessType(context);
+        else {
+            LuaType superType = type.getSuperClass(context);
+            if (superType != null)
+                set = guessFieldType(fieldName, superType, context);
+        }
+        return set;
     }
 
     @Override
