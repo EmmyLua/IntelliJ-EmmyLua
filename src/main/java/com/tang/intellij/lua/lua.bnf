@@ -271,10 +271,21 @@ binaryExpr ::= expr binaryOp expr { pin = 2 }
 left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1
     methods = [
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+        toString
+
         guessPrefixType
         dot = 'DOT'
         colon = 'COLON'
     ]
+    implements = [
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaIndexStub"
+    mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExpressionImpl"
 }
 
 arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }

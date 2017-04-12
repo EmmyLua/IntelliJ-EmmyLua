@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.lang;
+package com.tang.intellij.lua.stubs;
 
-import com.intellij.lang.Language;
+import com.intellij.psi.stubs.StubElement;
+import com.tang.intellij.lua.psi.LuaIndexExpr;
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ *
+ * Created by TangZX on 2017/4/12.
  */
-public class LuaLanguage extends Language {
-
-    public static final int INDEX_VERSION = 8;
-
-    public static final LuaLanguage INSTANCE = new LuaLanguage();
-
-    public LuaLanguage() {
-        super("Lua");
-    }
+public interface LuaIndexStub  extends StubElement<LuaIndexExpr> {
+    String getTypeName();
+    String getFieldName();
 }

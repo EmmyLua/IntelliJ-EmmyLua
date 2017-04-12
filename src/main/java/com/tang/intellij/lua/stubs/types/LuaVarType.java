@@ -49,7 +49,7 @@ public class LuaVarType extends IStubElementType<LuaVarStub, LuaVar> {
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         LuaVar psi = (LuaVar) node.getPsi();
-        return psi.getParent() instanceof LuaVarList;
+        return psi.getParent() instanceof LuaVarList && psi.getNameRef() != null;
     }
 
     @NotNull

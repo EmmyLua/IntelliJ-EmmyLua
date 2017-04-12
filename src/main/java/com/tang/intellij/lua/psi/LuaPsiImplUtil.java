@@ -297,6 +297,11 @@ public class LuaPsiImplUtil {
         return null;
     }
 
+    @Nullable
+    public static PsiElement getNameIdentifier(LuaIndexExpr indexExpr) {
+        return indexExpr.getId();
+    }
+
     public static LuaTableField findField(LuaTableConstructor table, String fieldName) {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
