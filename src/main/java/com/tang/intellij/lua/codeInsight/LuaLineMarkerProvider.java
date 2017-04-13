@@ -23,6 +23,7 @@ import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -31,6 +32,7 @@ import com.intellij.util.Function;
 import com.intellij.util.FunctionUtil;
 import com.intellij.util.Query;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
@@ -161,6 +163,17 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
                         subclassNavigator,
                         GutterIconRenderer.Alignment.CENTER));
             }
+
+            // class 标记
+            int startOffset = element.getTextOffset();
+            LineMarkerInfo classIcon = new LineMarkerInfo<>(element,
+                    new TextRange(startOffset, startOffset),
+                    LuaIcons.CLASS,
+                    Pass.LINE_MARKERS,
+                    null,
+                    null,
+                    GutterIconRenderer.Alignment.CENTER);
+            result.add(classIcon);
         }
         else if (element instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) element;
@@ -179,7 +192,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
                                     Pass.LINE_MARKERS,
                                     FunctionUtil.constant("Recursive call"),
                                     null,
-                                    GutterIconRenderer.Alignment.RIGHT));
+                                    GutterIconRenderer.Alignment.CENTER));
                             break;
                         }
                         cur = bodyOwner;
