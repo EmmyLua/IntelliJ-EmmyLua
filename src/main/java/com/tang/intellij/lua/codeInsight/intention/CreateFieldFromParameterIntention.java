@@ -6,6 +6,7 @@ import com.intellij.codeInsight.template.TemplateEditingAdapter;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.impl.MacroCallNode;
 import com.intellij.codeInsight.template.impl.TextExpression;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -67,40 +68,42 @@ public class CreateFieldFromParameterIntention extends BaseIntentionAction {
                 LuaBlock block = PsiTreeUtil.getChildOfType(methodDef.getFuncBody(), LuaBlock.class);
                 assert block != null;
 
-                String paramName = paramNameDef.getText();
-                CreateFieldFromParameterDialog dialog = new CreateFieldFromParameterDialog(project, paramName);
-                if (!dialog.showAndGet()) {
-                    return;
-                }
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    String paramName = paramNameDef.getText();
+                    CreateFieldFromParameterDialog dialog = new CreateFieldFromParameterDialog(project, paramName);
+                    if (!dialog.showAndGet()) {
+                        return;
+                    }
 
-                String fieldName = dialog.getFieldName();
-                boolean createDoc = dialog.isCreateDoc();
-                if (createDoc) {
-                    SearchContext context = new SearchContext(project);
-                    LuaType classType = methodDef.getClassType(context);
-                    if (classType != null) {
-                        LuaDocClassDef def = LuaClassIndex.find(classType.getClassName(), context);
-                        if (def != null) {
-                            String tempString = String.format("\n---@field public %s $type$$END$", fieldName);
-                            TemplateManager templateManager = TemplateManager.getInstance(project);
-                            Template template = templateManager.createTemplate("", "", tempString);
-                            template.addVariable("type", new MacroCallNode(new SuggestTypeMacro()), new TextExpression("table"), true);
-                            template.setToReformat(true);
+                    String fieldName = dialog.getFieldName();
+                    boolean createDoc = dialog.isCreateDoc();
+                    if (createDoc) {
+                        SearchContext context = new SearchContext(project);
+                        LuaType classType = methodDef.getClassType(context);
+                        if (classType != null) {
+                            LuaDocClassDef def = LuaClassIndex.find(classType.getClassName(), context);
+                            if (def != null) {
+                                String tempString = String.format("\n---@field public %s $type$$END$", fieldName);
+                                TemplateManager templateManager = TemplateManager.getInstance(project);
+                                Template template = templateManager.createTemplate("", "", tempString);
+                                template.addVariable("type", new MacroCallNode(new SuggestTypeMacro()), new TextExpression("table"), true);
+                                template.setToReformat(true);
 
-                            TextRange textRange = def.getTextRange();
-                            editor.getCaretModel().moveToOffset(textRange.getEndOffset());
-                            templateManager.startTemplate(editor, template, new TemplateEditingAdapter() {
-                                @Override
-                                public void templateFinished(Template template, boolean brokenOff) {
-                                    insertFieldAssign(project, editor, block, paramName, fieldName);
-                                }
-                            });
-                            return;
+                                TextRange textRange = def.getTextRange();
+                                editor.getCaretModel().moveToOffset(textRange.getEndOffset());
+                                templateManager.startTemplate(editor, template, new TemplateEditingAdapter() {
+                                    @Override
+                                    public void templateFinished(Template template, boolean brokenOff) {
+                                        insertFieldAssign(project, editor, block, paramName, fieldName);
+                                    }
+                                });
+                                return;
+                            }
                         }
                     }
-                }
 
-                insertFieldAssign(project, editor, block, paramName, fieldName);
+                    insertFieldAssign(project, editor, block, paramName, fieldName);
+                });
             }
         }
     }
