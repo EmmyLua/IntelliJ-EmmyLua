@@ -314,6 +314,11 @@
             <className>com.tang.intellij.lua.codeInsight.intention.CreateFieldFromParameterIntention</className>
             <descriptionDirectoryName>CreateFieldFromParameterIntention</descriptionDirectoryName>
         </intentionAction>
+        <intentionAction>
+            <category>Lua</category>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateMethodIntention</className>
+            <descriptionDirectoryName>CreateMethodIntention</descriptionDirectoryName>
+        </intentionAction>
 
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
