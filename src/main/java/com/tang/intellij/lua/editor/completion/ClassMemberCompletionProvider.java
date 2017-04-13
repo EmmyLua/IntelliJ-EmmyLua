@@ -50,7 +50,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
                 if (indexExpr.getColon() != null) {
                     prefixTypeSet.getTypes().forEach(luaType -> {
                         SearchContext context = new SearchContext(indexExpr.getProject());
-                        luaType.processMethods(completionParameters, context, (curType, def) -> {
+                        luaType.processMethods(context, (curType, def) -> {
                             String className = curType.getDisplayName();
                             addMethod(completionResultSet, curType == luaType, false, className, def);
                         });
@@ -58,15 +58,15 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
                 } else {
                     prefixTypeSet.getTypes().forEach(luaType -> {
                         SearchContext context = new SearchContext(indexExpr.getProject());
-                        luaType.processMethods(completionParameters, context, (curType, def) -> {
+                        luaType.processMethods(context, (curType, def) -> {
                             String className = curType.getDisplayName();
                             addMethod(completionResultSet, curType == luaType, true, className, def);
                         });
-                        luaType.processFields(completionParameters, context, (curType, field) -> {
+                        luaType.processFields(context, (curType, field) -> {
                             String className = curType.getDisplayName();
                             addField(completionResultSet, curType == luaType, className, field);
                         });
-                        luaType.processStaticMethods(completionParameters, context, (curType, def) -> {
+                        luaType.processStaticMethods(context, (curType, def) -> {
                             addStaticMethod(completionResultSet, curType == luaType, curType.getDisplayName(), def);
                         });
                     });

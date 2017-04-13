@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.lang.type;
 
-import com.intellij.codeInsight.completion.CompletionParameters;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableConstructor;
@@ -72,14 +71,13 @@ public class LuaTableType extends LuaType {
     }
 
     @Override
-    public void processFields(@NotNull CompletionParameters completionParameters,
-                              @NotNull SearchContext context,
+    public void processFields(@NotNull SearchContext context,
                               Processor<LuaClassField> processor) {
         InitFieldList();
         for (LuaTableField field : tableFields) {
             processor.process(this, field);
         }
-        super.processFields(completionParameters, context, processor);
+        super.processFields(context, processor);
     }
 
     @Override

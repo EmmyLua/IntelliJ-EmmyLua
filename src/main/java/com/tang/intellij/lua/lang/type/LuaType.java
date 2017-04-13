@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.lang.type;
 
-import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
@@ -107,13 +106,12 @@ public class LuaType {
         void process(LuaType type, T t);
     }
 
-    public void processFields(@NotNull CompletionParameters completionParameters,
-                              @NotNull SearchContext context,
+    public void processFields(@NotNull SearchContext context,
                               Processor<LuaClassField> processor) {
         String clazzName = getClassName();
         if (clazzName == null)
             return;
-        Project project = completionParameters.getEditor().getProject();
+        Project project = context.getProject();
         assert project != null;
 
         Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
@@ -125,16 +123,15 @@ public class LuaType {
         // super
         LuaType superType = getSuperClass(context);
         if (superType != null)
-            superType.processFields(completionParameters, context, processor);
+            superType.processFields(context, processor);
     }
 
-    public void processMethods(@NotNull CompletionParameters completionParameters,
-                               @NotNull SearchContext context,
+    public void processMethods(@NotNull SearchContext context,
                                Processor<LuaClassMethodDef> processor) {
         String clazzName = getClassName();
         if (clazzName == null)
             return;
-        Project project = completionParameters.getEditor().getProject();
+        Project project = context.getProject();
         assert project != null;
 
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
@@ -147,11 +144,10 @@ public class LuaType {
 
         LuaType superType = getSuperClass(context);
         if (superType != null)
-            superType.processMethods(completionParameters, context, processor);
+            superType.processMethods(context, processor);
     }
 
-    public void processStaticMethods(@NotNull CompletionParameters completionParameters,
-                                     @NotNull SearchContext context,
+    public void processStaticMethods(@NotNull SearchContext context,
                                      Processor<LuaClassMethodDef> processor) {
         String clazzName = getClassName();
         if (clazzName == null)
@@ -166,7 +162,7 @@ public class LuaType {
 
         LuaType superType = getSuperClass(context);
         if (superType != null)
-            superType.processStaticMethods(completionParameters, context, processor);
+            superType.processStaticMethods(context, processor);
     }
 
     public LuaClassField findField(String fieldName, SearchContext context) {

@@ -45,7 +45,7 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
             SearchContext searchContext = new SearchContext(position.getProject());
             LuaType type = methodDef.getClassType(searchContext);
             if (type != null) {
-                type.processFields(completionParameters, searchContext, (curType, field) -> {
+                type.processFields(searchContext, (curType, field) -> {
                     String fieldName = field.getFieldName();
                     if (fieldName != null) {
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create("self." + fieldName)
@@ -57,7 +57,7 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                     }
                 });
 
-                type.processMethods(completionParameters, searchContext, (curType, def) -> {
+                type.processMethods(searchContext, (curType, def) -> {
                     String methodName = def.getName();
                     if (methodName != null) {
                         LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
