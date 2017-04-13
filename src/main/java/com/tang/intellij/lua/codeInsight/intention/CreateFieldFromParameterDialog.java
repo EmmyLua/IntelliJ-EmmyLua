@@ -60,7 +60,7 @@ public class CreateFieldFromParameterDialog extends DialogWrapper {
         gbConstraints.weightx = 1;
         gbConstraints.gridx = 0;
         gbConstraints.gridy = 1;
-        docCheckbox = new JCheckBox("Type annotation:");
+        docCheckbox = new JCheckBox("Type annotation");
         panel.add(docCheckbox, gbConstraints);
 
         return panel;
