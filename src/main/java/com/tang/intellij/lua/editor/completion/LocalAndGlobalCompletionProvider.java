@@ -31,6 +31,7 @@ import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
 import com.tang.intellij.lua.psi.LuaPsiImplUtil;
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
+import com.tang.intellij.lua.psi.LuaTypes;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
@@ -44,14 +45,35 @@ import static com.tang.intellij.lua.editor.completion.LuaCompletionContributor.s
  */
 public class LocalAndGlobalCompletionProvider extends CompletionProvider<CompletionParameters> {
 
-    public static final int LOCAL_VAR = 1;
-    public static final int LOCAL_FUN = 2;
-    public static final int GLOBAL_VAR = 4;
-    public static final int GLOBAL_FUN = 8;
-    public static final int KEY_WORDS = 16;
-    public static final int ALL = LOCAL_VAR|LOCAL_FUN|GLOBAL_VAR|GLOBAL_FUN|KEY_WORDS;
-    public static final int VARS = LOCAL_VAR|GLOBAL_VAR;
+    private static final int LOCAL_VAR = 1;
+    private static final int LOCAL_FUN = 2;
+    private static final int GLOBAL_VAR = 4;
+    private static final int GLOBAL_FUN = 8;
+    private static final int KEY_WORDS = 16;
+    static final int ALL = LOCAL_VAR|LOCAL_FUN|GLOBAL_VAR|GLOBAL_FUN|KEY_WORDS;
+    static final int VARS = LOCAL_VAR|GLOBAL_VAR;
     private int mask;
+
+    private static final TokenSet KEYWORD_TOKENS = TokenSet.create(
+            LuaTypes.AND,
+            LuaTypes.BREAK,
+            LuaTypes.DO,
+            LuaTypes.ELSE,
+            //LuaTypes.ELSEIF,
+            LuaTypes.END,
+            //LuaTypes.FOR,
+            LuaTypes.FUNCTION,
+            //LuaTypes.IF,
+            LuaTypes.IN,
+            LuaTypes.LOCAL,
+            LuaTypes.NOT,
+            LuaTypes.OR,
+            LuaTypes.REPEAT,
+            LuaTypes.RETURN,
+            LuaTypes.THEN,
+            LuaTypes.UNTIL,
+            LuaTypes.WHILE
+    );
 
     LocalAndGlobalCompletionProvider(int mask) {
         this.mask = mask;
@@ -124,7 +146,7 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
         }
         //key words
         if (has(KEY_WORDS)) {
-            TokenSet keywords = TokenSet.orSet(LuaSyntaxHighlighter.KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET);
+            TokenSet keywords = TokenSet.orSet(KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET);
             for (IElementType keyWordToken : keywords.getTypes()) {
                 completionResultSet.addElement(LookupElementBuilder.create(keyWordToken)
                         .withInsertHandler(new KeywordInsertHandler(keyWordToken))
