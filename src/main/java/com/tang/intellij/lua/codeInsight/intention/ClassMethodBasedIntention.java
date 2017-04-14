@@ -23,6 +23,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaClassMethodName;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,8 +41,11 @@ public abstract class ClassMethodBasedIntention extends BaseIntentionAction {
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile psiFile) {
-        LuaClassMethodDef classMethodDef = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaClassMethodDef.class, false);
-        return classMethodDef != null && isAvailable(classMethodDef, editor);
+        LuaClassMethodName methodName = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaClassMethodName.class, false);
+        if (methodName == null)
+            return false;
+        LuaClassMethodDef classMethodDef = PsiTreeUtil.getParentOfType(methodName, LuaClassMethodDef.class);
+        return isAvailable(classMethodDef, editor);
     }
 
     protected boolean isAvailable(LuaClassMethodDef methodDef, Editor editor) {
