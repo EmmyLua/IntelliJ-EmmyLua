@@ -172,7 +172,7 @@ globalFuncDef ::= 'function' ID funcBody {
 
 private checkFuncPrefix ::= ID ('.' | ':') ID
 
-left funcPrefixRef ::= '.' <<repeat checkFuncPrefix 1>> ID { extends = indexExpr }
+left funcPrefixRef ::= '.' <<repeat checkFuncPrefix 1>> ID { extends = indexExpr elementType = indexExpr }
 classMethodName ::=  nameExpr (funcPrefixRef)* (('.' ID) | (':' ID)) {
     pin = 3
     methods = [
