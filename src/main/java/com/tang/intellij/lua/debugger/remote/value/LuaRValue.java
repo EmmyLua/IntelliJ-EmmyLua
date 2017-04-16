@@ -38,6 +38,9 @@ public abstract class LuaRValue extends XNamedValue {
             value = new LuaRTable(name);
         } else if (data.isboolean() || data.isnumber() || data.isstring()) {
             value = new LuaRPrimitive(name);
+        } else if (data.isnil()) {
+            value = new LuaRPrimitive(name);
+            desc = "nil";
         } else if (data.isfunction()) {
             value = new LuaRFunction(name);
         }

@@ -45,7 +45,7 @@ public class EvaluatorCommand extends DefaultCommand {
     }
 
     public EvaluatorCommand(String expr, boolean getChildren, Callback callback) {
-        super("EXEC " + createExpr(expr, getChildren), 2);
+        super("EXEC " + expr, 2);
         this.callback = callback;
     }
 
@@ -53,7 +53,6 @@ public class EvaluatorCommand extends DefaultCommand {
     protected void handle(int index, String data) {
         super.handle(index, data);
         if (index == 1) {
-            System.out.println(data);
             ApplicationManager.getApplication().runReadAction(()-> callback.onResult(data));
         }
     }

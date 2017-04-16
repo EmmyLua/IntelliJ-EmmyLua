@@ -19,8 +19,12 @@ package com.tang.intellij.lua.debugger.remote;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.tang.intellij.lua.debugger.remote.commands.EvaluatorCommand;
+import com.tang.intellij.lua.debugger.remote.value.LuaRValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JsePlatform;
 
 /**
  *
@@ -30,7 +34,16 @@ public class LuaDebuggerEvaluator extends XDebuggerEvaluator {
     @Override
     public void evaluate(@NotNull String s, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
         EvaluatorCommand evaluatorCommand = new EvaluatorCommand("return " + s, false, data -> {
-            xEvaluationCallback.evaluated(LuaNamedValue.createEvalValue(xSourcePosition, s, data));
+            Globals standardGlobals = JsePlatform.standardGlobals();
+            LuaValue code = standardGlobals.load(data);
+            code = code.call();
+
+            String code2Str = code.get(1).toString();
+            LuaValue code2 = standardGlobals.load(String.format("local _=%s return _", code2Str));
+
+            LuaRValue value = LuaRValue.create(s, code2.call(), s);
+
+            xEvaluationCallback.evaluated(value);
         });
         evaluatorCommand.exec();
     }
