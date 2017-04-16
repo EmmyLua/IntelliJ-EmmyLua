@@ -16,22 +16,19 @@
 
 package com.tang.intellij.lua.debugger.remote.commands;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
-import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
-import com.tang.intellij.lua.debugger.remote.LuaDebugProcess;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
-import com.tang.intellij.lua.debugger.remote.LuaNamedValue;
 import com.tang.intellij.lua.debugger.remote.LuaStackFrame;
-import com.tang.intellij.lua.psi.*;
-import org.jetbrains.annotations.NotNull;
+import com.tang.intellij.lua.debugger.remote.value.LuaRValue;
+import com.tang.intellij.lua.psi.LuaFileUtil;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,109 +66,47 @@ public class GetStackCommand extends DefaultCommand {
             //String status = matcher.group(1);//200
             //String statusName = matcher.group(2);//OK
             String stackCode = matcher.group(3);
-            stackCode = stackCode.replace("--[[..skipped..]]", "");
+            Globals standardGlobals = JsePlatform.standardGlobals();
+            LuaValue code = standardGlobals.load(stackCode);
+            LuaValue value = code.checkfunction().call();
 
-            String finalStackCode = stackCode;
-            ApplicationManager.getApplication().runReadAction(() -> {
-                LuaFile file = LuaElementFactory.createFile(debugProcess.getSession().getProject(), finalStackCode);
-                PsiElement firstChild = file.getFirstChild();
+            ArrayList<XStackFrame> frames = new ArrayList<>();
+            for (int i = 1; i <= value.length(); i++) {
+                LuaValue stackValue = value.get(i);
+                LuaValue stackInfo = stackValue.get(1);
 
-                StackVisitor stackVisitor = new StackVisitor(debugProcess);
-                firstChild.accept(stackVisitor);
+                LuaValue fileName = stackInfo.get(2);
+                LuaValue line = stackInfo.get(4);
+                LuaValue funcName = stackInfo.get(1);
 
-                debugProcess.setStack(new LuaExecutionStack(stackVisitor.stackFrameList));
-            });
+                VirtualFile virtualFile = LuaFileUtil.findFile(debugProcess.getSession().getProject(), fileName.toString());
+                if (virtualFile != null) {
+                    int nLine = line.toint();
+                    XSourcePositionImpl position = XSourcePositionImpl.create(virtualFile, nLine - 1);
+
+                    String functionName = funcName.toString();
+                    if (funcName.isnil())
+                        functionName = "main";
+
+                    LuaStackFrame frame = new LuaStackFrame(functionName, position);
+
+                    parseValues(stackValue.get(2).checktable(), frame);
+                    parseValues(stackValue.get(3).checktable(), frame);
+
+                    frames.add(frame);
+                }
+            }
+            debugProcess.setStack(new LuaExecutionStack(frames));
         }
     }
 
-    class StackVisitor extends LuaVisitor {
-        int tableLevel = 0;
-        boolean isStackData;
-        int stackChildIndex = 0;
-        int stackInfoIndex = 0;
-
-        LuaStackFrame stackFrame;
-        String functionName;
-        String fileName;
-        int line;
-
-        private List<XStackFrame> stackFrameList = new ArrayList<>();
-        private LuaDebugProcess process;
-
-        StackVisitor(LuaDebugProcess process) {
-            this.process = process;
-        }
-
-
-        @Override
-        public void visitElement(PsiElement element) {
-            element.acceptChildren(this);
-        }
-
-        @Override
-        public void visitTableConstructor(@NotNull LuaTableConstructor o) {
-            tableLevel++;
-            if (tableLevel == 2) {
-                stackChildIndex = -1;
-            } else if (tableLevel == 3) {
-                isStackData = true;
-                stackChildIndex++;
-            }
-
-            LuaFieldList fieldList = o.getFieldList();
-            if (fieldList != null) {
-                visitFieldList(fieldList);
-            }
-
-            if (tableLevel == 3) {
-                isStackData = false;
-            }
-
-            tableLevel--;
-        }
-
-        @Override
-        public void visitFieldList(@NotNull LuaFieldList o) {
-            if (isStackData) {
-                if (stackChildIndex == 0) {
-                    //System.out.println(o.getText());
-                    stackInfoIndex = 0;
-                    super.visitFieldList(o);
-
-                    Project project = process.getSession().getProject();
-                    VirtualFile virtualFile = LuaFileUtil.findFile(project, fileName);
-                    if (virtualFile != null) {
-                        XSourcePosition position = XSourcePositionImpl.create(virtualFile, line - 1);
-                        stackFrame = new LuaStackFrame(functionName, position);
-                        stackFrameList.add(stackFrame);
-                    }
-                    return;
-                }
-            }
-
-            super.visitFieldList(o);
-        }
-
-        @Override
-        public void visitTableField(@NotNull LuaTableField o) {
-            if (isStackData) {
-                String text = o.getText();
-                if (stackChildIndex == 0) {
-                    switch (stackInfoIndex) {
-                        case 0:
-                            if (text.startsWith("\""))
-                                functionName = text.substring(1, text.length() - 1);
-                            else
-                                functionName = text;
-                            break;
-                        case 1: fileName = text.substring(1, text.length() - 1); break;
-                        case 3: line = Integer.parseInt(text); break;
-                    }
-                    stackInfoIndex++;
-                } else {
-                    stackFrame.addValue(LuaNamedValue.createStack(stackFrame.getSourcePosition(), o));
-                }
-            } else super.visitTableField(o);
+    private void parseValues(LuaTable paramsTable, LuaStackFrame frame) {
+        LuaValue[] keys = paramsTable.keys();
+        for (LuaValue key : keys) {
+            LuaValue luaValue = paramsTable.get(key);
+            LuaValue desc = luaValue.get(2);
+            LuaRValue xValue = LuaRValue.create(key.toString(), luaValue.get(1), desc.toString());
+            frame.addValue(xValue);
         }
     }
 }

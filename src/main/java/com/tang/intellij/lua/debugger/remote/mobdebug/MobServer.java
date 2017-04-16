@@ -114,8 +114,6 @@ public class MobServer implements Runnable {
                                     stream.flush();
                                     if (command.getRequireRespLines() > 0)
                                         currentCommandWaitForResp = command;
-                                } else {
-                                    Thread.sleep(5);
                                 }
                             }
                             if (firstTime) {
@@ -123,6 +121,7 @@ public class MobServer implements Runnable {
                                 stream.write("RUN\n");
                                 stream.flush();
                             }
+                            Thread.sleep(5);
                         }
                     }
 
