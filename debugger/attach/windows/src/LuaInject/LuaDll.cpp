@@ -2822,32 +2822,31 @@ bool InstallLuaHooker(HINSTANCE hInstance, const char* symbolsDirectory)
 		{
 			LdrUnlockLoaderLock_dll(0, cookie);
 		}
-
-		return true;
-
 	}
-
-	MODULEENTRY32 module;
-	module.dwSize = sizeof(MODULEENTRY32);
-
-	BOOL moreModules = Module32First(hSnapshot, &module);
-
-	while (moreModules)
+	else
 	{
-		PostLoadLibrary(module.hModule);
-		moreModules = Module32Next(hSnapshot, &module);
+		MODULEENTRY32 module;
+		module.dwSize = sizeof(MODULEENTRY32);
+
+		BOOL moreModules = Module32First(hSnapshot, &module);
+
+		while (moreModules)
+		{
+			PostLoadLibrary(module.hModule);
+			moreModules = Module32Next(hSnapshot, &module);
+		}
+
+		CloseHandle(hSnapshot);
+		hSnapshot = NULL;
+
+		if (LdrLockLoaderLock_dll != NULL && LdrUnlockLoaderLock_dll != NULL)
+		{
+			LdrUnlockLoaderLock_dll(0, cookie);
+		}
 	}
 
-	CloseHandle(hSnapshot);
-	hSnapshot = NULL;
-
-	if (LdrLockLoaderLock_dll != NULL && LdrUnlockLoaderLock_dll != NULL)
-	{
-		LdrUnlockLoaderLock_dll(0, cookie);
-	}
-
+	DebugBackend::Get().Message("Attach finish.");
 	return true;
-
 }
 
 bool GetIsLuaLoaded()
