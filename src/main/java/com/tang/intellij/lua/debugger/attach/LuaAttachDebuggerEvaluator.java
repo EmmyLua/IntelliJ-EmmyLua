@@ -24,8 +24,12 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
+import com.tang.intellij.lua.psi.LuaIndexExpr;
+import com.tang.intellij.lua.psi.LuaNameExpr;
+import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,11 +63,16 @@ public class LuaAttachDebuggerEvaluator extends XDebuggerEvaluator {
         final Ref<TextRange> currentRange = Ref.create(null);
         PsiDocumentManager.getInstance(project).commitAndRunReadAction(() -> {
             try {
-                PsiElement elementAtCursor = DebuggerUtilsEx.findElementAt(PsiDocumentManager.getInstance(project).getPsiFile(document), offset);
-                if (elementAtCursor == null || !elementAtCursor.isValid()) {
+                PsiElement element = DebuggerUtilsEx.findElementAt(PsiDocumentManager.getInstance(project).getPsiFile(document), offset);
+                if (element == null || !element.isValid()) {
                     return;
                 }
-                currentRange.set(elementAtCursor.getTextRange());
+                IElementType type = element.getNode().getElementType();
+                if (type == LuaTypes.ID) {
+                    PsiElement parent = element.getParent();
+                    if (parent instanceof LuaNameExpr || parent instanceof LuaIndexExpr)
+                        currentRange.set(parent.getTextRange());
+                }
             } catch (IndexNotReadyException ignored) {}
         });
         return currentRange.get();
