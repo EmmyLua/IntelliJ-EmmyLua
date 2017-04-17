@@ -18,6 +18,7 @@ apply plugin :"java"
 
 dependencies {
 	compile fileTree(dir:"${System.env['IDEA_HOME']}/lib", includes:["*.jar"])
+	compile fileTree(dir:"libs", includes:["*.jar"])
 }
 
 sourceSets {
@@ -34,6 +35,9 @@ task buildZip (type: Zip, dependsOn: [jar]) {
 	baseName = 'LuaIDE'
 	destinationDir = file(".")
 	from (tasks['jar'].outputs) {
+		into '/LuaIDE/lib'
+	}
+	from ("libs") {
 		into '/LuaIDE/lib'
 	}
 	from (fileTree(dir:'src/main/resources/', includes:['std/**', 'debugger/**'])) {
