@@ -381,7 +381,8 @@ DebugBackend::VirtualMachine* DebugBackend::AttachState(unsigned long api, lua_S
     // This state may be a thread which will be garbage collected, so we need to register
     // to recieve notification when it is destroyed.
 
-    if (lua_pushthread_dll(api, L))
+	//todo:打开注释在前端主动detach并卸载dll后，线程销毁时会报错
+    /*if (lua_pushthread_dll(api, L))
     {
 
         lua_pushlightuserdata_dll(api, L, L);
@@ -390,7 +391,7 @@ DebugBackend::VirtualMachine* DebugBackend::AttachState(unsigned long api, lua_S
         SetGarbageCollectionCallback(api, L, -2);
         lua_pop_dll(api, L, 1);
     
-    }
+    }*/
 
     return vm;
 
