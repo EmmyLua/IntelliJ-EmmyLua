@@ -161,10 +161,10 @@ DebugBackend::~DebugBackend()
 {
 
     // Check if we successfully hooked the functions. If we didn't, send a warning.
-    if (!GetIsLuaLoaded())
-    {
-        Message("Warning 1000: Lua functions were not found during debugging session", MessageType_Warning);
-    }
+	/*if (!GetIsLuaLoaded())
+	{
+		Message("Warning 1000: Lua functions were not found during debugging session", MessageType_Warning);
+	}*/
 
     if (m_log != NULL)
     {
@@ -3041,11 +3041,6 @@ int DebugBackend::ObjectCollectionCallback(lua_State* L)
 
 }
 
-int __stdcall DebugBackend::ObjectCollectionCallback_stdcall(lua_State* L)
-{
-    return ObjectCollectionCallback(L);
-}
-
 void DebugBackend::CreateGarbageCollectionSentinel(unsigned long api, lua_State* L)
 {
 
@@ -3121,11 +3116,6 @@ int DebugBackend::ThreadEndCallback(lua_State* L)
 
     return 0;
 
-}
-
-int __stdcall DebugBackend::ThreadEndCallback_stdcall(lua_State* L)
-{
-    return ThreadEndCallback(L);
 }
 
 void DebugBackend::GetFileTitle(const char* name, std::string& title) const

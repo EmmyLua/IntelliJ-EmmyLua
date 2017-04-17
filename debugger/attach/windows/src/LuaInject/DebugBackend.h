@@ -512,12 +512,6 @@ private:
     static int ThreadEndCallback(lua_State* L);
 
     /**
-     * stdcall version of the thread garbage collection callback. This is used if the Lua API
-     * was linked with the stdcall calling convention.
-     */
-    static int __stdcall ThreadEndCallback_stdcall(lua_State* L);
-
-    /**
      * Calls the function on the top of the stack when the garbage collector runs.
      * The function is popped from the stack.
      */
@@ -529,12 +523,6 @@ private:
      */
     static int ObjectCollectionCallback(lua_State* L);
     
-    /**
-     * Used by the mechism to setup a garbage collection callback. This function is used
-     * internally as a callback and checks if the object is still alive or not.
-     */
-    static int __stdcall ObjectCollectionCallback_stdcall(lua_State* L);
-
 	static int IndexChained(lua_State* L);
 	static int IndexChained_intercept(lua_State* L);
 	static int NewIndexChained(lua_State* L);
