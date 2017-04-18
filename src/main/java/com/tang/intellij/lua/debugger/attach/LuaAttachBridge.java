@@ -253,4 +253,16 @@ public class LuaAttachBridge {
         callbackMap.put(id, info);
         send(String.format("eval %d %d %d %s", id, stack, depth, expr));
     }
+
+    void sendToggleBreakpoint(int idx, int line) {
+        send(String.format("setb %d %d", idx, line));
+    }
+
+    void sendDone() {
+        send("done");
+    }
+
+    void sendRun() {
+        send("run");
+    }
 }

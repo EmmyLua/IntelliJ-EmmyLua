@@ -79,13 +79,18 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
     }
 
     @Override
+    public void runToPosition(@NotNull XSourcePosition position, @Nullable XSuspendContext context) {
+
+    }
+
+    @Override
     public void stop() {
         bridge.stop();
     }
 
     @Override
     public void resume(@Nullable XSuspendContext context) {
-        bridge.send("run");
+        bridge.sendRun();
     }
 
     @Override
@@ -113,7 +118,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
     private void onBreak(LuaAttachBreakProto proto) {
         VirtualFile file = LuaFileUtil.findFile(getSession().getProject(), proto.getName());
         if (file == null) {
-            bridge.send("run");
+            bridge.sendRun();
             return;
         }
 
@@ -143,11 +148,11 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
 
             for (XSourcePosition pos : registeredBreakpoints.keySet()) {
                 if (file.equals(pos.getFile())) {
-                    bridge.send(String.format("setb %d %d", proto.getIndex(), pos.getLine()));
+                    bridge.sendToggleBreakpoint(proto.getIndex(), pos.getLine());
                 }
             }
         }
-        bridge.send("done");
+        bridge.sendDone();
     }
 
     @Nullable
@@ -166,7 +171,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
                     registeredBreakpoints.put(sourcePosition, breakpoint);
                     for (LoadedScript script : loadedScriptMap.values()) {
                         if (script.getFile().equals(sourcePosition.getFile())) {
-                            bridge.send(String.format("setb %d %d", script.getIndex(), sourcePosition.getLine()));
+                            bridge.sendToggleBreakpoint(script.getIndex(), sourcePosition.getLine());
                             break;
                         }
                     }
@@ -180,7 +185,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
                     registeredBreakpoints.remove(sourcePosition);
                     for (LoadedScript script : loadedScriptMap.values()) {
                         if (script.getFile().equals(sourcePosition.getFile())) {
-                            bridge.send(String.format("setb %d %d", script.getIndex(), sourcePosition.getLine()));
+                            bridge.sendToggleBreakpoint(script.getIndex(), sourcePosition.getLine());
                             break;
                         }
                     }
