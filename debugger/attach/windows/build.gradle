@@ -1,0 +1,105 @@
+apply plugin: 'cpp'
+apply plugin: 'visual-studio'
+
+def PATH_WINDOWS_KITS = "C:/Program Files (x86)/Windows Kits/10"
+
+model {
+    components {
+        arch(NativeExecutableSpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir "src/arch/"
+                        include "*.cpp"
+                    }
+                }
+            }
+        }
+        tinyxml(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir "src/tinyxml"
+                        include "*.cpp"
+                    }
+                }
+            }
+        }
+        /*EasyHookDll(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs "src/EasyHookDll", "src/EasyHookDll/LocalHook", "src/EasyHookDll/RemoteHook", "src/EasyHookDll/RemoteHook/Rtl"
+                        srcDirs "src/DriverShared", "src/DriverShared/LocalHook", "src/EasyHookDll/DriverShared/Rtl"
+                        //include "*.c"
+                        include "*.cpp"
+                    }
+                    exportedHeaders {
+                        srcDir "src/DriverShared"
+                        srcDir "src/EasyHookDll"
+                    }
+                }
+            }
+        }*/
+        Shared(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDir "src/Shared"
+                        include "*.cpp"
+                    }
+                    exportedHeaders {
+                        srcDir "src/tinyxml"
+                    }
+                    lib library:"tinyxml", linkage: 'static'
+                }
+            }
+        }
+        Debugger(NativeExecutableSpec) {
+            sources.cpp {
+                source {
+                    srcDir "src/Debugger/"
+                    include "*.cpp"
+                }
+                exportedHeaders {
+                    srcDir "src/Shared"
+                    srcDir "src/tinyxml"
+                }
+                lib library:"tinyxml", linkage: 'static'
+                lib library:"Shared", linkage: 'static'
+            }
+            binaries.all {
+                linker.args "user32.lib", "imagehlp.lib", "Advapi32.lib"
+            }
+        }
+    }
+
+    binaries {
+        all {
+            linker.args "/LIBPATH:${PATH_WINDOWS_KITS}/Lib/10.0.10240.0/ucrt/x86"
+            cppCompiler.args "/EHsc"
+            cppCompiler.define "TIXML_USE_STL"
+            cppCompiler.define "_MBCS"
+            //cppCompiler.define "UNICODE"
+            cppCompiler.define "EASYHOOK_EXPORTS"
+            cppCompiler.define "_USRDLL"
+            cppCompiler.define "_CRT_SECURE_NO_WARNINGS"
+            cppCompiler.define "_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS"
+            sources {
+                cpp {
+                    exportedHeaders {
+                        srcDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/include"
+                        srcDir "${PATH_WINDOWS_KITS}/Include/10.0.10240.0/ucrt"
+                        srcDir "c:/Program Files (x86)/Windows Kits/8.1/Include/shared"
+                    }
+                }
+            }
+        }
+        withType(SharedLibraryBinarySpec) {
+            if (toolChain in VisualCpp) {
+                //cppCompiler.define "_WINDLL"
+                cppCompiler.define "DLL_EXPORT"
+            }
+        }
+    }
+}
