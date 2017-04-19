@@ -47,14 +47,29 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs "src/EasyHookDll", "src/EasyHookDll/LocalHook", "src/EasyHookDll/RemoteHook", "src/EasyHookDll/RemoteHook/Rtl"
-                        srcDirs "src/DriverShared", "src/DriverShared/LocalHook", "src/EasyHookDll/DriverShared/Rtl"
-                        //include "*.c"
+                        srcDirs "src/EasyHookDll", "src/EasyHookDll/LocalHook", "src/EasyHookDll/RemoteHook", "src/EasyHookDll/Rtl"
+                        srcDirs "src/DriverShared", "src/DriverShared/LocalHook", "src/DriverShared/Rtl", "src/DriverShared/Disassembler/libudis86"
                         include "*.cpp"
+                        include "*.c"
                     }
                     exportedHeaders {
                         srcDir "src/DriverShared"
                         srcDir "src/EasyHookDll"
+                    }
+                }
+                binaries.all {
+                    cppCompiler.define "_UNICODE"
+                    cppCompiler.define "UNICODE"
+                    linker.args "Aux_ulib_x64.lib"
+                    linker.args "psapi.lib"
+                    linker.args "/LIBPATH:src/EasyHookDll"
+                    sources {
+                        platformAsm(AssemblerSourceSet) {
+                            source {
+                                srcDirs "src/DriverShared/ASM"
+                                include "HookSpecific_x64.asm"
+                            }
+                        }
                     }
                 }
             }
