@@ -399,7 +399,7 @@ ml.exe /D_WIN32 /c /Cx "%(FullPath)"
     <ClInclude Include="..\DriverShared\Disassembler\libudis86\types.h" />
     <ClInclude Include="..\DriverShared\Disassembler\udis86.h" />
     <ClInclude Include="..\DriverShared\DriverShared.h" />
-    <ClInclude Include="..\Public\easyhook.h" />
+    <ClInclude Include="easyhook.h" />
     <ClInclude Include="ntstatus.h" />
     <ClInclude Include="..\DriverShared\rtl.h" />
     <ClInclude Include="resource.h" />

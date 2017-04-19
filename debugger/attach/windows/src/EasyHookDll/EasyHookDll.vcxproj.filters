@@ -115,9 +115,6 @@
     <ClInclude Include="..\DriverShared\DriverShared.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\easyhook.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ntstatus.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -146,6 +143,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="easyhook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
