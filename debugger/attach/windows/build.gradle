@@ -2,7 +2,22 @@ apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 
 def PATH_WINDOWS_KITS = "C:/Program Files (x86)/Windows Kits/10"
-
+model {
+    platforms {
+        x86 {
+            architecture "x86"
+        }
+        x64 {
+            architecture "x86_64"
+        }
+    }
+}
+model {
+    buildTypes {
+        debug
+        release
+    }
+}
 model {
     components {
         arch(NativeExecutableSpec) {
@@ -21,6 +36,9 @@ model {
                     source {
                         srcDir "src/tinyxml"
                         include "*.cpp"
+                    }
+                    exportedHeaders {
+                        srcDir "src/tinyxml"
                     }
                 }
             }
@@ -49,7 +67,7 @@ model {
                         include "*.cpp"
                     }
                     exportedHeaders {
-                        srcDir "src/tinyxml"
+                        srcDir "src/Shared"
                     }
                     lib library:"tinyxml", linkage: 'static'
                 }
@@ -61,10 +79,6 @@ model {
                     srcDir "src/Debugger/"
                     include "*.cpp"
                 }
-                exportedHeaders {
-                    srcDir "src/Shared"
-                    srcDir "src/tinyxml"
-                }
                 lib library:"tinyxml", linkage: 'static'
                 lib library:"Shared", linkage: 'static'
             }
@@ -72,19 +86,10 @@ model {
                 linker.args "user32.lib", "imagehlp.lib", "Advapi32.lib"
             }
         }
-    }
 
-    binaries {
         all {
-            linker.args "/LIBPATH:${PATH_WINDOWS_KITS}/Lib/10.0.10240.0/ucrt/x86"
-            cppCompiler.args "/EHsc"
-            cppCompiler.define "TIXML_USE_STL"
-            cppCompiler.define "_MBCS"
-            //cppCompiler.define "UNICODE"
-            cppCompiler.define "EASYHOOK_EXPORTS"
-            cppCompiler.define "_USRDLL"
-            cppCompiler.define "_CRT_SECURE_NO_WARNINGS"
-            cppCompiler.define "_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS"
+            targetPlatform "x86"
+            targetPlatform "x64"
             sources {
                 cpp {
                     exportedHeaders {
@@ -95,9 +100,32 @@ model {
                 }
             }
         }
+    }
+
+    binaries {
+        all {
+            if (targetPlatform == platforms.x86) {
+                linker.args "/LIBPATH:${PATH_WINDOWS_KITS}/Lib/10.0.10240.0/ucrt/x86"
+            } else {
+                linker.args "/LIBPATH:${PATH_WINDOWS_KITS}/Lib/10.0.10240.0/ucrt/x64"
+            }
+            cppCompiler.args "/EHsc"
+            cppCompiler.args "/MTd"
+
+            cppCompiler.define "TIXML_USE_STL"
+            cppCompiler.define "_MBCS"
+            cppCompiler.define "EASYHOOK_EXPORTS"
+            cppCompiler.define "_USRDLL"
+            cppCompiler.define "_CRT_SECURE_NO_WARNINGS"
+            cppCompiler.define "_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS"
+            if (buildType == buildTypes.debug) {
+                cppCompiler.args '/Zi'
+                cppCompiler.define 'DEBUG'
+                linker.args '/DEBUG'
+            }
+        }
         withType(SharedLibraryBinarySpec) {
             if (toolChain in VisualCpp) {
-                //cppCompiler.define "_WINDLL"
                 cppCompiler.define "DLL_EXPORT"
             }
         }
