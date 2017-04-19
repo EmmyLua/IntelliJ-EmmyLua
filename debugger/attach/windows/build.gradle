@@ -49,26 +49,23 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs "src/EasyHookDll", "src/EasyHookDll/LocalHook", "src/EasyHookDll/RemoteHook", "src/EasyHookDll/Rtl"
-                        srcDirs "src/DriverShared", "src/DriverShared/LocalHook", "src/DriverShared/Rtl", "src/DriverShared/Disassembler/libudis86"
-                        include "*.cpp"
+                        srcDirs "src/EasyHookDll"
+                        include "**/*.cpp"
                     }
                     exportedHeaders {
                         srcDir "src/DriverShared"
                         srcDir "src/EasyHookDll"
-                        srcDir "src/DriverShared/Disassembler/libudis86"
                     }
                 }
                 c {
                     source {
-                        srcDirs "src/EasyHookDll", "src/EasyHookDll/LocalHook", "src/EasyHookDll/RemoteHook", "src/EasyHookDll/Rtl"
-                        srcDirs "src/DriverShared", "src/DriverShared/LocalHook", "src/DriverShared/Rtl", "src/DriverShared/Disassembler/libudis86"
-                        include "*.c"
+                        srcDirs "src/EasyHookDll"
+                        srcDirs "src/DriverShared"
+                        include "**/*.c"
                     }
                     exportedHeaders {
                         srcDir "src/DriverShared"
                         srcDir "src/EasyHookDll"
-                        srcDir "src/DriverShared/Disassembler/libudis86"
                     }
                 }
                 binaries.all {
