@@ -87,10 +87,10 @@ typedef struct _HOOK_TRACE_INFO_
 
 DRIVER_SHARED_API(NTSTATUS, RtlGetLastError());
 
-DRIVER_SHARED_API(PWCHAR, RtlGetLastErrorString());
+//DRIVER_SHARED_API(PWCHAR, RtlGetLastErrorString());
 
 #ifndef DRIVER
-DRIVER_SHARED_API(PWCHAR, RtlGetLastErrorStringCopy());
+//DRIVER_SHARED_API(PWCHAR, RtlGetLastErrorStringCopy());
 #endif
 
 DRIVER_SHARED_API(NTSTATUS, LhInstallHook(
