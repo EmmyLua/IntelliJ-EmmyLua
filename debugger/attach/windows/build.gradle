@@ -3,7 +3,11 @@ apply plugin: 'c'
 apply plugin: 'cpp'
 apply plugin: 'visual-studio'
 
-def PATH_WINDOWS_KITS = "C:/Program Files (x86)/Windows Kits/10"
+def WINDOWS_KITS100 = "C:/Program Files (x86)/Windows Kits/10"
+def WINDOWS_KITS81 = "C:/Program Files (x86)/Windows Kits/8.1"
+def VS140COMNTOOLS = System.env['VS140COMNTOOLS']
+def VS140COMNTOOLS_VC = "${VS140COMNTOOLS}/../../VC"
+
 model {
     platforms {
         x86 {
@@ -129,16 +133,16 @@ model {
             sources {
                 cpp {
                     exportedHeaders {
-                        srcDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/include"
-                        srcDir "${PATH_WINDOWS_KITS}/Include/10.0.10240.0/ucrt"
-                        srcDir "c:/Program Files (x86)/Windows Kits/8.1/Include/shared"
+                        srcDir "${VS140COMNTOOLS_VC}/atlmfc/include"
+                        srcDir "${WINDOWS_KITS100}/Include/10.0.10240.0/ucrt"
+                        srcDir "${WINDOWS_KITS81}/Include/shared"
                     }
                 }
                 c {
                     exportedHeaders {
-                        srcDir "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/include"
-                        srcDir "${PATH_WINDOWS_KITS}/Include/10.0.10240.0/ucrt"
-                        srcDir "c:/Program Files (x86)/Windows Kits/8.1/Include/shared"
+                        srcDir "${VS140COMNTOOLS_VC}/atlmfc/include"
+                        srcDir "${WINDOWS_KITS100}/Include/10.0.10240.0/ucrt"
+                        srcDir "${WINDOWS_KITS81}/Include/shared"
                     }
                 }
             }
@@ -148,13 +152,14 @@ model {
     binaries {
         all {
             if (targetPlatform == platforms.x86) {
-                linker.args "/LIBPATH:${PATH_WINDOWS_KITS}/Lib/10.0.10240.0/ucrt/x86"
-                linker.args "/LIBPATH:C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/lib"
+                linker.args "/LIBPATH:${WINDOWS_KITS100}/Lib/10.0.10240.0/ucrt/x86"
+                linker.args "/LIBPATH:${VS140COMNTOOLS_VC}/atlmfc/lib"
             } else {
-                linker.args "/LIBPATH:${PATH_WINDOWS_KITS}/Lib/10.0.10240.0/ucrt/x64"
-                linker.args "/LIBPATH:C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/lib/amd64"
+                linker.args "/LIBPATH:${WINDOWS_KITS100}/Lib/10.0.10240.0/ucrt/x64"
+                linker.args "/LIBPATH:${VS140COMNTOOLS_VC}/atlmfc/lib/amd64"
             }
             cppCompiler.args "/EHsc"
+            cppCompiler.args "/FS"
             cppCompiler.args "/MTd"
             cCompiler.args "/MTd"
 
