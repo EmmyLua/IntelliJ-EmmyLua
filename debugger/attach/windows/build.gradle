@@ -54,6 +54,7 @@ model {
                 cpp {
                     source {
                         srcDirs "src/EasyHookDll"
+                        srcDirs "src/DriverShared"
                         include "**/*.cpp"
                     }
                     exportedHeaders {
@@ -124,6 +125,24 @@ model {
             }
             binaries.all {
                 linker.args "user32.lib", "imagehlp.lib", "Advapi32.lib"
+            }
+        }
+        LuaInject(NativeLibrarySpec) {
+            sources.cpp {
+                source {
+                    srcDir "src/LuaInject"
+                    include "*.cpp"
+                }
+                exportedHeaders {
+                    srcDir "libs/LuaPlus/include"
+                }
+                lib library:"tinyxml", linkage: 'static'
+                lib library:"Shared", linkage: 'static'
+                lib library:"EasyHookDll", linkage: 'shared'
+            }
+            binaries.all {
+                linker.args "/LIBPATH:src/libs/dbghelp/lib"
+                linker.args "dbghelp.lib", "Psapi.lib", "Shell32.lib"
             }
         }
 
