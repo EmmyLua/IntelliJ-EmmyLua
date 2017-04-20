@@ -94,6 +94,16 @@
         ID="regexp:[A-Za-z_][A-Za-z0-9_]*"
         NUMBER="NUMBER"
         STRING = "STRING"
+
+        //lua 5.3
+        DOUBLE_COLON = "::"
+        GOTO = "goto"
+        BIT_OR = "|"
+        BIT_AND = "&"
+        BIT_LTLT = "<<"
+        BIT_RTRT = ">>"
+        BIT_TILDE = "~"
+        DOUBLE_DIV = "//"
   ]
 
   implements("tableConstructor") = "com.tang.intellij.lua.psi.LuaIndentRange"
@@ -131,13 +141,15 @@ private stat ::=
     localFuncDef |
     localDef |
     lastStat |
+    labelStat |
+    gotoStat |
     uncompleted {
         recoverWhile = stat_recover
     }
 private stat_recover ::= !(ID
     | ',' | ';'
     | 'local' | 'do' | 'while' | 'repeat' | 'function' | 'if' | 'for' | 'return' | break
-    | nil | true | false | STRING | NUMBER)
+    | nil | true | false | STRING | NUMBER | '::' | 'goto')
 
 assignStat ::= varList '=' exprList { pin = 1 methods = [getComment assign = 'ASSIGN'] }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
@@ -146,6 +158,8 @@ repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
 ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' { pin = 1 }
 forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 methods = [getComment getParamNameDefList] }
 forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 methods = [getComment] }
+labelStat ::= '::' ID '::' { pin = 1 }
+gotoStat ::= 'goto' ID { pin = 1 }
 
 globalFuncDef ::= 'function' ID funcBody {
     pin = 1
@@ -343,10 +357,14 @@ tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
 tableFieldSep ::= ',' | ';'
 
 binaryOp ::= '+' | '-' | '*' | '/' | '^' | '%' | '..' |
-     '<' | '<=' | '>' | '>=' | '==' | '~=' |
-     'and' | 'or'
+    '<' | '<=' | '>' | '>=' | '==' | '~=' |
+    'and' | 'or'
+    // lua5.3
+    | '|' | '&' | '>>' | '<<' | '~' | '//'
 
 unaryOp ::= '-' | 'not' | '#'
+    // lua5.3
+    | '~'
 
 fake name ::= ID {
     implements = [

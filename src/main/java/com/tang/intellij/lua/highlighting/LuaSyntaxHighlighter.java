@@ -56,7 +56,11 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaTypes.RETURN,
             LuaTypes.THEN,
             LuaTypes.UNTIL,
-            LuaTypes.WHILE
+            LuaTypes.WHILE,
+
+            //lua5.3
+            LuaTypes.DOUBLE_COLON,
+            LuaTypes.GOTO
     );
     public static final TokenSet PRIMITIVE_TYPE_SET = TokenSet.create(
             LuaTypes.FALSE,

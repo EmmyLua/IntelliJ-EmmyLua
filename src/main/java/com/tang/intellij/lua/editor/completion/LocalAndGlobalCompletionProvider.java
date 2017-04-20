@@ -72,7 +72,11 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
             LuaTypes.RETURN,
             LuaTypes.THEN,
             LuaTypes.UNTIL,
-            LuaTypes.WHILE
+            LuaTypes.WHILE,
+
+            //Lua5.3
+            LuaTypes.GOTO,
+            LuaTypes.DOUBLE_COLON
     );
 
     LocalAndGlobalCompletionProvider(int mask) {
