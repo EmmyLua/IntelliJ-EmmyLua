@@ -74,10 +74,10 @@ void LhBarrierProcessDetach();
 ULONGLONG LhBarrierIntro(LOCAL_HOOK_INFO* InHandle, void* InRetAddr, void** InAddrOfRetAddr);
 void* __stdcall LhBarrierOutro(LOCAL_HOOK_INFO* InHandle, void** InAddrOfRetAddr);
 
-LONG DbgRelocateRIPRelative(
-	        ULONGLONG InOffset,
-	        ULONGLONG InTargetOffset,
-            BOOL* OutWasRelocated);
+//LONG DbgRelocateRIPRelative(
+//	        ULONGLONG InOffset,
+//	        ULONGLONG InTargetOffset,
+//            BOOL* OutWasRelocated);
 
 EASYHOOK_NT_INTERNAL RhSetWakeUpThreadID(ULONG InThreadID);
 

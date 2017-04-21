@@ -34,12 +34,6 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 #include <EasyHook.h>
 
-#ifdef _WIN64
-#pragma comment(lib, "EasyHook64.lib")
-#else
-#pragma comment(lib, "EasyHook32.lib")
-#endif
-
 DebugBackend* DebugBackend::s_instance = NULL;
 
 extern HINSTANCE g_hInstance;
