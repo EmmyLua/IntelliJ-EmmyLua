@@ -5,6 +5,7 @@ Lua IDE for IntelliJ IDEA (requires `IDEA 2016.3`)
 [Download](/../../releases)
 
 QQ交流群：`29850775`
+(最新版本以及部分视频演示在群文件中下载)
 
 ![snapshot](/snapshot/overview.gif)
 
@@ -30,7 +31,6 @@ Color settings page | ok
 Doc based type/class annotation | ok
 Method override line marker | ok
 Name suggestion for refactor | 60%
-Modules support | 80%
 Quick Documentation(Ctrl + Q) | 50%
 Live templates | 10%
 Postfix completion templates | 11
@@ -39,6 +39,7 @@ Code intentions | 6
 Code inspections | 6
 Lua Standard Library/API | ok
 Region folding | ok
-Debugger | 50%
-Lua 5.3 | 0%
+Attach Debugger | 70%
+Remote Debugger | 50%
+Lua 5.3 | ok
 ... .etc |
