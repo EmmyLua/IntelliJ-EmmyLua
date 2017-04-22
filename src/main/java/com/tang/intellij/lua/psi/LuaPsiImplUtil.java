@@ -93,10 +93,6 @@ public class LuaPsiImplUtil {
         return ReferenceProvidersRegistry.getReferencesFromProviders(element, PsiReferenceService.Hints.NO_HINTS);
     }
 
-    public static PsiElement resolve(LuaNameExpr ref, SearchContext context) {
-        return LuaPsiResolveUtil.resolve(ref, context);
-    }
-
     /**
      * 寻找 Comment
      * @param declaration owner

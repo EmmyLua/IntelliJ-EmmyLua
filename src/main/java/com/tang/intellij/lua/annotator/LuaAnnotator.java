@@ -135,7 +135,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
         public void visitNameExpr(@NotNull LuaNameExpr o) {
             PsiElement id = o.getFirstChild();
 
-            PsiElement res = o.resolve(new SearchContext(o.getProject()));
+            PsiElement res = LuaPsiResolveUtil.resolve(o, new SearchContext(o.getProject()));
             if (res != null) { //std api highlighting
                 PsiFile containingFile = res.getContainingFile();
                 PsiDirectory directory = containingFile.getContainingDirectory();

@@ -386,7 +386,6 @@ nameExpr ::= ID {
         getNameIdentifier
         getPresentation
         getReferences
-        resolve
 
         toString
     ]
