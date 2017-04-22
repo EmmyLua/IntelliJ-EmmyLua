@@ -25,6 +25,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.SmartList;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
@@ -39,6 +40,7 @@ import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -163,6 +165,29 @@ public class LuaPsiResolveUtil {
         }
 
         return resolveResult;
+    }
+
+    public static PsiElement[] multiResolve(LuaNameExpr ref, SearchContext context) {
+        SmartList<PsiElement> list = new SmartList<>();
+        //search local
+        PsiElement resolveResult = resolveLocal(ref, context);
+
+        String refName = ref.getName();
+        //global field
+        if (resolveResult == null) {
+            Collection<LuaGlobalVar> globalVars = LuaGlobalVarIndex.findAll(refName, context);
+            for (LuaGlobalVar globalVar : globalVars) {
+                list.add(globalVar.getNameRef());
+            }
+        }
+
+        //global function
+        if (resolveResult == null) {
+            Collection<LuaGlobalFuncDef> globalFuncDefs = LuaGlobalFuncIndex.findAll(refName, context);
+            list.addAll(globalFuncDefs);
+        }
+
+        return list.toArray(new PsiElement[list.size()]);
     }
 
     public static PsiElement resolve(LuaIndexExpr indexExpr, SearchContext context) {

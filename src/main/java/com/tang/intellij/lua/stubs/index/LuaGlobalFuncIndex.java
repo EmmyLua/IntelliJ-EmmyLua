@@ -51,17 +51,21 @@ public class LuaGlobalFuncIndex extends StringStubIndexExtension<LuaGlobalFuncDe
     }
 
     public static LuaGlobalFuncDef find(String key, SearchContext context) {
-        if (context.isDumb())
-            return null;
-
-        Collection<LuaGlobalFuncDef> defs = new SmartList<>();
-        StubIndex.getInstance().processElements(KEY, key, context.getProject(), context.getScope(), LuaGlobalFuncDef.class, (s) -> {
-            defs.add(s);
-            return true;
-        });
+        Collection<LuaGlobalFuncDef> defs = findAll(key, context);
         if (!defs.isEmpty()) {
             return defs.iterator().next();
         }
         return null;
+    }
+
+    public static Collection<LuaGlobalFuncDef> findAll(String key, SearchContext context) {
+        Collection<LuaGlobalFuncDef> defs = new SmartList<>();
+        if (!context.isDumb()) {
+            StubIndex.getInstance().processElements(KEY, key, context.getProject(), context.getScope(), LuaGlobalFuncDef.class, (s) -> {
+                defs.add(s);
+                return true;
+            });
+        }
+        return defs;
     }
 }
