@@ -68,12 +68,31 @@ public class LuaTypeSet {
         return types.get(0);
     }
 
+    public LuaTypeSet union(LuaTypeSet other) {
+        if (other == null)
+            return this;
+        for (LuaType type : other.types) {
+            if (!hasType(type)) {
+                types.add(type);
+            }
+        }
+        return this;
+    }
+
     public boolean isEmpty() {
         return types.isEmpty();
     }
 
     public void addType(LuaType type) {
         types.add(type);
+    }
+
+    private boolean hasType(LuaType type) {
+        for (LuaType luaType : types) {
+            if (type == luaType)
+                return true;
+        }
+        return false;
     }
 
     public static void serialize(LuaTypeSet set, @NotNull StubOutputStream stubOutputStream) throws IOException {

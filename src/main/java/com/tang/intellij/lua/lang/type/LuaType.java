@@ -41,7 +41,7 @@ import java.util.Collection;
  * 类型说明
  * Created by TangZX on 2016/12/4.
  */
-public class LuaType {
+public class LuaType implements Comparable<LuaType> {
 
     public static LuaType create(@NotNull String typeName, @Nullable String superTypeName) {
         LuaType type = new LuaType();
@@ -100,6 +100,11 @@ public class LuaType {
         isAnonymous = stubInputStream.readBoolean();
         clazzName = StringRef.toString(stubInputStream.readName());
         superClassName = StringRef.toString(stubInputStream.readName());
+    }
+
+    @Override
+    public int compareTo(@NotNull LuaType other) {
+        return other.clazzName.compareTo(this.clazzName);
     }
 
     public interface Processor<T> {

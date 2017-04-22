@@ -167,26 +167,25 @@ public class LuaPsiResolveUtil {
         return resolveResult;
     }
 
+    @NotNull
     public static PsiElement[] multiResolve(LuaNameExpr ref, SearchContext context) {
         SmartList<PsiElement> list = new SmartList<>();
         //search local
         PsiElement resolveResult = resolveLocal(ref, context);
-
-        String refName = ref.getName();
-        //global field
-        if (resolveResult == null) {
+        if (resolveResult != null) {
+            list.add(resolveResult);
+        } else {
+            String refName = ref.getName();
+            //global field
             Collection<LuaGlobalVar> globalVars = LuaGlobalVarIndex.findAll(refName, context);
             for (LuaGlobalVar globalVar : globalVars) {
                 list.add(globalVar.getNameRef());
             }
-        }
 
-        //global function
-        if (resolveResult == null) {
-            Collection<LuaGlobalFuncDef> globalFuncDefs = LuaGlobalFuncIndex.findAll(refName, context);
-            list.addAll(globalFuncDefs);
+            //global function
+            Collection<LuaGlobalFuncDef> globalFuns = LuaGlobalFuncIndex.findAll(refName, context);
+            list.addAll(globalFuns);
         }
-
         return list.toArray(new PsiElement[list.size()]);
     }
 
