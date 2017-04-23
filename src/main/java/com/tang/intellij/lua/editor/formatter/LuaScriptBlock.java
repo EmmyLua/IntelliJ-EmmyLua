@@ -22,7 +22,6 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.psi.LuaExpr;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,6 +54,9 @@ public class LuaScriptBlock extends AbstractBlock {
             WHILE_STAT,
             TABLE_CONSTRUCTOR
     ));
+
+    //这几特殊一点，前后必须要有空格
+    private TokenSet AND_NOT_OR = TokenSet.create(AND, NOT, OR);
 
     private IElementType elementType;
     private SpacingBuilder spacingBuilder;
@@ -175,8 +177,20 @@ public class LuaScriptBlock extends AbstractBlock {
 
     @Nullable
     @Override
-    public Spacing getSpacing(@Nullable Block block, @NotNull Block block1) {
-        return spacingBuilder.getSpacing(this, block, block1);
+    public Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
+        LuaScriptBlock c1 = (LuaScriptBlock)child1;
+        LuaScriptBlock c2 = (LuaScriptBlock)child2;
+
+        if (elementType == UNARY_EXPR) {
+            assert c1 != null;
+            if (c1.myNode.findChildByType(AND_NOT_OR) != null)
+                return Spacing.createSpacing(1,1,0,false,0);
+        } else if (elementType == BINARY_EXPR) {
+            assert c1 != null;
+            if (c1.myNode.findChildByType(AND_NOT_OR) != null || c2.myNode.findChildByType(AND_NOT_OR) != null)
+                return Spacing.createSpacing(1,1,0,false,0);
+        }
+        return spacingBuilder.getSpacing(this, child1, child2);
     }
 
     @Nullable
