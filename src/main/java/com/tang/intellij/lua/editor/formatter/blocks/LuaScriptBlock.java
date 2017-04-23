@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor.formatter;
+package com.tang.intellij.lua.editor.formatter.blocks;
 
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
@@ -54,9 +54,6 @@ public class LuaScriptBlock extends AbstractBlock {
             WHILE_STAT,
             TABLE_CONSTRUCTOR
     ));
-
-    //这几特殊一点，前后必须要有空格
-    private TokenSet AND_NOT_OR = TokenSet.create(AND, NOT, OR);
 
     private IElementType elementType;
     private SpacingBuilder spacingBuilder;
@@ -158,10 +155,19 @@ public class LuaScriptBlock extends AbstractBlock {
                     if (parent.getTreeParent().getElementType() == ARGS && node.getPsi() instanceof LuaExpr)
                         alignment = this.paramAlignment;
                 }*/
-                results.add(new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder));
+                results.add(createBlock(node, childIndent, alignment));
             }
             node = node.getTreeNext();
         }
+    }
+
+    @NotNull
+    private LuaScriptBlock createBlock(ASTNode node, Indent childIndent, Alignment alignment) {
+        if (node.getElementType() == UNARY_EXPR)
+            return new LuaUnaryScriptBlock(this, node, null, alignment, childIndent, spacingBuilder);
+        if (node.getElementType() == BINARY_EXPR)
+            return new LuaBinaryScriptBlock(this, node, null, alignment, childIndent, spacingBuilder);
+        return new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder);
     }
 
     @Nullable
@@ -178,18 +184,6 @@ public class LuaScriptBlock extends AbstractBlock {
     @Nullable
     @Override
     public Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
-        LuaScriptBlock c1 = (LuaScriptBlock)child1;
-        LuaScriptBlock c2 = (LuaScriptBlock)child2;
-
-        if (elementType == UNARY_EXPR) {
-            assert c1 != null;
-            if (c1.myNode.findChildByType(AND_NOT_OR) != null)
-                return Spacing.createSpacing(1,1,0,false,0);
-        } else if (elementType == BINARY_EXPR) {
-            assert c1 != null;
-            if (c1.myNode.findChildByType(AND_NOT_OR) != null || c2.myNode.findChildByType(AND_NOT_OR) != null)
-                return Spacing.createSpacing(1,1,0,false,0);
-        }
         return spacingBuilder.getSpacing(this, child1, child2);
     }
 

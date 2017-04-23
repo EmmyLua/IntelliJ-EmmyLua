@@ -22,6 +22,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
+import com.tang.intellij.lua.editor.formatter.blocks.LuaScriptBlock;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import org.jetbrains.annotations.NotNull;
