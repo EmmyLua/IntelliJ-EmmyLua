@@ -19,6 +19,7 @@ package com.tang.intellij.lua.stubs.impl;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
+import com.tang.intellij.lua.PowerLevel;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
@@ -74,7 +75,7 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
 
     @Override
     public LuaTypeSet guessValueType() {
-        if (valueType == null && indexExpr != null) {
+        if (PowerLevel.isFullPower() && valueType == null && indexExpr != null) {
             Optional<LuaTypeSet> setOptional = Optional.of(indexExpr)
                     .filter(s -> s.getParent() instanceof LuaVar)
                     .map(PsiElement::getParent)

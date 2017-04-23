@@ -24,6 +24,7 @@ import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.PowerLevel;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaClassField;
@@ -77,7 +78,8 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
             return null;
 
         LuaTypeSet result = LuaTypeSet.create();
-        result = result.union(indexExpr.getValueType());
+        if (PowerLevel.isFullPower())
+            result = result.union(indexExpr.getValueType());
 
         LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
         if (prefixType != null && !prefixType.isEmpty()) {
