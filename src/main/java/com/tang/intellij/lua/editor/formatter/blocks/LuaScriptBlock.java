@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tang.intellij.lua.lang.LuaParserDefinition.COMMENTS;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 /**
@@ -61,11 +60,8 @@ public class LuaScriptBlock extends AbstractBlock {
     private LuaScriptBlock parent;
 
     private Alignment alignment;
-    private Alignment callAlignment;
-    private Alignment assignAlignment;
-    private Alignment paramAlignment;
 
-    LuaScriptBlock(LuaScriptBlock parent,
+    public LuaScriptBlock(LuaScriptBlock parent,
                    @NotNull ASTNode node,
                    @Nullable Wrap wrap,
                    @Nullable Alignment alignment,
@@ -77,52 +73,17 @@ public class LuaScriptBlock extends AbstractBlock {
         this.indent = indent;
         this.parent = parent;
         this.elementType = node.getElementType();
-
-        assignAlignment = Alignment.createAlignment(true);
-
-        if (elementType == CALL_EXPR || elementType == INDEX_EXPR)
-            callAlignment = Alignment.createAlignment(true);
-        else if (elementType == FUNC_BODY || elementType == EXPR_LIST)
-            paramAlignment = Alignment.createAlignment(true);
     }
 
     private static boolean shouldCreateBlockFor(ASTNode node) {
         return node.getTextRange().getLength() != 0 && node.getElementType() != TokenType.WHITE_SPACE;
     }
 
-    private LuaScriptBlock findChildBlockBy(IElementType type) {
-        for (Block b : getSubBlocks()) {
-            LuaScriptBlock block = ((LuaScriptBlock) b);
-            if (block.elementType == type)
-                return block;
-        }
-        return null;
-    }
-
     @Override
     protected List<Block> buildChildren() {
         List<Block> blocks = new ArrayList<>();
         buildChildren(myNode, blocks);
-        //checkAlignment(blocks);
         return blocks;
-    }
-
-    private void checkAlignment(List<Block> blocks) {
-        Alignment assignAlignment = null;
-        for (Block b : blocks) {
-            LuaScriptBlock block = (LuaScriptBlock) b;
-            IElementType elementType = block.elementType;
-            if (elementType == LOCAL_DEF || elementType == ASSIGN_STAT) {
-                LuaScriptBlock assBlock = block.findChildBlockBy(ASSIGN);
-                if (assBlock != null) {
-                    if (assignAlignment == null)
-                        assignAlignment = assBlock.assignAlignment;
-                    assBlock.alignment = assignAlignment;
-                }
-            } else if (!COMMENTS.contains(elementType)) {
-                assignAlignment = null;
-            }
-        }
     }
 
     private void buildChildren(ASTNode parent, List<Block> results) {
@@ -138,24 +99,7 @@ public class LuaScriptBlock extends AbstractBlock {
             if (fakeBlockSet.contains(nodeElementType)) {
                 buildChildren(node, results);
             } else if (shouldCreateBlockFor(node)) {
-                Alignment alignment = null;
-                /*if (parentType == CALL_EXPR || parentType == INDEX_EXPR) {
-                    if (nodeElementType == COLON || nodeElementType == DOT) {
-                        alignment = getTopmostCallAlignment();
-                    }
-                } else if (parentType == TABLE_FIELD) {
-                    if (nodeElementType == ASSIGN) {
-                        alignment = this.parent.parent.assignAlignment;
-                    }
-                } else if (parentType == FUNC_BODY) {
-                    if (nodeElementType == PARAM_NAME_DEF) {
-                        alignment = this.paramAlignment;
-                    }
-                } else if (parentType == EXPR_LIST) {
-                    if (parent.getTreeParent().getElementType() == ARGS && node.getPsi() instanceof LuaExpr)
-                        alignment = this.paramAlignment;
-                }*/
-                results.add(createBlock(node, childIndent, alignment));
+                results.add(createBlock(node, childIndent, null));
             }
             node = node.getTreeNext();
         }
@@ -168,17 +112,6 @@ public class LuaScriptBlock extends AbstractBlock {
         if (node.getElementType() == BINARY_EXPR)
             return new LuaBinaryScriptBlock(this, node, null, alignment, childIndent, spacingBuilder);
         return new LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder);
-    }
-
-    @Nullable
-    private Alignment getTopmostCallAlignment() {
-        Alignment alignment = null;
-        LuaScriptBlock callNode = this;
-        while (callNode != null && callNode.callAlignment != null) {
-            alignment = callNode.callAlignment;
-            callNode = callNode.parent;
-        }
-        return alignment;
     }
 
     @Nullable

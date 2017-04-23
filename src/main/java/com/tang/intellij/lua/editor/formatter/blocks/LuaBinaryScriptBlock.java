@@ -44,7 +44,7 @@ public class LuaBinaryScriptBlock extends LuaScriptBlock {
         LuaScriptBlock c2 = (LuaScriptBlock)child2;
         assert c1 != null;
         if (c1.getNode().findChildByType(AND_NOT_OR) != null || c2.getNode().findChildByType(AND_NOT_OR) != null)
-            return Spacing.createSpacing(1,1,0,false,0);
+            return Spacing.createSpacing(1,1,0,true,1);
         return super.getSpacing(child1, child2);
     }
 }

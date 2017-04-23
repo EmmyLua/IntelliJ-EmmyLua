@@ -43,7 +43,7 @@ public class LuaUnaryScriptBlock extends LuaScriptBlock {
         LuaScriptBlock c1 = (LuaScriptBlock)child1;
         assert c1 != null;
         if (c1.getNode().findChildByType(NOT) != null)
-            return Spacing.createSpacing(1,1,0,false,0);
+            return Spacing.createSpacing(1,1,0,true,1);
 
         return super.getSpacing(child1, child2);
     }
