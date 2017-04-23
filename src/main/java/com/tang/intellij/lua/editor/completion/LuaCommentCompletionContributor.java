@@ -24,15 +24,19 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
-import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef;
-import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
-import com.tang.intellij.lua.comment.psi.LuaDocTypes;
+import com.tang.intellij.lua.comment.psi.*;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.psi.LuaCommentOwner;
+import com.tang.intellij.lua.psi.LuaFuncBody;
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +45,7 @@ import java.util.List;
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 
 /**
- *
+ * doc 相关代码完成
  * Created by tangzx on 2016/12/2.
  */
 public class LuaCommentCompletionContributor extends CompletionContributor {
@@ -60,12 +64,14 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             psiElement(LuaDocTypes.TAG_PARAM));
 
     // 在 extends 之后提示类型
-    private static final  PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_EXTENDS =  psiElement().withParent(LuaDocClassNameRef.class);
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_EXTENDS = psiElement().withParent(LuaDocClassNameRef.class);
 
     // 在 @field 之后提示 public / protected
-    private static final  PsiElementPattern.Capture<PsiElement> SHOW_ACCESS_MODIFIER =  psiElement().afterLeaf(
-            psiElement().withElementType(LuaDocTypes.FIELD).inside(psiElement().withElementType(LuaTypes.DOC_COMMENT))
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_ACCESS_MODIFIER = psiElement().afterLeaf(
+            psiElement().withElementType(LuaDocTypes.FIELD)
     );
+
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_FIELD = psiElement(LuaDocTypes.ID).inside(LuaDocFieldDef.class);
 
     public LuaCommentCompletionContributor() {
         extend(CompletionType.BASIC, SHOW_DOC_TAG, new CompletionProvider<CompletionParameters>() {
@@ -129,6 +135,24 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 completionResultSet.addElement(LookupElementBuilder.create("protected"));
                 completionResultSet.addElement(LookupElementBuilder.create("public"));
+            }
+        });
+
+        // 属性提示
+        extend(CompletionType.BASIC, SHOW_FIELD, new CompletionProvider<CompletionParameters>() {
+            @Override
+            protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+                PsiElement position = completionParameters.getPosition();
+                LuaComment comment = PsiTreeUtil.getParentOfType(position, LuaComment.class);
+                LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
+                if (classDef != null) {
+                    LuaType classType = classDef.getClassType();
+                    if (classType != null) {
+                        classType.processFields(new SearchContext(classDef.getProject()), (curType, field) -> {
+                            completionResultSet.addElement(LookupElementBuilder.create(field.getFieldName()));
+                        });
+                    }
+                }
             }
         });
     }
