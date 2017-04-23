@@ -18,8 +18,11 @@ package com.tang.intellij.lua.stubs.impl;
 
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
+import com.tang.intellij.lua.psi.LuaAssignStat;
+import com.tang.intellij.lua.psi.LuaExprList;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
@@ -33,6 +36,7 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
     private LuaIndexExpr indexExpr;
     private String typeName;
     private String fieldName;
+    private LuaTypeSet valueType;
 
     public LuaIndexStubImpl(LuaIndexExpr indexExpr, StubElement parent, LuaIndexType elementType) {
         super(parent, elementType);
@@ -41,10 +45,11 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
         fieldName = indexExpr.getName();
     }
 
-    public LuaIndexStubImpl(String typeName, String fieldName, StubElement stubElement, LuaIndexType indexType) {
+    public LuaIndexStubImpl(String typeName, String fieldName, LuaTypeSet valueType, StubElement stubElement, LuaIndexType indexType) {
         super(stubElement, indexType);
         this.typeName = typeName;
         this.fieldName = fieldName;
+        this.valueType = valueType;
     }
 
     @Override
@@ -65,5 +70,18 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
     @Override
     public String getFieldName() {
         return fieldName;
+    }
+
+    @Override
+    public LuaTypeSet guessValueType() {
+        if (valueType == null && indexExpr != null) {
+            LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(indexExpr, LuaAssignStat.class);
+            if (assignStat != null) {
+                LuaExprList exprList = assignStat.getExprList();
+                if (exprList != null)
+                    valueType = exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
+            }
+        }
+        return valueType;
     }
 }

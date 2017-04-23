@@ -283,6 +283,8 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         toString
 
         guessPrefixType
+        guessValueType
+
         dot = 'DOT'
         colon = 'COLON'
     ]

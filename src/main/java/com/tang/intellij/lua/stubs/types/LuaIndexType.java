@@ -20,6 +20,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaVar;
 import com.tang.intellij.lua.psi.LuaVarList;
@@ -75,6 +76,7 @@ public class LuaIndexType extends IStubElementType<LuaIndexStub, LuaIndexExpr> {
     public void serialize(@NotNull LuaIndexStub indexStub, @NotNull StubOutputStream stubOutputStream) throws IOException {
         stubOutputStream.writeName(indexStub.getTypeName());
         stubOutputStream.writeName(indexStub.getFieldName());
+        LuaTypeSet.serialize(indexStub.guessValueType(), stubOutputStream);
     }
 
     @NotNull
@@ -82,8 +84,8 @@ public class LuaIndexType extends IStubElementType<LuaIndexStub, LuaIndexExpr> {
     public LuaIndexStub deserialize(@NotNull StubInputStream stubInputStream, StubElement stubElement) throws IOException {
         StringRef typeName = stubInputStream.readName();
         StringRef fieldName = stubInputStream.readName();
-
-        return new LuaIndexStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), stubElement, this);
+        LuaTypeSet valueType = LuaTypeSet.deserialize(stubInputStream);
+        return new LuaIndexStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), valueType, stubElement, this);
     }
 
     @Override

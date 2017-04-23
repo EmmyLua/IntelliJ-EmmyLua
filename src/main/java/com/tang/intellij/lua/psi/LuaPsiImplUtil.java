@@ -327,6 +327,22 @@ public class LuaPsiImplUtil {
         return getName((PsiNameIdentifierOwner)indexExpr);
     }
 
+    public static LuaTypeSet guessValueType(LuaIndexExpr indexExpr) {
+        LuaIndexStub stub = indexExpr.getStub();
+        if (stub != null) {
+            return stub.guessValueType();
+        }
+
+        LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(indexExpr, LuaAssignStat.class);
+        if (assignStat != null) {
+            LuaExprList exprList = assignStat.getExprList();
+            if (exprList != null) {
+                return exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
+            }
+        }
+        return null;
+    }
+
     public static LuaTableField findField(LuaTableConstructor table, String fieldName) {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
