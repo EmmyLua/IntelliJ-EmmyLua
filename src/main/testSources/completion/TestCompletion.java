@@ -33,7 +33,7 @@ public class TestCompletion extends LightCodeInsightFixtureTestCase {
     }
 
     public void testLocalCompletion() {
-        myFixture.configureByFiles("completion1.lua");
+        myFixture.configureByFiles("testCompletion.lua");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
 
@@ -42,11 +42,29 @@ public class TestCompletion extends LightCodeInsightFixtureTestCase {
     }
 
     public void testGlobalCompletion() {
-        myFixture.configureByFiles("completion1.lua", "globals.lua");
+        myFixture.configureByFiles("testCompletion.lua", "globals.lua");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
 
         assertNotNull(strings);
         assertTrue(strings.containsAll(Arrays.asList("gVar1", "gVar2")));
+    }
+
+    public void testSelfCompletion() {
+        myFixture.configureByFiles("testSelf.lua");
+        myFixture.complete(CompletionType.BASIC, 1);
+        List<String> strings = myFixture.getLookupElementStrings();
+
+        assertNotNull(strings);
+        assertTrue(strings.containsAll(Arrays.asList("self:aaa", "self:abb")));
+    }
+
+    public void testParamCompletion() {
+        myFixture.configureByFiles("testParam.lua");
+        myFixture.complete(CompletionType.BASIC, 1);
+        List<String> strings = myFixture.getLookupElementStrings();
+
+        assertNotNull(strings);
+        assertTrue(strings.containsAll(Arrays.asList("param1", "param2")));
     }
 }
