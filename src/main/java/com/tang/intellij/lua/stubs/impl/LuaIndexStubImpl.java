@@ -16,17 +16,17 @@
 
 package com.tang.intellij.lua.stubs.impl;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.LuaAssignStat;
-import com.tang.intellij.lua.psi.LuaExprList;
-import com.tang.intellij.lua.psi.LuaIndexExpr;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.tang.intellij.lua.stubs.types.LuaIndexType;
+
+import java.util.Optional;
 
 /**
  *
@@ -75,12 +75,22 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
     @Override
     public LuaTypeSet guessValueType() {
         if (valueType == null && indexExpr != null) {
-            LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(indexExpr, LuaAssignStat.class);
-            if (assignStat != null) {
-                LuaExprList exprList = assignStat.getExprList();
-                if (exprList != null)
-                    valueType = exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
-            }
+            Optional<LuaTypeSet> setOptional = Optional.of(indexExpr)
+                    .filter(s -> s.getParent() instanceof LuaVar)
+                    .map(PsiElement::getParent)
+                    .filter(s -> s.getParent() instanceof LuaVarList)
+                    .map(PsiElement::getParent)
+                    .filter(s -> s.getParent() instanceof LuaAssignStat)
+                    .map(PsiElement::getParent)
+                    .map(s -> {
+                        LuaAssignStat assignStat = (LuaAssignStat) s;
+                        LuaExprList exprList = assignStat.getExprList();
+                        if (exprList != null) {
+                            return exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
+                        }
+                        return null;
+                    });
+            valueType = setOptional.orElse(null);
         }
         return valueType;
     }

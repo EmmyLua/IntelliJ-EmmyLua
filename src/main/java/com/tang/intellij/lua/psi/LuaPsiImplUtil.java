@@ -43,6 +43,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * LuaPsiImplUtil
@@ -333,14 +334,22 @@ public class LuaPsiImplUtil {
             return stub.guessValueType();
         }
 
-        LuaAssignStat assignStat = PsiTreeUtil.getParentOfType(indexExpr, LuaAssignStat.class);
-        if (assignStat != null) {
-            LuaExprList exprList = assignStat.getExprList();
-            if (exprList != null) {
-                return exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
-            }
-        }
-        return null;
+        Optional<LuaTypeSet> setOptional = Optional.of(indexExpr)
+                .filter(s -> s.getParent() instanceof LuaVar)
+                .map(PsiElement::getParent)
+                .filter(s -> s.getParent() instanceof LuaVarList)
+                .map(PsiElement::getParent)
+                .filter(s -> s.getParent() instanceof LuaAssignStat)
+                .map(PsiElement::getParent)
+                .map(s -> {
+                    LuaAssignStat assignStat = (LuaAssignStat) s;
+                    LuaExprList exprList = assignStat.getExprList();
+                    if (exprList != null) {
+                        return exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
+                    }
+                    return null;
+                });
+        return setOptional.orElse(null);
     }
 
     public static LuaTableField findField(LuaTableConstructor table, String fieldName) {
