@@ -24,11 +24,11 @@ import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.LuaClassField;
+import com.tang.intellij.lua.psi.LuaExpression;
+import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
@@ -41,15 +41,15 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub> implements LuaExpression, LuaClassField {
 
-    public LuaIndexExpressionImpl(@NotNull LuaIndexStub stub, @NotNull IStubElementType nodeType) {
+    LuaIndexExpressionImpl(@NotNull LuaIndexStub stub, @NotNull IStubElementType nodeType) {
         super(stub, nodeType);
     }
 
-    public LuaIndexExpressionImpl(@NotNull ASTNode node) {
+    LuaIndexExpressionImpl(@NotNull ASTNode node) {
         super(node);
     }
 
-    public LuaIndexExpressionImpl(LuaIndexStub stub, IElementType nodeType, ASTNode node) {
+    LuaIndexExpressionImpl(LuaIndexStub stub, IElementType nodeType, ASTNode node) {
         super(stub, nodeType, node);
     }
 
@@ -73,27 +73,19 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
     public LuaTypeSet guessType(SearchContext context) {
         LuaIndexExpr indexExpr = (LuaIndexExpr) this;
         PsiElement id = indexExpr.getId();
-        if (id == null) return null;
+        if (id == null)
+            return null;
 
+        LuaTypeSet result = LuaTypeSet.create();
         LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
         if (prefixType != null && !prefixType.isEmpty()) {
             String propName = id.getText();
             for (LuaType type : prefixType.getTypes()) {
-                if (type instanceof LuaTableType) {
-                    LuaTableType table = (LuaTableType) type;
-                    LuaTableField field = table.tableConstructor.findField(propName);
-                    if (field != null) {
-                        LuaExpr expr = PsiTreeUtil.findChildOfType(field, LuaExpr.class);
-                        if (expr != null) return expr.guessType(context);
-                    }
-                } else {
-                    LuaTypeSet typeSet = guessFieldType(propName, type, context);
-                    if (typeSet != null)
-                        return typeSet;
-                }
+                LuaTypeSet typeSet = guessFieldType(propName, type, context);
+                result = result.union(typeSet);
             }
         }
-        return null;
+        return result;
     }
 
     @Nullable
@@ -103,9 +95,9 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
             return null;
 
         LuaTypeSet set = null;
-        if (fieldDef != null)
+        if (fieldDef != null) {
             set = fieldDef.guessType(context);
-        else {
+        } else {
             LuaType superType = type.getSuperClass(context);
             if (superType != null)
                 set = guessFieldType(fieldName, superType, context);
