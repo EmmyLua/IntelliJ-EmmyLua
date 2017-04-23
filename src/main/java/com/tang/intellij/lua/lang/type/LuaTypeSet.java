@@ -95,22 +95,31 @@ public class LuaTypeSet {
         return false;
     }
 
-    public static void serialize(LuaTypeSet set, @NotNull StubOutputStream stubOutputStream) throws IOException {
-        stubOutputStream.writeInt(set.types.size());
-        for (int i = 0; i < set.types.size(); i++) {
-            LuaType type = set.types.get(i);
-            type.serialize(stubOutputStream);
+    public static void serialize(@Nullable LuaTypeSet set, @NotNull StubOutputStream stubOutputStream) throws IOException {
+        boolean notNull = set != null;
+        stubOutputStream.writeBoolean(notNull);
+        if (notNull) {
+            stubOutputStream.writeInt(set.types.size());
+            for (int i = 0; i < set.types.size(); i++) {
+                LuaType type = set.types.get(i);
+                type.serialize(stubOutputStream);
+            }
         }
     }
 
+    @Nullable
     public static LuaTypeSet deserialize(@NotNull StubInputStream stubInputStream) throws IOException {
-        LuaTypeSet set = LuaTypeSet.create();
-        int num = stubInputStream.readInt();
-        for (int i = 0; i < num; i++) {
-            LuaType type = new LuaType();
-            type.deserialize(stubInputStream);
-            set.addType(type);
+        boolean notNull = stubInputStream.readBoolean();
+        if (notNull) {
+            LuaTypeSet set = LuaTypeSet.create();
+            int num = stubInputStream.readInt();
+            for (int i = 0; i < num; i++) {
+                LuaType type = new LuaType();
+                type.deserialize(stubInputStream);
+                set.addType(type);
+            }
+            return set;
         }
-        return set;
+        return null;
     }
 }
