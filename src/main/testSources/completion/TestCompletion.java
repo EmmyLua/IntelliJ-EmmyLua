@@ -42,12 +42,23 @@ public class TestCompletion extends LightCodeInsightFixtureTestCase {
     }
 
     public void testGlobalCompletion() {
-        myFixture.configureByFiles("testCompletion.lua", "globals.lua");
+        //test 1
+        myFixture.configureByFiles("globals.lua");
+        myFixture.configureByText("test.lua", "<caret>");
         myFixture.complete(CompletionType.BASIC, 1);
         List<String> strings = myFixture.getLookupElementStrings();
 
         assertNotNull(strings);
         assertTrue(strings.containsAll(Arrays.asList("gVar1", "gVar2")));
+
+        //test 2
+        myFixture.configureByFiles("globals.lua");
+        myFixture.configureByText("test.lua", "gVar2.<caret>");
+        myFixture.complete(CompletionType.BASIC, 1);
+        strings = myFixture.getLookupElementStrings();
+
+        assertNotNull(strings);
+        assertTrue(strings.containsAll(Arrays.asList("aaa", "bbb", "ccc")));
     }
 
     public void testSelfCompletion() {
