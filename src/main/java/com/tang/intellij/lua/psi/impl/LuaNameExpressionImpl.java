@@ -71,13 +71,16 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
         LuaTypeSet typeSet = LuaTypeSet.create();
         LuaNameExpr nameExpr = (LuaNameExpr) this;
 
+        boolean hasLocalDef = false;
         PsiElement[] multiResolve = LuaPsiResolveUtil.multiResolve(nameExpr, context);
         for (PsiElement def : multiResolve) {
+            if (def instanceof LuaNameDef)
+                hasLocalDef = true;
             LuaTypeSet set = getTypeSet(context, def);
             typeSet = typeSet.union(set);
         }
         //也许是global
-        if (multiResolve.length == 0) {
+        if (!hasLocalDef) {
             typeSet.addType(LuaType.createGlobalType(nameExpr));
         }
         return typeSet;
@@ -88,7 +91,6 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
         if (def instanceof LuaTypeGuessable) {
             return ((LuaTypeGuessable) def).guessType(context);
         } else if (def instanceof LuaNameExpr) {
-            LuaNameExpr newRef = (LuaNameExpr) def;
             LuaTypeSet typeSet = null;
             LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
             if (luaAssignStat != null) {
@@ -103,13 +105,6 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
                     if (exprList != null)
                         typeSet = exprList.guessTypeAt(0, context);//TODO : multi
                 }
-            }
-            //同时是 Global ?
-            if (LuaPsiResolveUtil.resolveLocal(newRef, context) == null) {
-                if (typeSet == null || typeSet.isEmpty())
-                    typeSet = LuaTypeSet.create(LuaType.createGlobalType(newRef));
-                else
-                    typeSet.addType(LuaType.createGlobalType(newRef));
             }
             return typeSet;
         }
