@@ -174,8 +174,10 @@ public class LuaAttachBridge {
                 isRunning = true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            session.getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(stream);
+            e.printStackTrace(ps);
+            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);
             session.stop();
             isRunning = false;
         }
