@@ -78,4 +78,29 @@ public class TestCompletion extends LightCodeInsightFixtureTestCase {
         assertNotNull(strings);
         assertTrue(strings.containsAll(Arrays.asList("param1", "param2")));
     }
+
+    public void testAnnotation() {
+        String code = "---@class MyClass\n" +
+                "---@field public name string\n" +
+                "local s = {}\n" +
+                "function s:method()end\n" +
+                "function s.staticMethod()end\n" +
+                "---@type MyClass\n" +
+                "local instance\n";
+
+        // fields and methods
+        myFixture.configureByText("test.lua", code + "instance.<caret>");
+        myFixture.completeBasic();
+        List<String> strings = myFixture.getLookupElementStrings();
+        assertNotNull(strings);
+        assertTrue(strings.containsAll(Arrays.asList("name", "method", "staticMethod")));
+
+
+        // methods
+        myFixture.configureByText("test.lua", code + "instance:<caret>");
+        myFixture.completeBasic();
+        strings = myFixture.getLookupElementStrings();
+        assertNotNull(strings);
+        assertTrue(strings.contains("method"));
+    }
 }
