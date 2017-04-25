@@ -23,7 +23,9 @@ import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
+import com.tang.intellij.lua.psi.LuaExpr;
 import com.tang.intellij.lua.psi.LuaExprStat;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,6 +48,25 @@ public class LuaPostfixUtils {
                 }
 
                 return ContainerUtil.createMaybeSingletonList(expr);
+            }
+        };
+    }
+
+    public static PostfixTemplateExpressionSelector selectorAllExpressionsWithCurrentOffset() {
+        return selectorAllExpressionsWithCurrentOffset(Conditions.alwaysTrue());
+    }
+
+    public static PostfixTemplateExpressionSelector selectorAllExpressionsWithCurrentOffset(final Condition<PsiElement> additionalFilter) {
+        return new PostfixTemplateExpressionSelectorBase(additionalFilter) {
+            @Override
+            protected List<PsiElement> getNonFilteredExpressions(@NotNull PsiElement psiElement, @NotNull Document document, int i) {
+                LuaExpr expr = PsiTreeUtil.getNonStrictParentOfType(psiElement, LuaExpr.class);
+                List<PsiElement> list = new SmartList<>();
+                while (expr != null) {
+                    list.add(expr);
+                    expr = PsiTreeUtil.getParentOfType(expr, LuaExpr.class);
+                }
+                return list;
             }
         };
     }

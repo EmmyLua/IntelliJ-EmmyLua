@@ -21,7 +21,7 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorTopmost;
+import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorAllExpressionsWithCurrentOffset;
 
 /**
  * expr -> (expr)
@@ -29,7 +29,7 @@ import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selector
  */
 public class LuaParPostfixTemplate extends StringBasedPostfixTemplate {
     public LuaParPostfixTemplate() {
-        super("par", "(expr)", selectorTopmost());
+        super("par", "(expr)", selectorAllExpressionsWithCurrentOffset());
     }
 
     @Nullable
