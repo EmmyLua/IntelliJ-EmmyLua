@@ -147,7 +147,8 @@ private stat_impl ::=
 private stat_recover ::= !(ID
     | ',' | ';'
     | 'local' | 'do' | 'while' | 'repeat' | 'function' | 'if' | 'for' | 'return' | break
-    | nil | true | false | STRING | NUMBER | '::' | 'goto')
+    | nil | true | false | STRING | NUMBER | '::' | 'goto'
+    | unaryOp)
 
 assignStat ::= varList '=' exprList { pin = 2 methods = [getComment assign = 'ASSIGN'] }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
