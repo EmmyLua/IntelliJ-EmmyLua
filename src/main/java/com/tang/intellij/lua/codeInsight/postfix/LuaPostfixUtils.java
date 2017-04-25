@@ -24,7 +24,7 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.containers.ContainerUtil;
-import com.tang.intellij.lua.psi.LuaUncompletedStat;
+import com.tang.intellij.lua.psi.LuaExprStat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class LuaPostfixUtils {
         return new PostfixTemplateExpressionSelectorBase(additionalFilter) {
             @Override
             protected List<PsiElement> getNonFilteredExpressions(@NotNull PsiElement psiElement, @NotNull Document document, int i) {
-                LuaUncompletedStat stat = PsiTreeUtil.getNonStrictParentOfType(psiElement, LuaUncompletedStat.class);
+                LuaExprStat stat = PsiTreeUtil.getNonStrictParentOfType(psiElement, LuaExprStat.class);
                 PsiElement expr = null;
                 if (stat != null) {
                     expr = stat.getExpr();

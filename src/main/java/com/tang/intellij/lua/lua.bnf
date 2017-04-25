@@ -128,6 +128,7 @@ block ::= stat_semi* (lastStat ';'?)?
 private lazy_block ::= <<lazyBlock>>
 
 fake statement ::= ()
+fake exprStat ::= expr
 private stat_impl ::=
     callStat |
     assignStat |
@@ -160,8 +161,8 @@ forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 methods
 labelStat ::= '::' ID '::' { pin = 1 }
 gotoStat ::= 'goto' ID { pin = 1 }
 defStat ::= classMethodDef | globalFuncDef | localFuncDef | localDef
-callStat ::= funcCallExpr
-uncompletedStat ::= expr
+callStat ::= funcCallExpr { extends = exprStat }
+uncompletedStat ::= expr { extends = exprStat }
 
 globalFuncDef ::= 'function' ID funcBody {
     pin = 1
