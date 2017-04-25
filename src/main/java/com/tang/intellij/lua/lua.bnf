@@ -284,18 +284,18 @@ expr ::=
 parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
 
-fake binaryExpr ::= expr binaryOp expr
-orExpr ::= expr 'or' expr { extends = binaryExpr }
-andExpr ::= expr 'and' expr { extends = binaryExpr }
-conditionalExpr ::= expr ('<'|'>'|'<='|'>='|'~='|'==') expr { extends = binaryExpr }
-bitOrExpr ::= expr '|' expr { extends = binaryExpr }
-bitTildeExpr ::= expr '~' expr { extends = binaryExpr }
-bitAndExpr ::= expr '&' expr { extends = binaryExpr }
-bitMoveExpr ::= expr ('<<'|'>>') expr { extends = binaryExpr }
-concatExpr ::= expr '..' expr { extends = binaryExpr }
-addExpr ::= expr ('+'|'-') expr { extends = binaryExpr }
-mulExpr ::= expr ('*'|'/'|'//'|'%') expr { extends = binaryExpr }
-expExpr ::= expr '^' expr { extends = binaryExpr }
+fake binaryExpr ::= ()
+orExpr ::= expr 'or' expr { elementType = binaryExpr }
+andExpr ::= expr 'and' expr { elementType = binaryExpr }
+conditionalExpr ::= expr ('<'|'>'|'<='|'>='|'~='|'==') expr { elementType = binaryExpr }
+bitOrExpr ::= expr '|' expr { elementType = binaryExpr }
+bitTildeExpr ::= expr '~' expr { elementType = binaryExpr }
+bitAndExpr ::= expr '&' expr { elementType = binaryExpr }
+bitMoveExpr ::= expr ('<<'|'>>') expr { elementType = binaryExpr }
+concatExpr ::= expr '..' expr { elementType = binaryExpr }
+addExpr ::= expr ('+'|'-') expr { elementType = binaryExpr }
+mulExpr ::= expr ('*'|'/'|'//'|'%') expr { elementType = binaryExpr }
+expExpr ::= expr '^' expr { elementType = binaryExpr }
 
 left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1
