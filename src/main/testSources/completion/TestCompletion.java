@@ -38,7 +38,7 @@ public class TestCompletion extends LightCodeInsightFixtureTestCase {
         List<String> strings = myFixture.getLookupElementStrings();
 
         assertNotNull(strings);
-        assertTrue(strings.containsAll(Arrays.asList("a", "b")));
+        assertTrue(strings.containsAll(Arrays.asList("a", "b", "func1")));
     }
 
     public void testGlobalCompletion() {
