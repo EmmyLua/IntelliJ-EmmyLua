@@ -266,11 +266,36 @@ var ::= callOrIndexExpr | nameExpr {
     ]
 }
 
-expr ::= unaryExpr | binaryExpr | valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
+expr ::=
+    orExpr |
+    andExpr |
+    conditionalExpr |
+    bitOrExpr |
+    bitTildeExpr |
+    bitAndExpr |
+    bitMoveExpr |
+    concatExpr |
+    addExpr |
+    mulExpr |
+    unaryExpr |
+    expExpr |
+    valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
 
 parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
-binaryExpr ::= expr binaryOp expr { pin = 2 }
+
+fake binaryExpr ::= expr binaryOp expr
+orExpr ::= expr 'or' expr { extends = binaryExpr }
+andExpr ::= expr 'and' expr { extends = binaryExpr }
+conditionalExpr ::= expr ('<'|'>'|'<='|'>='|'~='|'==') expr { extends = binaryExpr }
+bitOrExpr ::= expr '|' expr { extends = binaryExpr }
+bitTildeExpr ::= expr '~' expr { extends = binaryExpr }
+bitAndExpr ::= expr '&' expr { extends = binaryExpr }
+bitMoveExpr ::= expr ('<<'|'>>') expr { extends = binaryExpr }
+concatExpr ::= expr '..' expr { extends = binaryExpr }
+addExpr ::= expr ('+'|'-') expr { extends = binaryExpr }
+mulExpr ::= expr ('*'|'/'|'//'|'%') expr { extends = binaryExpr }
+expExpr ::= expr '^' expr { extends = binaryExpr }
 
 left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1
