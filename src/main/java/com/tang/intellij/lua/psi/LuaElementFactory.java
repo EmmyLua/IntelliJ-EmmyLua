@@ -42,4 +42,21 @@ public class LuaElementFactory {
         assert (def != null);
         return def.getFirstChild();
     }
+
+    public static PsiElement createName(Project project, String name) {
+        PsiElement element = createWith(project, name + " = 1");
+
+        return PsiTreeUtil.findChildOfType(element, LuaNameExpr.class);
+    }
+
+    @NotNull
+    public static PsiElement newLine(Project project) {
+        return createWith(project, "\n");
+    }
+
+    @NotNull
+    public static PsiElement createWith(Project project, String code) {
+        LuaFile file = createFile(project, code);
+        return file.getFirstChild();
+    }
 }

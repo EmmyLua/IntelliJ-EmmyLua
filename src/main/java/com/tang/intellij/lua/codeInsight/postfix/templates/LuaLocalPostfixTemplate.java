@@ -16,27 +16,32 @@
 
 package com.tang.intellij.lua.codeInsight.postfix.templates;
 
-import com.intellij.codeInsight.template.Template;
-import com.intellij.codeInsight.template.impl.TextExpression;
-import com.intellij.codeInsight.template.postfix.templates.StringBasedPostfixTemplate;
-import com.intellij.openapi.util.Conditions;
+import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateWithExpressionSelector;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
+import com.tang.intellij.lua.psi.LuaExpr;
+import com.tang.intellij.lua.refactoring.rename.LuaIntroduceVarHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorTopmost;
+import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorAllExpressionsWithCurrentOffset;
 
 /**
  * post fix test
  * Created by tangzx on 2017/2/4.
  */
-public class LuaLocalPostfixTemplate extends StringBasedPostfixTemplate {
+public class LuaLocalPostfixTemplate extends PostfixTemplateWithExpressionSelector {
 
     public LuaLocalPostfixTemplate() {
-        super("local", "local inst = expr", selectorTopmost(Conditions.alwaysTrue()));
+        super("local", "local inst = expr", selectorAllExpressionsWithCurrentOffset());
     }
 
-    @Nullable
+    @Override
+    protected void expandForChooseExpression(@NotNull PsiElement psiElement, @NotNull Editor editor) {
+        LuaIntroduceVarHandler handler = new LuaIntroduceVarHandler();
+        handler.invoke(editor.getProject(), editor, (LuaExpr) psiElement);
+    }
+
+    /*@Nullable
     @Override
     public String getTemplateString(@NotNull PsiElement psiElement) {
         return "local $inst$ = $expr$$END$";
@@ -51,5 +56,5 @@ public class LuaLocalPostfixTemplate extends StringBasedPostfixTemplate {
     @Override
     protected PsiElement getElementToRemove(PsiElement expr) {
         return expr;
-    }
+    }*/
 }
