@@ -57,7 +57,7 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
     class LuaElementVisitor extends LuaVisitor {
 
         @Override
-        public void visitUncompleted(@NotNull LuaUncompleted o) {
+        public void visitUncompletedStat(@NotNull LuaUncompletedStat o) {
             myHolder.createErrorAnnotation(o, "Uncompleted");
         }
 

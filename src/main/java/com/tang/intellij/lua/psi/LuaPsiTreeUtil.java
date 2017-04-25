@@ -60,13 +60,13 @@ public class LuaPsiTreeUtil {
         int funcDeep = 0;
         PsiElement curr = current;
         do {
-            if (curr instanceof LuaLocalFuncDef) {
-                //todo 第一级local function不能使用
-                //if (funcDeep > 0 || treeDeep != 1) {
-                    LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
+            if (curr instanceof LuaDefStat) {
+                LuaLocalFuncDef localFuncDef = ((LuaDefStat) curr).getLocalFuncDef();
+                if (localFuncDef != null) {
+                    //todo 第一级local function不能使用
                     continueSearch = processor.accept(localFuncDef);
-                //}
-                funcDeep++;
+                    funcDeep++;
+                }
             }
 
             PsiElement prevSibling = curr.getPrevSibling();
@@ -97,11 +97,12 @@ public class LuaPsiTreeUtil {
             }
             curr = next;
 
-            if (curr instanceof LuaLocalDef) {
+            if (curr instanceof LuaDefStat) {
+                LuaLocalDef localDef = ((LuaDefStat) curr).getLocalDef();
                 // 跳过类似
                 // local name = name //skip
-                if (!curr.getNode().getTextRange().contains(element.getNode().getTextRange())) {
-                    LuaNameList nameList = ((LuaLocalDef) curr).getNameList();
+                if (localDef != null && !localDef.getNode().getTextRange().contains(element.getNode().getTextRange())) {
+                    LuaNameList nameList = localDef.getNameList();
                     continueSearch = resolveInNameList(nameList, processor);
                 }
             } else {

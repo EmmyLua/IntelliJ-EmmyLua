@@ -108,27 +108,28 @@
 
   implements("tableConstructor") = "com.tang.intellij.lua.psi.LuaIndentRange"
   hooks("forAStat|forBStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
-  implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner, com.tang.intellij.lua.psi.LuaPsiStatement"
+  implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
   hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
-  implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration, com.tang.intellij.lua.psi.LuaPsiStatement"
+  implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
+  hooks("defStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
-  implements("doStat|whileStat|repeatStat|ifStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaPsiStatement"
+  implements("doStat|whileStat|repeatStat|ifStat") = "com.tang.intellij.lua.psi.LuaIndentRange"
   implements("funcBody") = "com.tang.intellij.lua.psi.LuaIndentRange"
   extends(".*Expr") = expr
+  extends(".*Stat") = statement
 }
 
 luaFile ::= stat_semi*
 
-private stat_semi ::= stat ';'?
+private stat_semi ::= stat_impl ';'?
 block ::= stat_semi* (lastStat ';'?)?
 private lazy_block ::= <<lazyBlock>>
-//末完成的，报错
-uncompleted ::= valueExpr
 
-private stat ::=
-    funcCallExpr |
+fake statement ::= ()
+private stat_impl ::=
+    callStat |
     assignStat |
     doStat |
     whileStat |
@@ -136,14 +137,11 @@ private stat ::=
     ifStat |
     forAStat |
     forBStat |
-    classMethodDef |
-    globalFuncDef |
-    localFuncDef |
-    localDef |
+    defStat |
     lastStat |
     labelStat |
     gotoStat |
-    uncompleted {
+    uncompletedStat {
         recoverWhile = stat_recover
     }
 private stat_recover ::= !(ID
@@ -151,7 +149,7 @@ private stat_recover ::= !(ID
     | 'local' | 'do' | 'while' | 'repeat' | 'function' | 'if' | 'for' | 'return' | break
     | nil | true | false | STRING | NUMBER | '::' | 'goto')
 
-assignStat ::= varList '=' exprList { pin = 1 methods = [getComment assign = 'ASSIGN'] }
+assignStat ::= varList '=' exprList { pin = 2 methods = [getComment assign = 'ASSIGN'] }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
 repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
@@ -160,6 +158,9 @@ forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'e
 forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 methods = [getComment] }
 labelStat ::= '::' ID '::' { pin = 1 }
 gotoStat ::= 'goto' ID { pin = 1 }
+defStat ::= classMethodDef | globalFuncDef | localFuncDef | localDef
+callStat ::= funcCallExpr
+uncompletedStat ::= expr
 
 globalFuncDef ::= 'function' ID funcBody {
     pin = 1
@@ -167,7 +168,6 @@ globalFuncDef ::= 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.intellij.psi.PsiNameIdentifierOwner"
-        "com.tang.intellij.lua.psi.LuaPsiStatement"
     ]
     methods = [
         getComment
@@ -201,7 +201,6 @@ classMethodDef ::= 'function' classMethodName funcBody {
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaClassMember"
         "com.intellij.psi.PsiNameIdentifierOwner"
-        "com.tang.intellij.lua.psi.LuaPsiStatement"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
     methods = [
@@ -226,7 +225,6 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.intellij.psi.PsiNameIdentifierOwner"
-        "com.tang.intellij.lua.psi.LuaPsiStatement"
     ]
     methods = [
         getComment
@@ -307,7 +305,6 @@ left callExpr ::= args {
         isMethodCall
         isFunctionCall
     ]
-    implements = "com.tang.intellij.lua.psi.LuaPsiStatement"
 }
 
 private suffixExpr ::= indexExpr | callExpr

@@ -22,7 +22,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtilCore;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.psi.LuaPsiStatement;
+import com.tang.intellij.lua.psi.LuaStatement;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class LuaSurroundDescriptor implements SurroundDescriptor {
         if (parent == null)
             return PsiElement.EMPTY_ARRAY;
         while (true) {
-            if (parent instanceof LuaPsiStatement) {
+            if (parent instanceof LuaStatement) {
                 if (!(element1 instanceof PsiComment)) {
                     parent = parent.getParent();
                 }
@@ -112,7 +112,7 @@ public class LuaSurroundDescriptor implements SurroundDescriptor {
         }
 
         for (PsiElement element : array) {
-            if (!(element instanceof LuaPsiStatement || element instanceof PsiWhiteSpace || element instanceof PsiComment)) {
+            if (!(element instanceof LuaStatement || element instanceof PsiWhiteSpace || element instanceof PsiComment)) {
                 return PsiElement.EMPTY_ARRAY;
             }
         }
