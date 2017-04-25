@@ -79,7 +79,7 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
 
         LuaTypeSet result = LuaTypeSet.create();
         if (PowerLevel.isFullPower())
-            result = result.union(indexExpr.getValueType());
+            result = result.union(indexExpr.guessValueType());
 
         LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
         if (prefixType != null && !prefixType.isEmpty()) {
