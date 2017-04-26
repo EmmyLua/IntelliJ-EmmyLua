@@ -10,15 +10,14 @@ using namespace std;
 
 void wxEvtHandler::AddPendingEvent(wxDebugEvent & event)
 {
+	this->vm = event.GetVm();
+
 	EventId id = event.GetEventId();
 	DebugFrontend& df = DebugFrontend::Get();
 	TiXmlDocument document;
 	document.LinkEndChild(WriteXmlNode("type", event.GetEventId()));
 
 	switch (id) {
-	case EventId_CreateVM:
-		this->vm = event.GetVm();
-		break;
 	case EventId_NameVM:
 	case EventId_Exception:
 	case EventId_LoadError:
