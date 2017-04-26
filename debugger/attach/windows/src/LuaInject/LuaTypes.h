@@ -22,7 +22,7 @@ extern "C"
 		int lastlinedefined;	/* (S) */
 		char short_src[LUA_IDSIZE]; /* (S) */
 		/* private part */
-		int i_ci;  /* active function */
+		struct CallInfo *i_ci;  /* active function */
 	};
 
 	struct lua_Debug_52
