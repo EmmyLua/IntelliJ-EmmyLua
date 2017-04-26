@@ -352,7 +352,7 @@ DebugBackend::VirtualMachine* DebugBackend::AttachState(unsigned long api, lua_S
     vm->stackTop            = 0;
     vm->luaJitWorkAround    = false;
     vm->breakpointInStack   = true;// Force the stack tobe checked when the first script is entered
-    vm->haveActiveBreakpoints = false;
+    vm->haveActiveBreakpoints = true;
     
     m_vms.push_back(vm);
     m_stateToVm.insert(std::make_pair(L, vm));
