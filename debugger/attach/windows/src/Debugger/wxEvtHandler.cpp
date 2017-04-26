@@ -63,9 +63,11 @@ void wxEvtHandler::AddPendingEvent(wxDebugEvent & event)
 		stacks.Parse(event.GetMessageString().c_str());
 		auto root = stacks.RootElement();
 
-		TiXmlElement* value = new TiXmlElement("value");
-		value->LinkEndChild(root->Clone());
-		document.LinkEndChild(value);
+		if (root != nullptr) {
+			TiXmlElement* value = new TiXmlElement("value");
+			value->LinkEndChild(root->Clone());
+			document.LinkEndChild(value);
+		}
 		break;
 	}
 	}
