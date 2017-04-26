@@ -412,32 +412,29 @@ void DebugBackend::DetachState(unsigned long api, lua_State* L)
         }
     }
 
+	//Remove VM
+	for (unsigned int i = 0; i < m_vms.size(); ++i)
+	{
+		VirtualMachine* vm = m_vms[i];
+		if (vm->L == L)
+		{
+			CloseHandle(vm->hThread);
+			delete vm;
+			m_vms.erase(m_vms.begin() + i);
+		}
+	}
     // Remove the state from our list.
 
     StateToVmMap::iterator stateIterator = m_stateToVm.find(L);
 
     if (stateIterator != m_stateToVm.end())
     {
+		m_stateToVm.erase(stateIterator);
 
         m_eventChannel.WriteUInt32(EventId_DestroyVM);
         m_eventChannel.WriteSize(reinterpret_cast<size_t>(L));
         m_eventChannel.Flush();
-
-        m_stateToVm.erase(stateIterator);
-    
     }
-
-    for (unsigned int i = 0; i < m_vms.size(); ++i)
-    {
-        VirtualMachine* vm = m_vms[i];
-        if (vm->L == L)
-        {
-            CloseHandle(vm->hThread);
-            delete vm;
-            m_vms.erase(m_vms.begin() + i);
-        }
-    }
-
 }
 
 int DebugBackend::PostLoadScript(unsigned long api, int result, lua_State* L, const char* source, size_t size, const char* name)

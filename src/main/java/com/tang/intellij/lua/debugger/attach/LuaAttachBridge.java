@@ -187,7 +187,7 @@ public class LuaAttachBridge {
         stop(true);
     }
 
-    private void stop(boolean detach) {
+    void stop(boolean detach) {
         if (detach)
             send("detach");
         writer = null;
