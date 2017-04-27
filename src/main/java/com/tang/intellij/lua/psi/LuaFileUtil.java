@@ -55,7 +55,7 @@ public class LuaFileUtil {
             for (String sourceRoot : sourceRoots) {
                 for (String ext : extensions) {
                     VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + shortUrl + ext);
-                    if (file != null) {
+                    if (file != null && !file.isDirectory()) {
                         return file;
                     }
                 }
@@ -65,7 +65,7 @@ public class LuaFileUtil {
         //绝对路径
         for (String ext : extensions) {
             VirtualFile file = VirtualFileManager.getInstance().findFileByUrl("file://" + shortUrl + ext);
-            if (file != null) {
+            if (file != null && !file.isDirectory()) {
                 return file;
             }
         }
