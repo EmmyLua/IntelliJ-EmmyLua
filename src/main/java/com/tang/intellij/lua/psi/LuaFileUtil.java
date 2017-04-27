@@ -40,7 +40,7 @@ public class LuaFileUtil {
 
     //有些扩展名也许是txt
     private static String[] extensions = new String[] {
-            ".lua", ".txt"
+            "", ".lua", ".txt"
     };
 
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
@@ -51,6 +51,7 @@ public class LuaFileUtil {
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
+            //相对路径
             for (String sourceRoot : sourceRoots) {
                 for (String ext : extensions) {
                     VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + shortUrl + ext);
@@ -58,6 +59,14 @@ public class LuaFileUtil {
                         return file;
                     }
                 }
+            }
+        }
+
+        //绝对路径
+        for (String ext : extensions) {
+            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl("file://" + shortUrl + ext);
+            if (file != null) {
+                return file;
             }
         }
         return null;
