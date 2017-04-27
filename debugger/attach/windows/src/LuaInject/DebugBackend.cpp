@@ -1339,13 +1339,14 @@ void DebugBackend::ToggleBreakpoint(lua_State* L, unsigned int scriptIndex, unsi
         else
         {
             //Check to see if this was the last active breakpoint set if so switch back to fast mode
-            if(!GetHaveActiveBreakpoints())
-            {
-                for(StateToVmMap::iterator it = m_stateToVm.begin(); it != m_stateToVm.end(); it++)
-                {
-                    it->second->haveActiveBreakpoints = false;
-                }
-            }
+			//TODO:暂时去除优化，这会导致HookMode_None
+			/*if(!GetHaveActiveBreakpoints())
+			{
+				for(StateToVmMap::iterator it = m_stateToVm.begin(); it != m_stateToVm.end(); it++)
+				{
+					it->second->haveActiveBreakpoints = false;
+				}
+			}*/
         }
 
         // Send back the event telling the frontend that we set/unset the breakpoint.
