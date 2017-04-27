@@ -38,20 +38,25 @@ import java.io.File;
  */
 public class LuaFileUtil {
 
+    //有些扩展名也许是txt
+    private static String[] extensions = new String[] {
+            ".lua", ".txt"
+    };
+
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
         if (shortUrl == null)
             return null;
-        if (!shortUrl.toLowerCase().endsWith(".lua"))
-            shortUrl = shortUrl + ".lua";
 
         shortUrl = shortUrl.replace('\\', '/');
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
             for (String sourceRoot : sourceRoots) {
-                VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + shortUrl);
-                if (file != null) {
-                    return file;
+                for (String ext : extensions) {
+                    VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + shortUrl + ext);
+                    if (file != null) {
+                        return file;
+                    }
                 }
             }
         }

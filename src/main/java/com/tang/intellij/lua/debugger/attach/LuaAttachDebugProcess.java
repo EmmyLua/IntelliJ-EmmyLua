@@ -146,10 +146,11 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
     private void onLoadScript(LuaAttachLoadScriptProto proto) {
         VirtualFile file = LuaFileUtil.findFile(getSession().getProject(), proto.getName());
         if (file == null) {
-            getSession().getConsoleView().print(String.format("File not found : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
+            getSession().getConsoleView().print(String.format("[✘] File not found : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
         } else {
             LoadedScript script = new LoadedScript(file, proto.getIndex(), proto.getName());
             loadedScriptMap.put(proto.getIndex(), script);
+            getSession().getConsoleView().print(String.format("[✔] File was loaded : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
 
             for (XSourcePosition pos : registeredBreakpoints.keySet()) {
                 if (file.equals(pos.getFile())) {
