@@ -238,7 +238,6 @@ struct LuaInterface
 	luaL_newstate_cdecl_t        luaL_newstate_dll_cdecl;
 	TRACED_HOOK_HANDLE luaL_newstate_hook_info;
 	lua_checkstack_cdecl_t       lua_checkstack_dll_cdecl;
-	TRACED_HOOK_HANDLE luaL_rotate_hook_info;
 	lua_rotate_cdecl_t       lua_rotate_dll_cdecl;
 
 	lua_CFunction                DecodaOutput;
