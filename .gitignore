@@ -6,12 +6,11 @@ gen
 !.idea/modules.xml
 *.skeleton
 .gradle
-LuaIDE*.zip
 jflex*.jar
 *.diff
 *.dll
 *.exe
-
+/*.zip
 
 */Debug
 */Release
