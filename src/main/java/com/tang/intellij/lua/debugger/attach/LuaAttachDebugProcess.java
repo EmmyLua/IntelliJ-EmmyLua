@@ -176,7 +176,6 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
                 if (sourcePosition != null) {
                     registeredBreakpoints.put(sourcePosition, breakpoint);
                     for (LoadedScript script : loadedScriptMap.values()) {
-                        System.out.println(script.getFile().getPath());
                         if (LuaFileUtil.fileEquals(sourcePosition.getFile(), script.getFile())) {
                             bridge.sendToggleBreakpoint(script.getIndex(), sourcePosition.getLine());
                             break;
