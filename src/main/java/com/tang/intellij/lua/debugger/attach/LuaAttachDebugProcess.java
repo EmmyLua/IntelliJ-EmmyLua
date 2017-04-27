@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.debugger.attach;
 
 import com.intellij.execution.process.ProcessInfo;
+import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
@@ -144,7 +145,9 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
 
     private void onLoadScript(LuaAttachLoadScriptProto proto) {
         VirtualFile file = LuaFileUtil.findFile(getSession().getProject(), proto.getName());
-        if (file != null) {
+        if (file == null) {
+            getSession().getConsoleView().print(String.format("File not found : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
+        } else {
             LoadedScript script = new LoadedScript(file, proto.getIndex(), proto.getName());
             loadedScriptMap.put(proto.getIndex(), script);
 

@@ -153,7 +153,7 @@ public class LuaAttachBridge {
                 isX86 = exitValue == 1;
 
                 String archType = isX86 ? "x86" : "x64";
-                session.getConsoleView().print(String.format("try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
+                session.getConsoleView().print(String.format("Try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
