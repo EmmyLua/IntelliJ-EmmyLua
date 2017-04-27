@@ -980,14 +980,13 @@ void DebugBackend::UpdateHookMode(unsigned long api, lua_State* L, lua_Debug* ho
 
 bool DebugBackend::StackHasBreakpoint(unsigned long api, lua_State* L)
 {
-	lua_Debug* p = new lua_Debug();
-	lua_Debug functionInfo = *p;
+	lua_Debug functionInfo = { 0 };
     VirtualMachine* vm = GetVm(L);
 	int stackIndex = 0;
     while (true)
     {
 		int status = lua_getstack_dll(api, L, stackIndex, &functionInfo);
-		if (status != 1 || functionInfo.ld52.i_ci == NULL || functionInfo.ld51.i_ci == NULL)
+		if (status != 1)
 			break;
 
 		stackIndex = stackIndex + 1;

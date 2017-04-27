@@ -980,6 +980,8 @@ const char* lua_setlocal_dll(unsigned long api, lua_State* L, const lua_Debug* a
 
 int lua_getstack_dll(unsigned long api, lua_State* L, int level, lua_Debug* ar)
 {
+	if (ar == NULL)
+		return 0;
 	int status = g_interfaces[api].lua_getstack_dll_cdecl(L, level, ar);
 	if (GetCI(api, ar) == NULL)
 		status = 0; //TODO: why
