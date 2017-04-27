@@ -153,7 +153,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
             getSession().getConsoleView().print(String.format("[✔] File was loaded : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
 
             for (XSourcePosition pos : registeredBreakpoints.keySet()) {
-                if (file.equals(pos.getFile())) {
+                if (LuaFileUtil.fileEquals(file, pos.getFile())) {
                     bridge.sendToggleBreakpoint(proto.getIndex(), pos.getLine());
                 }
             }
@@ -176,7 +176,8 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
                 if (sourcePosition != null) {
                     registeredBreakpoints.put(sourcePosition, breakpoint);
                     for (LoadedScript script : loadedScriptMap.values()) {
-                        if (script.getFile().equals(sourcePosition.getFile())) {
+                        System.out.println(script.getFile().getPath());
+                        if (LuaFileUtil.fileEquals(sourcePosition.getFile(), script.getFile())) {
                             bridge.sendToggleBreakpoint(script.getIndex(), sourcePosition.getLine());
                             break;
                         }
@@ -188,9 +189,12 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
             public void unregisterBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint, boolean temporary) {
                 XSourcePosition sourcePosition = breakpoint.getSourcePosition();
                 if (sourcePosition != null) {
+                    VirtualFile sourceFile = sourcePosition.getFile();
                     registeredBreakpoints.remove(sourcePosition);
+
                     for (LoadedScript script : loadedScriptMap.values()) {
-                        if (script.getFile().equals(sourcePosition.getFile())) {
+                        VirtualFile scriptFile = script.getFile();
+                        if (LuaFileUtil.fileEquals(sourceFile, scriptFile)) {
                             bridge.sendToggleBreakpoint(script.getIndex(), sourcePosition.getLine());
                             break;
                         }

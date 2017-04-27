@@ -43,6 +43,13 @@ public class LuaFileUtil {
             "", ".lua", ".txt"
     };
 
+    public static boolean fileEquals(VirtualFile f1, VirtualFile f2) {
+        if (f1 == null || f2 == null)
+            return false;
+        //f1.getName().equals(f2.getName()) &&
+        return f1.getPath().equals(f2.getPath());
+    }
+
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
         if (shortUrl == null)
             return null;
