@@ -31,7 +31,6 @@
     <ClInclude Include="Shared\CriticalSection.h" />
     <ClInclude Include="Shared\CriticalSectionLock.h" />
     <ClInclude Include="Shared\CriticalSectionTryLock.h" />
-    <ClInclude Include="Shared\Def.h" />
     <ClInclude Include="Shared\Protocol.h" />
     <ClInclude Include="Shared\StlUtility.h" />
     <ClInclude Include="Shared\XmlUtility.h" />

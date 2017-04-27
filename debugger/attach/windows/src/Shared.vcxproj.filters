@@ -56,9 +56,6 @@
     <ClInclude Include="Shared\StlUtility.h">
       <Filter>头文件\Shared</Filter>
     </ClInclude>
-    <ClInclude Include="Shared\Def.h">
-      <Filter>头文件\Shared</Filter>
-    </ClInclude>
     <ClInclude Include="Shared\XmlUtility.h">
       <Filter>头文件\Shared</Filter>
     </ClInclude>

@@ -25,7 +25,6 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 #include <string>
-#include "Def.h"
 
 /**
  * Communication channel used to between two processess. The current
