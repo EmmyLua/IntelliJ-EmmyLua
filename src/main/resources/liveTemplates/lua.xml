@@ -32,7 +32,7 @@
 
     <template resource-bundle="LuaBundle" key="livetemplate.description.for-i"
               name="fori" toReformat="true" toShortenFQNames="true"
-              value="for $VAR1$, $VAR2$ in iparis($EXPR$) do&#10;$END$&#10;end">
+              value="for $VAR1$, $VAR2$ in ipairs($EXPR$) do&#10;$END$&#10;end">
         <variable name="VAR1" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true" />
         <variable name="VAR2" expression="" defaultValue="&quot;v&quot;" alwaysStopAt="true" />
         <variable name="EXPR" expression="SuggestFirstLuaVarName()" defaultValue="" alwaysStopAt="true" />
@@ -43,7 +43,7 @@
 
     <template resource-bundle="LuaBundle" key="livetemplate.description.for-p"
               name="forp" toReformat="true" toShortenFQNames="true"
-              value="for $VAR1$, $VAR2$ in paris($EXPR$) do&#10;$END$&#10;end">
+              value="for $VAR1$, $VAR2$ in pairs($EXPR$) do&#10;$END$&#10;end">
         <variable name="VAR1" expression="" defaultValue="&quot;i&quot;" alwaysStopAt="true" />
         <variable name="VAR2" expression="" defaultValue="&quot;v&quot;" alwaysStopAt="true" />
         <variable name="EXPR" expression="SuggestFirstLuaVarName()" defaultValue="" alwaysStopAt="true" />
