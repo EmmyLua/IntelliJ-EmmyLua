@@ -445,6 +445,12 @@ int DebugBackend::PostLoadScript(unsigned long api, int result, lua_State* L, co
         return result;
     }
 
+	auto vm = GetVm(L);
+	if (vm -> inEval)
+	{
+		return result;
+	}
+
     bool registered = false;
 
     // Register the script before dealing with errors, since the front end has enough
@@ -2089,6 +2095,8 @@ bool DebugBackend::Evaluate(unsigned long api, lua_State* L, const std::string& 
     // Disable the debugger hook so that we don't try to debug the expression.
     SetHookMode(api, L, HookMode_None);
     EnableIntercepts(api, false);
+	auto vm = GetVm(L);
+	vm->inEval = true;
     
     int stackTop = lua_gettop_dll(api, L);    
     
@@ -2204,8 +2212,7 @@ bool DebugBackend::Evaluate(unsigned long api, lua_State* L, const std::string& 
     // Reenable the debugger hook
     EnableIntercepts(api, true);
     SetHookMode(api, L, HookMode_Full);
-    if(GetVm(L)->haveActiveBreakpoints || m_mode == Mode_StepInto || m_mode == Mode_StepOver){
-    }
+	vm->inEval = false;
 
     int t2 = lua_gettop_dll(api, L);
     assert(t1 == t2);

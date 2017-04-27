@@ -418,6 +418,7 @@ private:
         bool            breakpointInStack;
         bool            haveActiveBreakpoints;
         std::string     lastFunctions;
+		bool			inEval;
     };
 
     struct StackEntry
