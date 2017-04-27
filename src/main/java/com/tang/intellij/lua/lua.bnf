@@ -110,10 +110,8 @@
   hooks("forAStat|forBStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
   hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
-  implements("localDef|assignStat") = "com.tang.intellij.lua.psi.LuaDeclaration"
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
-  hooks("defStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
   implements("doStat|whileStat|repeatStat|ifStat") = "com.tang.intellij.lua.psi.LuaIndentRange"
   implements("funcBody") = "com.tang.intellij.lua.psi.LuaIndentRange"
@@ -151,7 +149,13 @@ private stat_recover ::= !(ID
     | nil | true | false | STRING | NUMBER | '::' | 'goto'
     | unaryOp)
 
-assignStat ::= varList '=' exprList { pin = 2 methods = [getComment assign = 'ASSIGN'] }
+assignStat ::= varList '=' exprList {
+    pin = 2
+    implements = [
+        "com.tang.intellij.lua.psi.LuaDeclaration"
+    ]
+    methods = [getComment assign = 'ASSIGN']
+}
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
 repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
@@ -160,7 +164,7 @@ forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'e
 forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 methods = [getComment] }
 labelStat ::= '::' ID '::' { pin = 1 }
 gotoStat ::= 'goto' ID { pin = 1 }
-defStat ::= classMethodDef | globalFuncDef | localFuncDef | localDef
+private defStat ::= classMethodDef | globalFuncDef | localFuncDef | localDef
 callStat ::= funcCallExpr { extends = exprStat }
 uncompletedStat ::= expr { extends = exprStat }
 
@@ -169,6 +173,7 @@ globalFuncDef ::= 'function' ID funcBody {
     implements = [
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
+        "com.tang.intellij.lua.psi.LuaStatement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     methods = [
@@ -202,6 +207,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaClassMember"
+        "com.tang.intellij.lua.psi.LuaStatement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
@@ -226,6 +232,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
     implements = [
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
+        "com.tang.intellij.lua.psi.LuaStatement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     methods = [
@@ -242,6 +249,10 @@ localFuncDef ::= 'local' 'function' ID funcBody {
 }
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
+    implements = [
+        "com.tang.intellij.lua.psi.LuaDeclaration"
+        "com.tang.intellij.lua.psi.LuaStatement"
+    ]
     methods = [getComment assign = 'ASSIGN']
 }
 
