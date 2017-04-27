@@ -182,12 +182,12 @@ const char* GetSource(unsigned long api, const lua_Debug* ar);
 const char* GetWhat(unsigned long api, const lua_Debug* ar);
 const char* GetName(unsigned long api, const lua_Debug* ar);
 const char* GetHookEventName(unsigned long api, const lua_Debug* ar);
-
+const void* GetCI(unsigned long api, const lua_Debug* ar);
 /**
  * Creates a new function that can be used with the specified API. The new function
  * automatically handles stdcall (if necessary) and adds an api parameter.
  */
-lua_CFunction CreateCFunction(unsigned long api, lua_CFunction function, lua_CFunction worker);
+void* CreateCFunction(unsigned long api, void* function, void* worker);
 
 void FreeLuaDll();
 #endif

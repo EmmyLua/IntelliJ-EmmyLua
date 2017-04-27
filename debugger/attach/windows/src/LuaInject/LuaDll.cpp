@@ -367,9 +367,15 @@ void HookHandlerWorker(unsigned long api, lua_State* L, lua_Debug* ar)
 {
 	return DebugBackend::Get().HookCallback(api, L, ar);
 }
-void HookHandler(lua_State* L, lua_Debug* ar)
+
+void HookHandler(lua_State* L, lua_Debug* ar) {}
+
+void HookHandler_intercept(lua_State* L, lua_Debug* ar)
 {
-	HookHandlerWorker(0, L, ar);
+	LPVOID lp;
+	LhBarrierGetCallback(&lp);
+	unsigned long api = (unsigned long)lp;
+	HookHandlerWorker(api, L, ar);
 }
 
 void SetHookMode(unsigned long api, lua_State* L, HookMode mode)
@@ -2332,7 +2338,7 @@ bool LoadLuaFunctions(const stdext::hash_map<std::string, DWORD64>& symbols, HAN
 
 	luaInterface.DecodaOutput = DecodaOutput;// (lua_CFunction)InstanceFunction(DecodaOutput, api);
 	luaInterface.CPCallHandler = CPCallHandler;// (lua_CFunction)InstanceFunction(CPCallHandler, api);
-	luaInterface.HookHandler = HookHandler;// (lua_Hook)InstanceFunction(HookHandler, api);
+	luaInterface.HookHandler = (lua_Hook)CreateCFunction(api, HookHandler, HookHandler_intercept);// (lua_Hook)InstanceFunction(HookHandler, api);
 
 	g_interfaces.push_back(luaInterface);
 
@@ -2926,7 +2932,7 @@ int CFunctionHandler(lua_State* L)
 	return result;
 }
 
-lua_CFunction CreateCFunction(unsigned long api, lua_CFunction function, lua_CFunction intercept)
+void* CreateCFunction(unsigned long api, void* function, void* intercept)
 {
 	// This is never deallocated, but it doesn't really matter since we never
 	// destroy these functions.
