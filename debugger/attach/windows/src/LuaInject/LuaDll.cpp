@@ -2067,7 +2067,7 @@ std::string GetApplicationDirectory()
 
 }
 
-bool LoadLuaFunctions(const stdext::hash_map<std::string, DWORD64>& symbols, HANDLE hProcess)
+bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string, DWORD64>& symbols, HANDLE hProcess)
 {
 
 #define GET_FUNCTION_OPTIONAL(function)                                                                                     \
@@ -2331,7 +2331,9 @@ bool LoadLuaFunctions(const stdext::hash_map<std::string, DWORD64>& symbols, HAN
 	DebugBackend::Get().CreateApi(api);
 
 #ifdef VERBOSE
-	DebugBackend::Get().Message("Found all necessary Lua functions");
+	char buffer[1024] = {0};
+	_snprintf(buffer, 1024, "Found all necessary Lua functions [%s]", moduleName);
+	DebugBackend::Get().Message(buffer);
 #endif
 
 	// Setup our API.
@@ -2783,7 +2785,7 @@ void PostLoadLibrary(HMODULE hModule)
 
 		LoadSymbolsRecursively(loadedModules, symbols, hProcess, hModule);
 
-		LoadLuaFunctions(symbols, hProcess);
+		LoadLuaFunctions(moduleName, symbols, hProcess);
 
 		//SymCleanup_dll(hProcess);
 		//hProcess = NULL;
