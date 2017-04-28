@@ -51,6 +51,7 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
 
     LuaAttachDebugProcess(@NotNull XDebugSession session, ProcessInfo processInfo) {
         super(session);
+        session.setPauseActionSupported(false);
         editorsProvider = new LuaDebuggerEditorsProvider();
         bridge = new LuaAttachBridge(processInfo, session);
         bridge.setProtoHandler(this);
@@ -77,6 +78,16 @@ public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBri
     @Override
     public void startStepInto(@Nullable XSuspendContext context) {
         bridge.send("stepinto");
+    }
+
+    @Override
+    public void startStepOut(@Nullable XSuspendContext context) {
+
+    }
+
+    @Override
+    public void startForceStepInto(@Nullable XSuspendContext context) {
+
     }
 
     @Override
