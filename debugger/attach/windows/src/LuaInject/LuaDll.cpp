@@ -2332,7 +2332,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 
 #ifdef VERBOSE
 	char buffer[1024] = {0};
-	_snprintf(buffer, 1024, "Found all necessary Lua functions [%s]", moduleName);
+	_snprintf(buffer, 1024, "Found all necessary Lua functions [M:%s, V:%d]", moduleName, luaInterface.version);
 	DebugBackend::Get().Message(buffer);
 #endif
 
@@ -2346,7 +2346,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 
 	if (!g_loadedLuaFunctions)
 	{
-		DebugBackend::Get().Message("Debugger attached to process");
+		DebugBackend::Get().Message("Debugger attached to process.");
 		g_loadedLuaFunctions = true;
 	}
 
