@@ -1,10 +1,10 @@
 out
 build
-gen
 .idea
 !.idea/IntelliJ-Lua.iml
 !.idea/modules.xml
 *.skeleton
+*.java~
 .gradle
 jflex*.jar
 *.diff
