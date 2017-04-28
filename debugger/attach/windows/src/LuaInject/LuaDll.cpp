@@ -240,7 +240,7 @@ struct LuaInterface
 	lua_checkstack_cdecl_t       lua_checkstack_dll_cdecl;
 	lua_rotate_cdecl_t       lua_rotate_dll_cdecl;
 
-	lua_CFunction                DecodaOutput;
+	lua_CFunction                EmmyOutput;
 	lua_CFunction                CPCallHandler;
 	lua_Hook                     HookHandler;
 
@@ -308,23 +308,24 @@ const char* MemoryReader_cdecl(lua_State* L, void* data, size_t* size)
 
 }
 
-
-int DecodaOutputWorker(unsigned long api, lua_State* L)
+int EmmyOutputWorker(unsigned long api, lua_State* L)
 {
 	const char* message = lua_tostring_dll(api, L, 1);
 	DebugBackend::Get().Message(message);
-
 	return 0;
-
 }
 
-int DecodaOutput(lua_State* L)
+int EmmyOutput_intercept(lua_State* L)
 {
-	unsigned long api = 0;
-	int result;
-	assert(false);//TODO get api
-	result = DecodaOutputWorker(api, L);
-	return result;
+	LPVOID lp;
+	LhBarrierGetCallback(&lp);
+	unsigned long api = (unsigned long)lp;
+	return EmmyOutputWorker(api, L);
+}
+
+int EmmyOutput(lua_State* L)
+{
+	return 0;
 }
 
 int CPCallHandlerWorker(unsigned long api, lua_State* L)
@@ -338,16 +339,15 @@ int CPCallHandlerWorker(unsigned long api, lua_State* L)
 	return args.function(api, L);
 
 }
-
-int CPCallHandler(lua_State* L)
+int CPCallHandler_intercept(lua_State* L)
 {
-	unsigned long api = 0;
-	int result;
-
-	assert(false);//TODO get api
-	result = CPCallHandlerWorker(api, L);
-	return result;
+	LPVOID lp;
+	LhBarrierGetCallback(&lp);
+	unsigned long api = (unsigned long)lp;
+	return CPCallHandlerWorker(api, L);
 }
+
+int CPCallHandler(lua_State* L) { return 0; }
 
 int lua_cpcall_dll(unsigned long api, lua_State *L, lua_CFunction_dll func, void *udn)
 {
@@ -756,7 +756,7 @@ bool GetAreInterceptsEnabled()
 
 void RegisterDebugLibrary(unsigned long api, lua_State* L)
 {
-	lua_register_dll(api, L, "decoda_output", g_interfaces[api].DecodaOutput);
+	lua_register_dll(api, L, "emmy_output", g_interfaces[api].EmmyOutput);
 }
 
 int GetGlobalsIndex(unsigned long api)
@@ -2338,9 +2338,9 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 
 	// Setup our API.
 
-	luaInterface.DecodaOutput = DecodaOutput;// (lua_CFunction)InstanceFunction(DecodaOutput, api);
-	luaInterface.CPCallHandler = CPCallHandler;// (lua_CFunction)InstanceFunction(CPCallHandler, api);
-	luaInterface.HookHandler = (lua_Hook)CreateCFunction(api, HookHandler, HookHandler_intercept);// (lua_Hook)InstanceFunction(HookHandler, api);
+	luaInterface.EmmyOutput = (lua_CFunction)CreateCFunction(api, EmmyOutput, EmmyOutput_intercept);
+	luaInterface.CPCallHandler = (lua_CFunction)CreateCFunction(api, CPCallHandler, CPCallHandler_intercept);
+	luaInterface.HookHandler = (lua_Hook)CreateCFunction(api, HookHandler, HookHandler_intercept);
 
 	g_interfaces.push_back(luaInterface);
 
