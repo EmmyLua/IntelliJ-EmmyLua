@@ -736,7 +736,11 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
         vm = iterator->second;
     }
 
-    assert(vm->api == api);
+	//TODO: 同一个L在不同的lua代码里被调用?
+	//assert(vm->api == api);
+	if (vm->api != api) {
+		api = vm->api;
+	}
 
     if (!vm->initialized && GetEvent(api, ar) == LUA_HOOKLINE)
     {
