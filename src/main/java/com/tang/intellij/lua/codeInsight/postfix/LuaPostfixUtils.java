@@ -27,6 +27,7 @@ import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 import com.tang.intellij.lua.psi.LuaExpr;
 import com.tang.intellij.lua.psi.LuaExprStat;
+import com.tang.intellij.lua.psi.LuaValueExpr;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -63,6 +64,8 @@ public class LuaPostfixUtils {
                 LuaExpr expr = PsiTreeUtil.getNonStrictParentOfType(psiElement, LuaExpr.class);
                 List<PsiElement> list = new SmartList<>();
                 while (expr != null) {
+                    if (expr instanceof LuaValueExpr)
+                        list.clear();
                     list.add(expr);
                     expr = PsiTreeUtil.getParentOfType(expr, LuaExpr.class);
                 }
