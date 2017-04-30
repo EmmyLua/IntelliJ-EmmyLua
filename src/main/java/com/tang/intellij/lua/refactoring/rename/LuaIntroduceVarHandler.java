@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.refactoring.rename;
 
+import com.intellij.codeInsight.CodeInsightUtilCore;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
@@ -32,9 +33,13 @@ import com.intellij.refactoring.introduce.inplace.OccurrencesChooser;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.psi.LuaExpr;
 import com.tang.intellij.lua.psi.LuaNameDef;
+import com.tang.intellij.lua.psi.LuaStatement;
+import com.tang.intellij.lua.refactoring.LuaRefactoringUtil;
 import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -52,6 +57,7 @@ public class LuaIntroduceVarHandler implements RefactoringActionHandler {
         public String name = "var";
         private List<PsiElement> newOccurrences;
         private LuaNameDef var;
+        private PsiElement element;
 
         IntroduceOperation(Project project, Editor editor, PsiFile psiFile) {
             this.project = project;
@@ -90,6 +96,14 @@ public class LuaIntroduceVarHandler implements RefactoringActionHandler {
         public void setVar(LuaNameDef var) {
             this.var = var;
         }
+
+        public PsiElement getElement() {
+            return element;
+        }
+
+        public void setElement(PsiElement element) {
+            this.element = element;
+        }
     }
 
     @Override
@@ -104,10 +118,9 @@ public class LuaIntroduceVarHandler implements RefactoringActionHandler {
 
     public void invoke(Project project, Editor editor, LuaExpr expr) {
         IntroduceOperation operation = new IntroduceOperation(project, editor, expr.getContainingFile());
-        List<PsiElement> list = new SmartList<>();
-        list.add(expr);
-        operation.setOccurrences(list);
-        OccurrencesChooser.simpleChooser(editor).showChooser(expr, list, new Pass<OccurrencesChooser.ReplaceChoice>() {
+        operation.setElement(expr);
+        operation.setOccurrences(getOccurrences(expr));
+        OccurrencesChooser.simpleChooser(editor).showChooser(expr, operation.getOccurrences(), new Pass<OccurrencesChooser.ReplaceChoice>() {
             @Override
             public void pass(OccurrencesChooser.ReplaceChoice choice) {
                 operation.setReplaceAll(choice == OccurrencesChooser.ReplaceChoice.ALL);
@@ -119,29 +132,55 @@ public class LuaIntroduceVarHandler implements RefactoringActionHandler {
         });
     }
 
+    private List<PsiElement> getOccurrences(LuaExpr expr) {
+        return LuaRefactoringUtil.getOccurrences(expr, expr.getContainingFile());
+    }
+
+    private static PsiElement findAnchor(List<PsiElement> occurrences) {
+        PsiElement anchor = occurrences.get(0);
+        next:
+        do {
+            final LuaStatement statement = PsiTreeUtil.getParentOfType(anchor, LuaStatement.class);
+            if (statement != null) {
+                final PsiElement parent = statement.getParent();
+                for (PsiElement element : occurrences) {
+                    if (!PsiTreeUtil.isAncestor(parent, element, true)) {
+                        anchor = statement;
+                        continue next;
+                    }
+                }
+            }
+            return statement;
+        }
+        while (true);
+    }
+
     private void performReplace(IntroduceOperation operation) {
+        if (!operation.isReplaceAll())
+            operation.setOccurrences(Collections.singletonList(operation.element));
+
         PsiElement commonParent = PsiTreeUtil.findCommonParent(operation.getOccurrences());
         if (commonParent != null) {
-            while (!(commonParent instanceof PsiFile)) {
-                commonParent = commonParent.getParent();
-            }
+            PsiElement anchor = findAnchor(operation.getOccurrences());
+            commonParent = anchor.getParent();
 
-            List<PsiElement> newOccurrences = new SmartList<>();
-            PsiElement anchor = commonParent.getFirstChild();
-            PsiElement localDef = LuaElementFactory.createWith(operation.project, "local var = 0");
+            PsiElement localDef = LuaElementFactory.createWith(operation.project, "local var = " + operation.getElement().getText());
             localDef = commonParent.addBefore(localDef, anchor);
 
-            LuaNameDef nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef.class);
-            operation.setVar(nameDef);
+            commonParent.addAfter(LuaElementFactory.newLine(operation.project), localDef);
 
+            List<PsiElement> newOccurrences = new SmartList<>();
             for (PsiElement occ : operation.getOccurrences()) {
                 PsiElement identifier = LuaElementFactory.createName(operation.project, operation.name);
                 identifier = occ.replace(identifier);
                 newOccurrences.add(identifier);
             }
             operation.setNewOccurrences(newOccurrences);
+
+            localDef = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(localDef);
+            LuaNameDef nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef.class);
+            operation.setVar(nameDef);
         }
-        PsiDocumentManager.getInstance(operation.project).doPostponedOperationsAndUnblockDocument(operation.editor.getDocument());
     }
 
     private void performInplaceIntroduce(IntroduceOperation operation) {
@@ -151,6 +190,13 @@ public class LuaIntroduceVarHandler implements RefactoringActionHandler {
     private class LuaIntroduce extends InplaceVariableIntroducer<PsiElement> {
         LuaIntroduce(IntroduceOperation operation) {
             super(operation.getVar(), operation.editor, operation.project, "Introduce Variable", operation.getNewOccurrences(), null);
+        }
+
+        @Nullable
+        @Override
+        protected PsiElement checkLocalScope() {
+            PsiFile currentFile = PsiDocumentManager.getInstance(this.myProject).getPsiFile(this.myEditor.getDocument());
+            return currentFile != null?currentFile:super.checkLocalScope();
         }
     }
  }
