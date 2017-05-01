@@ -159,7 +159,7 @@ public class MobServer implements Runnable {
     }
 
     public void addCommand(String command) {
-        addCommand(new DefaultCommand(command));
+        addCommand(new DefaultCommand(command, 0));
     }
 
     public void addCommand(DebugCommand command) {

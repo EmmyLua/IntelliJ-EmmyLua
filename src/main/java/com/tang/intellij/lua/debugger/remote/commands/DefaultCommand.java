@@ -35,7 +35,7 @@ public class DefaultCommand extends DebugCommand {
         this(commandline, 1);
     }
 
-    DefaultCommand(String commandline, int requireRespLines) {
+    public DefaultCommand(String commandline, int requireRespLines) {
         this.commandline = commandline;
         this.requireRespLines = requireRespLines;
     }
