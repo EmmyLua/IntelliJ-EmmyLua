@@ -34,7 +34,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LuaStackFrame extends XStackFrame {
 
-    private LuaDebuggerEvaluator evaluator = new LuaDebuggerEvaluator();
+    private LuaRemoteDebuggerEvaluator evaluator = new LuaRemoteDebuggerEvaluator();
     private String functionName;
     private XSourcePosition position;
     private XValueChildrenList values = new XValueChildrenList();

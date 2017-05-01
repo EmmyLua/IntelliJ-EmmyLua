@@ -16,19 +16,8 @@
 
 package com.tang.intellij.lua.debugger.attach;
 
-import com.intellij.debugger.impl.DebuggerUtilsEx;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.project.IndexNotReadyException;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Ref;
-import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.xdebugger.XSourcePosition;
-import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
-import com.tang.intellij.lua.psi.LuaTypes;
+import com.tang.intellij.lua.debugger.LuaDebuggerEvaluator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by tangzx on 2017/4/2.
  */
-public class LuaAttachDebuggerEvaluator extends XDebuggerEvaluator {
+public class LuaAttachDebuggerEvaluator extends LuaDebuggerEvaluator {
     private LuaAttachDebugProcess process;
     private LuaAttachStackFrame stackFrame;
 
@@ -54,26 +43,5 @@ public class LuaAttachDebuggerEvaluator extends XDebuggerEvaluator {
                 xEvaluationCallback.errorOccurred("error");
             }
         });
-    }
-
-    @Nullable
-    @Override
-    public TextRange getExpressionRangeAtOffset(Project project, Document document, int offset, boolean sideEffectsAllowed) {
-        final Ref<TextRange> currentRange = Ref.create(null);
-        PsiDocumentManager.getInstance(project).commitAndRunReadAction(() -> {
-            try {
-                PsiElement element = DebuggerUtilsEx.findElementAt(PsiDocumentManager.getInstance(project).getPsiFile(document), offset);
-                if (element == null || !element.isValid()) {
-                    return;
-                }
-                IElementType type = element.getNode().getElementType();
-                if (type == LuaTypes.ID) {
-                    PsiElement parent = element.getParent();
-                    if (parent instanceof PsiNamedElement)
-                        currentRange.set(parent.getTextRange());
-                }
-            } catch (IndexNotReadyException ignored) {}
-        });
-        return currentRange.get();
     }
 }
