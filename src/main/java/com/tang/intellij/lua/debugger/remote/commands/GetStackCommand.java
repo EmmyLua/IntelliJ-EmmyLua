@@ -24,6 +24,7 @@ import com.tang.intellij.lua.debugger.remote.LuaStackFrame;
 import com.tang.intellij.lua.debugger.remote.value.LuaRValue;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
@@ -66,35 +67,37 @@ public class GetStackCommand extends DefaultCommand {
             //String status = matcher.group(1);//200
             //String statusName = matcher.group(2);//OK
             String stackCode = matcher.group(3);
-            Globals standardGlobals = JsePlatform.standardGlobals();
+            Globals standardGlobals = JsePlatform.debugGlobals();
             LuaValue code = standardGlobals.load(stackCode);
-            LuaValue value = code.checkfunction().call();
+            LuaFunction function = code.checkfunction();
+            LuaValue value = function.call();
 
             ArrayList<XStackFrame> frames = new ArrayList<>();
             for (int i = 1; i <= value.length(); i++) {
                 LuaValue stackValue = value.get(i);
                 LuaValue stackInfo = stackValue.get(1);
 
+                LuaValue funcName = stackInfo.get(1);
                 LuaValue fileName = stackInfo.get(2);
                 LuaValue line = stackInfo.get(4);
-                LuaValue funcName = stackInfo.get(1);
 
+                XSourcePositionImpl position = null;
                 VirtualFile virtualFile = LuaFileUtil.findFile(debugProcess.getSession().getProject(), fileName.toString());
                 if (virtualFile != null) {
                     int nLine = line.toint();
-                    XSourcePositionImpl position = XSourcePositionImpl.create(virtualFile, nLine - 1);
-
-                    String functionName = funcName.toString();
-                    if (funcName.isnil())
-                        functionName = "main";
-
-                    LuaStackFrame frame = new LuaStackFrame(functionName, position);
-
-                    parseValues(stackValue.get(2).checktable(), frame);
-                    parseValues(stackValue.get(3).checktable(), frame);
-
-                    frames.add(frame);
+                    position = XSourcePositionImpl.create(virtualFile, nLine - 1);
                 }
+
+                String functionName = funcName.toString();
+                if (funcName.isnil())
+                    functionName = "main";
+
+                LuaStackFrame frame = new LuaStackFrame(functionName, position);
+
+                parseValues(stackValue.get(2).checktable(), frame);
+                parseValues(stackValue.get(3).checktable(), frame);
+
+                frames.add(frame);
             }
             debugProcess.setStack(new LuaExecutionStack(frames));
         }

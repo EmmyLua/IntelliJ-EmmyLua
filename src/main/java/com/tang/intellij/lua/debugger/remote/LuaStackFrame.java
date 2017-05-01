@@ -19,7 +19,6 @@ package com.tang.intellij.lua.debugger.remote;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTextContainer;
 import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.xdebugger.XDebuggerBundle;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XCompositeNode;
@@ -68,16 +67,15 @@ public class LuaStackFrame extends XStackFrame {
 
     public void customizePresentation(@NotNull ColoredTextContainer component) {
         XSourcePosition position = this.getSourcePosition();
+        String info = functionName;
+        String positionInfo = "unknown";
         if(position != null) {
-            String positionInfo = position.getFile().getName() + ":" + (position.getLine() + 1);
-            String info = positionInfo;
-            if (functionName != null)
-                info = String.format("%s (%s)", functionName, positionInfo);
-            component.append(info, SimpleTextAttributes.REGULAR_ATTRIBUTES);
-            component.setIcon(AllIcons.Debugger.StackFrame);
-        } else {
-            component.append(XDebuggerBundle.message("invalid.frame"), SimpleTextAttributes.ERROR_ATTRIBUTES);
+            positionInfo = position.getFile().getName() + ":" + (position.getLine() + 1);
         }
 
+        if (functionName != null)
+            info = String.format("%s (%s)", functionName, positionInfo);
+        component.append(info, SimpleTextAttributes.REGULAR_ATTRIBUTES);
+        component.setIcon(AllIcons.Debugger.StackFrame);
     }
 }
