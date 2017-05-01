@@ -34,6 +34,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -85,10 +87,14 @@ public class MobServer implements Runnable {
             currentCommandWaitForResp = null;
         }
 
-        String[] list = data.split(" ");
-        String[] params = Arrays.copyOfRange(list, 1, list.length);
-        int code = Integer.parseInt(list[0]);
-        listener.handleResp(code, params);
+        Pattern pattern = Pattern.compile("(\\d+) (\\w+)( (.+))?");
+        Matcher matcher = pattern.matcher(data);
+        if (matcher.find()) {
+            int code = Integer.parseInt(matcher.group(1));
+            //String status = matcher.group(2);
+            String context = matcher.group(4);
+            listener.handleResp(code, context);
+        }
     }
 
     public void write(String data) throws IOException {

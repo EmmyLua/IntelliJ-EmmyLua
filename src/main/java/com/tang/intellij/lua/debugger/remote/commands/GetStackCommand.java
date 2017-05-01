@@ -40,11 +40,9 @@ import java.util.regex.Pattern;
 public class GetStackCommand extends DefaultCommand {
 
     private boolean hasError;
-    private String[] params;
 
-    public GetStackCommand(String[] params) {
+    public GetStackCommand() {
         super("STACK", 1);
-        this.params = params;
     }
 
     @Override

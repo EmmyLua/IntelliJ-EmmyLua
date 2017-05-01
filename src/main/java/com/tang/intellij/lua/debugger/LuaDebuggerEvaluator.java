@@ -24,6 +24,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
@@ -48,8 +49,13 @@ public abstract class LuaDebuggerEvaluator extends XDebuggerEvaluator {
                 IElementType type = element.getNode().getElementType();
                 if (type == LuaTypes.ID) {
                     PsiElement parent = element.getParent();
-                    if (parent instanceof PsiNamedElement)
-                        currentRange.set(parent.getTextRange());
+                    if (parent instanceof PsiNamedElement) {
+                        PsiElement id = parent;
+                        if (parent instanceof PsiNameIdentifierOwner)
+                            id = ((PsiNameIdentifierOwner) parent).getNameIdentifier();
+                        if (id != null)
+                            currentRange.set(id.getTextRange());
+                    }
                 }
             } catch (IndexNotReadyException ignored) {}
         });
