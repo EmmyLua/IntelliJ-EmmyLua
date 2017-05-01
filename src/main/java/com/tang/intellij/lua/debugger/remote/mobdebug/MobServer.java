@@ -18,7 +18,7 @@ package com.tang.intellij.lua.debugger.remote.mobdebug;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.util.io.BaseOutputReader;
-import com.tang.intellij.lua.debugger.remote.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.remote.LuaRemoteDebugProcess;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,6 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.Future;
@@ -64,19 +63,19 @@ public class MobServer implements Runnable {
     private ServerSocket server;
     private Thread thread;
     private Future threadSend;
-    private LuaDebugProcess listener;
+    private LuaRemoteDebugProcess listener;
     private Queue<DebugCommand> commands = new LinkedList<>();
     private LuaDebugReader debugReader;
     private DebugCommand currentCommandWaitForResp;
     private OutputStreamWriter streamWriter;
 
-    public MobServer(LuaDebugProcess listener) {
+    public MobServer(LuaRemoteDebugProcess listener) {
         this.listener = listener;
     }
 
-    public void start() throws IOException {
+    public void start(int port) throws IOException {
         if (server == null)
-            server = new ServerSocket(8172);
+            server = new ServerSocket(port);
         thread = new Thread(this);
         thread.start();
     }
@@ -106,6 +105,7 @@ public class MobServer implements Runnable {
     public void run() {
         try {
             final Socket accept = server.accept();
+            listener.println("Connected.");
             debugReader = new LuaDebugReader(accept.getInputStream(), Charset.defaultCharset());
 
             threadSend = ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -133,7 +133,7 @@ public class MobServer implements Runnable {
                         Thread.sleep(5);
                     }
 
-                    System.out.println("disconnect");
+                    listener.println("Disconnected.");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

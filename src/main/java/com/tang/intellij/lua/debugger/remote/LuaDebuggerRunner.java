@@ -61,7 +61,7 @@ public class LuaDebuggerRunner extends GenericProgramRunner {
             @NotNull
             @Override
             public XDebugProcess start(@NotNull XDebugSession xDebugSession) throws ExecutionException {
-                return new LuaDebugProcess(xDebugSession);
+                return new LuaRemoteDebugProcess(xDebugSession);
             }
         });
     }

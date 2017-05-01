@@ -20,7 +20,6 @@ import com.intellij.execution.process.ProcessInfo;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
@@ -28,6 +27,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
+import com.tang.intellij.lua.debugger.LuaDebugProcess;
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
 import com.tang.intellij.lua.debugger.LuaLineBreakpointType;
 import com.tang.intellij.lua.debugger.LuaSuspendContext;
@@ -43,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * Created by tangzx on 2017/3/26.
  */
-public class LuaAttachDebugProcess extends XDebugProcess implements LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
+public class LuaAttachDebugProcess extends LuaDebugProcess implements LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
     private LuaDebuggerEditorsProvider editorsProvider;
     private LuaAttachBridge bridge;
     private Map<XSourcePosition, XLineBreakpoint> registeredBreakpoints = new ConcurrentHashMap<>();

@@ -16,11 +16,10 @@
 
 package com.tang.intellij.lua.debugger.remote.commands;
 
-import com.tang.intellij.lua.debugger.remote.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.remote.LuaRemoteDebugProcess;
 import com.tang.intellij.lua.debugger.remote.mobdebug.MobServer;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 /**
  * Remote Debug Command
@@ -28,9 +27,9 @@ import java.io.OutputStreamWriter;
  */
 public abstract class DebugCommand {
 
-    protected LuaDebugProcess debugProcess;
+    protected LuaRemoteDebugProcess debugProcess;
 
-    public void setDebugProcess(LuaDebugProcess process) {
+    public void setDebugProcess(LuaRemoteDebugProcess process) {
         debugProcess = process;
     }
 

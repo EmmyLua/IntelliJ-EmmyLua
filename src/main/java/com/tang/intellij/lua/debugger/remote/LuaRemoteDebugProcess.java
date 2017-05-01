@@ -19,7 +19,6 @@ package com.tang.intellij.lua.debugger.remote;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
@@ -27,9 +26,10 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
+import com.tang.intellij.lua.debugger.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
 import com.tang.intellij.lua.debugger.LuaSuspendContext;
-import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand;
 import com.tang.intellij.lua.debugger.remote.mobdebug.MobServer;
@@ -43,27 +43,23 @@ import java.io.IOException;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaDebugProcess extends XDebugProcess {
+public class LuaRemoteDebugProcess extends LuaDebugProcess {
 
     private LuaDebuggerEditorsProvider editorsProvider;
     private MobServer mobServer;
     private XLineBreakpoint<XBreakpointProperties> breakpoint;
+    private static final int PORT = 8172;
 
-    LuaDebugProcess(@NotNull XDebugSession session) {
+    LuaRemoteDebugProcess(@NotNull XDebugSession session) {
         super(session);
         current = this;
         editorsProvider = new LuaDebuggerEditorsProvider();
         mobServer = new MobServer(this);
-        try {
-            mobServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
-    private static LuaDebugProcess current;
+    private static LuaRemoteDebugProcess current;
 
-    public static LuaDebugProcess getCurrent() {
+    public static LuaRemoteDebugProcess getCurrent() {
         return current;
     }
 
@@ -71,6 +67,19 @@ public class LuaDebugProcess extends XDebugProcess {
     @Override
     public XDebuggerEditorsProvider getEditorsProvider() {
         return editorsProvider;
+    }
+
+    @Override
+    public void sessionInitialized() {
+        super.sessionInitialized();
+
+        try {
+            println("Start mobdebug server at port:" + 8172);
+            println("Waiting for process connection...");
+            mobServer.start(PORT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
