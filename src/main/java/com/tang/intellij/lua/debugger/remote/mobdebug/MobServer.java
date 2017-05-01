@@ -59,7 +59,6 @@ public class MobServer implements Runnable {
         }
     }
 
-    private final Object locker = new Object();
     private ServerSocket server;
     private Thread thread;
     private Future threadSend;
@@ -67,6 +66,7 @@ public class MobServer implements Runnable {
     private Queue<DebugCommand> commands = new LinkedList<>();
     private LuaDebugReader debugReader;
     private DebugCommand currentCommandWaitForResp;
+    private OutputStreamWriter streamWriter;
 
     public MobServer(LuaDebugProcess listener) {
         this.listener = listener;
@@ -80,15 +80,20 @@ public class MobServer implements Runnable {
     }
 
     private void onResp(String data) {
-        data = data.trim();
+        System.out.println(data);
         if (currentCommandWaitForResp != null && currentCommandWaitForResp.handle(data)) {
             currentCommandWaitForResp = null;
-        } else {
-            String[] list = data.split(" ");
-            String[] params = Arrays.copyOfRange(list, 1, list.length);
-            int code = Integer.parseInt(list[0]);
-            listener.handleResp(code, params);
         }
+
+        String[] list = data.split(" ");
+        String[] params = Arrays.copyOfRange(list, 1, list.length);
+        int code = Integer.parseInt(list[0]);
+        listener.handleResp(code, params);
+    }
+
+    public void write(String data) throws IOException {
+        streamWriter.write(data);
+        System.out.println("send:" + data);
     }
 
     @Override
@@ -99,30 +104,27 @@ public class MobServer implements Runnable {
 
             threadSend = ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
-                    OutputStreamWriter stream = new OutputStreamWriter(accept.getOutputStream());
+                    streamWriter = new OutputStreamWriter(accept.getOutputStream());
                     boolean firstTime = true;
 
                     while (accept.isConnected()) {
                         DebugCommand command;
-                        synchronized (locker) {
-                            while (commands.size() > 0) {
-                                if (currentCommandWaitForResp == null) {
-                                    command = commands.poll();
-                                    command.setDebugProcess(listener);
-                                    command.write(stream);
-                                    stream.write("\n");
-                                    stream.flush();
-                                    if (command.getRequireRespLines() > 0)
-                                        currentCommandWaitForResp = command;
-                                }
+                        while (commands.size() > 0 && currentCommandWaitForResp == null) {
+                            if (currentCommandWaitForResp == null) {
+                                command = commands.poll();
+                                command.setDebugProcess(listener);
+                                command.write(this);
+                                streamWriter.write("\n");
+                                streamWriter.flush();
+                                if (command.getRequireRespLines() > 0)
+                                    currentCommandWaitForResp = command;
                             }
-                            if (firstTime) {
-                                firstTime = false;
-                                stream.write("RUN\n");
-                                stream.flush();
-                            }
-                            Thread.sleep(5);
                         }
+                        if (firstTime) {
+                            firstTime = false;
+                            addCommand("RUN");
+                        }
+                        Thread.sleep(5);
                     }
 
                     System.out.println("disconnect");
@@ -155,8 +157,6 @@ public class MobServer implements Runnable {
     }
 
     public void addCommand(DebugCommand command) {
-        synchronized (locker) {
-            commands.add(command);
-        }
+        commands.add(command);
     }
 }

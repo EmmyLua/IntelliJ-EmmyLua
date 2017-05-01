@@ -17,9 +17,9 @@
 package com.tang.intellij.lua.debugger.remote.commands;
 
 import com.tang.intellij.lua.debugger.remote.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.remote.mobdebug.MobServer;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 /**
  *
@@ -28,26 +28,25 @@ import java.io.OutputStreamWriter;
 public class DefaultCommand extends DebugCommand {
 
     private String commandline;
-    protected int requireRespLines;
+    int requireRespLines;
     private int handleLines;
 
     public DefaultCommand(String commandline) {
         this(commandline, 1);
     }
 
-    public DefaultCommand(String commandline, int requireRespLines) {
+    DefaultCommand(String commandline, int requireRespLines) {
         this.commandline = commandline;
         this.requireRespLines = requireRespLines;
     }
 
     @Override
-    public void write(OutputStreamWriter writer) throws IOException {
+    public void write(MobServer writer) throws IOException {
         writer.write(commandline);
     }
 
     @Override
     public final boolean handle(String data) {
-        data = data.replace("--[[..skipped..]]", "");
         handle(handleLines, data);
         return requireRespLines == ++handleLines;
     }
