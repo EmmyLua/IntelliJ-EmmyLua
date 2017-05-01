@@ -21,6 +21,7 @@ import com.intellij.codeInsight.template.postfix.templates.PostfixTemplateExpres
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.SmartList;
@@ -64,8 +65,16 @@ public class LuaPostfixUtils {
                 LuaExpr expr = PsiTreeUtil.getNonStrictParentOfType(psiElement, LuaExpr.class);
                 List<PsiElement> list = new SmartList<>();
                 while (expr != null) {
-                    if (expr instanceof LuaValueExpr)
-                        list.clear();
+                    if (expr instanceof LuaValueExpr) {
+                        TextRange range = expr.getTextRange();
+                        for (int j = 0; j < list.size(); j++) {
+                            TextRange textRange = list.get(j).getTextRange();
+                            if (range.equals(textRange)) {
+                                list.remove(j);
+                                j--;
+                            }
+                        }
+                    }
                     list.add(expr);
                     expr = PsiTreeUtil.getParentOfType(expr, LuaExpr.class);
                 }

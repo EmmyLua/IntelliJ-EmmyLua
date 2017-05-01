@@ -32,7 +32,7 @@ import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selector
 public class LuaLocalPostfixTemplate extends PostfixTemplateWithExpressionSelector {
 
     public LuaLocalPostfixTemplate() {
-        super("local", "local inst = expr", selectorAllExpressionsWithCurrentOffset());
+        super("var", "local inst = expr", selectorAllExpressionsWithCurrentOffset());
     }
 
     @Override
@@ -40,21 +40,4 @@ public class LuaLocalPostfixTemplate extends PostfixTemplateWithExpressionSelect
         LuaIntroduceVarHandler handler = new LuaIntroduceVarHandler();
         handler.invoke(editor.getProject(), editor, (LuaExpr) psiElement);
     }
-
-    /*@Nullable
-    @Override
-    public String getTemplateString(@NotNull PsiElement psiElement) {
-        return "local $inst$ = $expr$$END$";
-    }
-
-    @Override
-    public void setVariables(@NotNull Template template, @NotNull PsiElement element) {
-        super.setVariables(template, element);
-        template.addVariable("inst", new TextExpression("inst"), true);
-    }
-
-    @Override
-    protected PsiElement getElementToRemove(PsiElement expr) {
-        return expr;
-    }*/
 }
