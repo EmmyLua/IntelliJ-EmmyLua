@@ -38,7 +38,7 @@ public class LuaConfigurationType implements ConfigurationType {
 
     @Override
     public String getDisplayName() {
-        return "Lua";
+        return "Lua Remote(Mobdebug)";
     }
 
     @Override
@@ -54,7 +54,7 @@ public class LuaConfigurationType implements ConfigurationType {
     @NotNull
     @Override
     public String getId() {
-        return "lua";
+        return "lua.mobdebug";
     }
 
     @Override
