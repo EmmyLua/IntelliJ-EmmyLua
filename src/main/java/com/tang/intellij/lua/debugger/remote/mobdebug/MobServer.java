@@ -119,7 +119,7 @@ public class MobServer implements Runnable {
 
             threadSend = ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
-                    streamWriter = new OutputStreamWriter(accept.getOutputStream());
+                    streamWriter = new OutputStreamWriter(accept.getOutputStream(), Charset.forName("UTF-8"));
                     boolean firstTime = true;
 
                     while (accept.isConnected()) {
