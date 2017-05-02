@@ -44,7 +44,17 @@ public class MobServer implements Runnable {
 
     class LuaDebugReader extends BaseOutputReader {
         LuaDebugReader(@NotNull InputStream inputStream, @Nullable Charset charset) {
-            super(inputStream, charset);
+            super(inputStream, charset, new BaseOutputReader.Options() {
+                @Override
+                public boolean sendIncompleteLines() {
+                    return false;
+                }
+
+                @Override
+                public SleepingPolicy policy() {
+                    return SleepingPolicy.BLOCKING;
+                }
+            });
             start(getClass().getName());
         }
 
@@ -106,7 +116,7 @@ public class MobServer implements Runnable {
         try {
             final Socket accept = server.accept();
             listener.println("Connected.");
-            debugReader = new LuaDebugReader(accept.getInputStream(), Charset.defaultCharset());
+            debugReader = new LuaDebugReader(accept.getInputStream(), Charset.forName("UTF-8"));
 
             threadSend = ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
