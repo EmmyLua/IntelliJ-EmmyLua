@@ -44,17 +44,7 @@ public class MobServer implements Runnable {
 
     class LuaDebugReader extends BaseOutputReader {
         LuaDebugReader(@NotNull InputStream inputStream, @Nullable Charset charset) {
-            super(inputStream, charset, new BaseOutputReader.Options() {
-                @Override
-                public boolean sendIncompleteLines() {
-                    return false;
-                }
-
-                @Override
-                public SleepingPolicy policy() {
-                    return SleepingPolicy.BLOCKING;
-                }
-            });
+            super(inputStream, charset);
             start(getClass().getName());
         }
 
@@ -78,6 +68,7 @@ public class MobServer implements Runnable {
     private LuaDebugReader debugReader;
     private DebugCommand currentCommandWaitForResp;
     private OutputStreamWriter streamWriter;
+    private StringBuffer stringBuffer = new StringBuffer(2048);
 
     public MobServer(LuaRemoteDebugProcess listener) {
         this.listener = listener;
@@ -92,8 +83,16 @@ public class MobServer implements Runnable {
 
     private void onResp(String data) {
         System.out.println(data);
-        if (currentCommandWaitForResp != null && currentCommandWaitForResp.handle(data)) {
-            currentCommandWaitForResp = null;
+        if (currentCommandWaitForResp != null) {
+            stringBuffer.append(data);
+            int eat = currentCommandWaitForResp.handle(stringBuffer.toString());
+            if (eat > 0) {
+                stringBuffer.delete(0, eat);
+                if (currentCommandWaitForResp.isFinished())
+                    currentCommandWaitForResp = null;
+            }
+        } else {
+            stringBuffer.setLength(0);
         }
 
         Pattern pattern = Pattern.compile("(\\d+) (\\w+)( (.+))?");

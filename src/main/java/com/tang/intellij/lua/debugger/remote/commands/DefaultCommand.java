@@ -29,7 +29,7 @@ public class DefaultCommand extends DebugCommand {
 
     private String commandline;
     int requireRespLines;
-    private int handleLines;
+    int handleLines;
 
     public DefaultCommand(String commandline) {
         this(commandline, 1);
@@ -46,9 +46,17 @@ public class DefaultCommand extends DebugCommand {
     }
 
     @Override
-    public final boolean handle(String data) {
-        handle(handleLines, data);
-        return requireRespLines == ++handleLines;
+    public int handle(String data) {
+        int LB = data.indexOf('\n');
+        if (LB == -1) return LB;
+
+        handle(handleLines++, data);
+        return data.length();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return requireRespLines <= handleLines;
     }
 
     @Override

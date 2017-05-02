@@ -40,22 +40,38 @@ import java.util.regex.Pattern;
 public class GetStackCommand extends DefaultCommand {
 
     private boolean hasError;
+    private int errorDataLen;
 
     public GetStackCommand() {
         super("STACK", 1);
     }
 
     @Override
-    protected void handle(int index, String data) {
-        if (hasError) {
-            new DefaultCommand("SUSPEND", 0).exec();
-            debugProcess.setStack(new LuaExecutionStack(new ArrayList<>()));
-            return;
-        }
+    public boolean isFinished() {
+        return !hasError && super.isFinished();
+    }
 
+    @Override
+    public int handle(String data) {
+        if (hasError) {
+            hasError = false;
+            String error = data.substring(0, errorDataLen);
+            debugProcess.error(error);
+            debugProcess.runCommand(new DefaultCommand("RUN", 0));
+            return errorDataLen;
+        }
+        return super.handle(data);
+    }
+
+    @Override
+    protected void handle(int index, String data) {
         if (data.startsWith("401")) {
             hasError = true;
-            requireRespLines++;
+            Pattern pattern = Pattern.compile("(\\d+)([^\\d]+)(\\d+)");
+            Matcher matcher = pattern.matcher(data);
+            if (matcher.find()) {
+                errorDataLen = Integer.parseInt(matcher.group(3));
+            }
             return;
         }
 

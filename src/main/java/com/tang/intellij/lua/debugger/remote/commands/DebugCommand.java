@@ -27,13 +27,14 @@ import java.io.IOException;
  */
 public abstract class DebugCommand {
 
-    protected LuaRemoteDebugProcess debugProcess;
+    LuaRemoteDebugProcess debugProcess;
 
     public void setDebugProcess(LuaRemoteDebugProcess process) {
         debugProcess = process;
     }
 
     public abstract void write(MobServer writer) throws IOException;
-    public abstract boolean handle(String data);
+    public abstract int handle(String data);
     public abstract int getRequireRespLines();
+    public abstract boolean isFinished();
 }
