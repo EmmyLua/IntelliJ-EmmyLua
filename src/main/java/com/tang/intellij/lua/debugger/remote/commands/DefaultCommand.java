@@ -28,7 +28,7 @@ import java.io.IOException;
 public class DefaultCommand extends DebugCommand {
 
     private String commandline;
-    int requireRespLines;
+    private int requireRespLines;
     int handleLines;
 
     public DefaultCommand(String commandline) {

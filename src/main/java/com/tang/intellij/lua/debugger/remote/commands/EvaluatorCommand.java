@@ -18,6 +18,9 @@ package com.tang.intellij.lua.debugger.remote.commands;
 
 import com.intellij.openapi.application.ApplicationManager;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  *
  * Created by tangzx on 2017/1/1.
@@ -28,6 +31,7 @@ public class EvaluatorCommand extends DefaultCommand {
     }
 
     private final Callback callback;
+    private int dataLen;
 
     private static String createExpr(String chunk, boolean getChildren) {
         String serFN = "local function se(o, children) " +
@@ -50,10 +54,27 @@ public class EvaluatorCommand extends DefaultCommand {
     }
 
     @Override
+    public int handle(String data) {
+        if (dataLen != 0) {
+            int index = data.indexOf("return _;end");
+            if (index > 0) {
+                handleLines++;
+                dataLen = index + 12;
+                final String res = data.substring(0, dataLen);
+                ApplicationManager.getApplication().runReadAction(() -> callback.onResult(res));
+                return dataLen;
+            }
+            return 0;
+        }
+        return super.handle(data);
+    }
+
+    @Override
     protected void handle(int index, String data) {
-        super.handle(index, data);
-        if (index == 1) {
-            ApplicationManager.getApplication().runReadAction(()-> callback.onResult(data));
+        Pattern pattern = Pattern.compile("\\d+[^\\d]+(\\d+)");
+        Matcher matcher = pattern.matcher(data);
+        if (matcher.find()) {
+            dataLen = Integer.parseInt(matcher.group(1));
         }
     }
 }
