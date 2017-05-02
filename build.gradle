@@ -32,15 +32,15 @@ tasks.withType(JavaCompile) {
 }
 
 task buildZip (type: Zip, dependsOn: [jar]) {
-	baseName = 'LuaIDE'
+	baseName = 'EmmyLua'
 	destinationDir = file(".")
 	from (tasks['jar'].outputs) {
-		into '/LuaIDE/lib'
+		into '/EmmyLua/lib'
 	}
 	from ("libs") {
-		into '/LuaIDE/lib'
+		into '/EmmyLua/lib'
 	}
 	from (fileTree(dir:'src/main/resources/', includes:['std/**', 'debugger/**'])) {
-		into '/LuaIDE/'
+		into '/EmmyLua/'
 	}
 }
