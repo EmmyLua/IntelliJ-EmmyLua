@@ -96,7 +96,7 @@ public class LuaFileUtil {
 
     public static String getShortUrl(Project project, VirtualFile file) {
         String fileFullUrl = file.getUrl();
-        String fileShortUrl = null;
+        String fileShortUrl = fileFullUrl;
 
         Module[] modules = ModuleManager.getInstance(project).getModules();
         moduleLoop: for (Module module : modules) {

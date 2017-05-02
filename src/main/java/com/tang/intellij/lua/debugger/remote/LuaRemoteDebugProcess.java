@@ -131,8 +131,8 @@ public class LuaRemoteDebugProcess extends LuaDebugProcess {
     void removeBreakpoint(XLineBreakpoint<XBreakpointProperties> breakpoint) {
         XSourcePosition sourcePosition = breakpoint.getSourcePosition();
         if (sourcePosition != null) {
-            String shortFilePath = breakpoint.getShortFilePath();
-            mobServer.addCommand(String.format("DELB %s %d", shortFilePath, sourcePosition.getLine() + 1));
+            String fileShortUrl = LuaFileUtil.getShortUrl(getSession().getProject(), sourcePosition.getFile());
+            mobServer.addCommand(String.format("DELB %s %d", fileShortUrl, sourcePosition.getLine() + 1));
         }
     }
 
