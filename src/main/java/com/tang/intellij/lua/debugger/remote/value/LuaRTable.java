@@ -31,6 +31,7 @@ import org.luaj.vm2.LuaValue;
 public class LuaRTable extends LuaRValue {
     private XValueChildrenList list;
     private String desc;
+    private LuaValue data;
 
     LuaRTable(@NotNull String name) {
         super(name);
@@ -39,12 +40,7 @@ public class LuaRTable extends LuaRValue {
     @Override
     protected void parse(LuaValue data, String desc) {
         this.desc = "table";
-        list = new XValueChildrenList();
-        LuaTable table = data.checktable();
-        for (LuaValue key : table.keys()) {
-            LuaRValue value = LuaRValue.create(key.toString(), table.get(key), null);
-            list.add(value);
-        }
+        this.data = data;
     }
 
     @Override
@@ -54,6 +50,14 @@ public class LuaRTable extends LuaRValue {
 
     @Override
     public void computeChildren(@NotNull XCompositeNode node) {
+        if (list == null) {
+            list = new XValueChildrenList();
+            LuaTable table = data.checktable();
+            for (LuaValue key : table.keys()) {
+                LuaRValue value = LuaRValue.create(key.toString(), table.get(key), null);
+                list.add(value);
+            }
+        }
         node.addChildren(list, true);
     }
 }
