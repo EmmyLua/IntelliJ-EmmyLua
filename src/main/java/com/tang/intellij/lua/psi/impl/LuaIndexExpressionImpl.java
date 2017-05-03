@@ -72,28 +72,31 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
 
     @Override
     public LuaTypeSet guessType(SearchContext context) {
-        LuaIndexExpr indexExpr = (LuaIndexExpr) this;
-
-        // value type
-        LuaIndexStub stub = indexExpr.getStub();
-        LuaTypeSet valueTypeSet;
-        if (stub != null)
-            valueTypeSet = stub.guessValueType();
-        else
-            valueTypeSet = indexExpr.guessValueType();
-
         LuaTypeSet result = LuaTypeSet.create();
-        result = result.union(valueTypeSet);
+        if (context.push(this, SearchContext.Overflow.GuessType)) {
+            LuaIndexExpr indexExpr = (LuaIndexExpr) this;
 
-        String propName = this.getFieldName();
-        if (propName != null) {
-            LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
-            if (prefixType != null && !prefixType.isEmpty()) {
-                for (LuaType type : prefixType.getTypes()) {
-                    LuaTypeSet typeSet = guessFieldType(propName, type, context);
-                    result = result.union(typeSet);
+            // value type
+            LuaIndexStub stub = indexExpr.getStub();
+            LuaTypeSet valueTypeSet;
+            if (stub != null)
+                valueTypeSet = stub.guessValueType();
+            else
+                valueTypeSet = indexExpr.guessValueType(context);
+
+            result = result.union(valueTypeSet);
+
+            String propName = this.getFieldName();
+            if (propName != null) {
+                LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
+                if (prefixType != null && !prefixType.isEmpty()) {
+                    for (LuaType type : prefixType.getTypes()) {
+                        LuaTypeSet typeSet = guessFieldType(propName, type, context);
+                        result = result.union(typeSet);
+                    }
                 }
             }
+            context.pop(this);
         }
         return result;
     }
@@ -110,7 +113,7 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
                 if (stub != null)
                     set = set.union(stub.guessValueType());
                 else
-                    set = set.union(indexExpr.guessValueType());
+                    set = set.union(indexExpr.guessValueType(context));
 
                 if (fieldDef == this)
                     return set;

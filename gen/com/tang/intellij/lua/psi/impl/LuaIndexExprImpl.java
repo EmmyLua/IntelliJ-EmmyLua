@@ -80,8 +80,8 @@ public class LuaIndexExprImpl extends LuaIndexExpressionImpl implements LuaIndex
     return LuaPsiImplUtil.guessPrefixType(this, context);
   }
 
-  public LuaTypeSet guessValueType() {
-    return LuaPsiImplUtil.guessValueType(this);
+  public LuaTypeSet guessValueType(SearchContext context) {
+    return LuaPsiImplUtil.guessValueType(this, context);
   }
 
   @Override

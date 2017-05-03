@@ -34,7 +34,7 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
 
   LuaTypeSet guessPrefixType(SearchContext context);
 
-  LuaTypeSet guessValueType();
+  LuaTypeSet guessValueType(SearchContext context);
 
   @Nullable
   PsiElement getDot();

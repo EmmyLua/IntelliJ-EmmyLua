@@ -18,11 +18,14 @@ package com.tang.intellij.lua.search;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.lang.GuessTypeKind;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Stack;
 
 /**
  *
@@ -34,19 +37,22 @@ public class SearchContext {
     private GlobalSearchScope scope;
     private Project project;
     private SearchContext parent;
-    private int type = -1;
     private Object obj;
     private int guessTypeKind = GuessTypeKind.Standard;
+    private Stack<Pair> deadLockStack = new Stack<>();
+
+    class Pair {
+        public Overflow type;
+        public PsiElement object;
+    }
 
     public SearchContext(Project project) {
         this.project = project;
     }
 
-    public SearchContext(SearchContext parent, int type, @NotNull Object o) {
+    public SearchContext(SearchContext parent, @NotNull Object o) {
         this(parent.getProject());
         this.parent = parent;
-        assert type >= 0;
-        this.type = type;
         this.obj = o;
         this.guessTypeKind = parent.guessTypeKind;
         setCurrentStubFile(parent.currentStubFile);
@@ -83,28 +89,38 @@ public class SearchContext {
         return scope;
     }
 
-    public boolean isDeadLock(int times) {
-        if (type == -1) return false;
-        int matchTimes = 0;
-        SearchContext cur = parent;
-        while (cur != null) {
-            if (cur.type == type && cur.obj == obj) {
-                matchTimes++;
-            }
-            cur = cur.parent;
+    public boolean push(PsiElement element, Overflow type) {
+        boolean v = !checkDeadLock(element, type);
+        if (v) {
+            Pair pair = new Pair();
+            pair.object = element;
+            pair.type = type;
+            deadLockStack.push(pair);
         }
-        return matchTimes >= times;
+        return v;
+    }
+
+    public void pop(PsiElement element) {
+        Pair pair = deadLockStack.pop();
+        assert pair.object == element;
+    }
+
+    private boolean checkDeadLock(PsiElement element, Overflow type) {
+        for (Pair pair : deadLockStack) {
+            if (type == pair.type && element == pair.object)
+                return true;
+        }
+        return false;
     }
 
     public boolean isDumb() {
         return DumbService.isDumb(project) || currentStubFile != null;
     }
 
-    public static int TYPE_FILE_RETURN = 0;
-    public static int TYPE_BODY_OWNER = 1;
-    public static int TYPE_VALUE_EXPR = 2;
-
-    public static SearchContext wrapDeadLock(SearchContext parent, int type, @NotNull Object o) {
-        return new SearchContext(parent, type, o);
+    public enum Overflow {
+        Normal,
+        GuessType,
+        FileReturn,
+        FindBodyOwner,
     }
 }

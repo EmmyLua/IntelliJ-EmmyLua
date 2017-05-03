@@ -35,13 +35,17 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
 
     @Override
     public LuaTypeSet guessType(SearchContext context) {
-        if (this instanceof LuaValueExpr)
-            return guessType((LuaValueExpr) this, context);
-        if (this instanceof LuaCallExpr)
-            return guessType((LuaCallExpr) this, context);
-        if (this instanceof LuaParenExpr)
-            return guessType((LuaParenExpr) this, context);
-        return null;
+        LuaTypeSet set = null;
+        if (context.push(this, SearchContext.Overflow.GuessType)) {
+            if (this instanceof LuaValueExpr)
+                set = guessType((LuaValueExpr) this, context);
+            if (this instanceof LuaCallExpr)
+                set = guessType((LuaCallExpr) this, context);
+            if (this instanceof LuaParenExpr)
+                set = guessType((LuaParenExpr) this, context);
+            context.pop(this);
+        }
+        return set;
     }
 
     private LuaTypeSet guessType(LuaParenExpr luaParenExpr, SearchContext context) {
@@ -76,10 +80,6 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     }
 
     private static LuaTypeSet guessType(LuaValueExpr valueExpr, SearchContext context) {
-        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_VALUE_EXPR, valueExpr);
-        if (context.isDeadLock(1))
-            return null;
-
         PsiElement firstChild = valueExpr.getFirstChild();
         if (firstChild != null) {
             if (firstChild instanceof LuaExpr) {

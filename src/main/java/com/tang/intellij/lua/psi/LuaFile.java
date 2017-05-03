@@ -46,22 +46,22 @@ public class LuaFile extends PsiFileBase {
      * @return LuaTypeSet
      */
     public LuaTypeSet getReturnedType(SearchContext context) {
-        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_FILE_RETURN, this);
-        //防止死循环
-        if (context.isDeadLock(5)) return null;
-
-        PsiElement lastChild = getLastChild();
-        final LuaReturnStat[] last = {null};
-        LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
-            last[0] = luaReturnStat;
-            return false;
-        });
-        LuaReturnStat lastReturn = last[0];
-        if (lastReturn != null) {
-            LuaExprList returnExpr = lastReturn.getExprList();
-            if (returnExpr != null)
-                return returnExpr.guessTypeAt(0, context);
+        LuaTypeSet set = null;
+        if (context.push(this, SearchContext.Overflow.FileReturn)) {
+            PsiElement lastChild = getLastChild();
+            final LuaReturnStat[] last = {null};
+            LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
+                last[0] = luaReturnStat;
+                return false;
+            });
+            LuaReturnStat lastReturn = last[0];
+            if (lastReturn != null) {
+                LuaExprList returnExpr = lastReturn.getExprList();
+                if (returnExpr != null)
+                    set = returnExpr.guessTypeAt(0, context);
+            }
+            context.pop(this);
         }
-        return null;
+        return set;
     }
 }

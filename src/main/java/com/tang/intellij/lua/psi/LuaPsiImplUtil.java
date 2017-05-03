@@ -210,21 +210,20 @@ public class LuaPsiImplUtil {
      * @return LuaFuncBodyOwner
      */
     public static LuaFuncBodyOwner resolveFuncBodyOwner(LuaCallExpr callExpr, SearchContext context) {
-        context = SearchContext.wrapDeadLock(context, SearchContext.TYPE_BODY_OWNER, callExpr);
-        if (context.isDeadLock(1))
-            return null;
-
-        LuaExpr expr = callExpr.getExpr();
-        if (expr instanceof LuaIndexExpr) {
-            PsiElement resolve = LuaPsiResolveUtil.resolve((LuaIndexExpr) expr, context);
-            if (resolve instanceof LuaFuncBodyOwner)
-                return (LuaFuncBodyOwner) resolve;
+        LuaFuncBodyOwner owner = null;
+        if (context.push(callExpr, SearchContext.Overflow.FindBodyOwner)) {
+            LuaExpr expr = callExpr.getExpr();
+            if (expr instanceof LuaIndexExpr) {
+                PsiElement resolve = LuaPsiResolveUtil.resolve((LuaIndexExpr) expr, context);
+                if (resolve instanceof LuaFuncBodyOwner)
+                    owner = (LuaFuncBodyOwner) resolve;
+            } else if (expr instanceof LuaNameExpr) {
+                LuaNameExpr luaNameRef = (LuaNameExpr) expr;
+                owner = LuaPsiResolveUtil.resolveFuncBodyOwner(luaNameRef, context);
+            }
+            context.pop(callExpr);
         }
-        else if (expr instanceof LuaNameExpr) {
-            LuaNameExpr luaNameRef = (LuaNameExpr) expr;
-            return LuaPsiResolveUtil.resolveFuncBodyOwner(luaNameRef, context);
-        }
-        return null;
+        return owner;
     }
 
     /**
@@ -328,7 +327,7 @@ public class LuaPsiImplUtil {
         return getName((PsiNameIdentifierOwner)indexExpr);
     }
 
-    public static LuaTypeSet guessValueType(LuaIndexExpr indexExpr) {
+    public static LuaTypeSet guessValueType(LuaIndexExpr indexExpr, SearchContext context) {
         LuaIndexStub stub = indexExpr.getStub();
         if (stub != null) {
             return stub.guessValueType();
@@ -345,7 +344,7 @@ public class LuaPsiImplUtil {
                     LuaAssignStat assignStat = (LuaAssignStat) s;
                     LuaExprList exprList = assignStat.getExprList();
                     if (exprList != null) {
-                        return exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
+                        return exprList.guessTypeAt(0, context);
                     }
                     return null;
                 });

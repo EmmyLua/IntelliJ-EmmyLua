@@ -69,12 +69,15 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
     @Override
     public LuaTypeSet guessType(SearchContext context) {
         LuaTypeSet typeSet = LuaTypeSet.create();
-        LuaNameExpr nameExpr = (LuaNameExpr) this;
+        if (context.push(this, SearchContext.Overflow.GuessType)) {
+            LuaNameExpr nameExpr = (LuaNameExpr) this;
 
-        PsiElement[] multiResolve = LuaPsiResolveUtil.multiResolve(nameExpr, context);
-        for (PsiElement def : multiResolve) {
-            LuaTypeSet set = getTypeSet(context, def);
-            typeSet = typeSet.union(set);
+            PsiElement[] multiResolve = LuaPsiResolveUtil.multiResolve(nameExpr, context);
+            for (PsiElement def : multiResolve) {
+                LuaTypeSet set = getTypeSet(context, def);
+                typeSet = typeSet.union(set);
+            }
+            context.pop(this);
         }
         return typeSet;
     }
