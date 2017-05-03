@@ -25,6 +25,7 @@ import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl;
 import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 import com.tang.intellij.lua.stubs.impl.LuaTableFieldStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -82,8 +83,9 @@ public class LuaTableFieldType extends IStubElementType<LuaTableFieldStub, LuaTa
         String fieldName = fieldStub.getFieldName();
         String typeName = fieldStub.getTypeName();
         if (fieldName != null && typeName != null) {
-            indexSink.occurrence(LuaClassFieldIndex.KEY, fieldName);
+            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName);
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName);
+            indexSink.occurrence(LuaShortNameIndex.KEY, fieldName);
         }
     }
 }
