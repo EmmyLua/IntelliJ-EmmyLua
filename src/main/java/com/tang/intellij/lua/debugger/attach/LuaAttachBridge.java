@@ -33,6 +33,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -161,7 +162,7 @@ public class LuaAttachBridge {
 
                 process = processBuilder.start();
                 writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8")));
 
                 writer.write(pid);
                 writer.write('\n');
@@ -224,7 +225,7 @@ public class LuaAttachBridge {
         try {
             DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
             data = "<data>" + data + "</data>";
-            Document document = documentBuilder.parse(new ByteArrayInputStream(data.getBytes()));
+            Document document = documentBuilder.parse(new ByteArrayInputStream(data.getBytes("UTF-8")));
             Element root = document.getDocumentElement();
             NodeList childNodes = root.getChildNodes();
             for (int i = 0; i < childNodes.getLength(); i++) {
