@@ -30,11 +30,13 @@ import com.tang.intellij.lua.stubs.LuaDocClassStub;
 public class LuaDocClassStubImpl extends StubBase<LuaDocClassDef> implements LuaDocClassStub {
 
     private String className;
+    private String aliasName;
     private String superClass;
 
-    public LuaDocClassStubImpl(String className, String superClass, StubElement parent) {
+    public LuaDocClassStubImpl(String className, String aliasName, String superClass, StubElement parent) {
         super(parent, LuaElementType.CLASS_DEF);
         this.className = className;
+        this.aliasName = aliasName;
         this.superClass = superClass;
     }
 
@@ -44,12 +46,19 @@ public class LuaDocClassStubImpl extends StubBase<LuaDocClassDef> implements Lua
     }
 
     @Override
+    public String getAliasName() {
+        return aliasName;
+    }
+
+    @Override
     public String getSuperClassName() {
         return superClass;
     }
 
     @Override
     public LuaType getClassType() {
-        return LuaType.create(className, superClass);
+        LuaType luaType = LuaType.create(className, superClass);
+        luaType.setAliasName(aliasName);
+        return luaType;
     }
 }

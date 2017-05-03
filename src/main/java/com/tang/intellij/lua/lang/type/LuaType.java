@@ -65,8 +65,9 @@ public class LuaType implements Comparable<LuaType> {
 
     // 模糊匹配的结果
     private boolean isUnreliable;
-    protected boolean isAnonymous;
+    boolean isAnonymous;
     String clazzName;
+    private String aliasName;
     private String superClassName;
 
     public LuaType getSuperClass(SearchContext context) {
@@ -82,6 +83,14 @@ public class LuaType implements Comparable<LuaType> {
         return superClassName;
     }
 
+    public void setAliasName(String aliasName) {
+        this.aliasName = aliasName;
+    }
+
+    public String getAliasName() {
+        return aliasName;
+    }
+
     public String getClassName() {
         return clazzName;
     }
@@ -93,12 +102,14 @@ public class LuaType implements Comparable<LuaType> {
     void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
         stubOutputStream.writeBoolean(isAnonymous);
         stubOutputStream.writeName(clazzName);
+        stubOutputStream.writeName(aliasName);
         stubOutputStream.writeName(superClassName);
     }
 
     void deserialize(@NotNull StubInputStream stubInputStream) throws IOException {
         isAnonymous = stubInputStream.readBoolean();
         clazzName = StringRef.toString(stubInputStream.readName());
+        aliasName = StringRef.toString(stubInputStream.readName());
         superClassName = StringRef.toString(stubInputStream.readName());
     }
 

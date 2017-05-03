@@ -26,6 +26,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
  */
 public interface LuaDocClassStub extends StubElement<LuaDocClassDef> {
     String getClassName();
+    String getAliasName();
     String getSuperClassName();
     LuaType getClassType();
 }
