@@ -18,13 +18,11 @@ package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.PowerLevel;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaClassField;
@@ -73,20 +71,26 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
     @Override
     public LuaTypeSet guessType(SearchContext context) {
         LuaIndexExpr indexExpr = (LuaIndexExpr) this;
-        PsiElement id = indexExpr.getId();
-        if (id == null)
-            return null;
+
+        // value type
+        LuaIndexStub stub = indexExpr.getStub();
+        LuaTypeSet valueTypeSet;
+        if (stub != null)
+            valueTypeSet = stub.guessValueType();
+        else
+            valueTypeSet = indexExpr.guessValueType();
 
         LuaTypeSet result = LuaTypeSet.create();
-        if (PowerLevel.isFullPower())
-            result = result.union(indexExpr.guessValueType());
+        result = result.union(valueTypeSet);
 
-        LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
-        if (prefixType != null && !prefixType.isEmpty()) {
-            String propName = id.getText();
-            for (LuaType type : prefixType.getTypes()) {
-                LuaTypeSet typeSet = guessFieldType(propName, type, context);
-                result = result.union(typeSet);
+        String propName = this.getFieldName();
+        if (propName != null) {
+            LuaTypeSet prefixType = indexExpr.guessPrefixType(context);
+            if (prefixType != null && !prefixType.isEmpty()) {
+                for (LuaType type : prefixType.getTypes()) {
+                    LuaTypeSet typeSet = guessFieldType(propName, type, context);
+                    result = result.union(typeSet);
+                }
             }
         }
         return result;
