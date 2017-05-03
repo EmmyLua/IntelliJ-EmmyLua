@@ -43,17 +43,16 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
         List<InlayInfo> list = new ArrayList<>();
         if (psiElement instanceof LuaCallExpr) {
             LuaCallExpr callExpr = (LuaCallExpr) psiElement;
-            List<LuaParamNameDef> parameters = null;
+            LuaParamInfo[] parameters = null;
             LuaFuncBodyOwner methodDef = callExpr.resolveFuncBodyOwner(new SearchContext(psiElement.getProject()));
 
             // 是否是 inst:method() 被用为 inst.method(self) 形式
             boolean isInstanceMethodUsedAsStaticMethod = false;
             if (methodDef != null) {
-                parameters = methodDef.getParamNameDefList();
+                parameters = methodDef.getParams();
                 if (methodDef instanceof LuaClassMethodDef) {
                     LuaClassMethodDef classMethodDef = (LuaClassMethodDef) methodDef;
-                    LuaClassMethodName classMethodName = classMethodDef.getClassMethodName();
-                    isInstanceMethodUsedAsStaticMethod = classMethodName.getColon() != null && callExpr.isStaticMethodCall();
+                    isInstanceMethodUsedAsStaticMethod = !classMethodDef.isStatic() && callExpr.isStaticMethodCall();
                 }
             }
 
@@ -63,7 +62,7 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                 if (luaExprList != null) {
                     List<LuaExpr> exprList = luaExprList.getExprList();
                     int paramIndex = 0;
-                    int paramCount = parameters.size();
+                    int paramCount = parameters.length;
                     int argIndex = 0;
                     if (isInstanceMethodUsedAsStaticMethod && exprList.size() > 0) {
                         LuaExpr expr = exprList.get(argIndex++);
@@ -73,7 +72,7 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                         LuaExpr expr = exprList.get(argIndex);
 
                         if (expr instanceof LuaLiteralExpr || expr instanceof LuaBinaryExpr || expr instanceof LuaUnaryExpr)
-                            list.add(new InlayInfo(parameters.get(paramIndex).getName(), expr.getTextOffset()));
+                            list.add(new InlayInfo(parameters[paramIndex].getName(), expr.getTextOffset()));
                         paramIndex++;
                     }
                 }
