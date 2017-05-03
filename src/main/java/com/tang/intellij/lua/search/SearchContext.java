@@ -23,7 +23,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.lang.GuessTypeKind;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Stack;
 
@@ -36,8 +35,6 @@ public class SearchContext {
     private PsiFile currentStubFile;
     private GlobalSearchScope scope;
     private Project project;
-    private SearchContext parent;
-    private Object obj;
     private int guessTypeKind = GuessTypeKind.Standard;
     private Stack<Pair> deadLockStack = new Stack<>();
 
@@ -48,14 +45,6 @@ public class SearchContext {
 
     public SearchContext(Project project) {
         this.project = project;
-    }
-
-    public SearchContext(SearchContext parent, @NotNull Object o) {
-        this(parent.getProject());
-        this.parent = parent;
-        this.obj = o;
-        this.guessTypeKind = parent.guessTypeKind;
-        setCurrentStubFile(parent.currentStubFile);
     }
 
     public void setGuessTypeKind(int value) {
@@ -77,20 +66,17 @@ public class SearchContext {
 
     public GlobalSearchScope getScope() {
         if (scope == null) {
-            if (parent != null) {
-                scope = parent.getScope();
+            if (isDumb()) {
+                scope = GlobalSearchScope.EMPTY_SCOPE;
             } else {
                 scope = new ProjectAndLibrariesScope(project);
-                if (isDumb()) {
-                    scope = GlobalSearchScope.EMPTY_SCOPE;
-                }
             }
         }
         return scope;
     }
 
     public boolean push(PsiElement element, Overflow type) {
-        boolean v = !checkDeadLock(element, type);
+        boolean v = !checkOverflow(element, type);
         if (v) {
             Pair pair = new Pair();
             pair.object = element;
@@ -105,7 +91,7 @@ public class SearchContext {
         assert pair.object == element;
     }
 
-    private boolean checkDeadLock(PsiElement element, Overflow type) {
+    private boolean checkOverflow(PsiElement element, Overflow type) {
         for (Pair pair : deadLockStack) {
             if (type == pair.type && element == pair.object)
                 return true;
