@@ -39,15 +39,15 @@ import org.jetbrains.annotations.Nullable;
  * Created by TangZX on 2017/4/12.
  */
 public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> implements LuaExpression, LuaGlobalVar {
-    public LuaNameExpressionImpl(@NotNull LuaNameStub stub, @NotNull IStubElementType nodeType) {
+    LuaNameExpressionImpl(@NotNull LuaNameStub stub, @NotNull IStubElementType nodeType) {
         super(stub, nodeType);
     }
 
-    public LuaNameExpressionImpl(@NotNull ASTNode node) {
+    LuaNameExpressionImpl(@NotNull ASTNode node) {
         super(node);
     }
 
-    public LuaNameExpressionImpl(LuaNameStub stub, IElementType nodeType, ASTNode node) {
+    LuaNameExpressionImpl(LuaNameStub stub, IElementType nodeType, ASTNode node) {
         super(stub, nodeType, node);
     }
 
@@ -71,17 +71,10 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
         LuaTypeSet typeSet = LuaTypeSet.create();
         LuaNameExpr nameExpr = (LuaNameExpr) this;
 
-        boolean hasLocalDef = false;
         PsiElement[] multiResolve = LuaPsiResolveUtil.multiResolve(nameExpr, context);
         for (PsiElement def : multiResolve) {
-            if (def instanceof LuaNameDef)
-                hasLocalDef = true;
             LuaTypeSet set = getTypeSet(context, def);
             typeSet = typeSet.union(set);
-        }
-        //也许是global
-        if (!hasLocalDef) {
-            typeSet.addType(LuaType.createGlobalType(nameExpr));
         }
         return typeSet;
     }
@@ -105,6 +98,14 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
                     if (exprList != null)
                         typeSet = exprList.guessTypeAt(0, context);//TODO : multi
                 }
+            }
+            //Global
+            LuaNameExpr newRef = (LuaNameExpr) def;
+            if (LuaPsiResolveUtil.resolveLocal(newRef, context) == null) {
+                if (typeSet == null || typeSet.isEmpty())
+                    typeSet = LuaTypeSet.create(LuaType.createGlobalType(newRef));
+                else
+                    typeSet.addType(LuaType.createGlobalType(newRef));
             }
             return typeSet;
         }

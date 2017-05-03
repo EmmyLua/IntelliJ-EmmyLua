@@ -62,6 +62,7 @@ public class LuaNameExprImpl extends LuaNameExpressionImpl implements LuaNameExp
     return LuaPsiImplUtil.getPresentation(this);
   }
 
+  @NotNull
   public PsiReference[] getReferences() {
     return LuaPsiImplUtil.getReferences(this);
   }
