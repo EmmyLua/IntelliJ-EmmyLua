@@ -70,6 +70,16 @@ public class LuaType implements Comparable<LuaType> {
     private String aliasName;
     private String superClassName;
 
+    public void initAliasName(SearchContext context) {
+        if (aliasName == null) {
+            LuaDocClassDef classDef = LuaClassIndex.find(clazzName, context);
+            if (classDef != null) {
+                LuaType classType = classDef.getClassType();
+                setAliasName(classType.getAliasName());
+            }
+        }
+    }
+
     public LuaType getSuperClass(SearchContext context) {
         if (superClassName != null) {
             LuaDocClassDef superClassDef = LuaClassIndex.find(superClassName, context);
@@ -130,7 +140,12 @@ public class LuaType implements Comparable<LuaType> {
         Project project = context.getProject();
         assert project != null;
 
-        Collection<LuaClassField> list = LuaClassFieldIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+        LuaClassFieldIndex fieldIndex = LuaClassFieldIndex.getInstance();
+        Collection<LuaClassField> list = fieldIndex.get(clazzName, project, new ProjectAndLibrariesScope(project));
+        if (aliasName != null) {
+            Collection<LuaClassField> classFields = fieldIndex.get(aliasName, project, new ProjectAndLibrariesScope(project));
+            list.addAll(classFields);
+        }
 
         for (LuaClassField field : list) {
             processor.process(this, field);
@@ -150,7 +165,11 @@ public class LuaType implements Comparable<LuaType> {
         Project project = context.getProject();
         assert project != null;
 
-        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+        LuaClassMethodIndex methodIndex = LuaClassMethodIndex.getInstance();
+        Collection<LuaClassMethodDef> list = methodIndex.get(clazzName, project, new ProjectAndLibrariesScope(project));
+        if (aliasName != null) {
+            list.addAll(methodIndex.get(aliasName, project, new ProjectAndLibrariesScope(project)));
+        }
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
             if (methodName != null) {
@@ -169,6 +188,9 @@ public class LuaType implements Comparable<LuaType> {
         if (clazzName == null)
             return;
         Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, context);
+        if (aliasName != null) {
+            list.addAll(LuaClassMethodIndex.findStaticMethods(aliasName, context));
+        }
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
             if (methodName != null) {

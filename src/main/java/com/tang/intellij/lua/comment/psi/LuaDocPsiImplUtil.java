@@ -23,11 +23,12 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.StubBasedPsiElement;
 import com.intellij.psi.stubs.StubElement;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference;
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.LuaElementFactory;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
@@ -182,17 +183,28 @@ public class LuaDocPsiImplUtil {
 
     public static LuaType getClassType(LuaDocClassDef classDef) {
         LuaDocClassStub stub = classDef.getStub();
-        if (stub != null)
-            return stub.getClassType();
+        LuaType luaType;
+        if (stub != null) {
+            luaType = stub.getClassType();
+        } else {
+            String clazzName = classDef.getName();
+            assert clazzName != null;
+            String superClassName = null;
+            LuaDocClassNameRef supperRef = classDef.getSuperClassNameRef();
+            if (supperRef != null)
+                superClassName = supperRef.getText();
 
-        String clazzName = classDef.getName();
-        assert clazzName != null;
-        String superClassName = null;
-        LuaDocClassNameRef supperRef = classDef.getSuperClassNameRef();
-        if (supperRef != null)
-            superClassName = supperRef.getText();
+            luaType = LuaType.create(clazzName, superClassName);
 
-        return LuaType.create(clazzName, superClassName);
+            LuaCommentOwner owner = LuaCommentUtil.findOwner(classDef);
+            if (owner instanceof LuaAssignStat) {
+                LuaAssignStat assignStat = (LuaAssignStat) owner;
+                LuaVarList varList = assignStat.getVarList();
+                LuaVar var = varList.getVarList().get(0);
+                luaType.setAliasName(var.getText());
+            }
+        }
+        return luaType;
     }
 
     /**

@@ -50,6 +50,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
                 if (indexExpr.getColon() != null) {
                     prefixTypeSet.getTypes().forEach(luaType -> {
                         SearchContext context = new SearchContext(indexExpr.getProject());
+                        luaType.initAliasName(context);
                         luaType.processMethods(context, (curType, def) -> {
                             String className = curType.getDisplayName();
                             addMethod(completionResultSet, curType == luaType, false, className, def);
@@ -58,6 +59,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
                 } else {
                     prefixTypeSet.getTypes().forEach(luaType -> {
                         SearchContext context = new SearchContext(indexExpr.getProject());
+                        luaType.initAliasName(context);
                         luaType.processMethods(context, (curType, def) -> {
                             String className = curType.getDisplayName();
                             addMethod(completionResultSet, curType == luaType, true, className, def);
