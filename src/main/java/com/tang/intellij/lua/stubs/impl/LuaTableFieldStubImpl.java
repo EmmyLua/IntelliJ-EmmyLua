@@ -16,14 +16,16 @@
 
 package com.tang.intellij.lua.stubs.impl;
 
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.lang.type.LuaTableType;
-import com.tang.intellij.lua.psi.LuaTableConstructor;
-import com.tang.intellij.lua.psi.LuaTableField;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.stubs.LuaTableFieldStub;
+
+import java.util.Optional;
 
 /**
  *
@@ -48,8 +50,19 @@ public class LuaTableFieldStubImpl extends StubBase<LuaTableField> implements Lu
     @Override
     public String getTypeName() {
         if (typeName == null && tableField != null) {
-            LuaTableConstructor tableConstructor = PsiTreeUtil.getParentOfType(tableField, LuaTableConstructor.class);
-            typeName = LuaTableType.getTypeName(tableConstructor);
+            LuaTableConstructor table = PsiTreeUtil.getParentOfType(tableField, LuaTableConstructor.class);
+            Optional<String> optional = Optional.ofNullable(table)
+                    .filter(s -> s.getParent() instanceof LuaValueExpr)
+                    .map(PsiElement::getParent)
+                    .filter(s -> s.getParent() instanceof LuaExprList)
+                    .map(PsiElement::getParent)
+                    .filter(s -> s.getParent() instanceof LuaAssignStat)
+                    .map(PsiElement::getParent)
+                    .map(s -> {
+                        LuaAssignStat assignStat = (LuaAssignStat) s;
+                        return LuaPsiImplUtil.getTypeName(assignStat, 0);
+                    });
+            typeName = optional.orElse(LuaTableType.getTypeName(table));
         }
         return typeName;
     }

@@ -26,10 +26,7 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
-import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef;
-import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef;
-import com.tang.intellij.lua.comment.psi.LuaDocTypeSet;
+import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
@@ -590,5 +587,32 @@ public class LuaPsiImplUtil {
         if (stub != null)
             return stub.getName();
         return nameExpr.getText();
+    }
+
+    /**
+     * 找出 LuaAssignStat 的第 index 位置上的 Var 的类型String
+     * @param stat LuaAssignStat
+     * @param index index
+     * @return type string
+     * todo 处理多个var的情况
+     */
+    public static String getTypeName(LuaAssignStat stat, int index) {
+        LuaVarList varList = stat.getVarList();
+        LuaVar luaVar = varList.getVarList().get(index);
+        String typeName = null;
+        if (luaVar != null && luaVar.getExpr() instanceof LuaNameExpr) {
+            // common 优先
+            LuaComment comment = stat.getComment();
+            if (comment != null) {
+                LuaDocClassDef classDef = comment.getClassDef();
+                if (classDef != null) {
+                    typeName = classDef.getName();
+                }
+            }
+            // 否则直接当成Global，以名字作类型
+            if (typeName == null)
+                typeName = luaVar.getText();
+        }
+        return typeName;
     }
 }
