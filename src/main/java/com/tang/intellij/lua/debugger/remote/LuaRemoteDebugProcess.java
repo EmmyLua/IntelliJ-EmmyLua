@@ -45,14 +45,15 @@ import java.io.IOException;
  */
 public class LuaRemoteDebugProcess extends LuaDebugProcess {
 
+    private LuaRunConfiguration runProfile;
     private LuaDebuggerEditorsProvider editorsProvider;
     private MobServer mobServer;
     private XLineBreakpoint<XBreakpointProperties> breakpoint;
-    private static final int PORT = 8172;
 
     LuaRemoteDebugProcess(@NotNull XDebugSession session) {
         super(session);
         current = this;
+        runProfile = (LuaRunConfiguration) session.getRunProfile();
         editorsProvider = new LuaDebuggerEditorsProvider();
         mobServer = new MobServer(this);
     }
@@ -74,9 +75,9 @@ public class LuaRemoteDebugProcess extends LuaDebugProcess {
         super.sessionInitialized();
 
         try {
-            println("Start mobdebug server at port:" + 8172);
+            println("Start mobdebug server at port:" + runProfile.getPort());
             println("Waiting for process connection...");
-            mobServer.start(PORT);
+            mobServer.start(runProfile.getPort());
         } catch (IOException e) {
             e.printStackTrace();
         }

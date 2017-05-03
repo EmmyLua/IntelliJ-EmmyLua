@@ -24,16 +24,18 @@ import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.InvalidDataException;
+import com.intellij.openapi.util.JDOMExternalizerUtil;
+import com.intellij.openapi.util.WriteExternalException;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
 /**
  *
@@ -41,21 +43,23 @@ import java.util.List;
  */
 public class LuaRunConfiguration extends AbstractRunConfiguration {
 
+    private int port = 8172;
+
     LuaRunConfiguration(Project project, ConfigurationFactory factory) {
         super(project, factory);
     }
 
     @Override
     public Collection<Module> getValidModules() {
-        final Module[] modules = ModuleManager.getInstance(getProject()).getModules();
-        List<Module> list = new ArrayList<>();
-        return list;
+        //final Module[] modules = ModuleManager.getInstance(getProject()).getModules();
+        return Collections.emptyList();
     }
 
     @NotNull
     @Override
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
         final SettingsEditorGroup<LuaRunConfiguration> group = new SettingsEditorGroup<>();
+        group.addEditor("123", new LuaRemoteSettingsEditor());
         return group;
     }
 
@@ -63,5 +67,27 @@ public class LuaRunConfiguration extends AbstractRunConfiguration {
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
         return new LuaCommandLineState(executionEnvironment);
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    @Override
+    public void writeExternal(Element element) throws WriteExternalException {
+        super.writeExternal(element);
+        JDOMExternalizerUtil.writeField(element, "PORT", String.valueOf(port));
+    }
+
+    @Override
+    public void readExternal(Element element) throws InvalidDataException {
+        super.readExternal(element);
+        String port = JDOMExternalizerUtil.readField(element, "PORT");
+        if (port != null)
+            this.port = Integer.parseInt(port);
     }
 }
