@@ -19,6 +19,7 @@ package com.tang.intellij.lua.stubs.index;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassField;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
 
 /**
  *
@@ -61,9 +63,10 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
         return null;
     }
 
+    @NotNull
     public static Collection<LuaClassField> find(@NotNull String className, @NotNull String fieldName, @NotNull SearchContext context) {
         if (context.isDumb())
-            return null;
+            return Collections.emptyList();
 
         String key = className + "." + fieldName;
         Collection<LuaClassField> list = INSTANCE.get(key, context.getProject(), context.getScope());
@@ -79,7 +82,7 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
                 String superClassName = type.getSuperClassName();
                 if (superClassName != null) {
                     list = find(superClassName, fieldName, context);
-                    if (list != null && !list.isEmpty())
+                    if (!list.isEmpty())
                         return list;
                 }
             }
@@ -91,14 +94,19 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     @Nullable
     public static LuaClassField find(LuaType type, String fieldName, SearchContext context) {
         Collection<LuaClassField> fields = findAll(type, fieldName, context);
-        if (!fields.isEmpty())
-            return fields.iterator().next();
-        return null;
+        LuaClassField perfect = null;
+        for (LuaClassField field : fields) {
+            perfect = field;
+            if (field instanceof LuaDocFieldDef)
+                break;
+        }
+        return perfect;
     }
 
+    @NotNull
     public static Collection<LuaClassField> findAll(LuaType type, String fieldName, SearchContext context) {
         Collection<LuaClassField> fields = find(type.getClassName(), fieldName, context);
-        if (fields == null) {
+        if (fields.isEmpty()) {
             type.initAliasName(context);
             if (type.getAliasName() != null)
                 fields = find(type.getAliasName(), fieldName, context);
