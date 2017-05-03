@@ -34,6 +34,8 @@ import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+
 /**
  *
  * Created by TangZX on 2017/4/12.
@@ -98,18 +100,31 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
 
     @Nullable
     private LuaTypeSet guessFieldType(String fieldName, LuaType type, SearchContext context) {
-        LuaClassField fieldDef = LuaClassFieldIndex.find(type, fieldName, context);
-        if (fieldDef == this)
-            return null;
+        LuaTypeSet set = LuaTypeSet.create();
 
-        LuaTypeSet set = null;
-        if (fieldDef != null) {
-            set = fieldDef.guessType(context);
-        } else {
-            LuaType superType = type.getSuperClass(context);
-            if (superType != null)
-                set = guessFieldType(fieldName, superType, context);
+        Collection<LuaClassField> all = LuaClassFieldIndex.findAll(type, fieldName, context);
+        for (LuaClassField fieldDef : all) {
+            if (fieldDef instanceof LuaIndexExpr) {
+                LuaIndexExpr indexExpr = (LuaIndexExpr) fieldDef;
+                LuaIndexStub stub = indexExpr.getStub();
+                if (stub != null)
+                    set = set.union(stub.guessValueType());
+                else
+                    set = set.union(indexExpr.guessValueType());
+
+                if (fieldDef == this)
+                    return set;
+            }
+
+            if (fieldDef != null) {
+                set = set.union(fieldDef.guessType(context));
+            } else {
+                LuaType superType = type.getSuperClass(context);
+                if (superType != null)
+                    set = set.union(guessFieldType(fieldName, superType, context));
+            }
         }
+
         return set;
     }
 

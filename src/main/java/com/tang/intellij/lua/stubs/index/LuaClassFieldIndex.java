@@ -19,12 +19,12 @@ package com.tang.intellij.lua.stubs.index;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -61,18 +61,15 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
         return null;
     }
 
-    public static LuaClassField find(@NotNull String className, @NotNull String fieldName, @NotNull SearchContext context) {
+    public static Collection<LuaClassField> find(@NotNull String className, @NotNull String fieldName, @NotNull SearchContext context) {
         if (context.isDumb())
             return null;
 
         String key = className + "." + fieldName;
         Collection<LuaClassField> list = INSTANCE.get(key, context.getProject(), context.getScope());
 
-        //LuaDocFieldDef 最佳
-        for (LuaClassField field : list) {
-            if (field instanceof LuaDocFieldDef)
-                return field;
-        }
+        if (!list.isEmpty())
+            return list;
 
         // from supper
         LuaDocClassDef classDef = LuaClassIndex.find(className, context);
@@ -81,25 +78,31 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
             if (type != null) {
                 String superClassName = type.getSuperClassName();
                 if (superClassName != null) {
-                    LuaClassField fieldFromSupper = find(superClassName, fieldName, context);
-                    if (fieldFromSupper != null)
-                        return fieldFromSupper;
+                    list = find(superClassName, fieldName, context);
+                    if (list != null && !list.isEmpty())
+                        return list;
                 }
             }
         }
 
-        if (!list.isEmpty())
-            return list.iterator().next();
+        return list;
+    }
+
+    @Nullable
+    public static LuaClassField find(LuaType type, String fieldName, SearchContext context) {
+        Collection<LuaClassField> fields = findAll(type, fieldName, context);
+        if (!fields.isEmpty())
+            return fields.iterator().next();
         return null;
     }
 
-    public static LuaClassField find(LuaType type, String fieldName, SearchContext context) {
-        LuaClassField field = find(type.getClassName(), fieldName, context);
-        if (field == null) {
+    public static Collection<LuaClassField> findAll(LuaType type, String fieldName, SearchContext context) {
+        Collection<LuaClassField> fields = find(type.getClassName(), fieldName, context);
+        if (fields == null) {
             type.initAliasName(context);
             if (type.getAliasName() != null)
-                field = find(type.getAliasName(), fieldName, context);
+                fields = find(type.getAliasName(), fieldName, context);
         }
-        return field;
+        return fields;
     }
 }
