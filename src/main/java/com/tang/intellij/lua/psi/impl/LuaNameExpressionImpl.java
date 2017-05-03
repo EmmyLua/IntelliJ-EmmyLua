@@ -73,9 +73,13 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
             LuaNameExpr nameExpr = (LuaNameExpr) this;
 
             PsiElement[] multiResolve = LuaPsiResolveUtil.multiResolve(nameExpr, context);
-            for (PsiElement def : multiResolve) {
-                LuaTypeSet set = getTypeSet(context, def);
-                typeSet = typeSet.union(set);
+            if (multiResolve.length == 0) {
+                typeSet.addType(LuaType.createGlobalType(nameExpr));
+            } else {
+                for (PsiElement def : multiResolve) {
+                    LuaTypeSet set = getTypeSet(context, def);
+                    typeSet = typeSet.union(set);
+                }
             }
             context.pop(this);
         }
@@ -105,10 +109,9 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
             //Global
             LuaNameExpr newRef = (LuaNameExpr) def;
             if (LuaPsiResolveUtil.resolveLocal(newRef, context) == null) {
-                if (typeSet == null || typeSet.isEmpty())
-                    typeSet = LuaTypeSet.create(LuaType.createGlobalType(newRef));
-                else
-                    typeSet.addType(LuaType.createGlobalType(newRef));
+                if (typeSet == null)
+                    typeSet = LuaTypeSet.create();
+                typeSet.addType(LuaType.createGlobalType(newRef));
             }
             return typeSet;
         }
