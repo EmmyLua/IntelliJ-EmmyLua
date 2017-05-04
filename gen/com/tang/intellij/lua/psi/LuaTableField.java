@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaTableFieldStub;
+import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 
@@ -29,6 +30,8 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, St
   String toString();
 
   String getFieldName();
+
+  ItemPresentation getPresentation();
 
   LuaTypeSet guessType(SearchContext context);
 

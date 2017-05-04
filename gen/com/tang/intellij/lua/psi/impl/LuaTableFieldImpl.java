@@ -11,6 +11,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 import com.intellij.psi.stubs.IStubElementType;
@@ -73,6 +74,10 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
 
   public String getFieldName() {
     return LuaPsiImplUtil.getFieldName(this);
+  }
+
+  public ItemPresentation getPresentation() {
+    return LuaPsiImplUtil.getPresentation(this);
   }
 
   public LuaTypeSet guessType(SearchContext context) {

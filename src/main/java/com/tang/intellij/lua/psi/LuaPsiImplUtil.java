@@ -542,6 +542,28 @@ public class LuaPsiImplUtil {
         return getName(tableField);
     }
 
+    public static ItemPresentation getPresentation(LuaTableField tableField) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return tableField.getName();
+            }
+
+            @NotNull
+            @Override
+            public String getLocationString() {
+                return tableField.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean b) {
+                return LuaIcons.CLASS_FIELD;
+            }
+        };
+    }
+
     public static String toString(StubBasedPsiElement<? extends StubElement> stubElement) {
         return "STUB:[" + stubElement.getClass().getSimpleName() + "]";
     }

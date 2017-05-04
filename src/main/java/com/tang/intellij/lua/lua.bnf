@@ -381,6 +381,7 @@ tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
         toString
 
         getFieldName
+        getPresentation
         guessType
         nameDef = "tableFieldNameDef"
     ]
