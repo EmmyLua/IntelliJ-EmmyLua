@@ -1,4 +1,4 @@
-Lua IDE for IntelliJ IDEA (requires `IDEA 2016.3`)
+Lua IDE for IntelliJ IDEA (requires `IDEA 2017.1`)
 
 [![Documentation Status](https://readthedocs.org/projects/intellij-lua/badge/?version=latest)](http://intellij-lua.readthedocs.io/en/latest/?badge=latest)
 
