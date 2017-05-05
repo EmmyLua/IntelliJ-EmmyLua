@@ -27,8 +27,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
+import com.tang.intellij.lua.psi.LuaIndexExpr;
 import com.tang.intellij.lua.psi.LuaTypes;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -49,16 +52,31 @@ public abstract class LuaDebuggerEvaluator extends XDebuggerEvaluator {
                 IElementType type = element.getNode().getElementType();
                 if (type == LuaTypes.ID) {
                     PsiElement parent = element.getParent();
+                    PsiElement target = parent;
                     if (parent instanceof PsiNamedElement) {
-                        PsiElement id = parent;
-                        if (parent instanceof PsiNameIdentifierOwner)
-                            id = ((PsiNameIdentifierOwner) parent).getNameIdentifier();
-                        if (id != null)
-                            currentRange.set(id.getTextRange());
+                        if (parent instanceof PsiNameIdentifierOwner) {
+                            if (parent instanceof LuaIndexExpr) {
+                                target = parent;
+                            } else {
+                                target = ((PsiNameIdentifierOwner) parent).getNameIdentifier();
+                            }
+                        }
                     }
+
+                    if (target != null)
+                        currentRange.set(target.getTextRange());
                 }
             } catch (IndexNotReadyException ignored) {}
         });
         return currentRange.get();
     }
+
+    @Override
+    public final void evaluate(@NotNull String express, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
+        //TODO self:method & self:method()
+        //express = express.replace(':', '.');
+        eval(express, xEvaluationCallback, xSourcePosition);
+    }
+
+    protected abstract void eval(@NotNull String express, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition);
 }

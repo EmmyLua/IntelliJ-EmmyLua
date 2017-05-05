@@ -32,7 +32,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
  */
 public class LuaRemoteDebuggerEvaluator extends LuaDebuggerEvaluator {
     @Override
-    public void evaluate(@NotNull String s, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
+    protected void eval(@NotNull String s, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
         EvaluatorCommand evaluatorCommand = new EvaluatorCommand("return " + s, false, data -> {
             Globals standardGlobals = JsePlatform.standardGlobals();
             LuaValue code = standardGlobals.load(data);

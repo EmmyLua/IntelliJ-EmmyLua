@@ -35,7 +35,7 @@ public class LuaAttachDebuggerEvaluator extends LuaDebuggerEvaluator {
     }
 
     @Override
-    public void evaluate(@NotNull String express, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
+    protected void eval(@NotNull String express, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
         process.getBridge().eval(express, stackFrame.getStack(), 1, result -> {
             if (result.isSuccess() && result.getXValue() != null) {
                 xEvaluationCallback.evaluated(result.getXValue());
