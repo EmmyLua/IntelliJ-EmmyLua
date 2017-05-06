@@ -1058,11 +1058,11 @@ bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandL
         return false;
     }
 
-    if (!info.i386)
+    /*if (!info.i386)
     {
         MessageEvent("Error: Debugging 64-bit applications is not supported", MessageType_Error);
         return false;
-    }
+    }*/
 
     DWORD flags = DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS;
 
@@ -1078,7 +1078,7 @@ bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandL
     if (!info.managed)
     {
 
-        unsigned long entryPoint = info.entryPoint;
+        size_t entryPoint = info.entryPoint;
 
         BYTE breakPointData;
         bool done = false;
