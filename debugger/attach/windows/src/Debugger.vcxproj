@@ -172,6 +172,7 @@
     <ClCompile Include="Debugger\wxEvtHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Debugger\cxxopts.hpp" />
     <ClInclude Include="Debugger\DebugEvent.h" />
     <ClInclude Include="Debugger\DebugFrontend.h" />
     <ClInclude Include="Debugger\LineMapper.h" />

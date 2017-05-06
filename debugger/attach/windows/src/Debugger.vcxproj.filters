@@ -44,5 +44,8 @@
     <ClInclude Include="Debugger\wxEvtHandler.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Debugger\cxxopts.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

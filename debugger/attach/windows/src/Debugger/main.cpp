@@ -1,4 +1,5 @@
 #include "DebugFrontend.h"
+#include "cxxopts.hpp"
 #include <iostream>
 #include <assert.h>
 
@@ -6,18 +7,6 @@ using namespace std;
 
 DebugFrontend& inst = DebugFrontend::Get();
 wxEvtHandler* handler = new wxEvtHandler();
-
-// attach to target process
-void doAttach() {
-	int pid = 0;
-	bool attached = false;
-	while (!attached) {
-		scanf("%d", &pid);
-		if (pid > 0) {
-			attached = inst.Attach(pid, "");
-		}
-	}
-}
 
 void split(std::string& s, std::string& delim, std::vector< std::string >* ret, size_t n)
 {
@@ -107,11 +96,60 @@ void mainLoop() {
 
 int main(int argc, char** argv)
 {
-	inst.SetEventHandler(handler);
+	cxxopts::Options options("EmmyLua", "EmmyLua Debugger");
+	options.add_options()
+		("m,mode", "debug model attach/run", cxxopts::value<std::string>())
+		("p,pid", "the pid we will attach to", cxxopts::value<int>())
 
-	doAttach();
+		("c,cmd", "command line", cxxopts::value<std::string>())
+		("a,args", "args", cxxopts::value<std::string>())
+		("d,debug", "is debug", cxxopts::value<bool>())
+		("w,workdir", "working directory", cxxopts::value<std::string>());
+	options.parse(argc, argv);
+	if (options.count("m") > 0) {
+		inst.SetEventHandler(handler);
 
-	mainLoop();
+		std::string mode = options["m"].as<std::string>();
+		if (mode == "attach") {
+			if (options.count("p")) {
+				int pid = options["p"].as<int>();
+				if (inst.Attach(pid, "")) {
+					mainLoop();
+				}
+			}
+		}
+		else if (mode == "run") {
+			//command
+			std::string cmd;
+			if (options.count("c")) {
+				cmd = options["c"].as<std::string>();
+			}
+			//command
+			std::string args;
+			if (options.count("a")) {
+				args = options["a"].as<std::string>();
+			}
+			//is debug mode
+			bool debug = true;
+			if (options.count("d")) {
+				debug = options["d"].as<bool>();
+			}
+			//working dir
+			std::string wd;
+			if (options.count("w")) {
+				wd = options["w"].as<std::string>();
+			}
 
+			if (!cmd.empty()) {
+				if (inst.Start(cmd.c_str(), args.c_str(), wd.c_str(), "", debug, true)) {
+					mainLoop();
+				}
+			}
+		}
+	}
+	else {
+		auto help = options.help();
+		printf("%s", help.c_str());
+	}
 	return 0;
 }
