@@ -1064,7 +1064,7 @@ bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandL
         return false;
     }*/
 
-    DWORD flags = DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS;
+    DWORD flags = DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS | CREATE_NEW_CONSOLE;
 
     if (!CreateProcess(NULL, commandLine, NULL, NULL, TRUE, flags, NULL, directory, &startUpInfo, &processInfo))
     {
