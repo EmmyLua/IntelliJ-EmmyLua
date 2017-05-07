@@ -158,15 +158,11 @@ public class LuaAttachBridge {
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
-                processBuilder = new ProcessBuilder(exe);
+                processBuilder = new ProcessBuilder(exe, "-m", "attach", "-p", pid);
 
                 process = processBuilder.start();
                 writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
                 reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8")));
-
-                writer.write(pid);
-                writer.write('\n');
-                writer.flush();
 
                 readerThread = new Thread(readProcess);
                 readerThread.start();
