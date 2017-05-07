@@ -146,7 +146,7 @@ public class LuaAttachBridge {
                 String archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe");
                 ProcessBuilder processBuilder = new ProcessBuilder(archExe);
                 boolean isX86;
-                Process archChecker = processBuilder.command(archExe, pid).start();
+                Process archChecker = processBuilder.command(archExe, "-pid", pid).start();
                 archChecker.waitFor();
                 int exitValue = archChecker.exitValue();
                 isX86 = exitValue == 1;
@@ -178,14 +178,19 @@ public class LuaAttachBridge {
         }
     }
 
-    public void start(@NotNull String cmd, @NotNull String wd, String[] args) {
+    public void start(@NotNull String program, @NotNull String wd, String[] args) {
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
         try {
             if (pluginVirtualDirectory != null) {
                 // check arch
-                //String archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe");
-                ProcessBuilder processBuilder;
-                boolean isX86 = true;
+                // check arch
+                String archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe");
+                ProcessBuilder processBuilder = new ProcessBuilder(archExe);
+                boolean isX86;
+                Process archChecker = processBuilder.command(archExe, "-file", program).start();
+                archChecker.waitFor();
+                int exitValue = archChecker.exitValue();
+                isX86 = exitValue == 1;
 
                 String archType = isX86 ? "x86" : "x64";
                 //session.getConsoleView().print(String.format("Try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
@@ -198,7 +203,7 @@ public class LuaAttachBridge {
 
                 processBuilder = new ProcessBuilder(exe,
                         "-m", "run",
-                        "-c", cmd,
+                        "-c", program,
                         "-w", wd,
                         "-a", argString);
 
