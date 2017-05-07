@@ -32,14 +32,14 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by tangzx on 2016/12/31.
  */
-public class LuaStackFrame extends XStackFrame {
+public class LuaMobStackFrame extends XStackFrame {
 
-    private LuaRemoteDebuggerEvaluator evaluator = new LuaRemoteDebuggerEvaluator();
+    private LuaMobDebuggerEvaluator evaluator = new LuaMobDebuggerEvaluator();
     private String functionName;
     private XSourcePosition position;
     private XValueChildrenList values = new XValueChildrenList();
 
-    public LuaStackFrame(String functionName, XSourcePosition position) {
+    public LuaMobStackFrame(String functionName, XSourcePosition position) {
         this.functionName = functionName;
         this.position = position;
     }

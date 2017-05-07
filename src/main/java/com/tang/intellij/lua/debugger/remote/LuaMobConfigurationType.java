@@ -28,12 +28,12 @@ import javax.swing.*;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaConfigurationType implements ConfigurationType {
+public class LuaMobConfigurationType implements ConfigurationType {
 
-    private final LuaConfigurationFactory factory = new LuaConfigurationFactory(this);
+    private final LuaMobConfigurationFactory factory = new LuaMobConfigurationFactory(this);
 
-    public static LuaConfigurationType getInstance() {
-        return ConfigurationTypeUtil.findConfigurationType(LuaConfigurationType.class);
+    public static LuaMobConfigurationType getInstance() {
+        return ConfigurationTypeUtil.findConfigurationType(LuaMobConfigurationType.class);
     }
 
     @Override

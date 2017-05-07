@@ -41,11 +41,11 @@ import java.util.Collections;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaRunConfiguration extends AbstractRunConfiguration {
+public class LuaMobConfiguration extends AbstractRunConfiguration {
 
     private int port = 8172;
 
-    LuaRunConfiguration(Project project, ConfigurationFactory factory) {
+    LuaMobConfiguration(Project project, ConfigurationFactory factory) {
         super(project, factory);
     }
 
@@ -58,8 +58,8 @@ public class LuaRunConfiguration extends AbstractRunConfiguration {
     @NotNull
     @Override
     public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
-        final SettingsEditorGroup<LuaRunConfiguration> group = new SettingsEditorGroup<>();
-        group.addEditor("123", new LuaRemoteSettingsEditor());
+        final SettingsEditorGroup<LuaMobConfiguration> group = new SettingsEditorGroup<>();
+        group.addEditor("123", new LuaMobSettingsEditor());
         return group;
     }
 

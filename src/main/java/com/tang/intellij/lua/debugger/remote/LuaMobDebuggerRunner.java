@@ -33,9 +33,9 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaDebuggerRunner extends GenericProgramRunner {
+public class LuaMobDebuggerRunner extends GenericProgramRunner {
 
-    private static final String ID = "luaRunner";
+    private static final String ID = "lua.mob.runner";
 
     @NotNull
     @Override
@@ -45,7 +45,7 @@ public class LuaDebuggerRunner extends GenericProgramRunner {
 
     @Override
     public boolean canRun(@NotNull String s, @NotNull RunProfile runProfile) {
-        return runProfile instanceof LuaRunConfiguration;
+        return runProfile instanceof LuaMobConfiguration;
     }
 
     @Nullable
@@ -61,7 +61,7 @@ public class LuaDebuggerRunner extends GenericProgramRunner {
             @NotNull
             @Override
             public XDebugProcess start(@NotNull XDebugSession xDebugSession) throws ExecutionException {
-                return new LuaRemoteDebugProcess(xDebugSession);
+                return new LuaMobDebugProcess(xDebugSession);
             }
         });
     }

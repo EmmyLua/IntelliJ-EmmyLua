@@ -20,7 +20,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.impl.XSourcePositionImpl;
 import com.tang.intellij.lua.debugger.LuaExecutionStack;
-import com.tang.intellij.lua.debugger.remote.LuaStackFrame;
+import com.tang.intellij.lua.debugger.remote.LuaMobStackFrame;
 import com.tang.intellij.lua.debugger.remote.value.LuaRValue;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.luaj.vm2.Globals;
@@ -106,7 +106,7 @@ public class GetStackCommand extends DefaultCommand {
                 if (funcName.isnil())
                     functionName = "main";
 
-                LuaStackFrame frame = new LuaStackFrame(functionName, position);
+                LuaMobStackFrame frame = new LuaMobStackFrame(functionName, position);
 
                 parseValues(stackValue.get(2).checktable(), frame);
                 parseValues(stackValue.get(3).checktable(), frame);
@@ -117,7 +117,7 @@ public class GetStackCommand extends DefaultCommand {
         }
     }
 
-    private void parseValues(LuaTable paramsTable, LuaStackFrame frame) {
+    private void parseValues(LuaTable paramsTable, LuaMobStackFrame frame) {
         LuaValue[] keys = paramsTable.keys();
         for (LuaValue key : keys) {
             LuaValue luaValue = paramsTable.get(key);

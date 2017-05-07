@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.remote.mobdebug;
+package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.util.io.BaseOutputReader;
-import com.tang.intellij.lua.debugger.remote.LuaRemoteDebugProcess;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand;
 import org.jetbrains.annotations.NotNull;
@@ -63,14 +62,14 @@ public class MobServer implements Runnable {
     private ServerSocket server;
     private Thread thread;
     private Future threadSend;
-    private LuaRemoteDebugProcess listener;
+    private LuaMobDebugProcess listener;
     private Queue<DebugCommand> commands = new LinkedList<>();
     private LuaDebugReader debugReader;
     private DebugCommand currentCommandWaitForResp;
     private OutputStreamWriter streamWriter;
     private StringBuffer stringBuffer = new StringBuffer(2048);
 
-    public MobServer(LuaRemoteDebugProcess listener) {
+    public MobServer(LuaMobDebugProcess listener) {
         this.listener = listener;
     }
 

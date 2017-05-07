@@ -16,8 +16,8 @@
 
 package com.tang.intellij.lua.debugger.remote.commands;
 
-import com.tang.intellij.lua.debugger.remote.LuaRemoteDebugProcess;
-import com.tang.intellij.lua.debugger.remote.mobdebug.MobServer;
+import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess;
+import com.tang.intellij.lua.debugger.remote.MobServer;
 
 import java.io.IOException;
 
@@ -27,9 +27,9 @@ import java.io.IOException;
  */
 public abstract class DebugCommand {
 
-    LuaRemoteDebugProcess debugProcess;
+    LuaMobDebugProcess debugProcess;
 
-    public void setDebugProcess(LuaRemoteDebugProcess process) {
+    public void setDebugProcess(LuaMobDebugProcess process) {
         debugProcess = process;
     }
 

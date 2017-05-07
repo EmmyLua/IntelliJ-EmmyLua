@@ -26,10 +26,10 @@ import org.jetbrains.annotations.NotNull;
  *
  * Created by tangzx on 2016/12/30.
  */
-public class LuaLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>> {
-    private LuaRemoteDebugProcess process;
+public class LuaMobLineBreakpointHandler extends XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>> {
+    private LuaMobDebugProcess process;
 
-    LuaLineBreakpointHandler(LuaRemoteDebugProcess process) {
+    LuaMobLineBreakpointHandler(LuaMobDebugProcess process) {
         super(LuaLineBreakpointType.class);
         this.process = process;
     }

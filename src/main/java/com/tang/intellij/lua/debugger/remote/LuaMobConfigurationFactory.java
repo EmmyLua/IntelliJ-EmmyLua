@@ -28,16 +28,16 @@ import org.jetbrains.annotations.NotNull;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaConfigurationFactory extends ConfigurationFactory {
+public class LuaMobConfigurationFactory extends ConfigurationFactory {
 
-    LuaConfigurationFactory(LuaConfigurationType type) {
+    LuaMobConfigurationFactory(LuaMobConfigurationType type) {
         super(type);
     }
 
     @NotNull
     @Override
     public RunConfiguration createTemplateConfiguration(@NotNull Project project) {
-        return new LuaRunConfiguration(project, this);
+        return new LuaMobConfiguration(project, this);
     }
 
     @Override

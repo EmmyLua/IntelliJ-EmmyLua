@@ -32,7 +32,6 @@ import com.tang.intellij.lua.debugger.LuaExecutionStack;
 import com.tang.intellij.lua.debugger.LuaSuspendContext;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand;
-import com.tang.intellij.lua.debugger.remote.mobdebug.MobServer;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,24 +42,24 @@ import java.io.IOException;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaRemoteDebugProcess extends LuaDebugProcess {
+public class LuaMobDebugProcess extends LuaDebugProcess {
 
-    private LuaRunConfiguration runProfile;
+    private LuaMobConfiguration runProfile;
     private LuaDebuggerEditorsProvider editorsProvider;
     private MobServer mobServer;
     private XLineBreakpoint<XBreakpointProperties> breakpoint;
 
-    LuaRemoteDebugProcess(@NotNull XDebugSession session) {
+    LuaMobDebugProcess(@NotNull XDebugSession session) {
         super(session);
         current = this;
-        runProfile = (LuaRunConfiguration) session.getRunProfile();
+        runProfile = (LuaMobConfiguration) session.getRunProfile();
         editorsProvider = new LuaDebuggerEditorsProvider();
         mobServer = new MobServer(this);
     }
 
-    private static LuaRemoteDebugProcess current;
+    private static LuaMobDebugProcess current;
 
-    public static LuaRemoteDebugProcess getCurrent() {
+    public static LuaMobDebugProcess getCurrent() {
         return current;
     }
 
@@ -113,7 +112,7 @@ public class LuaRemoteDebugProcess extends LuaDebugProcess {
     @NotNull
     @Override
     public XBreakpointHandler<?>[] getBreakpointHandlers() {
-        return new XBreakpointHandler[] { new LuaLineBreakpointHandler(this) };
+        return new XBreakpointHandler[] { new LuaMobLineBreakpointHandler(this) };
     }
 
     void addBreakpoint(XLineBreakpoint<XBreakpointProperties> breakpoint) {

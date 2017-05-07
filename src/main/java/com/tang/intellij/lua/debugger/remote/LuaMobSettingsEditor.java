@@ -26,19 +26,19 @@ import javax.swing.*;
  *
  * Created by tangzx on 2017/5/4.
  */
-public class LuaRemoteSettingsEditor extends SettingsEditor<LuaRunConfiguration> {
+public class LuaMobSettingsEditor extends SettingsEditor<LuaMobConfiguration> {
     private JTextField port;
     private JPanel myPanel;
 
     @Override
-    protected void resetEditorFrom(@NotNull LuaRunConfiguration luaRunConfiguration) {
-        port.setText(String.valueOf(luaRunConfiguration.getPort()));
+    protected void resetEditorFrom(@NotNull LuaMobConfiguration luaMobConfiguration) {
+        port.setText(String.valueOf(luaMobConfiguration.getPort()));
     }
 
     @Override
-    protected void applyEditorTo(@NotNull LuaRunConfiguration luaRunConfiguration) throws ConfigurationException {
+    protected void applyEditorTo(@NotNull LuaMobConfiguration luaMobConfiguration) throws ConfigurationException {
         try {
-            luaRunConfiguration.setPort(Integer.parseInt(port.getText()));
+            luaMobConfiguration.setPort(Integer.parseInt(port.getText()));
         } catch (NumberFormatException ignored) {
 
         }
@@ -47,7 +47,7 @@ public class LuaRemoteSettingsEditor extends SettingsEditor<LuaRunConfiguration>
     @NotNull
     @Override
     protected JComponent createEditor() {
-        port.addActionListener(e -> LuaRemoteSettingsEditor.this.fireEditorStateChanged());
+        port.addActionListener(e -> LuaMobSettingsEditor.this.fireEditorStateChanged());
         return myPanel;
     }
 }

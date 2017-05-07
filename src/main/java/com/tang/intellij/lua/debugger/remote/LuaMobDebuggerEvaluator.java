@@ -30,7 +30,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
  *
  * Created by tangzx on 2016/12/31.
  */
-public class LuaRemoteDebuggerEvaluator extends LuaDebuggerEvaluator {
+public class LuaMobDebuggerEvaluator extends LuaDebuggerEvaluator {
     @Override
     protected void eval(@NotNull String s, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
         EvaluatorCommand evaluatorCommand = new EvaluatorCommand("return " + s, false, data -> {

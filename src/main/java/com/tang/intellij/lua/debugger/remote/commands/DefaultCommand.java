@@ -16,8 +16,8 @@
 
 package com.tang.intellij.lua.debugger.remote.commands;
 
-import com.tang.intellij.lua.debugger.remote.LuaRemoteDebugProcess;
-import com.tang.intellij.lua.debugger.remote.mobdebug.MobServer;
+import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess;
+import com.tang.intellij.lua.debugger.remote.MobServer;
 
 import java.io.IOException;
 
@@ -69,6 +69,6 @@ public class DefaultCommand extends DebugCommand {
     }
 
     public void exec() {
-        LuaRemoteDebugProcess.getCurrent().runCommand(this);
+        LuaMobDebugProcess.getCurrent().runCommand(this);
     }
 }
