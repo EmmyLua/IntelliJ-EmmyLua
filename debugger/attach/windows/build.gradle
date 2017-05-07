@@ -35,6 +35,9 @@ model {
                     }
                 }
             }
+            binaries.all {
+                linker.args "imagehlp.lib"
+            }
         }
         tinyxml(NativeLibrarySpec) {
             sources {
@@ -49,7 +52,7 @@ model {
                 }
             }
         }
-        EasyHookDll(NativeLibrarySpec) {
+        EasyHook(NativeLibrarySpec) {
             sources {
                 cpp {
                     source {
@@ -138,7 +141,7 @@ model {
                 }
                 lib library:"tinyxml", linkage: 'static'
                 lib library:"Shared", linkage: 'static'
-                lib library:"EasyHookDll", linkage: 'shared'
+                lib library:"EasyHook", linkage: 'shared'
             }
             binaries.all {
                 linker.args "/LIBPATH:src/libs/dbghelp/lib"
