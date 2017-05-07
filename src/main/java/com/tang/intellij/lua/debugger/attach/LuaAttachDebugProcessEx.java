@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.remote;
+package com.tang.intellij.lua.debugger.attach;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.configurations.CommandLineState;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.execution.process.ProcessInfo;
+import com.intellij.xdebugger.XDebugSession;
 import org.jetbrains.annotations.NotNull;
 
 /**
  *
- * Created by TangZX on 2016/12/30.
+ * Created by tangzx on 2017/5/7.
  */
-public class LuaCommandLineState extends CommandLineState {
-    public LuaCommandLineState(ExecutionEnvironment environment) {
-        super(environment);
+public class LuaAttachDebugProcessEx extends LuaAttachDebugProcess {
+    private final ProcessInfo processInfo;
+    LuaAttachDebugProcessEx(@NotNull XDebugSession session, ProcessInfo processInfo) {
+        super(session);
+        this.processInfo = processInfo;
     }
 
-    @NotNull
     @Override
-    protected ProcessHandler startProcess() throws ExecutionException {
-        return null;
+    protected LuaAttachBridge startBridge() {
+        bridge = new LuaAttachBridge(getSession());
+        bridge.setProtoHandler(this);
+        bridge.setProtoFactory(this);
+        bridge.attach(processInfo.getPid());
+        return bridge;
     }
 }

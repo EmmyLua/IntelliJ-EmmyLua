@@ -30,6 +30,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
+import com.tang.intellij.lua.debugger.IRemoteConfiguration;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +42,7 @@ import java.util.Collections;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaMobConfiguration extends AbstractRunConfiguration {
+public class LuaMobConfiguration extends AbstractRunConfiguration implements IRemoteConfiguration {
 
     private int port = 8172;
 
@@ -73,7 +74,7 @@ public class LuaMobConfiguration extends AbstractRunConfiguration {
         return port;
     }
 
-    public void setPort(int port) {
+    void setPort(int port) {
         this.port = port;
     }
 

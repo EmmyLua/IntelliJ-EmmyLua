@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.debugger.attach;
 
-import com.intellij.execution.process.ProcessInfo;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
@@ -42,7 +41,6 @@ import java.util.Map;
  * Created by tangzx on 2017/3/26.
  */
 public class LuaAttachBridge {
-    private String pid;
     private XDebugSession session;
     private Process process;
     private BufferedWriter writer;
@@ -55,11 +53,11 @@ public class LuaAttachBridge {
     private int evalIdCounter = 0;
     private Map<Integer, EvalInfo> callbackMap = new HashMap<>();
 
-    void setProtoHandler(ProtoHandler protoHandler) {
+    public void setProtoHandler(ProtoHandler protoHandler) {
         this.protoHandler = protoHandler;
     }
 
-    void setProtoFactory(ProtoFactory protoFactory) {
+    public void setProtoFactory(ProtoFactory protoFactory) {
         this.protoFactory = protoFactory;
     }
 
@@ -79,8 +77,7 @@ public class LuaAttachBridge {
         public String expr;
     }
 
-    LuaAttachBridge(ProcessInfo processInfo, XDebugSession session) {
-        pid = String.valueOf(processInfo.getPid());
+    public LuaAttachBridge(XDebugSession session) {
         this.session = session;
     }
 
@@ -140,7 +137,8 @@ public class LuaAttachBridge {
 
     };
 
-    public void start() {
+    public void attach(int processId) {
+        String pid = String.valueOf(processId);
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
         try {
             if (pluginVirtualDirectory != null) {
@@ -148,7 +146,7 @@ public class LuaAttachBridge {
                 String archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe");
                 ProcessBuilder processBuilder = new ProcessBuilder(archExe);
                 boolean isX86;
-                Process archChecker = processBuilder.command(archExe, String.valueOf(pid)).start();
+                Process archChecker = processBuilder.command(archExe, pid).start();
                 archChecker.waitFor();
                 int exitValue = archChecker.exitValue();
                 isX86 = exitValue == 1;
@@ -159,6 +157,50 @@ public class LuaAttachBridge {
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
                 processBuilder = new ProcessBuilder(exe, "-m", "attach", "-p", pid);
+
+                process = processBuilder.start();
+                writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+                reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8")));
+
+                readerThread = new Thread(readProcess);
+                readerThread.start();
+                writerThread = new Thread(writeProcess);
+                writerThread.start();
+                isRunning = true;
+            }
+        } catch (Exception e) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            PrintStream ps = new PrintStream(stream);
+            e.printStackTrace(ps);
+            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);
+            session.stop();
+            isRunning = false;
+        }
+    }
+
+    public void start(@NotNull String cmd, @NotNull String wd, String[] args) {
+        VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
+        try {
+            if (pluginVirtualDirectory != null) {
+                // check arch
+                //String archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe");
+                ProcessBuilder processBuilder;
+                boolean isX86 = true;
+
+                String archType = isX86 ? "x86" : "x64";
+                //session.getConsoleView().print(String.format("Try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
+                // attach debugger
+                String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
+
+                String argString = "";
+                if (args != null)
+                    argString = String.join(" ", args);
+
+                processBuilder = new ProcessBuilder(exe,
+                        "-m", "run",
+                        "-c", cmd,
+                        "-w", wd,
+                        "-a", argString);
 
                 process = processBuilder.start();
                 writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));

@@ -16,14 +16,10 @@
 
 package com.tang.intellij.lua.debugger;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
- * console logger
- * Created by tangzx on 2017/5/1.
+ *
+ * Created by tangzx on 2017/5/7.
  */
-public interface DebugLogger {
-    void print(@NotNull String text);
-    void println(@NotNull String text);
-    void error(@NotNull String text);
+public interface IRemoteConfiguration {
+    int getPort();
 }

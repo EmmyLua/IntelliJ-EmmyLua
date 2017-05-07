@@ -51,7 +51,7 @@ public class LuaLocalAttachDebugger implements XLocalAttachDebugger {
             @NotNull
             @Override
             public XDebugProcess start(@NotNull XDebugSession xDebugSession) throws ExecutionException {
-                return new LuaAttachDebugProcess(xDebugSession, processInfo);
+                return new LuaAttachDebugProcessEx(xDebugSession, processInfo);
             }
         });
     }

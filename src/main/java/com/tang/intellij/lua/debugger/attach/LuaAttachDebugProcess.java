@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.debugger.attach;
 
-import com.intellij.execution.process.ProcessInfo;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -43,25 +42,24 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * Created by tangzx on 2017/3/26.
  */
-public class LuaAttachDebugProcess extends LuaDebugProcess implements LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
+public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
     private LuaDebuggerEditorsProvider editorsProvider;
-    private LuaAttachBridge bridge;
+    protected LuaAttachBridge bridge;
     private Map<XSourcePosition, XLineBreakpoint> registeredBreakpoints = new ConcurrentHashMap<>();
     private Map<Integer, LoadedScript> loadedScriptMap = new ConcurrentHashMap<>();
 
-    LuaAttachDebugProcess(@NotNull XDebugSession session, ProcessInfo processInfo) {
+    protected LuaAttachDebugProcess(@NotNull XDebugSession session) {
         super(session);
         session.setPauseActionSupported(false);
         editorsProvider = new LuaDebuggerEditorsProvider();
-        bridge = new LuaAttachBridge(processInfo, session);
-        bridge.setProtoHandler(this);
-        bridge.setProtoFactory(this);
     }
+
+    protected abstract LuaAttachBridge startBridge();
 
     @Override
     public void sessionInitialized() {
         super.sessionInitialized();
-        bridge.start();
+        bridge = startBridge();
     }
 
     @NotNull

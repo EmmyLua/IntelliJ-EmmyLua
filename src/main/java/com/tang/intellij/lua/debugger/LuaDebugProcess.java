@@ -30,6 +30,11 @@ public abstract class LuaDebugProcess extends XDebugProcess implements DebugLogg
         super(session);
     }
 
+    @Override
+    public void print(@NotNull String text) {
+        getSession().getConsoleView().print(text, ConsoleViewContentType.SYSTEM_OUTPUT);
+    }
+
     public void println(@NotNull String text) {
         getSession().getConsoleView().print(text + "\n", ConsoleViewContentType.SYSTEM_OUTPUT);
     }

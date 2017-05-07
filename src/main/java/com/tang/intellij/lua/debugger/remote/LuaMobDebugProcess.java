@@ -26,10 +26,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
-import com.tang.intellij.lua.debugger.LuaDebugProcess;
-import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
-import com.tang.intellij.lua.debugger.LuaExecutionStack;
-import com.tang.intellij.lua.debugger.LuaSuspendContext;
+import com.tang.intellij.lua.debugger.*;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand;
 import com.tang.intellij.lua.psi.LuaFileUtil;
@@ -44,15 +41,15 @@ import java.io.IOException;
  */
 public class LuaMobDebugProcess extends LuaDebugProcess {
 
-    private LuaMobConfiguration runProfile;
+    private IRemoteConfiguration runProfile;
     private LuaDebuggerEditorsProvider editorsProvider;
     private MobServer mobServer;
     private XLineBreakpoint<XBreakpointProperties> breakpoint;
 
-    LuaMobDebugProcess(@NotNull XDebugSession session) {
+    protected LuaMobDebugProcess(@NotNull XDebugSession session) {
         super(session);
         current = this;
-        runProfile = (LuaMobConfiguration) session.getRunProfile();
+        runProfile = (IRemoteConfiguration) session.getRunProfile();
         editorsProvider = new LuaDebuggerEditorsProvider();
         mobServer = new MobServer(this);
     }
@@ -136,7 +133,7 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
         }
     }
 
-    public void handleResp(int code, String data) {
+    void handleResp(int code, String data) {
         switch (code) {
             case 202:
                 runCommand(new GetStackCommand());

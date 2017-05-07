@@ -286,6 +286,8 @@
         <!-- debugger -->
         <programRunner implementation="com.tang.intellij.lua.debugger.remote.LuaMobDebuggerRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.remote.LuaMobConfigurationType"/>
+        <programRunner implementation="com.tang.intellij.lua.debugger.app.LuaAppRunner"/>
+        <configurationType implementation="com.tang.intellij.lua.debugger.app.LuaAppConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
         <xdebugger.localAttachDebuggerProvider implementation="com.tang.intellij.lua.debugger.attach.LuaLocalAttachDebuggerProvider"/>
 

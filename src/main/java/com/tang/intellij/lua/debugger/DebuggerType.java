@@ -16,14 +16,25 @@
 
 package com.tang.intellij.lua.debugger;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
- * console logger
- * Created by tangzx on 2017/5/1.
+ *
+ * Created by tangzx on 2017/5/7.
  */
-public interface DebugLogger {
-    void print(@NotNull String text);
-    void println(@NotNull String text);
-    void error(@NotNull String text);
+public enum DebuggerType {
+    Attach(1, "Attach Debugger"), Mob(2, "Mob Debugger");
+    private int v;
+    private String desc;
+    DebuggerType(int v, String desc) {
+        this.v = v;
+        this.desc = desc;
+    }
+    public static DebuggerType valueOf(int v) {
+        switch (v) {
+            case 1: return Attach;
+            case 2: return Mob;
+            default: return null;
+        }
+    }
+    public int value() { return v; }
+    public String toString() { return desc; }
 }
