@@ -13,34 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+plugins {
+  id 'org.jetbrains.intellij' version "0.1.8"
+}
 apply plugin :"java"
 
 dependencies {
-	compile fileTree(dir:"${System.env['IDEA_HOME']}/lib", includes:["*.jar"])
 	compile fileTree(dir:"libs", includes:["*.jar"])
 }
 
 sourceSets {
     main {
-        java.srcDirs 'src', 'gen'
+        java.srcDirs 'gen'
     }
 }
 
-tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
-}
-
-task buildZip (type: Zip, dependsOn: [jar]) {
-	baseName = 'EmmyLua'
-	destinationDir = file(".")
-	from (tasks['jar'].outputs) {
-		into '/EmmyLua/lib'
-	}
-	from ("libs") {
-		into '/EmmyLua/lib'
-	}
-	from (fileTree(dir:'src/main/resources/', includes:['std/**', 'debugger/**'])) {
-		into '/EmmyLua/'
-	}
+apply plugin: 'org.jetbrains.intellij'
+intellij {
+	version ideaVersion
+	type 'IU'
+	plugins 'uml'
+	updateSinceUntilBuild false
 }
