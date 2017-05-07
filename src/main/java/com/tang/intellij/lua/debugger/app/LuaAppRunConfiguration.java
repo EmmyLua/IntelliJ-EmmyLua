@@ -41,7 +41,6 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -136,6 +135,8 @@ public class LuaAppRunConfiguration extends AbstractRunConfiguration implements 
     }
 
     public String getWorkingDir() {
+        if (workingDir == null || workingDir.isEmpty())
+            workingDir = getDefaultWorkingDir();
         return workingDir;
     }
 
