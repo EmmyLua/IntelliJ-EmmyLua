@@ -45,7 +45,6 @@ class LuaAppMobProcess extends LuaMobDebugProcess {
     public void sessionInitialized() {
         super.sessionInitialized();
         StringBuilder setupPackagePath = new StringBuilder(String.format("%s/?.lua;", LuaFileUtil.getPluginVirtualFile("debugger/mobdebug")));
-        File dir = null;
 
         Module[] modules = ModuleManager.getInstance(getSession().getProject()).getModules();
         for (Module module : modules) {
@@ -53,7 +52,6 @@ class LuaAppMobProcess extends LuaMobDebugProcess {
             for (VirtualFile sourceRoot : sourceRoots) {
                 String path = sourceRoot.getCanonicalPath();
                 if (path != null) {
-                    dir = new File(path);
                     setupPackagePath.append(path).append("/?.lua;");
                 }
             }
@@ -62,7 +60,10 @@ class LuaAppMobProcess extends LuaMobDebugProcess {
         ProcessBuilder builder = new ProcessBuilder(configuration.getProgram(),
                 "-e",
                 String.format("package.path = package.path .. ';%s' require('mobdebug').start()", setupPackagePath.toString()),
-                configuration.getFile()).directory(dir);
+                configuration.getFile());
+        String dir = configuration.getWorkingDir();
+        if (dir != null && !dir.isEmpty())
+            builder.directory(new File(dir));
 
         try {
             process = builder.start();

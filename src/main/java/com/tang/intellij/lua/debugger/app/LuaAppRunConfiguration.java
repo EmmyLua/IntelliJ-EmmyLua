@@ -49,7 +49,7 @@ import java.util.Collections;
  * Created by tangzx on 2017/5/7.
  */
 public class LuaAppRunConfiguration extends AbstractRunConfiguration implements IRemoteConfiguration {
-    private String program = "lua";
+    private String program = "lua.exe";
     private String file;
     private String workingDir;
     private DebuggerType debuggerType = DebuggerType.Attach;

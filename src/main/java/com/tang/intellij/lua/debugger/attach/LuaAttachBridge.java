@@ -33,7 +33,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -178,7 +180,7 @@ public class LuaAttachBridge {
         }
     }
 
-    public void start(@NotNull String program, @NotNull String wd, String[] args) {
+    public void launch(@NotNull String program, String wd, String[] args) {
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
         try {
             if (pluginVirtualDirectory != null) {
@@ -193,19 +195,27 @@ public class LuaAttachBridge {
                 isX86 = exitValue == 1;
 
                 String archType = isX86 ? "x86" : "x64";
-                //session.getConsoleView().print(String.format("Try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
+                session.getConsoleView().print(String.format("Try launch program:%s with %s debugger.\n", program, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
-                String argString = "";
-                if (args != null)
-                    argString = String.join(" ", args);
+                List<String> argList = new ArrayList<>();
+                argList.add(exe);
+                argList.add("-m"); argList.add("run");
+                argList.add("-c"); argList.add(program);
+                if (!wd.isEmpty()) {
+                    argList.add("-w");
+                    argList.add(wd);
+                }
+                if (args != null) {
+                    String argString = String.join(" ", args);
+                    if (!argString.isEmpty()) {
+                        argList.add("-a");
+                        argList.add(argString);
+                    }
+                }
 
-                processBuilder = new ProcessBuilder(exe,
-                        "-m", "run",
-                        "-c", program,
-                        "-w", wd,
-                        "-a", argString);
+                processBuilder = new ProcessBuilder(argList);
 
                 process = processBuilder.start();
                 writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
