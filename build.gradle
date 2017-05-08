@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 plugins {
-  id 'org.jetbrains.intellij' version "0.1.8"
+  id 'org.jetbrains.intellij' version "0.2.9"
 }
-apply plugin :"java"
 
 dependencies {
 	compile fileTree(dir:"libs", includes:["*.jar"])
@@ -30,8 +29,7 @@ sourceSets {
 
 apply plugin: 'org.jetbrains.intellij'
 intellij {
-	version ideaVersion
 	type 'IU'
-	plugins 'uml'
 	updateSinceUntilBuild false
+	localPath ideaPath
 }
