@@ -31,5 +31,5 @@ apply plugin: 'org.jetbrains.intellij'
 intellij {
 	type 'IU'
 	updateSinceUntilBuild false
-	localPath ideaPath
+	localPath System.env['IDEA_HOME']
 }
