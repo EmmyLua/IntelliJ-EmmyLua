@@ -59,9 +59,8 @@ public class MobServer implements Runnable {
         }
     }
 
+    private boolean isStoped;
     private ServerSocket server;
-    private Thread thread;
-    private Future threadSend;
     private LuaMobDebugProcess listener;
     private Queue<DebugCommand> commands = new LinkedList<>();
     private LuaDebugReader debugReader;
@@ -76,7 +75,7 @@ public class MobServer implements Runnable {
     public void start(int port) throws IOException {
         if (server == null)
             server = new ServerSocket(port);
-        thread = new Thread(this);
+        Thread thread = new Thread(this);
         thread.start();
     }
 
@@ -116,12 +115,14 @@ public class MobServer implements Runnable {
             listener.println("Connected.");
             debugReader = new LuaDebugReader(accept.getInputStream(), Charset.forName("UTF-8"));
 
-            threadSend = ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 try {
                     streamWriter = new OutputStreamWriter(accept.getOutputStream(), Charset.forName("UTF-8"));
                     boolean firstTime = true;
 
                     while (accept.isConnected()) {
+                        if (isStoped) break;
+
                         DebugCommand command;
                         while (commands.size() > 0 && currentCommandWaitForResp == null) {
                             if (currentCommandWaitForResp == null) {
@@ -152,18 +153,27 @@ public class MobServer implements Runnable {
     }
 
     public void stop() {
+        if (streamWriter != null) {
+            try {
+                streamWriter.write("done\n");
+            } catch (IOException ignored) {
+            }
+        }
+        isStoped = true;
         currentCommandWaitForResp = null;
-        if (thread != null)
-            thread.interrupt();
-        if (threadSend != null)
-            threadSend.cancel(true);
         if (debugReader != null)
             debugReader.stop();
         try {
             server.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ignored) { }
+    }
+
+    void sendAddBreakpoint(String file, int line) {
+        addCommand(String.format("SETB %s %d", file, line));
+    }
+
+    void sendRemoveBreakpoint(String file, int line) {
+        addCommand(String.format("DELB %s %d", file, line));
     }
 
     public void addCommand(String command) {
