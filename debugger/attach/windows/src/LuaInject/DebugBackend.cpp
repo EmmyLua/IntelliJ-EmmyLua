@@ -886,7 +886,7 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
                 vm->callStackDepth = GetStackDepth(api, L);
                 vm->lastStepLine = GetCurrentLine(api, ar);
                 //TODO:这个的用意是什么？如果不注释会导致二次断点失败
-				//vm->lastStepScript = scriptIndex;
+				vm->lastStepScript = scriptIndex;
             }
         }
 

@@ -527,15 +527,6 @@ const char* GetName(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-const void* GetCI(unsigned long api, const lua_Debug* ar) {
-	switch (g_interfaces[api].version)
-	{
-	case LUA_V520:
-	case LUA_V530: return ar->ld52.i_ci;
-	default: return ar->ld51.i_ci;
-	}
-}
-
 const char* GetHookEventName(unsigned long api, const lua_Debug* ar)
 {
 	int event = GetEvent(api, ar);
@@ -985,10 +976,7 @@ const char* lua_setlocal_dll(unsigned long api, lua_State* L, const lua_Debug* a
 
 int lua_getstack_dll(unsigned long api, lua_State* L, int level, lua_Debug* ar)
 {
-	int status = g_interfaces[api].lua_getstack_dll_cdecl(L, level, ar);
-	if (GetCI(api, ar) == nullptr)
-		status = 0;
-	return status;
+	return g_interfaces[api].lua_getstack_dll_cdecl(L, level, ar);
 }
 
 void lua_insert_dll(unsigned long api, lua_State* L, int index)

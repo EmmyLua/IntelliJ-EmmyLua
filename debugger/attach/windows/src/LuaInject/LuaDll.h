@@ -61,7 +61,6 @@ void            lua_pushnil_dll         (unsigned long api, lua_State*);
 void            lua_pushcclosure_dll    (unsigned long api, lua_State*, lua_CFunction, int);
 void            lua_pushvalue_dll       (unsigned long api, lua_State*, int);
 void            lua_pushinteger_dll     (unsigned long api, lua_State*, int);
-void            lua_pushumber_dll       (unsigned long api, lua_State*, lua_Number);
 void            lua_pushlightuserdata_dll(unsigned long api, lua_State *L, void *p);
 void            lua_pushglobaltable_dll (unsigned long api, lua_State *L);
 const char*     lua_tostring_dll        (unsigned long api, lua_State*, int);
@@ -182,7 +181,6 @@ const char* GetSource(unsigned long api, const lua_Debug* ar);
 const char* GetWhat(unsigned long api, const lua_Debug* ar);
 const char* GetName(unsigned long api, const lua_Debug* ar);
 const char* GetHookEventName(unsigned long api, const lua_Debug* ar);
-const void* GetCI(unsigned long api, const lua_Debug* ar);
 /**
  * Creates a new function that can be used with the specified API. The new function
  * automatically handles stdcall (if necessary) and adds an api parameter.

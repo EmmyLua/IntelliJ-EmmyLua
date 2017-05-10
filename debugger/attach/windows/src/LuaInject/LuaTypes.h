@@ -6,7 +6,9 @@
 extern "C"
 {
 	// comes from luaconf.h, must match the configuration of the VM being debugged
-	#define LUA_IDSIZE 60
+	// 注意：有的人会在 luaconf.h 里修改这个数值，所以这里直接把这个值改大一些，
+	// 为的是保证lua_Debug结构体的size比宿主的大，否则可能i_ci值异常
+	#define LUA_IDSIZE 1024
 
 	// the lua_Debug structure changes between Lua 5.1 and Lua 5.2
 	struct lua_Debug_51
