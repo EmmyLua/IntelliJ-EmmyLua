@@ -182,9 +182,9 @@ local function s(t, opts)
       return tag..'nil'..comment('ref', level) end
     -- protect from those cases where __tostring may fail
     if type(mt) == 'table' and pcall(function() return mt.__tostring and mt.__tostring(t) end)
-    and (mt.__serialize or mt.__tostring) then -- knows how to serialize itself
+    and (rawget(mt, '__serialize') or rawget(mt, '__tostring')) then -- knows how to serialize itself
       seen[t] = insref or spath
-      if mt.__serialize then t = mt.__serialize(t) else t = tostring(t) end
+      if rawget(mt, '__serialize') then t = mt.__serialize(t) else t = tostring(t) end
       ttype = type(t) end -- new value falls through to be serialized
     if ttype == "table" then
       if level >= maxl then return tag..'{}'..comment('max', level) end
