@@ -204,3 +204,32 @@ model {
         }
     }
 }
+
+task buildProduct (dependsOn:build) << {
+    def x64Set = [
+        linkDebuggerX64DebugExecutable,
+        //linkArchX64DebugExecutable,
+        linkEasyHookX64DebugSharedLibrary,
+        linkLuaInjectX64DebugSharedLibrary]
+    x64Set.each {
+        def link = it
+        copy {
+            from link.outputs
+            into '/build/x64'
+            include '*.dll', '*.exe'
+        }
+    }
+    def x86Set = [
+        linkDebuggerX86DebugExecutable,
+        //linkArchX86DebugExecutable,
+        linkEasyHookX86DebugSharedLibrary,
+        linkLuaInjectX86DebugSharedLibrary]
+    x86Set.each {
+        def link = it
+        copy {
+            from link.outputs
+            into '/build/x86'
+            include '*.dll', '*.exe'
+        }
+    }
+}
