@@ -19,13 +19,15 @@ package com.tang.intellij.lua.documentation;
 import com.intellij.lang.documentation.AbstractDocumentationProvider;
 import com.intellij.lang.documentation.DocumentationProvider;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
+import com.tang.intellij.lua.psi.LuaNameDef;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -40,25 +42,36 @@ public class LuaDocumentationProvider extends AbstractDocumentationProvider impl
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
         if (element instanceof LuaCommentOwner) {
             return genDocForCommentOwner((LuaCommentOwner) element);
+        } else if (element instanceof LuaNameDef) {
+            LuaCommentOwner owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner.class);
+            if (owner != null)
+                return genDocForCommentOwner(owner);
         }
         return super.generateDoc(element, originalElement);
     }
 
     private String genDocForCommentOwner(LuaCommentOwner owner) {
         StringBuilder sb = new StringBuilder();
-        if (owner instanceof LuaClassMethodDef) {
-            LuaClassMethodDef methodDef = (LuaClassMethodDef) owner;
+        if (owner instanceof LuaFuncBodyOwner && owner instanceof PsiNameIdentifierOwner) {
+            LuaFuncBodyOwner funcBodyOwner = (LuaFuncBodyOwner) owner;
+            PsiNameIdentifierOwner methodDef = (PsiNameIdentifierOwner) owner;
             sb.append("<h1>");
             sb.append(methodDef.getName());
-            sb.append("()</h1><br>");
-        } else if (owner instanceof LuaGlobalFuncDef) {
-            LuaGlobalFuncDef globalFuncDef = (LuaGlobalFuncDef) owner;
-            sb.append("<h1>");
-            sb.append(globalFuncDef.getName());
-            sb.append("()</h1><br>");
+            sb.append(funcBodyOwner.getParamSignature());
         }
 
         LuaComment comment = LuaCommentUtil.findComment(owner);
+        sb.append(genComment(comment));
+
+        String doc = sb.toString();
+        if (doc.length() > 0)
+            return sb.toString();
+        else
+            return null;
+    }
+
+    private String genComment(LuaComment comment) {
+        StringBuilder sb = new StringBuilder();
         if (comment != null) {
             PsiElement child = comment.getFirstChild();
             while (child != null) {
@@ -92,12 +105,7 @@ public class LuaDocumentationProvider extends AbstractDocumentationProvider impl
                 child = child.getNextSibling();
             }
         }
-
-        String doc = sb.toString();
-        if (doc.length() > 0)
-            return sb.toString();
-        else
-            return null;
+        return sb.toString();
     }
 
     private void getTypeSet(LuaDocTypeSet typeSet, StringBuilder sb) {
