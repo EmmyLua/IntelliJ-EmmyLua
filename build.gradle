@@ -24,6 +24,9 @@ dependencies {
 sourceSets {
     main {
         java.srcDirs 'gen'
+        resources {
+            exclude "debugger/**", "std/**"
+        }
     }
 }
 
@@ -32,4 +35,8 @@ intellij {
 	type 'IU'
 	updateSinceUntilBuild false
 	localPath System.env['IDEA_HOME']
+}
+
+buildPlugin.from(fileTree(dir:'src/main/resources/', includes:['std/**', 'debugger/**'])) {
+    into "/${project.name}"
 }
