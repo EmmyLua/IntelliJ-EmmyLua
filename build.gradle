@@ -37,6 +37,16 @@ intellij {
 	localPath System.env['IDEA_HOME']
 }
 
-buildPlugin.from(fileTree(dir:'src/main/resources/', includes:['std/**', 'debugger/**'])) {
+def RES_DIR = "src/main/resources"
+
+task copyAttachDebugger(dependsOn:["debugger:attach:windows:buildProduct"], type:Copy) {
+    from(fileTree(dir:'debugger/attach/windows/build/', includes:['x64/**', 'x86/**'])) {
+        into "${RES_DIR}/debugger"
+    }
+    destinationDir file("${RES_DIR}/debugger")
+}
+
+buildPlugin.dependsOn(copyAttachDebugger)
+buildPlugin.from(fileTree(dir:"${RES_DIR}", includes:['std/**', 'debugger/**'])) {
     into "/${project.name}"
 }
