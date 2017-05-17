@@ -71,12 +71,14 @@ public class LuaTypeSet {
     public LuaTypeSet union(LuaTypeSet other) {
         if (other == null)
             return this;
+        LuaTypeSet newSet = new LuaTypeSet();
+        newSet.types.addAll(this.types);
         for (LuaType type : other.types) {
-            if (!hasType(type)) {
-                types.add(type);
+            if (!newSet.hasType(type)) {
+                newSet.addType(type);
             }
         }
-        return this;
+        return newSet;
     }
 
     public boolean isEmpty() {
