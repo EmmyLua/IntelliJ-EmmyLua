@@ -509,7 +509,7 @@ public class _LuaStringLexer implements FlexLexer {
             }
           case 9: break;
           case 4: 
-            { yybegin(BLOCK_STRING_CONTENT); return STRING;
+            { /*yybegin(BLOCK_STRING_CONTENT); */return STRING;
             }
           case 10: break;
           case 5: 
