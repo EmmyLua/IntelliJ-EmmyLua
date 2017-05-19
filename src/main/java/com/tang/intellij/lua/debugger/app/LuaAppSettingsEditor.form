@@ -21,14 +21,6 @@
           <text value="Parameters:"/>
         </properties>
       </component>
-      <component id="3d483" class="javax.swing.JTextField" binding="myParameters">
-        <constraints>
-          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="-1"/>
-          </grid>
-        </constraints>
-        <properties/>
-      </component>
       <component id="d96a3" class="javax.swing.JLabel">
         <constraints>
           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -86,6 +78,12 @@
         <properties>
           <text value="Program:"/>
         </properties>
+      </component>
+      <component id="30b37" class="com.intellij.ui.RawCommandLineEditor">
+        <constraints>
+          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
       </component>
     </children>
   </grid>

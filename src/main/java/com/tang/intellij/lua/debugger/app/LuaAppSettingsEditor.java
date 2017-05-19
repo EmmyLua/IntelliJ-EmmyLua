@@ -41,7 +41,6 @@ import javax.swing.*;
  */
 public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration> {
     private final DefaultComboBoxModel<DebuggerType> debuggerDataModel;
-    private JTextField myParameters;
     private TextFieldWithBrowseButton myProgram;
     private JPanel myPanel;
     private JComboBox<DebuggerType> myDebugger;
