@@ -67,7 +67,7 @@ public class LuaMobConfiguration extends AbstractRunConfiguration implements IRe
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
-        return new LuaCommandLineState(executionEnvironment);
+        return null;
     }
 
     public int getPort() {
