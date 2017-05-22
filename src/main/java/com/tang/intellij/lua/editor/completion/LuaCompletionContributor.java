@@ -85,9 +85,18 @@ public class LuaCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, new LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.VARS));
     }
 
-    static void suggestWordsInFile(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+    @Override
+    public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
+        parameters.getEditor().putUserData(CompletionSession.KEY, new CompletionSession(parameters, result));
+        super.fillCompletionVariants(parameters, result);
+    }
+
+    static void suggestWordsInFile(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
+        CompletionSession session = parameters.getEditor().getUserData(CompletionSession.KEY);
+        assert session != null;
+
         HashSet<String> wordsInFileSet = new HashSet<>();
-        PsiFile file = completionParameters.getOriginalFile();
+        PsiFile file = session.getParameters().getOriginalFile();
         file.acceptChildren(new LuaVisitor() {
             @Override
             public void visitPsiElement(@NotNull LuaPsiElement o) {
@@ -98,7 +107,7 @@ public class LuaCompletionContributor extends CompletionContributor {
             public void visitElement(PsiElement element) {
                 if (element.getNode().getElementType() == LuaTypes.ID && element.getTextLength() > 2) {
                     String text = element.getText();
-                    if (completionResultSet.getPrefixMatcher().prefixMatches(text))
+                    if (session.getResultSet().getPrefixMatcher().prefixMatches(text) && session.addWord(text))
                         wordsInFileSet.add(text);
                 }
                 super.visitElement(element);
@@ -106,10 +115,10 @@ public class LuaCompletionContributor extends CompletionContributor {
         });
 
         for (String s : wordsInFileSet) {
-            completionResultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
+            session.getResultSet().addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
                             .create(s)
                             .withIcon(LuaIcons.WORD)
-                            //.withTypeText("Word In File")
+                    //.withTypeText("Word In File")
                     , -1));
         }
     }
