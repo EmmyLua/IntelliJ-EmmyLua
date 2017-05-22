@@ -39,7 +39,7 @@ open class LuaTypeGuessableLookupElement(private val name: String, private val g
     override fun getTypeText(): String? {
         if (typeString == null) {
             val set = guessable.guessType(SearchContext(guessable.project))
-            typeString = set.createTypeString()
+            typeString = set?.createTypeString()
             if (typeString == null) {
                 typeString = "any"
             }
