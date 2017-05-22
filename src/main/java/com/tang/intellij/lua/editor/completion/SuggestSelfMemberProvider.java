@@ -55,7 +55,7 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                     String methodName = def.getName();
                     if (methodName != null) {
                         LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
-                            LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement("self." + methodName, signature, curType == type, def);
+                            LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement("self:" + methodName, signature, curType == type, def);
                             elementBuilder.setHandler(new FuncInsertHandler(def).withMask(mask));
                             completionResultSet.addElement(elementBuilder);
                         });
