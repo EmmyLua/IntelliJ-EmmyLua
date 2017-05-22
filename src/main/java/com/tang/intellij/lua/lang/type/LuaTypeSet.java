@@ -19,13 +19,13 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -129,14 +129,14 @@ public class LuaTypeSet {
 
     @Override
     public String toString() {
-        List<String> list = new SmartList<>();
+        HashSet<String> set = new HashSet<>();
         for (LuaType type : types) {
             if (!type.isAnonymous()) {
-                list.add(type.getClassName());
+                set.add(type.getDisplayName());
             }
         }
 
-        return String.join("|", list);
+        return String.join("|", set.toArray(new String[set.size()]));
     }
 
     public String createReturnString() {
