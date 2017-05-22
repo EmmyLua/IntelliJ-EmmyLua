@@ -58,6 +58,7 @@ public class LuaDocumentationProvider extends AbstractDocumentationProvider impl
             sb.append("<h1>");
             sb.append(methodDef.getName());
             sb.append(funcBodyOwner.getParamSignature());
+            sb.append("</h1><br>");
         }
 
         LuaComment comment = LuaCommentUtil.findComment(owner);
