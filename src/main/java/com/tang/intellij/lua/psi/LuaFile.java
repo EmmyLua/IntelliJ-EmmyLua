@@ -55,11 +55,7 @@ public class LuaFile extends PsiFileBase {
                 return false;
             });
             LuaReturnStat lastReturn = last[0];
-            if (lastReturn != null) {
-                LuaExprList returnExpr = lastReturn.getExprList();
-                if (returnExpr != null)
-                    set = returnExpr.guessTypeAt(0, context);
-            }
+            set = LuaPsiImplUtil.guessReturnTypeSet(lastReturn, 0, context);
             context.pop(this);
         }
         return set;

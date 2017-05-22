@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -397,7 +398,29 @@ public class LuaPsiImplUtil {
                 }
             }
         }
-        return LuaTypeSet.create();
+
+        LuaTypeSet typeSet = LuaTypeSet.create();
+        Ref<LuaTypeSet> setRef = Ref.create(typeSet);
+        //infer from return stat
+        owner.acceptChildren(new LuaVisitor() {
+            @Override
+            public void visitReturnStat(@NotNull LuaReturnStat o) {
+                LuaTypeSet set = setRef.get();
+                setRef.set(set.union(guessReturnTypeSet(o, 0, searchContext)));
+            }
+
+            @Override
+            public void visitFuncBodyOwner(@NotNull LuaFuncBodyOwner o) {
+                // ignore sub function
+            }
+
+            @Override
+            public void visitPsiElement(@NotNull LuaPsiElement o) {
+                o.acceptChildren(this);
+            }
+        });
+
+        return setRef.get();
     }
 
     @NotNull
@@ -636,5 +659,14 @@ public class LuaPsiImplUtil {
                 typeName = luaVar.getText();
         }
         return typeName;
+    }
+
+    public static LuaTypeSet guessReturnTypeSet(LuaReturnStat returnStat, int index, SearchContext context) {
+        if (returnStat != null) {
+            LuaExprList returnExpr = returnStat.getExprList();
+            if (returnExpr != null)
+                return returnExpr.guessTypeAt(index, context);
+        }
+        return null;
     }
 }
