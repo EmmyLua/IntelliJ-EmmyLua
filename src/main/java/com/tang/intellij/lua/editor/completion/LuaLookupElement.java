@@ -52,7 +52,7 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
     private final boolean isBold;
     private final Icon myIcon;
     private final Icon myTypeIcon;
-    private final String myTailText;
+    private String myTailText;
     private InsertHandler<LookupElement> myHandler;
 
     private LuaLookupElement(@NotNull final String lookupString,
@@ -104,6 +104,10 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
         return !StringUtil.isEmpty(myTailText) ? myTailText : null;
     }
 
+    public void setTailText(String text) {
+        myTailText = text;
+    }
+
     @Nullable
     protected String getTypeText() {
         return !StringUtil.isEmpty(myTypeText) ? myTypeText : null;
@@ -131,7 +135,7 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
         presentation.setItemText(getItemText());
         presentation.setItemTextUnderlined(itemTextUnderlined);
         presentation.setItemTextBold(isBold);
-        presentation.setTailText(getTailText());
+        presentation.setTailText(getTailText(), true);
         presentation.setTypeText(getTypeText(), getTypeIcon());
         presentation.setIcon(getIcon());
     }

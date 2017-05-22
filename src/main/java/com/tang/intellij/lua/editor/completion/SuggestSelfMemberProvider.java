@@ -47,6 +47,7 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                     String fieldName = field.getFieldName();
                     if (fieldName != null) {
                         LuaFieldLookupElement elementBuilder = new LuaFieldLookupElement("self." + fieldName, field, curType == type);
+                        elementBuilder.setTailText("  [" + curType.getDisplayName() + "]");
                         completionResultSet.addElement(elementBuilder);
                     }
                 });
@@ -57,6 +58,7 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                         LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
                             LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement("self:" + methodName, signature, curType == type, def);
                             elementBuilder.setHandler(new FuncInsertHandler(def).withMask(mask));
+                            elementBuilder.setTailText("  [" + curType.getDisplayName() + "]");
                             completionResultSet.addElement(elementBuilder);
                         });
                     }

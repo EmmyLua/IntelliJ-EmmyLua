@@ -79,6 +79,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
         String name = field.getFieldName();
         if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
             LuaFieldLookupElement elementBuilder = new LuaFieldLookupElement(name, field, bold);
+            elementBuilder.setTailText("  [" + clazzName + "]");
             completionResultSet.addElement(elementBuilder);
         }
     }
@@ -89,7 +90,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
             if (useAsField) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
                         .withIcon(LuaIcons.CLASS_METHOD)
-                        .withTailText(def.getParamSignature());
+                        .withTailText(def.getParamSignature() + "  [" + clazzName + "]");
                 if (bold)
                     elementBuilder = elementBuilder.bold();
                 completionResultSet.addElement(elementBuilder);
@@ -97,6 +98,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
                 LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
                     LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement(methodName, signature, bold, def);
                     elementBuilder.setHandler(new FuncInsertHandler(def).withMask(mask));
+                    elementBuilder.setTailText("  [" + clazzName + "]");
                     completionResultSet.addElement(elementBuilder);
                 });
             }
@@ -110,6 +112,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
                 LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement(methodName, signature, bold, def);
                 elementBuilder.setHandler(new FuncInsertHandler(def).withMask(mask));
                 elementBuilder.setItemTextUnderlined(true);
+                elementBuilder.setTailText("  [" + clazzName + "]");
                 completionResultSet.addElement(elementBuilder);
             });
         }
