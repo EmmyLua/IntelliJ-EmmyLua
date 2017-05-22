@@ -18,7 +18,9 @@ package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.lang.type.LuaTableType;
+import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
@@ -43,9 +45,23 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                 set = guessType((LuaCallExpr) this, context);
             if (this instanceof LuaParenExpr)
                 set = guessType((LuaParenExpr) this, context);
+            else if (this instanceof LuaLiteralExpr)
+                set = guessType((LuaLiteralExpr)this, context);
             context.pop(this);
         }
         return set;
+    }
+
+    private LuaTypeSet guessType(LuaLiteralExpr literalExpr, SearchContext context) {
+        PsiElement child = literalExpr.getFirstChild();
+        IElementType type = child.getNode().getElementType();
+        if (type == LuaTypes.TRUE || type == LuaTypes.FALSE)
+            return LuaTypeSet.create(LuaType.BOOLEAN);
+        if (type == LuaTypes.STRING)
+            return LuaTypeSet.create(LuaType.STRING);
+        if (type == LuaTypes.NUMBER)
+            return LuaTypeSet.create(LuaType.NUMBER);
+        return null;
     }
 
     private LuaTypeSet guessType(LuaParenExpr luaParenExpr, SearchContext context) {

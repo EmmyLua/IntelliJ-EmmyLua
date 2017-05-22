@@ -44,6 +44,13 @@ import java.util.Objects;
  */
 public class LuaType implements Comparable<LuaType> {
 
+    /**
+     * builtin lua type
+     */
+    public static LuaType NUMBER = create("number", null);
+    public static LuaType STRING = create("string", null);
+    public static LuaType BOOLEAN = create("boolean", null);
+
     public static LuaType create(@NotNull String typeName, @Nullable String superTypeName) {
         LuaType type = new LuaType();
         type.clazzName = typeName;
