@@ -31,7 +31,6 @@ sourceSets {
     }
 }
 
-apply plugin: 'org.jetbrains.intellij'
 intellij {
 	type 'IU'
 	updateSinceUntilBuild false
