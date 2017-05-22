@@ -37,6 +37,8 @@ import java.util.Collection;
  * Created by TangZX on 2016/12/16.
  */
 public class LuaLookupElement extends LookupElement implements Comparable<LookupElement> {
+    private boolean itemTextUnderlined;
+
     public static void fillTypes(Project project, Collection<LookupElement> results) {
         Collection<String> collection = LuaClassIndex.getInstance().getAllKeys(project);
         collection.forEach(className -> {
@@ -45,20 +47,20 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
     }
 
 
-    protected final String myLookupString;
-    protected final String myTypeText;
-    protected final boolean isBold;
-    protected final Icon myIcon;
+    private final String myLookupString;
+    private final String myTypeText;
+    private final boolean isBold;
+    private final Icon myIcon;
     private final Icon myTypeIcon;
-    protected final String myTailText;
-    protected InsertHandler<LookupElement> myHandler;
+    private final String myTailText;
+    private InsertHandler<LookupElement> myHandler;
 
-    public LuaLookupElement(@NotNull final String lookupString,
-                            @Nullable final String tailText,
-                            @Nullable final String typeText, final boolean bold,
-                            @Nullable final Icon icon,
-                            @Nullable final Icon typeIcon,
-                            @NotNull final InsertHandler<LookupElement> handler) {
+    private LuaLookupElement(@NotNull final String lookupString,
+                             @Nullable final String tailText,
+                             @Nullable final String typeText, final boolean bold,
+                             @Nullable final Icon icon,
+                             @Nullable final Icon typeIcon,
+                             @NotNull final InsertHandler<LookupElement> handler) {
         myLookupString = lookupString;
         myTailText = tailText;
         myTypeText = typeText;
@@ -88,8 +90,17 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
         return myLookupString;
     }
 
+    @NotNull
+    public String getItemText() {
+        return getLookupString();
+    }
+
+    public void setItemTextUnderlined(boolean itemTextUnderlined) {
+        this.itemTextUnderlined = itemTextUnderlined;
+    }
+
     @Nullable
-    public String getTailText() {
+    private String getTailText() {
         return !StringUtil.isEmpty(myTailText) ? myTailText : null;
     }
 
@@ -102,8 +113,7 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
         return myIcon;
     }
 
-
-    public Icon getTypeIcon() {
+    private Icon getTypeIcon() {
         return myTypeIcon;
     }
 
@@ -118,14 +128,29 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
 
     @Override
     public void renderElement(LookupElementPresentation presentation) {
-        presentation.setItemText(getLookupString());
+        presentation.setItemText(getItemText());
+        presentation.setItemTextUnderlined(itemTextUnderlined);
         presentation.setItemTextBold(isBold);
         presentation.setTailText(getTailText());
         presentation.setTypeText(getTypeText(), getTypeIcon());
         presentation.setIcon(getIcon());
     }
 
-    public int compareTo(final LookupElement o) {
-        return myLookupString.compareTo(o.getLookupString());
+    public int compareTo(@NotNull final LookupElement o) {
+        return getLookupString().compareTo(o.getLookupString());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LuaLookupElement) {
+            LuaLookupElement element = (LuaLookupElement) obj;
+            return element.getItemText().equals(getItemText());
+        }
+        return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return getItemText().hashCode();
     }
 }

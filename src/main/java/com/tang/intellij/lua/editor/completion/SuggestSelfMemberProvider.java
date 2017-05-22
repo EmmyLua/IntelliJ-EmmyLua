@@ -19,11 +19,9 @@ package com.tang.intellij.lua.editor.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
-import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaPsiImplUtil;
@@ -48,11 +46,7 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                 type.processFields(searchContext, (curType, field) -> {
                     String fieldName = field.getFieldName();
                     if (fieldName != null) {
-                        LookupElementBuilder elementBuilder = LookupElementBuilder.create("self." + fieldName)
-                                .withIcon(LuaIcons.CLASS_FIELD)
-                                .withTypeText(curType.getDisplayName());
-                        if (curType == type)
-                            elementBuilder = elementBuilder.bold();
+                        LuaFieldLookupElement elementBuilder = new LuaFieldLookupElement("self." + fieldName, field, curType == type);
                         completionResultSet.addElement(elementBuilder);
                     }
                 });
@@ -61,13 +55,8 @@ public class SuggestSelfMemberProvider extends CompletionProvider<CompletionPara
                     String methodName = def.getName();
                     if (methodName != null) {
                         LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
-                            LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, "self:" + methodName)
-                                    .withIcon(LuaIcons.CLASS_METHOD)
-                                    .withTypeText(curType.getDisplayName())
-                                    .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
-                                    .withTailText(signature);
-                            if (curType == type)
-                                elementBuilder = elementBuilder.bold();
+                            LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement("self." + methodName, signature, curType == type, def);
+                            elementBuilder.setHandler(new FuncInsertHandler(def).withMask(mask));
                             completionResultSet.addElement(elementBuilder);
                         });
                     }

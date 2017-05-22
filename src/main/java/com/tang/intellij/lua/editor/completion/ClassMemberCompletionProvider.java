@@ -82,13 +82,7 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
     private void addField(@NotNull CompletionResultSet completionResultSet, boolean bold, String clazzName, LuaClassField field) {
         String name = field.getFieldName();
         if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
-
-            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
-                    .withIcon(LuaIcons.CLASS_FIELD)
-                    .withTypeText(clazzName);
-            if (bold)
-                elementBuilder = elementBuilder.bold();
-
+            LuaFieldLookupElement elementBuilder = new LuaFieldLookupElement(name, field, bold);
             completionResultSet.addElement(elementBuilder);
         }
     }
@@ -99,20 +93,14 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
             if (useAsField) {
                 LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName)
                         .withIcon(LuaIcons.CLASS_METHOD)
-                        .withTypeText(clazzName)
                         .withTailText(def.getParamSignature());
                 if (bold)
                     elementBuilder = elementBuilder.bold();
                 completionResultSet.addElement(elementBuilder);
             } else {
                 LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
-                            .withIcon(LuaIcons.CLASS_METHOD)
-                            .withTypeText(clazzName)
-                            .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
-                            .withTailText(signature);
-                    if (bold)
-                        elementBuilder = elementBuilder.bold();
+                    LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement(methodName, signature, bold, def);
+                    elementBuilder.setHandler(new FuncInsertHandler(def).withMask(mask));
                     completionResultSet.addElement(elementBuilder);
                 });
             }
@@ -123,15 +111,9 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
         String methodName = def.getName();
         if (methodName != null && completionResultSet.getPrefixMatcher().prefixMatches(methodName)) {
             LuaPsiImplUtil.processOptional(def.getParams(), (signature, mask) -> {
-                LookupElementBuilder elementBuilder = LookupElementBuilder.create(methodName + signature, methodName)
-                        .withIcon(LuaIcons.CLASS_METHOD)
-                        .withInsertHandler(new FuncInsertHandler(def).withMask(mask))
-                        .withTypeText(clazzName)
-                        .withItemTextUnderlined(true)
-                        .withTailText(signature);
-                if (bold)
-                    elementBuilder = elementBuilder.bold();
-
+                LuaMethodLookupElement elementBuilder = new LuaMethodLookupElement(methodName, signature, bold, def);
+                elementBuilder.setHandler(new FuncInsertHandler(def).withMask(mask));
+                elementBuilder.setItemTextUnderlined(true);
                 completionResultSet.addElement(elementBuilder);
             });
         }
