@@ -19,6 +19,7 @@ package com.tang.intellij.lua.lang;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.LayeredIcon;
+import com.intellij.ui.RowIcon;
 
 import javax.swing.*;
 
@@ -31,6 +32,7 @@ public class LuaIcons {
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;
     public static final Icon CLASS_METHOD = AllIcons.Nodes.Method;
+    public static final Icon CLASS_METHOD_OVERRIDING = new RowIcon(AllIcons.Nodes.Method, AllIcons.Gutter.OverridingMethod);
     public static final Icon GLOBAL_FUNCTION = new LayeredIcon(AllIcons.Nodes.Method, AllIcons.Nodes.StaticMark);
     public static final Icon GLOBAL_FIELD = new LayeredIcon(AllIcons.Nodes.Field, AllIcons.Nodes.StaticMark);
     public static final Icon LOCAL_VAR = AllIcons.Nodes.Variable;

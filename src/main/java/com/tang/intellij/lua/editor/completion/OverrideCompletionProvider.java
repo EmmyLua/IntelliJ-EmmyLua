@@ -67,9 +67,8 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
                 String methodName = def.getName();
                 if (methodName != null) {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getName())
-                            .withIcon(LuaIcons.CLASS_METHOD)
+                            .withIcon(LuaIcons.CLASS_METHOD_OVERRIDING)
                             .withInsertHandler(new OverrideInsertHandler(def))
-                            .withTypeText("override " + clazzName)
                             .withTailText(def.getParamSignature());
 
                     completionResultSet.addElement(elementBuilder);
