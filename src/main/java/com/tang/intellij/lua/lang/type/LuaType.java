@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * 类型说明
@@ -250,4 +251,19 @@ public class LuaType implements Comparable<LuaType> {
         }
         return def;
     }*/
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof LuaType) {
+            LuaType otherType = (LuaType) obj;
+            if (Objects.equals(getClassName(), otherType.getClassName()))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return getClassName();
+    }
 }

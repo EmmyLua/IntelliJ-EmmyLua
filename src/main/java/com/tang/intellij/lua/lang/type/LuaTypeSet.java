@@ -87,12 +87,13 @@ public class LuaTypeSet {
     }
 
     public void addType(LuaType type) {
-        types.add(type);
+        if (!hasType(type))
+            types.add(type);
     }
 
     private boolean hasType(LuaType type) {
         for (LuaType luaType : types) {
-            if (type == luaType)
+            if (type.equals(luaType))
                 return true;
         }
         return false;
