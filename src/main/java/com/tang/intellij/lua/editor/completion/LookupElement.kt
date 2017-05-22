@@ -19,9 +19,7 @@
 package com.tang.intellij.lua.editor.completion
 
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.psi.LuaClassField
-import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import javax.swing.Icon
 
@@ -30,26 +28,32 @@ import javax.swing.Icon
  * Created by TangZX on 2017/5/22.
  */
 
-class LuaFieldLookupElement internal constructor(private val fieldName: String, private val field: LuaClassField, bold: Boolean)
-    : LuaLookupElement(fieldName, bold, LuaIcons.CLASS_FIELD) {
+open class LuaTypeGuessableLookupElement(private val name: String, private val guessable: LuaTypeGuessable, bold: Boolean, icon: Icon)
+    : LuaLookupElement(name, bold, icon) {
     private var typeString: String? = null
 
     override fun getLookupString(): String {
-        return fieldName
+        return name
     }
 
     override fun getTypeText(): String? {
         if (typeString == null) {
-            val set = field.guessType(SearchContext(field.project))
+            val set = guessable.guessType(SearchContext(guessable.project))
             typeString = set.createTypeString()
+            if (typeString == null) {
+                typeString = "any"
+            }
         }
         return typeString
     }
 
     override fun equals(other: Any?): Boolean {
-        return other is LuaFieldLookupElement && super.equals(other)
+        return other is LuaTypeGuessableLookupElement && super.equals(other)
     }
 }
+
+class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boolean)
+    : LuaTypeGuessableLookupElement(fieldName, field, bold, LuaIcons.CLASS_FIELD)
 
 abstract class LuaFunctionLookupElement(name:String, val signature: String, bold:Boolean, val bodyOwner: LuaFuncBodyOwner, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
@@ -75,3 +79,9 @@ abstract class LuaFunctionLookupElement(name:String, val signature: String, bold
 
 class LuaMethodLookupElement(name:String, signature: String, bold:Boolean, method: LuaClassMethodDef)
     : LuaFunctionLookupElement(name, signature, bold, method, LuaIcons.CLASS_METHOD)
+
+class LocalFunctionLookupElement(name:String, signature: String, method: LuaLocalFuncDef)
+    : LuaFunctionLookupElement(name, signature, false, method, LuaIcons.LOCAL_FUNCTION)
+
+class GlobalFunctionLookupElement(name:String, signature: String, method: LuaGlobalFuncDef)
+    : LuaFunctionLookupElement(name, signature, false, method, LuaIcons.GLOBAL_FUNCTION)

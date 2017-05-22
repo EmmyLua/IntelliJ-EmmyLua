@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by tangzx on 2017/1/16.
  */
-public interface LuaGlobalVar extends LuaPsiElement {
+public interface LuaGlobalVar extends LuaTypeGuessable {
     @Nullable
     LuaNameExpr getNameRef();
 }

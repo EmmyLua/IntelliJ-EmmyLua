@@ -28,10 +28,7 @@ import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaPsiImplUtil;
-import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
-import com.tang.intellij.lua.psi.LuaTypes;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
@@ -97,8 +94,8 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
                 String name = nameDef.getText();
                 if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                     session.addWord(name);
-                    LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
-                            .withIcon(LuaIcons.LOCAL_VAR);
+
+                    LuaTypeGuessableLookupElement elementBuilder = new LuaTypeGuessableLookupElement(name, nameDef, false, LuaIcons.LOCAL_VAR);
                     completionResultSet.addElement(elementBuilder);
                 }
                 return true;
@@ -110,10 +107,8 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
                 if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                     session.addWord(name);
                     LuaPsiImplUtil.processOptional(localFuncDef.getParams(), (signature, mask) -> {
-                        LookupElementBuilder elementBuilder = LookupElementBuilder.create(name + signature, name)
-                                .withInsertHandler(new FuncInsertHandler(localFuncDef).withMask(mask))
-                                .withIcon(LuaIcons.LOCAL_FUNCTION)
-                                .withTailText(signature);
+                        LocalFunctionLookupElement elementBuilder = new LocalFunctionLookupElement(name, signature, localFuncDef);
+                        elementBuilder.setHandler(new FuncInsertHandler(localFuncDef).withMask(mask));
                         completionResultSet.addElement(elementBuilder);
                     });
                 }
@@ -132,11 +127,8 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
                         session.addWord(name);
 
                         LuaPsiImplUtil.processOptional(globalFuncDef.getParams(), (signature, mask) -> {
-                            LookupElementBuilder elementBuilder = LookupElementBuilder.create(name + signature, name)
-                                    .withTypeText("Global Func")
-                                    .withInsertHandler(new GlobalFuncInsertHandler(name, project).withMask(mask))
-                                    .withIcon(LuaIcons.GLOBAL_FUNCTION)
-                                    .withTailText(signature);
+                            GlobalFunctionLookupElement elementBuilder = new GlobalFunctionLookupElement(name, signature, globalFuncDef);
+                            elementBuilder.setHandler(new GlobalFuncInsertHandler(name, project).withMask(mask));
                             completionResultSet.addElement(elementBuilder);
                         });
                     }
@@ -146,11 +138,15 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
         }
         //global fields
         if (has(GLOBAL_VAR)) {
+            SearchContext context = new SearchContext(project);
             LuaGlobalVarIndex.getInstance().processAllKeys(project, name -> {
                 if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
-                    session.addWord(name);
-
-                    completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(LuaIcons.GLOBAL_FIELD));
+                    LuaGlobalVar globalVar = LuaGlobalVarIndex.find(name, context);
+                    if (globalVar != null) {
+                        session.addWord(name);
+                        LuaTypeGuessableLookupElement elementBuilder = new LuaTypeGuessableLookupElement(name, globalVar, false, LuaIcons.GLOBAL_FIELD);
+                        completionResultSet.addElement(elementBuilder);
+                    }
                 }
                 return true;
             });

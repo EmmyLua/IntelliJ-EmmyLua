@@ -88,9 +88,7 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
 
     @Nullable
     private LuaTypeSet getTypeSet(SearchContext context, @NotNull PsiElement def) {
-        if (def instanceof LuaTypeGuessable) {
-            return ((LuaTypeGuessable) def).guessType(context);
-        } else if (def instanceof LuaNameExpr) {
+        if (def instanceof LuaNameExpr) {
             LuaTypeSet typeSet = null;
             LuaAssignStat luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat.class);
             if (luaAssignStat != null) {
@@ -114,7 +112,10 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
                 typeSet.addType(LuaType.createGlobalType(newRef));
             }
             return typeSet;
+        } else if (def instanceof LuaTypeGuessable) {
+            return ((LuaTypeGuessable) def).guessType(context);
         }
+
         return null;
     }
 
