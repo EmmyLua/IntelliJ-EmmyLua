@@ -18,16 +18,12 @@ package com.tang.intellij.lua.editor.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.lang.parser.GeneratedParserUtilBase;
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.impl.source.tree.TreeUtil;
 import com.intellij.util.containers.HashSet;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -89,9 +85,10 @@ public class LuaCompletionContributor extends CompletionContributor {
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
         parameters.getEditor().putUserData(CompletionSession.KEY, new CompletionSession(parameters, result));
         super.fillCompletionVariants(parameters, result);
+        suggestWordsInFile(parameters, result);
     }
 
-    static void suggestWordsInFile(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
+    private static void suggestWordsInFile(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
         CompletionSession session = parameters.getEditor().getUserData(CompletionSession.KEY);
         assert session != null;
 
@@ -121,27 +118,5 @@ public class LuaCompletionContributor extends CompletionContributor {
                     //.withTypeText("Word In File")
                     , -1));
         }
-    }
-
-    private static void suggestKeywords(PsiElement position) {
-
-        GeneratedParserUtilBase.CompletionState state = new GeneratedParserUtilBase.CompletionState(8) {
-            @Override
-            public String convertItem(Object o) {
-                if (o instanceof LuaTokenType) {
-                    LuaTokenType tokenType = (LuaTokenType) o;
-                    return tokenType.toString();
-                }
-                // we do not have other keywords
-                return o instanceof String? (String)o : null;
-            }
-        };
-
-        PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(position.getProject());
-        PsiFile file = psiFileFactory.createFileFromText("a.lua", LuaLanguage.INSTANCE, "local ", true, false);
-        file.putUserData(GeneratedParserUtilBase.COMPLETION_STATE_KEY, state);
-        TreeUtil.ensureParsed(file.getNode());
-
-        System.out.println("---");
     }
 }

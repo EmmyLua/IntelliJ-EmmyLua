@@ -31,8 +31,6 @@ import com.tang.intellij.lua.psi.LuaPsiImplUtil;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
-import static com.tang.intellij.lua.editor.completion.LuaCompletionContributor.suggestWordsInFile;
-
 /**
  *
  * Created by tangzx on 2016/12/25.
@@ -75,8 +73,6 @@ public class ClassMemberCompletionProvider extends CompletionProvider<Completion
                 }
             }
         }
-        //words in file
-        suggestWordsInFile(completionParameters, completionResultSet);
     }
 
     private void addField(@NotNull CompletionResultSet completionResultSet, boolean bold, String clazzName, LuaClassField field) {

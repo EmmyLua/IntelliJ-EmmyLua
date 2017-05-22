@@ -37,8 +37,6 @@ import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
 
-import static com.tang.intellij.lua.editor.completion.LuaCompletionContributor.suggestWordsInFile;
-
 /**
  * suggest local/global vars and functions
  * Created by TangZX on 2017/4/11.
@@ -89,12 +87,16 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
 
     @Override
     protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
+        CompletionSession session = completionParameters.getEditor().getUserData(CompletionSession.KEY);
+        assert session != null;
+
         //local
         PsiElement cur = completionParameters.getPosition();
         if (has(LOCAL_VAR)) {
             LuaPsiTreeUtil.walkUpLocalNameDef(cur, nameDef -> {
                 String name = nameDef.getText();
                 if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
+                    session.addWord(name);
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(name)
                             .withIcon(LuaIcons.LOCAL_VAR);
                     completionResultSet.addElement(elementBuilder);
@@ -106,6 +108,7 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
             LuaPsiTreeUtil.walkUpLocalFuncDef(cur, localFuncDef -> {
                 String name = localFuncDef.getName();
                 if (name != null && completionResultSet.getPrefixMatcher().prefixMatches(name)) {
+                    session.addWord(name);
                     LuaPsiImplUtil.processOptional(localFuncDef.getParams(), (signature, mask) -> {
                         LookupElementBuilder elementBuilder = LookupElementBuilder.create(name + signature, name)
                                 .withInsertHandler(new FuncInsertHandler(localFuncDef).withMask(mask))
@@ -126,6 +129,8 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
                 if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                     LuaGlobalFuncDef globalFuncDef = LuaGlobalFuncIndex.find(name, context);
                     if (globalFuncDef != null) {
+                        session.addWord(name);
+
                         LuaPsiImplUtil.processOptional(globalFuncDef.getParams(), (signature, mask) -> {
                             LookupElementBuilder elementBuilder = LookupElementBuilder.create(name + signature, name)
                                     .withTypeText("Global Func")
@@ -143,6 +148,8 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
         if (has(GLOBAL_VAR)) {
             LuaGlobalVarIndex.getInstance().processAllKeys(project, name -> {
                 if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
+                    session.addWord(name);
+
                     completionResultSet.addElement(LookupElementBuilder.create(name).withIcon(LuaIcons.GLOBAL_FIELD));
                 }
                 return true;
@@ -152,13 +159,13 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
         if (has(KEY_WORDS)) {
             TokenSet keywords = TokenSet.orSet(KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET);
             for (IElementType keyWordToken : keywords.getTypes()) {
+                session.addWord(keyWordToken.toString());
+
                 completionResultSet.addElement(LookupElementBuilder.create(keyWordToken)
                         .withInsertHandler(new KeywordInsertHandler(keyWordToken))
                 );
             }
             completionResultSet.addElement(LookupElementBuilder.create(Constants.WORD_SELF));
         }
-        //words in file
-        suggestWordsInFile(completionParameters, completionResultSet);
     }
 }
