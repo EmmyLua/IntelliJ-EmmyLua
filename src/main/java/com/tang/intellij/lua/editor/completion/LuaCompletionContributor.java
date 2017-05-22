@@ -109,7 +109,7 @@ public class LuaCompletionContributor extends CompletionContributor {
             completionResultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
                             .create(s)
                             .withIcon(LuaIcons.WORD)
-                            .withTypeText("Word In File")
+                            //.withTypeText("Word In File")
                     , -1));
         }
     }
