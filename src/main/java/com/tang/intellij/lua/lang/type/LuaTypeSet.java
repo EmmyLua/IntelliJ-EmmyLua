@@ -19,6 +19,7 @@ package com.tang.intellij.lua.lang.type;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
+import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,5 +124,29 @@ public class LuaTypeSet {
             return set;
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        List<String> list = new SmartList<>();
+        for (LuaType type : types) {
+            if (!type.isAnonymous()) {
+                list.add(type.getClassName());
+            }
+        }
+
+        return String.join("|", list);
+    }
+
+    public String createReturnString() {
+        String str = toString();
+
+        return str.isEmpty() ? "void" : str;
+    }
+
+    public String createTypeString() {
+        String str = toString();
+
+        return str.isEmpty() ? "any" : str;
     }
 }
