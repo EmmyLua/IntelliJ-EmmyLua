@@ -19,12 +19,16 @@ package com.tang.intellij.lua.psi;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.util.CachedValue;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.*;
@@ -387,6 +391,8 @@ public class LuaPsiImplUtil {
         return guessReturnTypeSetOriginal(owner, searchContext);
     }
 
+    private static final Key<CachedValue<LuaTypeSet>> FUNCTION_RETURN_TYPESET = Key.create("lua.function.return_typeset");
+
     @NotNull
     public static LuaTypeSet guessReturnTypeSetOriginal(LuaFuncBodyOwner owner, SearchContext searchContext) {
         if (owner instanceof LuaCommentOwner) {
@@ -399,28 +405,29 @@ public class LuaPsiImplUtil {
             }
         }
 
-        LuaTypeSet typeSet = LuaTypeSet.create();
-        Ref<LuaTypeSet> setRef = Ref.create(typeSet);
         //infer from return stat
-        owner.acceptChildren(new LuaVisitor() {
-            @Override
-            public void visitReturnStat(@NotNull LuaReturnStat o) {
-                LuaTypeSet set = setRef.get();
-                setRef.set(set.union(guessReturnTypeSet(o, 0, searchContext)));
-            }
+        return CachedValuesManager.getManager(owner.getProject()).getCachedValue(owner, FUNCTION_RETURN_TYPESET, () -> {
+            LuaTypeSet typeSet = LuaTypeSet.create();
+            Ref<LuaTypeSet> setRef = Ref.create(typeSet);
+            owner.acceptChildren(new LuaVisitor() {
+                @Override
+                public void visitReturnStat(@NotNull LuaReturnStat o) {
+                    LuaTypeSet set = setRef.get();
+                    setRef.set(set.union(guessReturnTypeSet(o, 0, searchContext)));
+                }
 
-            @Override
-            public void visitFuncBodyOwner(@NotNull LuaFuncBodyOwner o) {
-                // ignore sub function
-            }
+                @Override
+                public void visitFuncBodyOwner(@NotNull LuaFuncBodyOwner o) {
+                    // ignore sub function
+                }
 
-            @Override
-            public void visitPsiElement(@NotNull LuaPsiElement o) {
-                o.acceptChildren(this);
-            }
-        });
-
-        return setRef.get();
+                @Override
+                public void visitPsiElement(@NotNull LuaPsiElement o) {
+                    o.acceptChildren(this);
+                }
+            });
+            return CachedValueProvider.Result.create(setRef.get(), owner);
+        }, false);
     }
 
     @NotNull
