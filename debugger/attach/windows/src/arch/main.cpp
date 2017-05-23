@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <imagehlp.h>
 #include <string>
+#include <psapi.h>
 
 struct ExeInfo
 {
@@ -55,11 +56,16 @@ int main(int argc, char** argv)
 		else if(cmd == "-pid") {
 			const char* pid_str = argv[2];
 			DWORD processId = atoi(pid_str);
-			HANDLE m_process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
-			BOOL is32;
-			IsWow64Process(m_process, &is32);
-			printf("%d", is32);
-			return is32;
+
+			char fileName[_MAX_PATH];
+			HANDLE m_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
+			GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
+
+			ExeInfo info;
+			if (GetExeInfo(fileName, info)) {
+				printf("%d", info.i386);
+				return info.i386;
+			}
 		}
 	}
 	return 0;
