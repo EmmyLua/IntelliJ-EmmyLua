@@ -35,6 +35,7 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.tang.intellij.lua.debugger.DebuggerType;
 import com.tang.intellij.lua.debugger.IRemoteConfiguration;
+import com.tang.intellij.lua.debugger.remote.LuaCommandLineState;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,7 @@ public class LuaAppRunConfiguration extends AbstractRunConfiguration implements 
     @Nullable
     @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment executionEnvironment) throws ExecutionException {
-        return null;
+        return new LuaCommandLineState(executionEnvironment);
     }
 
     String getProgram() {
