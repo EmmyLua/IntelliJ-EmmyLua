@@ -30,8 +30,6 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <windows.h>
 #include <tlhelp32.h>
 #include <psapi.h>
-#include <windows.h>
-#include <malloc.h>
 #include <assert.h>
 #include <set>
 #include <hash_map>
@@ -252,9 +250,9 @@ struct CPCallHandlerArgs
 	void*                       data;
 };
 
-LoadLibraryExW_t                LoadLibraryExW_dll = NULL;
-LdrLockLoaderLock_t             LdrLockLoaderLock_dll = NULL;
-LdrUnlockLoaderLock_t           LdrUnlockLoaderLock_dll = NULL;
+LoadLibraryExW_t                LoadLibraryExW_dll = nullptr;
+LdrLockLoaderLock_t             LdrLockLoaderLock_dll = nullptr;
+LdrUnlockLoaderLock_t           LdrUnlockLoaderLock_dll = nullptr;
 
 bool                            g_loadedLuaFunctions = false;
 std::set<std::string>           g_loadedModules;
@@ -303,7 +301,7 @@ const char* MemoryReader_cdecl(lua_State* L, void* data, size_t* size)
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 
 }
@@ -383,7 +381,7 @@ void SetHookMode(unsigned long api, lua_State* L, HookMode mode)
 
 	if (mode == HookMode_None)
 	{
-		lua_sethook_dll(api, L, NULL, 0, 0);
+		lua_sethook_dll(api, L, nullptr, 0, 0);
 	}
 	else
 	{
@@ -608,7 +606,7 @@ bool lua_pushthread_dll(unsigned long api, lua_State *L)
 
 #pragma pack()
 
-	if (g_interfaces[api].lua_pushthread_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_pushthread_dll_cdecl != nullptr)
 	{
 		g_interfaces[api].lua_pushthread_dll_cdecl(L);
 		return true;
@@ -722,7 +720,7 @@ void EnableIntercepts(unsigned long apiIndex, bool enableIntercepts)
 	};
 	for (int i = 0; i < 17; i++)
 	{
-		if (all[i] != NULL)
+		if (all[i] != nullptr)
 		{
 			ULONG ACLEntries[1] = { 0 };
 			if (enableIntercepts)
@@ -763,7 +761,7 @@ int GetRegistryIndex(unsigned long api)
 
 int lua_absindex_dll(unsigned long api, lua_State* L, int i)
 {
-	if (g_interfaces[api].lua_absindex_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_absindex_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_absindex_dll_cdecl(L, i);
 	}
@@ -793,7 +791,7 @@ int lua_upvalueindex_dll(unsigned long api, int i)
 
 void lua_setglobal_dll(unsigned long api, lua_State* L, const char* s)
 {
-	if (g_interfaces[api].lua_setglobal_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_setglobal_dll_cdecl != nullptr)
 	{
 		g_interfaces[api].lua_setglobal_dll_cdecl(L, s);
 	}
@@ -805,7 +803,7 @@ void lua_setglobal_dll(unsigned long api, lua_State* L, const char* s)
 
 void lua_getglobal_dll(unsigned long api, lua_State* L, const char* s)
 {
-	if (g_interfaces[api].lua_getglobal_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_getglobal_dll_cdecl != nullptr)
 	{
 		g_interfaces[api].lua_getglobal_dll_cdecl(L, s);
 	}
@@ -826,7 +824,7 @@ void lua_rawgetglobal_dll(unsigned long api, lua_State* L, const char* s)
 
 lua_State* lua_newstate_dll(unsigned long api, lua_Alloc f, void* ud)
 {
-	if (g_interfaces[api].lua_newstate_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_newstate_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_newstate_dll_cdecl(f, ud);
 	}
@@ -834,16 +832,16 @@ lua_State* lua_newstate_dll(unsigned long api, lua_Alloc f, void* ud)
 	// This is an older version of Lua that doesn't support lua_newstate, so emulate it
 	// with lua_open.
 
-	if (g_interfaces[api].lua_open_500_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_open_500_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_open_500_dll_cdecl();
 	}
-	else if (g_interfaces[api].lua_open_dll_cdecl != NULL)
+	else if (g_interfaces[api].lua_open_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_open_dll_cdecl(0);
 	}
 	assert(0);
-	return NULL;
+	return nullptr;
 }
 
 void lua_close_dll(unsigned long api, lua_State* L)
@@ -1011,7 +1009,7 @@ void lua_pushnumber_dll(unsigned long api, lua_State* L, lua_Number value)
 
 void lua_pushinteger_dll(unsigned long api, lua_State* L, int value)
 {
-	if (g_interfaces[api].lua_pushinteger_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_pushinteger_dll_cdecl != nullptr)
 	{
 		// Lua 5.0 version.
 		return g_interfaces[api].lua_pushinteger_dll_cdecl(L, value);
@@ -1042,7 +1040,7 @@ void lua_pushglobaltable_dll(unsigned long api, lua_State* L)
 
 const char* lua_tostring_dll(unsigned long api, lua_State* L, int index)
 {
-	if (g_interfaces[api].lua_tostring_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_tostring_dll_cdecl != nullptr)
 	{
 		// Lua 4.0 implementation.
 		return g_interfaces[api].lua_tostring_dll_cdecl(L, index);
@@ -1050,13 +1048,13 @@ const char* lua_tostring_dll(unsigned long api, lua_State* L, int index)
 	else
 	{
 		// Lua 5.0 version.
-		return g_interfaces[api].lua_tolstring_dll_cdecl(L, index, NULL);
+		return g_interfaces[api].lua_tolstring_dll_cdecl(L, index, nullptr);
 	}
 }
 
 const char* lua_tolstring_dll(unsigned long api, lua_State* L, int index, size_t* len)
 {
-	if (g_interfaces[api].lua_tolstring_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_tolstring_dll_cdecl != nullptr)
 	{
 		// Lua 5.0 version.
 		return g_interfaces[api].lua_tolstring_dll_cdecl(L, index, len);
@@ -1093,12 +1091,12 @@ int lua_toboolean_dll(unsigned long api, lua_State* L, int index)
 
 int lua_tointeger_dll(unsigned long api, lua_State* L, int index)
 {
-	if (g_interfaces[api].lua_tointegerx_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_tointegerx_dll_cdecl != nullptr)
 	{
 		// Lua 5.2 implementation.
-		return g_interfaces[api].lua_tointegerx_dll_cdecl(L, index, NULL);
+		return g_interfaces[api].lua_tointegerx_dll_cdecl(L, index, nullptr);
 	}
-	if (g_interfaces[api].lua_tointeger_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_tointeger_dll_cdecl != nullptr)
 	{
 		// Lua 5.0 implementation.
 		return g_interfaces[api].lua_tointeger_dll_cdecl(L, index);
@@ -1117,10 +1115,10 @@ lua_CFunction lua_tocfunction_dll(unsigned long api, lua_State* L, int index)
 
 lua_Number lua_tonumber_dll(unsigned long api, lua_State* L, int index)
 {
-	if (g_interfaces[api].lua_tonumberx_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_tonumberx_dll_cdecl != nullptr)
 	{
 		// Lua 5.2 implementation.
-		return g_interfaces[api].lua_tonumberx_dll_cdecl(L, index, NULL);
+		return g_interfaces[api].lua_tonumberx_dll_cdecl(L, index, nullptr);
 	}
 	// Lua 5.0 and earlier.
 	return g_interfaces[api].lua_tonumber_dll_cdecl(L, index);
@@ -1143,11 +1141,11 @@ int lua_loadbuffer_dll(unsigned long api, lua_State* L, const char* buffer, size
 	memory.buffer = buffer;
 	memory.size = size;
 
-	if (g_interfaces[api].lua_load_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_load_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_load_dll_cdecl(L, MemoryReader_cdecl, &memory, chunkname, mode);
 	}
-	else if (g_interfaces[api].lua_load_510_dll_cdecl != NULL)
+	else if (g_interfaces[api].lua_load_510_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_load_510_dll_cdecl(L, MemoryReader_cdecl, &memory, chunkname);
 	}
@@ -1168,9 +1166,9 @@ int lua_pcallk_dll(unsigned long api, lua_State* L, int nargs, int nresults, int
 int lua_pcall_dll(unsigned long api, lua_State* L, int nargs, int nresults, int errfunc)
 {
 	// Lua 5.2.
-	if (g_interfaces[api].lua_pcallk_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_pcallk_dll_cdecl != nullptr)
 	{
-		return lua_pcallk_dll(api, L, nargs, nresults, errfunc, 0, NULL);
+		return lua_pcallk_dll(api, L, nargs, nresults, errfunc, 0, nullptr);
 	}
 	// Lua 5.1 and earlier.
 	return g_interfaces[api].lua_pcall_dll_cdecl(L, nargs, nresults, errfunc);
@@ -1179,7 +1177,7 @@ int lua_pcall_dll(unsigned long api, lua_State* L, int nargs, int nresults, int 
 void lua_newtable_dll(unsigned long api, lua_State* L)
 {
 
-	if (g_interfaces[api].lua_newtable_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_newtable_dll_cdecl != nullptr)
 	{
 		// Lua 4.0 implementation.
 		return g_interfaces[api].lua_newtable_dll_cdecl(L);
@@ -1214,7 +1212,7 @@ int lua_setmetatable_dll(unsigned long api, lua_State* L, int index)
 
 int luaL_ref_dll(unsigned long api, lua_State *L, int t)
 {
-	if (g_interfaces[api].luaL_ref_dll_cdecl != NULL)
+	if (g_interfaces[api].luaL_ref_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].luaL_ref_dll_cdecl(L, t);
 	}
@@ -1260,20 +1258,20 @@ lua_State* luaL_newstate_dll(unsigned long api)
 
 const lua_WChar* lua_towstring_dll(unsigned long api, lua_State* L, int index)
 {
-	if (g_interfaces[api].lua_towstring_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_towstring_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_towstring_dll_cdecl(L, index);
 	}
 	else
 	{
 		// The application is not using LuaPlus, so just return NULL.
-		return NULL;
+		return nullptr;
 	}
 }
 
 int lua_iswstring_dll(unsigned long api, lua_State* L, int index)
 {
-	if (g_interfaces[api].lua_iswstring_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_iswstring_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_iswstring_dll_cdecl(L, index);
 	}
@@ -1296,7 +1294,7 @@ const char* lua_setupvalue_dll(unsigned long api, lua_State *L, int funcindex, i
 
 void lua_getfenv_dll(unsigned long api, lua_State *L, int index)
 {
-	if (g_interfaces[api].lua_getfenv_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_getfenv_dll_cdecl != nullptr)
 	{
 		g_interfaces[api].lua_getfenv_dll_cdecl(L, index);
 	}
@@ -1305,14 +1303,14 @@ void lua_getfenv_dll(unsigned long api, lua_State *L, int index)
 		index = lua_absindex_dll(api, L, index);
 		// look for it
 		int upidx = 1;
-		const char* upname = NULL;
-		while ((upname = lua_getupvalue_dll(api, L, index, upidx)) != NULL && strcmp(upname, "_ENV") != 0)
+		const char* upname;
+		while ((upname = lua_getupvalue_dll(api, L, index, upidx)) != nullptr && strcmp(upname, "_ENV") != 0)
 		{
 			lua_pop_dll(api, L, 1);
 			++upidx;
 		}
 		// _ENV is left on the stack (or not)
-		if (upname == NULL)
+		if (upname == nullptr)
 		{
 			lua_pushnil_dll(api, L);
 		}
@@ -1321,7 +1319,7 @@ void lua_getfenv_dll(unsigned long api, lua_State *L, int index)
 
 int lua_setfenv_dll(unsigned long api, lua_State *L, int index)
 {
-	if (g_interfaces[api].lua_setfenv_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_setfenv_dll_cdecl != nullptr)
 	{
 		return g_interfaces[api].lua_setfenv_dll_cdecl(L, index);
 	}
@@ -1330,13 +1328,13 @@ int lua_setfenv_dll(unsigned long api, lua_State *L, int index)
 		index = lua_absindex_dll(api, L, index);
 		// look for it
 		int upidx = 1;
-		const char* upname = NULL;
-		while ((upname = lua_getupvalue_dll(api, L, index, upidx)) != NULL && strcmp(upname, "_ENV") != 0)
+		const char* upname = nullptr;
+		while ((upname = lua_getupvalue_dll(api, L, index, upidx)) != nullptr && strcmp(upname, "_ENV") != 0)
 		{
 			lua_pop_dll(api, L, 1);
 			++upidx;
 		}
-		if (upname != NULL)
+		if (upname != nullptr)
 		{
 			lua_pop_dll(api, L, 1); // pop the actual value, we are only interested in its index
 			lua_setupvalue_dll(api, L, index, upidx);
@@ -1357,21 +1355,21 @@ HMODULE WINAPI LoadLibraryExW_intercept(LPCWSTR fileName, HANDLE hFile, DWORD dw
 
 	ULONG cookie;
 
-	if (LdrLockLoaderLock_dll != NULL &&
-		LdrUnlockLoaderLock_dll != NULL)
+	if (LdrLockLoaderLock_dll != nullptr &&
+		LdrUnlockLoaderLock_dll != nullptr)
 	{
-		LdrLockLoaderLock_dll(0, 0, &cookie);
+		LdrLockLoaderLock_dll(0, nullptr, &cookie);
 	}
 
 	HMODULE hModule = LoadLibraryExW_dll(fileName, hFile, dwFlags);
 
-	if (hModule != NULL)
+	if (hModule != nullptr)
 	{
 		PostLoadLibrary(hModule);
 	}
 
-	if (LdrLockLoaderLock_dll != NULL &&
-		LdrUnlockLoaderLock_dll != NULL)
+	if (LdrLockLoaderLock_dll != nullptr &&
+		LdrUnlockLoaderLock_dll != nullptr)
 	{
 		LdrUnlockLoaderLock_dll(0, cookie);
 	}
@@ -1520,13 +1518,13 @@ int lua_pcallk_intercept(lua_State* L, int nargs, int nresults, int errfunc, int
 
 lua_State* lua_newstate_worker(unsigned long api, lua_Alloc f, void* ud)
 {
-	lua_State* result = NULL;
-	if (g_interfaces[api].lua_newstate_dll_cdecl != NULL)
+	lua_State* result = nullptr;
+	if (g_interfaces[api].lua_newstate_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].lua_newstate_dll_cdecl(f, ud);
 	}
 
-	if (result != NULL)
+	if (result != nullptr)
 	{
 		DebugBackend::Get().AttachState(api, result);
 	}
@@ -1552,13 +1550,13 @@ lua_State* lua_newstate_intercept(lua_Alloc f, void* ud)
 
 lua_State* lua_newthread_worker(unsigned long api, lua_State* L)
 {
-	lua_State* result = NULL;
-	if (g_interfaces[api].lua_newthread_dll_cdecl != NULL)
+	lua_State* result = nullptr;
+	if (g_interfaces[api].lua_newthread_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].lua_newthread_dll_cdecl(L);
 	}
 
-	if (result != NULL)
+	if (result != nullptr)
 	{
 		DebugBackend::Get().AttachState(api, result);
 	}
@@ -1583,13 +1581,13 @@ lua_State* lua_newthread_intercept(lua_State* L)
 
 lua_State* lua_open_worker(unsigned long api, int stacksize)
 {
-	lua_State* result = NULL;
-	if (g_interfaces[api].lua_open_dll_cdecl != NULL)
+	lua_State* result = nullptr;
+	if (g_interfaces[api].lua_open_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].lua_open_dll_cdecl(stacksize);
 	}
 
-	if (result != NULL)
+	if (result != nullptr)
 	{
 		DebugBackend::Get().AttachState(api, result);
 	}
@@ -1599,14 +1597,14 @@ lua_State* lua_open_worker(unsigned long api, int stacksize)
 
 lua_State* lua_open_500_worker(unsigned long api)
 {
-	lua_State* result = NULL;
+	lua_State* result = nullptr;
 
-	if (g_interfaces[api].lua_open_500_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_open_500_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].lua_open_500_dll_cdecl();
 	}
 
-	if (result != NULL)
+	if (result != nullptr)
 	{
 		DebugBackend::Get().AttachState(api, result);
 	}
@@ -1669,14 +1667,14 @@ int lua_load_worker(unsigned long api, lua_State* L, lua_Reader reader, void* da
 		// that, although according to the manual it should return NULL to signal
 		// the end of the data.
 
-		if (chunk != NULL && chunkSize > 0)
+		if (chunk != nullptr && chunkSize > 0)
 		{
 			buffer.insert(buffer.end(), chunk, chunk + chunkSize);
 		}
 
-	} while (chunk != NULL && chunkSize > 0);
+	} while (chunk != nullptr && chunkSize > 0);
 
-	const char* source = NULL;
+	const char* source = nullptr;
 
 	if (!buffer.empty())
 	{
@@ -1722,7 +1720,7 @@ int lua_load_510_intercept(lua_State* L, lua_Reader reader, void* data, const ch
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_load_worker(api, L, reader, data, name, NULL);
+	result = lua_load_worker(api, L, reader, data, name, nullptr);
 	return result;
 }
 
@@ -1745,7 +1743,7 @@ int lua_load_intercept(lua_State* L, lua_Reader reader, void* data, const char* 
 
 void lua_close_worker(unsigned long api, lua_State* L)
 {
-	if (g_interfaces[api].lua_close_dll_cdecl != NULL)
+	if (g_interfaces[api].lua_close_dll_cdecl != nullptr)
 	{
 		g_interfaces[api].lua_close_dll_cdecl(L);
 	}
@@ -1770,7 +1768,7 @@ void lua_close_intercept(lua_State* L)
 int luaL_newmetatable_worker(unsigned long api, lua_State *L, const char* tname)
 {
 	int result;
-	if (g_interfaces[api].luaL_newmetatable_dll_cdecl != NULL)
+	if (g_interfaces[api].luaL_newmetatable_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].luaL_newmetatable_dll_cdecl(L, tname);
 	}
@@ -1851,11 +1849,11 @@ int luaL_loadbufferx_worker(unsigned long api, lua_State *L, const char *buff, s
 {
 
 	int result = 0;
-	if (g_interfaces[api].luaL_loadbufferx_dll_cdecl != NULL)
+	if (g_interfaces[api].luaL_loadbufferx_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].luaL_loadbufferx_dll_cdecl(L, buff, sz, name, mode);
 	}
-	else if (g_interfaces[api].luaL_loadbuffer_dll_cdecl != NULL)
+	else if (g_interfaces[api].luaL_loadbuffer_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].luaL_loadbuffer_dll_cdecl(L, buff, sz, name);
 	}
@@ -1879,7 +1877,7 @@ int luaL_loadbuffer_intercept(lua_State *L, const char *buff, size_t sz, const c
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interfering with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_loadbufferx_worker(api, L, buff, sz, name, NULL);
+	result = luaL_loadbufferx_worker(api, L, buff, sz, name, nullptr);
 
 	return result;
 }
@@ -1903,11 +1901,11 @@ int luaL_loadfilex_worker(unsigned long api, lua_State *L, const char *fileName,
 {
 
 	int result = 0;
-	if (g_interfaces[api].luaL_loadfilex_dll_cdecl != NULL)
+	if (g_interfaces[api].luaL_loadfilex_dll_cdecl != nullptr)
 	{
 		g_interfaces[api].luaL_loadfilex_dll_cdecl(L, fileName, mode);
 	}
-	else if (g_interfaces[api].luaL_loadfile_dll_cdecl != NULL)
+	else if (g_interfaces[api].luaL_loadfile_dll_cdecl != nullptr)
 	{
 		g_interfaces[api].luaL_loadfile_dll_cdecl(L, fileName);
 	}
@@ -1919,7 +1917,7 @@ int luaL_loadfilex_worker(unsigned long api, lua_State *L, const char *fileName,
 
 	FILE* file = fopen(fileName, "rb");
 
-	if (file != NULL)
+	if (file != nullptr)
 	{
 
 		std::string name = "@";
@@ -1954,7 +1952,7 @@ int luaL_loadfile_intercept(lua_State *L, const char *fileName)
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_loadfilex_worker(api, L, fileName, NULL);
+	result = luaL_loadfilex_worker(api, L, fileName, nullptr);
 	return result;
 }
 
@@ -1975,9 +1973,9 @@ int luaL_loadfilex_intercept(lua_State *L, const char *fileName, const char* mod
 
 lua_State* luaL_newstate_worker(unsigned long api)
 {
-	lua_State* result = NULL;
+	lua_State* result = nullptr;
 
-	if (g_interfaces[api].luaL_newstate_dll_cdecl != NULL)
+	if (g_interfaces[api].luaL_newstate_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].luaL_newstate_dll_cdecl();
 	}
@@ -1992,7 +1990,7 @@ lua_State* luaL_newstate_worker(unsigned long api)
 	FinishLoadingLua(api, stdcall);
 	}*/
 
-	if (result != NULL)
+	if (result != nullptr)
 	{
 		DebugBackend::Get().AttachState(api, result);
 	}
@@ -2019,7 +2017,7 @@ lua_State* luaL_newstate_intercept()
 std::string GetEnvironmentVariable(const std::string& name)
 {
 
-	DWORD size = ::GetEnvironmentVariable(name.c_str(), NULL, 0);
+	DWORD size = ::GetEnvironmentVariable(name.c_str(), nullptr, 0);
 
 	std::string result;
 
@@ -2044,11 +2042,11 @@ std::string GetApplicationDirectory()
 {
 
 	char fileName[_MAX_PATH];
-	GetModuleFileNameEx(GetCurrentProcess(), NULL, fileName, _MAX_PATH);
+	GetModuleFileNameEx(GetCurrentProcess(), nullptr, fileName, _MAX_PATH);
 
 	char* term = strrchr(fileName, '\\');
 
-	if (term != NULL)
+	if (term != nullptr)
 	{
 		*term = 0;
 	}
@@ -2153,7 +2151,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 
 	// Only present in Lua 4.0 and Lua 5.0 (not 5.1)
 	GET_FUNCTION_OPTIONAL(lua_open);
-	if (luaInterface.lua_open_dll_cdecl == NULL)
+	if (luaInterface.lua_open_dll_cdecl == nullptr)
 	{
 		GET_FUNCTION(lua_newstate);
 	}
@@ -2203,14 +2201,14 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 	// Only present in Lua 4.0 and 5.0 (exists as a macro in Lua 5.1)
 	GET_FUNCTION_OPTIONAL(lua_tostring);
 
-	if (luaInterface.lua_tostring_dll_cdecl == NULL)
+	if (luaInterface.lua_tostring_dll_cdecl == nullptr)
 	{
 		GET_FUNCTION(lua_tolstring);
 	}
 
 	GET_FUNCTION_OPTIONAL(lua_tonumberx);
 
-	if (luaInterface.lua_tonumberx_dll_cdecl == NULL)
+	if (luaInterface.lua_tonumberx_dll_cdecl == nullptr)
 	{
 		// If the Lua 5.2 tonumber isn't present, require the previous version.
 		GET_FUNCTION(lua_tonumber);
@@ -2222,21 +2220,21 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 
 	// Exists as a macro in Lua 5.2
 	GET_FUNCTION_OPTIONAL(lua_callk);
-	if (luaInterface.lua_callk_dll_cdecl == NULL)
+	if (luaInterface.lua_callk_dll_cdecl == nullptr)
 	{
 		GET_FUNCTION(lua_call);
 	}
 
 	// Exists as a macro in Lua 5.2
 	GET_FUNCTION_OPTIONAL(lua_pcallk);
-	if (luaInterface.lua_pcallk_dll_cdecl == NULL)
+	if (luaInterface.lua_pcallk_dll_cdecl == nullptr)
 	{
 		GET_FUNCTION(lua_pcall);
 	}
 
 	// Only present in Lua 4.0 and 5.0 (exists as a macro in Lua 5.1)
 	GET_FUNCTION_OPTIONAL(lua_newtable);
-	if (luaInterface.lua_newtable_dll_cdecl == NULL)
+	if (luaInterface.lua_newtable_dll_cdecl == nullptr)
 	{
 		GET_FUNCTION(lua_createtable);
 	}
@@ -2284,13 +2282,13 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 	if (luaInterface.version == LUA_V500)
 	{
 		luaInterface.lua_open_500_dll_cdecl = reinterpret_cast<lua_open_500_cdecl_t>(luaInterface.lua_load_dll_cdecl);
-		luaInterface.lua_open_dll_cdecl = NULL;
+		luaInterface.lua_open_dll_cdecl = nullptr;
 	}
 
 	if (luaInterface.version == LUA_V510)
 	{
 		luaInterface.lua_load_510_dll_cdecl = reinterpret_cast<lua_load_510_cdecl_t>(luaInterface.lua_load_dll_cdecl);
-		luaInterface.lua_load_dll_cdecl = NULL;
+		luaInterface.lua_load_dll_cdecl = nullptr;
 	}
 
 	if (luaInterface.version == LUA_V530)
@@ -2347,7 +2345,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 
 static PIMAGE_NT_HEADERS PEHeaderFromHModule(HMODULE hModule)
 {
-	PIMAGE_NT_HEADERS pNTHeader = 0;
+	PIMAGE_NT_HEADERS pNTHeader = nullptr;
 
 	__try
 	{
@@ -2358,7 +2356,7 @@ static PIMAGE_NT_HEADERS PEHeaderFromHModule(HMODULE hModule)
 			+ PIMAGE_DOS_HEADER(hModule)->e_lfanew);
 
 		if (pNTHeader->Signature != IMAGE_NT_SIGNATURE)
-			pNTHeader = 0;
+			pNTHeader = nullptr;
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
@@ -2412,7 +2410,7 @@ void ReplaceExtension(char fileName[_MAX_PATH], const char* extension)
 
 	char* start = strrchr(fileName, '.');
 
-	if (start == NULL)
+	if (start == nullptr)
 	{
 		strcat(fileName, extension);
 	}
@@ -2431,7 +2429,7 @@ void GetFileTitle(const char* fileName, char fileTitle[_MAX_PATH])
 
 	const char* pathEnd = max(slash1, slash2);
 
-	if (pathEnd == NULL)
+	if (pathEnd == nullptr)
 	{
 		// There's no path so the whole thing is the file title.
 		strcpy(fileTitle, fileName);
@@ -2451,7 +2449,7 @@ void GetFilePath(const char* fileName, char path[_MAX_PATH])
 
 	const char* pathEnd = max(slash1, slash2);
 
-	if (pathEnd == NULL)
+	if (pathEnd == nullptr)
 	{
 		// There's no path on the file name.
 		path[0] = 0;
@@ -2507,7 +2505,7 @@ BOOL CALLBACK GatherSymbolsCallback(PSYMBOL_INFO pSymInfo, ULONG SymbolSize, PVO
 
 	stdext::hash_map<std::string, DWORD64>* symbols = reinterpret_cast<stdext::hash_map<std::string, DWORD64>*>(UserContext);
 
-	if (pSymInfo != NULL && pSymInfo->Name != NULL)
+	if (pSymInfo != nullptr && pSymInfo->Name != nullptr)
 	{
 		symbols->insert(std::make_pair(pSymInfo->Name, pSymInfo->Address));
 	}
@@ -2568,7 +2566,7 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 		GetModuleFileNameEx(hProcess, hModule, modulePath, _MAX_PATH);
 
 		char windowsPath[MAX_PATH];
-		if (SHGetFolderPath(NULL, CSIDL_WINDOWS, NULL, SHGFP_TYPE_CURRENT, windowsPath) == 0) {
+		if (SHGetFolderPath(nullptr, CSIDL_WINDOWS, nullptr, SHGFP_TYPE_CURRENT, windowsPath) == 0) {
 			std::string module_path = modulePath;
 			if (module_path.find(windowsPath) != std::string::npos) {
 				return;
@@ -2577,13 +2575,13 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 	}
 
 	{
-		MODULEINFO moduleInfo = { 0 };
+		MODULEINFO moduleInfo = { nullptr };
 		GetModuleInformation(hProcess, hModule, &moduleInfo, sizeof(moduleInfo));
 
 		char moduleFileName[_MAX_PATH];
 		GetModuleFileNameEx(hProcess, hModule, moduleFileName, _MAX_PATH);
 
-		DWORD64 base = SymLoadModule64_dll(hProcess, NULL, moduleFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
+		DWORD64 base = SymLoadModule64_dll(hProcess, nullptr, moduleFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
 
 #ifdef VERBOSE
 		char message[1024];
@@ -2612,7 +2610,7 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 
 			if (GetFileExists(pdbFileName))
 			{
-				base = SymLoadModule64_dll(hProcess, NULL, pdbFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
+				base = SymLoadModule64_dll(hProcess, nullptr, pdbFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
 
 				if (base != 0)
 				{
@@ -2709,7 +2707,7 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 
 			// Sometimes the import module comes back NULL, which means that for some reason
 			// it wasn't loaded. Perhaps these are delay loaded and we'll catch them later?
-			if (hImportModule != NULL)
+			if (hImportModule != nullptr)
 			{
 				LoadSymbolsRecursively(loadedModules, symbols, hProcess, hImportModule);
 			}
@@ -2787,9 +2785,9 @@ void PostLoadLibrary(HMODULE hModule)
 void HookLoadLibrary()
 {
 	HMODULE hModuleKernel = GetModuleHandle("KernelBase.dll");
-	if (hModuleKernel == NULL)
+	if (hModuleKernel == nullptr)
 		hModuleKernel = GetModuleHandle("kernel32.dll");
-	if (hModuleKernel != NULL)
+	if (hModuleKernel != nullptr)
 	{
 		// LoadLibraryExW is called by the other LoadLibrary functions, so we
 		// only need to hook it.
@@ -2803,7 +2801,7 @@ void HookLoadLibrary()
 		NTSTATUS status = LhInstallHook(
 			LoadLibraryExW_dll,
 			LoadLibraryExW_intercept,
-			(PVOID)0,
+			(PVOID)nullptr,
 			hHook);
 		assert(status == 0);
 		status = LhSetExclusiveACL(ACLEntries, 0, hHook);
@@ -2849,26 +2847,26 @@ bool InstallLuaHooker(HINSTANCE hInstance, const char* symbolsDirectory)
 	// Avoid deadlock if a new DLL is loaded during this function.
 	ULONG cookie;
 
-	if (LdrLockLoaderLock_dll != NULL && LdrUnlockLoaderLock_dll != NULL)
+	if (LdrLockLoaderLock_dll != nullptr && LdrUnlockLoaderLock_dll != nullptr)
 	{
-		LdrLockLoaderLock_dll(0, 0, &cookie);
+		LdrLockLoaderLock_dll(0, nullptr, &cookie);
 	}
 
 	// Process all of the loaded modules.
 
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, 0);
 
-	if (hSnapshot == NULL)
+	if (hSnapshot == nullptr)
 	{
 
 		// If for some reason we couldn't take a snapshot, just load the
 		// main module. This shouldn't ever happen, but we do it just in
 		// case.
-		HMODULE hModule = GetModuleHandle(NULL);
+		HMODULE hModule = GetModuleHandle(nullptr);
 		PostLoadLibrary(hModule);
 
-		if (LdrLockLoaderLock_dll != NULL &&
-			LdrUnlockLoaderLock_dll != NULL)
+		if (LdrLockLoaderLock_dll != nullptr &&
+			LdrUnlockLoaderLock_dll != nullptr)
 		{
 			LdrUnlockLoaderLock_dll(0, cookie);
 		}
@@ -2887,9 +2885,9 @@ bool InstallLuaHooker(HINSTANCE hInstance, const char* symbolsDirectory)
 		}
 
 		CloseHandle(hSnapshot);
-		hSnapshot = NULL;
+		hSnapshot = nullptr;
 
-		if (LdrLockLoaderLock_dll != NULL && LdrUnlockLoaderLock_dll != NULL)
+		if (LdrLockLoaderLock_dll != nullptr && LdrUnlockLoaderLock_dll != nullptr)
 		{
 			LdrUnlockLoaderLock_dll(0, cookie);
 		}

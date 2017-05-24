@@ -31,10 +31,9 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <assert.h>
 #include <algorithm>
-#include <sstream>
 #include <EasyHook.h>
 
-DebugBackend* DebugBackend::s_instance = NULL;
+DebugBackend* DebugBackend::s_instance = nullptr;
 
 extern HINSTANCE g_hInstance;
 
@@ -63,7 +62,7 @@ const char* MemoryReader(lua_State* L, void* data, size_t* size)
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 
 }
@@ -118,14 +117,14 @@ void DebugBackend::Script::ClearBreakpoints()
     breakpoints.resize(0);
 }
 
-bool DebugBackend::Script::HasBreakpointsActive()
+bool DebugBackend::Script::HasBreakpointsActive() const
 {
   return breakpoints.size() != 0;
 }
 
 DebugBackend& DebugBackend::Get()
 {
-    if (s_instance == NULL)
+    if (s_instance == nullptr)
     {
         s_instance = new DebugBackend;
     }
@@ -135,20 +134,20 @@ DebugBackend& DebugBackend::Get()
 void DebugBackend::Destroy()
 {
     delete s_instance;
-    s_instance = NULL;
+    s_instance = nullptr;
 }
 
 DebugBackend::DebugBackend()
 {
-    m_commandThread         = NULL;
-    m_stepEvent             = NULL;
-    m_loadEvent             = NULL;
-    m_detachEvent           = NULL;
+    m_commandThread         = nullptr;
+    m_stepEvent             = nullptr;
+    m_loadEvent             = nullptr;
+    m_detachEvent           = nullptr;
     m_mode                  = Mode_Continue;
-    m_log                   = NULL;
+    m_log                   = nullptr;
     m_warnedAboutUserData   = false;
-    m_evalEvent             = NULL;
-    m_evalResultEvent       = NULL;
+    m_evalEvent             = nullptr;
+    m_evalResultEvent       = nullptr;
 }
 
 DebugBackend::~DebugBackend()
@@ -160,49 +159,49 @@ DebugBackend::~DebugBackend()
 		Message("Warning 1000: Lua functions were not found during debugging session", MessageType_Warning);
 	}*/
 
-    if (m_log != NULL)
+    if (m_log != nullptr)
     {
         fclose(m_log);
-        m_log = NULL;
+        m_log = nullptr;
     }
 
     m_eventChannel.Destroy();
     m_commandChannel.Destroy();
 
-    if (m_commandThread != NULL)
+    if (m_commandThread != nullptr)
     {
         CloseHandle(m_commandThread);
-        m_commandThread = NULL;
+        m_commandThread = nullptr;
     }
 
-    if (m_stepEvent != NULL)
+    if (m_stepEvent != nullptr)
     {
         CloseHandle(m_stepEvent);
-        m_stepEvent = NULL;
+        m_stepEvent = nullptr;
     }
 
-    if (m_evalEvent != NULL)
+    if (m_evalEvent != nullptr)
     {
         CloseHandle(m_evalEvent);
-        m_evalEvent = NULL;
+        m_evalEvent = nullptr;
     }
 
-    if (m_evalResultEvent != NULL)
+    if (m_evalResultEvent != nullptr)
     {
         CloseHandle(m_evalResultEvent);
-        m_evalResultEvent = NULL;
+        m_evalResultEvent = nullptr;
     }
 
-    if (m_loadEvent != NULL)
+    if (m_loadEvent != nullptr)
     {
         CloseHandle(m_loadEvent);
-        m_loadEvent = NULL;
+        m_loadEvent = nullptr;
     }
 
-    if (m_detachEvent != NULL)
+    if (m_detachEvent != nullptr)
     {
         CloseHandle(m_detachEvent);
-        m_detachEvent = NULL;
+        m_detachEvent = nullptr;
     }
 
     for (unsigned int i = 0; i < m_scripts.size(); ++i)
@@ -236,7 +235,7 @@ void DebugBackend::CreateApi(unsigned long apiIndex)
 void DebugBackend::Log(const char* fmt, ...)
 {
 
-    if (m_log == NULL)
+    if (m_log == nullptr)
     {
         char fileName[_MAX_PATH];
         if (GetStartupDirectory(fileName, _MAX_PATH))
@@ -246,7 +245,7 @@ void DebugBackend::Log(const char* fmt, ...)
         }
     }
 
-    if (m_log != NULL)
+    if (m_log != nullptr)
     {
 
         char buffer[1024];
@@ -291,22 +290,22 @@ bool DebugBackend::Initialize(HINSTANCE hInstance)
 
     // Create the event used to signal when we should stop "breaking"
     // and step to the next line.
-    m_stepEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    m_stepEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
     // Create the event used to signal when the frontend is finished processing
     // the load of a script.w
-    m_loadEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    m_loadEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
     // Create the detach event used to signal when the debugger has been detached
     // from our process. Note this event doesn't reset itself automatically.
-    m_detachEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    m_detachEvent = CreateEvent(nullptr, TRUE, FALSE, nullptr);
 
-    m_evalEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-    m_evalResultEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    m_evalEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    m_evalResultEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 
     // Start a new thread to handle the incoming event channel.
     DWORD threadId;
-    m_commandThread = CreateThread(NULL, 0, StaticCommandThreadProc, this, 0, &threadId);
+    m_commandThread = CreateThread(nullptr, 0, StaticCommandThreadProc, this, 0, &threadId);
 
     // Give the front end the address of our Initialize function so that
     // it can call it once we're done loading.
@@ -323,7 +322,7 @@ DebugBackend::VirtualMachine* DebugBackend::AttachState(unsigned long api, lua_S
 
     if (!GetIsAttached())
     {
-        return NULL;
+        return nullptr;
     }
 
     CriticalSectionLock lock(m_criticalSection);
@@ -359,7 +358,7 @@ DebugBackend::VirtualMachine* DebugBackend::AttachState(unsigned long api, lua_S
    
     if (!lua_checkstack_dll(api, L, 3))
     {
-        return NULL;
+        return nullptr;
     }
 
     m_eventChannel.WriteUInt32(EventId_CreateVM);
@@ -543,7 +542,7 @@ int DebugBackend::RegisterScript(lua_State* L, const char* source, size_t size, 
 
     // If no name was specified, use the source as the name. This is similar to what
     // built-in Lua functions like luaL_loadstring do.
-    if (name == NULL)
+    if (name == nullptr)
     {
         // Null terminate the source in case it isn't already.
         char* temp = new char[size + 1];
@@ -561,7 +560,6 @@ int DebugBackend::RegisterScript(lua_State* L, const char* source, size_t size, 
         if (freeName)
         {
             delete [] name;
-            name = NULL;
         }
         return -1;
     }
@@ -584,7 +582,7 @@ int DebugBackend::RegisterScript(lua_State* L, const char* source, size_t size, 
                 if (freeName)
                 {
                     delete [] name;
-                    name = NULL;
+                    name = nullptr;
                 }
                 return -1;
             }
@@ -595,7 +593,7 @@ int DebugBackend::RegisterScript(lua_State* L, const char* source, size_t size, 
     script->name    = name;
     script->title   = title;
 
-    if (size > 0 && source != NULL)
+    if (size > 0 && source != nullptr)
     {
         script->source = std::string(source, size);
     }
@@ -638,12 +636,12 @@ int DebugBackend::RegisterScript(lua_State* L, const char* source, size_t size, 
     }
 
     // Check if this is a compiled/binary file.
-    if (source != NULL && size >= 4)
+    if (source != nullptr && size >= 4)
     {
         if (source[0] >= 27 && source[0] <= 33 && memcmp(source + 1, "Lua", 3) == 0)
         {
             state = CodeState_Binary;
-            source = NULL;
+            source = nullptr;
         }
     }
 
@@ -658,7 +656,7 @@ int DebugBackend::RegisterScript(lua_State* L, const char* source, size_t size, 
     if (freeName)
     {
         delete [] name;
-        name = NULL;
+        name = nullptr;
     }
 
     return scriptIndex;
@@ -668,16 +666,16 @@ int DebugBackend::RegisterScript(lua_State* L, const char* source, size_t size, 
 int DebugBackend::RegisterScript(unsigned long api, lua_State* L, lua_Debug* ar)
 {
     const char* arsource = GetSource( api, ar);
-    const char* source = NULL;
+    const char* source = nullptr;
     size_t size = 0;
   
-    if (arsource != NULL && arsource[0] != '@')
+    if (arsource != nullptr && arsource[0] != '@')
     {
         source = arsource;
         size   = strlen(source);
     }
   
-    int scriptIndex = RegisterScript(L, source, size, arsource, source == NULL);
+    int scriptIndex = RegisterScript(L, source, size, arsource, source == nullptr);
   
     // We need to exit the critical section before waiting so that we don't
     // monopolize it. Specifically, ToggleBreakpoint will need it.
@@ -721,7 +719,7 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
     // Note this executes in the thread of the script being debugged,
     // not our debugger, so we can block.
 
-    VirtualMachine* vm = NULL;
+    VirtualMachine* vm = nullptr;
     StateToVmMap::const_iterator iterator = m_stateToVm.find(L);
 
     if (iterator == m_stateToVm.end())
@@ -782,7 +780,7 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
     lua_rawgetglobal_dll(api, L, "decoda_name");
     const char* name = lua_tostring_dll(api, L, -1);
 
-    if (name == NULL)
+    if (name == nullptr)
     {
         name = "";
     }
@@ -948,7 +946,7 @@ void DebugBackend::UpdateHookMode(unsigned long api, lua_State* L, lua_Debug* ho
         Script* script = scriptIndex != -1 ? m_scripts[scriptIndex] : NULL;
 
         int lastlinedefined = GetLastLineDefined( api, hookEvent);
-        if(script != NULL && (script->HasBreakPointInRange(linedefined, lastlinedefined) ||
+        if(script != nullptr && (script->HasBreakPointInRange(linedefined, lastlinedefined) ||
            //Check if the function is the top level chunk of a script because they always have there lastlinedefined set to 0                  
            (script->HasBreakpointsActive() && linedefined == 0 && lastlinedefined == 0)))
         {
@@ -1016,7 +1014,7 @@ bool DebugBackend::StackHasBreakpoint(unsigned long api, lua_State* L)
         Script* script = scriptIndex != -1 ? m_scripts[scriptIndex] : NULL;
 
         int lastlinedefined = GetLastLineDefined( api, &functionInfo);
-        if(script != NULL && (script->HasBreakPointInRange(linedefined, lastlinedefined) ||
+        if(script != nullptr && (script->HasBreakPointInRange(linedefined, lastlinedefined) ||
            //Check if the function is the top level chunk of a source file                       
            (script->HasBreakpointsActive() && linedefined == 0 && lastlinedefined == 0)))
         {
@@ -1030,7 +1028,7 @@ bool DebugBackend::StackHasBreakpoint(unsigned long api, lua_State* L)
 
 int DebugBackend::GetScriptIndex(const char* name) const
 {
-    if (name == NULL) 
+    if (name == nullptr) 
     {
         return -1;
     }
@@ -1439,7 +1437,7 @@ void DebugBackend::SendBreakEvent(unsigned long api, lua_State* L, int stackTop)
     StackEntry nativeStack[100];
     unsigned int nativeStackSize = 0;
 
-    if (vm != NULL)
+    if (vm != nullptr)
     {
         // Remember how many stack levels to skip so when we evaluate we can adjust
         // the stack level accordingly.
@@ -1469,15 +1467,15 @@ void DebugBackend::SendBreakEvent(unsigned long api, lua_State* L, int stackTop)
         stackNode->SetAttribute("script_index", GetScriptIndex(GetSource(api, &ar)));
         stackNode->SetAttribute("line", GetCurrentLine(api, &ar) - 1);
         const char* functionName = GetName(api, &ar);
-        if (functionName == NULL)
+        if (functionName == nullptr)
             functionName = GetWhat(api, &ar);
-        if (functionName == NULL)
+        if (functionName == nullptr)
             functionName = "<unknown>";
         stackNode->SetAttribute("function", functionName);
         stacksNode->LinkEndChild(stackNode);
         const char *name;
         int j = 1;
-        while ((name = lua_getlocal_dll(api, L, &ar, j++)) != NULL) {
+        while ((name = lua_getlocal_dll(api, L, &ar, j++)) != nullptr) {
             if (!GetIsInternalVariable(name)) {
                 TiXmlNode* valueNode = GetValueAsText(api, L, -1, 1);
                 valueNode->LinkEndChild(WriteXmlNode("name", name));
@@ -1487,7 +1485,7 @@ void DebugBackend::SendBreakEvent(unsigned long api, lua_State* L, int stackTop)
         }
         lua_getinfo_dll(api, L, "f", &ar);  /* retrieves function */
         j = 1;
-        while ((name = lua_getupvalue_dll(api, L, -1, j++)) != NULL) {
+        while ((name = lua_getupvalue_dll(api, L, -1, j++)) != nullptr) {
             if (!GetIsInternalVariable(name)) {
                 TiXmlNode* valueNode = GetValueAsText(api, L, -1, 1);
                 valueNode->LinkEndChild(WriteXmlNode("name", name));
@@ -1527,7 +1525,7 @@ void DebugBackend::BreakFromScript(unsigned long api, lua_State* L)
     WaitForContinue();        
 }
 
-int DebugBackend::Call(unsigned long api, lua_State* L, int nargs, int nresults, int errorfunc)
+int DebugBackend::Call(unsigned long api, lua_State* L, int nargs, int nresults, int errorfunc) const
 {
 
     // Check it's not our error handler that's getting called (happens when there's an
@@ -1594,7 +1592,7 @@ int DebugBackend::ErrorHandler(unsigned long api, lua_State* L)
     // Get the error mesasge.
     const char* message = lua_tostring_dll(api, L, -1);
 
-    if (message == NULL)
+    if (message == nullptr)
     {
         message = "No error message available";
     }
@@ -1660,7 +1658,7 @@ bool DebugBackend::GetStartupDirectory(char* path, int maxPathLength)
 
     char* lastSlash = strrchr(path, '\\');
 
-    if (lastSlash == NULL)
+    if (lastSlash == nullptr)
     {
         return false;
     }
@@ -1711,7 +1709,7 @@ bool DebugBackend::CreateEnvironment(unsigned long api, lua_State* L, int stackL
         return false;
     }
 
-    const char* name = NULL;
+    const char* name = nullptr;
 
     // Copy the local variables into a new table.
 
@@ -1975,7 +1973,7 @@ void DebugBackend::SetLocals(unsigned long api, lua_State* L, int stackLevel, in
     int result = lua_getstack_dll(api, L, stackLevel, &stackEntry);
     assert(result);        
 
-    const char* name = NULL;
+    const char* name = nullptr;
 
     for (int local = 1; name = lua_getlocal_dll(api, L, &stackEntry, local); ++local) 
     {
@@ -2018,7 +2016,7 @@ void DebugBackend::SetUpValues(unsigned long api, lua_State* L, int stackLevel, 
     lua_getinfo_dll(api, L, "f", &stackEntry);
     int functionIndex = lua_gettop_dll(api, L);
 
-    const char* name = NULL;
+    const char* name = nullptr;
 
     for (int upValue = 1; name = lua_getupvalue_dll(api, L, functionIndex, upValue); ++upValue)
     {
@@ -2137,7 +2135,7 @@ bool DebugBackend::Evaluate(unsigned long api, lua_State* L, const std::string& 
         // expression.
         int nresults = lua_gettop_dll(api, L) - stackTop;
 
-        TiXmlNode* root = NULL;
+        TiXmlNode* root = nullptr;
 
         // If there are multiple results, create a root "values" node.
 
@@ -2155,7 +2153,7 @@ bool DebugBackend::Evaluate(unsigned long api, lua_State* L, const std::string& 
         {
             TiXmlNode* node = GetValueAsText(api, L, -1 - (nresults - 1 - i), depth);
 
-            if (node != NULL)
+            if (node != nullptr)
             {
                 root->LinkEndChild(node);
             }
@@ -2173,7 +2171,7 @@ bool DebugBackend::Evaluate(unsigned long api, lua_State* L, const std::string& 
         const char* wholeMessage = lua_tostring_dll(api, L, -1);
         const char* errorMessage = strstr(wholeMessage, ":2: ");
         
-        if (errorMessage == NULL)
+        if (errorMessage == nullptr)
         {
             errorMessage = wholeMessage;
         }
@@ -2315,7 +2313,7 @@ TiXmlNode* DebugBackend::GetLuaBindClassValue(unsigned long api, lua_State* L, u
 
     if (!lua_checkstack_dll(api, L, 3))
     {
-        return NULL;
+        return nullptr;
     }
 
     if (lua_getmetatable_dll(api, L, -1))
@@ -2333,7 +2331,7 @@ TiXmlNode* DebugBackend::GetLuaBindClassValue(unsigned long api, lua_State* L, u
         {
             // This userdata doesn't have the luabind class signature in its
             // metatable.
-            return NULL;
+            return nullptr;
         }
 
     }
@@ -2344,7 +2342,7 @@ TiXmlNode* DebugBackend::GetLuaBindClassValue(unsigned long api, lua_State* L, u
     // so we can directly convert that into the value.
     lua_getfenv_dll(api, L, -1);
 
-    TiXmlNode* node = NULL;
+    TiXmlNode* node = nullptr;
 
     // If the environment has a metatable, those are the class methods and we
     // need to merge them into the 
@@ -2379,7 +2377,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
 
     if (!lua_checkstack_dll(api, L, 1))
     {
-        return NULL;
+        return nullptr;
     }
 
     // Duplicate the item since calling to* can modify the value.
@@ -2388,12 +2386,12 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
     int type = lua_type_dll(api, L, -1);
     const char* typeName = lua_typename_dll(api, L, type);
 
-    if (typeNameOverride == NULL)
+    if (typeNameOverride == nullptr)
     {
         typeNameOverride = typeName;
     }
 
-    TiXmlNode* node = NULL;
+    TiXmlNode* node = nullptr;
 
     if (strcmp(typeName, "table") == 0)
     {
@@ -2425,7 +2423,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
 
             }
         }
-        if( node == NULL)
+        if( node == nullptr)
         {
             node = GetTableAsText(api, L, -1, maxDepth - 1, typeNameOverride);
         }
@@ -2453,7 +2451,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
             size_t length = 0;
             const lua_WChar* string = lua_towstring_dll(api, L, -1); 
             
-            if (string != NULL)
+            if (string != nullptr)
             {
                 length = wcslen(reinterpret_cast<const wchar_t*>(string)) * sizeof(lua_WChar);
             }
@@ -2516,7 +2514,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
             const char* temp = GetClassNameForUserdata(api, L, -1);
             std::string className;
 
-            if (temp != NULL)
+            if (temp != nullptr)
             {
                 className = temp;
             }
@@ -2531,7 +2529,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
             // Check if this is a luabind class instance.
             //node = GetLuaBindClassValue(api, L, maxDepth, displayAsKey);
 
-            if (node == NULL)
+            if (node == nullptr)
             {
 
                 // Check to see if the user data's metatable has a __towatch method. This is
@@ -2577,7 +2575,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
 
                         const char* string = lua_tostring_dll(api, L, -1);
                         
-                        if (string != NULL)
+                        if (string != nullptr)
                         {
                             node = new TiXmlElement("value");
                             node->LinkEndChild( WriteXmlNode("data", string) );
@@ -2596,7 +2594,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
 
                     const char* error = lua_tostring_dll(api, L, -1);
 
-                    if (error == NULL)
+                    if (error == nullptr)
                     {
                         // This shouldn't happen, but we check just to make it a little
                         // more robust.
@@ -2613,7 +2611,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
             }
 
             // If we did't find a way to display the user data, just display the class name.
-            if (node == NULL)
+            if (node == nullptr)
             {
 
                 if (!m_warnedAboutUserData)
@@ -2648,7 +2646,7 @@ TiXmlNode* DebugBackend::GetValueAsText(unsigned long api, lua_State* L, int n, 
             const char* string = lua_tostring_dll(api, L, -1);
             std::string result;
 
-            if (string == NULL)
+            if (string == nullptr)
             {
             
                 // If tostring failed for some reason, fallback to our own version.
@@ -2708,7 +2706,7 @@ TiXmlNode* DebugBackend::GetTableAsText(unsigned long api, lua_State* L, int t, 
 
     if (!lua_checkstack_dll(api, L, 2))
     {
-        return NULL;
+        return nullptr;
     }    
     
     int t1 = lua_gettop_dll(api, L);
@@ -2734,7 +2732,7 @@ TiXmlNode* DebugBackend::GetTableAsText(unsigned long api, lua_State* L, int t, 
         {
 
             TiXmlNode* key = new TiXmlElement("key");
-            key->LinkEndChild( GetValueAsText(api, L, -2, maxDepth - 1, NULL, true) );
+            key->LinkEndChild( GetValueAsText(api, L, -2, maxDepth - 1, nullptr, true) );
 
             TiXmlNode* value = new TiXmlElement("data");
             value->LinkEndChild( GetValueAsText(api, L, -1, maxDepth - 1) );
@@ -2828,7 +2826,7 @@ const char* DebugBackend::GetClassNameForUserdata(unsigned long api, lua_State* 
 
     if (!lua_checkstack_dll(api, L, 2))
     {
-        return NULL;
+        return nullptr;
     }
 
     bool result = false;
@@ -2861,7 +2859,7 @@ const char* DebugBackend::GetClassNameForUserdata(unsigned long api, lua_State* 
 
     }
 
-    return NULL;
+    return nullptr;
 
 }
 
@@ -2884,7 +2882,7 @@ void DebugBackend::RegisterClassName(unsigned long api, lua_State* L, const char
 
 int DebugBackend::LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const char* buffer, size_t size, const char* name)
 {
-    return lua_loadbuffer_dll(api, L, buffer, size, name, NULL);
+    return lua_loadbuffer_dll(api, L, buffer, size, name, nullptr);
 }
 
 int DebugBackend::LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const std::string& string)
@@ -2935,7 +2933,7 @@ std::string DebugBackend::GetAsciiString(const void* buffer, size_t length, bool
     wide = false;
     const char* string = reinterpret_cast<const char*>(buffer);
 
-    if (string == NULL)
+    if (string == nullptr)
     {
         return "";
     }
@@ -2959,7 +2957,7 @@ std::string DebugBackend::GetAsciiString(const void* buffer, size_t length, bool
     converted.reserve(length);
     
     char* result = new char[length + 2]; 
-    size_t convertedLength = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)string, length / sizeof(wchar_t), result, length + 1, 0, 0);
+    size_t convertedLength = WideCharToMultiByte(CP_UTF8, 0, (const wchar_t*)string, length / sizeof(wchar_t), result, length + 1, nullptr, nullptr);
 
     if (convertedLength != 0)
     {
@@ -3134,7 +3132,7 @@ void DebugBackend::GetFileTitle(const char* name, std::string& title) const
 
     const char* pathEnd = max(slash1, slash2);
 
-    if (pathEnd == NULL)
+    if (pathEnd == nullptr)
     {
         // There's no path so the whole thing is the file title.
         title = name;
@@ -3146,7 +3144,7 @@ void DebugBackend::GetFileTitle(const char* name, std::string& title) const
 
 }
 
-bool DebugBackend::EnableJit(unsigned long api, lua_State* L, bool enable)
+bool DebugBackend::EnableJit(unsigned long api, lua_State* L, bool enable) const
 {
 
     LUA_CHECK_STACK(api, L, 0);
@@ -3239,13 +3237,13 @@ unsigned int DebugBackend::GetCStack(HANDLE hThread, StackEntry stack[], unsigne
 
         // Try to get the symbol name from the address.
 
-        if (SymGetSymFromAddr64_dll(hProcess, stackFrame[i].AddrPC.Offset, NULL, symbol))
+        if (SymGetSymFromAddr64_dll(hProcess, stackFrame[i].AddrPC.Offset, nullptr, symbol))
         {
             sprintf(stack[i].name, "%s", symbol->Name);
         }
         else
         {
-            sprintf(stack[i].name, "0x%x", stackFrame[i].AddrPC.Offset);
+            sprintf(stack[i].name, "0x%llu", stackFrame[i].AddrPC.Offset);
         }
 
     }
@@ -3281,7 +3279,7 @@ DebugBackend::VirtualMachine* DebugBackend::GetVm(lua_State* L)
 
     }
 
-    return NULL;
+    return nullptr;
 
 }
 
@@ -3323,9 +3321,9 @@ unsigned int DebugBackend::GetUnifiedStack(unsigned long api, const StackEntry n
             const lua_Debug* ar = &scriptStack[scriptPos];
             const char* function = GetName(api, ar);
             const char* arwhat = GetWhat(api, ar);
-            if (function == NULL || function[0] == '\0')
+            if (function == nullptr || function[0] == '\0')
             {
-                if (arwhat != NULL)
+                if (arwhat != nullptr)
                 {
                     function = arwhat;
                 }
@@ -3335,7 +3333,7 @@ unsigned int DebugBackend::GetUnifiedStack(unsigned long api, const StackEntry n
                 }
             }
 
-            if (arwhat != NULL && strcmp(arwhat, "C") == 0)
+            if (arwhat != nullptr && strcmp(arwhat, "C") == 0)
             {
                 --scriptPos;
                 break;

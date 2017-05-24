@@ -170,7 +170,7 @@ public:
      * Calls the function on the top of the stack in a protected environment that
      * triggers a debugger exception on error.
      */
-    int Call(unsigned long api, lua_State* L, int nargs, int nresults, int errorfunc);
+    int Call(unsigned long api, lua_State* L, int nargs, int nresults, int errorfunc) const;
 
     /**
      * Returns the index of the script in the scripts array with the specified
@@ -230,7 +230,7 @@ public:
      * this has no effect and returns false. If JIT was successfully enabled or disabled the 
      * function returns true.
      */
-    bool EnableJit(unsigned long api, lua_State* L, bool enable);
+    bool EnableJit(unsigned long api, lua_State* L, bool enable) const;
 
 private:
 
@@ -247,7 +247,7 @@ private:
 
         bool ToggleBreakpoint(unsigned int line);
 
-        bool HasBreakpointsActive();
+        bool HasBreakpointsActive() const;
 
         void ClearBreakpoints();
 
