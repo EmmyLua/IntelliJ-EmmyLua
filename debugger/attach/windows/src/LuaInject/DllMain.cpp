@@ -22,10 +22,9 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <windows.h>
 
-#include "LuaDll.h"
 #include "DebugBackend.h"
 
-HINSTANCE g_hInstance = NULL;
+HINSTANCE g_hInstance = nullptr;
 
 BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD reason, LPVOID reserved)
 {
