@@ -19,7 +19,10 @@ package com.tang.intellij.lua.debugger;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XSourcePosition;
+import com.intellij.xdebugger.frame.XSuspendContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *
@@ -41,5 +44,20 @@ public abstract class LuaDebugProcess extends XDebugProcess implements DebugLogg
 
     public void error(@NotNull String text) {
         getSession().getConsoleView().print(text + "\n", ConsoleViewContentType.ERROR_OUTPUT);
+    }
+
+    @Override
+    public void startStepOut(@Nullable XSuspendContext context) {
+        startStepOver(context);
+    }
+
+    @Override
+    public void startForceStepInto(@Nullable XSuspendContext context) {
+        startStepInto(context);
+    }
+
+    @Override
+    public void runToPosition(@NotNull XSourcePosition position, @Nullable XSuspendContext context) {
+        resume(context);
     }
 }
