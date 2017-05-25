@@ -31,11 +31,11 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <psapi.h>
 
-DebugFrontend* DebugFrontend::s_instance = NULL;
+DebugFrontend* DebugFrontend::s_instance = nullptr;
 
 DebugFrontend& DebugFrontend::Get()
 {
-    if (s_instance == NULL)
+    if (s_instance == nullptr)
     {
         s_instance = new DebugFrontend;
     }
@@ -45,15 +45,15 @@ DebugFrontend& DebugFrontend::Get()
 void DebugFrontend::Destroy()
 {
     delete s_instance;
-    s_instance = NULL;
+    s_instance = nullptr;
 }
 
 DebugFrontend::DebugFrontend()
 {
     m_processId     = 0;
-    m_process       = NULL;
-    m_eventHandler  = NULL;
-    m_eventThread   = NULL;
+    m_process       = nullptr;
+    m_eventHandler  = nullptr;
+    m_eventThread   = nullptr;
     m_state         = State_Inactive;
 }
 
@@ -100,7 +100,7 @@ bool DebugFrontend::Start(const char* command, const char* commandArguments, con
     else
     {
 
-        if (!CreateProcess(NULL, commandLine, NULL, NULL, TRUE, 0, NULL, directory.c_str(), &startUpInfo, &processInfo))
+        if (!CreateProcess(nullptr, commandLine, nullptr, nullptr, TRUE, 0, nullptr, directory.c_str(), &startUpInfo, &processInfo))
         {
             OutputError(GetLastError());
             return false;
@@ -149,7 +149,7 @@ bool DebugFrontend::Attach(unsigned int processId, const char* symbolsDirectory)
     m_processId = processId;
     m_process   = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
 
-    if (m_process == NULL)
+    if (m_process == nullptr)
     {
         MessageEvent("Error: The process could not be opened", MessageType_Error);
         m_processId = 0;
@@ -159,7 +159,7 @@ bool DebugFrontend::Attach(unsigned int processId, const char* symbolsDirectory)
     if (!InitializeBackend(symbolsDirectory))
     {
         CloseHandle(m_process);
-        m_process   = NULL;
+        m_process   = nullptr;
         m_processId = 0;
         return false;
     }
@@ -220,13 +220,13 @@ bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 
     // Start a new thread to handle the incoming event channel.
     DWORD threadId;
-    m_eventThread = CreateThread(NULL, 0, StaticEventThreadProc, this, 0, &threadId);
+    m_eventThread = CreateThread(nullptr, 0, StaticEventThreadProc, this, 0, &threadId);
 
     return true;
 
 }
 
-bool DebugFrontend::AttachDebuggerToHost()
+bool DebugFrontend::AttachDebuggerToHost() const
 {
 
     if (m_processId != 0)
@@ -243,10 +243,10 @@ bool DebugFrontend::AttachDebuggerToHost()
             DWORD type;
             DWORD size;
 
-            if (RegQueryValueEx(key, "Debugger", NULL, &type, NULL, &size) == ERROR_SUCCESS && type == REG_SZ)
+            if (RegQueryValueEx(key, "Debugger", nullptr, &type, nullptr, &size) == ERROR_SUCCESS && type == REG_SZ)
             {
                 char* buffer = new char[size + 1];
-                RegQueryValueEx(key, "Debugger", NULL, &type, reinterpret_cast<PBYTE>(buffer), &size);
+                RegQueryValueEx(key, "Debugger", nullptr, &type, reinterpret_cast<PBYTE>(buffer), &size);
                 commandLine = buffer;
                 delete [] buffer;
             }
@@ -273,8 +273,8 @@ bool DebugFrontend::AttachDebuggerToHost()
 
             PROCESS_INFORMATION processInfo;
 
-            if (!CreateProcess(NULL, (LPTSTR)((LPCTSTR)(commandLine.c_str())), NULL, NULL, TRUE, 0,
-                    NULL, NULL, &startUpInfo, &processInfo))
+            if (!CreateProcess(nullptr, (LPTSTR)((LPCTSTR)(commandLine.c_str())), nullptr, nullptr, TRUE, 0,
+                    nullptr, nullptr, &startUpInfo, &processInfo))
             {
                 return false;
             }
@@ -307,18 +307,18 @@ void DebugFrontend::Stop(bool kill)
 
     // Store the handle to the process, since when the thread exists it will close the
     // handle.
-    HANDLE hProcess = NULL;
+    HANDLE hProcess = nullptr;
     DuplicateHandle(GetCurrentProcess(), m_process, 
         GetCurrentProcess(), &hProcess, 0, TRUE, DUPLICATE_SAME_ACCESS);
 
-    if (m_eventThread != NULL)
+    if (m_eventThread != nullptr)
     {
 
         // Wait for the thread to exit.
         WaitForSingleObject(m_eventThread, INFINITE);
     
         CloseHandle(m_eventThread);
-        m_eventThread = NULL;
+        m_eventThread = nullptr;
     
     }
 
@@ -331,7 +331,7 @@ void DebugFrontend::Stop(bool kill)
 
 }
 
-bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName)
+bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 {
 
     bool success = true;
@@ -349,7 +349,7 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName)
 
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
 
-    if (process == NULL)
+    if (process == nullptr)
     {
         return false;
 	}
@@ -358,7 +358,7 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName)
 	// set dll directory
 	char path[MAX_PATH];
 	HANDLE hProcess = GetCurrentProcess();
-	GetModuleFileNameEx(hProcess, NULL, path, MAX_PATH);
+	GetModuleFileNameEx(hProcess, nullptr, path, MAX_PATH);
 	strcpy(strrchr(path, '\\'), "");
 	void* dllDirRemote = RemoteDup(process, path, strlen(path) + 1);
 	ExecuteRemoteKernelFuntion(process, "SetDllDirectoryA", dllDirRemote, exitCode);
@@ -372,8 +372,8 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName)
     HMODULE dllHandle = reinterpret_cast<HMODULE>(exitCode);
 
 	// reset dll directory
-	ExecuteRemoteKernelFuntion(process, "SetDllDirectoryA", NULL, exitCode);
-    if (dllHandle == NULL)
+	ExecuteRemoteKernelFuntion(process, "SetDllDirectoryA", nullptr, exitCode);
+    if (dllHandle == nullptr)
     {
         success = false;
     }
@@ -395,13 +395,12 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName)
     }
     */
 
-    if (remoteFileName != NULL)
+    if (remoteFileName != nullptr)
     {
-        VirtualFreeEx(process, remoteFileName, 0, MEM_RELEASE); 
-        remoteFileName = NULL;
+        VirtualFreeEx(process, remoteFileName, 0, MEM_RELEASE);
     }
 
-    if (process != NULL)
+    if (process != nullptr)
     {
         CloseHandle(process);
     }
@@ -410,14 +409,14 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName)
 
 }
 
-bool DebugFrontend::GetIsBeingDebugged(DWORD processId)
+bool DebugFrontend::GetIsBeingDebugged(DWORD processId) const
 {
 
     LPCSTR moduleFileName = "LuaInject.dll";
 
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
 
-    if (process == NULL)
+    if (process == nullptr)
     {
         return false;
     }
@@ -432,13 +431,12 @@ bool DebugFrontend::GetIsBeingDebugged(DWORD processId)
         result = (exitCode != 0);
     }
 
-    if (remoteFileName != NULL)
+    if (remoteFileName != nullptr)
     {
-        VirtualFreeEx(process, remoteFileName, 0, MEM_RELEASE); 
-        remoteFileName = NULL;
+        VirtualFreeEx(process, remoteFileName, 0, MEM_RELEASE);
     }
 
-    if (process != NULL)
+    if (process != nullptr)
     {
         CloseHandle(process);
     }
@@ -447,22 +445,22 @@ bool DebugFrontend::GetIsBeingDebugged(DWORD processId)
 
 }
 
-bool DebugFrontend::ExecuteRemoteKernelFuntion(HANDLE process, const char* functionName, LPVOID param, DWORD& exitCode)
+bool DebugFrontend::ExecuteRemoteKernelFuntion(HANDLE process, const char* functionName, LPVOID param, DWORD& exitCode) const
 {
 
     HMODULE kernelModule = GetModuleHandle("Kernel32");
     FARPROC function = GetProcAddress(kernelModule, functionName);
 
-    if (function == NULL)
+    if (function == nullptr)
     {
         return false;
     }
 
     DWORD threadId;
-    HANDLE thread = CreateRemoteThread(process, NULL, 0,
+    HANDLE thread = CreateRemoteThread(process, nullptr, 0,
         (LPTHREAD_START_ROUTINE)function, param, 0, &threadId);
 
-    if (thread != NULL)
+    if (thread != nullptr)
     {
         
         WaitForSingleObject(thread, INFINITE);
@@ -479,17 +477,17 @@ bool DebugFrontend::ExecuteRemoteKernelFuntion(HANDLE process, const char* funct
 
 }
 
-bool DebugFrontend::GetStartupDirectory(char* path, int maxPathLength)
+bool DebugFrontend::GetStartupDirectory(char* path, int maxPathLength) const
 {
 
-    if (!GetModuleFileName(NULL, path, maxPathLength))
+    if (!GetModuleFileName(nullptr, path, maxPathLength))
     {
 		return false;
     }
 
     char* lastSlash = strrchr(path, '\\');
 
-    if (lastSlash == NULL)
+    if (lastSlash == nullptr)
     {
         return false;
     }
@@ -612,7 +610,7 @@ void DebugFrontend::EventThreadProc()
         }
 
         // Dispatch the message to the UI.
-        if (m_eventHandler != NULL)
+        if (m_eventHandler != nullptr)
         {
             m_eventHandler->AddPendingEvent(event);
         }
@@ -620,7 +618,7 @@ void DebugFrontend::EventThreadProc()
     }
 
     // Send the exit event message to the UI.
-    if (m_eventHandler != NULL)
+    if (m_eventHandler != nullptr)
     {
         wxDebugEvent event(static_cast<EventId>(EventId_SessionEnd), 0);
         m_eventHandler->AddPendingEvent(event);        
@@ -639,7 +637,7 @@ void DebugFrontend::Shutdown()
     // Clean up.
     CloseHandle(m_process);
 
-    m_process   = NULL;
+    m_process   = nullptr;
     m_processId = 0;
 
 }
@@ -744,7 +742,7 @@ DebugFrontend::Script* DebugFrontend::GetScript(unsigned int scriptIndex)
     CriticalSectionLock lock(m_criticalSection);
     if (scriptIndex == -1)
     {
-        return NULL;
+        return nullptr;
     }
     else
     {
@@ -782,7 +780,7 @@ DebugFrontend::State DebugFrontend::GetState() const
     return m_state;
 }
 
-void DebugFrontend::MessageEvent(const std::string& message, MessageType type)
+void DebugFrontend::MessageEvent(const std::string& message, MessageType type) const
 {
 
     wxDebugEvent event(EventId_Message, 0);
@@ -790,7 +788,7 @@ void DebugFrontend::MessageEvent(const std::string& message, MessageType type)
     event.SetMessageType(type);
 
     // Dispatch the message to the UI.
-    if (m_eventHandler != NULL)
+    if (m_eventHandler != nullptr)
     {
         m_eventHandler->AddPendingEvent(event);
     }
@@ -816,9 +814,9 @@ bool DebugFrontend::ProcessInitialization(const char* symbolsDirectory)
     void* remoteSymbolsDirectory = RemoteDup(m_process, symbolsDirectory, strlen(symbolsDirectory) + 1);
     
     DWORD threadId;
-    HANDLE thread = CreateRemoteThread(m_process, NULL, 0, (LPTHREAD_START_ROUTINE)function, remoteSymbolsDirectory, 0, &threadId);
+    HANDLE thread = CreateRemoteThread(m_process, nullptr, 0, (LPTHREAD_START_ROUTINE)function, remoteSymbolsDirectory, 0, &threadId);
 
-    if (thread == NULL)
+    if (thread == nullptr)
     {
         return false;
     }
@@ -828,13 +826,12 @@ bool DebugFrontend::ProcessInitialization(const char* symbolsDirectory)
     GetExitCodeThread(thread, &exitCode);
     
     CloseHandle(thread);
-    thread = NULL;
 
-    return exitCode != 0;
+	return exitCode != 0;
 
 }
 
-std::string DebugFrontend::MakeValidFileName(const std::string& name)
+std::string DebugFrontend::MakeValidFileName(const std::string& name) const
 {
 
     std::string result;
@@ -861,12 +858,12 @@ std::string DebugFrontend::MakeValidFileName(const std::string& name)
 HWND DebugFrontend::GetProcessWindow(DWORD processId) const
 {
 
-    HWND hWnd = FindWindowEx(NULL, NULL, NULL, NULL);
+    HWND hWnd = FindWindowEx(nullptr, nullptr, nullptr, nullptr);
 
-    while (hWnd != NULL)
+    while (hWnd != nullptr)
     {
 
-        if (GetParent(hWnd) == NULL && GetWindowTextLength(hWnd) > 0 && IsWindowVisible(hWnd))
+        if (GetParent(hWnd) == nullptr && GetWindowTextLength(hWnd) > 0 && IsWindowVisible(hWnd))
         {
 
             DWORD windowProcessId;
@@ -917,7 +914,7 @@ void DebugFrontend::GetProcesses(std::vector<Process>& processes) const
                     
                     HWND hWnd = GetProcessWindow(processEntry.th32ProcessID);
 
-                    if (hWnd != NULL)
+                    if (hWnd != nullptr)
                     {
                         char buffer[1024];
                         GetWindowText(hWnd, buffer, 1024);
@@ -945,9 +942,9 @@ void DebugFrontend::IgnoreException(const std::string& message)
     m_commandChannel.Flush();
 }
 
-void* DebugFrontend::RemoteDup(HANDLE process, const void* source, size_t length)
+void* DebugFrontend::RemoteDup(HANDLE process, const void* source, size_t length) const
 {
-    void* remote = VirtualAllocEx(process, NULL, length, MEM_COMMIT, PAGE_READWRITE);
+    void* remote = VirtualAllocEx(process, nullptr, length, MEM_COMMIT, PAGE_READWRITE);
 	SIZE_T numBytesWritten;
     WriteProcessMemory(process, remote, source, length, &numBytesWritten);
     return remote;
@@ -974,7 +971,7 @@ bool DebugFrontend::GetExeInfo(LPCSTR fileName, ExeInfo& info) const
 {
     
     LOADED_IMAGE loadedImage;
-    if (!MapAndLoad(const_cast<PSTR>(fileName), NULL, &loadedImage, FALSE, TRUE))
+    if (!MapAndLoad(const_cast<PSTR>(fileName), nullptr, &loadedImage, FALSE, TRUE))
     {
         return false;
     }
@@ -1066,7 +1063,7 @@ bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandL
 
     DWORD flags = DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS | CREATE_NEW_CONSOLE;
 
-    if (!CreateProcess(NULL, commandLine, NULL, NULL, TRUE, flags, NULL, directory, &startUpInfo, &processInfo))
+    if (!CreateProcess(nullptr, commandLine, nullptr, nullptr, TRUE, flags, nullptr, directory, &startUpInfo, &processInfo))
     {
         OutputError(GetLastError());
         return false;
@@ -1168,7 +1165,7 @@ void DebugFrontend::OutputError(DWORD error)
 {
 
     char buffer[1024];
-    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error, 0, buffer, 1024,  NULL))
+    if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, error, 0, buffer, 1024, nullptr))
     {
         std::string message = "Error: ";
         message += buffer;

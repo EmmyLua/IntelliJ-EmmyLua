@@ -24,7 +24,6 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #define DEBUG_FRONTEND_H
 
 #include <windows.h>
-#include <string>
 #include <vector>
 
 #include "wxEvtHandler.h"
@@ -105,7 +104,7 @@ public:
      * Attaches the default debugger (set on the machine) to the application
      * hosting the scripting language.
      */
-    bool AttachDebuggerToHost();
+    bool AttachDebuggerToHost() const;
 
     /**
      * Stops the debugger. If kill is true the debugee process will be
@@ -219,17 +218,17 @@ private:
      * Injects a DLL into a process. This causes the DLL to be loaded into that
      * process, allowing for manipulation in that processes memory space.
      */
-    bool InjectDll(DWORD processId, const char* dllFileName);
+    bool InjectDll(DWORD processId, const char* dllFileName) const;
 
     /**
      * Executes an OS kernel function call inside another process.
      */
-    bool ExecuteRemoteKernelFuntion(HANDLE process, const char* functionName, LPVOID param, DWORD& exitCode);
+    bool ExecuteRemoteKernelFuntion(HANDLE process, const char* functionName, LPVOID param, DWORD& exitCode) const;
 
     /**
      * Gets the path that the EXE resides in.
      */
-    bool GetStartupDirectory(char* path, int maxPathLength);
+    bool GetStartupDirectory(char* path, int maxPathLength) const;
     
     /**
      * Entry point into the event handling thread.
@@ -250,7 +249,7 @@ private:
     /**
      * Sends a message event.
      */
-    void MessageEvent(const std::string& message, MessageType type = MessageType_Normal);
+    void MessageEvent(const std::string& message, MessageType type = MessageType_Normal) const;
 
     /**
      * Handles the initialzation handshake between the frontend and the backend.
@@ -262,7 +261,7 @@ private:
     /**
      * Removes characters from the file name that would make it invalid (colons)
      */
-    std::string MakeValidFileName(const std::string& name);
+    std::string MakeValidFileName(const std::string& name) const;
 
     /**
      * Returns the top level window for the specified process. The first such window
@@ -278,7 +277,7 @@ private:
     /**
      * Duplicates a string into the memory of the specified process.
      */
-    void* RemoteDup(HANDLE process, const void* string, size_t len);
+    void* RemoteDup(HANDLE process, const void* string, size_t len) const;
 
     /**
      * Counts the number of lines in a piece of text.
@@ -289,7 +288,7 @@ private:
      * Returns true if the specified process is currently being debugged by Decoda (or
      * was debugged at some point).
      */
-    bool GetIsBeingDebugged(DWORD processId);
+    bool GetIsBeingDebugged(DWORD processId) const;
 
     /**
      * Gets the entry point for the specified executable file from the PE data. If the PE
