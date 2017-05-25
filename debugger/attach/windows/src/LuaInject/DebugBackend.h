@@ -332,7 +332,7 @@ private:
     /**
      * Gets the directory that the DLL is in. The directory ends in a slash.
      */
-    bool GetStartupDirectory(char* path, int maxPathLength);
+    bool GetStartupDirectory(char* path, int maxPathLength) const;
 
     /**
      * Gets the value at location n on the stack as text. If expandTable is true
@@ -361,12 +361,12 @@ private:
     /**
      * This is semantically equivalent to luaL_loadstring.
      */
-    int LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const char* string, size_t size, const char* name);
+    int LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const char* string, size_t size, const char* name) const;
 
     /**
      * This is semantically equivalent to luaL_loadstring.
      */
-    int LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const std::string& string);
+    int LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const std::string& string) const;
     
     /**
      * Called by the front end once the DLL is finished loading to finish
@@ -442,7 +442,7 @@ private:
     /**
      * Waits for the specified event or the detached event.
      */
-    void WaitForEvent(HANDLE hEvent);
+    void WaitForEvent(HANDLE hEvent) const;
 
     /**
      * Returns true if a debugger is currently attached to our process, or false
@@ -470,7 +470,7 @@ private:
      * Chains two tables together so that accessing members of a child table that don't exist
      * will then attempt to access them on the parent table.
      */
-    void ChainTables(unsigned long api, lua_State* L, int child, int parent);
+    void ChainTables(unsigned long api, lua_State* L, int child, int parent) const;
 
     /**
      *
@@ -482,25 +482,25 @@ private:
      * Values which are equal to the value stored at the nilSentinel stack index will be converted
      * to nils.
      */
-    void SetLocals(unsigned long api, lua_State* L, int stackLevel, int localTable, int nilSentinel);
+    void SetLocals(unsigned long api, lua_State* L, int stackLevel, int localTable, int nilSentinel) const;
 
     /**
      * Sets the values of the up values at the specified stack level based on values in the table.
      * Values which are equal to the value stored at the nilSentinel stack index will be converted
      * to nils.
      */
-    void SetUpValues(unsigned long api, lua_State* L, int stackLevel, int upValueTable, int nilSentinel);
+    void SetUpValues(unsigned long api, lua_State* L, int stackLevel, int upValueTable, int nilSentinel) const;
 
     /**
      * Sets the function (on the top of the Lua stack) to be called when a Lua
      * object is garbage collected.
      */
-    void SetGarbageCollectionCallback(unsigned long api, lua_State* L, int index);
+    void SetGarbageCollectionCallback(unsigned long api, lua_State* L, int index) const;
 
     /**
      * Creates a new table with weak keys or values (specified by setting the type as "k" or "v").
      */
-    void CreateWeakTable(unsigned long api, lua_State* L, const char* type);
+    void CreateWeakTable(unsigned long api, lua_State* L, const char* type) const;
 
     /**
      * Returns the index of the API that the VM was created in.
@@ -516,7 +516,7 @@ private:
      * Calls the function on the top of the stack when the garbage collector runs.
      * The function is popped from the stack.
      */
-    void CreateGarbageCollectionSentinel(unsigned long api, lua_State* L);
+    void CreateGarbageCollectionSentinel(unsigned long api, lua_State* L) const;
 
     /**
      * Used by the mechism to setup a garbage collection callback. This function is used
@@ -552,7 +552,7 @@ private:
     /**
      * Gets the current C/C++ call stack.
      */
-    unsigned int GetCStack(HANDLE hThread, StackEntry stack[], unsigned int maxStackSize);
+    unsigned int GetCStack(HANDLE hThread, StackEntry stack[], unsigned int maxStackSize) const;
 
     /**
      * Creates a new table on the top of the stack which is the result of merging
@@ -577,7 +577,7 @@ private:
      */
     unsigned int GetUnifiedStack(unsigned long api, const StackEntry nativeStack[], unsigned int nativeStackSize,
         const lua_Debug scriptStack[], unsigned int scriptStackSize,
-        StackEntry unifiedStack[]);
+        StackEntry unifiedStack[]) const;
 
 private:
 

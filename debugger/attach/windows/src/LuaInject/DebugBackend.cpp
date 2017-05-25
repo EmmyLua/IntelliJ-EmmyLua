@@ -1065,7 +1065,7 @@ void DebugBackend::WaitForContinue()
     }
 }
 
-void DebugBackend::WaitForEvent(HANDLE hEvent)
+void DebugBackend::WaitForEvent(HANDLE hEvent) const
 {
     HANDLE hEvents[] = { hEvent, m_detachEvent };
     WaitForMultipleObjects(2, hEvents, FALSE, INFINITE);
@@ -1240,7 +1240,7 @@ void DebugBackend::ActiveLuaHookInAllVms()
 {
     StateToVmMap::iterator end = m_stateToVm.end();
 
-    for (StateToVmMap::iterator it = m_stateToVm.begin(); it != end; it++)
+    for (StateToVmMap::iterator it = m_stateToVm.begin(); it != end; ++it)
     {
       VirtualMachine* vm = it->second;
       //May have issues with L not being the currently running thread
@@ -1370,7 +1370,7 @@ void DebugBackend::BreakpointsActiveForScript(int scriptIndex)
 
 bool DebugBackend::GetHaveActiveBreakpoints(){
 
-    for(std::vector<Script*>::iterator it = m_scripts.begin(); it != m_scripts.end(); it++)
+    for(std::vector<Script*>::iterator it = m_scripts.begin(); it != m_scripts.end(); ++it)
     {
         if((*it)->HasBreakpointsActive())
         {
@@ -1386,7 +1386,7 @@ void DebugBackend::SetHaveActiveBreakpoints(bool breakpointsActive)
 
     //m_HookLock.Enter();
 
-    for(StateToVmMap::iterator it = m_stateToVm.begin(); it != m_stateToVm.end(); it++)
+    for(StateToVmMap::iterator it = m_stateToVm.begin(); it != m_stateToVm.end(); ++it)
     {
         it->second->haveActiveBreakpoints = breakpointsActive;
     }
@@ -1400,7 +1400,7 @@ void DebugBackend::SetHaveActiveBreakpoints(bool breakpointsActive)
 
 void DebugBackend::DeleteAllBreakpoints(){
 
-    for(std::vector<Script*>::iterator it = m_scripts.begin(); it != m_scripts.end(); it++)
+    for(std::vector<Script*>::iterator it = m_scripts.begin(); it != m_scripts.end(); ++it)
     {
         (*it)->breakpoints.clear();
     }
@@ -1647,7 +1647,7 @@ int DebugBackend::ErrorHandler(unsigned long api, lua_State* L)
 
 }
 
-bool DebugBackend::GetStartupDirectory(char* path, int maxPathLength)
+bool DebugBackend::GetStartupDirectory(char* path, int maxPathLength) const
 {
 
     if (!GetModuleFileName(g_hInstance, path, maxPathLength))
@@ -1669,7 +1669,7 @@ bool DebugBackend::GetStartupDirectory(char* path, int maxPathLength)
 
 }
 
-void DebugBackend::ChainTables(unsigned long api, lua_State* L, int child, int parent)
+void DebugBackend::ChainTables(unsigned long api, lua_State* L, int child, int parent) const
 {
     
     int t1 = lua_gettop_dll(api, L);
@@ -1964,7 +1964,7 @@ void DebugBackend::CreateChainedTable(unsigned long api, lua_State* L, int nilSe
 
 }
 
-void DebugBackend::SetLocals(unsigned long api, lua_State* L, int stackLevel, int localTable, int nilSentinel)
+void DebugBackend::SetLocals(unsigned long api, lua_State* L, int stackLevel, int localTable, int nilSentinel) const
 {
 
     lua_Debug stackEntry;
@@ -2003,7 +2003,7 @@ void DebugBackend::SetLocals(unsigned long api, lua_State* L, int stackLevel, in
 
 }
 
-void DebugBackend::SetUpValues(unsigned long api, lua_State* L, int stackLevel, int upValueTable, int nilSentinel)
+void DebugBackend::SetUpValues(unsigned long api, lua_State* L, int stackLevel, int upValueTable, int nilSentinel) const
 {
 
     lua_Debug stackEntry;
@@ -2104,9 +2104,7 @@ bool DebugBackend::Evaluate(unsigned long api, lua_State* L, const std::string& 
     
     // Turn the expression into a statement by making it a return.
 
-    std::string statement;
-
-    statement  = "return \n";
+	std::string statement = "return \n";
     statement += expression;
     
     int error = LoadScriptWithoutIntercept(api, L, statement.c_str());
@@ -2180,9 +2178,7 @@ bool DebugBackend::Evaluate(unsigned long api, lua_State* L, const std::string& 
             errorMessage += 4;
         }
 
-        std::string text;
-
-        text = "Error: ";
+	    std::string text = "Error: ";
         text += errorMessage;
 
         document.LinkEndChild(WriteXmlNode("error", text));
@@ -2879,12 +2875,12 @@ void DebugBackend::RegisterClassName(unsigned long api, lua_State* L, const char
 
 }
 
-int DebugBackend::LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const char* buffer, size_t size, const char* name)
+int DebugBackend::LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const char* buffer, size_t size, const char* name) const
 {
     return lua_loadbuffer_dll(api, L, buffer, size, name, nullptr);
 }
 
-int DebugBackend::LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const std::string& string)
+int DebugBackend::LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const std::string& string) const
 {
     return LoadScriptWithoutIntercept(api, L, string.c_str(), string.length(), string.c_str());
 }
@@ -2987,7 +2983,7 @@ std::string DebugBackend::GetAsciiString(const void* buffer, size_t length, bool
 
 }
 
-void DebugBackend::CreateWeakTable(unsigned long api, lua_State* L, const char* type)
+void DebugBackend::CreateWeakTable(unsigned long api, lua_State* L, const char* type) const
 {
 
     lua_newtable_dll(api, L);
@@ -3046,7 +3042,7 @@ int DebugBackend::ObjectCollectionCallback(lua_State* L)
 
 }
 
-void DebugBackend::CreateGarbageCollectionSentinel(unsigned long api, lua_State* L)
+void DebugBackend::CreateGarbageCollectionSentinel(unsigned long api, lua_State* L) const
 {
 
     int t1 = lua_gettop_dll(api, L);
@@ -3075,7 +3071,7 @@ void DebugBackend::CreateGarbageCollectionSentinel(unsigned long api, lua_State*
 
 }
 
-void DebugBackend::SetGarbageCollectionCallback(unsigned long api, lua_State* L, int index)
+void DebugBackend::SetGarbageCollectionCallback(unsigned long api, lua_State* L, int index) const
 {
 
     int t1 = lua_gettop_dll(api, L);
@@ -3200,7 +3196,7 @@ void DebugBackend::LogHookEvent(unsigned long api, lua_State* L, lua_Debug* ar)
 
 }
 
-unsigned int DebugBackend::GetCStack(HANDLE hThread, StackEntry stack[], unsigned int maxStackSize)
+unsigned int DebugBackend::GetCStack(HANDLE hThread, StackEntry stack[], unsigned int maxStackSize) const
 {
 
     const unsigned int maxNameLength = 256;
@@ -3282,7 +3278,7 @@ DebugBackend::VirtualMachine* DebugBackend::GetVm(lua_State* L)
 
 }
 
-unsigned int DebugBackend::GetUnifiedStack(unsigned long api, const StackEntry nativeStack[], unsigned int nativeStackSize, const lua_Debug scriptStack[], unsigned int scriptStackSize, StackEntry stack[])
+unsigned int DebugBackend::GetUnifiedStack(unsigned long api, const StackEntry nativeStack[], unsigned int nativeStackSize, const lua_Debug scriptStack[], unsigned int scriptStackSize, StackEntry stack[]) const
 {
 
     // Print out the unified call stack.
