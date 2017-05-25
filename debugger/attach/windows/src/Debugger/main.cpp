@@ -141,7 +141,7 @@ int main(int argc, char** argv)
 			}
 
 			if (!cmd.empty()) {
-				if (inst.Start(cmd.c_str(), args.c_str(), wd.c_str(), "", debug, true)) {
+				if (inst.Start(cmd.c_str(), args.c_str(), wd.c_str(), "", debug, false)) {
 					mainLoop();
 				}
 			}
