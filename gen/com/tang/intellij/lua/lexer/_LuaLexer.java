@@ -14,6 +14,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
  * from the specification file <tt>lua.flex</tt>
  */
 public class _LuaLexer implements FlexLexer {
+
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
 
@@ -81,12 +82,12 @@ public class _LuaLexer implements FlexLexer {
     "\2\0\2\4\1\61\2\0\2\3\1\62\2\3\1\63"+
     "\1\64\1\65\2\3\1\66\6\3\1\0\1\60\1\67"+
     "\3\0\2\3\1\70\1\71\5\3\1\72\1\73\1\3"+
-    "\1\74\4\0\3\3\1\75\1\76\1\77\1\3\1\100"+
-    "\1\101\4\0\1\102\1\103\1\104\1\3\1\0\1\105"+
-    "\2\0\1\3\1\106\1\0\1\107\1\106\2\0\2\110";
+    "\1\74\1\0\1\75\2\0\3\3\1\76\1\77\1\100"+
+    "\1\3\1\101\1\102\3\0\1\103\1\104\1\105\1\3"+
+    "\3\0\1\3\1\106\1\0\1\107\1\106\2\0\2\110";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[176];
+    int [] result = new int[174];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -130,12 +131,12 @@ public class _LuaLexer implements FlexLexer {
     "\0\u140d\0\u1448\0\u1483\0\u14be\0\u01d8\0\u14f9\0\u1534\0\u156f"+
     "\0\u15aa\0\u15e5\0\u01d8\0\u01d8\0\u1620\0\u12e6\0\u165b\0\u1696"+
     "\0\u16d1\0\u170c\0\u1747\0\u1782\0\u17bd\0\u01d8\0\u01d8\0\u01d8"+
-    "\0\u17f8\0\u01d8\0\u01d8\0\u1833\0\u186e\0\u18a9\0\u18e4\0\u01d8"+
-    "\0\u01d8\0\u01d8\0\u191f\0\u195a\0\u186e\0\u1995\0\u19d0\0\u1a0b"+
-    "\0\u1a46\0\u1a81\0\u01d8\0\u1abc\0\u1af7\0\u1b32\0\u1b6d\0\u1ba8";
+    "\0\u17f8\0\u01d8\0\u01d8\0\u1833\0\u186e\0\u18a9\0\u01d8\0\u01d8"+
+    "\0\u01d8\0\u18e4\0\u191f\0\u195a\0\u1995\0\u19d0\0\u1a0b\0\u1a46"+
+    "\0\u01d8\0\u1a81\0\u1abc\0\u1af7\0\u1b32\0\u1b6d";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[176];
+    int [] result = new int[174];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -252,23 +253,22 @@ public class _LuaLexer implements FlexLexer {
     "\1\231\3\11\26\0\3\11\1\0\3\11\2\0\7\11"+
     "\11\0\3\11\1\232\10\11\26\0\3\11\1\0\3\11"+
     "\2\0\1\11\1\233\5\11\11\0\14\11\25\0\1\217"+
-    "\10\0\1\234\13\0\1\217\42\0\26\220\1\235\44\220"+
-    "\20\0\1\236\67\0\1\237\61\0\3\11\1\0\3\11"+
-    "\2\0\5\11\1\240\1\11\11\0\14\11\26\0\3\11"+
-    "\1\0\3\11\2\0\7\11\11\0\10\11\1\241\3\11"+
-    "\26\0\3\11\1\0\3\11\2\0\7\11\11\0\5\11"+
-    "\1\242\6\11\26\0\3\11\1\0\3\11\2\0\3\11"+
-    "\1\243\3\11\11\0\14\11\36\0\1\244\56\0\25\220"+
-    "\1\235\1\245\44\220\21\0\1\246\67\0\1\247\60\0"+
-    "\3\11\1\0\3\11\2\0\4\11\1\250\2\11\11\0"+
-    "\14\11\36\0\1\176\100\0\1\251\67\0\1\252\57\0"+
-    "\3\11\1\0\3\11\2\0\5\11\1\253\1\11\11\0"+
-    "\14\11\25\0\1\254\24\0\1\254\62\0\1\255\52\0"+
-    "\1\254\2\0\70\254\21\0\1\256\73\0\1\257\53\0"+
-    "\1\260\24\0\1\260\42\0\1\260\2\0\70\260";
+    "\10\0\1\234\13\0\1\217\42\0\73\220\20\0\1\235"+
+    "\67\0\1\236\61\0\3\11\1\0\3\11\2\0\5\11"+
+    "\1\237\1\11\11\0\14\11\26\0\3\11\1\0\3\11"+
+    "\2\0\7\11\11\0\10\11\1\240\3\11\26\0\3\11"+
+    "\1\0\3\11\2\0\7\11\11\0\5\11\1\241\6\11"+
+    "\26\0\3\11\1\0\3\11\2\0\3\11\1\242\3\11"+
+    "\11\0\14\11\36\0\1\243\77\0\1\244\67\0\1\245"+
+    "\60\0\3\11\1\0\3\11\2\0\4\11\1\246\2\11"+
+    "\11\0\14\11\36\0\1\176\100\0\1\247\67\0\1\250"+
+    "\57\0\3\11\1\0\3\11\2\0\5\11\1\251\1\11"+
+    "\11\0\14\11\25\0\1\252\24\0\1\252\62\0\1\253"+
+    "\52\0\1\252\2\0\70\252\21\0\1\254\73\0\1\255"+
+    "\53\0\1\256\24\0\1\256\42\0\1\256\2\0\70\256";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[7139];
+    int [] result = new int[7080];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -310,11 +310,11 @@ public class _LuaLexer implements FlexLexer {
     "\1\1\6\11\1\1\3\11\3\1\1\0\1\11\1\1"+
     "\1\0\1\1\1\0\15\1\1\11\1\0\1\11\12\1"+
     "\11\11\4\0\1\1\2\0\2\1\1\11\2\0\21\1"+
-    "\1\0\2\1\3\0\15\1\4\0\11\1\4\0\4\1"+
-    "\1\0\1\1\2\0\2\1\1\0\2\1\2\0\2\1";
+    "\1\0\2\1\3\0\15\1\1\0\1\1\2\0\11\1"+
+    "\3\0\4\1\3\0\2\1\1\0\2\1\2\0\2\1";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[176];
+    int [] result = new int[174];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -898,43 +898,43 @@ public class _LuaLexer implements FlexLexer {
             }
           case 132: break;
           case 61: 
-            { return BREAK;
-            }
-          case 133: break;
-          case 62: 
-            { return LOCAL;
-            }
-          case 134: break;
-          case 63: 
-            { return FALSE;
-            }
-          case 135: break;
-          case 64: 
-            { return UNTIL;
-            }
-          case 136: break;
-          case 65: 
-            { return WHILE;
-            }
-          case 137: break;
-          case 66: 
-            { return RETURN;
-            }
-          case 138: break;
-          case 67: 
-            { return REPEAT;
-            }
-          case 139: break;
-          case 68: 
-            { return ELSEIF;
-            }
-          case 140: break;
-          case 69: 
             { int redundant = checkBlockRedundant();
         if (redundant != -1) {
             yypushback(redundant);
             yybegin(YYINITIAL);return BLOCK_COMMENT; }
-        else { yypushback(yylength()); yybegin(xCOMMENT); }
+        else { yybegin(YYINITIAL);return BLOCK_COMMENT; }
+            }
+          case 133: break;
+          case 62: 
+            { return BREAK;
+            }
+          case 134: break;
+          case 63: 
+            { return LOCAL;
+            }
+          case 135: break;
+          case 64: 
+            { return FALSE;
+            }
+          case 136: break;
+          case 65: 
+            { return UNTIL;
+            }
+          case 137: break;
+          case 66: 
+            { return WHILE;
+            }
+          case 138: break;
+          case 67: 
+            { return RETURN;
+            }
+          case 139: break;
+          case 68: 
+            { return REPEAT;
+            }
+          case 140: break;
+          case 69: 
+            { return ELSEIF;
             }
           case 141: break;
           case 70: 

@@ -64,7 +64,7 @@ NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 //Comments
 REGION_START =--region({LINE_WS}+[^\r\n]*)*
 REGION_END =--endregion({LINE_WS}+[^\r\n]*)*
-BLOCK_COMMENT=--\[=*\[[\s\S]*\]=*\]
+BLOCK_COMMENT=--\[=*\[[\s\S]*(\]=*\])?
 SHORT_COMMENT=--.*
 DOC_COMMENT=----*.*(\n{LINE_WS}*----*.*)*
 
@@ -169,7 +169,7 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
         if (redundant != -1) {
             yypushback(redundant);
             yybegin(YYINITIAL);return BLOCK_COMMENT; }
-        else { yypushback(yylength()); yybegin(xCOMMENT); }
+        else { yybegin(YYINITIAL);return BLOCK_COMMENT; }
     }
     [^] { yypushback(yylength()); yybegin(xCOMMENT); }
 }
