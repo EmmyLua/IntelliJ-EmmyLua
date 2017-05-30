@@ -717,15 +717,25 @@ bool DebugFrontend::Evaluate(size_t vm, int evalId, const char* expression, unsi
 
 }
 
-void DebugFrontend::ToggleBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line)
+void DebugFrontend::AddBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line, const std::string& expr)
 {
 
-    m_commandChannel.WriteUInt32(CommandId_ToggleBreakpoint);
+    m_commandChannel.WriteUInt32(CommandId_AddBreakpoint);
     m_commandChannel.WriteSize(vm);
     m_commandChannel.WriteUInt32(scriptIndex);
     m_commandChannel.WriteUInt32(line);
+	m_commandChannel.WriteString(expr);
     m_commandChannel.Flush();
 
+}
+
+void DebugFrontend::DelBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line)
+{
+	m_commandChannel.WriteUInt32(CommandId_DelBreakpoint);
+	m_commandChannel.WriteSize(vm);
+	m_commandChannel.WriteUInt32(scriptIndex);
+	m_commandChannel.WriteUInt32(line);
+	m_commandChannel.Flush();
 }
 
 void DebugFrontend::RemoveAllBreakPoints(size_t vm)

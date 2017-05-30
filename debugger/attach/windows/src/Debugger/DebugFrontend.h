@@ -149,8 +149,9 @@ public:
 
     /**
      * Toggles a breakpoint on the specified line.
-     */
-    void ToggleBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line);
+	 */
+	void AddBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line, const std::string& expr);
+	void DelBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line);
     
     /**
      * Removes all breakpoints set this will also disable the line hook if the debug mode is set to continue

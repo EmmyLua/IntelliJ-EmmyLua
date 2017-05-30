@@ -59,7 +59,8 @@ enum CommandId
     CommandId_Continue          = 1,    // Continues execution until the next break point.
     CommandId_StepOver          = 2,    // Steps to the next line, not entering any functions.
     CommandId_StepInto          = 3,    // Steps to the next line, entering any functions.
-    CommandId_ToggleBreakpoint  = 4,    // Toggles a breakpoint on a line on and off.
+	CommandId_AddBreakpoint     = 4,    // Toggles a breakpoint on a line on.
+	CommandId_DelBreakpoint     = 15,   // Toggles a breakpoint on a line off.
     CommandId_Break             = 5,    // Instructs the debugger to break on the next line of script code.
     CommandId_Evaluate          = 6,    // Evaluates the value of an expression in the current context.
     CommandId_Detach            = 8,    // Detaches the debugger from the process.

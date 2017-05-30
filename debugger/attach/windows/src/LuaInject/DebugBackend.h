@@ -77,8 +77,6 @@ public:
      * Attaches the debugger to the state.
      */
     VirtualMachine* AttachState(unsigned long api, lua_State* L);
-    
-    void VMInitialize(unsigned long api, lua_State* L, VirtualMachine* vm);
 
     /**
      * Detaches the debugger from the state.
@@ -134,27 +132,10 @@ public:
     bool Evaluate(unsigned long api, lua_State* L, const std::string& expression, int stackLevel, int depth, std::string& result);
 
     /**
-     * Evalates the expression. If there was an error evaluating the expression the
-     * method returns false and the error message is stored in the result.
-     */
-    int ProtectedEvaluate(lua_State* L);
-
-    /**
-     * Evalates the expression. If there was an error evaluating the expression the
-     * method returns false and the error message is stored in the result.
-     */
-    static int StaticProtectedEvaluate(lua_State* L);
-
-    /**
-     * Gets the value of a variable. The variable can include member selection.
-     */
-    TiXmlNode* GetValue(unsigned long api, lua_State* L, const std::string& variable, unsigned int scriptIndex,
-        unsigned int line);
-
-    /**
      * Toggles a breakpoint on the line on or off.
-     */
-    void ToggleBreakpoint(lua_State* L, unsigned int scriptIndex, unsigned int line);
+	 */
+	void AddBreakpoint(lua_State* L, unsigned int scriptIndex, unsigned int line, const std::string& expr);
+	void DelBreakpoint(lua_State* L, unsigned int scriptIndex, unsigned int line);
     
     void BreakpointsActiveForScript(int scriptIndex);
     
@@ -233,7 +214,13 @@ public:
     bool EnableJit(unsigned long api, lua_State* L, bool enable) const;
 
 private:
-
+	class Breakpoint
+	{
+	public:
+		unsigned int line;
+		bool hasCondition;
+		std::string condtion;
+	};
     struct Script
     {
 
@@ -242,10 +229,14 @@ private:
          * of the script.
          */
         bool GetHasBreakPoint(unsigned int line) const;
+
+		Breakpoint* GetBreakpoint(unsigned int line);
         
         bool HasBreakPointInRange(unsigned int start, unsigned int end) const;
 
-        bool ToggleBreakpoint(unsigned int line);
+		void AddBreakpoint(unsigned int line, const std::string & condtion);
+
+		void DelBreakpoint(unsigned int line);
 
         bool HasBreakpointsActive() const;
 
@@ -254,7 +245,7 @@ private:
         std::string                 name;
         std::string                 source;
         std::string                 title;
-        std::vector<unsigned int>   breakpoints;    // Lines that have breakpoints on them.
+		std::vector<Breakpoint*>    breakpoints;    // Lines that have breakpoints on them.
         std::vector<unsigned int>   validLines;     // Lines that can have breakpoints on them.
 
     };
@@ -302,6 +293,8 @@ private:
      * is resumed.
      */
     void BreakFromScript(unsigned long api, lua_State* L);
+
+	bool CheckCondition(unsigned long api, lua_State* L, Breakpoint* bp);
 
     /**
      * Error handling call back for relaying exceptions.

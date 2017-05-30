@@ -148,7 +148,8 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
 
             for (XSourcePosition pos : registeredBreakpoints.keySet()) {
                 if (LuaFileUtil.fileEquals(file, pos.getFile())) {
-                    bridge.sendToggleBreakpoint(proto.getIndex(), pos.getLine());
+                    XLineBreakpoint breakpoint = registeredBreakpoints.get(pos);
+                    bridge.addBreakpoint(proto.getIndex(), breakpoint);
                 }
             }
         }
@@ -171,7 +172,7 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
                     registeredBreakpoints.put(sourcePosition, breakpoint);
                     for (LoadedScript script : loadedScriptMap.values()) {
                         if (LuaFileUtil.fileEquals(sourcePosition.getFile(), script.getFile())) {
-                            bridge.sendToggleBreakpoint(script.getIndex(), sourcePosition.getLine());
+                            bridge.addBreakpoint(script.getIndex(), breakpoint);
                             break;
                         }
                     }
@@ -188,7 +189,7 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
                     for (LoadedScript script : loadedScriptMap.values()) {
                         VirtualFile scriptFile = script.getFile();
                         if (LuaFileUtil.fileEquals(sourceFile, scriptFile)) {
-                            bridge.sendToggleBreakpoint(script.getIndex(), sourcePosition.getLine());
+                            bridge.removeBreakpoint(script.getIndex(), breakpoint);
                             break;
                         }
                     }

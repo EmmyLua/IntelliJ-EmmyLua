@@ -49,13 +49,22 @@ void mainLoop() {
 			inst.StepInto(handler->vm);
 		}
 		else if (cmd == "setb") {
-			//setb 3 2
+			//setb [index] [line] [condition]
+			vector<string> list;
+			split(line, string(" "), &list, 4);
+			assert(list.size() >= 4);
+			int scriptIndex = atoi(list[1].c_str());
+			int pointPos = atoi(list[2].c_str());
+			inst.AddBreakpoint(handler->vm, scriptIndex, pointPos, list[3]);
+		}
+		else if (cmd == "delb") {
+			//delb [index] [line]
 			vector<string> list;
 			split(line, string(" "), &list, 3);
 			assert(list.size() >= 3);
 			int scriptIndex = atoi(list[1].c_str());
 			int pointPos = atoi(list[2].c_str());
-			inst.ToggleBreakpoint(handler->vm, scriptIndex, pointPos);
+			inst.DelBreakpoint(handler->vm, scriptIndex, pointPos);
 		}
 		else if (cmd == "eval") {
 			//eval [id] [stack] [maxDepth] [script]

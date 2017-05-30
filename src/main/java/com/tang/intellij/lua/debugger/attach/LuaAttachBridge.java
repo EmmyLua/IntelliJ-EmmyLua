@@ -19,6 +19,8 @@ package com.tang.intellij.lua.debugger.attach;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XExpression;
+import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachEvalResultProto;
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto;
 import com.tang.intellij.lua.debugger.attach.value.LuaXValue;
@@ -310,8 +312,14 @@ public class LuaAttachBridge {
         send(String.format("eval %d %d %d %s", id, stack, depth, expr));
     }
 
-    void sendToggleBreakpoint(int idx, int line) {
-        send(String.format("setb %d %d", idx, line));
+    void addBreakpoint(int index, XLineBreakpoint breakpoint) {
+        XExpression expression = breakpoint.getConditionExpression();
+        String exp = expression != null ? expression.getExpression() : "";
+        send(String.format("setb %d %d %s", index, breakpoint.getLine(), exp));
+    }
+
+    void removeBreakpoint(int index, XLineBreakpoint breakpoint) {
+        send(String.format("delb %d %d", index, breakpoint.getLine()));
     }
 
     void sendDone() {

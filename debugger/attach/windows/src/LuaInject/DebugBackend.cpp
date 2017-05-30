@@ -72,13 +72,25 @@ bool DebugBackend::Script::GetHasBreakPoint(unsigned int line) const
     
     for (size_t i = 0; i < breakpoints.size(); i++)
     {
-        if(breakpoints[i] == line)
+        if(breakpoints[i]->line == line)
         {
             return true;
         }
     }
     
     return false;
+}
+
+DebugBackend::Breakpoint* DebugBackend::Script::GetBreakpoint(unsigned int line)
+{
+	for (auto bp : breakpoints)
+	{
+		if (bp->line == line)
+		{
+			return bp;
+		}
+	}
+	return nullptr;
 }
 
 bool DebugBackend::Script::HasBreakPointInRange(unsigned int start, unsigned int end) const
@@ -86,7 +98,8 @@ bool DebugBackend::Script::HasBreakPointInRange(unsigned int start, unsigned int
     
     for (size_t i = 0; i < breakpoints.size(); i++)
     {
-        if(breakpoints[i] >= start && breakpoints[i] < end)
+		auto bp = breakpoints[i];
+        if(bp->line >= start && bp->line < end)
         {
             return true;
         }
@@ -95,21 +108,46 @@ bool DebugBackend::Script::HasBreakPointInRange(unsigned int start, unsigned int
     return false;
 }
 
-bool DebugBackend::Script::ToggleBreakpoint(unsigned int line)
+void DebugBackend::Script::AddBreakpoint(unsigned int line, const std::string & condtion)
 {
+	Breakpoint* bp = nullptr;
+	for (auto b : breakpoints)
+	{
+		if (b->line == line)
+		{
+			bp = b;
+			break;
+		}
+	}
 
-    std::vector<unsigned int>::iterator result = std::find(breakpoints.begin(), breakpoints.end(), line);
+	if (bp == nullptr)
+	{
+		bp = new Breakpoint();
+		bp->line = line;
+		bp->condtion = condtion;
+		bp->hasCondition = !condtion.empty();
+		breakpoints.push_back(bp);
+	}
+	else
+	{
+		bp->condtion = condtion;
+		bp->hasCondition = !condtion.empty();
+	}
+}
 
-    if (result == breakpoints.end())
-    {
-        breakpoints.push_back(line);
-        return true;
-    }
-    else
-    {
-        breakpoints.erase(result);
-        return false;
-    }
+void DebugBackend::Script::DelBreakpoint(unsigned int line)
+{
+	for (int i = 0; i < breakpoints.size(); ++i)
+	{
+		auto bp = breakpoints[i];
+
+		if (bp->line == line)
+		{
+			breakpoints.erase(breakpoints.begin() + i);
+			delete bp;
+			break;
+		}
+	}
 }
 
 void DebugBackend::Script::ClearBreakpoints()
@@ -831,6 +869,7 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
 
         bool stop = false;
         bool onLastStepLine = false;
+		Breakpoint* breakpoint = nullptr;
 
         //Keep updating onLastStepLine even if the mode is Mode_Continue if were still on the same line so we don't trigger
         if (vm->luaJitWorkAround)
@@ -859,9 +898,13 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
         if (scriptIndex != -1)
         {
             // Check to see if we're on a breakpoint and should break.
-            if (!onLastStepLine && m_scripts[scriptIndex]->GetHasBreakPoint(GetCurrentLine(api, ar) - 1))
+            if (!onLastStepLine)
             {
-                stop = true;
+				breakpoint = m_scripts[scriptIndex]->GetBreakpoint(GetCurrentLine(api, ar) - 1);
+				if (breakpoint)
+				{
+					stop = true;
+				}
             }
         } 
         
@@ -875,7 +918,7 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
         // monopolize it.
         m_criticalSection.Exit();
 
-        if (stop)
+        if (stop && CheckCondition(api, L, breakpoint))
         {
             BreakFromScript(api, L);
             
@@ -1147,17 +1190,26 @@ void DebugBackend::CommandThreadProc()
             case CommandId_DeleteAllBreakpoints:
                 DeleteAllBreakpoints();
                 break;
-            case CommandId_ToggleBreakpoint:
+            case CommandId_AddBreakpoint:
                 {
-                    
+                    unsigned int scriptIndex;
+                    unsigned int line;
+					std::string expr;
+
+                    m_commandChannel.ReadUInt32(scriptIndex);
+                    m_commandChannel.ReadUInt32(line);
+					m_commandChannel.ReadString(expr);
+                    AddBreakpoint(L, scriptIndex, line, expr);
+                }
+                break;
+            case CommandId_DelBreakpoint:
+                {
                     unsigned int scriptIndex;
                     unsigned int line;
 
                     m_commandChannel.ReadUInt32(scriptIndex);
                     m_commandChannel.ReadUInt32(line);
-                    
-                    ToggleBreakpoint(L, scriptIndex, line);
-                
+                    DelBreakpoint(L, scriptIndex, line);
                 }
                 break;
             case CommandId_Break:
@@ -1302,7 +1354,7 @@ void DebugBackend::Break()
     ActiveLuaHookInAllVms();
 }
 
-void DebugBackend::ToggleBreakpoint(lua_State* L, unsigned int scriptIndex, unsigned int line)
+void DebugBackend::AddBreakpoint(lua_State* L, unsigned int scriptIndex, unsigned int line, const std::string& expr)
 {
 
     assert(GetIsLuaLoaded());
@@ -1331,13 +1383,9 @@ void DebugBackend::ToggleBreakpoint(lua_State* L, unsigned int scriptIndex, unsi
     if (foundValidLine)
     {
         
-        bool breakpointSet = script->ToggleBreakpoint(line);
+        script->AddBreakpoint(line, expr);
+		BreakpointsActiveForScript(scriptIndex);
 
-        if(breakpointSet)
-        {
-            BreakpointsActiveForScript(scriptIndex);
-        }
-        else
         {
             //Check to see if this was the last active breakpoint set if so switch back to fast mode
 			//TODO:暂时去除优化，这会导致HookMode_None
@@ -1355,11 +1403,51 @@ void DebugBackend::ToggleBreakpoint(lua_State* L, unsigned int scriptIndex, unsi
         m_eventChannel.WriteSize(reinterpret_cast<size_t>(L));
         m_eventChannel.WriteUInt32(scriptIndex);
         m_eventChannel.WriteUInt32(line);
-        m_eventChannel.WriteUInt32(breakpointSet);
+        m_eventChannel.WriteUInt32(true);
         m_eventChannel.Flush();
     
     }
 
+}
+
+void DebugBackend::DelBreakpoint(lua_State * L, unsigned int scriptIndex, unsigned int line)
+{
+
+	assert(GetIsLuaLoaded());
+
+	CriticalSectionLock lock(m_criticalSection);
+
+	Script* script = m_scripts[scriptIndex];
+
+	// Move the line to the next line after the one the user specified that is
+	// valid for a breakpoint.
+
+	bool foundValidLine = true;
+
+	// Disabled since right now we are only generating valid lines at file scope.
+	/*
+	for (unsigned int i = 0; i < script->validLines.size() && !foundValidLine; ++i)
+	{
+	if (script->validLines[i] >= line)
+	{
+	line = script->validLines[i];
+	foundValidLine = true;
+	}
+	}
+	*/
+
+	if (foundValidLine)
+	{
+		script->DelBreakpoint(line);
+
+		// Send back the event telling the frontend that we set/unset the breakpoint.
+		m_eventChannel.WriteUInt32(EventId_SetBreakpoint);
+		m_eventChannel.WriteSize(reinterpret_cast<size_t>(L));
+		m_eventChannel.WriteUInt32(scriptIndex);
+		m_eventChannel.WriteUInt32(line);
+		m_eventChannel.WriteUInt32(false);
+		m_eventChannel.Flush();
+	}
 }
 
 void DebugBackend::BreakpointsActiveForScript(int scriptIndex)
@@ -1522,6 +1610,33 @@ void DebugBackend::BreakFromScript(unsigned long api, lua_State* L)
 
     SendBreakEvent(api, L);
     WaitForContinue();        
+}
+
+bool DebugBackend::CheckCondition(unsigned long api, lua_State* L, Breakpoint * bp)
+{
+	if (bp == nullptr || !bp->hasCondition)
+		return true;
+	std::string result;
+	if (Evaluate(api, L, bp->condtion, 0, 1, result))
+	{
+		TiXmlDocument stacks;
+		stacks.Parse(result.c_str());
+		auto root = stacks.RootElement();
+		if (root) {
+			const TiXmlNode* dataNode = nullptr;
+			dataNode = root->IterateChildren("data", dataNode);
+			if (dataNode) {
+				std::string value = dataNode->FirstChild()->Value();
+				if (value == "false" || value == "nil") {
+					return false;
+				}
+				else {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 int DebugBackend::Call(unsigned long api, lua_State* L, int nargs, int nresults, int errorfunc) const
