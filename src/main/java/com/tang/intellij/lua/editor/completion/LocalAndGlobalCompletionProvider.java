@@ -34,6 +34,8 @@ import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex;
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+
 /**
  * suggest local/global vars and functions
  * Created by TangZX on 2017/4/11.
@@ -94,8 +96,11 @@ public class LocalAndGlobalCompletionProvider extends CompletionProvider<Complet
                 String name = nameDef.getText();
                 if (completionResultSet.getPrefixMatcher().prefixMatches(name)) {
                     session.addWord(name);
+                    Icon icon = LuaIcons.LOCAL_VAR;
+                    if (nameDef instanceof LuaParamNameDef)
+                        icon = LuaIcons.PARAMETER;
 
-                    LuaTypeGuessableLookupElement elementBuilder = new LuaTypeGuessableLookupElement(name, nameDef, false, LuaIcons.LOCAL_VAR);
+                    LuaTypeGuessableLookupElement elementBuilder = new LuaTypeGuessableLookupElement(name, nameDef, false, icon);
                     completionResultSet.addElement(elementBuilder);
                 }
                 return true;

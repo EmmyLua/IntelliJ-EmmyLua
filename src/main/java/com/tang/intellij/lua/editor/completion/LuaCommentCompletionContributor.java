@@ -108,7 +108,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                             for (LuaParamNameDef def : parDefList) {
                                 completionResultSet.addElement(
                                         LookupElementBuilder.create(def.getText())
-                                                .withIcon(LuaIcons.FUNCTION_PARAMETER)
+                                                .withIcon(LuaIcons.PARAMETER)
                                 );
                             }
                         }
