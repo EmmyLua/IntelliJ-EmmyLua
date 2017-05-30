@@ -188,7 +188,11 @@ public class LuaAnnotator extends LuaVisitor implements Annotator {
                         annotation.setTextAttributes(LuaHighlightingData.STATIC_METHOD);
                     }
                 } else {
-                    annotation.setTextAttributes(LuaHighlightingData.FIELD);
+                    if (o.getColon() != null) {
+                        myHolder.createErrorAnnotation(o, "Arguments expected");
+                    } else {
+                        annotation.setTextAttributes(LuaHighlightingData.FIELD);
+                    }
                 }
             }
             super.visitIndexExpr(o);
