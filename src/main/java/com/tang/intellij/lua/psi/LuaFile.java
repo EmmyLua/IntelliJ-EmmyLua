@@ -18,8 +18,12 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.CachedValue;
+import com.intellij.psi.util.CachedValueProvider;
+import com.intellij.psi.util.CachedValuesManager;
 import com.tang.intellij.lua.lang.LuaFileType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -41,6 +45,7 @@ public class LuaFile extends PsiFileBase {
         return LuaFileType.INSTANCE;
     }
 
+    private Key<CachedValue<LuaTypeSet>> RET_TYPE = Key.create("lua.RET_TYPE");
     /**
      * 获取最后返回的类型
      * @return LuaTypeSet
@@ -48,14 +53,17 @@ public class LuaFile extends PsiFileBase {
     public LuaTypeSet getReturnedType(SearchContext context) {
         LuaTypeSet set = null;
         if (context.push(this, SearchContext.Overflow.FileReturn)) {
-            PsiElement lastChild = getLastChild();
-            final LuaReturnStat[] last = {null};
-            LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
-                last[0] = luaReturnStat;
-                return false;
-            });
-            LuaReturnStat lastReturn = last[0];
-            set = LuaPsiImplUtil.guessReturnTypeSet(lastReturn, 0, context);
+            set = CachedValuesManager.getManager(getProject()).getCachedValue(this, RET_TYPE, ()->{
+                PsiElement lastChild = getLastChild();
+                final LuaReturnStat[] last = {null};
+                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
+                    last[0] = luaReturnStat;
+                    return false;
+                });
+                LuaReturnStat lastReturn = last[0];
+                LuaTypeSet typeSet = LuaPsiImplUtil.guessReturnTypeSet(lastReturn, 0, context);
+                return CachedValueProvider.Result.create(typeSet, this);
+            }, false);
             context.pop(this);
         }
         return set;
