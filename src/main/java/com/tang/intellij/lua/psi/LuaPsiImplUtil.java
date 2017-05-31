@@ -92,6 +92,7 @@ public class LuaPsiImplUtil {
         return GlobalSearchScope.fileScope(nameDef.getContainingFile());
     }
 
+    @NotNull
     public static PsiReference[] getReferences(LuaPsiElement element) {
         return ReferenceProvidersRegistry.getReferencesFromProviders(element, PsiReferenceService.Hints.NO_HINTS);
     }

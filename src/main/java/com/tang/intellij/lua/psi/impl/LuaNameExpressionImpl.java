@@ -50,13 +50,7 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
     LuaNameExpressionImpl(LuaNameStub stub, IElementType nodeType, ASTNode node) {
         super(stub, nodeType, node);
     }
-
-    @NotNull
-    @Override
-    public PsiReference[] getReferences() {
-        return ReferenceProvidersRegistry.getReferencesFromProviders(this, PsiReferenceService.Hints.NO_HINTS);
-    }
-
+    
     @Override
     public PsiReference getReference() {
         PsiReference[] references = getReferences();
