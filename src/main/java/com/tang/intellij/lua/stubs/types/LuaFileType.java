@@ -20,11 +20,16 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.StubBuilder;
 import com.intellij.psi.stubs.DefaultStubBuilder;
 import com.intellij.psi.stubs.StubElement;
+import com.intellij.psi.stubs.StubInputStream;
+import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaFile;
 import com.tang.intellij.lua.stubs.LuaFileStub;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 /**
  *
@@ -52,6 +57,19 @@ public class LuaFileType extends IStubFileElementType<LuaFileStub> {
                 return type == LuaTypes.BLOCK;
             }*/
         };
+    }
+
+    @Override
+    public void serialize(@NotNull LuaFileStub stub, @NotNull StubOutputStream dataStream) throws IOException {
+        LuaTypeSet returnedType = stub.getReturnedType();
+        LuaTypeSet.serialize(returnedType, dataStream);
+    }
+
+    @NotNull
+    @Override
+    public LuaFileStub deserialize(@NotNull StubInputStream dataStream, StubElement parentStub) throws IOException {
+        LuaTypeSet typeSet = LuaTypeSet.deserialize(dataStream);
+        return new LuaFileStub(null, typeSet);
     }
 
     @NotNull

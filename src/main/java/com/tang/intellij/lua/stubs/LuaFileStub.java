@@ -19,7 +19,9 @@ package com.tang.intellij.lua.stubs;
 import com.intellij.psi.stubs.PsiFileStubImpl;
 import com.intellij.psi.tree.IStubFileElementType;
 import com.tang.intellij.lua.lang.LuaParserDefinition;
+import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -27,13 +29,29 @@ import org.jetbrains.annotations.NotNull;
  * Created by tangzx on 2016/11/27.
  */
 public class LuaFileStub extends PsiFileStubImpl<LuaFile> {
+    private LuaTypeSet returnedType;
+    private LuaFile file;
+
     public LuaFileStub(LuaFile file) {
         super(file);
+        this.file = file;
+    }
+
+    public LuaFileStub(LuaFile file, LuaTypeSet typeSet) {
+        super(file);
+        this.file = file;
+        returnedType = typeSet;
     }
 
     @NotNull
     @Override
     public IStubFileElementType getType() {
         return LuaParserDefinition.FILE;
+    }
+
+    public LuaTypeSet getReturnedType() {
+        if (returnedType == null && file != null)
+            returnedType = file.guessReturnedType(new SearchContext(file.getProject()));
+        return returnedType;
     }
 }

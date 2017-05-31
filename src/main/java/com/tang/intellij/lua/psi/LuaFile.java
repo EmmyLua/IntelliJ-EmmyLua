@@ -21,13 +21,13 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.stubs.StubElement;
 import com.intellij.psi.util.CachedValue;
-import com.intellij.psi.util.CachedValueProvider;
-import com.intellij.psi.util.CachedValuesManager;
 import com.tang.intellij.lua.lang.LuaFileType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.stubs.LuaFileStub;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -51,19 +51,23 @@ public class LuaFile extends PsiFileBase {
      * @return LuaTypeSet
      */
     public LuaTypeSet getReturnedType(SearchContext context) {
+        StubElement greenStub = getGreenStub();
+        if (greenStub instanceof LuaFileStub)
+            return ((LuaFileStub) greenStub).getReturnedType();
+        return guessReturnedType(context);
+    }
+
+    public LuaTypeSet guessReturnedType(SearchContext context) {
         LuaTypeSet set = null;
         if (context.push(this, SearchContext.Overflow.FileReturn)) {
-            set = CachedValuesManager.getManager(getProject()).getCachedValue(this, RET_TYPE, ()->{
-                PsiElement lastChild = getLastChild();
-                final LuaReturnStat[] last = {null};
-                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
-                    last[0] = luaReturnStat;
-                    return false;
-                });
-                LuaReturnStat lastReturn = last[0];
-                LuaTypeSet typeSet = LuaPsiImplUtil.guessReturnTypeSet(lastReturn, 0, context);
-                return CachedValueProvider.Result.create(typeSet, this);
-            }, false);
+            PsiElement lastChild = getLastChild();
+            final LuaReturnStat[] last = {null};
+            LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
+                last[0] = luaReturnStat;
+                return false;
+            });
+            LuaReturnStat lastReturn = last[0];
+            set = LuaPsiImplUtil.guessReturnTypeSet(lastReturn, 0, context);
             context.pop(this);
         }
         return set;
