@@ -28,6 +28,4 @@ public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, StubBasedP
   @NotNull
   PsiReference[] getReferences();
 
-  String toString();
-
 }

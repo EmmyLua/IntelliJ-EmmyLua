@@ -27,8 +27,6 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, St
 
   int getTextOffset();
 
-  String toString();
-
   String getFieldName();
 
   ItemPresentation getPresentation();

@@ -14,6 +14,4 @@ public interface LuaTableConstructor extends LuaIndentRange, StubBasedPsiElement
 
   LuaTableField findField(String fieldName);
 
-  String toString();
-
 }

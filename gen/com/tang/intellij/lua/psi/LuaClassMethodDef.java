@@ -36,8 +36,6 @@ public interface LuaClassMethodDef extends LuaFuncBodyOwner, LuaDeclaration, Lua
 
   int getTextOffset();
 
-  String toString();
-
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull

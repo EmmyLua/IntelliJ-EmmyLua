@@ -34,8 +34,6 @@ public interface LuaGlobalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaS
 
   int getTextOffset();
 
-  String toString();
-
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull
