@@ -50,10 +50,6 @@ open class LuaTypeGuessableLookupElement(private val name: String, private val g
     override fun equals(other: Any?): Boolean {
         return other is LuaTypeGuessableLookupElement && super.equals(other)
     }
-
-    override fun getObject(): Any {
-        return guessable
-    }
 }
 
 class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boolean)
@@ -78,6 +74,10 @@ abstract class LuaFunctionLookupElement(name:String, val signature: String, bold
 
     override fun getItemText(): String {
         return lookupString + signature
+    }
+
+    override fun getObject(): Any {
+        return bodyOwner
     }
 }
 
