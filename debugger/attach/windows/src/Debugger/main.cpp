@@ -48,6 +48,9 @@ void mainLoop() {
 		else if (cmd == "stepinto") {
 			inst.StepInto(handler->vm);
 		}
+		else if (cmd == "stepout") {
+			inst.StepOut(handler->vm);
+		}
 		else if (cmd == "setb") {
 			//setb [index] [line] [condition]
 			vector<string> list;

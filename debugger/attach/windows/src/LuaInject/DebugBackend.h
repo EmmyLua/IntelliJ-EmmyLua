@@ -112,6 +112,8 @@ public:
      */
     void StepOver();
 
+	void StepOut();
+
     /**
      * Continues execution until a breakpoint is hit.
      */
@@ -374,11 +376,12 @@ private:
     static const int s_maxModuleNameLength = 32;
     static const int s_maxEntryNameLength  = 256;
 
-    enum Mode
-    {
-        Mode_Continue,
-        Mode_StepOver,
-        Mode_StepInto,
+	enum Mode
+	{
+		Mode_Continue,
+		Mode_StepOver,
+		Mode_StepInto,
+		Mode_StepOut,
     };
     
     struct Api

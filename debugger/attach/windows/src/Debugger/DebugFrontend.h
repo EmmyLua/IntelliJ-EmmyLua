@@ -136,6 +136,8 @@ public:
      */
     void StepInto(size_t vm);
 
+	void StepOut(size_t vm);
+
     /**
      * Signals to the debugger that we've finished the processing we needed to
      * do in response to a load script event.

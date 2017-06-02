@@ -681,6 +681,13 @@ void DebugFrontend::StepInto(size_t vm)
     m_commandChannel.Flush();
 }
 
+void DebugFrontend::StepOut(size_t vm)
+{
+	m_commandChannel.WriteUInt32(CommandId_StepOut);
+	m_commandChannel.WriteSize(vm);
+	m_commandChannel.Flush();
+}
+
 void DebugFrontend::DoneLoadingScript(size_t vm)
 {
     m_commandChannel.WriteUInt32(CommandId_LoadDone);

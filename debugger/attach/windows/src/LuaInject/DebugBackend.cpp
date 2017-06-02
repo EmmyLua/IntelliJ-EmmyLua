@@ -901,30 +901,39 @@ void DebugBackend::HookCallback(unsigned long api, lua_State* L, lua_Debug* ar)
             if (!onLastStepLine)
             {
 				breakpoint = m_scripts[scriptIndex]->GetBreakpoint(GetCurrentLine(api, ar) - 1);
-				if (breakpoint)
+				if (breakpoint && CheckCondition(api, L, breakpoint))
 				{
 					stop = true;
 				}
             }
-        } 
+        }
         
         //Break if were doing some kind of stepping 
-        if (!onLastStepLine && (m_mode == Mode_StepInto || (m_mode == Mode_StepOver && vm->callCount == 0)))
+        if (!onLastStepLine)
         {
-            stop = true;
+			if (m_mode == Mode_StepInto) {
+				stop = true;
+			}
+			else if (m_mode == Mode_StepOver) {
+				stop = vm->callCount == 0;
+			}
+			else if (m_mode == Mode_StepOut) {
+				int stackDepth = GetStackDepth(api, L);
+				stop = vm->callStackDepth == stackDepth + 1;
+			}
         }
        
         // We need to exit the critical section before waiting so that we don't
         // monopolize it.
         m_criticalSection.Exit();
 
-        if (stop && CheckCondition(api, L, breakpoint))
+        if (stop)
         {
-            BreakFromScript(api, L);
+			BreakFromScript(api, L);
+			vm->callStackDepth = GetStackDepth(api, L);
             
             if(vm->luaJitWorkAround)
             {
-                vm->callStackDepth = GetStackDepth(api, L);
 				vm->lastStepScript = scriptIndex;
             }
         }
@@ -1187,6 +1196,9 @@ void DebugBackend::CommandThreadProc()
             case CommandId_StepInto:
                 StepInto();
                 break;
+			case CommandId_StepOut:
+				StepOut();
+				break;
             case CommandId_DeleteAllBreakpoints:
                 DeleteAllBreakpoints();
                 break;
@@ -1332,6 +1344,20 @@ void DebugBackend::StepOver()
     ActiveLuaHookInAllVms();
 }
 
+void DebugBackend::StepOut()
+{
+	CriticalSectionLock lock(m_criticalSection);
+
+	for (unsigned int i = 0; i < m_vms.size(); ++i)
+	{
+		m_vms[i]->callCount = 0;
+	}
+
+	m_mode = Mode_StepOut;
+	SetEvent(m_stepEvent);
+
+	ActiveLuaHookInAllVms();
+}
 
 void DebugBackend::Continue()
 {

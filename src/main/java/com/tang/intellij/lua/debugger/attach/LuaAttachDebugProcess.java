@@ -79,6 +79,11 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
     }
 
     @Override
+    public void startStepOut(@Nullable XSuspendContext context) {
+        bridge.send("stepout");
+    }
+
+    @Override
     public void stop() {
         bridge.stop();
     }
