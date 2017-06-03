@@ -35,7 +35,7 @@ void mainLoop() {
 		cin.getline(input, 2048);
 
 		string line = input;
-		int index = line.find(" ");
+		size_t index = line.find(" ");
 
 		string cmd = line.substr(0, index);
 
@@ -92,16 +92,9 @@ void mainLoop() {
 		else if (cmd == "done") {
 			inst.DoneLoadingScript(handler->vm);
 		}
-		else if (cmd == "detach") {
+		else if (cmd == "detach" || cmd.empty()) {
 			inst.Stop(false);
 			break;
-		}
-		else if (cmd == "stack") {
-			int num = inst.GetNumStackFrames();
-			for (int i = 0; i < num; i++) {
-				const DebugFrontend::StackFrame frame = inst.GetStackFrame(i);
-				cout << frame.function << endl;
-			}
 		}
 	}
 }
