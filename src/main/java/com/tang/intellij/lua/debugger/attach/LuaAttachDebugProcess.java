@@ -21,14 +21,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
-import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
-import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.tang.intellij.lua.debugger.LuaDebugProcess;
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
-import com.tang.intellij.lua.debugger.LuaLineBreakpointType;
 import com.tang.intellij.lua.debugger.LuaSuspendContext;
 import com.tang.intellij.lua.debugger.attach.protos.*;
 import com.tang.intellij.lua.psi.LuaFileUtil;
@@ -45,7 +42,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
     private LuaDebuggerEditorsProvider editorsProvider;
     protected LuaAttachBridge bridge;
-    private Map<XSourcePosition, XLineBreakpoint> registeredBreakpoints = new ConcurrentHashMap<>();
     private Map<Integer, LoadedScript> loadedScriptMap = new ConcurrentHashMap<>();
 
     protected LuaAttachDebugProcess(@NotNull XDebugSession session) {
@@ -124,22 +120,19 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
             return;
         }
 
-        for (XSourcePosition pos : registeredBreakpoints.keySet()) {
-            if (file.equals(pos.getFile()) && proto.getLine() == pos.getLine()) {
-                final XLineBreakpoint breakpoint = registeredBreakpoints.get(pos);
-                ApplicationManager.getApplication().invokeLater(()-> {
-                    getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(proto.getStack()));
-                    getSession().showExecutionPoint();
-                });
-                return;
-            }
+        XLineBreakpoint breakpoint = getBreakpoint(file, proto.getLine());
+        if (breakpoint != null) {
+            ApplicationManager.getApplication().invokeLater(()-> {
+                getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(proto.getStack()));
+                getSession().showExecutionPoint();
+            });
+        } else {
+            //position reached
+            ApplicationManager.getApplication().invokeLater(() -> {
+                getSession().positionReached(new LuaSuspendContext(proto.getStack()));
+                getSession().showExecutionPoint();
+            });
         }
-
-        //position reached
-        ApplicationManager.getApplication().invokeLater(()-> {
-            getSession().positionReached(new LuaSuspendContext(proto.getStack()));
-            getSession().showExecutionPoint();
-        });
     }
 
     private void onLoadScript(LuaAttachLoadScriptProto proto) {
@@ -161,46 +154,34 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
         bridge.sendDone();
     }
 
+    @Override
+    protected void registerBreakpoint(@NotNull XSourcePosition sourcePosition, @NotNull XLineBreakpoint breakpoint) {
+        super.registerBreakpoint(sourcePosition, breakpoint);
+        for (LoadedScript script : loadedScriptMap.values()) {
+            if (LuaFileUtil.fileEquals(sourcePosition.getFile(), script.getFile())) {
+                bridge.addBreakpoint(script.getIndex(), breakpoint);
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void unregisterBreakpoint(@NotNull XSourcePosition sourcePosition, @NotNull XLineBreakpoint breakpoint) {
+        super.unregisterBreakpoint(sourcePosition, breakpoint);
+        VirtualFile sourceFile = sourcePosition.getFile();
+
+        for (LoadedScript script : loadedScriptMap.values()) {
+            VirtualFile scriptFile = script.getFile();
+            if (LuaFileUtil.fileEquals(sourceFile, scriptFile)) {
+                bridge.removeBreakpoint(script.getIndex(), breakpoint);
+                break;
+            }
+        }
+    }
+
     @Nullable
     public LoadedScript getScript(int index) {
         return loadedScriptMap.get(index);
-    }
-
-    @NotNull
-    @Override
-    public XBreakpointHandler<?>[] getBreakpointHandlers() {
-        return new XBreakpointHandler[] { new XBreakpointHandler<XLineBreakpoint<XBreakpointProperties>>(LuaLineBreakpointType.class) {
-            @Override
-            public void registerBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint) {
-                XSourcePosition sourcePosition = breakpoint.getSourcePosition();
-                if (sourcePosition != null) {
-                    registeredBreakpoints.put(sourcePosition, breakpoint);
-                    for (LoadedScript script : loadedScriptMap.values()) {
-                        if (LuaFileUtil.fileEquals(sourcePosition.getFile(), script.getFile())) {
-                            bridge.addBreakpoint(script.getIndex(), breakpoint);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void unregisterBreakpoint(@NotNull XLineBreakpoint<XBreakpointProperties> breakpoint, boolean temporary) {
-                XSourcePosition sourcePosition = breakpoint.getSourcePosition();
-                if (sourcePosition != null) {
-                    VirtualFile sourceFile = sourcePosition.getFile();
-                    registeredBreakpoints.remove(sourcePosition);
-
-                    for (LoadedScript script : loadedScriptMap.values()) {
-                        VirtualFile scriptFile = script.getFile();
-                        if (LuaFileUtil.fileEquals(sourceFile, scriptFile)) {
-                            bridge.removeBreakpoint(script.getIndex(), breakpoint);
-                            break;
-                        }
-                    }
-                }
-            }
-        } };
     }
 
     @Override

@@ -21,10 +21,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
-import com.intellij.xdebugger.breakpoints.XBreakpointHandler;
-import com.intellij.xdebugger.breakpoints.XBreakpointProperties;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
+import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.tang.intellij.lua.debugger.*;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
@@ -44,7 +43,6 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
     private IRemoteConfiguration runProfile;
     private LuaDebuggerEditorsProvider editorsProvider;
     private MobServer mobServer;
-    private XLineBreakpoint<XBreakpointProperties> breakpoint;
 
     protected LuaMobDebugProcess(@NotNull XDebugSession session) {
         super(session);
@@ -106,41 +104,32 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
         mobServer.addCommand("OUT");
     }
 
-    @NotNull
     @Override
-    public XBreakpointHandler<?>[] getBreakpointHandlers() {
-        return new XBreakpointHandler[] { new LuaMobLineBreakpointHandler(this) };
-    }
-
-    void addBreakpoint(XLineBreakpoint<XBreakpointProperties> breakpoint) {
-        this.breakpoint = breakpoint;
-        XSourcePosition sourcePosition = breakpoint.getSourcePosition();
-        if (sourcePosition != null) {
-            Project project = getSession().getProject();
-            VirtualFile file = sourcePosition.getFile();
-            String fileShortUrl = LuaFileUtil.getShortUrl(project, file);
-            if (fileShortUrl != null) {
+    protected void registerBreakpoint(@NotNull XSourcePosition sourcePosition, @NotNull XLineBreakpoint breakpoint) {
+        super.registerBreakpoint(sourcePosition, breakpoint);
+        Project project = getSession().getProject();
+        VirtualFile file = sourcePosition.getFile();
+        String fileShortUrl = LuaFileUtil.getShortUrl(project, file);
+        if (fileShortUrl != null) {
+            mobServer.sendAddBreakpoint(fileShortUrl, sourcePosition.getLine() + 1);
+            String extension = file.getExtension();
+            if (extension != null) {
+                fileShortUrl = fileShortUrl.substring(0, fileShortUrl.length() - extension.length() - 1);
                 mobServer.sendAddBreakpoint(fileShortUrl, sourcePosition.getLine() + 1);
-                String extension = file.getExtension();
-                if (extension != null) {
-                    fileShortUrl = fileShortUrl.substring(0, fileShortUrl.length() - extension.length() - 1);
-                    mobServer.sendAddBreakpoint(fileShortUrl, sourcePosition.getLine() + 1);
-                }
             }
         }
     }
 
-    void removeBreakpoint(XLineBreakpoint<XBreakpointProperties> breakpoint) {
-        XSourcePosition sourcePosition = breakpoint.getSourcePosition();
-        if (sourcePosition != null) {
-            VirtualFile file = sourcePosition.getFile();
-            String fileShortUrl = LuaFileUtil.getShortUrl(getSession().getProject(), file);
+    @Override
+    protected void unregisterBreakpoint(@NotNull XSourcePosition sourcePosition, @NotNull XLineBreakpoint position) {
+        super.unregisterBreakpoint(sourcePosition, position);
+        VirtualFile file = sourcePosition.getFile();
+        String fileShortUrl = LuaFileUtil.getShortUrl(getSession().getProject(), file);
+        mobServer.sendRemoveBreakpoint(fileShortUrl, sourcePosition.getLine() + 1);
+        String extension = file.getExtension();
+        if (extension != null) {
+            fileShortUrl = fileShortUrl.substring(0, fileShortUrl.length() - extension.length() - 1);
             mobServer.sendRemoveBreakpoint(fileShortUrl, sourcePosition.getLine() + 1);
-            String extension = file.getExtension();
-            if (extension != null) {
-                fileShortUrl = fileShortUrl.substring(0, fileShortUrl.length() - extension.length() - 1);
-                mobServer.sendRemoveBreakpoint(fileShortUrl, sourcePosition.getLine() + 1);
-            }
         }
     }
 
@@ -153,10 +142,24 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
     }
 
     public void setStack(LuaExecutionStack stack) {
-        ApplicationManager.getApplication().invokeLater(()-> {
-            getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(stack));
-            getSession().showExecutionPoint();
-        });
+        XStackFrame topFrame = stack.getTopFrame();
+        if (topFrame != null) {
+            XSourcePosition sourcePosition = topFrame.getSourcePosition();
+            if (sourcePosition != null) {
+                XLineBreakpoint breakpoint = getBreakpoint(sourcePosition.getFile(), sourcePosition.getLine());
+                if (breakpoint != null) {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(stack));
+                        getSession().showExecutionPoint();
+                    });
+                } else {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        getSession().positionReached(new LuaSuspendContext(stack));
+                        getSession().showExecutionPoint();
+                    });
+                }
+            }
+        }
     }
 
     public void runCommand(DebugCommand command) {
