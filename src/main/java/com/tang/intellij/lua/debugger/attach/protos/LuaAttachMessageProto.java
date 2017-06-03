@@ -31,8 +31,8 @@ public class LuaAttachMessageProto extends LuaAttachProto {
     public static final int Warning         = 1;
     public static final int Error           = 2;
 
-    public LuaAttachMessageProto() {
-        super(Message);
+    public LuaAttachMessageProto(int type) {
+        super(type);
     }
 
     @Override

@@ -567,7 +567,7 @@ void DebugFrontend::EventThreadProc()
             
             std::string message;
             m_eventChannel.ReadString(message);
-            
+			event.SetMessageType(MessageType_Error);
             event.SetMessageString(message);
         
         }
@@ -575,8 +575,8 @@ void DebugFrontend::EventThreadProc()
         {
 
             std::string message;
-            m_eventChannel.ReadString(message);
-            
+			m_eventChannel.ReadString(message);
+			event.SetMessageType(MessageType_Error);
             event.SetMessageString(message);
         
         }

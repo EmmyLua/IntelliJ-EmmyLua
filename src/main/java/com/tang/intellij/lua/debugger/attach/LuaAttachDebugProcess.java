@@ -93,6 +93,7 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
     public void handle(LuaAttachProto proto) {
         int type = proto.getType();
         switch (type) {
+            case LuaAttachProto.Exception:
             case LuaAttachProto.Message:
                 LuaAttachMessageProto messageProto = (LuaAttachMessageProto) proto;
                 messageProto.outputToConsole();
@@ -188,8 +189,9 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
     public LuaAttachProto createProto(int type) {
         LuaAttachProto proto;
         switch (type) {
+            case LuaAttachProto.Exception:
             case LuaAttachProto.Message:
-                proto = new LuaAttachMessageProto();
+                proto = new LuaAttachMessageProto(type);
                 break;
             case LuaAttachProto.LoadScript:
                 proto = new LuaAttachLoadScriptProto();
