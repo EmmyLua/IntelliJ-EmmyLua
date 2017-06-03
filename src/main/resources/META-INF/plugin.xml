@@ -284,6 +284,7 @@
         <langCodeStyleSettingsProvider implementation="com.tang.intellij.lua.editor.formatter.LuaLanguageCodeStyleSettingsProvider"/>
 
         <!-- debugger -->
+        <runConfigurationProducer implementation="com.tang.intellij.lua.debugger.LuaRunConfigurationProducer"/>
         <programRunner implementation="com.tang.intellij.lua.debugger.remote.LuaMobDebuggerRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.remote.LuaMobConfigurationType"/>
         <programRunner implementation="com.tang.intellij.lua.debugger.app.LuaAppRunner"/>

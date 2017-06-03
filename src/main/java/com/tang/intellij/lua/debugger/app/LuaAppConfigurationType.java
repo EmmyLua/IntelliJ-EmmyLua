@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.app;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
+import com.intellij.execution.configurations.ConfigurationTypeUtil;
 import com.tang.intellij.lua.lang.LuaIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,5 +56,10 @@ public class LuaAppConfigurationType implements ConfigurationType {
     @Override
     public ConfigurationFactory[] getConfigurationFactories() {
         return new ConfigurationFactory[] { factory };
+    }
+
+    @NotNull
+    public static LuaAppConfigurationType getInstance() {
+        return ConfigurationTypeUtil.findConfigurationType(LuaAppConfigurationType.class);
     }
 }
