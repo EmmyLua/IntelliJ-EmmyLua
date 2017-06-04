@@ -28,9 +28,11 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.LuaNameDef;
+import com.tang.intellij.lua.psi.LuaParamNameDef;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Documentation support
@@ -40,17 +42,40 @@ public class LuaDocumentationProvider extends AbstractDocumentationProvider impl
 
     @Override
     public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
-        if (element instanceof LuaCommentOwner) {
-            return genDocForCommentOwner((LuaCommentOwner) element);
-        } else if (element instanceof LuaNameDef) {
-            LuaCommentOwner owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner.class);
-            if (owner != null)
-                return genDocForCommentOwner(owner);
-        }
-        return super.generateDoc(element, originalElement);
+        String doc = genDoc(element, originalElement);
+        if (doc == null)
+            doc = super.generateDoc(element, originalElement);
+        return doc;
     }
 
-    private String genDocForCommentOwner(LuaCommentOwner owner) {
+    @Nullable
+    private String genDoc(PsiElement element, @Nullable PsiElement originalElement) {
+        if (element instanceof LuaCommentOwner) {
+            return genDoc((LuaCommentOwner) element);
+        }
+        else if (element instanceof LuaParamNameDef) {
+            return genDoc((LuaParamNameDef) element);
+        }
+        else if (element instanceof LuaNameDef) {
+            LuaCommentOwner owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner.class);
+            if (owner != null)
+                return genDoc(owner);
+        }
+        return null;
+    }
+
+    private String genDoc(LuaParamNameDef paramNameDef) {
+        LuaCommentOwner owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner.class);
+        Optional<String> o = Optional.ofNullable(owner)
+                .map(LuaCommentOwner::getComment)
+                .map(t -> t.getParamDef(paramNameDef.getName()))
+                .map(LuaDocParamDef::getCommentString)
+                .map(LuaDocCommentString::getString)
+                .map(PsiElement::getText);
+        return o.orElse(null);
+    }
+
+    private String genDoc(LuaCommentOwner owner) {
         StringBuilder sb = new StringBuilder();
         if (owner instanceof LuaFuncBodyOwner && owner instanceof PsiNameIdentifierOwner) {
             LuaFuncBodyOwner funcBodyOwner = (LuaFuncBodyOwner) owner;
