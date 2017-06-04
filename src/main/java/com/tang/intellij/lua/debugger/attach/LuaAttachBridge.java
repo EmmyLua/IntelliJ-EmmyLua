@@ -173,20 +173,24 @@ public class LuaAttachBridge {
                 isRunning = true;
             }
         } catch (Exception e) {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(stream);
             e.printStackTrace(ps);
-            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);
+            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);*/
+            session.getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
             session.stop();
             isRunning = false;
         }
     }
 
-    public void launch(@NotNull String program, @NotNull String wd, String[] args) {
+    public void launch(@NotNull String program, String workingDir, String[] args) {
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
         try {
             if (pluginVirtualDirectory != null) {
-                // check arch
+                if (workingDir == null || workingDir.isEmpty()) {
+                    throw new Exception("Working directory not found.");
+                }
+
                 // check arch
                 String archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe");
                 ProcessBuilder processBuilder = new ProcessBuilder(archExe);
@@ -194,6 +198,9 @@ public class LuaAttachBridge {
                 Process archChecker = processBuilder.command(archExe, "-file", program).start();
                 archChecker.waitFor();
                 int exitValue = archChecker.exitValue();
+                if (exitValue == -1) {
+                    throw new Exception(String.format("Program [%s] not found.", program));
+                }
                 isX86 = exitValue == 1;
 
                 String archType = isX86 ? "x86" : "x64";
@@ -205,9 +212,9 @@ public class LuaAttachBridge {
                 argList.add(exe);
                 argList.add("-m"); argList.add("run");
                 argList.add("-c"); argList.add(program);
-                if (!wd.isEmpty()) {
+                if (!workingDir.isEmpty()) {
                     argList.add("-w");
-                    argList.add(wd);
+                    argList.add(workingDir);
                 }
                 if (args != null) {
                     String argString = String.join(" ", args);
@@ -230,10 +237,11 @@ public class LuaAttachBridge {
                 isRunning = true;
             }
         } catch (Exception e) {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(stream);
             e.printStackTrace(ps);
-            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);
+            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);*/
+            session.getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
             session.stop();
             isRunning = false;
         }
