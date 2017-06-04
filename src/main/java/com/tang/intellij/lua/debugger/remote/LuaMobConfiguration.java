@@ -18,7 +18,6 @@ package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
@@ -31,6 +30,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import com.tang.intellij.lua.debugger.IRemoteConfiguration;
+import com.tang.intellij.lua.debugger.LuaRunConfiguration;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +42,7 @@ import java.util.Collections;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaMobConfiguration extends AbstractRunConfiguration implements IRemoteConfiguration {
+public class LuaMobConfiguration extends LuaRunConfiguration implements IRemoteConfiguration {
 
     private int port = 8172;
 

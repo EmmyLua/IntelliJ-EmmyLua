@@ -18,7 +18,6 @@ package com.tang.intellij.lua.debugger.app;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
@@ -36,6 +35,7 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.tang.intellij.lua.debugger.DebuggerType;
 import com.tang.intellij.lua.debugger.IRemoteConfiguration;
+import com.tang.intellij.lua.debugger.LuaRunConfiguration;
 import com.tang.intellij.lua.debugger.remote.LuaCommandLineState;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jdom.Element;
@@ -50,7 +50,7 @@ import java.util.Collections;
  *
  * Created by tangzx on 2017/5/7.
  */
-public class LuaAppRunConfiguration extends AbstractRunConfiguration implements IRemoteConfiguration {
+public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemoteConfiguration {
     private String program = "lua.exe";
     private String file;
     private String workingDir;
