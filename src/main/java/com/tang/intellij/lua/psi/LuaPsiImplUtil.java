@@ -127,10 +127,14 @@ public class LuaPsiImplUtil {
 
     public static ItemPresentation getPresentation(LuaClassMethodDef classMethodDef) {
         return new ItemPresentation() {
-            @Nullable
             @Override
             public String getPresentableText() {
-                return classMethodDef.getName();
+                LuaType type = classMethodDef.getClassType(new SearchContext(classMethodDef.getProject()));
+                if (type != null) {
+                    String c = classMethodDef.isStatic() ? "." : ":";
+                    return type.getDisplayName() + c + classMethodDef.getName() + classMethodDef.getParamSignature();
+                }
+                return classMethodDef.getName() + classMethodDef.getParamSignature();
             }
 
             @NotNull
@@ -175,10 +179,9 @@ public class LuaPsiImplUtil {
 
     public static ItemPresentation getPresentation(LuaGlobalFuncDef globalFuncDef) {
         return new ItemPresentation() {
-            @Nullable
             @Override
             public String getPresentableText() {
-                return globalFuncDef.getName();
+                return globalFuncDef.getName() + globalFuncDef.getParamSignature();
             }
 
             @NotNull
@@ -566,10 +569,14 @@ public class LuaPsiImplUtil {
         return null;
     }
 
-    public static String getFieldName(LuaTableField tableField) {
+    public static String getName(LuaTableField tableField) {
         LuaTableFieldStub stub = tableField.getStub();
         if (stub != null)
             return stub.getFieldName();
+        return getName((PsiNameIdentifierOwner) tableField);
+    }
+
+    public static String getFieldName(LuaTableField tableField) {
         return getName(tableField);
     }
 

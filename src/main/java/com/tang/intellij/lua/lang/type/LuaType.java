@@ -114,7 +114,7 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     public String getDisplayName() {
-        return isAnonymous() ? "" : getClassName();
+        return isAnonymous() ? "Anonymous" : getClassName();
     }
 
     void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
