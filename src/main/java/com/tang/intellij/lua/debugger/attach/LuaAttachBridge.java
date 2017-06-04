@@ -182,7 +182,7 @@ public class LuaAttachBridge {
         }
     }
 
-    public void launch(@NotNull String program, String wd, String[] args) {
+    public void launch(@NotNull String program, @NotNull String wd, String[] args) {
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
         try {
             if (pluginVirtualDirectory != null) {

@@ -22,6 +22,7 @@ import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -41,6 +42,7 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -156,5 +158,24 @@ public class LuaAppRunConfiguration extends AbstractRunConfiguration implements 
             }
         }
         return null;
+    }
+
+    @Override
+    public void checkConfiguration() throws RuntimeConfigurationException {
+        super.checkConfiguration();
+        String program = getProgram();
+        if (program == null || program.isEmpty()) {
+            throw new RuntimeConfigurationException("Program doesn't exist.");
+        }
+
+        String workingDir = getWorkingDir();
+        if (workingDir == null || !new File(workingDir).exists()) {
+            throw new RuntimeConfigurationException("Working dir doesn't exist.");
+        }
+
+        VirtualFile virtualFile = getVirtualFile();
+        if (virtualFile == null) {
+            throw new RuntimeConfigurationException("Entry file doesn't exist.");
+        }
     }
 }
