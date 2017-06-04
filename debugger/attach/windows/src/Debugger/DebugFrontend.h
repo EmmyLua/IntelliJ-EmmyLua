@@ -200,13 +200,6 @@ public:
 
 private:
 
-    struct ExeInfo
-    {
-        size_t			entryPoint;
-        bool            managed;
-        bool            i386;
-    };
-
     /**
      * Constructor.
      */
@@ -292,12 +285,6 @@ private:
      * was debugged at some point).
      */
     bool GetIsBeingDebugged(DWORD processId) const;
-
-    /**
-     * Gets the entry point for the specified executable file from the PE data. If the PE
-     * is a .NET/managed application the managed parameter will be set to true.
-     */
-    bool GetExeInfo(LPCSTR fileName, ExeInfo& info) const;
 
     /**
      * Writes or clears a breakpoint (interrupt 3) at the address in the specified

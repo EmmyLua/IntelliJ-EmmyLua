@@ -72,13 +72,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>Shared;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\x86\</OutDir>
     <IntDir>$(SolutionDir)Build\$(Configuration)\x86\Temp\$(ProjectName)</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>Shared;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\x64</OutDir>
     <IntDir>$(SolutionDir)Build\$(Configuration)\x64\Temp\$(ProjectName)</IntDir>
   </PropertyGroup>
@@ -167,9 +167,6 @@
   <ItemGroup>
     <ProjectReference Include="Shared.vcxproj">
       <Project>{2cd198e9-319c-48fb-85dc-ae3427a05bd2}</Project>
-    </ProjectReference>
-    <ProjectReference Include="tinyxml\tinyxmlSTL.vcxproj">
-      <Project>{a3a84737-5017-4577-b8a2-79429a25b8b6}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
