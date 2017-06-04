@@ -55,7 +55,7 @@ public class LuaRunConfigurationProducer extends RunConfigurationProducer<LuaApp
         if (element == null)
             return false;
         PsiFile psiFile = element.getContainingFile();
-        if (psiFile.getFileType() != LuaFileType.INSTANCE)
+        if (psiFile == null || psiFile.getFileType() != LuaFileType.INSTANCE)
             return false;
         VirtualFile file = luaAppRunConfiguration.getVirtualFile();
         return psiFile.getVirtualFile().equals(file);

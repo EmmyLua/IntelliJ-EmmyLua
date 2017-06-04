@@ -18,10 +18,7 @@ package com.tang.intellij.lua.debugger.app;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunProfileState;
-import com.intellij.execution.configurations.RuntimeConfigurationException;
+import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -165,17 +162,17 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
         super.checkConfiguration();
         String program = getProgram();
         if (program == null || program.isEmpty()) {
-            throw new RuntimeConfigurationException("Program doesn't exist.");
+            throw new RuntimeConfigurationError("Program doesn't exist.");
         }
 
         String workingDir = getWorkingDir();
         if (workingDir == null || !new File(workingDir).exists()) {
-            throw new RuntimeConfigurationException("Working dir doesn't exist.");
+            throw new RuntimeConfigurationError("Working dir doesn't exist.");
         }
 
         VirtualFile virtualFile = getVirtualFile();
         if (virtualFile == null) {
-            throw new RuntimeConfigurationException("Entry file doesn't exist.");
+            throw new RuntimeConfigurationError("Entry file doesn't exist.");
         }
     }
 }
