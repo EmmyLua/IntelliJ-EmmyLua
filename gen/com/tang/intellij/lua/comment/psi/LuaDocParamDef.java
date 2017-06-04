@@ -10,6 +10,9 @@ import com.tang.intellij.lua.search.SearchContext;
 public interface LuaDocParamDef extends LuaDocPsiElement {
 
   @Nullable
+  LuaDocCommentString getCommentString();
+
+  @Nullable
   LuaDocParamNameRef getParamNameRef();
 
   @Nullable

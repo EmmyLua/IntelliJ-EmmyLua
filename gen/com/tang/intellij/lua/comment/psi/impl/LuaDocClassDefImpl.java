@@ -40,6 +40,12 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
   }
 
   @Override
+  @Nullable
+  public LuaDocCommentString getCommentString() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
+  }
+
+  @Override
   @NotNull
   public PsiElement getId() {
     return notNullChild(findChildByType(ID));

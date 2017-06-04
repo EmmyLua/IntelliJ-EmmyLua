@@ -12,6 +12,9 @@ import com.tang.intellij.lua.lang.type.LuaType;
 
 public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocClassStub> {
 
+  @Nullable
+  LuaDocCommentString getCommentString();
+
   @NotNull
   PsiElement getId();
 
@@ -26,8 +29,6 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
   String getName();
 
   int getTextOffset();
-
-  String toString();
 
   @Nullable
   LuaDocClassNameRef getSuperClassNameRef();

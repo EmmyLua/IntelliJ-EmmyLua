@@ -59,13 +59,13 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 //private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def) comment_string?
+private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def)
 
 //todo : remove # ,
 type_set ::= '#'? class_name_ref ((','|'|')? class_name_ref)*
 access_modifier ::= "protected" | "public"
 
-field_def ::= FIELD access_modifier ID type_set {
+field_def ::= FIELD access_modifier ID type_set comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
@@ -86,20 +86,20 @@ field_def ::= FIELD access_modifier ID type_set {
 
 //--- tag
 tag_value ::= ID
-tag_def ::= TAG_NAME tag_value? { pin = 1 }
+tag_def ::= TAG_NAME tag_value? comment_string? { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_def ::= TAG_PARAM OPTIONAL? param_name_ref type_set {
+param_def ::= TAG_PARAM OPTIONAL? param_name_ref type_set comment_string? {
     pin = 1
     methods = [guessType optional = 'OPTIONAL']
 }
 
 //--- return
 type_list ::= type_set+
-return_def ::= TAG_RETURN type_list {
+return_def ::= TAG_RETURN type_list comment_string? {
     pin = 1
     methods = [resolveTypeAt]
 }
@@ -107,7 +107,7 @@ return_def ::= TAG_RETURN type_list {
 class_name_ref ::= ID {
     methods = [getReference resolveType]
 }
-class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
+class_def ::= CLASS ID (EXTENDS class_name_ref)? comment_string? {
     pin = 2
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
@@ -129,6 +129,11 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)?  {
 }
 
 // @type CLASS_REF
-type_def ::= TYPE type_set { pin = 1 methods = [guessType] }
+type_def ::= TYPE type_set comment_string? { pin = 1 methods = [guessType] }
 
-comment_string ::= STRING_BEGIN STRING? { pin = 1 }
+comment_string ::= STRING_BEGIN STRING? {
+    pin = 1
+    methods = [
+        string = "STRING"
+    ]
+}

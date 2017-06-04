@@ -30,6 +30,12 @@ public class LuaDocParamDefImpl extends ASTWrapperPsiElement implements LuaDocPa
 
   @Override
   @Nullable
+  public LuaDocCommentString getCommentString() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
+  }
+
+  @Override
+  @Nullable
   public LuaDocParamNameRef getParamNameRef() {
     return PsiTreeUtil.getChildOfType(this, LuaDocParamNameRef.class);
   }

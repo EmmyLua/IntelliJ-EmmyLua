@@ -17,6 +17,9 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   LuaDocAccessModifier getAccessModifier();
 
   @Nullable
+  LuaDocCommentString getCommentString();
+
+  @Nullable
   LuaDocTypeSet getTypeSet();
 
   @Nullable
@@ -33,7 +36,5 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   int getTextOffset();
 
   String getFieldName();
-
-  String toString();
 
 }

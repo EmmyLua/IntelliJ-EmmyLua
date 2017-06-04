@@ -30,6 +30,12 @@ public class LuaDocReturnDefImpl extends ASTWrapperPsiElement implements LuaDocR
 
   @Override
   @Nullable
+  public LuaDocCommentString getCommentString() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
+  }
+
+  @Override
+  @Nullable
   public LuaDocTypeList getTypeList() {
     return PsiTreeUtil.getChildOfType(this, LuaDocTypeList.class);
   }

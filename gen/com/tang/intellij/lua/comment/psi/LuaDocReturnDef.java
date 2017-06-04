@@ -10,6 +10,9 @@ import com.tang.intellij.lua.search.SearchContext;
 public interface LuaDocReturnDef extends LuaDocPsiElement {
 
   @Nullable
+  LuaDocCommentString getCommentString();
+
+  @Nullable
   LuaDocTypeList getTypeList();
 
   LuaTypeSet resolveTypeAt(int index, SearchContext context);
