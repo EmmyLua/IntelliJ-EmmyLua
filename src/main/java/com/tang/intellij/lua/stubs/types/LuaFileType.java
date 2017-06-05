@@ -26,6 +26,7 @@ import com.intellij.psi.tree.IStubFileElementType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaFileStub;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +62,7 @@ public class LuaFileType extends IStubFileElementType<LuaFileStub> {
 
     @Override
     public void serialize(@NotNull LuaFileStub stub, @NotNull StubOutputStream dataStream) throws IOException {
-        LuaTypeSet returnedType = stub.getReturnedType();
+        LuaTypeSet returnedType = stub.getReturnedType(new SearchContext(stub.getProject()));
         LuaTypeSet.serialize(returnedType, dataStream);
     }
 

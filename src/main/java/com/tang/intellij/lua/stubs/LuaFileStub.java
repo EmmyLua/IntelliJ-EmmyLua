@@ -49,9 +49,9 @@ public class LuaFileStub extends PsiFileStubImpl<LuaFile> {
         return LuaParserDefinition.FILE;
     }
 
-    public LuaTypeSet getReturnedType() {
+    public LuaTypeSet getReturnedType(SearchContext context) {
         if (returnedType == null && file != null)
-            returnedType = file.guessReturnedType(new SearchContext(file.getProject()));
+            returnedType = file.guessReturnedType(context);
         return returnedType;
     }
 }

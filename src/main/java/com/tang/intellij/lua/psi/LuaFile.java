@@ -53,7 +53,7 @@ public class LuaFile extends PsiFileBase {
     public LuaTypeSet getReturnedType(SearchContext context) {
         StubElement greenStub = getGreenStub();
         if (greenStub instanceof LuaFileStub)
-            return ((LuaFileStub) greenStub).getReturnedType();
+            return ((LuaFileStub) greenStub).getReturnedType(context);
         return guessReturnedType(context);
     }
 
