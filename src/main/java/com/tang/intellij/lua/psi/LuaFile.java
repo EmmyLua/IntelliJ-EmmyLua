@@ -18,11 +18,10 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.Ref;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.util.CachedValue;
 import com.tang.intellij.lua.lang.LuaFileType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -45,7 +44,6 @@ public class LuaFile extends PsiFileBase {
         return LuaFileType.INSTANCE;
     }
 
-    private Key<CachedValue<LuaTypeSet>> RET_TYPE = Key.create("lua.RET_TYPE");
     /**
      * 获取最后返回的类型
      * @return LuaTypeSet
@@ -61,13 +59,12 @@ public class LuaFile extends PsiFileBase {
         LuaTypeSet set = null;
         if (context.push(this, SearchContext.Overflow.FileReturn)) {
             PsiElement lastChild = getLastChild();
-            final LuaReturnStat[] last = {null};
+            Ref<LuaReturnStat> returnStatRef = Ref.create();
             LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
-                last[0] = luaReturnStat;
+                returnStatRef.set(luaReturnStat);
                 return false;
             });
-            LuaReturnStat lastReturn = last[0];
-            set = LuaPsiImplUtil.guessReturnTypeSet(lastReturn, 0, context);
+            set = LuaPsiImplUtil.guessReturnTypeSet(returnStatRef.get(), 0, context);
             context.pop(this);
         }
         return set;
