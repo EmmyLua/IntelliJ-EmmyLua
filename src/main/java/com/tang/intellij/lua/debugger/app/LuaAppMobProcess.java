@@ -19,6 +19,7 @@ package com.tang.intellij.lua.debugger.app;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessListener;
+import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -92,7 +93,8 @@ class LuaAppMobProcess extends LuaMobDebugProcess {
             });
             handler.startNotify();
         } catch (Exception e) {
-            e.printStackTrace();
+            getSession().getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
+            getSession().stop();
         }
     }
 
