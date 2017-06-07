@@ -69,16 +69,18 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
     private static final Map<String, TextAttributesKey> ourTags;
     static {
         ourTags = RainbowHighlighter.createRainbowHLM();
-        ourTags.put("Parameters", LuaHighlightingData.PARAMETER);
+        ourTags.put("parameter", LuaHighlightingData.PARAMETER);
         ourTags.put("docTag", LuaHighlightingData.DOC_COMMENT_TAG);
         ourTags.put("docTagValue", LuaHighlightingData.DOC_COMMENT_TAG_VALUE);
         ourTags.put("localVar", LuaHighlightingData.LOCAL_VAR);
         ourTags.put("globalVar", LuaHighlightingData.GLOBAL_VAR);
         ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION);
-        ourTags.put("tableField", LuaHighlightingData.FIELD);
+        ourTags.put("field", LuaHighlightingData.FIELD);
         ourTags.put("localVar", LuaHighlightingData.PARAMETER);
         ourTags.put("upValue", LuaHighlightingData.UP_VALUE);
         ourTags.put("std", LuaHighlightingData.STD_API);
+        ourTags.put("self", LuaHighlightingData.SELF);
+        ourTags.put("primitive", LuaHighlightingData.PRIMITIVE_TYPE);
     }
 
     @Nullable
@@ -97,11 +99,12 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
     @Override
     public String getDemoText() {
         return "local <localVar>var</localVar> = 1 -- a short comment\n" +
+                "local a, b, c = <primitive>true</primitive>, <primitive>false</primitive>, <primitive>nil</primitive>\n" +
                 "--- doc comment\n" +
                 "--- @param <docTagValue>par1</docTagValue> Par1Type @some strings\n" +
-                "function var:fun(<Parameters>par1</Parameters>, <Parameters>par2</Parameters>)\n" +
+                "function var:fun(<parameter>par1</parameter>, <parameter>par2</parameter>)\n" +
                 "   <std>print</std>('hello')" +
-                "   return self.len + 2\n" +
+                "   return <self>self</self>.<field>len</field> + 2\n" +
                 "end\n" +
                 "\n" +
                 "function <globalFunction>globalFun</globalFunction>()\n" +
@@ -109,7 +112,7 @@ public class LuaColorSettingsPage implements ColorSettingsPage {
                 "end\n" +
                 "\n" +
                 "<globalVar>globalVar</globalVar> = {\n" +
-                "   <tableField>property</tableField> = value\n" +
+                "   <field>property</field> = value\n" +
                 "}\n";
     }
 
