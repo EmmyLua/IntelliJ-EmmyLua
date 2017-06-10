@@ -17,12 +17,14 @@
 package com.tang.intellij.lua.debugger;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.CommandLineState;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessHandler;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.tang.intellij.lua.debugger.LuaRunConfiguration;
+import com.intellij.execution.ui.ConsoleView;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *
@@ -38,5 +40,14 @@ public class LuaCommandLineState extends CommandLineState {
     protected ProcessHandler startProcess() throws ExecutionException {
         LuaRunConfiguration runProfile = (LuaRunConfiguration) getEnvironment().getRunProfile();
         return new OSProcessHandler(runProfile.createCommandLine());
+    }
+
+    @Nullable
+    @Override
+    protected ConsoleView createConsole(@NotNull Executor executor) throws ExecutionException {
+        ConsoleView consoleView = super.createConsole(executor);
+        assert consoleView != null;
+        consoleView.addMessageFilter(new LuaTracebackFilter(getEnvironment().getProject()));
+        return consoleView;
     }
 }

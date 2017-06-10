@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.debugger;
 
 import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.execution.ui.ExecutionConsole;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugSession;
@@ -40,6 +41,12 @@ public abstract class LuaDebugProcess extends XDebugProcess implements DebugLogg
 
     protected LuaDebugProcess(@NotNull XDebugSession session) {
         super(session);
+    }
+
+    @Override
+    public void sessionInitialized() {
+        super.sessionInitialized();
+        getSession().getConsoleView().addMessageFilter(new LuaTracebackFilter(getSession().getProject()));
     }
 
     @Override
