@@ -21,7 +21,7 @@ package com.tang.intellij.lua.debugger;
  * Created by tangzx on 2017/5/7.
  */
 public enum DebuggerType {
-    Attach(1, "Attach Debugger(Windows only)"), Mob(2, "Remote Debugger(Mobdebug)");
+    Attach(1, "Attach Debugger"), Mob(2, "Remote Debugger(Mobdebug)");
     private int v;
     private String desc;
     DebuggerType(int v, String desc) {

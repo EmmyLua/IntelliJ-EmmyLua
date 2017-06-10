@@ -25,6 +25,7 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.util.TextFieldCompletionProvider;
 import com.intellij.util.textCompletion.TextFieldWithCompletion;
 import com.tang.intellij.lua.debugger.DebuggerType;
@@ -54,10 +55,13 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
         myWorkingDir.addBrowseFolderListener("Choose Working Dir", "Choose working dir", project, descriptor);
 
-        DefaultComboBoxModel<DebuggerType> debuggerDataModel = new DefaultComboBoxModel<>(new DebuggerType[]{
-                DebuggerType.Attach,
-                DebuggerType.Mob
-        });
+        DebuggerType[] debuggerTypes;
+        if (SystemInfoRt.isWindows)
+            debuggerTypes = new DebuggerType[] { DebuggerType.Attach, DebuggerType.Mob };
+        else
+            debuggerTypes = new DebuggerType[] { DebuggerType.Mob };
+
+        DefaultComboBoxModel<DebuggerType> debuggerDataModel = new DefaultComboBoxModel<>(debuggerTypes);
         myDebugger.setModel(debuggerDataModel);
         myDebugger.addItemListener(e -> fireEditorStateChanged());
     }
