@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger;
 
 import com.intellij.execution.configuration.AbstractRunConfiguration;
 import com.intellij.execution.configurations.ConfigurationFactory;
+import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.configurations.RuntimeConfigurationError;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.openapi.module.Module;
@@ -52,5 +53,9 @@ public abstract class LuaRunConfiguration extends AbstractRunConfiguration {
         if (!sourceRootExist) {
             throw new RuntimeConfigurationError("Sources root not found.");
         }
+    }
+
+    public GeneralCommandLine createCommandLine() {
+        return null;
     }
 }

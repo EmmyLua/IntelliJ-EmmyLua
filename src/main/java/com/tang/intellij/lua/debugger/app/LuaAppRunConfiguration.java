@@ -34,7 +34,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.tang.intellij.lua.debugger.DebuggerType;
 import com.tang.intellij.lua.debugger.IRemoteConfiguration;
 import com.tang.intellij.lua.debugger.LuaRunConfiguration;
-import com.tang.intellij.lua.debugger.remote.LuaCommandLineState;
+import com.tang.intellij.lua.debugger.LuaCommandLineState;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -175,5 +175,13 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
         if (virtualFile == null) {
             throw new RuntimeConfigurationError("Entry file doesn't exist.");
         }
+    }
+
+    @Override
+    public GeneralCommandLine createCommandLine() {
+        GeneralCommandLine commandLine = new GeneralCommandLine().withExePath(program);
+        commandLine.addParameters(getFile());
+        commandLine.setWorkDirectory(getWorkingDir());
+        return commandLine;
     }
 }

@@ -30,6 +30,7 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import com.tang.intellij.lua.debugger.IRemoteConfiguration;
+import com.tang.intellij.lua.debugger.LuaCommandLineState;
 import com.tang.intellij.lua.debugger.LuaRunConfiguration;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
