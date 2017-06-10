@@ -54,7 +54,7 @@ public class LuaFileUtil {
         if (shortUrl == null)
             return null;
 
-        shortUrl = shortUrl.replace('\\', '/');
+        shortUrl = shortUrl.replace('\\', '/').trim();
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
