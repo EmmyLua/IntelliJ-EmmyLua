@@ -19,6 +19,7 @@ package com.tang.intellij.lua.debugger.remote;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.GenericProgramRunner;
 import com.intellij.execution.ui.RunContentDescriptor;
@@ -26,6 +27,7 @@ import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
+import com.tang.intellij.lua.debugger.LuaRunner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaMobDebuggerRunner extends GenericProgramRunner {
+public class LuaMobDebuggerRunner extends LuaRunner {
 
     private static final String ID = "lua.mob.runner";
 
@@ -44,8 +46,8 @@ public class LuaMobDebuggerRunner extends GenericProgramRunner {
     }
 
     @Override
-    public boolean canRun(@NotNull String s, @NotNull RunProfile runProfile) {
-        return runProfile instanceof LuaMobConfiguration;
+    public boolean canRun(@NotNull String executorId, @NotNull RunProfile runProfile) {
+        return DefaultDebugExecutor.EXECUTOR_ID.equals(executorId) && (runProfile instanceof LuaMobConfiguration);
     }
 
     @Nullable

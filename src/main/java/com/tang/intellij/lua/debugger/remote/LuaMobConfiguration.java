@@ -22,6 +22,7 @@ import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.options.SettingsEditorGroup;
@@ -43,7 +44,7 @@ import java.util.Collections;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaMobConfiguration extends LuaRunConfiguration implements IRemoteConfiguration {
+public class LuaMobConfiguration extends LuaRunConfiguration implements IRemoteConfiguration, RunConfigurationWithSuppressedDefaultRunAction {
 
     private int port = 8172;
 
