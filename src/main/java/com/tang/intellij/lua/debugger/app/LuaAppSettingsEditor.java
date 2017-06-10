@@ -40,7 +40,6 @@ import javax.swing.*;
  * Created by tangzx on 2017/5/7.
  */
 public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration> {
-    private final DefaultComboBoxModel<DebuggerType> debuggerDataModel;
     private TextFieldWithBrowseButton myProgram;
     private JPanel myPanel;
     private JComboBox<DebuggerType> myDebugger;
@@ -55,14 +54,12 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
         myWorkingDir.addBrowseFolderListener("Choose Working Dir", "Choose working dir", project, descriptor);
 
-        debuggerDataModel = new DefaultComboBoxModel<>(new DebuggerType[] {
+        DefaultComboBoxModel<DebuggerType> debuggerDataModel = new DefaultComboBoxModel<>(new DebuggerType[]{
                 DebuggerType.Attach,
                 DebuggerType.Mob
         });
         myDebugger.setModel(debuggerDataModel);
-        myDebugger.addItemListener(e -> {
-            fireEditorStateChanged();
-        });
+        myDebugger.addItemListener(e -> fireEditorStateChanged());
     }
 
     @Override
@@ -96,7 +93,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
                                              @NotNull CompletionResultSet result) {
             ProjectRootManager.getInstance(project).getFileIndex().iterateContent(virtualFile -> {
                 if (!virtualFile.isDirectory() && virtualFile.getFileType() == LuaFileType.INSTANCE) {
-                    String url = LuaFileUtil.getShortUrl(project, virtualFile);
+                    String url = LuaFileUtil.getShortPath(project, virtualFile);
                     result.addElement(LookupElementBuilder.create(url).withIcon(LuaIcons.FILE));
                 }
                 return true;

@@ -28,6 +28,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
+import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.tang.intellij.lua.debugger.DebuggerType;
@@ -48,7 +49,7 @@ import java.util.Collections;
  * Created by tangzx on 2017/5/7.
  */
 public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemoteConfiguration {
-    private String program = "lua.exe";
+    private String program = SystemInfoRt.isWindows ? "lua.exe" : "lua";
     private String file;
     private String workingDir;
     private DebuggerType debuggerType = DebuggerType.Attach;

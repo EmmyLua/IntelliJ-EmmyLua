@@ -44,7 +44,7 @@ public class LuaRunConfigurationProducer extends RunConfigurationProducer<LuaApp
         if (!(containingFile instanceof LuaFile))
             return false;
 
-        luaAppRunConfiguration.setFile(LuaFileUtil.getShortUrl(element.getProject(), containingFile.getVirtualFile()));
+        luaAppRunConfiguration.setFile(LuaFileUtil.getShortPath(element.getProject(), containingFile.getVirtualFile()));
         luaAppRunConfiguration.setName(containingFile.getName());
         return true;
     }

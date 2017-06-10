@@ -71,7 +71,7 @@ public class LuaFileUtil {
 
         //绝对路径
         for (String ext : extensions) {
-            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl("file://" + shortUrl + ext);
+            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(shortUrl + ext));
             if (file != null && !file.isDirectory()) {
                 return file;
             }
@@ -92,6 +92,10 @@ public class LuaFileUtil {
             }
         }
         return list.toArray(new VirtualFile[list.size()]);
+    }
+
+    public static String getShortPath(Project project, VirtualFile file) {
+        return VfsUtil.urlToPath(getShortUrl(project, file));
     }
 
     public static String getShortUrl(Project project, VirtualFile file) {
