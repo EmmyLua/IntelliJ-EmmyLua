@@ -292,6 +292,13 @@
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
         <xdebugger.localAttachDebuggerProvider implementation="com.tang.intellij.lua.debugger.attach.LuaLocalAttachDebuggerProvider"/>
 
+        <applicationService serviceInterface="com.tang.intellij.lua.project.LuaSettings" serviceImplementation="com.tang.intellij.lua.project.LuaSettings"/>
+        <applicationConfigurable
+                groupId="language"
+                displayName="Lua"
+                id="preferences.Lua"
+                instance="com.tang.intellij.lua.project.LuaSettingsPanel" />
+
         <intentionAction>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocIntention</className>
