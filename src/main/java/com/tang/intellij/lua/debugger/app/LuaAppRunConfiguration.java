@@ -171,10 +171,10 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
             throw new RuntimeConfigurationError("Working dir doesn't exist.");
         }
 
-        VirtualFile virtualFile = getVirtualFile();
+        /*VirtualFile virtualFile = getVirtualFile();
         if (virtualFile == null) {
             throw new RuntimeConfigurationError("Entry file doesn't exist.");
-        }
+        }*/
     }
 
     @Override
