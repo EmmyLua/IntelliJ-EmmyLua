@@ -80,6 +80,9 @@ public abstract class LuaXValue extends XValue {
         String nodeName = node.getNodeName();
         LuaXValue value = null;
         switch (nodeName) {
+            case "userdata":
+                value = new LuaXUserdata();
+                break;
             case "table":
                 value = new LuaXTable();
                 break;
