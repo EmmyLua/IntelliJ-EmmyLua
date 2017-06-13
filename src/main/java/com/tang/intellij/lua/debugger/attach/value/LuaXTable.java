@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.attach.value;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.frame.*;
 import com.tang.intellij.lua.debugger.attach.LuaAttachStackFrame;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ public class LuaXTable extends LuaXValue {
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
-        xValueNode.setPresentation(null, null, "table", true);
+        xValueNode.setPresentation(AllIcons.Json.Object, "table", "", true);
     }
 
     @Override

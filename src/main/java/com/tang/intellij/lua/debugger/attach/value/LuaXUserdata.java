@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.attach.value;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
 import org.jetbrains.annotations.NotNull;
@@ -27,8 +28,8 @@ import org.w3c.dom.NodeList;
  * Created by Administrator on 2017/6/13.
  */
 public class LuaXUserdata extends LuaXTable {
-    private String type;
-    private String data;
+    private String type = "userdata";
+    private String data = "unknown";
 
     @Override
     public void doParse(Node node) {
@@ -49,7 +50,7 @@ public class LuaXUserdata extends LuaXTable {
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
-        xValueNode.setPresentation(null, type, data, true);
+        xValueNode.setPresentation(AllIcons.Json.Object, type, data, true);
     }
 
     @Override
