@@ -142,8 +142,8 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
     }
 
     public void setStack(LuaExecutionStack stack) {
-        XStackFrame topFrame = stack.getTopFrame();
-        if (topFrame != null) {
+        XStackFrame[] frames = stack.getStackFrames();
+        for (XStackFrame topFrame : frames) {
             XSourcePosition sourcePosition = topFrame.getSourcePosition();
             if (sourcePosition != null) {
                 XLineBreakpoint breakpoint = getBreakpoint(sourcePosition.getFile(), sourcePosition.getLine());
@@ -158,8 +158,12 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
                         getSession().showExecutionPoint();
                     });
                 }
+                return;
             }
         }
+
+        // file and source position not found, run it
+        mobServer.addCommand("RUN");
     }
 
     public void runCommand(DebugCommand command) {

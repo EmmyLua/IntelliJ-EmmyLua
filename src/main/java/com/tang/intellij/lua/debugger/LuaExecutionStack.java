@@ -43,6 +43,10 @@ public class LuaExecutionStack extends XExecutionStack {
         return frame;
     }
 
+    public XStackFrame[] getStackFrames() {
+        return stackFrameList.toArray(new XStackFrame[stackFrameList.size()]);
+    }
+
     @Override
     public void computeStackFrames(int i, XStackFrameContainer xStackFrameContainer) {
         xStackFrameContainer.addStackFrames(stackFrameList, true);
