@@ -21,7 +21,11 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.impl.ProjectFileIndexFacade;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -82,6 +86,42 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
                         }
                     }
                 }
+            }
+
+            addAllFiles(completionParameters, completionResultSet);
+        }
+
+        completionResultSet.stopHere();
+    }
+
+    void addAllFiles(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
+        Project project = completionParameters.getOriginalFile().getProject();
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+        for (Module module : modules) {
+            VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
+            for (VirtualFile sourceRoot : sourceRoots) {
+                addAllFiles(project, completionResultSet, null, sourceRoot.getChildren());
+            }
+        }
+    }
+
+    void addAllFiles(Project project, @NotNull CompletionResultSet completionResultSet, String pck, VirtualFile[] children) {
+        for (VirtualFile child : children) {
+            if (!ProjectFileIndexFacade.getInstance(project).isInSource(child)) {
+                return;
+            }
+
+            String fileName = FileUtil.getNameWithoutExtension(child.getName());
+            String newPath = pck == null ? fileName : pck + "." + fileName;
+
+            if (child.isDirectory()) {
+                //noinspection UnsafeVfsRecursion
+                addAllFiles(project, completionResultSet, newPath, child.getChildren());
+            } else {
+                LookupElement lookupElement = LookupElementBuilder
+                        .create(newPath)
+                        .withIcon(LuaIcons.FILE);
+                completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
             }
         }
     }
