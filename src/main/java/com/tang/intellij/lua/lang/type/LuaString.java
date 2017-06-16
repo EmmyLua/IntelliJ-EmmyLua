@@ -49,6 +49,7 @@ public class LuaString {
             }
         } else {
             content.start = 1;
+            content.end = text.length() - 1;
             content.value = text.substring(1, text.length() - 1);
         }
         return content;

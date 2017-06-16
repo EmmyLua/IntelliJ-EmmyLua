@@ -120,7 +120,8 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
             } else {
                 LookupElement lookupElement = LookupElementBuilder
                         .create(newPath)
-                        .withIcon(LuaIcons.FILE);
+                        .withIcon(LuaIcons.FILE)
+                        .withInsertHandler(new FullPackageInsertHandler());
                 completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
             }
         }
@@ -134,6 +135,26 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
             insertionContext.getDocument().insertString(tail, String.valueOf(PATH_SPLITTER));
             insertionContext.getEditor().getCaretModel().moveToOffset(tail + 1);
             AutoPopupController.getInstance(insertionContext.getProject()).autoPopupMemberLookup(insertionContext.getEditor(), null);
+        }
+    }
+
+    static class FullPackageInsertHandler implements InsertHandler<LookupElement> {
+
+        @Override
+        public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
+            int tailOffset = insertionContext.getTailOffset();
+            PsiElement cur = insertionContext.getFile().findElementAt(tailOffset);
+
+            if (cur != null) {
+                int start = cur.getTextOffset();
+
+                LuaString ls = LuaString.getContent(cur.getText());
+                insertionContext.getDocument().deleteString(start + ls.start, start + ls.end);
+
+                String lookupString = lookupElement.getLookupString();
+                insertionContext.getDocument().insertString(start + ls.start, lookupString);
+                insertionContext.getEditor().getCaretModel().moveToOffset(start + ls.start + lookupString.length());
+            }
         }
     }
 }
