@@ -16,11 +16,9 @@
 
 package com.tang.intellij.lua.editor.completion;
 
-import com.intellij.codeInsight.AutoPopupController;
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -30,13 +28,10 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaFileType;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaString;
-import com.tang.intellij.lua.psi.LuaFile;
-import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -53,42 +48,9 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
         PsiElement cur = file.findElementAt(completionParameters.getOffset() - 1);
         if (cur != null) {
             LuaString ls = LuaString.getContent(cur.getText());
-            int textOffset = completionParameters.getOffset() - cur.getTextOffset() - ls.start;
-            String content = ls.value.substring(0, textOffset).replace('/', '.'); //统一用.来处理，aaa.bbb.ccc
+            String content = ls.value.replace('/', PATH_SPLITTER); //统一用.来处理，aaa.bbb.ccc
 
-            int last = content.lastIndexOf(PATH_SPLITTER);
-            String prefixPackage = "";
-            if (last !=- 1)
-                prefixPackage = content.substring(0, last);
-            String postfix = content.substring(last + 1);
-
-            CompletionResultSet prefixMatcher = completionResultSet.withPrefixMatcher(postfix);
-
-            Project project = file.getProject();
-            // add packages / files
-            VirtualFile[] packages = LuaFileUtil.getPackages(project, prefixPackage.replace('.', '/'));
-            for (VirtualFile dir : packages) {
-                VirtualFile[] children = dir.getChildren();
-                for (VirtualFile child : children) {
-                    if (child.isDirectory()) {
-                        LookupElement lookupElement = LookupElementBuilder
-                                .create(child.getName())
-                                .withIcon(AllIcons.Nodes.Package)
-                                .withInsertHandler(new PackageInsertHandler());
-                        prefixMatcher.addElement(PrioritizedLookupElement.withPriority(lookupElement, 2));
-                    } else {
-                        PsiFile psiFile = PsiManager.getInstance(project).findFile(child);
-                        if (psiFile instanceof LuaFile) {
-                            String fileName = FileUtil.getNameWithoutExtension(psiFile.getName());
-                            LookupElement lookupElement = LookupElementBuilder
-                                    .create(fileName)
-                                    .withIcon(LuaIcons.FILE);
-                            prefixMatcher.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
-                        }
-                    }
-                }
-            }
-
+            completionResultSet = completionResultSet.withPrefixMatcher(content);
             addAllFiles(completionParameters, completionResultSet);
         }
 
@@ -124,17 +86,6 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
                         .withInsertHandler(new FullPackageInsertHandler());
                 completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
             }
-        }
-    }
-
-    static class PackageInsertHandler implements InsertHandler<LookupElement> {
-
-        @Override
-        public void handleInsert(InsertionContext insertionContext, LookupElement lookupElement) {
-            int tail = insertionContext.getTailOffset();
-            insertionContext.getDocument().insertString(tail, String.valueOf(PATH_SPLITTER));
-            insertionContext.getEditor().getCaretModel().moveToOffset(tail + 1);
-            AutoPopupController.getInstance(insertionContext.getProject()).autoPopupMemberLookup(insertionContext.getEditor(), null);
         }
     }
 
