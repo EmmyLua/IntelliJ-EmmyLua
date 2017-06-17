@@ -43,9 +43,11 @@ public class LuaRequireReference extends PsiReferenceBase<LuaCallExpr> {
             LuaString luaString = LuaString.getContent(path.getText());
             pathString = luaString.value;
 
-            int start = path.getTextOffset() - callExpr.getTextOffset() + luaString.start;
-            int end = start + pathString.length();
-            range = new TextRange(start, end);
+            if (pathString != null) {
+                int start = path.getTextOffset() - callExpr.getTextOffset() + luaString.start;
+                int end = start + pathString.length();
+                range = new TextRange(start, end);
+            }
         }
     }
 
@@ -62,6 +64,8 @@ public class LuaRequireReference extends PsiReferenceBase<LuaCallExpr> {
     @Nullable
     @Override
     public PsiElement resolve() {
+        if (pathString == null)
+            return  null;
         return LuaPsiResolveUtil.resolveRequireFile(pathString, myElement.getProject());
     }
 
