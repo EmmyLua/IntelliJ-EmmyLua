@@ -32,6 +32,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.util.ProcessingContext;
+import com.tang.intellij.lua.lang.LuaFileType;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaString;
 import com.tang.intellij.lua.psi.LuaFile;
@@ -61,7 +62,7 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
                 prefixPackage = content.substring(0, last);
             String postfix = content.substring(last + 1);
 
-            completionResultSet = completionResultSet.withPrefixMatcher(postfix);
+            CompletionResultSet prefixMatcher = completionResultSet.withPrefixMatcher(postfix);
 
             Project project = file.getProject();
             // add packages / files
@@ -74,7 +75,7 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
                                 .create(child.getName())
                                 .withIcon(AllIcons.Nodes.Package)
                                 .withInsertHandler(new PackageInsertHandler());
-                        completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 2));
+                        prefixMatcher.addElement(PrioritizedLookupElement.withPriority(lookupElement, 2));
                     } else {
                         PsiFile psiFile = PsiManager.getInstance(project).findFile(child);
                         if (psiFile instanceof LuaFile) {
@@ -82,7 +83,7 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
                             LookupElement lookupElement = LookupElementBuilder
                                     .create(fileName)
                                     .withIcon(LuaIcons.FILE);
-                            completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
+                            prefixMatcher.addElement(PrioritizedLookupElement.withPriority(lookupElement, 1));
                         }
                     }
                 }
@@ -107,9 +108,8 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
 
     void addAllFiles(Project project, @NotNull CompletionResultSet completionResultSet, String pck, VirtualFile[] children) {
         for (VirtualFile child : children) {
-            if (!ProjectFileIndexFacade.getInstance(project).isInSource(child)) {
-                return;
-            }
+            if (!ProjectFileIndexFacade.getInstance(project).isInSource(child))
+                continue;
 
             String fileName = FileUtil.getNameWithoutExtension(child.getName());
             String newPath = pck == null ? fileName : pck + "." + fileName;
@@ -117,7 +117,7 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
             if (child.isDirectory()) {
                 //noinspection UnsafeVfsRecursion
                 addAllFiles(project, completionResultSet, newPath, child.getChildren());
-            } else {
+            } else if (pck != null && child.getFileType() == LuaFileType.INSTANCE) { //第一层的文件不要
                 LookupElement lookupElement = LookupElementBuilder
                         .create(newPath)
                         .withIcon(LuaIcons.FILE)
