@@ -26,9 +26,9 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.util.CachedValue;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
+import com.intellij.psi.util.ParameterizedCachedValue;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.*;
@@ -151,6 +151,8 @@ public class LuaPsiImplUtil {
         };
     }
 
+    private static Key<ParameterizedCachedValue<LuaType, SearchContext>> GET_CLASS_METHOD = Key.create("GET_CLASS_METHOD");
+
     /**
      * 寻找对应的类
      * @param classMethodDef def
@@ -158,12 +160,15 @@ public class LuaPsiImplUtil {
      */
     @Nullable
     public static LuaType getClassType(LuaClassMethodDef classMethodDef, SearchContext context) {
-        LuaExpr expr = classMethodDef.getClassMethodName().getExpr();
-        LuaTypeSet typeSet = expr.guessType(context);
-        if (typeSet != null) {
-            return typeSet.getPerfect();
-        }
-        return null;
+        return CachedValuesManager.getManager(classMethodDef.getProject()).getParameterizedCachedValue(classMethodDef, GET_CLASS_METHOD, ctx -> {
+            LuaExpr expr = classMethodDef.getClassMethodName().getExpr();
+            LuaTypeSet typeSet = expr.guessType(ctx);
+            LuaType type = null;
+            if (typeSet != null) {
+                type = typeSet.getPerfect();
+            }
+            return CachedValueProvider.Result.create(type, classMethodDef);
+        }, false, context);
     }
 
     public static PsiElement getNameIdentifier(LuaGlobalFuncDef globalFuncDef) {
@@ -395,7 +400,7 @@ public class LuaPsiImplUtil {
         return guessReturnTypeSetOriginal(owner, searchContext);
     }
 
-    private static final Key<CachedValue<LuaTypeSet>> FUNCTION_RETURN_TYPESET = Key.create("lua.function.return_typeset");
+    private static final Key<ParameterizedCachedValue<LuaTypeSet, SearchContext>> FUNCTION_RETURN_TYPESET = Key.create("lua.function.return_typeset");
 
     @NotNull
     public static LuaTypeSet guessReturnTypeSetOriginal(LuaFuncBodyOwner owner, SearchContext searchContext) {
@@ -410,14 +415,14 @@ public class LuaPsiImplUtil {
         }
 
         //infer from return stat
-        return CachedValuesManager.getManager(owner.getProject()).getCachedValue(owner, FUNCTION_RETURN_TYPESET, () -> {
+        return CachedValuesManager.getManager(owner.getProject()).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, (ctx) -> {
             LuaTypeSet typeSet = LuaTypeSet.create();
             Ref<LuaTypeSet> setRef = Ref.create(typeSet);
             owner.acceptChildren(new LuaVisitor() {
                 @Override
                 public void visitReturnStat(@NotNull LuaReturnStat o) {
                     LuaTypeSet set = setRef.get();
-                    setRef.set(set.union(guessReturnTypeSet(o, 0, searchContext)));
+                    setRef.set(set.union(guessReturnTypeSet(o, 0, ctx)));
                 }
 
                 @Override
@@ -431,7 +436,7 @@ public class LuaPsiImplUtil {
                 }
             });
             return CachedValueProvider.Result.create(setRef.get(), owner);
-        }, false);
+        }, false, searchContext);
     }
 
     @NotNull
