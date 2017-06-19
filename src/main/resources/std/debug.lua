@@ -134,3 +134,22 @@ function debug.setmetatable(object, table) end
 --- with the given index. Otherwise, it returns the name of the upvalue.
 function debug.setupvalue(func, up, value) end
 
+--- Sets the given value as the Lua value associated to the given udata. udata must be a full userdata.
+--- Returns udata.
+function debug.setuservalue(udata, value) end
+
+--- If message is present but is neither a string nor nil, this function
+--- returns message without further processing. Otherwise, it returns a string
+--- with a traceback of the call stack. The optional message string is appended
+--- at the beginning of the traceback. An optional level number tells at which
+--- level to start the traceback (default is 1, the function calling traceback).
+function debug.traceback(thread, message, level) end
+
+--- Returns a unique identifier (as a light userdata) for the upvalue numbered n from the given function.
+--- These unique identifiers allow a program to check whether different
+--- closures share upvalues. Lua closures that share an upvalue (that is, that
+--- access a same external local variable) will return identical ids for those upvalue indices.
+function debug.upvalueid(f, n) end
+
+--- Make the n1-th upvalue of the Lua closure f1 refer to the n2-th upvalue of the Lua closure f2.
+function debug.upvaluejoin(f1, n1, f2, n2) end
