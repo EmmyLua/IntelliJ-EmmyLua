@@ -1,5 +1,6 @@
 Lua IDE for IntelliJ IDEA (requires `IDEA 2017.1`)
 
+> EmmyLua has been uploaded to the [Jebrains Plugin Repository](https://plugins.jetbrains.com/plugin/9768-emmylua)
 
 [Download](/../../releases)
 
