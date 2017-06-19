@@ -102,8 +102,8 @@
         <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
         <gotoSymbolContributor implementation="com.tang.intellij.lua.editor.LuaSymbolNavigationContributor"/>
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
-        <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCommentCompletionContributor"/>
+        <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>
 
         <codeInsight.lineMarkerProvider language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaLineMarkerProvider"/>
         <codeInsight.parameterNameHints language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.LuaParameterHintsProvider"/>

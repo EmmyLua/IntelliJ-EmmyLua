@@ -83,13 +83,16 @@ public class LuaCompletionContributor extends CompletionContributor {
 
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
-        parameters.getEditor().putUserData(CompletionSession.KEY, new CompletionSession(parameters, result));
+        CompletionSession session = new CompletionSession(parameters, result);
+        parameters.getEditor().putUserData(CompletionSession.KEY, session);
         super.fillCompletionVariants(parameters, result);
-        suggestWordsInFile(parameters, result);
+        if (session.isSuggestWords()) {
+            suggestWordsInFile(parameters, result);
+        }
     }
 
     private static void suggestWordsInFile(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
-        CompletionSession session = parameters.getEditor().getUserData(CompletionSession.KEY);
+        CompletionSession session = CompletionSession.get(parameters);
         assert session != null;
 
         HashSet<String> wordsInFileSet = new HashSet<>();

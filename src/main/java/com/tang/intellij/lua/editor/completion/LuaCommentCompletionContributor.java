@@ -64,7 +64,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             psiElement(LuaDocTypes.TAG_PARAM));
 
     // 在 extends 之后提示类型
-    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS_AFTER_EXTENDS = psiElement().withParent(LuaDocClassNameRef.class);
+    private static final PsiElementPattern.Capture<PsiElement> SHOW_CLASS = psiElement().withParent(LuaDocClassNameRef.class);
 
     // 在 @field 之后提示 public / protected
     private static final PsiElementPattern.Capture<PsiElement> SHOW_ACCESS_MODIFIER = psiElement().afterLeaf(
@@ -117,7 +117,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             }
         });
 
-        extend(CompletionType.BASIC, SHOW_CLASS_AFTER_EXTENDS, new CompletionProvider<CompletionParameters>() {
+        extend(CompletionType.BASIC, SHOW_CLASS, new CompletionProvider<CompletionParameters>() {
             @Override
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 Project project = completionParameters.getPosition().getProject();
@@ -127,6 +127,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                     }
                     return true;
                 });
+                completionResultSet.stopHere();
             }
         });
 

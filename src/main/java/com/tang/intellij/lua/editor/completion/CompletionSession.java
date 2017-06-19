@@ -20,6 +20,7 @@ import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 
@@ -31,12 +32,18 @@ public class CompletionSession {
 
     private CompletionParameters parameters;
     private CompletionResultSet resultSet;
+    private boolean suggestWords = true;
 
     public static Key<CompletionSession> KEY = Key.create("lua.CompletionSession");
 
     public CompletionSession(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet) {
         parameters = completionParameters;
         resultSet = completionResultSet;
+    }
+
+    @Nullable
+    public static CompletionSession get(CompletionParameters completionParameters) {
+        return completionParameters.getEditor().getUserData(KEY);
     }
 
     private HashSet<String> words = new HashSet<>();
@@ -55,5 +62,13 @@ public class CompletionSession {
 
     public CompletionResultSet getResultSet() {
         return resultSet;
+    }
+
+    public boolean isSuggestWords() {
+        return suggestWords;
+    }
+
+    public void setSuggestWords(boolean suggestWords) {
+        this.suggestWords = suggestWords;
     }
 }
