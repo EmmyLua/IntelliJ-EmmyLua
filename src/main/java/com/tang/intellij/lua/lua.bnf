@@ -371,7 +371,10 @@ tableConstructor ::= '{' fieldList '}' {
 
 fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
 
-tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
+private tableField1 ::= '[' expr ']' '=' expr { pin = 1 }
+private tableField2 ::= ID '=' expr { pin = 2 }
+
+tableField ::= tableField1 | tableField2 | expr {
     methods = [
         getNameIdentifier
         setName
@@ -390,7 +393,10 @@ tableField ::= '[' expr ']' '=' expr | ID '=' expr | expr {
         "com.tang.intellij.lua.psi.LuaClassField"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
+    recoverWhile = tableField_recover
 }
+
+private tableField_recover ::= !(tableFieldSep | '}' | '[')
 
 tableFieldSep ::= ',' | ';'
 

@@ -1385,40 +1385,46 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '[' expr ']' '=' expr | ID '=' expr | expr
+  // tableField1 | tableField2 | expr
   public static boolean tableField(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tableField")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TABLE_FIELD, "<table field>");
-    r = tableField_0(b, l + 1);
-    if (!r) r = tableField_1(b, l + 1);
+    r = tableField1(b, l + 1);
+    if (!r) r = tableField2(b, l + 1);
     if (!r) r = expr(b, l + 1, -1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, l, m, r, false, tableField_recover_parser_);
     return r;
   }
 
+  /* ********************************************************** */
   // '[' expr ']' '=' expr
-  private static boolean tableField_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tableField_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+  static boolean tableField1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableField1")) return false;
+    if (!nextTokenIs(b, LBRACK)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, LBRACK);
-    r = r && expr(b, l + 1, -1);
-    r = r && consumeTokens(b, 0, RBRACK, ASSIGN);
-    r = r && expr(b, l + 1, -1);
-    exit_section_(b, m, null, r);
-    return r;
+    p = r; // pin = 1
+    r = r && report_error_(b, expr(b, l + 1, -1));
+    r = p && report_error_(b, consumeTokens(b, -1, RBRACK, ASSIGN)) && r;
+    r = p && expr(b, l + 1, -1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
+  /* ********************************************************** */
   // ID '=' expr
-  private static boolean tableField_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tableField_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, ID, ASSIGN);
+  static boolean tableField2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableField2")) return false;
+    if (!nextTokenIs(b, ID)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeTokens(b, 2, ID, ASSIGN);
+    p = r; // pin = 2
     r = r && expr(b, l + 1, -1);
-    exit_section_(b, m, null, r);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -1431,6 +1437,29 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, COMMA);
     if (!r) r = consumeToken(b, SEMI);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // !(tableFieldSep | '}' | '[')
+  static boolean tableField_recover(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableField_recover")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !tableField_recover_0(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // tableFieldSep | '}' | '['
+  private static boolean tableField_recover_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableField_recover_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = tableFieldSep(b, l + 1);
+    if (!r) r = consumeToken(b, RCURLY);
+    if (!r) r = consumeToken(b, LBRACK);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1702,6 +1731,11 @@ public class LuaParser implements PsiParser, LightPsiParser {
   final static Parser stat_recover_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return stat_recover(b, l + 1);
+    }
+  };
+  final static Parser tableField_recover_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return tableField_recover(b, l + 1);
     }
   };
 }
