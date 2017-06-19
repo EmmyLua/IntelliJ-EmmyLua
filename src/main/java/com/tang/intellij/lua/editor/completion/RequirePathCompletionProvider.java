@@ -50,8 +50,8 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
             LuaString ls = LuaString.getContent(cur.getText());
             String content = ls.value.replace('/', PATH_SPLITTER); //统一用.来处理，aaa.bbb.ccc
 
-            completionResultSet = completionResultSet.withPrefixMatcher(content);
-            addAllFiles(completionParameters, completionResultSet);
+            CompletionResultSet resultSet = completionResultSet.withPrefixMatcher(content);
+            addAllFiles(completionParameters, resultSet);
         }
 
         completionResultSet.stopHere();

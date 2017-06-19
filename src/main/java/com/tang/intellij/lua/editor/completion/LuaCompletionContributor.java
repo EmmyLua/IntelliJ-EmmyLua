@@ -86,7 +86,7 @@ public class LuaCompletionContributor extends CompletionContributor {
         CompletionSession session = new CompletionSession(parameters, result);
         parameters.getEditor().putUserData(CompletionSession.KEY, session);
         super.fillCompletionVariants(parameters, result);
-        if (session.isSuggestWords()) {
+        if (session.isSuggestWords() && !result.isStopped()) {
             suggestWordsInFile(parameters, result);
         }
     }
