@@ -334,7 +334,6 @@ public class LuaPsiResolveUtil {
         if (pathString == null)
             return null;
         String fileName = pathString.replace('.', '/');
-        fileName += ".lua";
         VirtualFile f = LuaFileUtil.findFile(project, fileName);
         if (f != null) {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(f);
