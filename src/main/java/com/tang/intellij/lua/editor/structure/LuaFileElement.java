@@ -27,7 +27,6 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -70,19 +69,16 @@ public class LuaFileElement implements StructureViewTreeElement {
     @Override
     public ItemPresentation getPresentation() {
         return new ItemPresentation() {
-            @Nullable
             @Override
             public String getPresentableText() {
                 return file.getName();
             }
 
-            @Nullable
             @Override
             public String getLocationString() {
                 return file.getName();
             }
 
-            @Nullable
             @Override
             public Icon getIcon(boolean b) {
                 return LuaIcons.FILE;
