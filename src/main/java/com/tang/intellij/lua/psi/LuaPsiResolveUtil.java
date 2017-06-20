@@ -50,23 +50,23 @@ import java.util.List;
 public class LuaPsiResolveUtil {
 
     static LuaFuncBodyOwner resolveFuncBodyOwner(@NotNull LuaNameExpr ref, SearchContext context) {
+        final Ref<LuaFuncBodyOwner> ret = Ref.create();
         String refName = ref.getName();
-        LuaFuncBodyOwner[] ret = new LuaFuncBodyOwner[] { null };
         //local 函数名
         LuaPsiTreeUtil.walkUpLocalFuncDef(ref, localFuncDef -> {
             if (refName.equals(localFuncDef.getName())) {
-                ret[0] = localFuncDef;
+                ret.set(localFuncDef);
                 return false;
             }
             return true;
         });
 
         //global function
-        if (ret[0] == null) {
-            ret[0] = LuaGlobalFuncIndex.find(refName, context);
+        if (ret.isNull()) {
+            ret.set(LuaGlobalFuncIndex.find(refName, context));
         }
 
-        return ret[0];
+        return ret.get();
     }
 
     public static PsiElement resolveLocal(LuaNameExpr ref, SearchContext context) {
