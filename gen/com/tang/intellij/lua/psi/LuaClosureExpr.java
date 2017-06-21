@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 
-public interface LuaClosureFuncDef extends LuaFuncBodyOwner {
+public interface LuaClosureExpr extends LuaExpr, LuaFuncBodyOwner {
 
   @NotNull
   LuaFuncBody getFuncBody();

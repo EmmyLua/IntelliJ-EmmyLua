@@ -7,10 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface LuaValueExpr extends LuaExpr {
 
-  @Nullable
-  LuaClosureFuncDef getClosureFuncDef();
-
-  @Nullable
-  LuaTableConstructor getTableConstructor();
-
 }

@@ -19,7 +19,7 @@ public interface LuaTypes {
   IElementType CALL_STAT = LuaParserDefinition.createType("CALL_STAT");
   IElementType CLASS_METHOD_DEF = LuaParserDefinition.createType("CLASS_METHOD_DEF");
   IElementType CLASS_METHOD_NAME = LuaParserDefinition.createType("CLASS_METHOD_NAME");
-  IElementType CLOSURE_FUNC_DEF = LuaParserDefinition.createType("CLOSURE_FUNC_DEF");
+  IElementType CLOSURE_EXPR = LuaParserDefinition.createType("CLOSURE_EXPR");
   IElementType DO_STAT = LuaParserDefinition.createType("DO_STAT");
   IElementType EXPR = LuaParserDefinition.createType("EXPR");
   IElementType EXPR_LIST = LuaParserDefinition.createType("EXPR_LIST");
@@ -42,7 +42,7 @@ public interface LuaTypes {
   IElementType PAREN_EXPR = LuaParserDefinition.createType("PAREN_EXPR");
   IElementType REPEAT_STAT = LuaParserDefinition.createType("REPEAT_STAT");
   IElementType RETURN_STAT = LuaParserDefinition.createType("RETURN_STAT");
-  IElementType TABLE_CONSTRUCTOR = LuaParserDefinition.createType("TABLE_CONSTRUCTOR");
+  IElementType TABLE_EXPR = LuaParserDefinition.createType("TABLE_EXPR");
   IElementType TABLE_FIELD = LuaParserDefinition.createType("TABLE_FIELD");
   IElementType TABLE_FIELD_SEP = LuaParserDefinition.createType("TABLE_FIELD_SEP");
   IElementType UNARY_EXPR = LuaParserDefinition.createType("UNARY_EXPR");
@@ -150,8 +150,8 @@ public interface LuaTypes {
       else if (type == CLASS_METHOD_NAME) {
         return new LuaClassMethodNameImpl(node);
       }
-      else if (type == CLOSURE_FUNC_DEF) {
-        return new LuaClosureFuncDefImpl(node);
+      else if (type == CLOSURE_EXPR) {
+        return new LuaClosureExprImpl(node);
       }
       else if (type == DO_STAT) {
         return new LuaDoStatImpl(node);
@@ -216,8 +216,8 @@ public interface LuaTypes {
       else if (type == RETURN_STAT) {
         return new LuaReturnStatImpl(node);
       }
-      else if (type == TABLE_CONSTRUCTOR) {
-        return new LuaTableConstructorImpl(node);
+      else if (type == TABLE_EXPR) {
+        return new LuaTableExprImpl(node);
       }
       else if (type == TABLE_FIELD) {
         return new LuaTableFieldImpl(node);
@@ -233,9 +233,6 @@ public interface LuaTypes {
       }
       else if (type == UNCOMPLETED_STAT) {
         return new LuaUncompletedStatImpl(node);
-      }
-      else if (type == VALUE_EXPR) {
-        return new LuaValueExprImpl(node);
       }
       else if (type == VAR_LIST) {
         return new LuaVarListImpl(node);

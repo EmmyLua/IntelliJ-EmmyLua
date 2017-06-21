@@ -43,7 +43,7 @@ import org.jetbrains.annotations.Nullable;
 public class LuaEnterAfterUnmatchedBraceHandler implements EnterHandlerDelegate {
 
     private static IElementType getEnd(IElementType range) {
-        if (range == LuaTypes.TABLE_CONSTRUCTOR)
+        if (range == LuaTypes.TABLE_EXPR)
             return LuaTypes.RCURLY;
         if (range == LuaTypes.REPEAT_STAT)
             return LuaTypes.UNTIL;

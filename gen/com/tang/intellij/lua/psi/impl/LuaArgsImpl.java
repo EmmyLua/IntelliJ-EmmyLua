@@ -34,8 +34,8 @@ public class LuaArgsImpl extends ASTWrapperPsiElement implements LuaArgs {
 
   @Override
   @Nullable
-  public LuaTableConstructor getTableConstructor() {
-    return PsiTreeUtil.getChildOfType(this, LuaTableConstructor.class);
+  public LuaTableExpr getTableExpr() {
+    return PsiTreeUtil.getChildOfType(this, LuaTableExpr.class);
   }
 
 }

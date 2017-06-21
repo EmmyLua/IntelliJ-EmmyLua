@@ -51,8 +51,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == CLASS_METHOD_NAME) {
       r = classMethodName(b, 0);
     }
-    else if (t == CLOSURE_FUNC_DEF) {
-      r = closureFuncDef(b, 0);
+    else if (t == CLOSURE_EXPR) {
+      r = closureExpr(b, 0);
     }
     else if (t == DO_STAT) {
       r = doStat(b, 0);
@@ -120,8 +120,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == RETURN_STAT) {
       r = returnStat(b, 0);
     }
-    else if (t == TABLE_CONSTRUCTOR) {
-      r = tableConstructor(b, 0);
+    else if (t == TABLE_EXPR) {
+      r = tableExpr(b, 0);
     }
     else if (t == TABLE_FIELD) {
       r = tableField(b, 0);
@@ -154,9 +154,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(EXPR_LIST, VAR_LIST),
     create_token_set_(NAME_DEF, PARAM_NAME_DEF),
-    create_token_set_(BINARY_EXPR, CALL_EXPR, EXPR, INDEX_EXPR,
-      LITERAL_EXPR, NAME_EXPR, PAREN_EXPR, UNARY_EXPR,
-      VALUE_EXPR),
+    create_token_set_(BINARY_EXPR, CALL_EXPR, CLOSURE_EXPR, EXPR,
+      INDEX_EXPR, LITERAL_EXPR, NAME_EXPR, PAREN_EXPR,
+      TABLE_EXPR, UNARY_EXPR, VALUE_EXPR),
     create_token_set_(ASSIGN_STAT, BREAK_STAT, CALL_STAT, DO_STAT,
       FOR_A_STAT, FOR_B_STAT, GOTO_STAT, IF_STAT,
       LABEL_STAT, REPEAT_STAT, RETURN_STAT, UNCOMPLETED_STAT,
@@ -220,13 +220,13 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '(' (arg_expr_list)? ')' | tableConstructor | STRING
+  // '(' (arg_expr_list)? ')' | tableExpr | STRING
   public static boolean args(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "args")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ARGS, "<args>");
     r = args_0(b, l + 1);
-    if (!r) r = tableConstructor(b, l + 1);
+    if (!r) r = tableExpr(b, l + 1);
     if (!r) r = consumeToken(b, STRING);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -536,14 +536,14 @@ public class LuaParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // 'function' funcBody
-  public static boolean closureFuncDef(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "closureFuncDef")) return false;
+  public static boolean closureExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "closureExpr")) return false;
     if (!nextTokenIs(b, FUNCTION)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, FUNCTION);
     r = r && funcBody(b, l + 1);
-    exit_section_(b, m, CLOSURE_FUNC_DEF, r);
+    exit_section_(b, m, CLOSURE_EXPR, r);
     return r;
   }
 
@@ -1369,11 +1369,11 @@ public class LuaParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // '{' fieldList '}'
-  public static boolean tableConstructor(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "tableConstructor")) return false;
+  public static boolean tableExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableExpr")) return false;
     if (!nextTokenIs(b, LCURLY)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, TABLE_CONSTRUCTOR, null);
+    Marker m = enter_section_(b, l, _NONE_, TABLE_EXPR, null);
     r = consumeToken(b, LCURLY);
     p = r; // pin = 1
     r = r && report_error_(b, fieldList(b, l + 1));
@@ -1702,14 +1702,14 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // literalExpr | closureFuncDef | tableConstructor | varExpr | parenExpr
+  // literalExpr | closureExpr | tableExpr | varExpr | parenExpr
   public static boolean valueExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "valueExpr")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, VALUE_EXPR, "<value expr>");
     r = literalExpr(b, l + 1);
-    if (!r) r = closureFuncDef(b, l + 1);
-    if (!r) r = tableConstructor(b, l + 1);
+    if (!r) r = closureExpr(b, l + 1);
+    if (!r) r = tableExpr(b, l + 1);
     if (!r) r = varExpr(b, l + 1);
     if (!r) r = parenExpr(b, l + 1);
     exit_section_(b, l, m, r, false, null);

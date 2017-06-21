@@ -362,7 +362,7 @@ public class LuaPsiImplUtil {
         return setOptional.orElse(null);
     }
 
-    public static LuaTableField findField(LuaTableConstructor table, String fieldName) {
+    public static LuaTableField findField(LuaTableExpr table, String fieldName) {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
             for (LuaTableField field : fieldList.getTableFieldList()) {

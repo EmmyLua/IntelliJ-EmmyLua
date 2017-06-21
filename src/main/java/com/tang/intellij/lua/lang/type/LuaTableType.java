@@ -18,7 +18,7 @@ package com.tang.intellij.lua.lang.type;
 
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaFieldList;
-import com.tang.intellij.lua.psi.LuaTableConstructor;
+import com.tang.intellij.lua.psi.LuaTableExpr;
 import com.tang.intellij.lua.psi.LuaTableField;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
@@ -32,19 +32,19 @@ import java.util.List;
  */
 public class LuaTableType extends LuaType {
 
-    public static LuaTableType create(LuaTableConstructor tableElement) {
+    public static LuaTableType create(LuaTableExpr tableElement) {
         return new LuaTableType(tableElement);
     }
 
-    public static String getTypeName(LuaTableConstructor tableConstructor) {
+    public static String getTypeName(LuaTableExpr tableConstructor) {
         String fileName = tableConstructor.getContainingFile().getName();
         return String.format("%s@(%d)table", fileName, tableConstructor.getNode().getStartOffset());
     }
 
-    public LuaTableConstructor tableConstructor;
+    public LuaTableExpr tableConstructor;
     private List<LuaTableField> tableFields;
 
-    private LuaTableType(LuaTableConstructor tableElement) {
+    private LuaTableType(LuaTableExpr tableElement) {
         tableConstructor = tableElement;
         clazzName = getTypeName(tableElement);
         isAnonymous = true;

@@ -8,19 +8,18 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 
-public class LuaClosureFuncDefImpl extends ASTWrapperPsiElement implements LuaClosureFuncDef {
+public class LuaClosureExprImpl extends LuaExprImpl implements LuaClosureExpr {
 
-  public LuaClosureFuncDefImpl(ASTNode node) {
+  public LuaClosureExprImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
-    visitor.visitClosureFuncDef(this);
+    visitor.visitClosureExpr(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

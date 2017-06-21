@@ -51,7 +51,7 @@ public class LuaScriptBlock extends AbstractBlock {
             FOR_B_STAT,
             REPEAT_STAT,
             WHILE_STAT,
-            TABLE_CONSTRUCTOR
+            TABLE_EXPR
     ));
 
     private IElementType elementType;

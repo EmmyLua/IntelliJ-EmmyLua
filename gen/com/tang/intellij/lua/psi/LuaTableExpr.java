@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaTableStub;
 
-public interface LuaTableConstructor extends LuaIndentRange, StubBasedPsiElement<LuaTableStub> {
+public interface LuaTableExpr extends LuaExpr, LuaIndentRange, StubBasedPsiElement<LuaTableStub> {
 
   @Nullable
   LuaFieldList getFieldList();

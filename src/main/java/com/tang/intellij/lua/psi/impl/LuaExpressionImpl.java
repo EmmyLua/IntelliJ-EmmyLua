@@ -20,7 +20,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.RecursionManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.lang.type.LuaTableType;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
@@ -40,8 +39,6 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
     public LuaTypeSet guessType(SearchContext context) {
         return RecursionManager.doPreventingRecursion(this, true, () -> {
             LuaTypeSet set = null;
-            if (this instanceof LuaValueExpr)
-                set = guessType((LuaValueExpr) this, context);
             if (this instanceof LuaCallExpr)
                 set = guessType((LuaCallExpr) this, context);
             if (this instanceof LuaParenExpr)
@@ -92,19 +89,6 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
         LuaFuncBodyOwner bodyOwner = luaCallExpr.resolveFuncBodyOwner(context);
         if (bodyOwner != null)
             return bodyOwner.guessReturnTypeSet(context);
-        return null;
-    }
-
-    private static LuaTypeSet guessType(LuaValueExpr valueExpr, SearchContext context) {
-        PsiElement firstChild = valueExpr.getFirstChild();
-        if (firstChild != null) {
-            if (firstChild instanceof LuaExpr) {
-                return ((LuaExpr) firstChild).guessType(context);
-            }
-            else if (firstChild instanceof LuaTableConstructor) {
-                return LuaTypeSet.create(LuaTableType.create((LuaTableConstructor) firstChild));
-            }
-        }
         return null;
     }
 }

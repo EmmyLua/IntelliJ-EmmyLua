@@ -11,6 +11,6 @@ public interface LuaArgs extends LuaPsiElement {
   LuaExprList getExprList();
 
   @Nullable
-  LuaTableConstructor getTableConstructor();
+  LuaTableExpr getTableExpr();
 
 }

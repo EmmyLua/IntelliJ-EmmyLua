@@ -18,8 +18,8 @@ package com.tang.intellij.lua.stubs.types;
 
 import com.intellij.psi.stubs.*;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.psi.LuaTableConstructor;
-import com.tang.intellij.lua.psi.impl.LuaTableConstructorImpl;
+import com.tang.intellij.lua.psi.LuaTableExpr;
+import com.tang.intellij.lua.psi.impl.LuaTableExprImpl;
 import com.tang.intellij.lua.stubs.LuaTableStub;
 import com.tang.intellij.lua.stubs.impl.LuaTableStubImpl;
 import org.jetbrains.annotations.NotNull;
@@ -30,19 +30,19 @@ import java.io.IOException;
  * table
  * Created by tangzx on 2017/1/12.
  */
-public class LuaTableType extends IStubElementType<LuaTableStub, LuaTableConstructor> {
+public class LuaTableType extends IStubElementType<LuaTableStub, LuaTableExpr> {
     public LuaTableType() {
         super("Table", LuaLanguage.INSTANCE);
     }
 
     @Override
-    public LuaTableConstructor createPsi(@NotNull LuaTableStub luaTableStub) {
-        return new LuaTableConstructorImpl(luaTableStub, this);
+    public LuaTableExpr createPsi(@NotNull LuaTableStub luaTableStub) {
+        return new LuaTableExprImpl(luaTableStub, this);
     }
 
     @NotNull
     @Override
-    public LuaTableStub createStub(@NotNull LuaTableConstructor tableConstructor, StubElement stubElement) {
+    public LuaTableStub createStub(@NotNull LuaTableExpr tableConstructor, StubElement stubElement) {
         return new LuaTableStubImpl(stubElement, this);
     }
 

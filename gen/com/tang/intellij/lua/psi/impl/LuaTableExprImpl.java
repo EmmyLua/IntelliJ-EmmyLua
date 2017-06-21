@@ -8,28 +8,27 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.tang.intellij.lua.stubs.LuaTableStub;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.stubs.LuaTableStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaTableConstructorImpl extends StubBasedPsiElementBase<LuaTableStub> implements LuaTableConstructor {
+public class LuaTableExprImpl extends LuaTableExpressionImpl implements LuaTableExpr {
 
-  public LuaTableConstructorImpl(LuaTableStub stub, IStubElementType type) {
+  public LuaTableExprImpl(LuaTableStub stub, IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaTableConstructorImpl(ASTNode node) {
+  public LuaTableExprImpl(ASTNode node) {
     super(node);
   }
 
-  public LuaTableConstructorImpl(LuaTableStub stub, IElementType type, ASTNode node) {
+  public LuaTableExprImpl(LuaTableStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
-    visitor.visitTableConstructor(this);
+    visitor.visitTableExpr(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

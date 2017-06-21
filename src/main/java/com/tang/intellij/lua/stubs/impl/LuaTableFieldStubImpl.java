@@ -50,10 +50,8 @@ public class LuaTableFieldStubImpl extends StubBase<LuaTableField> implements Lu
     @Override
     public String getTypeName() {
         if (typeName == null && tableField != null) {
-            LuaTableConstructor table = PsiTreeUtil.getParentOfType(tableField, LuaTableConstructor.class);
+            LuaTableExpr table = PsiTreeUtil.getParentOfType(tableField, LuaTableExpr.class);
             Optional<String> optional = Optional.ofNullable(table)
-                    .filter(s -> s.getParent() instanceof LuaValueExpr)
-                    .map(PsiElement::getParent)
                     .filter(s -> s.getParent() instanceof LuaExprList)
                     .map(PsiElement::getParent)
                     .filter(s -> s.getParent() instanceof LuaAssignStat)

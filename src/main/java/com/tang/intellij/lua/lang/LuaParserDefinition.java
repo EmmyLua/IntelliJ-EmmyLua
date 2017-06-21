@@ -108,7 +108,7 @@ public class LuaParserDefinition implements ParserDefinition {
             return LuaElementType.CLASS_METHOD_DEF;
         else if ("BLOCK".equals(string))
             return LuaElementType.BLOCK;
-        else if ("TABLE_CONSTRUCTOR".equals(string))
+        else if ("TABLE_EXPR".equals(string))
             return LuaElementType.TABLE;
         else if ("TABLE_FIELD".equals(string))
             return LuaElementType.TABLE_FIELD;

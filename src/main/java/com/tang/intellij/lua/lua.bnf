@@ -106,7 +106,7 @@
         DOUBLE_DIV = "//"
   ]
 
-  implements("tableConstructor") = "com.tang.intellij.lua.psi.LuaIndentRange"
+  implements("tableExpr") = "com.tang.intellij.lua.psi.LuaIndentRange"
   hooks("forAStat|forBStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
   hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
@@ -268,7 +268,7 @@ exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..."
 
-valueExpr ::= literalExpr | closureFuncDef | tableConstructor | varExpr | parenExpr
+valueExpr ::= literalExpr | closureExpr | tableExpr | varExpr | parenExpr
 
 // 最终产生 call expr | index expr | nameRef
 private varExpr ::= callOrIndexExpr | nameExpr
@@ -328,7 +328,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
 }
 
 arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }
-args ::=  '(' (arg_expr_list)? ')' | tableConstructor | STRING { pin(".*") = 1 }
+args ::=  '(' (arg_expr_list)? ')' | tableExpr | STRING { pin(".*") = 1 }
 left callExpr ::= args {
     methods = [
         guessPrefixType
@@ -348,7 +348,7 @@ private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr
 private funcCallExpr ::= callOrIndexExpr <<checkType 'CALL_EXPR'>>
 
-closureFuncDef ::= 'function' funcBody {
+closureExpr ::= 'function' funcBody {
     pin = 2
     implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
     methods = [getParamNameDefList guessReturnTypeSet getParams]
@@ -359,9 +359,10 @@ funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...' { recoverWhile = parList_recover }
 private parList_recover ::= !(')'|'in')
 
-tableConstructor ::= '{' fieldList '}' {
+tableExpr ::= '{' fieldList '}' {
     pin = 1
     methods = [findField toString]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaTableExpressionImpl"
     stubClass = "com.tang.intellij.lua.stubs.LuaTableStub"
 }
 

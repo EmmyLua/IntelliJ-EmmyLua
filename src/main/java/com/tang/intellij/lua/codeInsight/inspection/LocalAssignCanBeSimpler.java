@@ -45,7 +45,7 @@ public class LocalAssignCanBeSimpler extends LocalInspectionTool {
                     List<LuaExpr> list = exprList.getExprList();
                     if (list.size() == 1) {
                         LuaExpr expr = list.get(0);
-                        if (expr instanceof LuaValueExpr && "nil".equals(expr.getText())) {
+                        if (expr instanceof LuaLiteralExpr && "nil".equals(expr.getText())) {
                             holder.registerProblem(o, "Local assign can be simpler", new Fix());
                         }
                     }

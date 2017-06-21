@@ -54,8 +54,9 @@ public class LuaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitClosureFuncDef(@NotNull LuaClosureFuncDef o) {
-    visitFuncBodyOwner(o);
+  public void visitClosureExpr(@NotNull LuaClosureExpr o) {
+    visitExpr(o);
+    // visitFuncBodyOwner(o);
   }
 
   public void visitDoStat(@NotNull LuaDoStat o) {
@@ -174,8 +175,9 @@ public class LuaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitTableConstructor(@NotNull LuaTableConstructor o) {
-    visitIndentRange(o);
+  public void visitTableExpr(@NotNull LuaTableExpr o) {
+    visitExpr(o);
+    // visitIndentRange(o);
   }
 
   public void visitTableField(@NotNull LuaTableField o) {
