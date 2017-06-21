@@ -37,10 +37,4 @@ public class LuaValueExprImpl extends LuaExprImpl implements LuaValueExpr {
     return PsiTreeUtil.getChildOfType(this, LuaTableConstructor.class);
   }
 
-  @Override
-  @Nullable
-  public LuaVar getVar() {
-    return PsiTreeUtil.getChildOfType(this, LuaVar.class);
-  }
-
 }

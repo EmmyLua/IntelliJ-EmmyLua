@@ -27,15 +27,9 @@ public class LuaAssignStatImpl extends LuaStatementImpl implements LuaAssignStat
   }
 
   @Override
-  @Nullable
-  public LuaExprList getExprList() {
-    return PsiTreeUtil.getChildOfType(this, LuaExprList.class);
-  }
-
-  @Override
   @NotNull
-  public LuaVarList getVarList() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaVarList.class));
+  public List<LuaExprList> getExprListList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaExprList.class);
   }
 
   public LuaComment getComment() {
@@ -46,6 +40,20 @@ public class LuaAssignStatImpl extends LuaStatementImpl implements LuaAssignStat
   @NotNull
   public PsiElement getAssign() {
     return notNullChild(findChildByType(ASSIGN));
+  }
+
+  @Override
+  @NotNull
+  public LuaExprList getVarExprList() {
+    List<LuaExprList> p1 = getExprListList();
+    return p1.get(0);
+  }
+
+  @Override
+  @Nullable
+  public LuaExprList getValueExprList() {
+    List<LuaExprList> p1 = getExprListList();
+    return p1.size() < 2 ? null : p1.get(1);
   }
 
 }

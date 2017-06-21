@@ -135,9 +135,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == UNCOMPLETED_STAT) {
       r = uncompletedStat(b, 0);
     }
-    else if (t == VAR) {
-      r = var(b, 0);
-    }
     else if (t == VAR_LIST) {
       r = varList(b, 0);
     }
@@ -155,6 +152,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
+    create_token_set_(EXPR_LIST, VAR_LIST),
     create_token_set_(NAME_DEF, PARAM_NAME_DEF),
     create_token_set_(BINARY_EXPR, CALL_EXPR, EXPR, INDEX_EXPR,
       LITERAL_EXPR, NAME_EXPR, PAREN_EXPR, UNARY_EXPR,
@@ -1492,31 +1490,31 @@ public class LuaParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // callOrIndexExpr | nameExpr
-  public static boolean var(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "var")) return false;
-    if (!nextTokenIs(b, "<var>", LPAREN, ID)) return false;
+  static boolean varExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "varExpr")) return false;
+    if (!nextTokenIs(b, "", LPAREN, ID)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, VAR, "<var>");
+    Marker m = enter_section_(b);
     r = callOrIndexExpr(b, l + 1);
     if (!r) r = nameExpr(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
+    exit_section_(b, m, null, r);
     return r;
   }
 
   /* ********************************************************** */
-  // var (',' var)*
+  // varExpr (',' varExpr)*
   public static boolean varList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "varList")) return false;
     if (!nextTokenIs(b, "<var list>", LPAREN, ID)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, VAR_LIST, "<var list>");
-    r = var(b, l + 1);
+    r = varExpr(b, l + 1);
     r = r && varList_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // (',' var)*
+  // (',' varExpr)*
   private static boolean varList_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "varList_1")) return false;
     int c = current_position_(b);
@@ -1528,13 +1526,13 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ',' var
+  // ',' varExpr
   private static boolean varList_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "varList_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, COMMA);
-    r = r && var(b, l + 1);
+    r = r && varExpr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1704,7 +1702,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // literalExpr | closureFuncDef | tableConstructor | var | parenExpr
+  // literalExpr | closureFuncDef | tableConstructor | varExpr | parenExpr
   public static boolean valueExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "valueExpr")) return false;
     boolean r;
@@ -1712,7 +1710,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = literalExpr(b, l + 1);
     if (!r) r = closureFuncDef(b, l + 1);
     if (!r) r = tableConstructor(b, l + 1);
-    if (!r) r = var(b, l + 1);
+    if (!r) r = varExpr(b, l + 1);
     if (!r) r = parenExpr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

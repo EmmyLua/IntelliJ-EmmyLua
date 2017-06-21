@@ -203,12 +203,8 @@ public class LuaVisitor extends PsiElementVisitor {
     visitExpr(o);
   }
 
-  public void visitVar(@NotNull LuaVar o) {
-    visitPsiElement(o);
-  }
-
   public void visitVarList(@NotNull LuaVarList o) {
-    visitPsiElement(o);
+    visitExprList(o);
   }
 
   public void visitWhileStat(@NotNull LuaWhileStat o) {

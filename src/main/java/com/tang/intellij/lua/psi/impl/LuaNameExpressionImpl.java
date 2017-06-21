@@ -91,7 +91,7 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
                 }
                 //再从赋值猜
                 if (typeSet == null) {
-                    LuaExprList exprList = luaAssignStat.getExprList();
+                    LuaExprList exprList = luaAssignStat.getValueExprList();
                     if (exprList != null)
                         typeSet = exprList.guessTypeAt(0, context);//TODO : multi
                 }

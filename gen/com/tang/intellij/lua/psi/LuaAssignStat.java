@@ -8,15 +8,18 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 
 public interface LuaAssignStat extends LuaStatement, LuaDeclaration {
 
-  @Nullable
-  LuaExprList getExprList();
-
   @NotNull
-  LuaVarList getVarList();
+  List<LuaExprList> getExprListList();
 
   LuaComment getComment();
 
   @NotNull
   PsiElement getAssign();
+
+  @NotNull
+  LuaExprList getVarExprList();
+
+  @Nullable
+  LuaExprList getValueExprList();
 
 }

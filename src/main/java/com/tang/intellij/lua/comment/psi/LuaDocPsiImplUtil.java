@@ -199,9 +199,9 @@ public class LuaDocPsiImplUtil {
             LuaCommentOwner owner = LuaCommentUtil.findOwner(classDef);
             if (owner instanceof LuaAssignStat) {
                 LuaAssignStat assignStat = (LuaAssignStat) owner;
-                LuaVarList varList = assignStat.getVarList();
-                LuaVar var = varList.getVarList().get(0);
-                luaType.setAliasName(var.getText());
+                LuaExpr expr = PsiExtensionKt.getExprAt(assignStat, 0);
+                assert expr != null;
+                luaType.setAliasName(expr.getText());
             }
         }
         return luaType;

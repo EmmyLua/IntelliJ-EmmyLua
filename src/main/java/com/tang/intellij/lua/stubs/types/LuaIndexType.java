@@ -22,7 +22,6 @@ import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
-import com.tang.intellij.lua.psi.LuaVar;
 import com.tang.intellij.lua.psi.LuaVarList;
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
@@ -51,10 +50,8 @@ public class LuaIndexType extends IStubElementType<LuaIndexStub, LuaIndexExpr> {
     public boolean shouldCreateStub(ASTNode node) {
         LuaIndexExpr psi = (LuaIndexExpr) node.getPsi();
         if (psi.getId() != null) {
-            if (psi.getParent() instanceof LuaVar) {
-                if (psi.getParent().getParent() instanceof LuaVarList) {
-                    return true;
-                }
+            if (psi.getParent() instanceof LuaVarList) {
+                return true;
             }
         }
         return false;

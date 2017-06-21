@@ -26,8 +26,8 @@ import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaAssignStat;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
-import com.tang.intellij.lua.psi.LuaVar;
-import com.tang.intellij.lua.psi.LuaVarList;
+import com.tang.intellij.lua.psi.LuaExpr;
+import com.tang.intellij.lua.psi.PsiExtensionKt;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.tang.intellij.lua.stubs.impl.LuaDocClassStubImpl;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
@@ -60,9 +60,9 @@ public class LuaDocClassType extends IStubElementType<LuaDocClassStub, LuaDocCla
         LuaCommentOwner owner = LuaCommentUtil.findOwner(luaDocClassDef);
         if (owner instanceof LuaAssignStat) {
             LuaAssignStat assignStat = (LuaAssignStat) owner;
-            LuaVarList varList = assignStat.getVarList();
-            LuaVar var = varList.getVarList().get(0);
-            aliasName = var.getText();
+            LuaExpr expr = PsiExtensionKt.getExprAt(assignStat, 0);
+            assert expr != null;
+            aliasName = expr.getText();
         }
 
         return new LuaDocClassStubImpl(luaDocClassDef.getName(), aliasName, superClassName, stubElement);

@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor.structure;
+package com.tang.intellij.lua.psi
 
-import com.intellij.icons.AllIcons;
-import com.tang.intellij.lua.psi.LuaAssignStat;
 
-/**
- *
- * Created by TangZX on 2016/12/28.
- */
-public class LuaAssignElement extends LuaTreeElement<LuaAssignStat> {
-    LuaAssignElement(LuaAssignStat target) {
-        super(target, AllIcons.Nodes.ClassInitializer);
-    }
-
-    @Override
-    protected String getPresentableText() {
-        return element.getVarExprList().getText() + " = ...";
-    }
+fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
+    val list = this.varExprList.exprList
+    return list[index]
 }

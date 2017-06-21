@@ -49,7 +49,6 @@ public interface LuaTypes {
   IElementType UNARY_OP = LuaParserDefinition.createType("UNARY_OP");
   IElementType UNCOMPLETED_STAT = LuaParserDefinition.createType("UNCOMPLETED_STAT");
   IElementType VALUE_EXPR = LuaParserDefinition.createType("VALUE_EXPR");
-  IElementType VAR = LuaParserDefinition.createType("VAR");
   IElementType VAR_LIST = LuaParserDefinition.createType("VAR_LIST");
   IElementType WHILE_STAT = LuaParserDefinition.createType("WHILE_STAT");
 
@@ -237,9 +236,6 @@ public interface LuaTypes {
       }
       else if (type == VALUE_EXPR) {
         return new LuaValueExprImpl(node);
-      }
-      else if (type == VAR) {
-        return new LuaVarImpl(node);
       }
       else if (type == VAR_LIST) {
         return new LuaVarListImpl(node);

@@ -345,15 +345,15 @@ public class LuaPsiImplUtil {
         }
 
         Optional<LuaTypeSet> setOptional = Optional.of(indexExpr)
-                .filter(s -> s.getParent() instanceof LuaVar)
-                .map(PsiElement::getParent)
+//                .filter(s -> s.getParent() instanceof LuaVar)
+//                .map(PsiElement::getParent)
                 .filter(s -> s.getParent() instanceof LuaVarList)
                 .map(PsiElement::getParent)
                 .filter(s -> s.getParent() instanceof LuaAssignStat)
                 .map(PsiElement::getParent)
                 .map(s -> {
                     LuaAssignStat assignStat = (LuaAssignStat) s;
-                    LuaExprList exprList = assignStat.getExprList();
+                    LuaExprList exprList = assignStat.getValueExprList();
                     if (exprList != null) {
                         return exprList.guessTypeAt(0, context);
                     }
@@ -611,14 +611,6 @@ public class LuaPsiImplUtil {
         return "STUB:[" + stubElement.getClass().getSimpleName() + "]";
     }
 
-    public static LuaTypeSet guessType(LuaVar var, SearchContext context) {
-        LuaExpr expr = var.getExpr();
-        //TODO stack overflow
-        if (expr instanceof LuaIndexExpr)
-            return null;
-        return expr.guessType(context);
-    }
-
     public static ItemPresentation getPresentation(LuaNameExpr nameExpr) {
         return new ItemPresentation() {
             @NotNull
@@ -662,10 +654,9 @@ public class LuaPsiImplUtil {
      * todo 处理多个var的情况
      */
     public static String getTypeName(LuaAssignStat stat, int index) {
-        LuaVarList varList = stat.getVarList();
-        LuaVar luaVar = varList.getVarList().get(index);
+        LuaExpr expr = PsiExtensionKt.getExprAt(stat, index);
         String typeName = null;
-        if (luaVar != null && luaVar.getExpr() instanceof LuaNameExpr) {
+        if (expr instanceof LuaNameExpr) {
             // common 优先
             LuaComment comment = stat.getComment();
             if (comment != null) {
@@ -676,7 +667,7 @@ public class LuaPsiImplUtil {
             }
             // 否则直接当成Global，以名字作类型
             if (typeName == null)
-                typeName = luaVar.getText();
+                typeName = expr.getText();
         }
         return typeName;
     }

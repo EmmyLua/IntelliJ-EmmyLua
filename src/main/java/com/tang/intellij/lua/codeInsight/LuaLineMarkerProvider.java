@@ -200,7 +200,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
                 }
             }
         }
-        else if (element instanceof LuaReturnStat) {
+        /*else if (element instanceof LuaReturnStat) {
             LuaReturnStat returnStat = (LuaReturnStat) element;
             LuaExprList exprList = returnStat.getExprList();
             if (exprList != null) {
@@ -221,7 +221,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
                     }
                 }
             }
-        }
+        }*/
     }
 
     @Nullable

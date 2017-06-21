@@ -154,7 +154,7 @@ assignStat ::= varList '=' exprList {
     implements = [
         "com.tang.intellij.lua.psi.LuaDeclaration"
     ]
-    methods = [getComment assign = 'ASSIGN']
+    methods = [getComment assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
 }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
@@ -260,7 +260,7 @@ returnStat ::= return exprList?
 breakStat ::= break
 private lastStat ::= returnStat | breakStat
 
-varList ::= var (',' var)*
+varList ::= varExpr (',' varExpr)* { extends = exprList }
 
 nameList ::= nameDef (',' nameDef)*
 
@@ -268,14 +268,10 @@ exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..."
 
-valueExpr ::= literalExpr | closureFuncDef | tableConstructor | var | parenExpr
+valueExpr ::= literalExpr | closureFuncDef | tableConstructor | varExpr | parenExpr
 
 // 最终产生 call expr | index expr | nameRef
-var ::= callOrIndexExpr | nameExpr {
-    methods = [
-        guessType
-    ]
-}
+private varExpr ::= callOrIndexExpr | nameExpr
 
 expr ::=
     orExpr |

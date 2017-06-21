@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaVarList extends LuaPsiElement {
-
-  @NotNull
-  List<LuaVar> getVarList();
+public interface LuaVarList extends LuaExprList {
 
 }

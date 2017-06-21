@@ -104,10 +104,6 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
             else if (firstChild instanceof LuaTableConstructor) {
                 return LuaTypeSet.create(LuaTableType.create((LuaTableConstructor) firstChild));
             }
-            else if (firstChild instanceof LuaVar) {
-                LuaVar luaVar = (LuaVar) firstChild;
-                return luaVar.getExpr().guessType(context);
-            }
         }
         return null;
     }

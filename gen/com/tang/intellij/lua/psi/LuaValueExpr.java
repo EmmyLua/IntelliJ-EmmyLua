@@ -13,7 +13,4 @@ public interface LuaValueExpr extends LuaExpr {
   @Nullable
   LuaTableConstructor getTableConstructor();
 
-  @Nullable
-  LuaVar getVar();
-
 }

@@ -21,7 +21,6 @@ import com.intellij.psi.stubs.*;
 import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaNameExpr;
-import com.tang.intellij.lua.psi.LuaVar;
 import com.tang.intellij.lua.psi.LuaVarList;
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl;
 import com.tang.intellij.lua.stubs.LuaNameStub;
@@ -49,12 +48,7 @@ public class LuaNameType extends IStubElementType<LuaNameStub, LuaNameExpr> {
     @Override
     public boolean shouldCreateStub(ASTNode node) {
         LuaNameExpr psi = (LuaNameExpr) node.getPsi();
-        if (psi.getParent() instanceof LuaVar) {
-            if (psi.getParent().getParent() instanceof LuaVarList) {
-                return true;
-            }
-        }
-        return false;
+        return psi.getParent() instanceof LuaVarList;
     }
 
     @NotNull

@@ -77,15 +77,15 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
     public LuaTypeSet guessValueType() {
         if (PowerLevel.isFullPower() && valueType == null && indexExpr != null) {
             Optional<LuaTypeSet> setOptional = Optional.of(indexExpr)
-                    .filter(s -> s.getParent() instanceof LuaVar)
-                    .map(PsiElement::getParent)
+//                    .filter(s -> s.getParent() instanceof LuaVar)
+//                    .map(PsiElement::getParent)
                     .filter(s -> s.getParent() instanceof LuaVarList)
                     .map(PsiElement::getParent)
                     .filter(s -> s.getParent() instanceof LuaAssignStat)
                     .map(PsiElement::getParent)
                     .map(s -> {
                         LuaAssignStat assignStat = (LuaAssignStat) s;
-                        LuaExprList exprList = assignStat.getExprList();
+                        LuaExprList exprList = assignStat.getValueExprList();
                         if (exprList != null) {
                             return exprList.guessTypeAt(0, new SearchContext(indexExpr.getProject()));
                         }
