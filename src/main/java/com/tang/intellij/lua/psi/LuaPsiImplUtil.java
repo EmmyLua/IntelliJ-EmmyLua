@@ -20,6 +20,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.icons.AllIcons;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.RecursionManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
@@ -221,8 +222,8 @@ public class LuaPsiImplUtil {
      * @return LuaFuncBodyOwner
      */
     public static LuaFuncBodyOwner resolveFuncBodyOwner(LuaCallExpr callExpr, SearchContext context) {
-        LuaFuncBodyOwner owner = null;
-        if (context.push(callExpr, SearchContext.Overflow.FindBodyOwner)) {
+        return RecursionManager.doPreventingRecursion(callExpr, true, () -> {
+            LuaFuncBodyOwner owner = null;
             LuaExpr expr = callExpr.getExpr();
             if (expr instanceof LuaIndexExpr) {
                 PsiElement resolve = LuaPsiResolveUtil.resolve((LuaIndexExpr) expr, context);
@@ -232,9 +233,8 @@ public class LuaPsiImplUtil {
                 LuaNameExpr luaNameRef = (LuaNameExpr) expr;
                 owner = LuaPsiResolveUtil.resolveFuncBodyOwner(luaNameRef, context);
             }
-            context.pop(callExpr);
-        }
-        return owner;
+            return owner;
+        });
     }
 
     /**

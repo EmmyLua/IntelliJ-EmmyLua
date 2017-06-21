@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.util.RecursionManager;
 import com.intellij.openapi.util.Ref;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
@@ -56,8 +57,8 @@ public class LuaFile extends PsiFileBase {
     }
 
     public LuaTypeSet guessReturnedType(SearchContext context) {
-        LuaTypeSet set = null;
-        if (context.push(this, SearchContext.Overflow.FileReturn)) {
+        return RecursionManager.doPreventingRecursion(this, true, () -> {
+            LuaTypeSet set;
             PsiElement lastChild = getLastChild();
             Ref<LuaReturnStat> returnStatRef = Ref.create();
             LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {
@@ -65,8 +66,7 @@ public class LuaFile extends PsiFileBase {
                 return false;
             });
             set = LuaPsiImplUtil.guessReturnTypeSet(returnStatRef.get(), 0, context);
-            context.pop(this);
-        }
-        return set;
+            return set;
+        });
     }
 }

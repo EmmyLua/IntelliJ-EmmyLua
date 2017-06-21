@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.RecursionManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.stubs.IStubElementType;
@@ -60,8 +61,8 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
 
     @Override
     public LuaTypeSet guessType(SearchContext context) {
-        LuaTypeSet typeSet = LuaTypeSet.create();
-        if (context.push(this, SearchContext.Overflow.GuessType)) {
+        return RecursionManager.doPreventingRecursion(this, true, () -> {
+            LuaTypeSet typeSet = LuaTypeSet.create();
             LuaNameExpr nameExpr = (LuaNameExpr) this;
 
             PsiElement[] multiResolve = LuaPsiResolveUtil.multiResolve(nameExpr, context);
@@ -73,9 +74,8 @@ public class LuaNameExpressionImpl extends StubBasedPsiElementBase<LuaNameStub> 
                     typeSet = typeSet.union(set);
                 }
             }
-            context.pop(this);
-        }
-        return typeSet;
+            return typeSet;
+        });
     }
 
     @Nullable

@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.RecursionManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.lang.type.LuaTableType;
@@ -37,8 +38,8 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
 
     @Override
     public LuaTypeSet guessType(SearchContext context) {
-        LuaTypeSet set = null;
-        if (context.push(this, SearchContext.Overflow.GuessType)) {
+        return RecursionManager.doPreventingRecursion(this, true, () -> {
+            LuaTypeSet set = null;
             if (this instanceof LuaValueExpr)
                 set = guessType((LuaValueExpr) this, context);
             if (this instanceof LuaCallExpr)
@@ -47,9 +48,8 @@ public class LuaExpressionImpl extends LuaPsiElementImpl implements LuaExpressio
                 set = guessType((LuaParenExpr) this, context);
             else if (this instanceof LuaLiteralExpr)
                 set = guessType((LuaLiteralExpr)this, context);
-            context.pop(this);
-        }
-        return set;
+            return set;
+        });
     }
 
     private LuaTypeSet guessType(LuaLiteralExpr literalExpr, SearchContext context) {

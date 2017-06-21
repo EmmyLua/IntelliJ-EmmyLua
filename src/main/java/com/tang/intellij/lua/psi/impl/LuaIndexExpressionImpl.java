@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi.impl;
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.util.RecursionManager;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceService;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
@@ -72,8 +73,8 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
 
     @Override
     public LuaTypeSet guessType(SearchContext context) {
-        LuaTypeSet result = LuaTypeSet.create();
-        if (context.push(this, SearchContext.Overflow.GuessType)) {
+        return RecursionManager.doPreventingRecursion(this, true, () -> {
+            LuaTypeSet result = LuaTypeSet.create();
             LuaIndexExpr indexExpr = (LuaIndexExpr) this;
 
             // value type
@@ -96,9 +97,8 @@ public class LuaIndexExpressionImpl extends StubBasedPsiElementBase<LuaIndexStub
                     }
                 }
             }
-            context.pop(this);
-        }
-        return result;
+            return result;
+        });
     }
 
     @Nullable
