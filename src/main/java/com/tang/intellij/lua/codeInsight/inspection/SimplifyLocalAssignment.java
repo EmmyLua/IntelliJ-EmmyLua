@@ -33,7 +33,7 @@ import java.util.List;
  *
  * Created by TangZX on 2016/12/16.
  */
-public class LocalAssignCanBeSimpler extends LocalInspectionTool {
+public class SimplifyLocalAssignment extends LocalInspectionTool {
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
@@ -46,7 +46,7 @@ public class LocalAssignCanBeSimpler extends LocalInspectionTool {
                     if (list.size() == 1) {
                         LuaExpr expr = list.get(0);
                         if (expr instanceof LuaLiteralExpr && "nil".equals(expr.getText())) {
-                            holder.registerProblem(o, "Local assign can be simpler", new Fix());
+                            holder.registerProblem(o, "Local assignment can be simplified", new Fix());
                         }
                     }
                 }
@@ -60,7 +60,7 @@ public class LocalAssignCanBeSimpler extends LocalInspectionTool {
         @NotNull
         @Override
         public String getFamilyName() {
-            return "Delete nil";
+            return "Simplify local assignment";
         }
 
         @Override

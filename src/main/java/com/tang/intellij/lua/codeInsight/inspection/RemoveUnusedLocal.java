@@ -48,7 +48,7 @@ public class RemoveUnusedLocal extends LocalInspectionTool {
                         if (search.findFirst() == null) {
                             int offset = name.getNode().getStartOffset() - o.getNode().getStartOffset();
                             TextRange textRange = new TextRange(offset, offset + name.getTextLength());
-                            holder.registerProblem(o, textRange,"Remove unused local", new Fix());
+                            holder.registerProblem(o, textRange,"Remove unused local assignment", new Fix());
                         }
                     }
                 }

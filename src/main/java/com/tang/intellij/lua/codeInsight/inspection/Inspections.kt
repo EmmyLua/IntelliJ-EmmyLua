@@ -20,7 +20,6 @@ import com.intellij.codeInspection.*
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.*
 
 class UnreachableStatement : LocalInspectionTool() {
