@@ -34,20 +34,21 @@ import org.jetbrains.annotations.Nullable;
  */
 public class LuaMobStackFrame extends XStackFrame {
 
-    private LuaMobDebuggerEvaluator evaluator = new LuaMobDebuggerEvaluator();
     private String functionName;
     private XSourcePosition position;
+    private LuaMobDebugProcess process;
     private XValueChildrenList values = new XValueChildrenList();
 
-    public LuaMobStackFrame(String functionName, XSourcePosition position) {
+    public LuaMobStackFrame(String functionName, XSourcePosition position, LuaMobDebugProcess debugProcess) {
         this.functionName = functionName;
         this.position = position;
+        process = debugProcess;
     }
 
     @Nullable
     @Override
     public XDebuggerEvaluator getEvaluator() {
-        return evaluator;
+        return  new LuaMobDebuggerEvaluator(process.getSession());
     }
 
     @Nullable

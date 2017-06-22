@@ -24,6 +24,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.frame.XNavigatable;
 import com.intellij.xdebugger.frame.XValue;
@@ -115,27 +116,31 @@ public abstract class LuaXValue extends XValue {
     @Override
     public void computeSourcePosition(@NotNull XNavigatable xNavigatable) {
         if (name != null && process != null) {
-            XSourcePosition currentPosition = process.getSession().getCurrentPosition();
-            if (currentPosition != null) {
-                VirtualFile file = currentPosition.getFile();
-                Project project = process.getSession().getProject();
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
-                FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(file);
+            computeSourcePosition(xNavigatable, name, process.getSession());
+        }
+    }
 
-                if (psiFile != null && editor instanceof TextEditor) {
-                    TextEditor textEditor = (TextEditor) editor;
-                    com.intellij.openapi.editor.Document document = textEditor.getEditor().getDocument();
-                    int lineEndOffset = document.getLineStartOffset(currentPosition.getLine());
-                    PsiElement element = psiFile.findElementAt(lineEndOffset);
-                    LuaPsiTreeUtil.walkUpLocalNameDef(element, nameDef -> {
-                        if (name.equals(nameDef.getName())) {
-                            XSourcePosition position = XSourcePositionImpl.createByElement(nameDef);
-                            xNavigatable.setSourcePosition(position);
-                            return false;
-                        }
-                        return true;
-                    });
-                }
+    public static void computeSourcePosition(@NotNull XNavigatable xNavigatable, @NotNull String name, @NotNull XDebugSession session) {
+        XSourcePosition currentPosition = session.getCurrentPosition();
+        if (currentPosition != null) {
+            VirtualFile file = currentPosition.getFile();
+            Project project = session.getProject();
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+            FileEditor editor = FileEditorManager.getInstance(project).getSelectedEditor(file);
+
+            if (psiFile != null && editor instanceof TextEditor) {
+                TextEditor textEditor = (TextEditor) editor;
+                com.intellij.openapi.editor.Document document = textEditor.getEditor().getDocument();
+                int lineEndOffset = document.getLineStartOffset(currentPosition.getLine());
+                PsiElement element = psiFile.findElementAt(lineEndOffset);
+                LuaPsiTreeUtil.walkUpLocalNameDef(element, nameDef -> {
+                    if (name.equals(nameDef.getName())) {
+                        XSourcePosition position = XSourcePositionImpl.createByElement(nameDef);
+                        xNavigatable.setSourcePosition(position);
+                        return false;
+                    }
+                    return true;
+                });
             }
         }
     }

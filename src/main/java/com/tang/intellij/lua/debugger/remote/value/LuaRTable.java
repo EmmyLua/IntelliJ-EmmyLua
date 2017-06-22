@@ -55,7 +55,7 @@ public class LuaRTable extends LuaRValue {
             list = new XValueChildrenList();
             LuaTable table = data.checktable();
             for (LuaValue key : table.keys()) {
-                LuaRValue value = LuaRValue.create(key.toString(), table.get(key), null);
+                LuaRValue value = LuaRValue.create(key.toString(), table.get(key), null, session);
                 list.add(value);
             }
         }

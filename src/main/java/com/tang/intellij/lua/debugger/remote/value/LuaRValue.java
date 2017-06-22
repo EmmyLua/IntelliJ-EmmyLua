@@ -16,7 +16,10 @@
 
 package com.tang.intellij.lua.debugger.remote.value;
 
+import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.frame.XNamedValue;
+import com.intellij.xdebugger.frame.XNavigatable;
+import com.tang.intellij.lua.debugger.attach.value.LuaXValue;
 import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.LuaValue;
 
@@ -25,13 +28,16 @@ import org.luaj.vm2.LuaValue;
  * Created by tangzx on 2017/4/16.
  */
 public abstract class LuaRValue extends XNamedValue {
+
+    protected XDebugSession session;
+
     LuaRValue(@NotNull String name) {
         super(name);
     }
 
     protected abstract void parse(LuaValue data, String desc);
 
-    public static LuaRValue create(String name, LuaValue data, String desc) {
+    public static LuaRValue create(String name, LuaValue data, String desc, XDebugSession session) {
         LuaRValue value = null;
 
         if (data.istable()) {
@@ -44,8 +50,17 @@ public abstract class LuaRValue extends XNamedValue {
         } else if (data.isfunction()) {
             value = new LuaRFunction(name);
         }
-        if (value != null)
+        if (value != null) {
+            value.session = session;
             value.parse(data, desc);
+        }
         return value;
+    }
+
+    @Override
+    public void computeSourcePosition(@NotNull XNavigatable xNavigatable) {
+        if (session != null) {
+            LuaXValue.computeSourcePosition(xNavigatable, getName(), session);
+        }
     }
 }

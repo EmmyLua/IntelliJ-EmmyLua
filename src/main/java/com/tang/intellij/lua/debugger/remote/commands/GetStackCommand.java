@@ -106,7 +106,7 @@ public class GetStackCommand extends DefaultCommand {
                 if (funcName.isnil())
                     functionName = "main";
 
-                LuaMobStackFrame frame = new LuaMobStackFrame(functionName, position);
+                LuaMobStackFrame frame = new LuaMobStackFrame(functionName, position, debugProcess);
 
                 parseValues(stackValue.get(2).checktable(), frame);
                 parseValues(stackValue.get(3).checktable(), frame);
@@ -122,7 +122,7 @@ public class GetStackCommand extends DefaultCommand {
         for (LuaValue key : keys) {
             LuaValue luaValue = paramsTable.get(key);
             LuaValue desc = luaValue.get(2);
-            LuaRValue xValue = LuaRValue.create(key.toString(), luaValue.get(1), desc.toString());
+            LuaRValue xValue = LuaRValue.create(key.toString(), luaValue.get(1), desc.toString(), debugProcess.getSession());
             frame.addValue(xValue);
         }
     }
