@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger;
 
 import com.intellij.xdebugger.frame.XExecutionStack;
 import com.intellij.xdebugger.frame.XStackFrame;
+import com.intellij.xdebugger.impl.frame.XStackFrameContainerEx;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -27,20 +28,24 @@ import java.util.List;
  * Created by tangzx on 2016/12/31.
  */
 public class LuaExecutionStack extends XExecutionStack {
-    private XStackFrame frame;
+    private XStackFrame topFrame;
     private List<XStackFrame> stackFrameList;
 
     public LuaExecutionStack(List<XStackFrame> stackFrameList) {
         super("LuaStack");
         this.stackFrameList = stackFrameList;
         if (!stackFrameList.isEmpty())
-            frame = stackFrameList.get(0);
+            topFrame = stackFrameList.get(0);
     }
 
     @Nullable
     @Override
     public XStackFrame getTopFrame() {
-        return frame;
+        return topFrame;
+    }
+
+    public void setTopFrame(XStackFrame frame) {
+        topFrame = frame;
     }
 
     public XStackFrame[] getStackFrames() {
@@ -49,6 +54,7 @@ public class LuaExecutionStack extends XExecutionStack {
 
     @Override
     public void computeStackFrames(int i, XStackFrameContainer xStackFrameContainer) {
-        xStackFrameContainer.addStackFrames(stackFrameList, true);
+        XStackFrameContainerEx stackFrameContainerEx = (XStackFrameContainerEx) xStackFrameContainer;
+        stackFrameContainerEx.addStackFrames(stackFrameList, topFrame, true);
     }
 }

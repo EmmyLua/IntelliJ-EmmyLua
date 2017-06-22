@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.debugger.attach;
 
 import com.intellij.execution.ui.ConsoleViewContentType;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
@@ -26,7 +25,6 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
 import com.intellij.xdebugger.frame.XSuspendContext;
 import com.tang.intellij.lua.debugger.LuaDebugProcess;
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
-import com.tang.intellij.lua.debugger.LuaSuspendContext;
 import com.tang.intellij.lua.debugger.attach.protos.*;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +83,7 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
     }
 
     @Override
-    public void resume(@Nullable XSuspendContext context) {
+    protected void run() {
         bridge.sendRun();
     }
 
@@ -121,19 +119,7 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
             return;
         }
 
-        XLineBreakpoint breakpoint = getBreakpoint(file, proto.getLine());
-        if (breakpoint != null) {
-            ApplicationManager.getApplication().invokeLater(()-> {
-                getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(proto.getStack()));
-                getSession().showExecutionPoint();
-            });
-        } else {
-            //position reached
-            ApplicationManager.getApplication().invokeLater(() -> {
-                getSession().positionReached(new LuaSuspendContext(proto.getStack()));
-                getSession().showExecutionPoint();
-            });
-        }
+        setStack(proto.getStack());
     }
 
     private void onLoadScript(LuaAttachLoadScriptProto proto) {

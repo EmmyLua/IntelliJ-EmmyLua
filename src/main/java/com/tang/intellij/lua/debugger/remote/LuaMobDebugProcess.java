@@ -16,16 +16,16 @@
 
 package com.tang.intellij.lua.debugger.remote;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider;
-import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XSuspendContext;
-import com.tang.intellij.lua.debugger.*;
+import com.tang.intellij.lua.debugger.IRemoteConfiguration;
+import com.tang.intellij.lua.debugger.LuaDebugProcess;
+import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand;
 import com.tang.intellij.lua.psi.LuaFileUtil;
@@ -85,7 +85,7 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
     }
 
     @Override
-    public void resume(@Nullable XSuspendContext context) {
+    protected void run() {
         mobServer.addCommand("RUN");
     }
 
@@ -139,31 +139,6 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
                 runCommand(new GetStackCommand());
                 break;
         }
-    }
-
-    public void setStack(LuaExecutionStack stack) {
-        XStackFrame[] frames = stack.getStackFrames();
-        for (XStackFrame topFrame : frames) {
-            XSourcePosition sourcePosition = topFrame.getSourcePosition();
-            if (sourcePosition != null) {
-                XLineBreakpoint breakpoint = getBreakpoint(sourcePosition.getFile(), sourcePosition.getLine());
-                if (breakpoint != null) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        getSession().breakpointReached(breakpoint, null, new LuaSuspendContext(stack));
-                        getSession().showExecutionPoint();
-                    });
-                } else {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        getSession().positionReached(new LuaSuspendContext(stack));
-                        getSession().showExecutionPoint();
-                    });
-                }
-                return;
-            }
-        }
-
-        // file and source position not found, run it
-        mobServer.addCommand("RUN");
     }
 
     public void runCommand(DebugCommand command) {
