@@ -43,6 +43,12 @@ public class LuaElementFactory {
         return def.getFirstChild();
     }
 
+    public static LuaLiteralExpr createLiteral(Project project, String value) {
+        String content = "local a = " + value;
+        LuaFile file = createFile(project, content);
+        return PsiTreeUtil.findChildOfType(file, LuaLiteralExpr.class);
+    }
+
     public static PsiElement createName(Project project, String name) {
         PsiElement element = createWith(project, name + " = 1");
 
