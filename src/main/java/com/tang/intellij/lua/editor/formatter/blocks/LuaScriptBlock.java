@@ -22,6 +22,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -117,6 +118,21 @@ public class LuaScriptBlock extends AbstractBlock {
     @Nullable
     @Override
     public Spacing getSpacing(@Nullable Block child1, @NotNull Block child2) {
+        if (this.myNode.getElementType() == CALL_EXPR) {
+            if (child1 instanceof LuaScriptBlock) {
+                LuaScriptBlock c2 = (LuaScriptBlock) child2;
+
+                // call(param)
+                if (c2.myNode.findChildByType(LuaTypes.LPAREN) != null) {
+                    return Spacing.createSpacing(0, 0, 0, false, 0);
+                }
+                // call "string"
+                else {
+                    return Spacing.createSpacing(1, 1, 0, false, 0);
+                }
+            }
+        }
+
         return spacingBuilder.getSpacing(this, child1, child2);
     }
 

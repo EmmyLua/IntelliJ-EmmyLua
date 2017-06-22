@@ -188,6 +188,14 @@
             <className>com.tang.intellij.lua.codeInsight.intention.CreateMethodIntention</className>
             <descriptionDirectoryName>CreateMethodIntention</descriptionDirectoryName>
         </intentionAction>
+        <intentionAction>
+            <category>Lua</category>
+            <className>com.tang.intellij.lua.codeInsight.intention.AppendCallParenIntention</className>
+        </intentionAction>
+        <intentionAction>
+            <category>Lua</category>
+            <className>com.tang.intellij.lua.codeInsight.intention.RemoveCallParenIntention</className>
+        </intentionAction>
 
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
