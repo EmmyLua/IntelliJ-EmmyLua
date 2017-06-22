@@ -46,20 +46,20 @@ public class LuaTracebackFilter implements Filter {
         //Test.lua:7: in function 'b'
         //Test.lua:11: in main chunk
 
-        /*Pattern pattern = Pattern.compile("\\s*((\\w:)?((/+)?[^<>/\\\\|:\"*? ]+)+):(\\d+):");
+        Pattern pattern = Pattern.compile("\\s*((/+)?[^<>/\\\\|:\"*? ]+):(\\d+):");
         Matcher matcher = pattern.matcher(line);
         if (matcher.find()) {
             String fileName = matcher.group(1);
-            int lineNumber = Integer.parseInt(matcher.group(5));
+            int lineNumber = Integer.parseInt(matcher.group(3));
             VirtualFile file = LuaFileUtil.findFile(project, fileName);
             if (file != null) {
                 final OpenFileHyperlinkInfo hyperlink = new OpenFileHyperlinkInfo(project, file, lineNumber - 1);
                 final int textStartOffset = entireLength - line.length();
                 final int startPos = matcher.start(1);
-                final int endPos = matcher.end(5);
+                final int endPos = matcher.end(3);
                 return new Filter.Result(startPos + textStartOffset, endPos + textStartOffset, hyperlink);
             }
-        }*/
+        }
         return null;
     }
 }
