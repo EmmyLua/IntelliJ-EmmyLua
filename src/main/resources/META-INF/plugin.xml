@@ -215,6 +215,11 @@
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyBody"/>
+        <localInspection
+            displayName="Unreachable statement"
+            enabledByDefault="true"
+            groupName="Lua"
+            implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
         
         <defaultLiveTemplatesProvider implementation="com.tang.intellij.lua.codeInsight.LuaLiveTemplatesProvider"/>
         <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.LuaCodeTemplateContextType"/>
