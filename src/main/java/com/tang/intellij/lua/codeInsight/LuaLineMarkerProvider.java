@@ -200,28 +200,25 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
                 }
             }
         }
-        /*else if (element instanceof LuaReturnStat) {
+        else if (element instanceof LuaReturnStat) {
             LuaReturnStat returnStat = (LuaReturnStat) element;
             LuaExprList exprList = returnStat.getExprList();
             if (exprList != null) {
                 for (PsiElement psiElement : exprList.getChildren()) {
-                    if (psiElement instanceof LuaValueExpr) {
-                        LuaVar var = ((LuaValueExpr) psiElement).getVar();
-                        if (var != null && var.getExpr() instanceof LuaCallExpr) {
-                            PsiElement returnKeyWord = returnStat.getFirstChild();
-                            result.add(new LineMarkerInfo<>(returnKeyWord,
-                                    returnKeyWord.getTextRange(),
-                                    AllIcons.General.HideRightHover,
-                                    Pass.LINE_MARKERS,
-                                    FunctionUtil.constant("Trail call"),
-                                    null,
-                                    GutterIconRenderer.Alignment.CENTER));
-                            break;
-                        }
+                    if (psiElement instanceof LuaCallExpr) {
+                        PsiElement returnKeyWord = returnStat.getFirstChild();
+                        result.add(new LineMarkerInfo<>(returnKeyWord,
+                                returnKeyWord.getTextRange(),
+                                AllIcons.General.HideRightHover,
+                                Pass.LINE_MARKERS,
+                                FunctionUtil.constant("Trail call"),
+                                null,
+                                GutterIconRenderer.Alignment.CENTER));
+                        break;
                     }
                 }
             }
-        }*/
+        }
     }
 
     @Nullable
