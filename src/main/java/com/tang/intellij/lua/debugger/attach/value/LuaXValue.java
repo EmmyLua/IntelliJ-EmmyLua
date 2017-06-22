@@ -87,7 +87,7 @@ public abstract class LuaXValue extends XValue {
                 value = new LuaXTable();
                 break;
             case "value":
-                value = new LuaXString();
+                value = new LuaXPrimitive();
                 break;
             case "function":
                 value = new LuaXFunction();

@@ -18,6 +18,10 @@ package com.tang.intellij.lua.debugger.attach.value;
 
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.tang.intellij.lua.debugger.LuaXNumberPresentation;
+import com.tang.intellij.lua.debugger.LuaXStringPresentation;
+import com.tang.intellij.lua.debugger.LuaXValuePresentation;
+import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -26,7 +30,7 @@ import org.w3c.dom.NodeList;
  *
  * Created by tangzx on 2017/4/2.
  */
-public class LuaXString extends LuaXValue {
+public class LuaXPrimitive extends LuaXValue {
     private String type;
     private String data;
 
@@ -49,7 +53,23 @@ public class LuaXString extends LuaXValue {
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
-        xValueNode.setPresentation(null, type, data, false);
+        switch (type) {
+            case "boolean":
+                xValueNode.setPresentation(null, new LuaXValuePresentation(type, data, LuaHighlightingData.PRIMITIVE_TYPE), false);
+                break;
+            case "number":
+                xValueNode.setPresentation(null, new LuaXNumberPresentation(data), false);
+                break;
+            case "string":
+                String value = data;
+                if (value.startsWith("\""))
+                    value = value.substring(1, value.length() - 2);
+
+                xValueNode.setPresentation(null, new LuaXStringPresentation(value), false);
+                break;
+            default:
+                xValueNode.setPresentation(null, type, data, false);
+        }
     }
 
     @Override

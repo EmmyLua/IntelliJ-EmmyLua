@@ -18,6 +18,11 @@ package com.tang.intellij.lua.debugger.remote.value;
 
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.intellij.xdebugger.frame.presentation.XValuePresentation;
+import com.tang.intellij.lua.debugger.LuaXNumberPresentation;
+import com.tang.intellij.lua.debugger.LuaXStringPresentation;
+import com.tang.intellij.lua.debugger.LuaXValuePresentation;
+import com.tang.intellij.lua.highlighting.LuaHighlightingData;
 import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.*;
 
@@ -28,27 +33,35 @@ import org.luaj.vm2.*;
 public class LuaRPrimitive extends LuaRValue {
     private String type;
     private String data;
+    private XValuePresentation valuePresentation;
 
     LuaRPrimitive(@NotNull String name) {
         super(name);
     }
 
     @Override
-    protected void parse(LuaValue data, String desc) {
-        this.data = data.toString();
-        if (data instanceof LuaString) {
+    protected void parse(LuaValue value, String desc) {
+        this.data = value.toString();
+        if (value instanceof LuaString) {
             type = "string";
-            this.data = "\"" + this.data + "\"";
-        } else if (data instanceof LuaNumber)
+            valuePresentation = new LuaXStringPresentation(data);
+        } else if (value instanceof LuaNumber) {
             type = "number";
-        else if (data instanceof LuaBoolean)
+            valuePresentation = new LuaXNumberPresentation(data);
+        } else if (value instanceof LuaBoolean) {
             type = "boolean";
-        else if (data instanceof LuaFunction)
+            valuePresentation = new LuaXValuePresentation(type, data, LuaHighlightingData.PRIMITIVE_TYPE);
+        } else if (value instanceof LuaFunction)
             type = "function";
     }
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
-        xValueNode.setPresentation(null, type, data, false);
+        if (valuePresentation == null) {
+            xValueNode.setPresentation(null, type, data, false);
+        }
+        else {
+            xValueNode.setPresentation(null, valuePresentation, false);
+        }
     }
 }
