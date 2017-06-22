@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.remote.value;
 
 import com.intellij.xdebugger.frame.XValueNode;
 import com.intellij.xdebugger.frame.XValuePlace;
+import com.tang.intellij.lua.lang.LuaIcons;
 import org.jetbrains.annotations.NotNull;
 import org.luaj.vm2.LuaValue;
 
@@ -42,6 +43,6 @@ public class LuaRFunction extends LuaRValue {
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
-        xValueNode.setPresentation(null, type, data, false);
+        xValueNode.setPresentation(LuaIcons.LOCAL_FUNCTION, type, data, false);
     }
 }

@@ -36,9 +36,10 @@ public class LuaRPrimitive extends LuaRValue {
     @Override
     protected void parse(LuaValue data, String desc) {
         this.data = data.toString();
-        if (data instanceof LuaString)
+        if (data instanceof LuaString) {
             type = "string";
-        else if (data instanceof LuaNumber)
+            this.data = "\"" + this.data + "\"";
+        } else if (data instanceof LuaNumber)
             type = "number";
         else if (data instanceof LuaBoolean)
             type = "boolean";

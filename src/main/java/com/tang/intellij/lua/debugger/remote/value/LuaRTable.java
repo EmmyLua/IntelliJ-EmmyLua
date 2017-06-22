@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.remote.value;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XValueChildrenList;
 import com.intellij.xdebugger.frame.XValueNode;
@@ -45,7 +46,7 @@ public class LuaRTable extends LuaRValue {
 
     @Override
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
-        xValueNode.setPresentation(null, "table", desc, true);
+        xValueNode.setPresentation(AllIcons.Json.Object, "table", desc, true);
     }
 
     @Override
