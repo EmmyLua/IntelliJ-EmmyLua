@@ -268,7 +268,7 @@ exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..."
 
-valueExpr ::= literalExpr | closureExpr | tableExpr | varExpr | parenExpr
+valueExpr ::= varExpr | literalExpr | closureExpr | tableExpr | parenExpr
 
 // 最终产生 call expr | index expr | nameRef
 private varExpr ::= callOrIndexExpr | nameExpr
@@ -342,7 +342,7 @@ left callExpr ::= args {
 }
 
 private suffixExpr ::= indexExpr | callExpr
-private prefixExpr ::= parenExpr | nameExpr
+private prefixExpr ::= parenExpr | nameExpr | literalExpr | tableExpr
 // 最终产生 callExpr | indexExpr
 private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr
