@@ -21,6 +21,7 @@ import com.intellij.codeInsight.hints.InlayInfo;
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider;
 import com.intellij.lang.Language;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
@@ -37,6 +38,14 @@ import java.util.Set;
  * Created by TangZX on 2016/12/14.
  */
 public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
+
+    Class[] EXPR_HINT = {
+            LuaLiteralExpr.class,
+            LuaBinaryExpr.class,
+            LuaUnaryExpr.class,
+            LuaClosureExpr.class
+    };
+
     @NotNull
     @Override
     public List<InlayInfo> getParameterHints(PsiElement psiElement) {
@@ -70,8 +79,8 @@ public class LuaParameterHintsProvider implements InlayParameterHintsProvider {
                     }
                     for (; argIndex < exprList.size() && paramIndex < paramCount; argIndex++) {
                         LuaExpr expr = exprList.get(argIndex);
-
-                        if (expr instanceof LuaLiteralExpr || expr instanceof LuaBinaryExpr || expr instanceof LuaUnaryExpr)
+                        
+                        if (PsiTreeUtil.instanceOf(expr, EXPR_HINT))
                             list.add(new InlayInfo(parameters[paramIndex].getName(), expr.getTextOffset()));
                         paramIndex++;
                     }
