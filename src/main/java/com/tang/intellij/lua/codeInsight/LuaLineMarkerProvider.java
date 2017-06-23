@@ -211,7 +211,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
                                 returnKeyWord.getTextRange(),
                                 AllIcons.General.HideRightHover,
                                 Pass.LINE_MARKERS,
-                                FunctionUtil.constant("Trail call"),
+                                FunctionUtil.constant("Tail call"),
                                 null,
                                 GutterIconRenderer.Alignment.CENTER));
                         break;
