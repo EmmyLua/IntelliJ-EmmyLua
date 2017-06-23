@@ -17,14 +17,20 @@
 package com.tang.intellij.lua.codeInsight.intention
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.impl.MacroCallNode
+import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaTypes
+import com.intellij.util.IncorrectOperationException
+import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
+import com.tang.intellij.lua.psi.*
+import org.jetbrains.annotations.Nls
 
 class AppendCallParenIntention : BaseIntentionAction() {
     override fun getFamilyName() = "Append call paren"
@@ -91,6 +97,103 @@ class RemoveCallParenIntention : BaseIntentionAction() {
                 argsNode.removeChild(lParen)
 
             CodeStyleManager.getInstance(project).reformat(callExpr)
+        }
+    }
+}
+
+abstract class ClassMethodBasedIntention : BaseIntentionAction() {
+    override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
+        val bodyOwner = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaFuncBodyOwner::class.java, false)
+        if (bodyOwner == null || bodyOwner is LuaClosureExpr)
+            return false
+
+        return isAvailable(bodyOwner, editor)
+    }
+
+    abstract fun isAvailable(bodyOwner: LuaFuncBodyOwner, editor: Editor): Boolean
+
+    @Throws(IncorrectOperationException::class)
+    override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
+        val bodyOwner = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaFuncBodyOwner::class.java, false)
+        if (bodyOwner != null) invoke(bodyOwner, editor)
+    }
+
+    abstract fun invoke(bodyOwner: LuaFuncBodyOwner, editor: Editor)
+}
+
+class CreateReturnDocIntention : ClassMethodBasedIntention() {
+    override fun isAvailable(bodyOwner: LuaFuncBodyOwner, editor: Editor): Boolean {
+        if (bodyOwner is LuaCommentOwner) {
+            val comment = bodyOwner.comment
+            return comment == null || PsiTreeUtil.getChildrenOfType(comment, LuaDocReturnDef::class.java) == null
+        }
+        return false
+    }
+
+    @Nls
+    override fun getFamilyName() = text
+
+    override fun getText() = "Create return declaration"
+
+    override fun invoke(bodyOwner: LuaFuncBodyOwner, editor: Editor) {
+        if (bodyOwner is LuaCommentOwner) {
+            val comment = bodyOwner.comment
+            val funcBody = bodyOwner.funcBody
+            if (funcBody != null) {
+                val templateManager = TemplateManager.getInstance(editor.project)
+                val template = templateManager.createTemplate("", "")
+                if (comment != null) template.addTextSegment("\n")
+                template.addTextSegment("---@return ")
+                val typeSuggest = MacroCallNode(SuggestTypeMacro())
+                template.addVariable("returnType", typeSuggest, TextExpression("table"), false)
+                template.addEndVariable()
+                if (comment != null) {
+                    editor.caretModel.moveToOffset(comment.textOffset + comment.textLength)
+                } else {
+                    template.addTextSegment("\n")
+                    val e:PsiElement = bodyOwner
+                    editor.caretModel.moveToOffset(e.node.startOffset)
+                }
+                templateManager.startTemplate(editor, template)
+            }
+        }
+    }
+}
+
+class CreateDocForMethodIntention : ClassMethodBasedIntention() {
+    override fun isAvailable(bodyOwner: LuaFuncBodyOwner, editor: Editor): Boolean {
+        if (bodyOwner is LuaCommentOwner) {
+            return bodyOwner.comment == null || bodyOwner.funcBody == null
+        }
+        return false
+    }
+
+    @Nls
+    override fun getFamilyName() = text
+
+    override fun getText() = "Create LuaDoc"
+
+    override fun invoke(bodyOwner: LuaFuncBodyOwner, editor: Editor) {
+        val funcBody = bodyOwner.funcBody
+        if (funcBody != null) {
+            val templateManager = TemplateManager.getInstance(bodyOwner.project)
+            val template = templateManager.createTemplate("", "")
+            template.addTextSegment("---" + bodyOwner.name!!)
+            val typeSuggest = MacroCallNode(SuggestTypeMacro())
+
+            // params
+            val parDefList = funcBody.paramNameDefList
+            for (parDef in parDefList) {
+                template.addTextSegment(String.format("\n---@param %s ", parDef.name))
+                template.addVariable(parDef.name, typeSuggest, TextExpression("table"), false)
+            }
+
+            template.addEndVariable()
+            template.addTextSegment("\n")
+
+            val textOffset = bodyOwner.node.startOffset
+            editor.caretModel.moveToOffset(textOffset)
+            templateManager.startTemplate(editor, template)
         }
     }
 }
