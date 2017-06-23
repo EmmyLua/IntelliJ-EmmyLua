@@ -101,10 +101,16 @@ class RemoveCallParenIntention : BaseIntentionAction() {
     }
 }
 
-abstract class ClassMethodBasedIntention : BaseIntentionAction() {
+abstract class FunctionIntention : BaseIntentionAction() {
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
         val bodyOwner = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaFuncBodyOwner::class.java, false)
+        //不对Closure生效
         if (bodyOwner == null || bodyOwner is LuaClosureExpr)
+            return false
+
+        //不在body内
+        val contains = bodyOwner.funcBody?.textRange?.contains(editor.caretModel.offset)
+        if (contains != null && contains)
             return false
 
         return isAvailable(bodyOwner, editor)
@@ -121,7 +127,7 @@ abstract class ClassMethodBasedIntention : BaseIntentionAction() {
     abstract fun invoke(bodyOwner: LuaFuncBodyOwner, editor: Editor)
 }
 
-class CreateReturnDocIntention : ClassMethodBasedIntention() {
+class CreateFunctionReturnAnnotationIntention : FunctionIntention() {
     override fun isAvailable(bodyOwner: LuaFuncBodyOwner, editor: Editor): Boolean {
         if (bodyOwner is LuaCommentOwner) {
             val comment = bodyOwner.comment
@@ -133,7 +139,7 @@ class CreateReturnDocIntention : ClassMethodBasedIntention() {
     @Nls
     override fun getFamilyName() = text
 
-    override fun getText() = "Create return declaration"
+    override fun getText() = "Create return annotation"
 
     override fun invoke(bodyOwner: LuaFuncBodyOwner, editor: Editor) {
         if (bodyOwner is LuaCommentOwner) {
@@ -160,7 +166,7 @@ class CreateReturnDocIntention : ClassMethodBasedIntention() {
     }
 }
 
-class CreateDocForMethodIntention : ClassMethodBasedIntention() {
+class CreateFunctionDocIntention : FunctionIntention() {
     override fun isAvailable(bodyOwner: LuaFuncBodyOwner, editor: Editor): Boolean {
         if (bodyOwner is LuaCommentOwner) {
             return bodyOwner.comment == null || bodyOwner.funcBody == null

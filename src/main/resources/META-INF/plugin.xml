@@ -160,23 +160,23 @@
 
         <intentionAction>
             <category>Lua</category>
-            <className>com.tang.intellij.lua.codeInsight.intention.CreateParamDocIntention</className>
-            <descriptionDirectoryName>CreateParamDocIntention</descriptionDirectoryName>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateParameterAnnotationIntention</className>
+            <descriptionDirectoryName>CreateParameterAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
             <category>Lua</category>
-            <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeDeclarationIntention</className>
-            <descriptionDirectoryName>CreateTypeDeclarationIntention</descriptionDirectoryName>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeAnnotationIntention</className>
+            <descriptionDirectoryName>CreateTypeAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
             <category>Lua</category>
-            <className>com.tang.intellij.lua.codeInsight.intention.CreateReturnDocIntention</className>
-            <descriptionDirectoryName>CreateReturnDocIntention</descriptionDirectoryName>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateFunctionReturnAnnotationIntention</className>
+            <descriptionDirectoryName>CreateFunctionReturnAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
             <category>Lua</category>
-            <className>com.tang.intellij.lua.codeInsight.intention.CreateDocForMethodIntention</className>
-            <descriptionDirectoryName>CreateDocForMethodIntention</descriptionDirectoryName>
+            <className>com.tang.intellij.lua.codeInsight.intention.CreateFunctionDocIntention</className>
+            <descriptionDirectoryName>CreateFunctionDocIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
             <category>Lua</category>
