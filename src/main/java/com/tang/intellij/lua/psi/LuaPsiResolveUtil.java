@@ -69,7 +69,7 @@ public class LuaPsiResolveUtil {
         return ret.get();
     }
 
-    public static PsiElement resolveLocal(LuaNameExpr ref, SearchContext context) {
+    public static PsiElement resolveLocal(LuaNameExpr ref, @Nullable SearchContext context) {
         final Ref<PsiElement> ret = Ref.create();
         String refName = ref.getName();
 
@@ -80,7 +80,7 @@ public class LuaPsiResolveUtil {
                 if (classMethodFuncDef != null && !classMethodFuncDef.isStatic()) {
                     LuaExpr expr = classMethodFuncDef.getClassMethodName().getExpr();
                     PsiReference reference = expr.getReference();
-                    if (reference instanceof LuaReference) {
+                    if (reference instanceof LuaReference && context != null) {
                         PsiElement resolve = ((LuaReference) reference).resolve(context);
                         ret.set(resolve);
                     }
