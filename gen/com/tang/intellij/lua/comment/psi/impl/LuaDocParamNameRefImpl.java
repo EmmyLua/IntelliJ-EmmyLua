@@ -35,7 +35,7 @@ public class LuaDocParamNameRefImpl extends ASTWrapperPsiElement implements LuaD
 
   @NotNull
   public PsiReference getReference() {
-    return LuaDocPsiImplUtil.getReference(this);
+    return LuaDocPsiImplUtilKt.getReference(this);
   }
 
 }

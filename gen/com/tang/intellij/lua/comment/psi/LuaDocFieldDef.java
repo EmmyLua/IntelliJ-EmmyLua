@@ -25,16 +25,21 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   @Nullable
   PsiElement getId();
 
+  @Nullable
   LuaTypeSet guessType(SearchContext context);
 
+  @Nullable
   PsiElement getNameIdentifier();
 
+  @NotNull
   PsiElement setName(String newName);
 
+  @Nullable
   String getName();
 
   int getTextOffset();
 
+  @Nullable
   String getFieldName();
 
 }

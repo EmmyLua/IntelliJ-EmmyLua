@@ -63,32 +63,38 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocClassField
     return findChildByType(ID);
   }
 
+  @Nullable
   public LuaTypeSet guessType(SearchContext context) {
-    return LuaDocPsiImplUtil.guessType(this, context);
+    return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 
+  @Nullable
   public PsiElement getNameIdentifier() {
-    return LuaDocPsiImplUtil.getNameIdentifier(this);
+    return LuaDocPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @NotNull
   public PsiElement setName(String newName) {
-    return LuaDocPsiImplUtil.setName(this, newName);
+    return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 
+  @Nullable
   public String getName() {
-    return LuaDocPsiImplUtil.getName(this);
+    return LuaDocPsiImplUtilKt.getName(this);
   }
 
   public int getTextOffset() {
-    return LuaDocPsiImplUtil.getTextOffset(this);
+    return LuaDocPsiImplUtilKt.getTextOffset(this);
   }
 
+  @Nullable
   public String getFieldName() {
-    return LuaDocPsiImplUtil.getFieldName(this);
+    return LuaDocPsiImplUtilKt.getFieldName(this);
   }
 
+  @NotNull
   public String toString() {
-    return LuaDocPsiImplUtil.toString(this);
+    return LuaDocPsiImplUtilKt.toString(this);
   }
 
 }

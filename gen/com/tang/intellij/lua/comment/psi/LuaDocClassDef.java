@@ -18,14 +18,19 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
   @NotNull
   PsiElement getId();
 
+  @NotNull
   LuaType getClassType();
 
+  @NotNull
   ItemPresentation getPresentation();
 
+  @NotNull
   PsiElement getNameIdentifier();
 
+  @NotNull
   PsiElement setName(String newName);
 
+  @Nullable
   String getName();
 
   int getTextOffset();

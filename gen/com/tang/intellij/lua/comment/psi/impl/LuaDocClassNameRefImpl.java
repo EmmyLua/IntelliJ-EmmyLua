@@ -37,11 +37,12 @@ public class LuaDocClassNameRefImpl extends ASTWrapperPsiElement implements LuaD
 
   @NotNull
   public PsiReference getReference() {
-    return LuaDocPsiImplUtil.getReference(this);
+    return LuaDocPsiImplUtilKt.getReference(this);
   }
 
+  @Nullable
   public LuaType resolveType(SearchContext context) {
-    return LuaDocPsiImplUtil.resolveType(this, context);
+    return LuaDocPsiImplUtilKt.resolveType(this, context);
   }
 
 }

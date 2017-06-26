@@ -18,6 +18,7 @@ public interface LuaDocParamDef extends LuaDocPsiElement {
   @Nullable
   LuaDocTypeSet getTypeSet();
 
+  @Nullable
   LuaTypeSet guessType(SearchContext context);
 
   @Nullable

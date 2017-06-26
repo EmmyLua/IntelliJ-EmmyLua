@@ -22,7 +22,7 @@ import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
-import com.tang.intellij.lua.comment.psi.LuaDocPsiImplUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocPsiImplUtilKt;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
@@ -69,7 +69,7 @@ public class LuaDocClassFieldType extends IStubElementType<LuaDocClassFieldStub,
         }
 
         SearchContext searchContext = new SearchContext(luaDocFieldDef.getProject()).setCurrentStubFile(luaDocFieldDef.getContainingFile());
-        LuaTypeSet typeSet = LuaDocPsiImplUtil.resolveDocTypeSet(luaDocFieldDef.getTypeSet(), null, searchContext);
+        LuaTypeSet typeSet = LuaDocPsiImplUtilKt.resolveDocTypeSet(luaDocFieldDef.getTypeSet(), null, searchContext);
 
         return new LuaDocClassFieldStubImpl(stubElement, name, className, typeSet);
     }

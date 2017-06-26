@@ -40,8 +40,9 @@ public class LuaDocTypeDefImpl extends ASTWrapperPsiElement implements LuaDocTyp
     return PsiTreeUtil.getChildOfType(this, LuaDocTypeSet.class);
   }
 
+  @Nullable
   public LuaTypeSet guessType(SearchContext context) {
-    return LuaDocPsiImplUtil.guessType(this, context);
+    return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 
 }

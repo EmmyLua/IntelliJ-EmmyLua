@@ -16,6 +16,7 @@ public interface LuaDocClassNameRef extends LuaDocPsiElement {
   @NotNull
   PsiReference getReference();
 
+  @Nullable
   LuaType resolveType(SearchContext context);
 
 }
