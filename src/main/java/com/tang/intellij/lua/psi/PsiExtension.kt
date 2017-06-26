@@ -16,8 +16,16 @@
 
 package com.tang.intellij.lua.psi
 
+import com.intellij.psi.util.PsiTreeUtil
+
 
 fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     val list = this.varExprList.exprList
     return list[index]
 }
+
+val LuaParamNameDef.funcBodyOwner: LuaFuncBodyOwner?
+    get() = PsiTreeUtil.getParentOfType(this, LuaFuncBodyOwner::class.java)
+
+val LuaParamNameDef.owner: LuaParametersOwner
+    get() = PsiTreeUtil.getParentOfType(this, LuaParametersOwner::class.java)!!

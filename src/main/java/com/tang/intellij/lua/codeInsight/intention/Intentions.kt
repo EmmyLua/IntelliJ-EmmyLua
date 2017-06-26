@@ -41,7 +41,7 @@ class CreateParameterAnnotationIntention : BaseIntentionAction() {
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
         val offset = editor.caretModel.offset
         val name = findParamName(psiFile, offset) ?: findParamName(psiFile, offset - 1)
-        return name != null
+        return name != null && name.funcBodyOwner !is LuaClosureExpr
     }
 
     private fun findParamName(psiFile: PsiFile, offset:Int): LuaParamNameDef? {
@@ -62,7 +62,7 @@ class CreateParameterAnnotationIntention : BaseIntentionAction() {
         val parDef = findParamName(psiFile, offset) ?: findParamName(psiFile, offset - 1)
         parDef ?: return
 
-        val parametersOwner = PsiTreeUtil.getParentOfType(parDef, LuaParametersOwner::class.java)
+        val parametersOwner = parDef.owner
         if (parametersOwner is LuaCommentOwner) {
             val comment = parametersOwner.comment
 
