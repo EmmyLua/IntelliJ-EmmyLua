@@ -18,13 +18,10 @@ package com.tang.intellij.lua.search;
 
 import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.tang.intellij.lua.lang.GuessTypeKind;
-
-import java.util.Stack;
 
 /**
  *
@@ -36,12 +33,6 @@ public class SearchContext {
     private GlobalSearchScope scope;
     private Project project;
     private int guessTypeKind = GuessTypeKind.Standard;
-    private Stack<Pair> deadLockStack = new Stack<>();
-
-    class Pair {
-        public Overflow type;
-        public PsiElement object;
-    }
 
     public SearchContext(Project project) {
         this.project = project;
@@ -75,38 +66,7 @@ public class SearchContext {
         return scope;
     }
 
-    public boolean push(PsiElement element, Overflow type) {
-        boolean v = !checkOverflow(element, type);
-        if (v) {
-            Pair pair = new Pair();
-            pair.object = element;
-            pair.type = type;
-            deadLockStack.push(pair);
-        }
-        return v;
-    }
-
-    public void pop(PsiElement element) {
-        Pair pair = deadLockStack.pop();
-        assert pair.object == element;
-    }
-
-    private boolean checkOverflow(PsiElement element, Overflow type) {
-        for (Pair pair : deadLockStack) {
-            if (type == pair.type && element == pair.object)
-                return true;
-        }
-        return false;
-    }
-
     public boolean isDumb() {
         return DumbService.isDumb(project) || currentStubFile != null;
-    }
-
-    public enum Overflow {
-        Normal,
-        GuessType,
-        FileReturn,
-        FindBodyOwner,
     }
 }
