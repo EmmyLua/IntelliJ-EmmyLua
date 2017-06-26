@@ -24,6 +24,33 @@ fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     return list[index]
 }
 
+fun LuaExprList.getExprAt(idx: Int): LuaExpr? {
+    return exprList[idx]
+}
+
+fun LuaLocalDef.getExprFor(nameDef: LuaNameDef): LuaExpr? {
+    val nameList = this.nameList
+    nameList ?: return null
+    val exprList = this.exprList
+    exprList ?: return null
+
+    var next = nameList.firstChild
+    var idx = 0
+    var found = false
+    while (next != null) {
+        if (next is LuaNameDef) {
+            if (next == nameDef) {
+                found = true
+                break
+            }
+            idx++
+        }
+        next = next.nextSibling
+    }
+    if (!found) return null
+    return exprList.getExprAt(idx)
+}
+
 val LuaParamNameDef.funcBodyOwner: LuaFuncBodyOwner?
     get() = PsiTreeUtil.getParentOfType(this, LuaFuncBodyOwner::class.java)
 
