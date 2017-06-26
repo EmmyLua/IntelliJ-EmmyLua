@@ -258,3 +258,44 @@ class CreateFunctionDocIntention : FunctionIntention() {
         }
     }
 }
+
+/**
+ * true <-> false
+ */
+class InvertBooleanIntention : BaseIntentionAction() {
+    override fun getFamilyName() = text
+
+    override fun getText() = "Invert boolean value"
+
+    override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
+        val element = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaLiteralExpr::class.java, false)
+        if (element is LuaLiteralExpr && element.kind == LuaLiteralKind.Bool) {
+            return true
+        }
+        return false
+    }
+
+    override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
+        val element = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaLiteralExpr::class.java, false)
+        if (element is LuaLiteralExpr && element.kind == LuaLiteralKind.Bool) {
+            val lit = LuaElementFactory.createLiteral(project, if (element.text == "true") "false" else "true")
+            element.replace(lit)
+        }
+    }
+
+}
+
+class InvertConditionIntention : BaseIntentionAction() {
+    override fun getFamilyName() = text
+
+    override fun getText() = "Invert condition"
+
+    override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+}

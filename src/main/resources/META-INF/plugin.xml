@@ -199,6 +199,10 @@
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.RemoveCallParenIntention</className>
         </intentionAction>
+        <intentionAction>
+            <category>Lua</category>
+            <className>com.tang.intellij.lua.codeInsight.intention.InvertBooleanIntention</className>
+        </intentionAction>
 
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"

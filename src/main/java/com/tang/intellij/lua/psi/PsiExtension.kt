@@ -29,3 +29,20 @@ val LuaParamNameDef.funcBodyOwner: LuaFuncBodyOwner?
 
 val LuaParamNameDef.owner: LuaParametersOwner
     get() = PsiTreeUtil.getParentOfType(this, LuaParametersOwner::class.java)!!
+
+enum class LuaLiteralKind {
+    String,
+    Bool,
+    Number,
+    Nil,
+    Unknown
+}
+
+val LuaLiteralExpr.kind: LuaLiteralKind get() = when(node.firstChildNode.elementType) {
+    LuaTypes.STRING -> LuaLiteralKind.String
+    LuaTypes.TRUE -> LuaLiteralKind.Bool
+    LuaTypes.FALSE -> LuaLiteralKind.Bool
+    LuaTypes.NIL -> LuaLiteralKind.Nil
+    LuaTypes.NUMBER -> LuaLiteralKind.Number
+    else -> LuaLiteralKind.Unknown
+}
