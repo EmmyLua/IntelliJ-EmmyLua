@@ -32,6 +32,61 @@ import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.psi.*
 import org.jetbrains.annotations.Nls
 
+class CreateParameterAnnotationIntention : BaseIntentionAction() {
+    @Nls
+    override fun getFamilyName() = text
+
+    override fun getText() = "Create parameter annotation"
+
+    override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
+        val offset = editor.caretModel.offset
+        val name = findParamName(psiFile, offset) ?: findParamName(psiFile, offset - 1)
+        return name != null
+    }
+
+    private fun findParamName(psiFile: PsiFile, offset:Int): LuaParamNameDef? {
+        var element = psiFile.findElementAt(offset)
+        if (element != null) {
+            element = element.parent
+            if (element is LuaParamNameDef) {
+                //TODO: 并且没有相应 Doc
+                return element
+            }
+        }
+        return null
+    }
+
+    @Throws(IncorrectOperationException::class)
+    override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
+        val offset = editor.caretModel.offset
+        val parDef = findParamName(psiFile, offset) ?: findParamName(psiFile, offset - 1)
+        parDef ?: return
+
+        val parametersOwner = PsiTreeUtil.getParentOfType(parDef, LuaParametersOwner::class.java)
+        if (parametersOwner is LuaCommentOwner) {
+            val comment = parametersOwner.comment
+
+            val templateManager = TemplateManager.getInstance(project)
+            val template = templateManager.createTemplate("", "")
+            if (comment != null) template.addTextSegment("\n")
+            template.addTextSegment(String.format("---@param %s ", parDef.name))
+            val name = MacroCallNode(SuggestTypeMacro())
+            template.addVariable("type", name, TextExpression("table"), true)
+            template.addEndVariable()
+
+            if (comment != null) {
+                editor.caretModel.moveToOffset(comment.textOffset + comment.textLength)
+            } else {
+                val commentOwner:LuaCommentOwner = parametersOwner
+                editor.caretModel.moveToOffset(commentOwner.node.startOffset)
+                template.addTextSegment("\n")
+            }
+
+            templateManager.startTemplate(editor, template)
+        }
+    }
+}
+
 class AppendCallParenIntention : BaseIntentionAction() {
     override fun getFamilyName() = "Append call paren"
 
