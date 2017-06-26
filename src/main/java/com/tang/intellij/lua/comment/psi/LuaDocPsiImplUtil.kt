@@ -23,14 +23,12 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.lang.type.LuaType
 import com.tang.intellij.lua.lang.type.LuaTypeSet
-import com.tang.intellij.lua.psi.LuaAssignStat
 import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.psi.getExprAt
+import com.tang.intellij.lua.psi.aliasName
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import javax.swing.Icon
@@ -185,12 +183,7 @@ fun getClassType(classDef: LuaDocClassDef): LuaType {
             superClassName = supperRef.text
 
         luaType = LuaType.create(clazzName, superClassName)
-
-        val owner = LuaCommentUtil.findOwner(classDef)
-        if (owner is LuaAssignStat) {
-            val expr = owner.getExprAt(0)!!
-            luaType.aliasName = expr.text
-        }
+        luaType.aliasName = classDef.aliasName
     }
     return luaType
 }

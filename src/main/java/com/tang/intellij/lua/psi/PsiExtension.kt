@@ -17,6 +17,9 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.comment.LuaCommentUtil
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.lang.type.LuaTableType
 
 
 fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
@@ -72,4 +75,21 @@ val LuaLiteralExpr.kind: LuaLiteralKind get() = when(node.firstChildNode.element
     LuaTypes.NIL -> LuaLiteralKind.Nil
     LuaTypes.NUMBER -> LuaLiteralKind.Number
     else -> LuaLiteralKind.Unknown
+}
+
+val LuaDocClassDef.aliasName: String? get() {
+    val owner = LuaCommentUtil.findOwner(this)
+    when (owner) {
+        is LuaAssignStat -> {
+            val expr = owner.getExprAt(0)
+            if (expr != null) return expr.text
+        }
+
+        is LuaLocalDef -> {
+            val expr = owner.exprList?.getExprAt(0)
+            if (expr is LuaTableExpr)
+                return LuaTableType.getTypeName(expr)
+        }
+    }
+    return null
 }
