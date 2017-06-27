@@ -63,7 +63,7 @@ public class LuaXPrimitive extends LuaXValue {
             case "string":
                 String value = data;
                 if (value.startsWith("\""))
-                    value = value.substring(1, value.length() - 2);
+                    value = value.substring(1, value.length() - 1);
 
                 xValueNode.setPresentation(null, new LuaXStringPresentation(value), false);
                 break;
