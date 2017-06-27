@@ -22,10 +22,7 @@ import com.intellij.psi.PsiReferenceBase
 import com.intellij.util.IncorrectOperationException
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef
-import com.tang.intellij.lua.psi.LuaCommentOwner
-import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.psi.LuaParamNameDef
-import com.tang.intellij.lua.psi.LuaParametersOwner
+import com.tang.intellij.lua.psi.*
 
 /**
  * 函数参数引用
@@ -53,9 +50,17 @@ class LuaDocParamNameReference(element: LuaDocParamNameRef) : PsiReferenceBase<L
 
         if (owner != null) {
             val name = myElement.text
-            if (owner is LuaParametersOwner) {
-                return findParamWithName(owner.paramNameDefList, name)
-            }
+            var target:PsiElement? = null
+            owner.accept(object :LuaVisitor() {
+                override fun visitPsiElement(o: LuaPsiElement) {
+                    if (o is LuaParametersOwner) {
+                        target = findParamWithName(o.paramNameDefList, name)
+                    }
+
+                    target ?: o.acceptChildren(this)
+                }
+            })
+            return target
         }
         return null
     }
