@@ -9,7 +9,6 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 
 public class LuaAssignStatImpl extends LuaStatementImpl implements LuaAssignStat {
 
@@ -30,10 +29,6 @@ public class LuaAssignStatImpl extends LuaStatementImpl implements LuaAssignStat
   @NotNull
   public List<LuaExprList> getExprListList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaExprList.class);
-  }
-
-  public LuaComment getComment() {
-    return LuaPsiImplUtil.getComment(this);
   }
 
   @Override

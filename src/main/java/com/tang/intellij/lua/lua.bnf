@@ -107,7 +107,7 @@
   ]
 
   implements("tableExpr") = "com.tang.intellij.lua.psi.LuaIndentRange"
-  hooks("forAStat|forBStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
+  //hooks("forAStat|forBStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
   hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
@@ -117,6 +117,7 @@
   implements("funcBody") = "com.tang.intellij.lua.psi.LuaIndentRange"
   extends(".*Expr") = expr
   extends(".*Stat") = statement
+  hooks(".*Stat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
 }
 
 luaFile ::= stat_semi*
@@ -125,7 +126,10 @@ private stat_semi ::= stat_impl ';'?
 block ::= stat_semi* (lastStat ';'?)?
 private lazy_block ::= <<lazyBlock>>
 
-fake statement ::= ()
+fake statement ::= () {
+    implements = "com.tang.intellij.lua.psi.LuaCommentOwner"
+    methods = [getComment]
+}
 fake exprStat ::= expr
 private stat_impl ::=
     callStat |
@@ -154,14 +158,14 @@ assignStat ::= varList '=' exprList {
     implements = [
         "com.tang.intellij.lua.psi.LuaDeclaration"
     ]
-    methods = [getComment assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
+    methods = [assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
 }
 doStat ::= 'do' lazy_block 'end' { pin = 1 }
 whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
 repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
 ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' { pin = 1 }
-forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 methods = [getComment getParamNameDefList] }
-forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 methods = [getComment] }
+forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 methods = [getParamNameDefList] }
+forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 }
 labelStat ::= '::' ID '::' { pin = 1 }
 gotoStat ::= 'goto' ID { pin = 1 }
 private defStat ::= classMethodDef | globalFuncDef | localFuncDef | localDef

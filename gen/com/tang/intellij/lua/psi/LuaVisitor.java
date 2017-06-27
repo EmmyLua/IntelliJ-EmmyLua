@@ -172,7 +172,7 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitStatement(@NotNull LuaStatement o) {
-    visitPsiElement(o);
+    visitCommentOwner(o);
   }
 
   public void visitTableExpr(@NotNull LuaTableExpr o) {
@@ -215,6 +215,10 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitClassField(@NotNull LuaClassField o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCommentOwner(@NotNull LuaCommentOwner o) {
     visitPsiElement(o);
   }
 

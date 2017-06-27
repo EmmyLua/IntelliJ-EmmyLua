@@ -9,7 +9,6 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 
 public class LuaForAStatImpl extends LuaStatementImpl implements LuaForAStat {
 
@@ -36,10 +35,6 @@ public class LuaForAStatImpl extends LuaStatementImpl implements LuaForAStat {
   @NotNull
   public LuaParamNameDef getParamNameDef() {
     return notNullChild(PsiTreeUtil.getChildOfType(this, LuaParamNameDef.class));
-  }
-
-  public LuaComment getComment() {
-    return LuaPsiImplUtil.getComment(this);
   }
 
   public List<LuaParamNameDef> getParamNameDefList() {

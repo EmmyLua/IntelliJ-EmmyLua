@@ -6,7 +6,6 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import  com.tang.intellij.lua.psi.LuaParametersOwner;
 import  com.tang.intellij.lua.psi.LuaCommentOwner;
-import com.tang.intellij.lua.comment.psi.api.LuaComment;
 
 public interface LuaForBStat extends LuaStatement, LuaIndentRange, LuaParametersOwner, LuaCommentOwner {
 
@@ -15,7 +14,5 @@ public interface LuaForBStat extends LuaStatement, LuaIndentRange, LuaParameters
 
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
-
-  LuaComment getComment();
 
 }
