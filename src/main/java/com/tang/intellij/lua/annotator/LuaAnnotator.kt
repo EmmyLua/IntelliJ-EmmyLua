@@ -20,6 +20,7 @@ import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.roots.FileIndexFacade
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.tang.intellij.lua.Constants
@@ -32,10 +33,11 @@ import com.tang.intellij.lua.search.SearchContext
  * LuaAnnotator
  * Created by TangZX on 2016/11/22.
  */
-class LuaAnnotator : LuaVisitor(), Annotator {
+class LuaAnnotator : Annotator {
     private var myHolder: AnnotationHolder? = null
     private val luaVisitor = LuaElementVisitor()
     private val docVisitor = LuaDocElementVisitor()
+    private val STD_MARKER = Key.create<Boolean>("lua.std.marker")
 
     override fun annotate(psiElement: PsiElement, annotationHolder: AnnotationHolder) {
         myHolder = annotationHolder
@@ -126,6 +128,7 @@ class LuaAnnotator : LuaVisitor(), Annotator {
                 if (FileIndexFacade.getInstance(o.project).isInLibraryClasses(containingFile.virtualFile)) {
                     val annotation = myHolder!!.createInfoAnnotation(o, null)
                     annotation.textAttributes = LuaHighlightingData.STD_API
+                    o.putUserData(STD_MARKER, true)
                     return
                 }
             }
@@ -163,24 +166,31 @@ class LuaAnnotator : LuaVisitor(), Annotator {
         }
 
         override fun visitIndexExpr(o: LuaIndexExpr) {
-            val id = o.id
-            if (id != null) {
-                val annotation = myHolder!!.createInfoAnnotation(id, null)
-                if (o.parent is LuaCallExpr) {
-                    if (o.colon != null) {
-                        annotation.textAttributes = LuaHighlightingData.INSTANCE_METHOD
+            super.visitIndexExpr(o)
+            val prefix = o.prefixExpr
+            if (prefix is LuaNameExpr && prefix.getUserData(STD_MARKER) != null) {
+                val annotation = myHolder!!.createInfoAnnotation(o, null)
+                annotation.textAttributes = LuaHighlightingData.STD_API
+                o.putUserData(STD_MARKER, true)
+            } else {
+                val id = o.id
+                if (id != null) {
+                    val annotation = myHolder!!.createInfoAnnotation(id, null)
+                    if (o.parent is LuaCallExpr) {
+                        if (o.colon != null) {
+                            annotation.textAttributes = LuaHighlightingData.INSTANCE_METHOD
+                        } else {
+                            annotation.textAttributes = LuaHighlightingData.STATIC_METHOD
+                        }
                     } else {
-                        annotation.textAttributes = LuaHighlightingData.STATIC_METHOD
-                    }
-                } else {
-                    if (o.colon != null) {
-                        myHolder!!.createErrorAnnotation(o, "Arguments expected")
-                    } else {
-                        annotation.setTextAttributes(LuaHighlightingData.FIELD)
+                        if (o.colon != null) {
+                            myHolder!!.createErrorAnnotation(o, "Arguments expected")
+                        } else {
+                            annotation.setTextAttributes(LuaHighlightingData.FIELD)
+                        }
                     }
                 }
             }
-            super.visitIndexExpr(o)
         }
     }
 

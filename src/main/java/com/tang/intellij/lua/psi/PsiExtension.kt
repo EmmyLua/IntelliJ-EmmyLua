@@ -93,3 +93,7 @@ val LuaDocClassDef.aliasName: String? get() {
     }
     return null
 }
+
+val LuaIndexExpr.prefixExpr: LuaExpr get() {
+    return firstChild as LuaExpr
+}
