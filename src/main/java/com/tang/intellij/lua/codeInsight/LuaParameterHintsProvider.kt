@@ -39,36 +39,41 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             val callExpr = psiElement
             var parameters: Array<LuaParamInfo>? = null
             val methodDef = callExpr.resolveFuncBodyOwner(SearchContext(psiElement.getProject()))
+            methodDef ?: return list
+
 
             // 是否是 inst:method() 被用为 inst.method(self) 形式
             var isInstanceMethodUsedAsStaticMethod = false
-            if (methodDef != null) {
-                parameters = methodDef.params
-                if (methodDef is LuaClassMethodDef) {
-                    isInstanceMethodUsedAsStaticMethod = !methodDef.isStatic && callExpr.isStaticMethodCall
-                }
+            var isStaticMethodUsedAsInstanceMethod = false
+
+            parameters = methodDef.params
+            if (methodDef is LuaClassMethodDef) {
+                isInstanceMethodUsedAsStaticMethod = !methodDef.isStatic && callExpr.isStaticMethodCall
+                isStaticMethodUsedAsInstanceMethod = methodDef.isStatic && !callExpr.isStaticMethodCall
             }
 
-            if (parameters != null) {
-                val args = callExpr.args
-                val luaExprList = args.exprList
-                if (luaExprList != null) {
-                    val exprList = luaExprList.exprList
-                    var paramIndex = 0
-                    val paramCount = parameters.size
-                    var argIndex = 0
-                    if (isInstanceMethodUsedAsStaticMethod && exprList.size > 0) {
-                        val expr = exprList[argIndex++]
-                        list.add(InlayInfo(Constants.WORD_SELF, expr.textOffset))
-                    }
-                    while (argIndex < exprList.size && paramIndex < paramCount) {
-                        val expr = exprList[argIndex]
+            val args = callExpr.args
+            val luaExprList = args.exprList
+            if (luaExprList != null) {
+                val exprList = luaExprList.exprList
+                var paramIndex = 0
+                val paramCount = parameters.size
+                var argIndex = 0
 
-                        if (PsiTreeUtil.instanceOf(expr, *EXPR_HINT))
-                            list.add(InlayInfo(parameters[paramIndex].name, expr.textOffset))
-                        paramIndex++
-                        argIndex++
-                    }
+                if (isStaticMethodUsedAsInstanceMethod)
+                    paramIndex = 1
+                else if (isInstanceMethodUsedAsStaticMethod && exprList.size > 0) {
+                    val expr = exprList[argIndex++]
+                    list.add(InlayInfo(Constants.WORD_SELF, expr.textOffset))
+                }
+
+                while (argIndex < exprList.size && paramIndex < paramCount) {
+                    val expr = exprList[argIndex]
+
+                    if (PsiTreeUtil.instanceOf(expr, *EXPR_HINT))
+                        list.add(InlayInfo(parameters[paramIndex].name, expr.textOffset))
+                    paramIndex++
+                    argIndex++
                 }
             }
         }
