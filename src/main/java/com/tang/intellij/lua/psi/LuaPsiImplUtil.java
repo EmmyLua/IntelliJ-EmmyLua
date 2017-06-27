@@ -431,6 +431,11 @@ public class LuaPsiImplUtil {
                 }
 
                 @Override
+                public void visitClosureExpr(@NotNull LuaClosureExpr o) {
+                    
+                }
+
+                @Override
                 public void visitPsiElement(@NotNull LuaPsiElement o) {
                     o.acceptChildren(this);
                 }

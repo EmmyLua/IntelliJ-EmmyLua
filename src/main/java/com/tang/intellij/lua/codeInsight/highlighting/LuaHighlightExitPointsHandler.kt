@@ -49,6 +49,10 @@ class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: P
                 // ignore sub function
             }
 
+            override fun visitClosureExpr(o: LuaClosureExpr) {
+
+            }
+
             override fun visitPsiElement(o: LuaPsiElement) {
                 o.acceptChildren(this)
             }
