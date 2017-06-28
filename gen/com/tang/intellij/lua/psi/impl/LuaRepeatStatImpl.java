@@ -31,4 +31,10 @@ public class LuaRepeatStatImpl extends LuaStatementImpl implements LuaRepeatStat
     return PsiTreeUtil.getChildOfType(this, LuaExpr.class);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getUntil() {
+    return findChildByType(UNTIL);
+  }
+
 }

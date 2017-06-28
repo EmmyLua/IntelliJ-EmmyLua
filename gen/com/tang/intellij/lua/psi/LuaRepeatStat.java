@@ -10,4 +10,7 @@ public interface LuaRepeatStat extends LuaStatement, LuaLoop, LuaIndentRange {
   @Nullable
   LuaExpr getExpr();
 
+  @Nullable
+  PsiElement getUntil();
+
 }

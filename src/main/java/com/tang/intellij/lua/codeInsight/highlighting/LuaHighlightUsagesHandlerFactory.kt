@@ -23,10 +23,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Consumer
-import com.tang.intellij.lua.psi.LuaFuncBody
-import com.tang.intellij.lua.psi.LuaLoop
-import com.tang.intellij.lua.psi.LuaReturnStat
-import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.*
 
 /**
  *
@@ -85,6 +82,13 @@ private class LoopHandler(editor: Editor, psiFile: PsiFile, val psi:PsiElement, 
 
     override fun computeUsages(list: MutableList<PsiElement>?) {
         addOccurrence(loop.firstChild)
+        when (loop) {
+            is LuaRepeatStat -> { val until = loop.until; if (until != null) addOccurrence(until) }
+            else -> {
+                val end = loop.node.findChildByType(LuaTypes.END)
+                end?.let { addOccurrence(end.psi) }
+            }
+        }
         addOccurrence(psi)
     }
 

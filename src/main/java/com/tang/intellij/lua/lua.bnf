@@ -173,6 +173,9 @@ repeatStat ::= 'repeat' lazy_block 'until' expr {
         "com.tang.intellij.lua.psi.LuaLoop"
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
+    methods = [
+        until = 'UNTIL'
+    ]
 }
 ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' {
     pin = 1
