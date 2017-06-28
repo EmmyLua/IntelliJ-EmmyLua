@@ -306,7 +306,7 @@ const char* MemoryReader_cdecl(lua_State* L, void* data, size_t* size)
 
 }
 
-int EmmyOutputWorker(unsigned long api, lua_State* L)
+int EmmyOutputWorker(LAPI api, lua_State* L)
 {
 	const char* message = lua_tostring_dll(api, L, 1);
 	DebugBackend::Get().Message(message);
@@ -317,7 +317,7 @@ int EmmyOutput_intercept(lua_State* L)
 {
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	return EmmyOutputWorker(api, L);
 }
 
@@ -326,7 +326,7 @@ int EmmyOutput(lua_State* L)
 	return 0;
 }
 
-int CPCallHandlerWorker(unsigned long api, lua_State* L)
+int CPCallHandlerWorker(LAPI api, lua_State* L)
 {
 	CPCallHandlerArgs args = *static_cast<CPCallHandlerArgs*>(lua_touserdata_dll(api, L, 1));
 
@@ -341,13 +341,13 @@ int CPCallHandler_intercept(lua_State* L)
 {
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	return CPCallHandlerWorker(api, L);
 }
 
 int CPCallHandler(lua_State* L) { return 0; }
 
-int lua_cpcall_dll(unsigned long api, lua_State *L, lua_CFunction_dll func, void *udn)
+int lua_cpcall_dll(LAPI api, lua_State *L, lua_CFunction_dll func, void *udn)
 {
 
 	CPCallHandlerArgs args;
@@ -361,7 +361,7 @@ int lua_cpcall_dll(unsigned long api, lua_State *L, lua_CFunction_dll func, void
 	return lua_pcall_dll(api, L, 1, 0, 0);
 }
 
-void HookHandlerWorker(unsigned long api, lua_State* L, lua_Debug* ar)
+void HookHandlerWorker(LAPI api, lua_State* L, lua_Debug* ar)
 {
 	return DebugBackend::Get().HookCallback(api, L, ar);
 }
@@ -372,11 +372,11 @@ void HookHandler_intercept(lua_State* L, lua_Debug* ar)
 {
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	HookHandlerWorker(api, L, ar);
 }
 
-void SetHookMode(unsigned long api, lua_State* L, HookMode mode)
+void SetHookMode(LAPI api, lua_State* L, HookMode mode)
 {
 
 	if (mode == HookMode_None)
@@ -406,12 +406,12 @@ void SetHookMode(unsigned long api, lua_State* L, HookMode mode)
 
 }
 
-int lua_gethookmask(unsigned long api, lua_State *L)
+int lua_gethookmask(LAPI api, lua_State *L)
 {
 	return g_interfaces[api].lua_gethookmask_dll_cdecl(L);
 }
 
-HookMode GetHookMode(unsigned long api, lua_State* L)
+HookMode GetHookMode(LAPI api, lua_State* L)
 {
 
 	int mask = lua_gethookmask(api, L);
@@ -435,17 +435,17 @@ HookMode GetHookMode(unsigned long api, lua_State* L)
 }
 
 
-bool GetIsHookEventRet(unsigned long api, int event)
+bool GetIsHookEventRet(LAPI api, int event)
 {
 	return event == LUA_HOOKRET || event == g_interfaces[api].hookTailRet;
 }
 
-bool GetIsHookEventCall(unsigned long api, int event)
+bool GetIsHookEventCall(LAPI api, int event)
 {
 	return event == LUA_HOOKCALL || event == g_interfaces[api].hookTailCall;
 }
 
-int GetEvent(unsigned long api, const lua_Debug* ar)
+int GetEvent(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -455,7 +455,7 @@ int GetEvent(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-int GetNups(unsigned long api, const lua_Debug* ar)
+int GetNups(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -465,7 +465,7 @@ int GetNups(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-int GetCurrentLine(unsigned long api, const lua_Debug* ar)
+int GetCurrentLine(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -475,7 +475,7 @@ int GetCurrentLine(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-int GetLineDefined(unsigned long api, const lua_Debug* ar)
+int GetLineDefined(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -485,7 +485,7 @@ int GetLineDefined(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-int GetLastLineDefined(unsigned long api, const lua_Debug* ar)
+int GetLastLineDefined(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -495,7 +495,7 @@ int GetLastLineDefined(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-const char* GetSource(unsigned long api, const lua_Debug* ar)
+const char* GetSource(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -505,7 +505,7 @@ const char* GetSource(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-const char* GetWhat(unsigned long api, const lua_Debug* ar)
+const char* GetWhat(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -515,7 +515,7 @@ const char* GetWhat(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-const char* GetName(unsigned long api, const lua_Debug* ar)
+const char* GetName(LAPI api, const lua_Debug* ar)
 {
 	switch (g_interfaces[api].version)
 	{
@@ -525,7 +525,7 @@ const char* GetName(unsigned long api, const lua_Debug* ar)
 	}
 }
 
-const char* GetHookEventName(unsigned long api, const lua_Debug* ar)
+const char* GetHookEventName(LAPI api, const lua_Debug* ar)
 {
 	int event = GetEvent(api, ar);
 	const char* eventType = "Unknown";
@@ -553,7 +553,7 @@ const char* GetHookEventName(unsigned long api, const lua_Debug* ar)
 	return eventType;
 }
 
-bool lua_pushthread_dll(unsigned long api, lua_State *L)
+bool lua_pushthread_dll(LAPI api, lua_State *L)
 {
 
 	// These structures are taken out of the Lua 5.0 source code.
@@ -680,12 +680,12 @@ bool lua_pushthread_dll(unsigned long api, lua_State *L)
 
 }
 
-void* lua_newuserdata_dll(unsigned long api, lua_State *L, size_t size)
+void* lua_newuserdata_dll(LAPI api, lua_State *L, size_t size)
 {
 	return g_interfaces[api].lua_newuserdata_dll_cdecl(L, size);
 }
 
-void EnableIntercepts(unsigned long apiIndex, bool enableIntercepts)
+void EnableIntercepts(LAPI apiIndex, bool enableIntercepts)
 {
 	int value = reinterpret_cast<int>(TlsGetValue(g_disableInterceptIndex));
 	if (enableIntercepts)
@@ -743,23 +743,23 @@ bool GetAreInterceptsEnabled()
 	return value <= 0;
 }
 
-void RegisterDebugLibrary(unsigned long api, lua_State* L)
+void RegisterDebugLibrary(LAPI api, lua_State* L)
 {
 	lua_register_dll(api, L, "emmy_output", g_interfaces[api].EmmyOutput);
 }
 
-int GetGlobalsIndex(unsigned long api)
+int GetGlobalsIndex(LAPI api)
 {
 	assert(g_interfaces[api].version >= 500 && g_interfaces[api].version < 520);
 	return g_interfaces[api].globalsIndex;
 }
 
-int GetRegistryIndex(unsigned long api)
+int GetRegistryIndex(LAPI api)
 {
 	return g_interfaces[api].registryIndex;
 }
 
-int lua_absindex_dll(unsigned long api, lua_State* L, int i)
+int lua_absindex_dll(LAPI api, lua_State* L, int i)
 {
 	if (g_interfaces[api].lua_absindex_dll_cdecl != nullptr)
 	{
@@ -777,7 +777,7 @@ int lua_absindex_dll(unsigned long api, lua_State* L, int i)
 	}
 }
 
-int lua_upvalueindex_dll(unsigned long api, int i)
+int lua_upvalueindex_dll(LAPI api, int i)
 {
 	if (g_interfaces[api].version >= LUA_V520)
 	{
@@ -789,7 +789,7 @@ int lua_upvalueindex_dll(unsigned long api, int i)
 	}
 }
 
-void lua_setglobal_dll(unsigned long api, lua_State* L, const char* s)
+void lua_setglobal_dll(LAPI api, lua_State* L, const char* s)
 {
 	if (g_interfaces[api].lua_setglobal_dll_cdecl != nullptr)
 	{
@@ -801,7 +801,7 @@ void lua_setglobal_dll(unsigned long api, lua_State* L, const char* s)
 	}
 }
 
-void lua_getglobal_dll(unsigned long api, lua_State* L, const char* s)
+void lua_getglobal_dll(LAPI api, lua_State* L, const char* s)
 {
 	if (g_interfaces[api].lua_getglobal_dll_cdecl != nullptr)
 	{
@@ -813,7 +813,7 @@ void lua_getglobal_dll(unsigned long api, lua_State* L, const char* s)
 	}
 }
 
-void lua_rawgetglobal_dll(unsigned long api, lua_State* L, const char* s)
+void lua_rawgetglobal_dll(LAPI api, lua_State* L, const char* s)
 {
 	lua_pushglobaltable_dll(api, L);
 	int glb = lua_gettop_dll(api, L);
@@ -822,7 +822,7 @@ void lua_rawgetglobal_dll(unsigned long api, lua_State* L, const char* s)
 	lua_remove_dll(api, L, glb);
 }
 
-lua_State* lua_newstate_dll(unsigned long api, lua_Alloc f, void* ud)
+lua_State* lua_newstate_dll(LAPI api, lua_Alloc f, void* ud)
 {
 	if (g_interfaces[api].lua_newstate_dll_cdecl != nullptr)
 	{
@@ -844,32 +844,32 @@ lua_State* lua_newstate_dll(unsigned long api, lua_Alloc f, void* ud)
 	return nullptr;
 }
 
-void lua_close_dll(unsigned long api, lua_State* L)
+void lua_close_dll(LAPI api, lua_State* L)
 {
 	g_interfaces[api].lua_close_dll_cdecl(L);
 }
 
-lua_State* lua_newthread_dll(unsigned long api, lua_State* L)
+lua_State* lua_newthread_dll(LAPI api, lua_State* L)
 {
 	return g_interfaces[api].lua_newthread_dll_cdecl(L);
 }
 
-int lua_error_dll(unsigned long api, lua_State* L)
+int lua_error_dll(LAPI api, lua_State* L)
 {
 	return g_interfaces[api].lua_error_dll_cdecl(L);
 }
 
-int lua_sethook_dll(unsigned long api, lua_State* L, lua_Hook f, int mask, int count)
+int lua_sethook_dll(LAPI api, lua_State* L, lua_Hook f, int mask, int count)
 {
 	return g_interfaces[api].lua_sethook_dll_cdecl(L, f, mask, count);
 }
 
-int lua_getinfo_dll(unsigned long api, lua_State* L, const char* what, lua_Debug* ar)
+int lua_getinfo_dll(LAPI api, lua_State* L, const char* what, lua_Debug* ar)
 {
 	return g_interfaces[api].lua_getinfo_dll_cdecl(L, what, ar);
 }
 
-void lua_remove_dll(unsigned long api, lua_State* L, int index)
+void lua_remove_dll(LAPI api, lua_State* L, int index)
 {
 	if (g_interfaces[api].version == LUA_V530) {
 		g_interfaces[api].lua_rotate_dll_cdecl(L, index, -1);
@@ -880,57 +880,57 @@ void lua_remove_dll(unsigned long api, lua_State* L, int index)
 	}
 }
 
-void lua_settable_dll(unsigned long api, lua_State* L, int index)
+void lua_settable_dll(LAPI api, lua_State* L, int index)
 {
 	g_interfaces[api].lua_settable_dll_cdecl(L, index);
 }
 
-void lua_gettable_dll(unsigned long api, lua_State* L, int index)
+void lua_gettable_dll(LAPI api, lua_State* L, int index)
 {
 	g_interfaces[api].lua_gettable_dll_cdecl(L, index);
 }
 
-void lua_rawget_dll(unsigned long api, lua_State* L, int idx)
+void lua_rawget_dll(LAPI api, lua_State* L, int idx)
 {
 	g_interfaces[api].lua_rawget_dll_cdecl(L, idx);
 }
 
-void lua_rawgeti_dll(unsigned long api, lua_State *L, int idx, int n)
+void lua_rawgeti_dll(LAPI api, lua_State *L, int idx, int n)
 {
 	g_interfaces[api].lua_rawgeti_dll_cdecl(L, idx, n);
 }
 
-void lua_rawset_dll(unsigned long api, lua_State* L, int idx)
+void lua_rawset_dll(LAPI api, lua_State* L, int idx)
 {
 	g_interfaces[api].lua_rawset_dll_cdecl(L, idx);
 }
 
-void lua_pushstring_dll(unsigned long api, lua_State* L, const char* s)
+void lua_pushstring_dll(LAPI api, lua_State* L, const char* s)
 {
 	g_interfaces[api].lua_pushstring_dll_cdecl(L, s);
 }
 
-void lua_pushlstring_dll(unsigned long api, lua_State* L, const char* s, size_t len)
+void lua_pushlstring_dll(LAPI api, lua_State* L, const char* s, size_t len)
 {
 	g_interfaces[api].lua_pushlstring_dll_cdecl(L, s, len);
 }
 
-int lua_type_dll(unsigned long api, lua_State* L, int index)
+int lua_type_dll(LAPI api, lua_State* L, int index)
 {
 	return g_interfaces[api].lua_type_dll_cdecl(L, index);
 }
 
-const char* lua_typename_dll(unsigned long api, lua_State* L, int type)
+const char* lua_typename_dll(LAPI api, lua_State* L, int type)
 {
 	return g_interfaces[api].lua_typename_dll_cdecl(L, type);
 }
 
-int lua_checkstack_dll(unsigned long api, lua_State* L, int extra)
+int lua_checkstack_dll(LAPI api, lua_State* L, int extra)
 {
 	return g_interfaces[api].lua_checkstack_dll_cdecl(L, extra);
 }
 
-void lua_getfield_dll(unsigned long api, lua_State* L, int index, const char* k)
+void lua_getfield_dll(LAPI api, lua_State* L, int index, const char* k)
 {
 
 	// Since Lua 4.0 doesn't include lua_getfield, we just emulate its
@@ -943,7 +943,7 @@ void lua_getfield_dll(unsigned long api, lua_State* L, int index, const char* k)
 
 }
 
-void lua_setfield_dll(unsigned long api, lua_State* L, int index, const char* k)
+void lua_setfield_dll(LAPI api, lua_State* L, int index, const char* k)
 {
 
 	// Since Lua 4.0 doesn't include lua_setfield, we just emulate its
@@ -957,27 +957,27 @@ void lua_setfield_dll(unsigned long api, lua_State* L, int index, const char* k)
 
 }
 
-void lua_settop_dll(unsigned long api, lua_State* L, int index)
+void lua_settop_dll(LAPI api, lua_State* L, int index)
 {
 	g_interfaces[api].lua_settop_dll_cdecl(L, index);
 }
 
-const char* lua_getlocal_dll(unsigned long api, lua_State* L, const lua_Debug* ar, int n)
+const char* lua_getlocal_dll(LAPI api, lua_State* L, const lua_Debug* ar, int n)
 {
 	return g_interfaces[api].lua_getlocal_dll_cdecl(L, ar, n);
 }
 
-const char* lua_setlocal_dll(unsigned long api, lua_State* L, const lua_Debug* ar, int n)
+const char* lua_setlocal_dll(LAPI api, lua_State* L, const lua_Debug* ar, int n)
 {
 	return g_interfaces[api].lua_setlocal_dll_cdecl(L, ar, n);
 }
 
-int lua_getstack_dll(unsigned long api, lua_State* L, int level, lua_Debug* ar)
+int lua_getstack_dll(LAPI api, lua_State* L, int level, lua_Debug* ar)
 {
 	return g_interfaces[api].lua_getstack_dll_cdecl(L, level, ar);
 }
 
-void lua_insert_dll(unsigned long api, lua_State* L, int index)
+void lua_insert_dll(LAPI api, lua_State* L, int index)
 {
 	if (g_interfaces[api].version == LUA_V530) {
 		g_interfaces[api].lua_rotate_dll_cdecl(L, index, 1);
@@ -987,27 +987,27 @@ void lua_insert_dll(unsigned long api, lua_State* L, int index)
 	}
 }
 
-void lua_pushnil_dll(unsigned long api, lua_State* L)
+void lua_pushnil_dll(LAPI api, lua_State* L)
 {
 	g_interfaces[api].lua_pushnil_dll_cdecl(L);
 }
 
-void lua_pushcclosure_dll(unsigned long api, lua_State* L, lua_CFunction fn, int n)
+void lua_pushcclosure_dll(LAPI api, lua_State* L, lua_CFunction fn, int n)
 {
 	g_interfaces[api].lua_pushcclosure_dll_cdecl(L, fn, n);
 }
 
-void lua_pushvalue_dll(unsigned long api, lua_State* L, int index)
+void lua_pushvalue_dll(LAPI api, lua_State* L, int index)
 {
 	g_interfaces[api].lua_pushvalue_dll_cdecl(L, index);
 }
 
-void lua_pushnumber_dll(unsigned long api, lua_State* L, lua_Number value)
+void lua_pushnumber_dll(LAPI api, lua_State* L, lua_Number value)
 {
 	g_interfaces[api].lua_pushnumber_dll_cdecl(L, value);
 }
 
-void lua_pushinteger_dll(unsigned long api, lua_State* L, int value)
+void lua_pushinteger_dll(LAPI api, lua_State* L, int value)
 {
 	if (g_interfaces[api].lua_pushinteger_dll_cdecl != nullptr)
 	{
@@ -1021,12 +1021,12 @@ void lua_pushinteger_dll(unsigned long api, lua_State* L, int value)
 	}
 }
 
-void lua_pushlightuserdata_dll(unsigned long api, lua_State* L, void* p)
+void lua_pushlightuserdata_dll(LAPI api, lua_State* L, void* p)
 {
 	g_interfaces[api].lua_pushlightuserdata_dll_cdecl(L, p);
 }
 
-void lua_pushglobaltable_dll(unsigned long api, lua_State* L)
+void lua_pushglobaltable_dll(LAPI api, lua_State* L)
 {
 	if (g_interfaces[api].version >= LUA_V520)
 	{
@@ -1038,7 +1038,7 @@ void lua_pushglobaltable_dll(unsigned long api, lua_State* L)
 	}
 }
 
-const char* lua_tostring_dll(unsigned long api, lua_State* L, int index)
+const char* lua_tostring_dll(LAPI api, lua_State* L, int index)
 {
 	if (g_interfaces[api].lua_tostring_dll_cdecl != nullptr)
 	{
@@ -1052,7 +1052,7 @@ const char* lua_tostring_dll(unsigned long api, lua_State* L, int index)
 	}
 }
 
-const char* lua_tolstring_dll(unsigned long api, lua_State* L, int index, size_t* len)
+const char* lua_tolstring_dll(LAPI api, lua_State* L, int index, size_t* len)
 {
 	if (g_interfaces[api].lua_tolstring_dll_cdecl != nullptr)
 	{
@@ -1084,12 +1084,12 @@ const char* lua_tolstring_dll(unsigned long api, lua_State* L, int index, size_t
 	}
 }
 
-int lua_toboolean_dll(unsigned long api, lua_State* L, int index)
+int lua_toboolean_dll(LAPI api, lua_State* L, int index)
 {
 	return g_interfaces[api].lua_toboolean_dll_cdecl(L, index);
 }
 
-int lua_tointeger_dll(unsigned long api, lua_State* L, int index)
+int lua_tointeger_dll(LAPI api, lua_State* L, int index)
 {
 	if (g_interfaces[api].lua_tointegerx_dll_cdecl != nullptr)
 	{
@@ -1108,12 +1108,12 @@ int lua_tointeger_dll(unsigned long api, lua_State* L, int index)
 	}
 }
 
-lua_CFunction lua_tocfunction_dll(unsigned long api, lua_State* L, int index)
+lua_CFunction lua_tocfunction_dll(LAPI api, lua_State* L, int index)
 {
 	return g_interfaces[api].lua_tocfunction_dll_cdecl(L, index);
 }
 
-lua_Number lua_tonumber_dll(unsigned long api, lua_State* L, int index)
+lua_Number lua_tonumber_dll(LAPI api, lua_State* L, int index)
 {
 	if (g_interfaces[api].lua_tonumberx_dll_cdecl != nullptr)
 	{
@@ -1124,17 +1124,17 @@ lua_Number lua_tonumber_dll(unsigned long api, lua_State* L, int index)
 	return g_interfaces[api].lua_tonumber_dll_cdecl(L, index);
 }
 
-void* lua_touserdata_dll(unsigned long api, lua_State *L, int index)
+void* lua_touserdata_dll(LAPI api, lua_State *L, int index)
 {
 	return g_interfaces[api].lua_touserdata_dll_cdecl(L, index);
 }
 
-int lua_gettop_dll(unsigned long api, lua_State* L)
+int lua_gettop_dll(LAPI api, lua_State* L)
 {
 	return g_interfaces[api].lua_gettop_dll_cdecl(L);
 }
 
-int lua_loadbuffer_dll(unsigned long api, lua_State* L, const char* buffer, size_t size, const char* chunkname, const char* mode)
+int lua_loadbuffer_dll(LAPI api, lua_State* L, const char* buffer, size_t size, const char* chunkname, const char* mode)
 {
 	Memory memory;
 
@@ -1153,17 +1153,17 @@ int lua_loadbuffer_dll(unsigned long api, lua_State* L, const char* buffer, size
 	return 0;
 }
 
-void lua_call_dll(unsigned long api, lua_State* L, int nargs, int nresults)
+void lua_call_dll(LAPI api, lua_State* L, int nargs, int nresults)
 {
 	return g_interfaces[api].lua_call_dll_cdecl(L, nargs, nresults);
 }
 
-int lua_pcallk_dll(unsigned long api, lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
+int lua_pcallk_dll(LAPI api, lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
 {
 	return g_interfaces[api].lua_pcallk_dll_cdecl(L, nargs, nresults, errfunc, ctx, k);
 }
 
-int lua_pcall_dll(unsigned long api, lua_State* L, int nargs, int nresults, int errfunc)
+int lua_pcall_dll(LAPI api, lua_State* L, int nargs, int nresults, int errfunc)
 {
 	// Lua 5.2.
 	if (g_interfaces[api].lua_pcallk_dll_cdecl != nullptr)
@@ -1174,7 +1174,7 @@ int lua_pcall_dll(unsigned long api, lua_State* L, int nargs, int nresults, int 
 	return g_interfaces[api].lua_pcall_dll_cdecl(L, nargs, nresults, errfunc);
 }
 
-void lua_newtable_dll(unsigned long api, lua_State* L)
+void lua_newtable_dll(LAPI api, lua_State* L)
 {
 
 	if (g_interfaces[api].lua_newtable_dll_cdecl != nullptr)
@@ -1190,27 +1190,27 @@ void lua_newtable_dll(unsigned long api, lua_State* L)
 
 }
 
-int lua_next_dll(unsigned long api, lua_State* L, int index)
+int lua_next_dll(LAPI api, lua_State* L, int index)
 {
 	return g_interfaces[api].lua_next_dll_cdecl(L, index);
 }
 
-int lua_rawequal_dll(unsigned long api, lua_State *L, int idx1, int idx2)
+int lua_rawequal_dll(LAPI api, lua_State *L, int idx1, int idx2)
 {
 	return g_interfaces[api].lua_rawequal_dll_cdecl(L, idx1, idx2);
 }
 
-int lua_getmetatable_dll(unsigned long api, lua_State* L, int index)
+int lua_getmetatable_dll(LAPI api, lua_State* L, int index)
 {
 	return g_interfaces[api].lua_getmetatable_dll_cdecl(L, index);
 }
 
-int lua_setmetatable_dll(unsigned long api, lua_State* L, int index)
+int lua_setmetatable_dll(LAPI api, lua_State* L, int index)
 {
 	return g_interfaces[api].lua_setmetatable_dll_cdecl(L, index);
 }
 
-int luaL_ref_dll(unsigned long api, lua_State *L, int t)
+int luaL_ref_dll(LAPI api, lua_State *L, int t)
 {
 	if (g_interfaces[api].luaL_ref_dll_cdecl != nullptr)
 	{
@@ -1221,42 +1221,42 @@ int luaL_ref_dll(unsigned long api, lua_State *L, int t)
 	return LUA_NOREF;
 }
 
-void luaL_unref_dll(unsigned long api, lua_State *L, int t, int ref)
+void luaL_unref_dll(LAPI api, lua_State *L, int t, int ref)
 {
 	g_interfaces[api].luaL_unref_dll_cdecl(L, t, ref);
 }
 
-int luaL_newmetatable_dll(unsigned long api, lua_State *L, const char *tname)
+int luaL_newmetatable_dll(LAPI api, lua_State *L, const char *tname)
 {
 	return g_interfaces[api].luaL_newmetatable_dll_cdecl(L, tname);
 }
 
-int luaL_loadbuffer_dll(unsigned long api, lua_State *L, const char *buff, size_t sz, const char *name)
+int luaL_loadbuffer_dll(LAPI api, lua_State *L, const char *buff, size_t sz, const char *name)
 {
 	return g_interfaces[api].luaL_loadbuffer_dll_cdecl(L, buff, sz, name);
 }
 
-int luaL_loadbufferx_dll(unsigned long api, lua_State *L, const char *buff, size_t sz, const char *name, const char* mode)
+int luaL_loadbufferx_dll(LAPI api, lua_State *L, const char *buff, size_t sz, const char *name, const char* mode)
 {
 	return g_interfaces[api].luaL_loadbufferx_dll_cdecl(L, buff, sz, name, mode);
 }
 
-int luaL_loadfile_dll(unsigned long api, lua_State* L, const char* fileName)
+int luaL_loadfile_dll(LAPI api, lua_State* L, const char* fileName)
 {
 	return g_interfaces[api].luaL_loadfile_dll_cdecl(L, fileName);
 }
 
-int luaL_loadfilex_dll(unsigned long api, lua_State* L, const char* fileName, const char* mode)
+int luaL_loadfilex_dll(LAPI api, lua_State* L, const char* fileName, const char* mode)
 {
 	return g_interfaces[api].luaL_loadfilex_dll_cdecl(L, fileName, mode);
 }
 
-lua_State* luaL_newstate_dll(unsigned long api)
+lua_State* luaL_newstate_dll(LAPI api)
 {
 	return g_interfaces[api].luaL_newstate_dll_cdecl();
 }
 
-const lua_WChar* lua_towstring_dll(unsigned long api, lua_State* L, int index)
+const lua_WChar* lua_towstring_dll(LAPI api, lua_State* L, int index)
 {
 	if (g_interfaces[api].lua_towstring_dll_cdecl != nullptr)
 	{
@@ -1269,7 +1269,7 @@ const lua_WChar* lua_towstring_dll(unsigned long api, lua_State* L, int index)
 	}
 }
 
-int lua_iswstring_dll(unsigned long api, lua_State* L, int index)
+int lua_iswstring_dll(LAPI api, lua_State* L, int index)
 {
 	if (g_interfaces[api].lua_iswstring_dll_cdecl != nullptr)
 	{
@@ -1282,17 +1282,17 @@ int lua_iswstring_dll(unsigned long api, lua_State* L, int index)
 	}
 }
 
-const char* lua_getupvalue_dll(unsigned long api, lua_State *L, int funcindex, int n)
+const char* lua_getupvalue_dll(LAPI api, lua_State *L, int funcindex, int n)
 {
 	return g_interfaces[api].lua_getupvalue_dll_cdecl(L, funcindex, n);
 }
 
-const char* lua_setupvalue_dll(unsigned long api, lua_State *L, int funcindex, int n)
+const char* lua_setupvalue_dll(LAPI api, lua_State *L, int funcindex, int n)
 {
 	return g_interfaces[api].lua_setupvalue_dll_cdecl(L, funcindex, n);
 }
 
-void lua_getfenv_dll(unsigned long api, lua_State *L, int index)
+void lua_getfenv_dll(LAPI api, lua_State *L, int index)
 {
 	if (g_interfaces[api].lua_getfenv_dll_cdecl != nullptr)
 	{
@@ -1317,7 +1317,7 @@ void lua_getfenv_dll(unsigned long api, lua_State *L, int index)
 	}
 }
 
-int lua_setfenv_dll(unsigned long api, lua_State *L, int index)
+int lua_setfenv_dll(LAPI api, lua_State *L, int index)
 {
 	if (g_interfaces[api].lua_setfenv_dll_cdecl != nullptr)
 	{
@@ -1378,7 +1378,7 @@ HMODULE WINAPI LoadLibraryExW_intercept(LPCWSTR fileName, HANDLE hFile, DWORD dw
 
 }
 
-void lua_call_worker(unsigned long api, lua_State* L, int nargs, int nresults)
+void lua_call_worker(LAPI api, lua_State* L, int nargs, int nresults)
 {
 	DebugBackend::Get().AttachState(api, L);
 
@@ -1398,7 +1398,7 @@ void lua_call_intercept(lua_State* L, int nargs, int nresults)
 {
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1406,7 +1406,7 @@ void lua_call_intercept(lua_State* L, int nargs, int nresults)
 	lua_call_worker(api, L, nargs, nresults);
 }
 
-void lua_callk_worker(unsigned long api, lua_State* L, int nargs, int nresults, int ctk, lua_CFunction k)
+void lua_callk_worker(LAPI api, lua_State* L, int nargs, int nresults, int ctk, lua_CFunction k)
 {
 	DebugBackend::Get().AttachState(api, L);
 
@@ -1427,7 +1427,7 @@ void lua_callk_intercept(lua_State* L, int nargs, int nresults, int ctx, lua_CFu
 {
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1435,7 +1435,7 @@ void lua_callk_intercept(lua_State* L, int nargs, int nresults, int ctx, lua_CFu
 	lua_callk_worker(api, L, nargs, nresults, ctx, k);
 }
 
-int lua_pcall_worker(unsigned long api, lua_State* L, int nargs, int nresults, int errfunc)
+int lua_pcall_worker(LAPI api, lua_State* L, int nargs, int nresults, int errfunc)
 {
 
 	int result;
@@ -1466,7 +1466,7 @@ int lua_pcall_intercept(lua_State* L, int nargs, int nresults, int errfunc)
 	int     result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1475,7 +1475,7 @@ int lua_pcall_intercept(lua_State* L, int nargs, int nresults, int errfunc)
 	return result;
 }
 
-int lua_pcallk_worker(unsigned long api, lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
+int lua_pcallk_worker(LAPI api, lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
 {
 	int result;
 
@@ -1507,7 +1507,7 @@ int lua_pcallk_intercept(lua_State* L, int nargs, int nresults, int errfunc, int
 	
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1516,7 +1516,7 @@ int lua_pcallk_intercept(lua_State* L, int nargs, int nresults, int errfunc, int
 	return result;
 }
 
-lua_State* lua_newstate_worker(unsigned long api, lua_Alloc f, void* ud)
+lua_State* lua_newstate_worker(LAPI api, lua_Alloc f, void* ud)
 {
 	lua_State* result = nullptr;
 	if (g_interfaces[api].lua_newstate_dll_cdecl != nullptr)
@@ -1539,7 +1539,7 @@ lua_State* lua_newstate_intercept(lua_Alloc f, void* ud)
 	lua_State*      result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1548,7 +1548,7 @@ lua_State* lua_newstate_intercept(lua_Alloc f, void* ud)
 	return result;
 }
 
-lua_State* lua_newthread_worker(unsigned long api, lua_State* L)
+lua_State* lua_newthread_worker(LAPI api, lua_State* L)
 {
 	lua_State* result = nullptr;
 	if (g_interfaces[api].lua_newthread_dll_cdecl != nullptr)
@@ -1571,7 +1571,7 @@ lua_State* lua_newthread_intercept(lua_State* L)
 	lua_State*      result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
@@ -1579,7 +1579,7 @@ lua_State* lua_newthread_intercept(lua_State* L)
 	return result;
 }
 
-lua_State* lua_open_worker(unsigned long api, int stacksize)
+lua_State* lua_open_worker(LAPI api, int stacksize)
 {
 	lua_State* result = nullptr;
 	if (g_interfaces[api].lua_open_dll_cdecl != nullptr)
@@ -1595,7 +1595,7 @@ lua_State* lua_open_worker(unsigned long api, int stacksize)
 	return result;
 }
 
-lua_State* lua_open_500_worker(unsigned long api)
+lua_State* lua_open_500_worker(LAPI api)
 {
 	lua_State* result = nullptr;
 
@@ -1620,7 +1620,7 @@ lua_State* lua_open_intercept(int stacksize)
 
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1637,7 +1637,7 @@ lua_State* lua_open_500_intercept()
 
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1646,7 +1646,7 @@ lua_State* lua_open_500_intercept()
 	return result;
 }
 
-int lua_load_worker(unsigned long api, lua_State* L, lua_Reader reader, void* data, const char* name, const char* mode)
+int lua_load_worker(LAPI api, lua_State* L, lua_Reader reader, void* data, const char* name, const char* mode)
 {
 	// If we haven't finished loading yet this will be wrong, but we'll fix it up
 	// when we access the reader function.
@@ -1715,7 +1715,7 @@ int lua_load_510_intercept(lua_State* L, lua_Reader reader, void* data, const ch
 
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1732,7 +1732,7 @@ int lua_load_intercept(lua_State* L, lua_Reader reader, void* data, const char* 
 
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1741,7 +1741,7 @@ int lua_load_intercept(lua_State* L, lua_Reader reader, void* data, const char* 
 	return result;
 }
 
-void lua_close_worker(unsigned long api, lua_State* L)
+void lua_close_worker(LAPI api, lua_State* L)
 {
 	if (g_interfaces[api].lua_close_dll_cdecl != nullptr)
 	{
@@ -1757,7 +1757,7 @@ void lua_close_intercept(lua_State* L)
 {
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1765,7 +1765,7 @@ void lua_close_intercept(lua_State* L)
 	lua_close_worker(api, L);
 }
 
-int luaL_newmetatable_worker(unsigned long api, lua_State *L, const char* tname)
+int luaL_newmetatable_worker(LAPI api, lua_State *L, const char* tname)
 {
 	int result;
 	if (g_interfaces[api].luaL_newmetatable_dll_cdecl != nullptr)
@@ -1788,7 +1788,7 @@ int luaL_newmetatable_intercept(lua_State* L, const char* tname)
 	int     result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1797,7 +1797,7 @@ int luaL_newmetatable_intercept(lua_State* L, const char* tname)
 	return result;
 }
 
-int lua_sethook_worker(unsigned long api, lua_State *L, lua_Hook f, int mask, int count)
+int lua_sethook_worker(LAPI api, lua_State *L, lua_Hook f, int mask, int count)
 {
 
 	// Currently we're using the hook and can't let anyone else use it.
@@ -1836,7 +1836,7 @@ int lua_sethook_intercept(lua_State *L, lua_Hook f, int mask, int count)
 
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1845,7 +1845,7 @@ int lua_sethook_intercept(lua_State *L, lua_Hook f, int mask, int count)
 	return result;
 }
 
-int luaL_loadbufferx_worker(unsigned long api, lua_State *L, const char *buff, size_t sz, const char *name, const char* mode)
+int luaL_loadbufferx_worker(LAPI api, lua_State *L, const char *buff, size_t sz, const char *name, const char* mode)
 {
 
 	int result = 0;
@@ -1873,7 +1873,7 @@ int luaL_loadbuffer_intercept(lua_State *L, const char *buff, size_t sz, const c
 	int     result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interfering with the inline assembly and other strange
 	// aspects of this function.
@@ -1889,7 +1889,7 @@ int luaL_loadbufferx_intercept(lua_State *L, const char *buff, size_t sz, const 
 	int     result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interfering with the inline assembly and other strange
 	// aspects of this function.
@@ -1897,7 +1897,7 @@ int luaL_loadbufferx_intercept(lua_State *L, const char *buff, size_t sz, const 
 	return result;
 }
 
-int luaL_loadfilex_worker(unsigned long api, lua_State *L, const char *fileName, const char* mode)
+int luaL_loadfilex_worker(LAPI api, lua_State *L, const char *fileName, const char* mode)
 {
 
 	int result = 0;
@@ -1948,7 +1948,7 @@ int luaL_loadfile_intercept(lua_State *L, const char *fileName)
 	int     result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
@@ -1963,7 +1963,7 @@ int luaL_loadfilex_intercept(lua_State *L, const char *fileName, const char* mod
 	int     result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
@@ -1971,7 +1971,7 @@ int luaL_loadfilex_intercept(lua_State *L, const char *fileName, const char* mod
 	return result;
 }
 
-lua_State* luaL_newstate_worker(unsigned long api)
+lua_State* luaL_newstate_worker(LAPI api)
 {
 	lua_State* result = nullptr;
 
@@ -2005,7 +2005,7 @@ lua_State* luaL_newstate_intercept()
 	lua_State*      result;
 	LPVOID lp;
 	LhBarrierGetCallback(&lp);
-	unsigned long api = (unsigned long)lp;
+	LAPI api = (LAPI)lp;
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
@@ -2904,7 +2904,7 @@ bool GetIsLuaLoaded()
 
 struct CFunctionArgs
 {
-	unsigned long       api;
+	LAPI       api;
 	lua_CFunction_dll   function;
 };
 
@@ -2922,7 +2922,7 @@ int CFunctionHandler(lua_State* L)
 	return result;
 }
 
-void* CreateCFunction(unsigned long api, void* function, void* intercept)
+void* CreateCFunction(LAPI api, void* function, void* intercept)
 {
 	// This is never deallocated, but it doesn't really matter since we never
 	// destroy these functions.

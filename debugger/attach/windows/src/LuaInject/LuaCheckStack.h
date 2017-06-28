@@ -36,7 +36,7 @@ class LuaCheckStack
 
 public:
 
-    LuaCheckStack(unsigned long api, lua_State* L, int delta);
+    LuaCheckStack(LAPI api, lua_State* L, int delta);
     ~LuaCheckStack();
 
 private:

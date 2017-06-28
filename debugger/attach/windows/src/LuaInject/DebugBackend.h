@@ -76,18 +76,18 @@ public:
     /**
      * Attaches the debugger to the state.
      */
-    VirtualMachine* AttachState(unsigned long api, lua_State* L);
+    VirtualMachine* AttachState(LAPI api, lua_State* L);
 
     /**
      * Detaches the debugger from the state.
      */
-    void DetachState(unsigned long api, lua_State* L);
+    void DetachState(LAPI api, lua_State* L);
 
     /**
      * Sends information about the script to the front end. This is called after
      * calling the lua_load (or similar) method.
      */
-    int PostLoadScript(unsigned long api, int result, lua_State* L, const char* source, size_t size, const char* name);
+    int PostLoadScript(LAPI api, int result, lua_State* L, const char* source, size_t size, const char* name);
 
     /**
      * Registers a script with the backend. This will tell track this source file
@@ -98,7 +98,7 @@ public:
      */
     int RegisterScript(lua_State* L, const char* source, size_t size, const char* name, bool unavailable);
 
-    int RegisterScript(unsigned long api, lua_State* L, lua_Debug* ar);
+    int RegisterScript(LAPI api, lua_State* L, lua_Debug* ar);
 
     /**
      * Steps execution of a "broken" script by one line. If the current line
@@ -131,7 +131,7 @@ public:
      * Evalates the expression. If there was an error evaluating the expression the
      * method returns false and the error message is stored in the result.
      */
-    bool Evaluate(unsigned long api, lua_State* L, const std::string& expression, int stackLevel, int depth, std::string& result);
+    bool Evaluate(LAPI api, lua_State* L, const std::string& expression, int stackLevel, int depth, std::string& result);
 
     /**
      * Toggles a breakpoint on the line on or off.
@@ -153,7 +153,7 @@ public:
      * Calls the function on the top of the stack in a protected environment that
      * triggers a debugger exception on error.
      */
-    int Call(unsigned long api, lua_State* L, int nargs, int nresults, int errorfunc) const;
+    int Call(LAPI api, lua_State* L, int nargs, int nresults, int errorfunc) const;
 
     /**
      * Returns the index of the script in the scripts array with the specified
@@ -162,25 +162,25 @@ public:
      */
     int GetScriptIndex(const char* name) const;
 
-    bool StackHasBreakpoint(unsigned long api, lua_State* L);
+    bool StackHasBreakpoint(LAPI api, lua_State* L);
 
     /**
      * Returns the class name associated with the metatable index. This makes
      * a few assumptions, namely that the metatable was associated with a global
      * variable which is the class name (i.e. what luaL_newmetatable does).
      */
-    bool GetClassNameForMetatable(unsigned long api, lua_State* L, int mt) const;
+    bool GetClassNameForMetatable(LAPI api, lua_State* L, int mt) const;
 
     /**
      * Pushes onto the stack the class name for a userdata.
      */
-    const char* GetClassNameForUserdata(unsigned long api, lua_State* L, int ud) const;
+    const char* GetClassNameForUserdata(LAPI api, lua_State* L, int ud) const;
 
     /**
      * Called to register a metatable with a class name. This allows the lookup
      * of class names based on the userdata object's metatable.
      */
-    void RegisterClassName(unsigned long api, lua_State* L, const char* name, int metaTable);
+    void RegisterClassName(LAPI api, lua_State* L, const char* name, int metaTable);
 
     /**
      * Sends a text message to the front end.
@@ -201,19 +201,19 @@ public:
      * Callback from Lua when a debug event (new line, function enter or exit)
      * occurs.
      */
-    void HookCallback(unsigned long api, lua_State* L, lua_Debug* ar);
+    void HookCallback(LAPI api, lua_State* L, lua_Debug* ar);
 
     /**
      * Called when a new API is created.
      */
-    void CreateApi(unsigned long api);
+    void CreateApi(LAPI api);
 
     /**
      * Enables or disable just-in-time compilation for the state. If LuaJIT is not being used
      * this has no effect and returns false. If JIT was successfully enabled or disabled the 
      * function returns true.
      */
-    bool EnableJit(unsigned long api, lua_State* L, bool enable) const;
+    bool EnableJit(LAPI api, lua_State* L, bool enable) const;
 
 private:
 	class Breakpoint
@@ -256,7 +256,7 @@ private:
     {
 		bool success;
 		lua_State* L;
-		unsigned long api;
+		LAPI api;
         int             stackLevel;
 		int				depth;
         std::string     expression;
@@ -294,14 +294,14 @@ private:
      * Breaks from inside the script code. This will block until execution
      * is resumed.
      */
-    void BreakFromScript(unsigned long api, lua_State* L);
+    void BreakFromScript(LAPI api, lua_State* L);
 
-	bool CheckCondition(unsigned long api, lua_State* L, Breakpoint* bp);
+	bool CheckCondition(LAPI api, lua_State* L, Breakpoint* bp);
 
     /**
      * Error handling call back for relaying exceptions.
      */
-    int ErrorHandler(unsigned long api, lua_State* L);
+    int ErrorHandler(LAPI api, lua_State* L);
 
     /**
      * Static version of the error handler that just forwards to the non-static
@@ -315,7 +315,7 @@ private:
      * be skipped. This is usful when the current execution point is an error
      * handler we defined.
      */
-    void SendBreakEvent(unsigned long api, lua_State* L, int stackTop = 0);
+    void SendBreakEvent(LAPI api, lua_State* L, int stackTop = 0);
 
     /**
      * Sends an exception event to the frontend. Break events should be sent
@@ -333,19 +333,19 @@ private:
      * Gets the value at location n on the stack as text. If expandTable is true
      * then tables will be returned in their expanded form (i.e. "{ ... }")
      */
-    TiXmlNode* GetValueAsText(unsigned long api, lua_State* L, int n, int maxDepth = 10, const char* typeNameOverride = NULL, bool displayAsKey = false) const;
+    TiXmlNode* GetValueAsText(LAPI api, lua_State* L, int n, int maxDepth = 10, const char* typeNameOverride = NULL, bool displayAsKey = false) const;
 
     /**
      * Gets the value at location n on the stack as text. If expandTable is true
      * then tables will be returned in their expanded form (i.e. "{ ... }")
      */
-    TiXmlNode* GetLuaBindClassValue(unsigned long api, lua_State* L, unsigned int maxDepth, bool displayAsKey = false) const;
+    TiXmlNode* GetLuaBindClassValue(LAPI api, lua_State* L, unsigned int maxDepth, bool displayAsKey = false) const;
 
     /**
      * Gets the table value at location n on the stack as text. Nested tables are
      * not expanded.
      */
-    TiXmlNode* GetTableAsText(unsigned long api, lua_State* L, int t, int maxDepth = 10, const char* typeNameOverride = NULL) const;
+    TiXmlNode* GetTableAsText(LAPI api, lua_State* L, int t, int maxDepth = 10, const char* typeNameOverride = NULL) const;
 
     /**
      * Returns true if the name belongs to a Lua internal variable that we
@@ -356,12 +356,12 @@ private:
     /**
      * This is semantically equivalent to luaL_loadstring.
      */
-    int LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const char* string, size_t size, const char* name) const;
+    int LoadScriptWithoutIntercept(LAPI api, lua_State* L, const char* string, size_t size, const char* name) const;
 
     /**
      * This is semantically equivalent to luaL_loadstring.
      */
-    int LoadScriptWithoutIntercept(unsigned long api, lua_State* L, const std::string& string) const;
+    int LoadScriptWithoutIntercept(LAPI api, lua_State* L, const std::string& string) const;
     
     /**
      * Called by the front end once the DLL is finished loading to finish
@@ -407,7 +407,7 @@ private:
         int             callStackDepth;
         int             lastStepLine;
         int             lastStepScript;
-        unsigned long   api;
+        LAPI   api;
         std::string     name;
         unsigned int    stackTop;
         bool            luaJitWorkAround;
@@ -460,48 +460,48 @@ private:
      * value is true and the table is placed on the stack. Otherwise the function returns false and
      * nothing is put on the stack.
      */
-    bool CreateEnvironment(unsigned long api, lua_State* L, int stackLevel, int nilSentinel);
+    bool CreateEnvironment(LAPI api, lua_State* L, int stackLevel, int nilSentinel);
 
     /**
      * Chains two tables together so that accessing members of a child table that don't exist
      * will then attempt to access them on the parent table.
      */
-    void ChainTables(unsigned long api, lua_State* L, int child, int parent) const;
+    void ChainTables(LAPI api, lua_State* L, int child, int parent) const;
 
     /**
      *
      */
-    void CreateChainedTable(unsigned long api, lua_State* L, int nilSentinel, int localTable, int upValueTable, int globalTable);
+    void CreateChainedTable(LAPI api, lua_State* L, int nilSentinel, int localTable, int upValueTable, int globalTable);
 
     /**
      * Sets the values of the locals at the specified stack level based on values in the table.
      * Values which are equal to the value stored at the nilSentinel stack index will be converted
      * to nils.
      */
-    void SetLocals(unsigned long api, lua_State* L, int stackLevel, int localTable, int nilSentinel) const;
+    void SetLocals(LAPI api, lua_State* L, int stackLevel, int localTable, int nilSentinel) const;
 
     /**
      * Sets the values of the up values at the specified stack level based on values in the table.
      * Values which are equal to the value stored at the nilSentinel stack index will be converted
      * to nils.
      */
-    void SetUpValues(unsigned long api, lua_State* L, int stackLevel, int upValueTable, int nilSentinel) const;
+    void SetUpValues(LAPI api, lua_State* L, int stackLevel, int upValueTable, int nilSentinel) const;
 
     /**
      * Sets the function (on the top of the Lua stack) to be called when a Lua
      * object is garbage collected.
      */
-    void SetGarbageCollectionCallback(unsigned long api, lua_State* L, int index) const;
+    void SetGarbageCollectionCallback(LAPI api, lua_State* L, int index) const;
 
     /**
      * Creates a new table with weak keys or values (specified by setting the type as "k" or "v").
      */
-    void CreateWeakTable(unsigned long api, lua_State* L, const char* type) const;
+    void CreateWeakTable(LAPI api, lua_State* L, const char* type) const;
 
     /**
      * Returns the index of the API that the VM was created in.
      */
-    unsigned long GetApiForVm(lua_State* L) const;
+	LAPI GetApiForVm(lua_State* L) const;
 
     /**
      * Callback when a thread is garbage collected.
@@ -512,7 +512,7 @@ private:
      * Calls the function on the top of the stack when the garbage collector runs.
      * The function is popped from the stack.
      */
-    void CreateGarbageCollectionSentinel(unsigned long api, lua_State* L) const;
+    void CreateGarbageCollectionSentinel(LAPI api, lua_State* L) const;
 
     /**
      * Used by the mechism to setup a garbage collection callback. This function is used
@@ -533,9 +533,9 @@ private:
     /**
      * Logs information about a hook callback event. This is used for debugging.
      */
-    void LogHookEvent(unsigned long api, lua_State* L, lua_Debug* ar);
+    void LogHookEvent(LAPI api, lua_State* L, lua_Debug* ar);
 
-    void UpdateHookMode(unsigned long api, lua_State* L, lua_Debug* hookEvent);
+    void UpdateHookMode(LAPI api, lua_State* L, lua_Debug* hookEvent);
 
     /**
      * Calls the named meta-method for the specified value. If the value does
@@ -543,7 +543,7 @@ private:
      * Otherwise the result of calling the method is stored in the result parameter
      * (same return as lua_pcall).
      */
-    bool CallMetaMethod(unsigned long api, lua_State* L, int valueIndex, const char* method, int numResults, int& result) const;
+    bool CallMetaMethod(LAPI api, lua_State* L, int valueIndex, const char* method, int numResults, int& result) const;
 
     /**
      * Gets the current C/C++ call stack.
@@ -554,12 +554,12 @@ private:
      * Creates a new table on the top of the stack which is the result of merging
      * the two specified tables.
      */
-    void MergeTables(unsigned long api, lua_State* L, unsigned int tableIndex1, unsigned int tableIndex2) const;
+    void MergeTables(LAPI api, lua_State* L, unsigned int tableIndex1, unsigned int tableIndex2) const;
 
     /**
      * Gets the number of functions on the Lua stack.
      */
-    int GetStackDepth(unsigned long api, lua_State* L) const;
+    int GetStackDepth(LAPI api, lua_State* L) const;
 
     /**
      * Returns the virtual machine that corresponds to the specified Lua state.
@@ -571,7 +571,7 @@ private:
      * Creates a call stack that unifies the native call stack and the script
      * call stack.
      */
-    unsigned int GetUnifiedStack(unsigned long api, const StackEntry nativeStack[], unsigned int nativeStackSize,
+    unsigned int GetUnifiedStack(LAPI api, const StackEntry nativeStack[], unsigned int nativeStackSize,
         const lua_Debug scriptStack[], unsigned int scriptStackSize,
         StackEntry unifiedStack[]) const;
 

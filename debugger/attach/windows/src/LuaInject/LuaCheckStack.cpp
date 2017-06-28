@@ -23,7 +23,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include "LuaCheckStack.h"    
 #include <assert.h>
 
-LuaCheckStack::LuaCheckStack(unsigned long api, lua_State* L, int delta)
+LuaCheckStack::LuaCheckStack(LAPI api, lua_State* L, int delta)
 {
     m_api   = api;
     m_L     = L;

@@ -104,7 +104,7 @@ extern "C"
 	typedef void (*lua_Hook) (lua_State *L, lua_Debug *ar);
 	typedef int (*lua_CFunction) (lua_State *L);
 	typedef const char * (*lua_Reader) (lua_State *L, void *ud, size_t *sz);
-
+	typedef unsigned long LAPI;
 } // extern "C"
 
 #endif // __LuaTypes_h__
