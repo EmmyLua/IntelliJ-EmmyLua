@@ -29,6 +29,10 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LuaPlus.h>
 
+#define GetHookedAPI(api) LPVOID lp; \
+	LhBarrierGetCallback(&lp); \
+	LAPI api = (LAPI)lp;
+
 typedef int (*lua_CFunction_dll) (LAPI api, lua_State *L);
 
 lua_State*      lua_newstate_dll        (LAPI api, lua_Alloc, void*);

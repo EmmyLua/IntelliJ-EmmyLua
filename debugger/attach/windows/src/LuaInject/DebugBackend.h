@@ -215,6 +215,18 @@ public:
      */
     bool EnableJit(LAPI api, lua_State* L, bool enable) const;
 
+	void RegisterEmmyLibrary(LAPI api, lua_State* L) const;
+
+	/**
+	* Gets the value at location n on the stack as text. If expandTable is true
+	* then tables will be returned in their expanded form (i.e. "{ ... }")
+	*/
+	TiXmlNode* GetValueAsText(LAPI api, lua_State* L, int n, int maxDepth = 10, const char* typeNameOverride = nullptr, bool displayAsKey = false, bool askEmmy = true) const;
+
+	/**
+	* Returns the index of the API that the VM was created in.
+	*/
+	LAPI GetApiForVm(lua_State* L) const;
 private:
 	class Breakpoint
 	{
@@ -328,12 +340,6 @@ private:
      * Gets the directory that the DLL is in. The directory ends in a slash.
      */
     bool GetStartupDirectory(char* path, int maxPathLength) const;
-
-    /**
-     * Gets the value at location n on the stack as text. If expandTable is true
-     * then tables will be returned in their expanded form (i.e. "{ ... }")
-     */
-    TiXmlNode* GetValueAsText(LAPI api, lua_State* L, int n, int maxDepth = 10, const char* typeNameOverride = NULL, bool displayAsKey = false) const;
 
     /**
      * Gets the value at location n on the stack as text. If expandTable is true
@@ -497,11 +503,6 @@ private:
      * Creates a new table with weak keys or values (specified by setting the type as "k" or "v").
      */
     void CreateWeakTable(LAPI api, lua_State* L, const char* type) const;
-
-    /**
-     * Returns the index of the API that the VM was created in.
-     */
-	LAPI GetApiForVm(lua_State* L) const;
 
     /**
      * Callback when a thread is garbage collected.

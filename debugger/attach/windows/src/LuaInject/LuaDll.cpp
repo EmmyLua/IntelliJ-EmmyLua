@@ -51,10 +51,6 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #define LUA_V520 520
 #define LUA_V530 530
 
-#define GetHookedAPI(api) LPVOID lp; \
-	LhBarrierGetCallback(&lp); \
-	LAPI api = (LAPI)lp;
-
 typedef lua_State*      (*lua_open_cdecl_t)             (int stacksize);
 typedef lua_State*      (*lua_open_500_cdecl_t)         ();
 typedef lua_State*      (*lua_newstate_cdecl_t)         (lua_Alloc, void*);
@@ -241,7 +237,7 @@ struct LuaInterface
 	lua_checkstack_cdecl_t       lua_checkstack_dll_cdecl;
 	lua_rotate_cdecl_t       lua_rotate_dll_cdecl;
 
-	lua_CFunction                EmmyOutput;
+	lua_CFunction                EmmyInit;
 	lua_CFunction                CPCallHandler;
 	lua_Hook                     HookHandler;
 
@@ -309,20 +305,14 @@ const char* MemoryReader_cdecl(lua_State* L, void* data, size_t* size)
 
 }
 
-int EmmyOutputWorker(LAPI api, lua_State* L)
+int EmmyInit_intercept(lua_State* L)
 {
-	const char* message = lua_tostring_dll(api, L, 1);
-	DebugBackend::Get().Message(message);
+	GetHookedAPI(api);
+	DebugBackend::Get().RegisterEmmyLibrary(api, L);
 	return 0;
 }
 
-int EmmyOutput_intercept(lua_State* L)
-{
-	GetHookedAPI(api)
-	return EmmyOutputWorker(api, L);
-}
-
-int EmmyOutput(lua_State* L)
+int EmmyInit(lua_State* L)
 {
 	return 0;
 }
@@ -340,7 +330,7 @@ int CPCallHandlerWorker(LAPI api, lua_State* L)
 }
 int CPCallHandler_intercept(lua_State* L)
 {
-	GetHookedAPI(api)
+	GetHookedAPI(api);
 	return CPCallHandlerWorker(api, L);
 }
 
@@ -742,7 +732,7 @@ bool GetAreInterceptsEnabled()
 
 void RegisterDebugLibrary(LAPI api, lua_State* L)
 {
-	lua_register_dll(api, L, "emmy_output", g_interfaces[api].EmmyOutput);
+	lua_register_dll(api, L, "emmy_init", g_interfaces[api].EmmyInit);
 }
 
 int GetGlobalsIndex(LAPI api)
@@ -2256,7 +2246,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 
 	// Setup our API.
 
-	luaInterface.EmmyOutput = (lua_CFunction)CreateCFunction(api, EmmyOutput, EmmyOutput_intercept);
+	luaInterface.EmmyInit = (lua_CFunction)CreateCFunction(api, EmmyInit, EmmyInit_intercept);
 	luaInterface.CPCallHandler = (lua_CFunction)CreateCFunction(api, CPCallHandler, CPCallHandler_intercept);
 	luaInterface.HookHandler = (lua_Hook)CreateCFunction(api, HookHandler, HookHandler_intercept);
 
