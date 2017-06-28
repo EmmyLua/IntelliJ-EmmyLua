@@ -1,8 +1,9 @@
 Lua IDE for IntelliJ IDEA (requires `IDEA 2017.1`)
 
+[![Join the chat at https://gitter.im/emmylua/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 > EmmyLua has been uploaded to the [JetBrains Plugin Repository](https://plugins.jetbrains.com/plugin/9768-emmylua)
 
-[Download](https://plugins.jetbrains.com/plugin/9768-emmylua)
+[Download](https://plugins.jetbrains.com/plugin/9768-emmylua) | [Donate](https://www.paypal.me/tangzx)
 
 QQ交流群：`29850775`
 (最新版本以及部分视频演示在群文件中下载)
