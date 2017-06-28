@@ -51,6 +51,9 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #define LUA_V520 520
 #define LUA_V530 530
 
+#define GetHookedAPI(api) LPVOID lp; \
+	LhBarrierGetCallback(&lp); \
+	LAPI api = (LAPI)lp;
 
 typedef lua_State*      (*lua_open_cdecl_t)             (int stacksize);
 typedef lua_State*      (*lua_open_500_cdecl_t)         ();
@@ -315,9 +318,7 @@ int EmmyOutputWorker(LAPI api, lua_State* L)
 
 int EmmyOutput_intercept(lua_State* L)
 {
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api)
 	return EmmyOutputWorker(api, L);
 }
 
@@ -339,9 +340,7 @@ int CPCallHandlerWorker(LAPI api, lua_State* L)
 }
 int CPCallHandler_intercept(lua_State* L)
 {
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api)
 	return CPCallHandlerWorker(api, L);
 }
 
@@ -370,9 +369,7 @@ void HookHandler(lua_State* L, lua_Debug* ar) {}
 
 void HookHandler_intercept(lua_State* L, lua_Debug* ar)
 {
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api)
 	HookHandlerWorker(api, L, ar);
 }
 
@@ -1396,9 +1393,7 @@ void lua_call_worker(LAPI api, lua_State* L, int nargs, int nresults)
 // calling convention at run-time and removes and extra argument from the stack.
 void lua_call_intercept(lua_State* L, int nargs, int nresults)
 {
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api)
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1425,9 +1420,7 @@ void lua_callk_worker(LAPI api, lua_State* L, int nargs, int nresults, int ctk, 
 // calling convention at run-time and removes and extra argument from the stack.
 void lua_callk_intercept(lua_State* L, int nargs, int nresults, int ctx, lua_CFunction k)
 {
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1463,16 +1456,11 @@ int lua_pcall_worker(LAPI api, lua_State* L, int nargs, int nresults, int errfun
 // calling convention at run-time and removes and extra argument from the stack.
 int lua_pcall_intercept(lua_State* L, int nargs, int nresults, int errfunc)
 {
-	int     result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
-
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_pcall_worker(api, L, nargs, nresults, errfunc);
-	return result;
+	return lua_pcall_worker(api, L, nargs, nresults, errfunc);
 }
 
 int lua_pcallk_worker(LAPI api, lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
@@ -1503,17 +1491,12 @@ int lua_pcallk_worker(LAPI api, lua_State* L, int nargs, int nresults, int errfu
 // calling convention at run-time and removes and extra argument from the stack.
 int lua_pcallk_intercept(lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
 {
-	int     result;
-	
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_pcallk_worker(api, L, nargs, nresults, errfunc, ctx, k);
-	return result;
+	return lua_pcallk_worker(api, L, nargs, nresults, errfunc, ctx, k);
 }
 
 lua_State* lua_newstate_worker(LAPI api, lua_Alloc f, void* ud)
@@ -1536,15 +1519,12 @@ lua_State* lua_newstate_worker(LAPI api, lua_Alloc f, void* ud)
 // calling convention at run-time and removes and extra argument from the stack.
 lua_State* lua_newstate_intercept(lua_Alloc f, void* ud)
 {
-	lua_State*      result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_newstate_worker(api, f, ud);
+	lua_State * result = lua_newstate_worker(api, f, ud);
 	return result;
 }
 
@@ -1568,14 +1548,11 @@ lua_State* lua_newthread_worker(LAPI api, lua_State* L)
 // calling convention at run-time and removes and extra argument from the stack.
 lua_State* lua_newthread_intercept(lua_State* L)
 {
-	lua_State*      result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_newthread_worker(api, L);
+	lua_State * result = lua_newthread_worker(api, L);
 	return result;
 }
 
@@ -1616,16 +1593,11 @@ lua_State* lua_open_500_worker(LAPI api)
 // calling convention at run-time and removes and extra argument from the stack.
 lua_State* lua_open_intercept(int stacksize)
 {
-	lua_State*      result;
-
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
-
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_open_worker(api, stacksize);
+	lua_State * result = lua_open_worker(api, stacksize);
 	return result;
 }
 
@@ -1633,16 +1605,11 @@ lua_State* lua_open_intercept(int stacksize)
 // calling convention at run-time and removes and extra argument from the stack.
 lua_State* lua_open_500_intercept()
 {
-	lua_State*      result;
-
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
-
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_open_500_worker(api);
+	lua_State * result = lua_open_500_worker(api);
 	return result;
 }
 
@@ -1711,16 +1678,11 @@ int lua_load_worker(LAPI api, lua_State* L, lua_Reader reader, void* data, const
 // calling convention at run-time and removes and extra argument from the stack.
 int lua_load_510_intercept(lua_State* L, lua_Reader reader, void* data, const char* name)
 {
-	int     result;
-
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
-
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_load_worker(api, L, reader, data, name, nullptr);
+	int result = lua_load_worker(api, L, reader, data, name, nullptr);
 	return result;
 }
 
@@ -1728,16 +1690,11 @@ int lua_load_510_intercept(lua_State* L, lua_Reader reader, void* data, const ch
 // calling convention at run-time and removes and extra argument from the stack.
 int lua_load_intercept(lua_State* L, lua_Reader reader, void* data, const char* name, const char* mode)
 {
-	int     result;
-
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
-
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_load_worker(api, L, reader, data, name, mode);
+	int result = lua_load_worker(api, L, reader, data, name, mode);
 	return result;
 }
 
@@ -1755,9 +1712,7 @@ void lua_close_worker(LAPI api, lua_State* L)
 // calling convention at run-time and removes and extra argument from the stack.
 void lua_close_intercept(lua_State* L)
 {
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
@@ -1785,15 +1740,11 @@ int luaL_newmetatable_worker(LAPI api, lua_State *L, const char* tname)
 // calling convention at run-time and removes and extra argument from the stack.
 int luaL_newmetatable_intercept(lua_State* L, const char* tname)
 {
-	int     result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
-
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_newmetatable_worker(api, L, tname);
+	int result = luaL_newmetatable_worker(api, L, tname);
 	return result;
 }
 
@@ -1832,16 +1783,11 @@ int lua_sethook_worker(LAPI api, lua_State *L, lua_Hook f, int mask, int count)
 // calling convention at run-time and removes and extra argument from the stack.
 int lua_sethook_intercept(lua_State *L, lua_Hook f, int mask, int count)
 {
-	int     result;
-
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
-
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = lua_sethook_worker(api, L, f, mask, count);
+	int result = lua_sethook_worker(api, L, f, mask, count);
 	return result;
 }
 
@@ -1870,15 +1816,11 @@ int luaL_loadbufferx_worker(LAPI api, lua_State *L, const char *buff, size_t sz,
 // calling convention at run-time and removes and extra argument from the stack.
 int luaL_loadbuffer_intercept(lua_State *L, const char *buff, size_t sz, const char *name)
 {
-	int     result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interfering with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_loadbufferx_worker(api, L, buff, sz, name, nullptr);
-
+	int result = luaL_loadbufferx_worker(api, L, buff, sz, name, nullptr);
 	return result;
 }
 
@@ -1886,14 +1828,11 @@ int luaL_loadbuffer_intercept(lua_State *L, const char *buff, size_t sz, const c
 // calling convention at run-time and removes and extra argument from the stack.
 int luaL_loadbufferx_intercept(lua_State *L, const char *buff, size_t sz, const char *name, const char* mode)
 {
-	int     result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interfering with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_loadbufferx_worker(api, L, buff, sz, name, mode);
+	int result = luaL_loadbufferx_worker(api, L, buff, sz, name, mode);
 	return result;
 }
 
@@ -1945,14 +1884,11 @@ int luaL_loadfilex_worker(LAPI api, lua_State *L, const char *fileName, const ch
 // calling convention at run-time and removes and extra argument from the stack.
 int luaL_loadfile_intercept(lua_State *L, const char *fileName)
 {
-	int     result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_loadfilex_worker(api, L, fileName, nullptr);
+	int result = luaL_loadfilex_worker(api, L, fileName, nullptr);
 	return result;
 }
 
@@ -1960,14 +1896,11 @@ int luaL_loadfile_intercept(lua_State *L, const char *fileName)
 // calling convention at run-time and removes and extra argument from the stack.
 int luaL_loadfilex_intercept(lua_State *L, const char *fileName, const char* mode)
 {
-	int     result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_loadfilex_worker(api, L, fileName, mode);
+	int result = luaL_loadfilex_worker(api, L, fileName, mode);
 	return result;
 }
 
@@ -2002,14 +1935,11 @@ lua_State* luaL_newstate_worker(LAPI api)
 // calling convention at run-time and removes and extra argument from the stack.
 lua_State* luaL_newstate_intercept()
 {
-	lua_State*      result;
-	LPVOID lp;
-	LhBarrierGetCallback(&lp);
-	LAPI api = (LAPI)lp;
+	GetHookedAPI(api);
 	// We push the actual functionality of this function into a separate, "normal"
 	// function so avoid interferring with the inline assembly and other strange
 	// aspects of this function.
-	result = luaL_newstate_worker(api);
+	lua_State * result = luaL_newstate_worker(api);
 	return result;
 }
 
@@ -2914,11 +2844,10 @@ int CFunctionHandlerWorker(CFunctionArgs* args, lua_State* L)
 }
 int CFunctionHandler(lua_State* L)
 {
-	int result;
 	CFunctionArgs* args;
 	LhBarrierGetCallback((PVOID*)&args);
 
-	result = CFunctionHandlerWorker(args, L);
+	int result = CFunctionHandlerWorker(args, L);
 	return result;
 }
 
