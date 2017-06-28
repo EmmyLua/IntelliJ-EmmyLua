@@ -109,7 +109,6 @@
   hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
-  implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
   extends(".*Expr") = expr
   extends(".*Stat") = statement
   hooks(".*Stat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
@@ -322,7 +321,12 @@ expr ::=
     mulExpr |
     unaryExpr |
     expExpr |
-    valueExpr { mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl" }
+    valueExpr {
+    mixin = "com.tang.intellij.lua.psi.impl.LuaExpressionImpl"
+    implements = [
+        "com.tang.intellij.lua.psi.LuaExpression"
+    ]
+}
 
 parenExpr ::= '(' expr ')' { pin = 1 }
 unaryExpr ::= unaryOp expr { pin = 1 }
