@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaWhileStat extends LuaStatement, LuaIndentRange {
+public interface LuaWhileStat extends LuaStatement, LuaLoop, LuaIndentRange {
 
   @Nullable
   LuaExpr getExpr();

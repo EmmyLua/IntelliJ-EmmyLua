@@ -22,7 +22,9 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.Consumer
 import com.tang.intellij.lua.psi.LuaFuncBody
+import com.tang.intellij.lua.psi.LuaLoop
 import com.tang.intellij.lua.psi.LuaReturnStat
 import com.tang.intellij.lua.psi.LuaTypes
 
@@ -43,6 +45,12 @@ class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
                         return LuaHighlightExitPointsHandler(editor, psiFile, returnStat, funcBody)
                     }
                 }
+            }
+
+            LuaTypes.BREAK -> {
+                val loop = PsiTreeUtil.getParentOfType(psiElement, LuaLoop::class.java)
+                if (loop != null)
+                    return LoopHandler(editor, psiFile, psiElement, loop)
             }
 
             // local a = value
@@ -70,4 +78,16 @@ class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
         }
         return null
     }
+}
+
+private class LoopHandler(editor: Editor, psiFile: PsiFile, val psi:PsiElement, val loop: LuaLoop) : HighlightUsagesHandlerBase<PsiElement>(editor, psiFile) {
+    override fun getTargets() = arrayListOf(psi)
+
+    override fun computeUsages(list: MutableList<PsiElement>?) {
+        addOccurrence(loop.firstChild)
+        addOccurrence(psi)
+    }
+
+    override fun selectTargets(list: MutableList<PsiElement>?, consumer: Consumer<MutableList<PsiElement>>?) {}
+
 }

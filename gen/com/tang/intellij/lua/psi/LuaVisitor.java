@@ -4,8 +4,6 @@ package com.tang.intellij.lua.psi;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiNameIdentifierOwner;
-import  com.tang.intellij.lua.psi.LuaParametersOwner;
-import  com.tang.intellij.lua.psi.LuaCommentOwner;
 
 public class LuaVisitor extends PsiElementVisitor {
 
@@ -82,11 +80,15 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitForAStat(@NotNull LuaForAStat o) {
     visitStatement(o);
+    // visitParametersOwner(o);
+    // visitLoop(o);
     // visitIndentRange(o);
   }
 
   public void visitForBStat(@NotNull LuaForBStat o) {
     visitStatement(o);
+    // visitParametersOwner(o);
+    // visitLoop(o);
     // visitIndentRange(o);
   }
 
@@ -164,6 +166,7 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitRepeatStat(@NotNull LuaRepeatStat o) {
     visitStatement(o);
+    // visitLoop(o);
     // visitIndentRange(o);
   }
 
@@ -211,6 +214,7 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitWhileStat(@NotNull LuaWhileStat o) {
     visitStatement(o);
+    // visitLoop(o);
     // visitIndentRange(o);
   }
 

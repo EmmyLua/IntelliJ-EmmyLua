@@ -106,15 +106,10 @@
         DOUBLE_DIV = "//"
   ]
 
-  implements("tableExpr") = "com.tang.intellij.lua.psi.LuaIndentRange"
-  //hooks("forAStat|forBStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
-  implements("forAStat|forBStat") = "com.tang.intellij.lua.psi.LuaIndentRange, com.tang.intellij.lua.psi.LuaParametersOwner, com.tang.intellij.lua.psi.LuaCommentOwner"
   hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
   implements("expr|funcCall") = "com.tang.intellij.lua.psi.LuaExpression"
-  implements("doStat|whileStat|repeatStat|ifStat") = "com.tang.intellij.lua.psi.LuaIndentRange"
-  implements("funcBody") = "com.tang.intellij.lua.psi.LuaIndentRange"
   extends(".*Expr") = expr
   extends(".*Stat") = statement
   hooks(".*Stat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
@@ -160,12 +155,49 @@ assignStat ::= varList '=' exprList {
     ]
     methods = [assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
 }
-doStat ::= 'do' lazy_block 'end' { pin = 1 }
-whileStat ::= 'while' expr 'do' lazy_block 'end' { pin = 1 }
-repeatStat ::= 'repeat' lazy_block 'until' expr { pin = 1 }
-ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' { pin = 1 }
-forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' { pin = 3 methods = [getParamNameDefList] }
-forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' { pin = 1 }
+doStat ::= 'do' lazy_block 'end' {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
+}
+whileStat ::= 'while' expr 'do' lazy_block 'end' {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.psi.LuaLoop"
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
+}
+repeatStat ::= 'repeat' lazy_block 'until' expr {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.psi.LuaLoop"
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
+}
+ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
+}
+forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' {
+    pin = 3
+    methods = [getParamNameDefList]
+    implements = [
+        "com.tang.intellij.lua.psi.LuaParametersOwner"
+        "com.tang.intellij.lua.psi.LuaLoop"
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
+}
+forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.psi.LuaParametersOwner"
+        "com.tang.intellij.lua.psi.LuaLoop"
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
+}
 labelStat ::= '::' ID '::' { pin = 1 }
 gotoStat ::= 'goto' ID { pin = 1 }
 private defStat ::= classMethodDef | globalFuncDef | localFuncDef | localDef
@@ -358,7 +390,12 @@ closureExpr ::= 'function' funcBody {
     methods = [getParamNameDefList guessReturnTypeSet getParams]
 }
 
-funcBody ::= '(' (parList)? ')' lazy_block? 'end' { pin = 3 }
+funcBody ::= '(' (parList)? ')' lazy_block? 'end' {
+    pin = 3
+    implements = [
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
+}
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...' { recoverWhile = parList_recover }
 private parList_recover ::= !(')'|'in')
@@ -366,6 +403,9 @@ private parList_recover ::= !(')'|'in')
 tableExpr ::= '{' fieldList '}' {
     pin = 1
     methods = [findField toString]
+    implements = [
+        "com.tang.intellij.lua.psi.LuaIndentRange"
+    ]
     mixin = "com.tang.intellij.lua.psi.impl.LuaTableExpressionImpl"
     stubClass = "com.tang.intellij.lua.stubs.LuaTableStub"
 }

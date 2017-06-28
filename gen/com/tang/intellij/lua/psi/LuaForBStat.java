@@ -4,10 +4,8 @@ package com.tang.intellij.lua.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import  com.tang.intellij.lua.psi.LuaParametersOwner;
-import  com.tang.intellij.lua.psi.LuaCommentOwner;
 
-public interface LuaForBStat extends LuaStatement, LuaIndentRange, LuaParametersOwner, LuaCommentOwner {
+public interface LuaForBStat extends LuaStatement, LuaParametersOwner, LuaLoop, LuaIndentRange {
 
   @Nullable
   LuaExprList getExprList();
