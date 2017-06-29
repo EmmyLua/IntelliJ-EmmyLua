@@ -79,7 +79,7 @@ public abstract class LuaXValue extends XValue {
 
     public static LuaXValue parse(Node node, LuaAttachDebugProcess process) {
         String nodeName = node.getNodeName();
-        LuaXValue value = null;
+        LuaXValue value;
         switch (nodeName) {
             case "userdata":
                 value = new LuaXUserdata();
@@ -93,11 +93,11 @@ public abstract class LuaXValue extends XValue {
             case "function":
                 value = new LuaXFunction();
                 break;
+            default:
+                value = new LuaXUserdata();
         }
-        if (value != null) {
-            value.setProcess(process);
-            value.doParse(node);
-        }
+        value.setProcess(process);
+        value.doParse(node);
         return value;
     }
 
