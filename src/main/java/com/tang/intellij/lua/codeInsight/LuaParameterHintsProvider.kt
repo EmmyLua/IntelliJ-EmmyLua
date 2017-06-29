@@ -37,7 +37,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         val list = ArrayList<InlayInfo>()
         if (psiElement is LuaCallExpr) {
             val callExpr = psiElement
-            var parameters: Array<LuaParamInfo>? = null
+            val parameters: Array<LuaParamInfo>?
             val methodDef = callExpr.resolveFuncBodyOwner(SearchContext(psiElement.getProject()))
             methodDef ?: return list
 
