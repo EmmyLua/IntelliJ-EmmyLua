@@ -219,6 +219,13 @@ bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 
     m_state = State_Running;
 
+	//init emmy env
+    {
+		m_commandChannel.WriteUInt32(CommandId_InitEmmy);
+		m_commandChannel.WriteString(m_emmyLua);
+		m_commandChannel.Flush();
+    }
+
     // Start a new thread to handle the incoming event channel.
     DWORD threadId;
     m_eventThread = CreateThread(nullptr, 0, StaticEventThreadProc, this, 0, &threadId);

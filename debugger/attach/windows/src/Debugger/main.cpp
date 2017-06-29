@@ -109,10 +109,16 @@ int main(int argc, char** argv)
 		("c,cmd", "command line", cxxopts::value<std::string>())
 		("a,args", "args", cxxopts::value<std::string>())
 		("d,debug", "is debug", cxxopts::value<bool>())
-		("w,workdir", "working directory", cxxopts::value<std::string>());
+		("w,workdir", "working directory", cxxopts::value<std::string>())
+		("e,emmy", "emmy lua", cxxopts::value<std::string>());
 	options.parse(argc, argv);
 	if (options.count("m") > 0) {
 		inst.SetEventHandler(handler);
+
+		if (options.count("e")) {
+			std::string emmy = options["e"].as<std::string>();
+			inst.SetEmmyEnv(emmy);
+		}
 
 		std::string mode = options["m"].as<std::string>();
 		if (mode == "attach") {

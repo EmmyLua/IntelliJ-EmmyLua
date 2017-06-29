@@ -308,7 +308,7 @@ const char* MemoryReader_cdecl(lua_State* L, void* data, size_t* size)
 int EmmyInit_intercept(lua_State* L)
 {
 	GetHookedAPI(api);
-	DebugBackend::Get().RegisterEmmyLibrary(api, L);
+	DebugBackend::Get().InitEmmy(api, L);
 	return 0;
 }
 

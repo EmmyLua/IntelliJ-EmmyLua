@@ -215,6 +215,11 @@ public:
      */
     bool EnableJit(LAPI api, lua_State* L, bool enable) const;
 
+	/**
+	 * Load emmy!
+	 */
+	void InitEmmy(LAPI api, lua_State* L) const;
+
 	void RegisterEmmyLibrary(LAPI api, lua_State* L) const;
 
 	/**
@@ -421,6 +426,7 @@ private:
         bool            haveActiveBreakpoints;
         std::string     lastFunctions;
 		bool			inEval;
+		bool			isEmmyLoaded;
     };
 
     struct StackEntry
@@ -615,6 +621,8 @@ private:
     std::vector<Api>                m_apis;
 
     mutable bool                    m_warnedAboutUserData;
+
+	std::string						m_emmyLua;
 
 };
 

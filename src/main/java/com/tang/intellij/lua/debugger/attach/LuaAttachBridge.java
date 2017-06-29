@@ -141,6 +141,10 @@ public class LuaAttachBridge {
 
     };
 
+    private String getEmmyLua() {
+        return LuaFileUtil.getPluginVirtualFile("debugger/Emmy.lua");
+    }
+
     public void attach(int processId) {
         String pid = String.valueOf(processId);
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
@@ -160,7 +164,7 @@ public class LuaAttachBridge {
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
-                processBuilder = new ProcessBuilder(exe, "-m", "attach", "-p", pid);
+                processBuilder = new ProcessBuilder(exe, "-m", "attach", "-p", pid, "-e", getEmmyLua());
 
                 process = processBuilder.start();
                 writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
@@ -212,6 +216,7 @@ public class LuaAttachBridge {
                 argList.add(exe);
                 argList.add("-m"); argList.add("run");
                 argList.add("-c"); argList.add(program);
+                argList.add("-e"); argList.add(getEmmyLua());
                 if (!workingDir.isEmpty()) {
                     argList.add("-w");
                     argList.add(workingDir);

@@ -58,8 +58,8 @@ enum CommandId
 {
     CommandId_Continue          = 1,    // Continues execution until the next break point.
     CommandId_StepOver          = 2,    // Steps to the next line, not entering any functions.
-	CommandId_StepInto = 3,    // Steps to the next line, entering any functions.
-	CommandId_StepOut = 16,    // Steps out functions
+	CommandId_StepInto			= 3,    // Steps to the next line, entering any functions.
+	CommandId_StepOut			= 16,    // Steps out functions
 	CommandId_AddBreakpoint     = 4,    // Toggles a breakpoint on a line on.
 	CommandId_DelBreakpoint     = 15,   // Toggles a breakpoint on a line off.
     CommandId_Break             = 5,    // Instructs the debugger to break on the next line of script code.
@@ -71,6 +71,7 @@ enum CommandId
     CommandId_LoadDone          = 12,   // Signals to the backend that the frontend has finished processing a load.
     CommandId_IgnoreException   = 13,   // Instructs the backend to ignore the specified exception message in the future.
     CommandId_DeleteAllBreakpoints = 14,// Instructs the backend to clear all breakpoints set
+	CommandId_InitEmmy          = 17,// set emmy env
 };
 
 #endif

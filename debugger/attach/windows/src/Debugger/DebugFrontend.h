@@ -198,6 +198,7 @@ public:
      */
     void IgnoreException(const std::string& message);
 
+	void SetEmmyEnv(std::string& emmyLua) { m_emmyLua = emmyLua; }
 private:
 
     /**
@@ -236,11 +237,6 @@ private:
      * forwards to the non-static version.
      */
     static DWORD WINAPI StaticEventThreadProc(LPVOID param);
-
-    /**
-     * Called when the break event is received.
-     */
-    void OnBreak();
 
     /**
      * Sends a message event.
@@ -324,6 +320,7 @@ private:
 
     State                       m_state;
 
+	std::string					m_emmyLua;
 };
 
 #endif

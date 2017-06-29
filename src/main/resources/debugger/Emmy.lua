@@ -17,29 +17,33 @@ local toluaDebugger = {}
 
 function toluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
     if ty == 'userdata' then
-        local getTab = obj[tolua.gettag]
-        if getTab then
-            local tableNode = toluaDebugger.RawGetValueAsText(obj, depth + 1, nil, false)
-            if tableNode then
-                for property, _ in pairs(getTab) do
-                    local key = toluaDebugger.RawGetValueAsText(property, 0, nil, true)
-                    local value = toluaDebugger.RawGetValueAsText(obj[property], depth, nil, false)
-                    toluaDebugger.AddChildNode(tableNode, key, value)
+        local mt = getmetatable(obj)
+        if mt == nil then return nil end
+        local tableNode = toluaDebugger.RawGetValueAsText(obj, depth + 1, nil, false)
+        while mt ~= nil do
+            local getTab = obj[tolua.gettag]
+            if getTab then
+                if tableNode then
+                    for property, _ in pairs(getTab) do
+                        local key = toluaDebugger.RawGetValueAsText(property, 0, nil, true)
+                        local value = toluaDebugger.RawGetValueAsText(obj[property], depth, nil, false)
+                        toluaDebugger.AddChildNode(tableNode, key, value)
+                    end
                 end
             end
-            return tableNode
+            mt = getmetatable(mt)
         end
-    elseif ty == 'table' then
-        --local clsName = obj.__cname
-        --if clsName then
-        --    return e.RawGetValueAsText(obj, depth + 1, clsName, displayAsKey)
-        --end
+        return tableNode
     end
 end
 
 local xluaDebugger = {}
 function xluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
     if ty == 'userdata' then
+        local mt = getmetatable(obj)
+        if mt == nil then
+            return nil
+        end
         local CSType = obj:GetType()
         if CSType then
             local tableNode = xluaDebugger.RawGetValueAsText(obj, depth + 1, nil, false)
