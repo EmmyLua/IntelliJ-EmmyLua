@@ -17,16 +17,21 @@ local toluaDebugger = {}
 
 function toluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
     if ty == 'userdata' then
+        if depth <= 1 then return nil end
         local mt = getmetatable(obj)
         if mt == nil then return nil end
-        local tableNode = toluaDebugger.RawGetValueAsText(obj, depth + 1, nil, false)
+        local tableNode = toluaDebugger.RawGetValueAsText(obj, depth, nil, false)
+        if tableNode == nil then return nil end
+
+        local propMap = {}
         while mt ~= nil do
-            local getTab = obj[tolua.gettag]
+            local getTab = mt[tolua.gettag]
             if getTab then
-                if tableNode then
-                    for property, _ in pairs(getTab) do
+                for property, _ in pairs(getTab) do
+                    if not propMap[property] then
+                        propMap[property] = true
                         local key = toluaDebugger.RawGetValueAsText(property, 0, nil, true)
-                        local value = toluaDebugger.RawGetValueAsText(obj[property], depth, nil, false)
+                        local value = toluaDebugger.RawGetValueAsText(obj[property], depth - 1, nil, false)
                         toluaDebugger.AddChildNode(tableNode, key, value)
                     end
                 end
