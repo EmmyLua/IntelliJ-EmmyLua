@@ -23,15 +23,19 @@ public interface LuaGlobalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaS
   @Nullable
   LuaComment getComment();
 
+  @NotNull
   ItemPresentation getPresentation();
 
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
+  @Nullable
   PsiElement getNameIdentifier();
 
+  @NotNull
   PsiElement setName(String name);
 
+  @Nullable
   String getName();
 
   int getTextOffset();

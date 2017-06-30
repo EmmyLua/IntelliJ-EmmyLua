@@ -15,6 +15,7 @@ public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, StubBasedP
   @NotNull
   PsiElement getId();
 
+  @NotNull
   PsiElement setName(String name);
 
   @NotNull
@@ -23,6 +24,7 @@ public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, StubBasedP
   @NotNull
   PsiElement getNameIdentifier();
 
+  @NotNull
   ItemPresentation getPresentation();
 
   @NotNull

@@ -44,6 +44,7 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
     return LuaPsiImplUtil.guessPrefixType(this, context);
   }
 
+  @Nullable
   public LuaFuncBodyOwner resolveFuncBodyOwner(SearchContext context) {
     return LuaPsiImplUtil.resolveFuncBodyOwner(this, context);
   }

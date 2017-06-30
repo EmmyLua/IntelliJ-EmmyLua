@@ -18,6 +18,7 @@ public interface LuaCallExpr extends LuaExpr {
   @Nullable
   LuaTypeSet guessPrefixType(SearchContext context);
 
+  @Nullable
   LuaFuncBodyOwner resolveFuncBodyOwner(SearchContext context);
 
   @Nullable

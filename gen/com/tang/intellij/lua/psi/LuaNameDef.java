@@ -11,10 +11,13 @@ import com.tang.intellij.lua.search.SearchContext;
 
 public interface LuaNameDef extends LuaName, LuaTypeGuessable, PsiNameIdentifierOwner {
 
+  @Nullable
   LuaTypeSet guessType(SearchContext context);
 
+  @NotNull
   PsiElement getNameIdentifier();
 
+  @NotNull
   SearchScope getUseScope();
 
 }

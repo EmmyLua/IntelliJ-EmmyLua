@@ -58,6 +58,7 @@ public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncS
     return LuaPsiImplUtil.getComment(this);
   }
 
+  @NotNull
   public ItemPresentation getPresentation() {
     return LuaPsiImplUtil.getPresentation(this);
   }
@@ -67,14 +68,17 @@ public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncS
     return LuaPsiImplUtil.getParamNameDefList(this);
   }
 
+  @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtil.getNameIdentifier(this);
   }
 
+  @NotNull
   public PsiElement setName(String name) {
     return LuaPsiImplUtil.setName(this, name);
   }
 
+  @Nullable
   public String getName() {
     return LuaPsiImplUtil.getName(this);
   }
@@ -83,6 +87,7 @@ public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncS
     return LuaPsiImplUtil.getTextOffset(this);
   }
 
+  @NotNull
   public String toString() {
     return LuaPsiImplUtil.toString(this);
   }

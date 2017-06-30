@@ -24,14 +24,18 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaSt
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
+  @Nullable
   PsiElement getNameIdentifier();
 
+  @NotNull
   PsiElement setName(String name);
 
+  @Nullable
   String getName();
 
   int getTextOffset();
 
+  @NotNull
   SearchScope getUseScope();
 
   @NotNull

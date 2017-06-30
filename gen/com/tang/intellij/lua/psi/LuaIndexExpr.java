@@ -22,12 +22,15 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
   @Nullable
   PsiElement getNameIdentifier();
 
+  @NotNull
   PsiElement setName(String name);
 
+  @Nullable
   String getName();
 
   int getTextOffset();
 
+  @NotNull
   ItemPresentation getPresentation();
 
   @Nullable

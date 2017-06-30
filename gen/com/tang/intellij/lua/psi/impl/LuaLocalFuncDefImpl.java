@@ -52,14 +52,17 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
     return LuaPsiImplUtil.getParamNameDefList(this);
   }
 
+  @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtil.getNameIdentifier(this);
   }
 
+  @NotNull
   public PsiElement setName(String name) {
     return LuaPsiImplUtil.setName(this, name);
   }
 
+  @Nullable
   public String getName() {
     return LuaPsiImplUtil.getName(this);
   }
@@ -68,6 +71,7 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
     return LuaPsiImplUtil.getTextOffset(this);
   }
 
+  @NotNull
   public SearchScope getUseScope() {
     return LuaPsiImplUtil.getUseScope(this);
   }

@@ -28,14 +28,17 @@ public class LuaNameDefImpl extends LuaNameImpl implements LuaNameDef {
     else super.accept(visitor);
   }
 
+  @Nullable
   public LuaTypeSet guessType(SearchContext context) {
     return LuaPsiImplUtil.guessType(this, context);
   }
 
+  @NotNull
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtil.getNameIdentifier(this);
   }
 
+  @NotNull
   public SearchScope getUseScope() {
     return LuaPsiImplUtil.getUseScope(this);
   }

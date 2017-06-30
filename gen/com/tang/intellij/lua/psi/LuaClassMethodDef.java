@@ -30,10 +30,13 @@ public interface LuaClassMethodDef extends LuaFuncBodyOwner, LuaDeclaration, Lua
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
+  @NotNull
   PsiElement getNameIdentifier();
 
+  @NotNull
   PsiElement setName(String name);
 
+  @Nullable
   String getName();
 
   int getTextOffset();
@@ -46,6 +49,7 @@ public interface LuaClassMethodDef extends LuaFuncBodyOwner, LuaDeclaration, Lua
 
   boolean isStatic();
 
+  @NotNull
   ItemPresentation getPresentation();
 
 }

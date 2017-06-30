@@ -10,6 +10,7 @@ public interface LuaName extends LuaNamedElement {
   @NotNull
   PsiElement getId();
 
+  @NotNull
   PsiElement setName(String name);
 
   @NotNull

@@ -52,14 +52,17 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     return findChildByType(ID);
   }
 
+  @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtil.getNameIdentifier(this);
   }
 
+  @NotNull
   public PsiElement setName(String name) {
     return LuaPsiImplUtil.setName(this, name);
   }
 
+  @Nullable
   public String getName() {
     return LuaPsiImplUtil.getName(this);
   }
@@ -68,18 +71,22 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     return LuaPsiImplUtil.getTextOffset(this);
   }
 
+  @NotNull
   public String toString() {
     return LuaPsiImplUtil.toString(this);
   }
 
+  @Nullable
   public String getFieldName() {
     return LuaPsiImplUtil.getFieldName(this);
   }
 
+  @NotNull
   public ItemPresentation getPresentation() {
     return LuaPsiImplUtil.getPresentation(this);
   }
 
+  @Nullable
   public LuaTypeSet guessType(SearchContext context) {
     return LuaPsiImplUtil.guessType(this, context);
   }

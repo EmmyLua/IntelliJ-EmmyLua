@@ -47,6 +47,7 @@ public class LuaTableExprImpl extends LuaTableExpressionImpl implements LuaTable
     return LuaPsiImplUtil.findField(this, fieldName);
   }
 
+  @NotNull
   public String toString() {
     return LuaPsiImplUtil.toString(this);
   }

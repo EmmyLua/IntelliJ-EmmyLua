@@ -44,6 +44,7 @@ public class LuaNameExprImpl extends LuaNameExpressionImpl implements LuaNameExp
     return notNullChild(findChildByType(ID));
   }
 
+  @NotNull
   public PsiElement setName(String name) {
     return LuaPsiImplUtil.setName(this, name);
   }
@@ -58,6 +59,7 @@ public class LuaNameExprImpl extends LuaNameExpressionImpl implements LuaNameExp
     return LuaPsiImplUtil.getNameIdentifier(this);
   }
 
+  @NotNull
   public ItemPresentation getPresentation() {
     return LuaPsiImplUtil.getPresentation(this);
   }
@@ -67,6 +69,7 @@ public class LuaNameExprImpl extends LuaNameExpressionImpl implements LuaNameExp
     return LuaPsiImplUtil.getReferences(this);
   }
 
+  @NotNull
   public String toString() {
     return LuaPsiImplUtil.toString(this);
   }
