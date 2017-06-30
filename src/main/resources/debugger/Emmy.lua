@@ -46,12 +46,11 @@ local xluaDebugger = {}
 function xluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
     if ty == 'userdata' then
         local mt = getmetatable(obj)
-        if mt == nil then
-            return nil
-        end
+        if mt == nil or depth <= 1 then return nil end
+
         local CSType = obj:GetType()
         if CSType then
-            local tableNode = xluaDebugger.RawGetValueAsText(obj, depth + 1, nil, false)
+            local tableNode = xluaDebugger.RawGetValueAsText(obj, depth, nil, false)
 
             local Type = CS.System.Type
             local ObsoleteType = Type.GetType('System.ObsoleteAttribute')
@@ -65,7 +64,7 @@ function xluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAs
                     local value = obj[property]
 
                     local key = xluaDebugger.RawGetValueAsText(property, 0, nil, true)
-                    local value = xluaDebugger.RawGetValueAsText(value, depth, nil, false)
+                    local value = xluaDebugger.RawGetValueAsText(value, depth - 1, nil, false)
                     xluaDebugger.AddChildNode(tableNode, key, value)
                 end
             end
