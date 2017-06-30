@@ -25,19 +25,24 @@ import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaPsiElement
 import com.tang.intellij.lua.psi.LuaVisitor
+import java.io.DataInput
+import java.io.DataOutput
 
-class ClassEntry
+data class ClassEntry(val clazz:String, val superClazz:String?)
 
-class ClassIndex : FileBasedIndexExtension<ClassEntry, Int>() {
+class ClassIndex : FileBasedIndexExtension<String, ClassEntry>() {
 
-    val NAME:ID<ClassEntry, Int> = ID.create("lua.file.class")
+    val NAME:ID<String, ClassEntry> = ID.create("lua.file.class")
 
-    val myIndexer = DataIndexer<ClassEntry, Int, FileContent> { fileContent ->
+    val myIndexer = DataIndexer<String, ClassEntry, FileContent> { fileContent ->
+        val map = mutableMapOf<String, ClassEntry>()
         fileContent.psiFile.accept(object :LuaVisitor() {
             override fun visitComment(comment: PsiComment?) {
                 if (comment is LuaComment) {
-                    val type = comment.classDef.classType
-
+                    val type = comment.classDef?.classType
+                    if (type != null) {
+                        map.put(type.className, ClassEntry(type.className, type.superClassName))
+                    }
                 }
             }
 
@@ -45,22 +50,40 @@ class ClassIndex : FileBasedIndexExtension<ClassEntry, Int>() {
                 o.acceptChildren(this)
             }
         })
-        emptyMap()
+        map
     }
 
-    override fun getKeyDescriptor(): KeyDescriptor<ClassEntry> {
+    override fun getKeyDescriptor(): KeyDescriptor<String> {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getName(): ID<ClassEntry, Int> = NAME
+    override fun getName(): ID<String, ClassEntry> = NAME
 
-    override fun getValueExternalizer(): DataExternalizer<Int> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getValueExternalizer(): DataExternalizer<ClassEntry> {
+        return object :DataExternalizer<ClassEntry> {
+            override fun read(input: DataInput): ClassEntry {
+                val clsName = input.readUTF()!!
+                val hasSur = input.readBoolean()
+                var surName:String? = null
+                if (hasSur) {
+                    surName = input.readUTF()
+                }
+                return ClassEntry(clsName, surName)
+            }
+
+            override fun save(output: DataOutput, entry: ClassEntry) {
+                output.writeUTF(entry.clazz)
+                output.writeBoolean(entry.superClazz != null)
+                if (entry.superClazz != null) {
+                    output.writeUTF(entry.superClazz)
+                }
+            }
+        }
     }
 
     override fun dependsOnFileContent() = true
 
-    override fun getIndexer(): DataIndexer<ClassEntry, Int, FileContent> = myIndexer
+    override fun getIndexer(): DataIndexer<String, ClassEntry, FileContent> = myIndexer
 
     override fun getInputFilter(): FileBasedIndex.InputFilter {
         return FileBasedIndex.InputFilter { file -> file.fileType == LuaFileType.INSTANCE }

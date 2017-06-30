@@ -25,15 +25,22 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.search.SearchContext;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by Tangzx on 2016/11/21.
  *
  * @qq 272669294
  */
 public interface LuaComment extends PsiComment, LuaDocPsiElement {
+    @Nullable
     LuaCommentOwner getOwner();
+    @Nullable
     LuaDocParamDef getParamDef(String name);
+    @Nullable
     LuaDocClassDef getClassDef();
+    @Nullable
     LuaDocTypeDef getTypeDef();
+    @Nullable
     LuaTypeSet guessType(SearchContext context);
 }
