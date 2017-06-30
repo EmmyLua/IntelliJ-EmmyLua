@@ -79,7 +79,7 @@ public class RequirePathCompletionProvider extends CompletionProvider<Completion
             if (child.isDirectory()) {
                 //noinspection UnsafeVfsRecursion
                 addAllFiles(project, completionResultSet, newPath, child.getChildren());
-            } else if (pck != null && child.getFileType() == LuaFileType.INSTANCE) { //第一层的文件不要
+            } else if (child.getFileType() == LuaFileType.INSTANCE) {
                 LookupElement lookupElement = LookupElementBuilder
                         .create(newPath)
                         .withIcon(LuaIcons.FILE)
