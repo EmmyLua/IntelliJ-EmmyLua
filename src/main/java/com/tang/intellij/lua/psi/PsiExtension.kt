@@ -97,3 +97,15 @@ val LuaDocClassDef.aliasName: String? get() {
 val LuaIndexExpr.prefixExpr: LuaExpr get() {
     return firstChild as LuaExpr
 }
+
+val LuaTableField.shouldCreateStub: Boolean get() {
+    id ?: return false
+
+    val tableExpr = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaTableExpr::class.java)
+    tableExpr ?: return false
+    return tableExpr.shouldCreateStub
+}
+
+val LuaTableExpr.shouldCreateStub: Boolean get() {
+    return true
+}

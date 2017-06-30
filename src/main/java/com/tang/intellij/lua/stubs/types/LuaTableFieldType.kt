@@ -22,6 +22,7 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
+import com.tang.intellij.lua.psi.shouldCreateStub
 import com.tang.intellij.lua.stubs.LuaTableFieldStub
 import com.tang.intellij.lua.stubs.impl.LuaTableFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
@@ -39,9 +40,9 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
         return LuaTableFieldImpl(luaTableFieldStub, this)
     }
 
-    override fun shouldCreateStub(node: ASTNode?): Boolean {
-        val tableField = node!!.psi as LuaTableField
-        return tableField.id != null
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        val tableField = node.psi as LuaTableField
+        return tableField.shouldCreateStub
     }
 
     override fun createStub(field: LuaTableField, stubElement: StubElement<*>): LuaTableFieldStub {

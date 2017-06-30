@@ -16,10 +16,12 @@
 
 package com.tang.intellij.lua.stubs.types
 
+import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.*
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.psi.impl.LuaTableExprImpl
+import com.tang.intellij.lua.psi.shouldCreateStub
 import com.tang.intellij.lua.stubs.LuaTableStub
 import com.tang.intellij.lua.stubs.impl.LuaTableStubImpl
 
@@ -35,6 +37,11 @@ class LuaTableType : IStubElementType<LuaTableStub, LuaTableExpr>("Table", LuaLa
 
     override fun createStub(tableConstructor: LuaTableExpr, stubElement: StubElement<*>): LuaTableStub {
         return LuaTableStubImpl(stubElement, this)
+    }
+
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        val tab = node.psi as LuaTableExpr
+        return tab.shouldCreateStub
     }
 
     override fun getExternalId() = "lua.table"
