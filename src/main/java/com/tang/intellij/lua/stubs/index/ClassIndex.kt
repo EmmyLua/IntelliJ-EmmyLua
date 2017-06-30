@@ -19,6 +19,7 @@ package com.tang.intellij.lua.stubs.index
 import com.intellij.psi.PsiComment
 import com.intellij.util.indexing.*
 import com.intellij.util.io.DataExternalizer
+import com.intellij.util.io.EnumeratorStringDescriptor
 import com.intellij.util.io.KeyDescriptor
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaFileType
@@ -36,26 +37,21 @@ class ClassIndex : FileBasedIndexExtension<String, ClassEntry>() {
 
     val myIndexer = DataIndexer<String, ClassEntry, FileContent> { fileContent ->
         val map = mutableMapOf<String, ClassEntry>()
-        fileContent.psiFile.accept(object :LuaVisitor() {
-            override fun visitComment(comment: PsiComment?) {
-                if (comment is LuaComment) {
-                    val type = comment.classDef?.classType
+        fileContent.psiFile.acceptChildren(object :LuaVisitor() {
+            override fun visitPsiElement(o: LuaPsiElement) {
+                if (o is LuaComment) {
+                    val type = o.classDef?.classType
                     if (type != null) {
                         map.put(type.className, ClassEntry(type.className, type.superClassName))
                     }
                 }
-            }
-
-            override fun visitPsiElement(o: LuaPsiElement) {
-                o.acceptChildren(this)
+                else o.acceptChildren(this)
             }
         })
         map
     }
 
-    override fun getKeyDescriptor(): KeyDescriptor<String> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun getKeyDescriptor(): KeyDescriptor<String> = EnumeratorStringDescriptor.INSTANCE
 
     override fun getName(): ID<String, ClassEntry> = NAME
 
