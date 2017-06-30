@@ -34,6 +34,7 @@ import java.util.List;
  */
 public class LuaTypeSet {
 
+    @NotNull
     public static LuaTypeSet create() {
         return new LuaTypeSet();
     }
