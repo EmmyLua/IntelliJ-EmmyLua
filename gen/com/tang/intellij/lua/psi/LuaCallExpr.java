@@ -15,10 +15,12 @@ public interface LuaCallExpr extends LuaExpr {
   @NotNull
   LuaExpr getExpr();
 
+  @Nullable
   LuaTypeSet guessPrefixType(SearchContext context);
 
   LuaFuncBodyOwner resolveFuncBodyOwner(SearchContext context);
 
+  @Nullable
   PsiElement getFirstStringArg();
 
   boolean isStaticMethodCall();

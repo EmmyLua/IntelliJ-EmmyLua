@@ -12,6 +12,7 @@ public interface LuaTableExpr extends LuaExpr, LuaIndentRange, StubBasedPsiEleme
   @Nullable
   LuaFieldList getFieldList();
 
+  @Nullable
   LuaTableField findField(String fieldName);
 
 }

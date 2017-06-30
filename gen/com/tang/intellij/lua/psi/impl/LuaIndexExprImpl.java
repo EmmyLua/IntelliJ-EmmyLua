@@ -18,8 +18,8 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaIndexExprImpl extends LuaIndexExpressionImpl implements LuaIndexExpr {
 
-  public LuaIndexExprImpl(LuaIndexStub stub, IStubElementType type) {
-    super(stub, type);
+  public LuaIndexExprImpl(LuaIndexStub stub, IStubElementType<?, ?> nodeType) {
+    super(stub, nodeType);
   }
 
   public LuaIndexExprImpl(ASTNode node) {
@@ -76,10 +76,12 @@ public class LuaIndexExprImpl extends LuaIndexExpressionImpl implements LuaIndex
     return LuaPsiImplUtil.toString(this);
   }
 
+  @Nullable
   public LuaTypeSet guessPrefixType(SearchContext context) {
     return LuaPsiImplUtil.guessPrefixType(this, context);
   }
 
+  @Nullable
   public LuaTypeSet guessValueType(SearchContext context) {
     return LuaPsiImplUtil.guessValueType(this, context);
   }

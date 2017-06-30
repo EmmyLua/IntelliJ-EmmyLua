@@ -53,6 +53,7 @@ public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncS
     return findChildByType(ID);
   }
 
+  @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtil.getComment(this);
   }
@@ -61,6 +62,7 @@ public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncS
     return LuaPsiImplUtil.getPresentation(this);
   }
 
+  @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtil.getParamNameDefList(this);
   }
@@ -85,6 +87,7 @@ public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncS
     return LuaPsiImplUtil.toString(this);
   }
 
+  @NotNull
   public LuaTypeSet guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }

@@ -39,6 +39,7 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
     return notNullChild(PsiTreeUtil.getChildOfType(this, LuaExpr.class));
   }
 
+  @Nullable
   public LuaTypeSet guessPrefixType(SearchContext context) {
     return LuaPsiImplUtil.guessPrefixType(this, context);
   }
@@ -47,6 +48,7 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
     return LuaPsiImplUtil.resolveFuncBodyOwner(this, context);
   }
 
+  @Nullable
   public PsiElement getFirstStringArg() {
     return LuaPsiImplUtil.getFirstStringArg(this);
   }

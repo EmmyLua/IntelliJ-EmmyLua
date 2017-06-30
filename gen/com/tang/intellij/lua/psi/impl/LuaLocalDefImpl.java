@@ -39,6 +39,7 @@ public class LuaLocalDefImpl extends ASTWrapperPsiElement implements LuaLocalDef
     return PsiTreeUtil.getChildOfType(this, LuaNameList.class);
   }
 
+  @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtil.getComment(this);
   }

@@ -18,8 +18,10 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaSt
   @Nullable
   PsiElement getId();
 
+  @Nullable
   LuaComment getComment();
 
+  @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
   PsiElement getNameIdentifier();
@@ -32,6 +34,7 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaSt
 
   SearchScope getUseScope();
 
+  @NotNull
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull

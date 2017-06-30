@@ -42,10 +42,12 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
     return findChildByType(ID);
   }
 
+  @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtil.getComment(this);
   }
 
+  @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtil.getParamNameDefList(this);
   }
@@ -70,6 +72,7 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
     return LuaPsiImplUtil.getUseScope(this);
   }
 
+  @NotNull
   public LuaTypeSet guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }

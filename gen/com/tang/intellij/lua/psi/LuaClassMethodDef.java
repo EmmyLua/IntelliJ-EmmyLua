@@ -21,11 +21,13 @@ public interface LuaClassMethodDef extends LuaFuncBodyOwner, LuaDeclaration, Lua
   @Nullable
   LuaFuncBody getFuncBody();
 
+  @Nullable
   LuaComment getComment();
 
   @Nullable
   LuaType getClassType(SearchContext context);
 
+  @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
   PsiElement getNameIdentifier();
@@ -36,6 +38,7 @@ public interface LuaClassMethodDef extends LuaFuncBodyOwner, LuaDeclaration, Lua
 
   int getTextOffset();
 
+  @NotNull
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull

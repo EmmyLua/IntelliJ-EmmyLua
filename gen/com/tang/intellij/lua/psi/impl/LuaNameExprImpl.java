@@ -17,8 +17,8 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaNameExprImpl extends LuaNameExpressionImpl implements LuaNameExpr {
 
-  public LuaNameExprImpl(LuaNameStub stub, IStubElementType type) {
-    super(stub, type);
+  public LuaNameExprImpl(LuaNameStub stub, IStubElementType<?, ?> nodeType) {
+    super(stub, nodeType);
   }
 
   public LuaNameExprImpl(ASTNode node) {

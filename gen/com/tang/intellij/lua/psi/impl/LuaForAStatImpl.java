@@ -37,6 +37,7 @@ public class LuaForAStatImpl extends LuaStatementImpl implements LuaForAStat {
     return notNullChild(PsiTreeUtil.getChildOfType(this, LuaParamNameDef.class));
   }
 
+  @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtil.getParamNameDefList(this);
   }

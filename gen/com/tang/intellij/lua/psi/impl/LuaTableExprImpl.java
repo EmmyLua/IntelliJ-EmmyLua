@@ -15,8 +15,8 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaTableExprImpl extends LuaTableExpressionImpl implements LuaTableExpr {
 
-  public LuaTableExprImpl(LuaTableStub stub, IStubElementType type) {
-    super(stub, type);
+  public LuaTableExprImpl(LuaTableStub stub, IStubElementType<?, ?> nodeType) {
+    super(stub, nodeType);
   }
 
   public LuaTableExprImpl(ASTNode node) {
@@ -42,6 +42,7 @@ public class LuaTableExprImpl extends LuaTableExpressionImpl implements LuaTable
     return PsiTreeUtil.getChildOfType(this, LuaFieldList.class);
   }
 
+  @Nullable
   public LuaTableField findField(String fieldName) {
     return LuaPsiImplUtil.findField(this, fieldName);
   }

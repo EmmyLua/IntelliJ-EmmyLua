@@ -43,10 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * LuaPsiImplUtil
@@ -103,6 +100,7 @@ public class LuaPsiImplUtil {
      * @param declaration owner
      * @return LuaComment
      */
+    @Nullable
     public static LuaComment getComment(LuaCommentOwner declaration) {
         return LuaCommentUtil.findComment(declaration);
     }
@@ -209,6 +207,7 @@ public class LuaPsiImplUtil {
      * @param callExpr call expr
      * @return LuaTypeSet
      */
+    @Nullable
     public static LuaTypeSet guessPrefixType(LuaCallExpr callExpr, SearchContext context) {
         LuaExpr prefix = (LuaExpr) callExpr.getFirstChild();
         if (prefix != null)
@@ -242,6 +241,7 @@ public class LuaPsiImplUtil {
      * @param callExpr callExpr
      * @return String PsiElement
      */
+    @Nullable
     public static PsiElement getFirstStringArg(LuaCallExpr callExpr) {
         LuaArgs args = callExpr.getArgs();
         PsiElement path = null;
@@ -284,6 +284,7 @@ public class LuaPsiImplUtil {
         return callExpr.getExpr() instanceof LuaNameExpr;
     }
 
+    @Nullable
     public static LuaTypeSet guessTypeAt(LuaExprList list, int index, SearchContext context) {
         int cur = 0;
         for (PsiElement child = list.getFirstChild(); child != null; child = child.getNextSibling()) {
@@ -297,6 +298,7 @@ public class LuaPsiImplUtil {
         return null;
     }
 
+    @Nullable
     public static LuaTypeSet guessPrefixType(LuaIndexExpr indexExpr, SearchContext context) {
         LuaExpr prefix = (LuaExpr) indexExpr.getFirstChild();
         if (prefix != null)
@@ -338,6 +340,7 @@ public class LuaPsiImplUtil {
         return getName((PsiNameIdentifierOwner)indexExpr);
     }
 
+    @Nullable
     public static LuaTypeSet guessValueType(LuaIndexExpr indexExpr, SearchContext context) {
         LuaIndexStub stub = indexExpr.getStub();
         if (stub != null) {
@@ -362,6 +365,7 @@ public class LuaPsiImplUtil {
         return setOptional.orElse(null);
     }
 
+    @Nullable
     public static LuaTableField findField(LuaTableExpr table, String fieldName) {
         LuaFieldList fieldList = table.getFieldList();
         if (fieldList != null) {
@@ -373,20 +377,23 @@ public class LuaPsiImplUtil {
         return null;
     }
 
+    @NotNull
     public static List<LuaParamNameDef> getParamNameDefList(LuaFuncBodyOwner funcBodyOwner) {
         LuaFuncBody funcBody = funcBodyOwner.getFuncBody();
         if (funcBody != null)
             return funcBody.getParamNameDefList();
         else
-            return null;
+            return Collections.emptyList();
     }
 
+    @NotNull
     public static List<LuaParamNameDef> getParamNameDefList(LuaForAStat forAStat) {
         List<LuaParamNameDef> list = new ArrayList<>();
         list.add(forAStat.getParamNameDef());
         return list;
     }
 
+    @NotNull
     public static LuaTypeSet guessReturnTypeSet(LuaFuncBodyOwner owner, SearchContext searchContext) {
         if (owner instanceof StubBasedPsiElementBase) {
             StubBasedPsiElementBase stubElement = (StubBasedPsiElementBase) owner;
@@ -677,6 +684,7 @@ public class LuaPsiImplUtil {
         return typeName;
     }
 
+    @Nullable
     public static LuaTypeSet guessReturnTypeSet(LuaReturnStat returnStat, int index, SearchContext context) {
         if (returnStat != null) {
             LuaExprList returnExpr = returnStat.getExprList();

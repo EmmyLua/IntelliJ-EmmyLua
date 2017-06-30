@@ -12,6 +12,7 @@ public interface LuaExprList extends LuaPsiElement {
   @NotNull
   List<LuaExpr> getExprList();
 
+  @Nullable
   LuaTypeSet guessTypeAt(int index, SearchContext context);
 
 }

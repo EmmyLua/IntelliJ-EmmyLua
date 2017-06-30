@@ -14,6 +14,7 @@ public interface LuaLocalDef extends LuaDeclaration, LuaStatement {
   @Nullable
   LuaNameList getNameList();
 
+  @Nullable
   LuaComment getComment();
 
   @Nullable

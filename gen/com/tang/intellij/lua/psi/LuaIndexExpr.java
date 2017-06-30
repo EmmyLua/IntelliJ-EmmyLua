@@ -30,8 +30,10 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
 
   ItemPresentation getPresentation();
 
+  @Nullable
   LuaTypeSet guessPrefixType(SearchContext context);
 
+  @Nullable
   LuaTypeSet guessValueType(SearchContext context);
 
   @Nullable

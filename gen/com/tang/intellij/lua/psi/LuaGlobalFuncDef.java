@@ -20,10 +20,12 @@ public interface LuaGlobalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaS
   @Nullable
   PsiElement getId();
 
+  @Nullable
   LuaComment getComment();
 
   ItemPresentation getPresentation();
 
+  @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
   PsiElement getNameIdentifier();
@@ -34,6 +36,7 @@ public interface LuaGlobalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaS
 
   int getTextOffset();
 
+  @NotNull
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull

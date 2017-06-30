@@ -54,6 +54,7 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
     return PsiTreeUtil.getChildOfType(this, LuaFuncBody.class);
   }
 
+  @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtil.getComment(this);
   }
@@ -63,6 +64,7 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
     return LuaPsiImplUtil.getClassType(this, context);
   }
 
+  @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtil.getParamNameDefList(this);
   }
@@ -87,6 +89,7 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
     return LuaPsiImplUtil.toString(this);
   }
 
+  @NotNull
   public LuaTypeSet guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }

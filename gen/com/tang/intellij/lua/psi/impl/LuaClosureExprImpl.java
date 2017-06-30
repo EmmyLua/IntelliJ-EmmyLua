@@ -33,10 +33,12 @@ public class LuaClosureExprImpl extends LuaExprImpl implements LuaClosureExpr {
     return notNullChild(PsiTreeUtil.getChildOfType(this, LuaFuncBody.class));
   }
 
+  @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtil.getParamNameDefList(this);
   }
 
+  @NotNull
   public LuaTypeSet guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }

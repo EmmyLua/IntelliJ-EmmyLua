@@ -12,8 +12,10 @@ public interface LuaClosureExpr extends LuaExpr, LuaFuncBodyOwner {
   @NotNull
   LuaFuncBody getFuncBody();
 
+  @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
+  @NotNull
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull
