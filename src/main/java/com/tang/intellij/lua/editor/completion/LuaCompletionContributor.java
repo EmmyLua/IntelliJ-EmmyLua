@@ -76,9 +76,9 @@ public class LuaCompletionContributor extends CompletionContributor {
                 .andNot(IN_COMMENT)
                 .andNot(IN_CLASS_METHOD_NAME)
                 .andNot(IN_PARAM_NAME)
-                .andNot(SHOW_OVERRIDE), new LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL));
+                .andNot(SHOW_OVERRIDE), new LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.getALL()));
 
-        extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, new LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.VARS));
+        extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, new LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.getVARS()));
     }
 
     @Override
