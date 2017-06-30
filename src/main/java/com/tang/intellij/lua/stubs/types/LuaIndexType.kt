@@ -1,0 +1,86 @@
+/*
+ * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.tang.intellij.lua.stubs.types
+
+import com.intellij.lang.ASTNode
+import com.intellij.psi.stubs.*
+import com.intellij.util.io.StringRef
+import com.tang.intellij.lua.lang.LuaLanguage
+import com.tang.intellij.lua.lang.type.LuaTypeSet
+import com.tang.intellij.lua.psi.LuaIndexExpr
+import com.tang.intellij.lua.psi.LuaVarList
+import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
+import com.tang.intellij.lua.stubs.LuaIndexStub
+import com.tang.intellij.lua.stubs.impl.LuaIndexStubImpl
+import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+
+import java.io.IOException
+
+/**
+
+ * Created by TangZX on 2017/4/12.
+ */
+class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", LuaLanguage.INSTANCE) {
+
+    override fun createPsi(indexStub: LuaIndexStub): LuaIndexExpr {
+        return LuaIndexExprImpl(indexStub, this)
+    }
+
+    override fun shouldCreateStub(node: ASTNode?): Boolean {
+        val psi = node!!.psi as LuaIndexExpr
+        if (psi.id != null) {
+            if (psi.parent is LuaVarList) {
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexStub {
+        return LuaIndexStubImpl(indexExpr, stubElement, this)
+    }
+
+    override fun getExternalId(): String {
+        return "lua.index_expr"
+    }
+
+    @Throws(IOException::class)
+    override fun serialize(indexStub: LuaIndexStub, stubOutputStream: StubOutputStream) {
+        stubOutputStream.writeName(indexStub.typeName)
+        stubOutputStream.writeName(indexStub.fieldName)
+        LuaTypeSet.serialize(indexStub.guessValueType(), stubOutputStream)
+    }
+
+    @Throws(IOException::class)
+    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexStub {
+        val typeName = stubInputStream.readName()
+        val fieldName = stubInputStream.readName()
+        val valueType = LuaTypeSet.deserialize(stubInputStream)
+        return LuaIndexStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), valueType, stubElement, this)
+    }
+
+    override fun indexStub(indexStub: LuaIndexStub, indexSink: IndexSink) {
+        val fieldName = indexStub.fieldName
+        val typeName = indexStub.typeName
+        if (typeName != null && fieldName != null) {
+            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName)
+            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName)
+            indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
+        }
+    }
+}
