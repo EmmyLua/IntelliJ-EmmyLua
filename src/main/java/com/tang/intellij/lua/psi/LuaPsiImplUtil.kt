@@ -333,13 +333,7 @@ object LuaPsiImplUtil {
 
     @JvmStatic fun findField(table: LuaTableExpr, fieldName: String): LuaTableField? {
         val fieldList = table.fieldList
-        if (fieldList != null) {
-            for (field in fieldList.tableFieldList) {
-                if (fieldName == field.name)
-                    return field
-            }
-        }
-        return null
+        return fieldList?.tableFieldList?.firstOrNull { fieldName == it.name }
     }
 
     @JvmStatic fun getParamNameDefList(funcBodyOwner: LuaFuncBodyOwner): List<LuaParamNameDef> {

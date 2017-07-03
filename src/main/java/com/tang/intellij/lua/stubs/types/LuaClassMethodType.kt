@@ -46,7 +46,6 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         val methodName = methodDef.classMethodName
         val id = methodDef.nameIdentifier
         val expr = methodName.expr
-        assert(id != null)
         var clazzName = expr.text
         val searchContext = SearchContext(methodDef.project).setCurrentStubFile(methodDef.containingFile)
 
@@ -62,7 +61,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
 
         val isStatic = methodName.dot != null
 
-        return LuaClassMethodStubImpl(id!!.text, clazzName, params, returnTypeSet, isStatic, stubElement)
+        return LuaClassMethodStubImpl(id.text, clazzName, params, returnTypeSet, isStatic, stubElement)
     }
 
     override fun getExternalId(): String {
