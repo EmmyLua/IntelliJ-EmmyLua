@@ -14,27 +14,25 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor.structure;
+package com.tang.intellij.lua.editor.structure
 
-import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaLocalDef;
+import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaClassMethodDef
 
 /**
- *
- * Created by TangZX on 2016/12/28.
- */
-public class LuaLocalElement extends LuaTreeElement<LuaLocalDef> {
 
-    LuaLocalElement(LuaLocalDef localDef) {
-        super(localDef, LuaIcons.LOCAL_VAR);
+ * Created by TangZX on 2016/12/13.
+ */
+class LuaClassMethodElement internal constructor(methodDef: LuaClassMethodDef) : LuaTreeElement<LuaClassMethodDef>(methodDef, LuaIcons.CLASS_METHOD) {
+
+    private val methodName: String
+
+    init {
+        val methodName = methodDef.classMethodName
+        this.methodName = methodName.text + methodDef.paramSignature
     }
 
-    @Override
-    protected String getPresentableText() {
-        PsiElement nameList = element.getNameList();
-        if (nameList != null)
-            return "local " + nameList.getText();
-        return null;
+    override fun getPresentableText(): String {
+        return methodName
     }
 }

@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor.structure;
+package com.tang.intellij.lua.editor.structure
 
-import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
+import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaGlobalFuncDef
 
 /**
- *
+
  * Created by TangZX on 2016/12/13.
  */
-public class LuaGlobalFuncElement extends LuaTreeElement<LuaGlobalFuncDef> {
+class LuaGlobalFuncElement internal constructor(globalFuncDef: LuaGlobalFuncDef) : LuaTreeElement<LuaGlobalFuncDef>(globalFuncDef, LuaIcons.GLOBAL_FUNCTION) {
 
-    private String globalFuncName;
+    private val globalFuncName: String? = globalFuncDef.name
 
-    LuaGlobalFuncElement(LuaGlobalFuncDef globalFuncDef) {
-        super(globalFuncDef, LuaIcons.GLOBAL_FUNCTION);
-        globalFuncName = globalFuncDef.getName();
-    }
-
-    @Override
-    protected String getPresentableText() {
-        return globalFuncName;
+    override fun getPresentableText(): String? {
+        return globalFuncName
     }
 }

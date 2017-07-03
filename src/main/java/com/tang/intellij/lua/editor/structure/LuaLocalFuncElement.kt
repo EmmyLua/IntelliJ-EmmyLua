@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor.structure;
+package com.tang.intellij.lua.editor.structure
 
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.lang.LuaIcons;
+import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaLocalFuncDef
 
 /**
- *
- * Created by TangZX on 2016/12/13.
+
+ * Created by tangzx on 2017/3/14.
  */
-public class LuaClassElement extends LuaTreeElement<LuaDocClassDef> {
+class LuaLocalFuncElement internal constructor(target: LuaLocalFuncDef) : LuaTreeElement<LuaLocalFuncDef>(target, LuaIcons.LOCAL_FUNCTION) {
 
-    private String className;
+    private val name: String = "local function " + element.name + element.paramSignature
 
-    LuaClassElement(LuaDocClassDef docClassDef) {
-        super(docClassDef, LuaIcons.CLASS);
-        this.className = docClassDef.getName();
-    }
-
-    @Override
-    protected String getPresentableText() {
-        return className;
+    override fun getPresentableText(): String {
+        return name
     }
 }
