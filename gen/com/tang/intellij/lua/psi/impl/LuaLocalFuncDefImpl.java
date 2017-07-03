@@ -76,7 +76,7 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
     return LuaPsiImplUtil.getUseScope(this);
   }
 
-  @NotNull
+  @Nullable
   public LuaTypeSet guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }

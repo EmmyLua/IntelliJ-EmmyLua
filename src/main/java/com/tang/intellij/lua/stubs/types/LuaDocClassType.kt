@@ -24,7 +24,7 @@ import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.aliasName
 import com.tang.intellij.lua.stubs.LuaDocClassStub
-import com.tang.intellij.lua.stubs.impl.LuaDocClassStubImpl
+import com.tang.intellij.lua.stubs.LuaDocClassStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex

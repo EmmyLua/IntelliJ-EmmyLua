@@ -30,7 +30,7 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
   @NotNull
   PsiElement setName(String newName);
 
-  @Nullable
+  @NotNull
   String getName();
 
   int getTextOffset();

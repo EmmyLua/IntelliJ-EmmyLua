@@ -6,19 +6,19 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.tang.intellij.lua.stubs;
+package com.tang.intellij.lua.stubs
 
-import com.intellij.psi.stubs.StubElement;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
-import com.tang.intellij.lua.psi.LuaParamInfo;
+import com.intellij.psi.stubs.StubElement
+import com.tang.intellij.lua.lang.type.LuaTypeSet
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner
+import com.tang.intellij.lua.psi.LuaParamInfo
 
 /**
  * func body owner stub
  * Created by TangZX on 2017/2/4.
  */
-public interface LuaFuncBodyOwnerStub<T extends LuaFuncBodyOwner> extends StubElement<T> {
-    LuaTypeSet getReturnTypeSet();
+interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
+    val returnTypeSet: LuaTypeSet?
 
-    LuaParamInfo[] getParams();
+    val params: Array<LuaParamInfo?>
 }

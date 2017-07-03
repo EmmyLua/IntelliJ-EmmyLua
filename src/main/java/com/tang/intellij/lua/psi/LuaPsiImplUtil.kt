@@ -350,13 +350,12 @@ object LuaPsiImplUtil {
         return list
     }
 
-    @JvmStatic fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): LuaTypeSet {
+    @JvmStatic fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): LuaTypeSet? {
         if (owner is StubBasedPsiElementBase<*>) {
             val stubElement = owner as StubBasedPsiElementBase<*>
             val stub = stubElement.stub
             if (stub is LuaFuncBodyOwnerStub<*>) {
-                val funcBodyOwnerStub = stub as LuaFuncBodyOwnerStub<*>?
-                return funcBodyOwnerStub!!.returnTypeSet
+                return stub.returnTypeSet
             }
         }
 

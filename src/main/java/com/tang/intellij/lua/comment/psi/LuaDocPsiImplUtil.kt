@@ -141,11 +141,11 @@ fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, set: LuaTypeSet?, context: Sea
  * *
  * @return string
  */
-fun getName(classDef: LuaDocClassDef): String? {
+fun getName(classDef: LuaDocClassDef): String {
     val stub = classDef.stub
     if (stub != null)
         return stub.className
-    return getName(classDef as PsiNameIdentifierOwner)
+    return classDef.id.text
 }
 
 /**
@@ -176,7 +176,7 @@ fun getClassType(classDef: LuaDocClassDef): LuaType {
     if (stub != null) {
         luaType = stub.classType
     } else {
-        val clazzName = classDef.name!!
+        val clazzName = classDef.name
         var superClassName: String? = null
         val supperRef = classDef.superClassNameRef
         if (supperRef != null)

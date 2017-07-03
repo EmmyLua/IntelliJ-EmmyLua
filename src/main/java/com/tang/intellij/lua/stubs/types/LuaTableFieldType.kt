@@ -24,10 +24,9 @@ import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
 import com.tang.intellij.lua.psi.shouldCreateStub
 import com.tang.intellij.lua.stubs.LuaTableFieldStub
-import com.tang.intellij.lua.stubs.impl.LuaTableFieldStubImpl
+import com.tang.intellij.lua.stubs.LuaTableFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-
 import java.io.IOException
 
 /**

@@ -27,7 +27,7 @@ import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub
-import com.tang.intellij.lua.stubs.impl.LuaDocClassFieldStubImpl
+import com.tang.intellij.lua.stubs.LuaDocClassFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import java.io.IOException
 
@@ -79,6 +79,8 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
 
     override fun indexStub(luaFieldStub: LuaDocClassFieldStub, indexSink: IndexSink) {
         val className = luaFieldStub.className
+        className ?: return
+
         indexSink.occurrence(LuaClassFieldIndex.KEY, className)
         indexSink.occurrence(LuaClassFieldIndex.KEY, className + "." + luaFieldStub.name)
     }

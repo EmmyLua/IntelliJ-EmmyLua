@@ -40,7 +40,7 @@ public interface LuaGlobalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaS
 
   int getTextOffset();
 
-  @NotNull
+  @Nullable
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull

@@ -41,7 +41,7 @@ public interface LuaClassMethodDef extends LuaFuncBodyOwner, LuaDeclaration, Lua
 
   int getTextOffset();
 
-  @NotNull
+  @Nullable
   LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull

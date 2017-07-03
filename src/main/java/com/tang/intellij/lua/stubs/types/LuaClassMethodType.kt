@@ -27,7 +27,7 @@ import com.tang.intellij.lua.psi.LuaPsiImplUtil
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMethodStub
-import com.tang.intellij.lua.stubs.impl.LuaClassMethodStubImpl
+import com.tang.intellij.lua.stubs.LuaClassMethodStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import java.io.IOException

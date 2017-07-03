@@ -23,8 +23,7 @@ import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.psi.impl.LuaTableExprImpl
 import com.tang.intellij.lua.psi.shouldCreateStub
 import com.tang.intellij.lua.stubs.LuaTableStub
-import com.tang.intellij.lua.stubs.impl.LuaTableStubImpl
-
+import com.tang.intellij.lua.stubs.LuaTableStubImpl
 import java.io.IOException
 
 /**

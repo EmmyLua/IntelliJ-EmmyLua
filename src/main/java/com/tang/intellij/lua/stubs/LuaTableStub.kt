@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs;
+package com.tang.intellij.lua.stubs
 
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.psi.stubs.IStubElementType
+import com.intellij.psi.stubs.StubBase
+import com.intellij.psi.stubs.StubElement
+import com.tang.intellij.lua.psi.LuaTableExpr
 
 /**
- *
- * Created by tangzx on 2016/11/26.
+
+ * Created by tangzx on 2017/1/12.
  */
-public interface LuaGlobalFuncStub extends LuaFuncBodyOwnerStub<LuaGlobalFuncDef> {
-    @NotNull
-    String getName();
-}
+interface LuaTableStub : StubElement<LuaTableExpr>
+
+class LuaTableStubImpl(parent: StubElement<*>, elementType: IStubElementType<*, *>)
+    : StubBase<LuaTableExpr>(parent, elementType), LuaTableStub

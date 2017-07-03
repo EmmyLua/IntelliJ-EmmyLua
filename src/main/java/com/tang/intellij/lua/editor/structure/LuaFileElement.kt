@@ -74,10 +74,7 @@ class LuaFileElement(private val file: LuaFile) : StructureViewTreeElement {
             internal fun visitDocComment(comment: PsiElement) {
                 comment.acceptChildren(object : LuaDocVisitor() {
                     override fun visitClassDef(o: LuaDocClassDef) {
-                        val name = o.name
-                        if (name != null) {
-                            list.add(LuaClassElement(o))
-                        }
+                        list.add(LuaClassElement(o))
                     }
 
                     override fun visitFieldDef(o: LuaDocFieldDef) {

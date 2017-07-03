@@ -27,7 +27,7 @@ import com.tang.intellij.lua.psi.LuaPsiImplUtil
 import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub
-import com.tang.intellij.lua.stubs.impl.LuaGlobalFuncStubImpl
+import com.tang.intellij.lua.stubs.LuaGlobalFuncStubImpl
 import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import java.io.IOException

@@ -24,10 +24,9 @@ import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
 import com.tang.intellij.lua.stubs.LuaNameStub
-import com.tang.intellij.lua.stubs.impl.LuaNameStubImpl
+import com.tang.intellij.lua.stubs.LuaNameStubImpl
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-
 import java.io.IOException
 
 /**

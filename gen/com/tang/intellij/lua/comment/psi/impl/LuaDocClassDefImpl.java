@@ -71,7 +71,7 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
     return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 
-  @Nullable
+  @NotNull
   public String getName() {
     return LuaDocPsiImplUtilKt.getName(this);
   }
