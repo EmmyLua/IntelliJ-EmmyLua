@@ -49,7 +49,7 @@ open class LuaNameExpressionImpl : StubBasedPsiElementBase<LuaNameStub>, LuaExpr
         return null
     }
 
-    override fun guessType(context: SearchContext): LuaTypeSet {
+    override fun guessType(context: SearchContext): LuaTypeSet? {
         return RecursionManager.doPreventingRecursion(this, true) {
             var typeSet = LuaTypeSet.create()
             val nameExpr = this as LuaNameExpr
@@ -64,7 +64,7 @@ open class LuaNameExpressionImpl : StubBasedPsiElementBase<LuaNameStub>, LuaExpr
                 }
             }
             typeSet
-        }!!
+        }
     }
 
     private fun getTypeSet(context: SearchContext, def: PsiElement): LuaTypeSet? {
