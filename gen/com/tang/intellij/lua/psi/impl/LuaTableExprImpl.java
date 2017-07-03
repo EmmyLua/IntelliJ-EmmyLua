@@ -13,7 +13,7 @@ import com.tang.intellij.lua.stubs.LuaTableStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaTableExprImpl extends LuaTableExpressionImpl implements LuaTableExpr {
+public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr {
 
   public LuaTableExprImpl(LuaTableStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);

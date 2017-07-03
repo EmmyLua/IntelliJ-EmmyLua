@@ -27,7 +27,7 @@ import com.tang.intellij.lua.search.SearchContext
  * 表达式基类
  * Created by TangZX on 2016/12/4.
  */
-open class LuaExpressionImpl internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpression {
+open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpression {
 
     override fun guessType(context: SearchContext): LuaTypeSet? {
         return RecursionManager.doPreventingRecursion<LuaTypeSet>(this, true) {

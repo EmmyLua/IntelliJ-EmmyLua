@@ -31,7 +31,7 @@ import com.tang.intellij.lua.stubs.LuaTableStub
 
  * Created by Administrator on 2017/6/21.
  */
-open class LuaTableExpressionImpl : StubBasedPsiElementBase<LuaTableStub>, LuaExpression {
+open class LuaTableExprMixin : StubBasedPsiElementBase<LuaTableStub>, LuaExpression {
     constructor(stub: LuaTableStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     constructor(node: ASTNode) : super(node)

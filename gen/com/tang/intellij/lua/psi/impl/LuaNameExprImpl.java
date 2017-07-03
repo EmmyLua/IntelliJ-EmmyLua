@@ -15,7 +15,7 @@ import com.tang.intellij.lua.stubs.LuaNameStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaNameExprImpl extends LuaNameExpressionImpl implements LuaNameExpr {
+public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
 
   public LuaNameExprImpl(LuaNameStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);

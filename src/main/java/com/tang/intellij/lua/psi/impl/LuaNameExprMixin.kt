@@ -34,7 +34,7 @@ import com.tang.intellij.lua.stubs.LuaNameStub
 
  * Created by TangZX on 2017/4/12.
  */
-open class LuaNameExpressionImpl : StubBasedPsiElementBase<LuaNameStub>, LuaExpression, LuaGlobalVar {
+open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpression, LuaGlobalVar {
     internal constructor(stub: LuaNameStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     internal constructor(node: ASTNode) : super(node)

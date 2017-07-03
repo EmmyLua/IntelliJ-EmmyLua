@@ -37,7 +37,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 
  * Created by TangZX on 2017/4/12.
  */
-open class LuaIndexExpressionImpl : StubBasedPsiElementBase<LuaIndexStub>, LuaExpression, LuaClassField {
+open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpression, LuaClassField {
 
     internal constructor(stub: LuaIndexStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 

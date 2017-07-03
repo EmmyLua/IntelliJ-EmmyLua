@@ -16,7 +16,7 @@ import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaIndexExprImpl extends LuaIndexExpressionImpl implements LuaIndexExpr {
+public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr {
 
   public LuaIndexExprImpl(LuaIndexStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
