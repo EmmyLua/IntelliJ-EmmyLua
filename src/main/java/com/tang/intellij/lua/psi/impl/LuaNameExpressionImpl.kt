@@ -68,35 +68,32 @@ open class LuaNameExpressionImpl : StubBasedPsiElementBase<LuaNameStub>, LuaExpr
     }
 
     private fun getTypeSet(context: SearchContext, def: PsiElement): LuaTypeSet? {
-        if (def is LuaNameExpr) {
-            var typeSet: LuaTypeSet? = null
-            val luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat::class.java)
-            if (luaAssignStat != null) {
-                val comment = luaAssignStat.comment
-                //优先从 Comment 猜
-                if (comment != null) {
-                    typeSet = comment.guessType(context)
+        when (def) {
+            is LuaNameExpr -> {
+                var typeSet: LuaTypeSet? = null
+                val luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat::class.java)
+                if (luaAssignStat != null) {
+                    val comment = luaAssignStat.comment
+                    //优先从 Comment 猜
+                    typeSet = comment?.guessType(context)
+                    //再从赋值猜
+                    if (typeSet == null) {
+                        val exprList = luaAssignStat.valueExprList
+                        if (exprList != null)
+                            typeSet = exprList.guessTypeAt(0, context)//TODO : multi
+                    }
                 }
-                //再从赋值猜
-                if (typeSet == null) {
-                    val exprList = luaAssignStat.valueExprList
-                    if (exprList != null)
-                        typeSet = exprList.guessTypeAt(0, context)//TODO : multi
+                //Global
+                if (LuaPsiResolveUtil.resolveLocal(def, context) == null) {
+                    if (typeSet == null)
+                        typeSet = LuaTypeSet.create()
+                    typeSet.addType(LuaType.createGlobalType(def))
                 }
+                return typeSet
             }
-            //Global
-            val newRef = def
-            if (LuaPsiResolveUtil.resolveLocal(newRef, context) == null) {
-                if (typeSet == null)
-                    typeSet = LuaTypeSet.create()
-                typeSet.addType(LuaType.createGlobalType(newRef))
-            }
-            return typeSet
-        } else if (def is LuaTypeGuessable) {
-            return def.guessType(context)
+            is LuaTypeGuessable -> return def.guessType(context)
+            else -> return null
         }
-
-        return null
     }
 
     override fun getNameRef(): LuaNameExpr? = this as LuaNameExpr
