@@ -129,7 +129,11 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)? comment_string? {
 }
 
 // @type CLASS_REF
-type_def ::= TYPE type_set comment_string? { pin = 1 methods = [guessType] }
+type_def ::= TYPE type_set comment_string? {
+    pin = 1
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTyStub"
+    methods = [guessType]
+}
 
 comment_string ::= STRING_BEGIN STRING? {
     pin = 1

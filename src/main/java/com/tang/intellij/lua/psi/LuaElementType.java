@@ -32,6 +32,7 @@ import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
 import com.tang.intellij.lua.stubs.types.*;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -59,7 +60,7 @@ public class LuaElementType extends IElementType {
             return node.getFirstChildNode();
         }
 
-        @Nullable
+        @NotNull
         @Override
         public ASTNode createNode(CharSequence text) {
             return new LuaCommentImpl(text);
@@ -69,6 +70,7 @@ public class LuaElementType extends IElementType {
     public static IStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncType();
     public static IStubElementType CLASS_METHOD_DEF = new LuaClassMethodType();
     public static IStubElementType CLASS_FIELD_DEF = new LuaDocClassFieldType();
+    public static IStubElementType TYPE_DEF = new LuaDocTyType();
     public static IStubElementType CLASS_DEF = new LuaDocClassType();
     public static IStubElementType TABLE = new LuaTableType();
     public static IStubElementType TABLE_FIELD = new LuaTableFieldType();
