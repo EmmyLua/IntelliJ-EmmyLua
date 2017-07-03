@@ -93,7 +93,8 @@ public class LuaTypeSet {
     }
 
     private boolean hasType(LuaType type) {
-        for (LuaType luaType : types) {
+        LuaType[] arr = types.toArray(new LuaType[types.size()]); //ConcurrentModificationException ??
+        for (LuaType luaType : arr) {
             if (type.equals(luaType))
                 return true;
         }
