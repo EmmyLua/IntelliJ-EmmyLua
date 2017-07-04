@@ -147,11 +147,16 @@ object LuaPsiImplUtil {
      */
     @JvmStatic fun getClassType(classMethodDef: LuaClassMethodDef, context: SearchContext): LuaType? {
         return CachedValuesManager.getManager(classMethodDef.project).getParameterizedCachedValue(classMethodDef, GET_CLASS_METHOD, { ctx ->
-            val expr = classMethodDef.classMethodName.expr
-            val typeSet = expr.guessType(ctx)
+            val stub = classMethodDef.stub
             var type: LuaType? = null
-            if (typeSet != null) {
-                type = typeSet.perfect
+            if (stub != null) {
+                type = LuaType.create(stub.className, null)
+            } else {
+                val expr = classMethodDef.classMethodName.expr
+                val typeSet = expr.guessType(ctx)
+                if (typeSet != null) {
+                    type = typeSet.perfect
+                }
             }
             CachedValueProvider.Result.create(type, classMethodDef)
         }, false, context)
