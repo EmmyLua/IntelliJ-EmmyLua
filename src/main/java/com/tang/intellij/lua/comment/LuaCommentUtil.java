@@ -47,6 +47,7 @@ public class LuaCommentUtil {
         }
     }
 
+    @Nullable
     public static LuaComment findComment(LuaCommentOwner element) {
         return PsiTreeUtil.getChildOfType(element,  LuaComment.class);
     }
