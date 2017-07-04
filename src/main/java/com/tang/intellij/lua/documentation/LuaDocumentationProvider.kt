@@ -44,14 +44,14 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
     }
 
     private fun genDoc(element: PsiElement): String? {
-        if (element is LuaCommentOwner) {
-            return genDoc(element)
-        } else if (element is LuaParamNameDef) {
-            return genDoc(element)
-        } else if (element is LuaNameDef) {
-            val owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner::class.java)
-            if (owner != null)
-                return genDoc(owner)
+        when (element) {
+            is LuaCommentOwner -> return genDoc(element)
+            is LuaParamNameDef -> return genDoc(element)
+            is LuaNameDef -> {
+                val owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner::class.java)
+                if (owner != null)
+                    return genDoc(owner)
+            }
         }
         return null
     }
@@ -93,31 +93,36 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         if (comment != null) {
             var child: PsiElement? = comment.firstChild
             while (child != null) {
-                val elementType = child.node.elementType
-                if (elementType === LuaDocTypes.STRING) {
-                    sb.append(child.text)
-                    sb.append("<br>")
-                } else if (elementType === LuaDocTypes.PARAM_DEF) {
-                    val paramDef = child as LuaDocParamDef?
-                    val paramNameRef = paramDef!!.paramNameRef
-                    if (paramNameRef != null) {
-                        sb.append("<li><b>param</b> ")
-                        sb.append(paramNameRef.text)
-                        sb.append(" ")
-                        getTypeSet(paramDef.typeSet, sb)
-                        sb.append("<br>")
-                    }
-                } else if (elementType === LuaDocTypes.RETURN_DEF) {
-                    val returnDef = child as LuaDocReturnDef?
-                    val typeList = returnDef!!.typeList
-                    if (typeList != null) {
-                        sb.append("<li><b>return</b> ")
-                        val typeSetList = typeList.typeSetList
-                        for (typeSet in typeSetList) {
-                            getTypeSet(typeSet, sb)
+                when (child) {
+                    is LuaDocParamDef -> {
+                        val paramNameRef = child.paramNameRef
+                        if (paramNameRef != null) {
+                            sb.append("<li><b>param</b> ")
+                            sb.append(paramNameRef.text)
                             sb.append(" ")
+                            getTypeSet(child.typeSet, sb)
+                            sb.append(" " + child.commentString?.string?.text)
+                            sb.append("<br>")
                         }
-                        sb.append("<br>")
+                    }
+                    is LuaDocReturnDef -> {
+                        val typeList = child.typeList
+                        if (typeList != null) {
+                            sb.append("<li><b>return</b> ")
+                            val typeSetList = typeList.typeSetList
+                            for (typeSet in typeSetList) {
+                                getTypeSet(typeSet, sb)
+                                sb.append(" ")
+                            }
+                            sb.append("<br>")
+                        }
+                    }
+                    else -> {
+                        val elementType = child.node.elementType
+                        if (elementType === LuaDocTypes.STRING) {
+                            sb.append(child.text)
+                            sb.append("<br>")
+                        }
                     }
                 }
                 child = child.nextSibling
