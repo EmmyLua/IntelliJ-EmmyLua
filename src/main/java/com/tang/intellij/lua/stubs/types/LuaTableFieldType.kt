@@ -48,9 +48,7 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
         return LuaTableFieldStubImpl(field, stubElement, this)
     }
 
-    override fun getExternalId(): String {
-        return "lua.table_field"
-    }
+    override fun getExternalId() = "lua.table_field"
 
     @Throws(IOException::class)
     override fun serialize(fieldStub: LuaTableFieldStub, stubOutputStream: StubOutputStream) {

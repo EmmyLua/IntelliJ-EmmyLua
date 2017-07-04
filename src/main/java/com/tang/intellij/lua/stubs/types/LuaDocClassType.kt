@@ -48,9 +48,7 @@ class LuaDocClassType : IStubElementType<LuaDocClassStub, LuaDocClassDef>("Class
         return LuaDocClassStubImpl(luaDocClassDef.name, aliasName, superClassName, stubElement)
     }
 
-    override fun getExternalId(): String {
-        return "lua.class"
-    }
+    override fun getExternalId() = "lua.class"
 
     @Throws(IOException::class)
     override fun serialize(luaDocClassStub: LuaDocClassStub, stubOutputStream: StubOutputStream) {

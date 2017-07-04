@@ -37,8 +37,8 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
 
     override fun createPsi(luaNameStub: LuaNameStub) = LuaNameExprImpl(luaNameStub, this)
 
-    override fun shouldCreateStub(node: ASTNode?): Boolean {
-        val psi = node!!.psi as LuaNameExpr
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        val psi = node.psi as LuaNameExpr
         return psi.parent is LuaVarList
     }
 

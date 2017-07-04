@@ -39,8 +39,8 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
 
     override fun createPsi(luaFieldStub: LuaDocClassFieldStub) = LuaDocFieldDefImpl(luaFieldStub, this)
 
-    override fun shouldCreateStub(node: ASTNode?): Boolean {
-        val element = node!!.psi as LuaDocFieldDef
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        val element = node.psi as LuaDocFieldDef
         val comment = LuaCommentUtil.findContainer(element)
         return comment.classDef != null && element.nameIdentifier != null
     }

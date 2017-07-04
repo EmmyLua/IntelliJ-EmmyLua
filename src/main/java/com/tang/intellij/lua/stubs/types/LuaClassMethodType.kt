@@ -64,13 +64,11 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         return LuaClassMethodStubImpl(id.text, clazzName, params, returnTypeSet, isStatic, stubElement)
     }
 
-    override fun getExternalId(): String {
-        return "lua.class_method"
-    }
+    override fun getExternalId() = "lua.class_method"
 
-    override fun shouldCreateStub(node: ASTNode?): Boolean {
+    override fun shouldCreateStub(node: ASTNode): Boolean {
         //确定是完整的，并且是 class:method, class.method 形式的， 否则会报错
-        val psi = node!!.psi as LuaClassMethodDef
+        val psi = node.psi as LuaClassMethodDef
         return psi.funcBody != null
     }
 
@@ -113,15 +111,13 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
 
     override fun indexStub(luaClassMethodStub: LuaClassMethodStub, indexSink: IndexSink) {
         val className = luaClassMethodStub.className
-        if (className != null) {
-            val shortName = luaClassMethodStub.shortName
-            if (luaClassMethodStub.isStatic) {
-                indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static")
-                indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + shortName)
-            } else {
-                indexSink.occurrence(LuaClassMethodIndex.KEY, className)
-            }
-            indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
+        val shortName = luaClassMethodStub.shortName
+        if (luaClassMethodStub.isStatic) {
+            indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static")
+            indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + shortName)
+        } else {
+            indexSink.occurrence(LuaClassMethodIndex.KEY, className)
         }
+        indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
     }
 }

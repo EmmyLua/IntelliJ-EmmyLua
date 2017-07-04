@@ -41,8 +41,8 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
         return LuaIndexExprImpl(indexStub, this)
     }
 
-    override fun shouldCreateStub(node: ASTNode?): Boolean {
-        val psi = node!!.psi as LuaIndexExpr
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        val psi = node.psi as LuaIndexExpr
         if (psi.id != null) {
             if (psi.parent is LuaVarList) {
                 return true
@@ -55,9 +55,7 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
         return LuaIndexStubImpl(indexExpr, stubElement, this)
     }
 
-    override fun getExternalId(): String {
-        return "lua.index_expr"
-    }
+    override fun getExternalId() = "lua.index_expr"
 
     @Throws(IOException::class)
     override fun serialize(indexStub: LuaIndexStub, stubOutputStream: StubOutputStream) {

@@ -53,8 +53,8 @@ class LuaGlobalFuncType : IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef>(
 
     override fun getExternalId() = "lua.global_func_def"
 
-    override fun shouldCreateStub(node: ASTNode?): Boolean {
-        val element = node!!.psi
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        val element = node.psi
         if (element is LuaGlobalFuncDef) {
             return element.nameIdentifier != null
         }
