@@ -107,5 +107,16 @@ val LuaTableField.shouldCreateStub: Boolean get() {
 }
 
 val LuaTableExpr.shouldCreateStub: Boolean get() {
-    return true
+    val pt = parent
+    return when (pt) {
+        is LuaTableField -> pt.shouldCreateStub
+        is LuaExprList -> {
+            val ppt = pt.parent
+            when (ppt) {
+                is LuaArgs-> false
+                else-> true
+            }
+        }
+        else-> true
+    }
 }
