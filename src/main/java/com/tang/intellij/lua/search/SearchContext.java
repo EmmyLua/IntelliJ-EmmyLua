@@ -21,7 +21,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
+import com.intellij.util.indexing.AdditionalIndexedRootsScope;
 import com.tang.intellij.lua.lang.GuessTypeKind;
+import com.tang.intellij.lua.project.LuaPredefinedLibraryProvider;
 
 /**
  *
@@ -60,7 +62,7 @@ public class SearchContext {
             if (isDumb()) {
                 scope = GlobalSearchScope.EMPTY_SCOPE;
             } else {
-                scope = new ProjectAndLibrariesScope(project);
+                scope = new AdditionalIndexedRootsScope(new ProjectAndLibrariesScope(project), LuaPredefinedLibraryProvider.class);
             }
         }
         return scope;
