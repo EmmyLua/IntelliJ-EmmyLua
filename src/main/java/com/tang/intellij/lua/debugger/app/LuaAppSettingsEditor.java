@@ -26,6 +26,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.SystemInfoRt;
+import com.intellij.ui.RawCommandLineEditor;
 import com.intellij.util.TextFieldCompletionProvider;
 import com.intellij.util.textCompletion.TextFieldWithCompletion;
 import com.tang.intellij.lua.debugger.DebuggerType;
@@ -46,6 +47,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
     private JComboBox<DebuggerType> myDebugger;
     private TextFieldWithCompletion myFile;
     private TextFieldWithBrowseButton myWorkingDir;
+    private RawCommandLineEditor parameters;
     private Project project;
 
     LuaAppSettingsEditor(Project project) {
@@ -72,6 +74,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         myWorkingDir.setText(luaAppRunConfiguration.getWorkingDir());
         myFile.setText(luaAppRunConfiguration.getFile());
         myDebugger.setSelectedItem(luaAppRunConfiguration.getDebuggerType());
+        parameters.setText(luaAppRunConfiguration.getParameters());
     }
 
     @Override
@@ -80,6 +83,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         luaAppRunConfiguration.setWorkingDir(myWorkingDir.getText());
         luaAppRunConfiguration.setFile(myFile.getText());
         luaAppRunConfiguration.setDebuggerType((DebuggerType) myDebugger.getSelectedItem());
+        luaAppRunConfiguration.setParameters(parameters.getText());
     }
 
     @NotNull

@@ -33,14 +33,16 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.tang.intellij.lua.debugger.DebuggerType;
 import com.tang.intellij.lua.debugger.IRemoteConfiguration;
-import com.tang.intellij.lua.debugger.LuaRunConfiguration;
 import com.tang.intellij.lua.debugger.LuaCommandLineState;
+import com.tang.intellij.lua.debugger.LuaRunConfiguration;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -52,6 +54,7 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
     private String program = SystemInfoRt.isWindows ? "lua.exe" : "lua";
     private String file;
     private String workingDir;
+    private String params;
     private DebuggerType debuggerType = DebuggerType.Attach;
 
     LuaAppRunConfiguration(Project project, ConfigurationFactory factory) {
@@ -92,6 +95,7 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
         JDOMExternalizerUtil.writeField(element, "file", file);
         JDOMExternalizerUtil.writeField(element, "workingDir", workingDir);
         JDOMExternalizerUtil.writeField(element, "debuggerType", String.valueOf(debuggerType.value()));
+        JDOMExternalizerUtil.writeField(element, "params", params);
     }
 
     @Override
@@ -106,6 +110,8 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
         String debuggerType = JDOMExternalizerUtil.readField(element, "debuggerType");
         if (debuggerType != null)
             this.debuggerType = DebuggerType.valueOf(Integer.parseInt(debuggerType));
+
+        params = JDOMExternalizerUtil.readField(element, "params");
     }
 
     @Override
@@ -132,6 +138,27 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
 
     public void setDebuggerType(DebuggerType debuggerType) {
         this.debuggerType = debuggerType;
+    }
+
+    public void setParameters(@Nullable String params) {
+        this.params = params;
+    }
+
+    public String getParameters() {
+        return params;
+    }
+
+    @NotNull
+    public String[] getParametersArray() {
+        ArrayList<String> list = new ArrayList<>();
+        if (params != null && !params.isEmpty()) {
+            String[] strings = params.split("\\s+");
+            list.addAll(Arrays.asList(strings));
+        }
+        if (file != null && !file.isEmpty()) {
+            list.add(file);
+        }
+        return list.toArray(new String[list.size()]);
     }
 
     public String getWorkingDir() {
@@ -180,7 +207,8 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
     @Override
     public GeneralCommandLine createCommandLine() {
         GeneralCommandLine commandLine = new GeneralCommandLine().withExePath(program);
-        commandLine.addParameters(getFile());
+        String[] params = getParametersArray();
+        commandLine.addParameters(params);
         commandLine.setWorkDirectory(getWorkingDir());
         return commandLine;
     }
