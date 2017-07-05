@@ -81,6 +81,7 @@ field_def ::= FIELD access_modifier ID type_set comment_string? {
         getTextOffset
         getFieldName
         toString
+        getPresentation
     ]
 }
 

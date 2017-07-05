@@ -29,6 +29,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import java.io.IOException
 
 /**
@@ -83,5 +84,6 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
 
         indexSink.occurrence(LuaClassFieldIndex.KEY, className)
         indexSink.occurrence(LuaClassFieldIndex.KEY, className + "." + luaFieldStub.name)
+        indexSink.occurrence(LuaShortNameIndex.KEY, luaFieldStub.name)
     }
 }

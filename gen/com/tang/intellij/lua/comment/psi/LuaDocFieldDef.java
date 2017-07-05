@@ -8,6 +8,7 @@ import com.tang.intellij.lua.psi.LuaClassField;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
+import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 
@@ -41,5 +42,8 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
 
   @Nullable
   String getFieldName();
+
+  @NotNull
+  ItemPresentation getPresentation();
 
 }

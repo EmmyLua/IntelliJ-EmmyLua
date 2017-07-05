@@ -11,6 +11,7 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.tang.intellij.lua.comment.psi.*;
+import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 import com.intellij.psi.stubs.IStubElementType;
@@ -95,6 +96,11 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocClassField
   @NotNull
   public String toString() {
     return LuaDocPsiImplUtilKt.toString(this);
+  }
+
+  @NotNull
+  public ItemPresentation getPresentation() {
+    return LuaDocPsiImplUtilKt.getPresentation(this);
   }
 
 }

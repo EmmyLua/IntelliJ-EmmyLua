@@ -216,3 +216,19 @@ fun getFieldName(fieldDef: LuaDocFieldDef): String? {
         return stub.name
     return fieldDef.name
 }
+
+fun getPresentation(fieldDef: LuaDocFieldDef): ItemPresentation {
+    return object : ItemPresentation {
+        override fun getPresentableText(): String? {
+            return fieldDef.name
+        }
+
+        override fun getLocationString(): String? {
+            return fieldDef.containingFile.name
+        }
+
+        override fun getIcon(b: Boolean): Icon? {
+            return AllIcons.Nodes.Field
+        }
+    }
+}
