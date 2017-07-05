@@ -78,7 +78,7 @@ class LuaFileElement(private val file: LuaFile) : StructureViewTreeElement {
                     }
 
                     override fun visitFieldDef(o: LuaDocFieldDef) {
-
+                        list.add(LuaClassFieldElement(o))
                     }
                 })
             }
