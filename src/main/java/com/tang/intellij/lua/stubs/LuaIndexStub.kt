@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs;
+package com.tang.intellij.lua.stubs
 
-import com.intellij.psi.stubs.StubElement;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.LuaIndexExpr;
+import com.intellij.psi.stubs.StubElement
+import com.tang.intellij.lua.lang.type.LuaTypeSet
+import com.tang.intellij.lua.psi.LuaIndexExpr
 
 /**
- *
+
  * Created by TangZX on 2017/4/12.
  */
-public interface LuaIndexStub  extends StubElement<LuaIndexExpr> {
-    String getTypeName();
-    String getFieldName();
-    LuaTypeSet guessValueType();
+interface LuaIndexStub : StubElement<LuaIndexExpr> {
+    val typeName: String?
+    val fieldName: String?
+    fun guessValueType(): LuaTypeSet?
 }
