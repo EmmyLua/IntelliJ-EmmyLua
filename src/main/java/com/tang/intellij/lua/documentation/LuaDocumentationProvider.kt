@@ -56,7 +56,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         return null
     }
 
-    private fun genDoc(paramNameDef: LuaParamNameDef): String {
+    private fun genDoc(paramNameDef: LuaParamNameDef): String? {
         val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
         val o = Optional.ofNullable(owner)
                 .map<LuaComment>({ it.comment })

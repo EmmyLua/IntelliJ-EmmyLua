@@ -58,7 +58,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         return null
     }
 
-    override fun guessType(context: SearchContext): LuaTypeSet {
+    override fun guessType(context: SearchContext): LuaTypeSet? {
         return RecursionManager.doPreventingRecursion(this, true) {
             var result = LuaTypeSet.create()
             val indexExpr = this as LuaIndexExpr
@@ -84,7 +84,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
                 }
             }
             result
-        }!!
+        }
     }
 
     private fun guessFieldType(fieldName: String, type: LuaType, context: SearchContext): LuaTypeSet? {
