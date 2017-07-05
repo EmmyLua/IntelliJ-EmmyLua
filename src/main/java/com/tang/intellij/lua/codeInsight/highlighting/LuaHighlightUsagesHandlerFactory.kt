@@ -30,6 +30,8 @@ import com.tang.intellij.lua.psi.*
  * Created by tangzx on 2017/3/18.
  */
 class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
+    val binaryOp = arrayOf(LuaTypes.AND, LuaTypes.OR)
+
     override fun createHighlightUsagesHandler(editor: Editor,
                                               psiFile: PsiFile,
                                               psiElement: PsiElement): HighlightUsagesHandlerBase<*>? {
@@ -48,6 +50,21 @@ class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
                 val loop = PsiTreeUtil.getParentOfType(psiElement, LuaLoop::class.java)
                 if (loop != null)
                     return LoopHandler(editor, psiFile, psiElement, loop)
+            }
+
+            in binaryOp -> {
+                val expr = PsiTreeUtil.getParentOfType(psiElement, LuaBinaryExpr::class.java)
+                if (expr != null) {
+                    return object : HighlightUsagesHandlerBase<PsiElement>(editor, psiFile) {
+                        override fun selectTargets(list: MutableList<PsiElement>?, consumer: Consumer<MutableList<PsiElement>>?) { }
+
+                        override fun computeUsages(list: MutableList<PsiElement>) {
+                            addOccurrence(expr)
+                        }
+
+                        override fun getTargets() = arrayListOf(psiElement)
+                    }
+                }
             }
 
             // local a = value
