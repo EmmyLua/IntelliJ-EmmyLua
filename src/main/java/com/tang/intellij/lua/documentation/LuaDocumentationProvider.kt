@@ -101,7 +101,9 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
                             sb.append(paramNameRef.text)
                             sb.append(" ")
                             getTypeSet(child.typeSet, sb)
-                            sb.append(" " + child.commentString?.string?.text)
+                            child.commentString?.string?.text?.let {
+                                sb.append(" " + it)
+                            }
                             sb.append("<br>")
                         }
                     }
