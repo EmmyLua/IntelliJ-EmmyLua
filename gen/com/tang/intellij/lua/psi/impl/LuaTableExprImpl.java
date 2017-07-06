@@ -37,9 +37,15 @@ public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr 
   }
 
   @Override
-  @Nullable
-  public LuaFieldList getFieldList() {
-    return PsiTreeUtil.getChildOfType(this, LuaFieldList.class);
+  @NotNull
+  public List<LuaTableField> getTableFieldList() {
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaTableField.class);
+  }
+
+  @Override
+  @NotNull
+  public List<LuaTableFieldSep> getTableFieldSepList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaTableFieldSep.class);
   }
 
   @Nullable

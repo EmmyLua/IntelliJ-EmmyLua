@@ -41,8 +41,7 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
 
     //不创建 ASTBlock
     private val fakeBlockSet = TokenSet.create(
-            BLOCK,
-            FIELD_LIST
+            BLOCK
     )
 
     //回车时
@@ -71,21 +70,28 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
     }
 
     private fun buildChildren(parent: ASTNode, results: MutableList<Block>) {
-        var node: ASTNode? = parent.firstChildNode
+        var child: ASTNode? = parent.firstChildNode
         val parentType = parent.elementType
         var childIndent = Indent.getNoneIndent()
         if (fakeBlockSet.contains(parentType)) {
             childIndent = Indent.getNormalIndent()
         }
 
-        while (node != null) {
-            val nodeElementType = node.elementType
-            if (fakeBlockSet.contains(nodeElementType)) {
-                buildChildren(node, results)
-            } else if (shouldCreateBlockFor(node)) {
-                results.add(createBlock(node, childIndent, null))
+        while (child != null) {
+            val childType = child.elementType
+            if (parentType == TABLE_EXPR ) {
+                if (childType != LCURLY && childType != RCURLY)
+                    childIndent = Indent.getNormalIndent()
+                else
+                    childIndent = Indent.getNoneIndent()
             }
-            node = node.treeNext
+
+            if (fakeBlockSet.contains(childType)) {
+                buildChildren(child, results)
+            } else if (shouldCreateBlockFor(child)) {
+                results.add(createBlock(child, childIndent, null))
+            }
+            child = child.treeNext
         }
     }
 

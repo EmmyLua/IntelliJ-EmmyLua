@@ -23,7 +23,6 @@ public interface LuaTypes {
   IElementType DO_STAT = LuaParserDefinition.createType("DO_STAT");
   IElementType EXPR = LuaParserDefinition.createType("EXPR");
   IElementType EXPR_LIST = LuaParserDefinition.createType("EXPR_LIST");
-  IElementType FIELD_LIST = LuaParserDefinition.createType("FIELD_LIST");
   IElementType FOR_A_STAT = LuaParserDefinition.createType("FOR_A_STAT");
   IElementType FOR_B_STAT = LuaParserDefinition.createType("FOR_B_STAT");
   IElementType FUNC_BODY = LuaParserDefinition.createType("FUNC_BODY");
@@ -158,9 +157,6 @@ public interface LuaTypes {
       }
       else if (type == EXPR_LIST) {
         return new LuaExprListImpl(node);
-      }
-      else if (type == FIELD_LIST) {
-        return new LuaFieldListImpl(node);
       }
       else if (type == FOR_A_STAT) {
         return new LuaForAStatImpl(node);

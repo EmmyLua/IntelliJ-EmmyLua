@@ -417,7 +417,7 @@ tableExpr ::= '{' fieldList '}' {
     stubClass = "com.tang.intellij.lua.stubs.LuaTableStub"
 }
 
-fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
+private fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
 
 private tableField1 ::= '[' expr ']' '=' expr { pin = 1 }
 private tableField2 ::= ID '=' expr { pin = 2 }

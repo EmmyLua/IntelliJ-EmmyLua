@@ -74,10 +74,6 @@ public class LuaVisitor extends PsiElementVisitor {
     visitStatement(o);
   }
 
-  public void visitFieldList(@NotNull LuaFieldList o) {
-    visitPsiElement(o);
-  }
-
   public void visitForAStat(@NotNull LuaForAStat o) {
     visitStatement(o);
     // visitParametersOwner(o);

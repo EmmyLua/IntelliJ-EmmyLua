@@ -63,9 +63,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == EXPR_LIST) {
       r = exprList(b, 0);
     }
-    else if (t == FIELD_LIST) {
-      r = fieldList(b, 0);
-    }
     else if (t == FOR_A_STAT) {
       r = forAStat(b, 0);
     }
@@ -615,13 +612,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
-  public static boolean fieldList(PsiBuilder b, int l) {
+  static boolean fieldList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fieldList")) return false;
-    Marker m = enter_section_(b, l, _NONE_, FIELD_LIST, "<field list>");
     fieldList_0(b, l + 1);
-    register_hook_(b, LEFT_BINDER, GREEDY_LEFT_BINDER);
-    register_hook_(b, RIGHT_BINDER, GREEDY_RIGHT_BINDER);
-    exit_section_(b, l, m, true, false, null);
     return true;
   }
 

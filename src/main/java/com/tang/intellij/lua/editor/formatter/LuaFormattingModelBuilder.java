@@ -56,9 +56,11 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
                 .after(DO).lineBreakInCode()
                 .after(THEN).lineBreakInCode()
                 .after(LOCAL).spaces(1) //local<SPACE>
+                .before(COMMA).spaces(settings.SPACE_BEFORE_COMMA ? 1 : 0)
                 .after(COMMA).spaces(settings.SPACE_AFTER_COMMA ? 1 : 0) //,<SPACE>
                 .between(LCURLY, TABLE_FIELD).spaces(1) // {<SPACE>1, 2 }
                 .between(TABLE_FIELD, RCURLY).spaces(1) // { 1, 2<SPACE>}
+                .before(TABLE_FIELD_SEP).none() // { 1<SPACE>, 2 }
                 .after(TABLE_FIELD_SEP).spaces(luaCodeStyleSettings.SPACE_AFTER_TABLE_FIELD_SEP ? 1 : 0) // { 1,<SPACE>2 }
                 .before(BLOCK).blankLines(0)
                 .afterInside(RPAREN, FUNC_BODY).lineBreakInCode()
@@ -68,7 +70,6 @@ public class LuaFormattingModelBuilder implements FormattingModelBuilder {
                 .around(UNARY_OP).none()
                 .around(ASSIGN).lineBreakOrForceSpace(false, settings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
-                .before(COMMA).spaces(settings.SPACE_BEFORE_COMMA ? 1 : 0)
                 .before(SEMI).spaces(0);
     }
 

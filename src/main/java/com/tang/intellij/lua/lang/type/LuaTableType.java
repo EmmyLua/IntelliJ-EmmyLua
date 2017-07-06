@@ -17,13 +17,11 @@
 package com.tang.intellij.lua.lang.type;
 
 import com.tang.intellij.lua.psi.LuaClassField;
-import com.tang.intellij.lua.psi.LuaFieldList;
 import com.tang.intellij.lua.psi.LuaTableExpr;
 import com.tang.intellij.lua.psi.LuaTableField;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,11 +60,7 @@ public class LuaTableType extends LuaType {
 
     private void InitFieldList() {
         if (tableFields == null) {
-            tableFields = new ArrayList<>();
-            LuaFieldList fieldList = tableConstructor.getFieldList();
-            if (fieldList != null) {
-                tableFields.addAll(fieldList.getTableFieldList());
-            }
+            tableFields =  tableConstructor.getTableFieldList();
         }
     }
 
