@@ -20,7 +20,10 @@ import com.intellij.codeInsight.highlighting.HighlightUsagesHandlerBase
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Consumer
+import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
+import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.*
 
 import java.util.Collections
@@ -29,7 +32,7 @@ import java.util.Collections
 
  * Created by tangzx on 2017/3/18.
  */
-class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: PsiFile, private val target: LuaReturnStat, private val funcBody: LuaFuncBody?) : HighlightUsagesHandlerBase<PsiElement>(editor, file) {
+class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: PsiFile, private val target: LuaReturnStat, private val funcBody: LuaFuncBody) : HighlightUsagesHandlerBase<PsiElement>(editor, file) {
 
     override fun getTargets(): List<PsiElement> {
         return listOf<PsiElement>(target)
@@ -40,7 +43,7 @@ class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: P
     }
 
     override fun computeUsages(list: List<PsiElement>) {
-        funcBody?.acceptChildren(object : LuaVisitor() {
+        funcBody.acceptChildren(object : LuaVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
                 addOccurrence(o)
             }
@@ -57,5 +60,13 @@ class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: P
                 o.acceptChildren(this)
             }
         })
+
+        val parent = funcBody.parent
+        if (parent is LuaCommentOwner) {
+            val comment = parent.comment
+            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
+            if (returnDef != null)
+                addOccurrence(returnDef)
+        }
     }
 }
