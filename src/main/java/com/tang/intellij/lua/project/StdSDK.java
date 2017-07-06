@@ -22,9 +22,6 @@ import com.intellij.openapi.projectRoots.ProjectJdkTable;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.projectRoots.SdkModificator;
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl;
-import com.intellij.openapi.roots.OrderRootType;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,10 +34,16 @@ public class StdSDK implements ApplicationComponent {
     @Override
     public void initComponent() {
         ProjectJdkTable pjt = ProjectJdkTable.getInstance();
+        //清除旧的std sdk，不用了，用predefined代替
         Sdk mySdk = pjt.findJdk(StdSDK.NAME);
+        if (mySdk != null) {
+            SdkModificator sdkModificator = mySdk.getSdkModificator();
+            sdkModificator.removeAllRoots();
+            sdkModificator.commitChanges();
+        }
         if (mySdk == null) {
             ProjectJdkImpl sdk = new ProjectJdkImpl(StdSDK.NAME, LuaSdkType.getInstance());
-            SdkModificator sdkModificator = sdk.getSdkModificator();
+            /*SdkModificator sdkModificator = sdk.getSdkModificator();
 
             VirtualFile dir  = LuaFileUtil.getPluginVirtualDirectory();
             if (dir != null) {
@@ -56,9 +59,9 @@ public class StdSDK implements ApplicationComponent {
                 }
             }
 
-            sdkModificator.commitChanges();
+            sdkModificator.commitChanges();*/
 
-            ApplicationManager.getApplication().runWriteAction(() -> ProjectJdkTable.getInstance().addJdk(sdk));
+            ApplicationManager.getApplication().runWriteAction(() -> pjt.addJdk(sdk));
         }
     }
 

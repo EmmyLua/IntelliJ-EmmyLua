@@ -19,7 +19,6 @@ package com.tang.intellij.lua.annotator
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
-import com.intellij.openapi.roots.FileIndexFacade
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.ReferencesSearch
@@ -125,7 +124,7 @@ class LuaAnnotator : Annotator {
             val res = LuaPsiResolveUtil.resolve(o, SearchContext(o.project))
             if (res != null) { //std api highlighting
                 val containingFile = res.containingFile
-                if (FileIndexFacade.getInstance(o.project).isInLibraryClasses(containingFile.virtualFile)) {
+                if (LuaFileUtil.isStdLibFile(containingFile.virtualFile, o.project)) {
                     val annotation = myHolder!!.createInfoAnnotation(o, null)
                     annotation.textAttributes = LuaHighlightingData.STD_API
                     o.putUserData(STD_MARKER, true)

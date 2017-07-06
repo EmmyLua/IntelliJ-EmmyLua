@@ -22,7 +22,9 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -159,5 +161,11 @@ public class LuaFileUtil {
                 return fullPath;
         }
         return null;
+    }
+
+    public static Key<Boolean> PREDEFINED_KEY = Key.create("lua.lib.predefined");
+
+    public static boolean isStdLibFile(@NotNull VirtualFile file, Project project) {
+        return file.getUserData(PREDEFINED_KEY) != null || FileIndexFacade.getInstance(project).isInLibraryClasses(file);
     }
 }

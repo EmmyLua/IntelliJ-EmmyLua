@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.project
 
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.indexing.IndexableSetContributor
@@ -37,11 +36,18 @@ class LuaPredefinedLibraryProvider : IndexableSetContributor() {
         return list
     }*/
 
-    override fun getAdditionalRootsToIndex(): Set<VirtualFile> {
+    val predefined: Set<VirtualFile> by lazy {
         val dir = LuaFileUtil.getPluginVirtualFile("std")
         val file = VfsUtil.findFileByIoFile(File(dir), false)
         val set = mutableSetOf<VirtualFile>()
-        set.add(file!!)
-        return set
+        if (file != null) {
+            file.children.forEach { it.putUserData(LuaFileUtil.PREDEFINED_KEY, true) }
+            set.add(file)
+        }
+        set
+    }
+
+    override fun getAdditionalRootsToIndex(): Set<VirtualFile> {
+        return predefined
     }
 }
