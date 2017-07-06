@@ -24,12 +24,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.Nls;
@@ -74,7 +74,7 @@ public class CreateMethodIntention extends BaseIntentionAction {
             if (expr instanceof LuaIndexExpr) {
                 LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
                 LuaTypeSet typeSet = indexExpr.guessPrefixType(new SearchContext(project));
-                if (typeSet.isEmpty()) return;
+                if (typeSet == null || typeSet.isEmpty()) return;
 
                 InsertPosition position = calcInsertPosition(typeSet.getPerfect(), project);
                 if (position != null) {
@@ -97,7 +97,9 @@ public class CreateMethodIntention extends BaseIntentionAction {
 
     @Nullable
     private InsertPosition calcInsertPosition(LuaType perfect, Project project) {
-        Collection<LuaClassMethodDef> methods = LuaClassMethodIndex.getInstance().get(perfect.getClassName(), project, new ProjectAndLibrariesScope(project));
+        Collection<LuaClassMethodDef> methods = LuaClassMethodIndex.getInstance().get(perfect.getClassName(),
+                project,
+                new LuaPredefinedScope(project));
         if (!methods.isEmpty()) {
             LuaClassMethodDef methodDef = methods.iterator().next();
             LuaExpr expr = methodDef.getClassMethodName().getExpr();

@@ -19,8 +19,8 @@ package com.tang.intellij.lua.comment.reference
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
-import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
+import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 
 /**
@@ -37,7 +37,7 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
 
     override fun resolve(): PsiElement? {
         val name = myElement.text
-        val defs = LuaClassIndex.getInstance().get(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
+        val defs = LuaClassIndex.getInstance().get(name, myElement.project, LuaPredefinedScope(myElement.project))
         if (defs.isNotEmpty()) {
             return defs.firstOrNull()
         }

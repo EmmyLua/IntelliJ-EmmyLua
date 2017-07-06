@@ -53,7 +53,7 @@ class SearchContext(val project: Project) {
             if (isDumb) {
                 scope = GlobalSearchScope.EMPTY_SCOPE
             } else {
-                scope = AdditionalIndexedRootsScope(ProjectAndLibrariesScope(project), LuaPredefinedLibraryProvider::class.java)
+                scope = LuaPredefinedScope(project)
             }
         }
         return scope!!
@@ -61,4 +61,9 @@ class SearchContext(val project: Project) {
 
     val isDumb: Boolean
         get() = DumbService.isDumb(project) || currentStubFile != null
+}
+
+class LuaPredefinedScope : AdditionalIndexedRootsScope {
+    constructor(project: Project) : this(ProjectAndLibrariesScope(project))
+    constructor(base: GlobalSearchScope) : super(base, LuaPredefinedLibraryProvider::class.java)
 }

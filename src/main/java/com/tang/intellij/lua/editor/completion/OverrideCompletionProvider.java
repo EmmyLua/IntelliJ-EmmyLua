@@ -24,7 +24,6 @@ import com.intellij.codeInsight.template.Template;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaIcons;
@@ -32,6 +31,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.LuaParamInfo;
+import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +62,7 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
             Project project = completionParameters.getOriginalFile().getProject();
             SearchContext context = new SearchContext(project);
             String clazzName = sup.getClassName();
-            Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new ProjectAndLibrariesScope(project));
+            Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new LuaPredefinedScope(project));
             for (LuaClassMethodDef def : list) {
                 String methodName = def.getName();
                 if (methodName != null) {

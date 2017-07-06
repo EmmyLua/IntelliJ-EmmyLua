@@ -18,7 +18,6 @@ package com.tang.intellij.lua.lang.type;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.search.ProjectAndLibrariesScope;
 import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
@@ -27,6 +26,7 @@ import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaNameExpr;
 import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
+import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
@@ -146,12 +146,11 @@ public class LuaType implements Comparable<LuaType> {
         if (clazzName == null)
             return;
         Project project = context.getProject();
-        assert project != null;
 
         LuaClassFieldIndex fieldIndex = LuaClassFieldIndex.getInstance();
-        Collection<LuaClassField> list = fieldIndex.get(clazzName, project, new ProjectAndLibrariesScope(project));
+        Collection<LuaClassField> list = fieldIndex.get(clazzName, project, new LuaPredefinedScope(project));
         if (aliasName != null) {
-            Collection<LuaClassField> classFields = fieldIndex.get(aliasName, project, new ProjectAndLibrariesScope(project));
+            Collection<LuaClassField> classFields = fieldIndex.get(aliasName, project, new LuaPredefinedScope(project));
             list.addAll(classFields);
         }
 
@@ -171,12 +170,11 @@ public class LuaType implements Comparable<LuaType> {
         if (clazzName == null)
             return;
         Project project = context.getProject();
-        assert project != null;
 
         LuaClassMethodIndex methodIndex = LuaClassMethodIndex.getInstance();
-        Collection<LuaClassMethodDef> list = methodIndex.get(clazzName, project, new ProjectAndLibrariesScope(project));
+        Collection<LuaClassMethodDef> list = methodIndex.get(clazzName, project, new LuaPredefinedScope(project));
         if (aliasName != null) {
-            list.addAll(methodIndex.get(aliasName, project, new ProjectAndLibrariesScope(project)));
+            list.addAll(methodIndex.get(aliasName, project, new LuaPredefinedScope(project)));
         }
         for (LuaClassMethodDef def : list) {
             String methodName = def.getName();
