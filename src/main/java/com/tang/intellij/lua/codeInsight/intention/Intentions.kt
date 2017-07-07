@@ -41,7 +41,7 @@ class CreateParameterAnnotationIntention : BaseIntentionAction() {
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
         val offset = editor.caretModel.offset
         val name = findParamName(psiFile, offset) ?: findParamName(psiFile, offset - 1)
-        return name != null && name.funcBodyOwner !is LuaClosureExpr
+        return name != null //&& name.funcBodyOwner !is LuaClosureExpr
     }
 
     private fun findParamName(psiFile: PsiFile, offset:Int): LuaParamNameDef? {
@@ -62,13 +62,14 @@ class CreateParameterAnnotationIntention : BaseIntentionAction() {
         val parDef = findParamName(psiFile, offset) ?: findParamName(psiFile, offset - 1)
         parDef ?: return
 
-        val parametersOwner = parDef.owner
-        if (parametersOwner is LuaCommentOwner) {
-            val comment = parametersOwner.comment
+        val owner = PsiTreeUtil.getParentOfType(parDef, LuaCommentOwner::class.java)
+        if (owner != null) {
+            val comment = owner.comment
 
             val templateManager = TemplateManager.getInstance(project)
             val template = templateManager.createTemplate("", "")
-            if (comment != null) template.addTextSegment("\n")
+            if (comment != null)
+                template.addTextSegment("\n")
             template.addTextSegment(String.format("---@param %s ", parDef.name))
             val name = MacroCallNode(SuggestTypeMacro())
             template.addVariable("type", name, TextExpression("table"), true)
@@ -77,8 +78,7 @@ class CreateParameterAnnotationIntention : BaseIntentionAction() {
             if (comment != null) {
                 editor.caretModel.moveToOffset(comment.textOffset + comment.textLength)
             } else {
-                val commentOwner:LuaCommentOwner = parametersOwner
-                editor.caretModel.moveToOffset(commentOwner.node.startOffset)
+                editor.caretModel.moveToOffset(owner.node.startOffset)
                 template.addTextSegment("\n")
             }
 
