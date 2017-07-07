@@ -129,9 +129,9 @@ class RemoveCallParenIntention : BaseIntentionAction() {
                 val list = exprList.exprList
                 if (list.size != 1) return false
                 val expr = list[0]
-                when (expr.firstChild.node.elementType) {
-                    LuaTypes.STRING -> return true
-                    LuaTypes.TABLE_EXPR -> return true
+                when (expr) {
+                    is LuaTableExpr -> return true
+                    is LuaLiteralExpr -> return expr.kind == LuaLiteralKind.String
                 }
             }
         }
