@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.codeInsight;
 
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
@@ -69,8 +70,8 @@ public class LuaEnterAfterUnmatchedBraceHandler implements EnterHandlerDelegate 
                 if (searched == null || searched instanceof PsiFile) break;
                 if (searched instanceof LuaIndentRange) {
                     IElementType endType = getEnd(searched.getNode().getElementType());
-                    PsiElement lastChild = searched.getLastChild();
-                    if (lastChild.getNode().getElementType() != endType) {
+                    ASTNode endChild = searched.getNode().findChildByType(endType);
+                    if (endChild == null) {
                         needAddEnd = true;
                         range = searched;
                         break;
