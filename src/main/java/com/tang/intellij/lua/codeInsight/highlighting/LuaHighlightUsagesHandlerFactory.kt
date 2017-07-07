@@ -98,14 +98,8 @@ private class LoopHandler(editor: Editor, psiFile: PsiFile, val psi:PsiElement, 
     override fun getTargets() = arrayListOf(psi)
 
     override fun computeUsages(list: MutableList<PsiElement>?) {
-        addOccurrence(loop.firstChild)
-        when (loop) {
-            is LuaRepeatStat -> { val until = loop.until; if (until != null) addOccurrence(until) }
-            else -> {
-                val end = loop.node.findChildByType(LuaTypes.END)
-                end?.let { addOccurrence(end.psi) }
-            }
-        }
+        loop.head?.let { addOccurrence(it) }
+        loop.end?.let { addOccurrence(it) }
         addOccurrence(psi)
     }
 
