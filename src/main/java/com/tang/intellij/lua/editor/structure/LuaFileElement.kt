@@ -94,8 +94,7 @@ class LuaFileElement(private val file: LuaFile) : StructureViewTreeElement {
 
             override fun visitElement(element: PsiElement?) {
                 if (element is LuaCommentOwner) {
-                    val owner = element as LuaCommentOwner?
-                    val comment = owner!!.comment
+                    val comment = element.comment
                     if (comment != null)
                         visitDocComment(comment)
                 }

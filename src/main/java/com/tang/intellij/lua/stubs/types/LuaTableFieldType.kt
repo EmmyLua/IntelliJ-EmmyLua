@@ -62,7 +62,10 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaTableFieldStub {
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
-        return LuaTableFieldStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), stubElement, this)
+        return LuaTableFieldStubImpl(StringRef.toString(typeName)!!,
+                StringRef.toString(fieldName)!!,
+                stubElement,
+                this)
     }
 
     override fun indexStub(fieldStub: LuaTableFieldStub, indexSink: IndexSink) {

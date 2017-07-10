@@ -62,7 +62,10 @@ class LuaDocClassType : IStubElementType<LuaDocClassStub, LuaDocClassDef>("Class
         val className = stubInputStream.readName()
         val aliasName = stubInputStream.readName()
         val superClassName = stubInputStream.readName()
-        return LuaDocClassStubImpl(StringRef.toString(className), StringRef.toString(aliasName), StringRef.toString(superClassName), stubElement)
+        return LuaDocClassStubImpl(StringRef.toString(className)!!,
+                StringRef.toString(aliasName),
+                StringRef.toString(superClassName),
+                stubElement)
     }
 
     override fun indexStub(luaDocClassStub: LuaDocClassStub, indexSink: IndexSink) {

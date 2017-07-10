@@ -356,8 +356,7 @@ object LuaPsiImplUtil {
 
     @JvmStatic fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): LuaTypeSet? {
         if (owner is StubBasedPsiElementBase<*>) {
-            val stubElement = owner as StubBasedPsiElementBase<*>
-            val stub = stubElement.stub
+            val stub = owner.stub
             if (stub is LuaFuncBodyOwnerStub<*>) {
                 return stub.returnTypeSet
             }
@@ -370,7 +369,7 @@ object LuaPsiImplUtil {
 
     @JvmStatic fun guessReturnTypeSetOriginal(owner: LuaFuncBodyOwner, searchContext: SearchContext): LuaTypeSet {
         if (owner is LuaCommentOwner) {
-            val comment = LuaCommentUtil.findComment(owner as LuaCommentOwner)
+            val comment = LuaCommentUtil.findComment(owner)
             if (comment != null) {
                 val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
                 if (returnDef != null) {
@@ -407,11 +406,9 @@ object LuaPsiImplUtil {
 
     @JvmStatic fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo?> {
         if (owner is StubBasedPsiElementBase<*>) {
-            val stubElement = owner as StubBasedPsiElementBase<*>
-            val stub = stubElement.stub
+            val stub = owner.stub
             if (stub is LuaFuncBodyOwnerStub<*>) {
-                val funcBodyOwnerStub = stub as LuaFuncBodyOwnerStub<*>?
-                return funcBodyOwnerStub!!.params
+                return stub.params
             }
         }
         return getParamsOriginal(owner)
@@ -420,7 +417,7 @@ object LuaPsiImplUtil {
     @JvmStatic fun getParamsOriginal(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo?> {
         var comment: LuaComment? = null
         if (funcBodyOwner is LuaCommentOwner) {
-            comment = LuaCommentUtil.findComment(funcBodyOwner as LuaCommentOwner)
+            comment = LuaCommentUtil.findComment(funcBodyOwner)
         }
 
         val paramNameList = funcBodyOwner.paramNameDefList

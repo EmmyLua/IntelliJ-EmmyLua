@@ -56,7 +56,7 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
     @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameStub {
         val nameRef = stubInputStream.readName()
-        return LuaNameStubImpl(StringRef.toString(nameRef), stubElement, this)
+        return LuaNameStubImpl(StringRef.toString(nameRef)!!, stubElement, this)
     }
 
     override fun indexStub(luaNameStub: LuaNameStub, indexSink: IndexSink) {
