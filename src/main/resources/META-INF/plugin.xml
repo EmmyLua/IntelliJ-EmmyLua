@@ -22,13 +22,25 @@
     <category>Custom Languages</category>
     <description><![CDATA[
     Support for Lua programming language.<br>
+    <p><a href="https://github.com/tangzx/IntelliJ-EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://www.paypal.me/tangzx">Donate</a></p>
     Featrues:
     <ul>
         <li>Syntax highlighting</li>
         <ul>
-            <li>Highlighting global</li>
-            <li>Highlighting local/param</li>
-            <li>Highlighting up value</li>
+            <li>Highlight global value</li>
+            <li>Highlight local/param value</li>
+            <li>Highlight up value</li>
+        </ul>
+        <li>Code completion</li>
+        <ul>
+            <li>Keyword completion</li>
+            <li>Basic completion</li>
+            <li>Type inferred based completion</li>
+        </ul>
+        <li>Debugger</li>
+        <ul>
+            <li>Attach Debugger(Windows only)</li>
+            <li>Remote Debugger(Mobdebug.lua)</li>
         </ul>
         <li>Lua 5.3 support</li>
         <li>Find usages</li>
@@ -38,12 +50,6 @@
         <li>Go to class</li>
         <li>Go to file</li>
         <li>Parameter name hints</li>
-        <li>Code completion</li>
-        <ul>
-            <li>Keyword completion</li>
-            <li>Basic completion</li>
-            <li>Comment based completion</li>
-        </ul>
         <li>Comment based type/class annotation</li>
         <li>Structure view</li>
         <li>Comment in/out</li>
@@ -57,9 +63,8 @@
         <li>Code inspections</li>
         <li>Lua Standard Library/API</li>
         <li>Region folding</li>
-        <li>Attach Debugger(Windows only)</li>
-        <li>Remote Debugger(Mobdebug.lua)</li>
     </ul>
+    <p>中国朋友可以加QQ群29850775交流及反馈BUG</p>
     ]]></description>
 
     <change-notes><![CDATA[
