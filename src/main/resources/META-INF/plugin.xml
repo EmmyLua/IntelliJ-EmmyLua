@@ -80,6 +80,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!--<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>-->
+        <toolWindow id="LuaCheck" anchor="bottom" icon="/icons/lua.png"
+                    factoryClass="com.tang.intellij.lua.luacheck.LuaCheckToolWindowFactory" canCloseContents="true"/>
 
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
         <moduleType id="LUA_MODULE" implementationClass="com.tang.intellij.lua.project.LuaModuleType"/>
