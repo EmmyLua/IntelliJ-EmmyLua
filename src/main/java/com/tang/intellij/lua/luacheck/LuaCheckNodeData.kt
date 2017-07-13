@@ -16,21 +16,24 @@
 
 package com.tang.intellij.lua.luacheck
 
+import com.intellij.ide.util.treeView.AbstractTreeNode
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindow
-import com.intellij.ui.content.ContentFactory
+import com.intellij.openapi.vfs.VirtualFile
 
-/**
- * LuaCheckView
- * Created by tangzx on 2017/7/12.
- */
-class LuaCheckView(val project: Project) {
-    val panel: LuaCheckPanel by lazy { LuaCheckPanel() }
+abstract class LuaCheckNodeData {
+    abstract fun render(cell: LuaCheckCellRenderer)
+}
 
-    fun init(toolWindow: ToolWindow) {
-        panel.init()
-        val contentFactory = ContentFactory.SERVICE.getInstance()
-        val content = contentFactory.createContent(panel, "", false)
-        toolWindow.contentManager.addContent(content)
+abstract class LuaCheckNode<T>(project: Project, value: T) : AbstractTreeNode<T>(project, value)
+
+class LuaCheckFileNodeData(val file: VirtualFile) : LuaCheckNodeData() {
+    override fun render(cell: LuaCheckCellRenderer) {
+        cell.append(file.name)
+    }
+}
+
+class LuaCheckRecordNodeData(val line:Int, val col:Int, val desc:String) : LuaCheckNodeData() {
+    override fun render(cell: LuaCheckCellRenderer) {
+        cell.append("($line, $col) $desc")
     }
 }

@@ -20,12 +20,14 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
+import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.execution.ParametersListUtil
 import java.io.File
 
-fun runLuaCheck(file: VirtualFile) {
+fun runLuaCheck(project: Project, file: VirtualFile) {
     val settings = LuaCheckSettings.getInstance()
     val cmd = GeneralCommandLine(settings.luaCheck)
     val args = settings.luaCheckArgs
@@ -35,10 +37,26 @@ fun runLuaCheck(file: VirtualFile) {
     cmd.addParameter(file.name)
     cmd.workDirectory = File(file.parent.path)
 
+    val checkView = ServiceManager.getService(project, LuaCheckView::class.java)
+    val panel = checkView.panel
+    panel.clear()
+    val fileNode = panel.addNode(LuaCheckFileNodeData(file))
+
     val handler = OSProcessHandler(cmd)
+    val reg = "(.+?):(\\d+):(\\d+):(.+)\\n".toRegex()
     handler.addProcessListener(object : ProcessListener {
         override fun onTextAvailable(event: ProcessEvent, key: Key<*>?) {
-            println(event.text)
+            val matchResult = reg.find(event.text)
+            if (matchResult != null) {
+                //val matchGroup = matchResult.groups[1]!!
+                val lineGroup = matchResult.groups[2]!!
+                val colGroup = matchResult.groups[3]!!
+                val descGroup = matchResult.groups[4]!!
+
+                panel.addNode(LuaCheckRecordNodeData(lineGroup.value.toInt(),
+                        colGroup.value.toInt(),
+                        descGroup.value), fileNode)
+            }
         }
 
         override fun processTerminated(event: ProcessEvent) {

@@ -30,7 +30,7 @@ class LuaCheckGroup : AnAction() {
         when (event.place) {
             ActionPlaces.EDITOR_POPUP -> {
                 val editorManager = FileEditorManager.getInstance(project) as FileEditorManagerEx
-                runLuaCheck(editorManager.currentFile!!)
+                runLuaCheck(project, editorManager.currentFile!!)
             }
         }
     }
