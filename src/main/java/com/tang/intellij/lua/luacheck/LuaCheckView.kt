@@ -25,7 +25,7 @@ import com.intellij.ui.content.ContentFactory
  * Created by tangzx on 2017/7/12.
  */
 class LuaCheckView(val project: Project) {
-    val panel: LuaCheckPanel by lazy { LuaCheckPanel() }
+    val panel: LuaCheckPanel by lazy { LuaCheckPanel(project) }
 
     fun init(toolWindow: ToolWindow) {
         panel.init()

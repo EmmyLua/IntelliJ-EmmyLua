@@ -20,10 +20,12 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.util.execution.ParametersListUtil
 import java.io.File
 
@@ -39,13 +41,14 @@ fun runLuaCheck(project: Project, file: VirtualFile) {
 
     val checkView = ServiceManager.getService(project, LuaCheckView::class.java)
     val panel = checkView.panel
-    panel.clear()
-    val fileNode = panel.addNode(LuaCheckFileNodeData(file))
+    val psiFile = PsiManagerEx.getInstance(project).findFile(file)!!
+    val fileNode = panel.builder.addFile(psiFile)
 
     val handler = OSProcessHandler(cmd)
     val reg = "(.+?):(\\d+):(\\d+):(.+)\\n".toRegex()
     handler.addProcessListener(object : ProcessListener {
         override fun onTextAvailable(event: ProcessEvent, key: Key<*>?) {
+            //print(event.text)
             val matchResult = reg.find(event.text)
             if (matchResult != null) {
                 //val matchGroup = matchResult.groups[1]!!
@@ -53,14 +56,14 @@ fun runLuaCheck(project: Project, file: VirtualFile) {
                 val colGroup = matchResult.groups[3]!!
                 val descGroup = matchResult.groups[4]!!
 
-                panel.addNode(LuaCheckRecordNodeData(lineGroup.value.toInt(),
+                panel.builder.addLCItem(LuaCheckRecordNodeData(lineGroup.value.toInt(),
                         colGroup.value.toInt(),
                         descGroup.value), fileNode)
             }
         }
 
         override fun processTerminated(event: ProcessEvent) {
-
+            ApplicationManager.getApplication().invokeLater { panel.builder.performUpdate() }
         }
 
         override fun processWillTerminate(event: ProcessEvent, p1: Boolean) {

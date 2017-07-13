@@ -16,11 +16,18 @@
 
 package com.tang.intellij.lua.luacheck
 
+import com.intellij.ide.projectView.TreeStructureProvider
 import com.intellij.ide.util.treeView.AbstractTreeBuilder
+import com.intellij.ide.util.treeView.AbstractTreeStructureBase
+import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.DataProvider
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.psi.PsiFile
+import com.intellij.ui.AutoScrollToSourceHandler
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.HighlightableCellRenderer
 import com.intellij.ui.components.JBScrollPane
@@ -34,10 +41,11 @@ import javax.swing.tree.TreeCellRenderer
  * LuaCheckPanel
  * Created by tangzx on 2017/7/12.
  */
-class LuaCheckPanel : SimpleToolWindowPanel(false) {
+class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataProvider {
     val rootNode = DefaultMutableTreeNode()
     val treeModel = DefaultTreeModel(rootNode)
     var tree: JTree = JTree(treeModel)
+    lateinit var builder:LuaCheckTreeBuilder
 
     override fun getActions(originalProvider: Boolean): MutableList<AnAction> {
         return super.getActions(originalProvider)
@@ -48,38 +56,89 @@ class LuaCheckPanel : SimpleToolWindowPanel(false) {
     }
 
     fun createTree() {
-        tree.cellRenderer = LuaCheckCellRenderer()
+        tree.cellRenderer = NodeRenderer()
         tree.isRootVisible = false
         val jbScrollPane = JBScrollPane(tree)
         jbScrollPane.border = null
         setContent(jbScrollPane)
+
+        val handler = object : AutoScrollToSourceHandler() {
+            override fun isAutoScrollMode(): Boolean {
+                return true
+            }
+
+            override fun setAutoScrollMode(p0: Boolean) {
+            }
+        }
+        handler.install(tree)
+
+        builder = buildTree(tree)
+        builder.initRootNode()
     }
 
     fun buildTree(tree: JTree): LuaCheckTreeBuilder {
-        return LuaCheckTreeBuilder()
+        return LuaCheckTreeBuilder(tree, treeModel, project)
     }
 
-    fun clear() {
-        rootNode.removeAllChildren()
-    }
-
-    fun addNode(nodeData: LuaCheckNodeData): DefaultMutableTreeNode {
-        val node = DefaultMutableTreeNode(nodeData)
-        rootNode.add(node)
-        ApplicationManager.getApplication().invokeLater { treeModel.reload() }
-        return node
-    }
-
-    fun addNode(nodeData: LuaCheckNodeData, parentNode: DefaultMutableTreeNode): DefaultMutableTreeNode {
-        val node = DefaultMutableTreeNode(nodeData)
-        parentNode.add(node)
-        ApplicationManager.getApplication().invokeLater { treeModel.reload() }
-        return node
+    override fun getData(dataId: String?): Any? {
+        if (CommonDataKeys.NAVIGATABLE.`is`(dataId)) {
+            val path = tree.selectionPath
+            if (path == null) {
+                return null
+            } else {
+                val node = path.lastPathComponent as DefaultMutableTreeNode
+                val userObject = node.userObject
+                if (userObject !is NodeDescriptor<*>) {
+                    return null
+                } else {
+                    val element = userObject.element
+                    if (element is LCRecord) {
+                        return element.navigate(true)
+                    }
+                }
+            }
+        }
+        return super.getData(dataId)
     }
 }
 
-class LuaCheckTreeBuilder : AbstractTreeBuilder() {
+class LuaCheckTreeBuilder(tree: JTree, model: DefaultTreeModel, val project: Project)
+    : AbstractTreeBuilder(tree, model, LuaCheckTreeStructure(project), null, false) {
 
+    override fun initRootNode() {
+        super.initRootNode()
+        performUpdate()
+    }
+
+    fun addFile(file: PsiFile): LCPsiFileNode {
+        val root = rootElement as LCRootNode
+        val fileNode = LCPsiFileNode(project, file)
+        root.append(fileNode)
+        return fileNode
+    }
+
+    fun addLCItem(item: LuaCheckRecordNodeData, fileNode: LCPsiFileNode) {
+        fileNode.append(LCRecord(project, fileNode.value, item))
+    }
+
+    fun performUpdate() {
+        treeModel?.reload()
+        updater?.performUpdate()
+    }
+}
+
+class LuaCheckTreeStructure(project: Project) : AbstractTreeStructureBase(project) {
+    val root: LCRootNode = LCRootNode(project)
+
+    override fun commit() { }
+
+    override fun getProviders(): List<TreeStructureProvider> {
+        return emptyList()
+    }
+
+    override fun getRootElement(): Any = root
+
+    override fun hasSomethingToCommit(): Boolean = false
 }
 
 class LuaCheckCellRenderer : ColoredTreeCellRenderer() {
