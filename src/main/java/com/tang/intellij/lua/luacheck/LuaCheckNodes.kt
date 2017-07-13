@@ -58,6 +58,7 @@ class LCPsiFileNode(project: Project, file: PsiFile) : PsiFileNode(project, file
     }
 }
 
+data class LuaCheckRecordNodeData(val line:Int, val col:Int, val desc:String)
 class LCRecord(project: Project, val file:PsiFile, val record: LuaCheckRecordNodeData) : AbstractTreeNode<LuaCheckRecordNodeData>(project, record) {
     override fun update(presentationData: PresentationData) {
         presentationData.presentableText = "(${record.line}, ${record.col}) ${record.desc}"

@@ -28,14 +28,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
 import com.intellij.psi.PsiFile
 import com.intellij.ui.AutoScrollToSourceHandler
-import com.intellij.ui.ColoredTreeCellRenderer
-import com.intellij.ui.HighlightableCellRenderer
 import com.intellij.ui.components.JBScrollPane
-import java.awt.Component
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
-import javax.swing.tree.TreeCellRenderer
 
 /**
  * LuaCheckPanel
@@ -139,45 +135,4 @@ class LuaCheckTreeStructure(project: Project) : AbstractTreeStructureBase(projec
     override fun getRootElement(): Any = root
 
     override fun hasSomethingToCommit(): Boolean = false
-}
-
-class LuaCheckCellRenderer : ColoredTreeCellRenderer() {
-    override fun customizeCellRenderer(tree: JTree,
-                                       value: Any,
-                                       selected: Boolean,
-                                       expanded: Boolean,
-                                       leaf: Boolean,
-                                       row: Int,
-                                       hasFocus: Boolean) {
-        val treeNode = value as DefaultMutableTreeNode
-        val obj = treeNode.userObject
-        when (obj) {
-            is LuaCheckNodeData -> {
-                obj.render(this)
-            }
-        }
-    }
-
-}
-
-class LuaCheckCompositeRenderer : TreeCellRenderer {
-    private val myNodeRenderer: NodeRenderer by lazy { NodeRenderer() }
-    private val myColorTreeCellRenderer: HighlightableCellRenderer by lazy { HighlightableCellRenderer() }
-
-    override fun getTreeCellRendererComponent(tree: JTree,
-                                              value: Any,
-                                              selected: Boolean,
-                                              expanded: Boolean,
-                                              leaf: Boolean,
-                                              row: Int,
-                                              hasFocus: Boolean): Component {
-        val treeNode = value as DefaultMutableTreeNode
-        val obj = treeNode.userObject
-        when (obj) {
-            is LuaCheckFileNodeData -> {
-
-            }
-        }
-        return myNodeRenderer
-    }
 }
