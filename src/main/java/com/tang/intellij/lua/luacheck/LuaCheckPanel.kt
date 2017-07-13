@@ -16,21 +16,15 @@
 
 package com.tang.intellij.lua.luacheck
 
-import com.intellij.openapi.components.ServiceManager
-import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.wm.ToolWindow
-import com.intellij.openapi.wm.ToolWindowFactory
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.ui.SimpleToolWindowPanel
 
 /**
- * ToolWindowFactory
- * Created by tangzx on 2017/7/11.
+ * LuaCheckPanel
+ * Created by tangzx on 2017/7/12.
  */
-class LuaCheckToolWindowFactory : ToolWindowFactory {
-    override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        DumbService.getInstance(project).runWhenSmart {
-            val checkView = ServiceManager.getService(project, LuaCheckView::class.java)
-            checkView.init(toolWindow)
-        }
+class LuaCheckPanel : SimpleToolWindowPanel(false) {
+    override fun getActions(originalProvider: Boolean): MutableList<AnAction> {
+        return super.getActions(originalProvider)
     }
 }

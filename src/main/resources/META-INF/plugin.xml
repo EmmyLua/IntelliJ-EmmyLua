@@ -82,6 +82,14 @@
         <!--<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>-->
         <toolWindow id="LuaCheck" anchor="bottom" icon="/icons/lua.png"
                     factoryClass="com.tang.intellij.lua.luacheck.LuaCheckToolWindowFactory" canCloseContents="true"/>
+        <projectService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckView"
+                        serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckView"/>
+        <applicationService serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckSettings"
+                            serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
+        <applicationConfigurable displayName="LuaCheck"
+                                 groupId="language"
+                                 id="preferences.LuaCheck"
+                                 instance="com.tang.intellij.lua.luacheck.LuaCheckSettingsPanel"/>
 
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
         <moduleType id="LUA_MODULE" implementationClass="com.tang.intellij.lua.project.LuaModuleType"/>
@@ -270,6 +278,16 @@
                 text="Lua File"
                 id="lua.newFile">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
+
+        <action id="LuaCheck"
+                text="Run LuaCheck"
+                popup="true"
+                icon="/icons/lua.png"
+                class="com.tang.intellij.lua.luacheck.LuaCheckGroup">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
 
