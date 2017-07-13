@@ -22,7 +22,7 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil
 
-@State(name = "LuaCheckSettings", storages = arrayOf(Storage("other.xml")))
+@State(name = "LuaCheckSettings", storages = arrayOf(Storage("emmy.xml")))
 class LuaCheckSettings : PersistentStateComponent<LuaCheckSettings> {
     var luaCheck:String? = null
     var luaCheckArgs:String? = null
