@@ -16,19 +16,23 @@
 
 package com.tang.intellij.lua.luacheck
 
+import com.intellij.ide.CommonActionsManager
+import com.intellij.ide.TreeExpander
 import com.intellij.ide.projectView.TreeStructureProvider
 import com.intellij.ide.util.treeView.AbstractTreeBuilder
 import com.intellij.ide.util.treeView.AbstractTreeStructureBase
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.ide.util.treeView.NodeRenderer
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DataProvider
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
+import com.intellij.pom.Navigatable
 import com.intellij.psi.PsiFile
 import com.intellij.ui.AutoScrollToSourceHandler
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.util.PlatformIcons
+import java.awt.GridLayout
+import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
@@ -40,55 +44,75 @@ import javax.swing.tree.DefaultTreeModel
 class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataProvider {
     val rootNode = DefaultMutableTreeNode()
     val treeModel = DefaultTreeModel(rootNode)
-    var tree: JTree = JTree(treeModel)
-    lateinit var builder:LuaCheckTreeBuilder
+    val tree: JTree = JTree(treeModel)
+    val builder:LuaCheckTreeBuilder = LuaCheckTreeBuilder(tree, treeModel, project)
+    val treeExpander = MyTreeExpander()
 
-    override fun getActions(originalProvider: Boolean): MutableList<AnAction> {
-        return super.getActions(originalProvider)
+    inner class MyShowPackagesAction : ToggleAction("Group By Packages", null, PlatformIcons.GROUP_BY_PACKAGES) {
+        override fun isSelected(actionEvent: AnActionEvent): Boolean {
+            return builder.arePackagesShown
+        }
+
+        override fun setSelected(actionEvent: AnActionEvent, state: Boolean) {
+            builder.arePackagesShown = state
+        }
+    }
+
+    inner class MyTreeExpander : TreeExpander {
+        override fun collapseAll() {
+            builder.collapseAll()
+        }
+
+        override fun canExpand() = true
+
+        override fun expandAll() {
+            builder.expandAll()
+        }
+
+        override fun canCollapse() = true
+    }
+
+    inner class MyAutoScrollToSourceHandler : AutoScrollToSourceHandler() {
+        override fun isAutoScrollMode() = builder.isAutoScrollMode
+
+        override fun setAutoScrollMode(value: Boolean) {
+            builder.isAutoScrollMode = value
+        }
     }
 
     fun init() {
-        createTree()
-    }
-
-    fun createTree() {
         tree.cellRenderer = NodeRenderer()
         tree.isRootVisible = false
         val jbScrollPane = JBScrollPane(tree)
         jbScrollPane.border = null
         setContent(jbScrollPane)
 
-        val handler = object : AutoScrollToSourceHandler() {
-            override fun isAutoScrollMode(): Boolean {
-                return true
-            }
-
-            override fun setAutoScrollMode(p0: Boolean) {
-            }
-        }
+        //auto scroll source handler
+        val handler = MyAutoScrollToSourceHandler()
         handler.install(tree)
 
-        builder = buildTree(tree)
-        builder.initRootNode()
-    }
+        //toolbar
+        val toolBarPanel = JPanel(GridLayout())
+        setToolbar(toolBarPanel)
+        val group = DefaultActionGroup()
+        group.add(CommonActionsManager.getInstance().createExpandAllAction(treeExpander, this))
+        group.add(CommonActionsManager.getInstance().createCollapseAllAction(treeExpander, this))
+        group.add(MyShowPackagesAction())
+        group.add(handler.createToggleAction())
+        toolBarPanel.add(ActionManager.getInstance().createActionToolbar(ActionPlaces.TODO_VIEW_TOOLBAR, group, false).component)
 
-    fun buildTree(tree: JTree): LuaCheckTreeBuilder {
-        return LuaCheckTreeBuilder(tree, treeModel, project)
+        builder.initRootNode()
     }
 
     override fun getData(dataId: String?): Any? {
         if (CommonDataKeys.NAVIGATABLE.`is`(dataId)) {
             val path = tree.selectionPath
-            if (path == null) {
-                return null
-            } else {
+            if (path != null) {
                 val node = path.lastPathComponent as DefaultMutableTreeNode
                 val userObject = node.userObject
-                if (userObject !is NodeDescriptor<*>) {
-                    return null
-                } else {
+                if (userObject is NodeDescriptor<*>) {
                     val element = userObject.element
-                    if (element is LCRecord) {
+                    if (element is Navigatable) {
                         return element.navigate(true)
                     }
                 }
@@ -100,10 +124,17 @@ class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataPr
 
 class LuaCheckTreeBuilder(tree: JTree, model: DefaultTreeModel, val project: Project)
     : AbstractTreeBuilder(tree, model, LuaCheckTreeStructure(project), null, false) {
+    var isAutoScrollMode: Boolean = true
+    var arePackagesShown: Boolean = true
 
     override fun initRootNode() {
         super.initRootNode()
         performUpdate()
+    }
+
+    fun clear() {
+        val root = rootElement as LCRootNode
+        root.clear()
     }
 
     fun addFile(file: PsiFile): LCPsiFileNode {
@@ -118,8 +149,19 @@ class LuaCheckTreeBuilder(tree: JTree, model: DefaultTreeModel, val project: Pro
     }
 
     fun performUpdate() {
-        treeModel?.reload()
-        updater?.performUpdate()
+        queueUpdateFrom(rootNode, true)
+    }
+
+    fun collapseAll() {
+        var rc = tree.rowCount - 1
+        while (rc >= 0) {
+            tree.collapseRow(rc)
+            rc--
+        }
+    }
+
+    fun expandAll() {
+        ui.expandAll {  }
     }
 }
 

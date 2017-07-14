@@ -42,7 +42,9 @@ fun runLuaCheck(project: Project, file: VirtualFile) {
     val checkView = ServiceManager.getService(project, LuaCheckView::class.java)
     val panel = checkView.panel
     val psiFile = PsiManagerEx.getInstance(project).findFile(file)!!
-    val fileNode = panel.builder.addFile(psiFile)
+    val builder = panel.builder
+    builder.clear()
+    val fileNode = builder.addFile(psiFile)
 
     val handler = OSProcessHandler(cmd)
     val reg = "(.+?):(\\d+):(\\d+):(.+)\\n".toRegex()
@@ -56,14 +58,14 @@ fun runLuaCheck(project: Project, file: VirtualFile) {
                 val colGroup = matchResult.groups[3]!!
                 val descGroup = matchResult.groups[4]!!
 
-                panel.builder.addLCItem(LuaCheckRecordNodeData(lineGroup.value.toInt(),
+                builder.addLCItem(LuaCheckRecordNodeData(lineGroup.value.toInt(),
                         colGroup.value.toInt(),
                         descGroup.value), fileNode)
             }
         }
 
         override fun processTerminated(event: ProcessEvent) {
-            ApplicationManager.getApplication().invokeLater { panel.builder.performUpdate() }
+            ApplicationManager.getApplication().invokeLater { builder.performUpdate() }
         }
 
         override fun processWillTerminate(event: ProcessEvent, p1: Boolean) {
