@@ -16,8 +16,7 @@
 
 package com.tang.intellij.lua.debugger.remote.commands;
 
-import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess;
-import com.tang.intellij.lua.debugger.remote.MobServer;
+import com.tang.intellij.lua.debugger.remote.MobClient;
 
 import java.io.IOException;
 
@@ -41,7 +40,7 @@ public class DefaultCommand extends DebugCommand {
     }
 
     @Override
-    public void write(MobServer writer) throws IOException {
+    public void write(MobClient writer) throws IOException {
         writer.write(commandline);
     }
 
@@ -69,6 +68,6 @@ public class DefaultCommand extends DebugCommand {
     }
 
     public void exec() {
-        LuaMobDebugProcess.getCurrent().runCommand(this);
+        debugProcess.runCommand(this);
     }
 }
