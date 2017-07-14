@@ -17,7 +17,9 @@
 package com.tang.intellij.lua.debugger.remote;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.util.TimeoutUtil;
 import com.intellij.util.io.BaseOutputReader;
+import com.tang.intellij.lua.debugger.DebugLogger;
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand;
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand;
 import org.jetbrains.annotations.NotNull;
@@ -41,10 +43,42 @@ import java.util.regex.Pattern;
  */
 public class MobServer implements Runnable {
 
+    interface MobServerListener extends DebugLogger {
+        void handleResp(int code, String data);
+        void onSocketClosed();
+        LuaMobDebugProcess getProcess();
+    }
+
     class LuaDebugReader extends BaseOutputReader {
         LuaDebugReader(@NotNull InputStream inputStream, @Nullable Charset charset) {
             super(inputStream, charset);
             start(getClass().getName());
+        }
+
+        @Override
+        protected void doRun() {
+            try {
+                while (true) {
+                    boolean read = readAvailableBlocking();
+
+                    if (!read) {
+                        break;
+                    }
+                    else {
+                        if (isStopped) {
+                            break;
+                        }
+
+                        TimeoutUtil.sleep(mySleepingPolicy.getTimeToSleep(true));
+                    }
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                MobServer.this.onSocketClosed();
+            }
         }
 
         @Override
@@ -59,16 +93,16 @@ public class MobServer implements Runnable {
         }
     }
 
-    private boolean isStoped;
+    private boolean isStopped;
     private ServerSocket server;
-    private LuaMobDebugProcess listener;
+    private MobServerListener listener;
     private Queue<DebugCommand> commands = new LinkedList<>();
     private LuaDebugReader debugReader;
     private DebugCommand currentCommandWaitForResp;
     private OutputStreamWriter streamWriter;
     private StringBuffer stringBuffer = new StringBuffer(2048);
 
-    public MobServer(LuaMobDebugProcess listener) {
+    public MobServer(MobServerListener listener) {
         this.listener = listener;
     }
 
@@ -80,7 +114,6 @@ public class MobServer implements Runnable {
     }
 
     private void onResp(String data) {
-        System.out.println(data);
         if (currentCommandWaitForResp != null) {
             stringBuffer.append(data);
             int eat = currentCommandWaitForResp.handle(stringBuffer.toString());
@@ -121,13 +154,13 @@ public class MobServer implements Runnable {
                     boolean firstTime = true;
 
                     while (accept.isConnected()) {
-                        if (isStoped) break;
+                        if (isStopped) break;
 
                         DebugCommand command;
                         while (commands.size() > 0 && currentCommandWaitForResp == null) {
                             if (currentCommandWaitForResp == null) {
                                 command = commands.poll();
-                                command.setDebugProcess(listener);
+                                command.setDebugProcess(listener.getProcess());
                                 command.write(this);
                                 streamWriter.write("\n");
                                 streamWriter.flush();
@@ -152,6 +185,10 @@ public class MobServer implements Runnable {
         }
     }
 
+    private void onSocketClosed() {
+        listener.onSocketClosed();
+    }
+
     public void stop() {
         if (streamWriter != null) {
             try {
@@ -159,13 +196,15 @@ public class MobServer implements Runnable {
             } catch (IOException ignored) {
             }
         }
-        isStoped = true;
+        isStopped = true;
         currentCommandWaitForResp = null;
         if (debugReader != null)
             debugReader.stop();
         try {
             server.close();
-        } catch (IOException ignored) { }
+        } catch (IOException ignored) {
+
+        }
     }
 
     void sendAddBreakpoint(String file, int line) {

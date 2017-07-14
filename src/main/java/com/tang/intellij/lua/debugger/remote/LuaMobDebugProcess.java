@@ -38,7 +38,7 @@ import java.io.IOException;
  *
  * Created by TangZX on 2016/12/30.
  */
-public class LuaMobDebugProcess extends LuaDebugProcess {
+public class LuaMobDebugProcess extends LuaDebugProcess implements MobServer.MobServerListener {
 
     private IRemoteConfiguration runProfile;
     private LuaDebuggerEditorsProvider editorsProvider;
@@ -133,12 +133,23 @@ public class LuaMobDebugProcess extends LuaDebugProcess {
         }
     }
 
-    void handleResp(int code, String data) {
+    @Override
+    public void handleResp(int code, String data) {
         switch (code) {
             case 202:
                 runCommand(new GetStackCommand());
                 break;
         }
+    }
+
+    @Override
+    public void onSocketClosed() {
+        getSession().stop();
+    }
+
+    @Override
+    public LuaMobDebugProcess getProcess() {
+        return this;
     }
 
     public void runCommand(DebugCommand command) {
