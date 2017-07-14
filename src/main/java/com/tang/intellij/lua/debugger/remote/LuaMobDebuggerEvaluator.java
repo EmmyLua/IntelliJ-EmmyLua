@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.debugger.remote;
 
-import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XSourcePosition;
 import com.tang.intellij.lua.debugger.LuaDebuggerEvaluator;
 import com.tang.intellij.lua.debugger.remote.commands.EvaluatorCommand;
@@ -32,10 +31,10 @@ import org.luaj.vm2.lib.jse.JsePlatform;
  * Created by tangzx on 2016/12/31.
  */
 public class LuaMobDebuggerEvaluator extends LuaDebuggerEvaluator {
-    private XDebugSession session;
+    private LuaMobDebugProcess process;
 
-    public LuaMobDebuggerEvaluator(@NotNull XDebugSession session) {
-        this.session = session;
+    public LuaMobDebuggerEvaluator(@NotNull LuaMobDebugProcess process) {
+        this.process = process;
     }
 
     @Override
@@ -48,10 +47,10 @@ public class LuaMobDebuggerEvaluator extends LuaDebuggerEvaluator {
             String code2Str = code.get(1).toString();
             LuaValue code2 = standardGlobals.load(String.format("local _=%s return _", code2Str));
 
-            LuaRValue value = LuaRValue.create(s, code2.call(), s, session);
+            LuaRValue value = LuaRValue.create(s, code2.call(), s, process.getSession());
 
             xEvaluationCallback.evaluated(value);
         });
-        evaluatorCommand.exec();
+        process.runCommand(evaluatorCommand);
     }
 }

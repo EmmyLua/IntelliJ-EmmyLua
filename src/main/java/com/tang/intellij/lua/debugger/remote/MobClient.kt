@@ -147,12 +147,14 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
     fun stop() {
         try {
             streamWriter?.write("done\n")
-        } catch (ignored: IOException) {
-        }
+        } catch (ignored: IOException) { }
 
         isStopped = true
         currentCommandWaitForResp = null
         debugReader?.stop()
+        try {
+            socket.close()
+        } catch (ignored: Exception) {}
     }
 
     fun sendAddBreakpoint(file: String, line: Int) {

@@ -66,8 +66,4 @@ public class DefaultCommand extends DebugCommand {
     protected void handle(int index, String data) {
 
     }
-
-    public void exec() {
-        debugProcess.runCommand(this);
-    }
 }
