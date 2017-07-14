@@ -27,15 +27,26 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.util.execution.ParametersListUtil
+import org.intellij.lang.annotations.Language
 import java.io.File
+
+private val DEFAULT_ARGS = arrayOf("--codes", "--ranges")
+
+private fun applyDefaultArgs(strArgs: String?): List<String> {
+    val list:MutableList<String> = mutableListOf()
+    if (strArgs != null) {
+        val array = ParametersListUtil.parseToArray(strArgs)
+        list.addAll(array)
+    }
+    list.addAll(DEFAULT_ARGS)
+    return list.distinct()
+}
 
 fun runLuaCheck(project: Project, file: VirtualFile) {
     val settings = LuaCheckSettings.getInstance()
     val cmd = GeneralCommandLine(settings.luaCheck)
     val args = settings.luaCheckArgs
-    if (args != null) {
-        cmd.addParameters(ParametersListUtil.parseToArray(args).toList())
-    }
+    cmd.addParameters(applyDefaultArgs(args))
     cmd.addParameter(file.name)
     cmd.workDirectory = File(file.parent.path)
 
@@ -47,19 +58,23 @@ fun runLuaCheck(project: Project, file: VirtualFile) {
     val fileNode = builder.addFile(psiFile)
 
     val handler = OSProcessHandler(cmd)
-    val reg = "(.+?):(\\d+):(\\d+):(.+)\\n".toRegex()
+    @Language("RegExp")
+    val reg = "(.+?):(\\d+):(\\d+)-(\\d+):(.+)\\n".toRegex()
     handler.addProcessListener(object : ProcessListener {
         override fun onTextAvailable(event: ProcessEvent, key: Key<*>?) {
-            //print(event.text)
+            print(event.text)
             val matchResult = reg.find(event.text)
             if (matchResult != null) {
                 //val matchGroup = matchResult.groups[1]!!
                 val lineGroup = matchResult.groups[2]!!
-                val colGroup = matchResult.groups[3]!!
-                val descGroup = matchResult.groups[4]!!
+                val colSGroup = matchResult.groups[3]!!
+                val colEGroup = matchResult.groups[4]!!
+                val descGroup = matchResult.groups[5]!!
 
-                builder.addLCItem(LuaCheckRecordNodeData(lineGroup.value.toInt(),
-                        colGroup.value.toInt(),
+                builder.addLCItem(LCRecordData(
+                        lineGroup.value.toInt() - 1,
+                        colSGroup.value.toInt() - 1,
+                        colEGroup.value.toInt() - colSGroup.value.toInt() + 1,
                         descGroup.value), fileNode)
             }
         }

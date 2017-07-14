@@ -16,6 +16,9 @@
 
 package com.tang.intellij.lua.luacheck
 
+import com.intellij.find.FindModel
+import com.intellij.find.impl.FindInProjectUtil
+import com.intellij.icons.AllIcons
 import com.intellij.ide.CommonActionsManager
 import com.intellij.ide.TreeExpander
 import com.intellij.ide.projectView.TreeStructureProvider
@@ -24,14 +27,20 @@ import com.intellij.ide.util.treeView.AbstractTreeStructureBase
 import com.intellij.ide.util.treeView.NodeDescriptor
 import com.intellij.ide.util.treeView.NodeRenderer
 import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.SimpleToolWindowPanel
-import com.intellij.pom.Navigatable
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.ui.AutoScrollToSourceHandler
+import com.intellij.ui.OnePixelSplitter
 import com.intellij.ui.components.JBScrollPane
+import com.intellij.usageView.UsageInfo
+import com.intellij.usages.impl.UsagePreviewPanel
+import com.intellij.util.EditSourceOnDoubleClickHandler
 import com.intellij.util.PlatformIcons
 import java.awt.GridLayout
+import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JTree
 import javax.swing.tree.DefaultMutableTreeNode
@@ -42,11 +51,12 @@ import javax.swing.tree.DefaultTreeModel
  * Created by tangzx on 2017/7/12.
  */
 class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataProvider {
-    val rootNode = DefaultMutableTreeNode()
-    val treeModel = DefaultTreeModel(rootNode)
-    val tree: JTree = JTree(treeModel)
+    private val rootNode = DefaultMutableTreeNode()
+    private val treeModel = DefaultTreeModel(rootNode)
+    private val tree: JTree = JTree(treeModel)
     val builder:LuaCheckTreeBuilder = LuaCheckTreeBuilder(tree, treeModel, project)
-    val treeExpander = MyTreeExpander()
+    private val treeExpander = MyTreeExpander()
+    private var myUsagePreviewPanel: UsagePreviewPanel? = null
 
     inner class MyShowPackagesAction : ToggleAction("Group By Packages", null, PlatformIcons.GROUP_BY_PACKAGES) {
         override fun isSelected(actionEvent: AnActionEvent): Boolean {
@@ -55,6 +65,21 @@ class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataPr
 
         override fun setSelected(actionEvent: AnActionEvent, state: Boolean) {
             builder.arePackagesShown = state
+        }
+    }
+
+    inner class MyPreviewAction internal constructor() : ToggleAction("Preview Source", null, AllIcons.Actions.PreviewDetails) {
+
+        override fun isSelected(actionEvent: AnActionEvent): Boolean {
+            return builder.showPreview
+        }
+
+        override fun setSelected(actionEvent: AnActionEvent, state: Boolean) {
+            myUsagePreviewPanel?.isVisible = state
+            builder.showPreview = state
+            if (state) {
+                updatePreview()
+            }
         }
     }
 
@@ -83,10 +108,11 @@ class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataPr
     fun init() {
         tree.cellRenderer = NodeRenderer()
         tree.isRootVisible = false
-        val jbScrollPane = JBScrollPane(tree)
-        jbScrollPane.border = null
-        setContent(jbScrollPane)
+        tree.selectionModel.addTreeSelectionListener {
+            ApplicationManager.getApplication().invokeLater { updatePreview() }
+        }
 
+        EditSourceOnDoubleClickHandler.install(tree)
         //auto scroll source handler
         val handler = MyAutoScrollToSourceHandler()
         handler.install(tree)
@@ -99,21 +125,58 @@ class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataPr
         group.add(CommonActionsManager.getInstance().createCollapseAllAction(treeExpander, this))
         group.add(MyShowPackagesAction())
         group.add(handler.createToggleAction())
+        group.add(MyPreviewAction())
         toolBarPanel.add(ActionManager.getInstance().createActionToolbar(ActionPlaces.TODO_VIEW_TOOLBAR, group, false).component)
 
         builder.initRootNode()
+
+        //preview
+        myUsagePreviewPanel = UsagePreviewPanel(project, FindInProjectUtil.setupViewPresentation(false, FindModel()))
+        myUsagePreviewPanel?.isVisible = builder.showPreview
+
+        setContent(createCenterComponent())
+    }
+
+    private fun createCenterComponent(): JComponent {
+        val splitter = OnePixelSplitter()
+        val jbScrollPane = JBScrollPane(tree)
+        jbScrollPane.border = null
+        splitter.firstComponent = jbScrollPane//ScrollPaneFactory.createScrollPane(tree, false)
+        splitter.secondComponent = myUsagePreviewPanel
+        return splitter
+    }
+
+    private fun updatePreview() {
+        val treePath = tree.selectionPath
+        treePath ?: return
+
+        val list: MutableList<UsageInfo> = mutableListOf()
+        val node = treePath.lastPathComponent as DefaultMutableTreeNode
+        val userdata = node.userObject
+        if (userdata is NodeDescriptor<*>) {
+            val data = userdata.element
+            if (data is LCRecord) {
+                val document = PsiDocumentManager.getInstance(project).getDocument(data.file)
+                document ?: return
+
+                val startOffset = document.getLineStartOffset(data.record.line) + data.record.col
+                list.add(UsageInfo(data.file, startOffset, startOffset + data.record.len))
+            }
+        }
+
+        myUsagePreviewPanel?.updateLayout(if (list.isEmpty()) null else list)
     }
 
     override fun getData(dataId: String?): Any? {
         if (CommonDataKeys.NAVIGATABLE.`is`(dataId)) {
             val path = tree.selectionPath
-            if (path != null) {
+            if (path != null && !builder.showPreview) {
                 val node = path.lastPathComponent as DefaultMutableTreeNode
                 val userObject = node.userObject
                 if (userObject is NodeDescriptor<*>) {
                     val element = userObject.element
-                    if (element is Navigatable) {
-                        return element.navigate(true)
+                    if (element is LCRecord) {
+                        return element.getNavigator()
                     }
                 }
             }
@@ -124,8 +187,9 @@ class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataPr
 
 class LuaCheckTreeBuilder(tree: JTree, model: DefaultTreeModel, val project: Project)
     : AbstractTreeBuilder(tree, model, LuaCheckTreeStructure(project), null, false) {
-    var isAutoScrollMode: Boolean = true
+    var isAutoScrollMode: Boolean = false
     var arePackagesShown: Boolean = true
+    var showPreview: Boolean = false
 
     override fun initRootNode() {
         super.initRootNode()
@@ -144,7 +208,7 @@ class LuaCheckTreeBuilder(tree: JTree, model: DefaultTreeModel, val project: Pro
         return fileNode
     }
 
-    fun addLCItem(item: LuaCheckRecordNodeData, fileNode: LCPsiFileNode) {
+    fun addLCItem(item: LCRecordData, fileNode: LCPsiFileNode) {
         fileNode.append(LCRecord(project, fileNode.value, item))
     }
 

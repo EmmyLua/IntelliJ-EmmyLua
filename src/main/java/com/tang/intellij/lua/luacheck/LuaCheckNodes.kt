@@ -58,8 +58,8 @@ class LCPsiFileNode(project: Project, file: PsiFile) : PsiFileNode(project, file
     }
 }
 
-data class LuaCheckRecordNodeData(val line:Int, val col:Int, val desc:String)
-class LCRecord(project: Project, val file:PsiFile, val record: LuaCheckRecordNodeData) : AbstractTreeNode<LuaCheckRecordNodeData>(project, record) {
+data class LCRecordData(val line:Int, val col:Int, val len:Int, val desc:String)
+class LCRecord(project: Project, val file:PsiFile, val record: LCRecordData) : AbstractTreeNode<LCRecordData>(project, record) {
     override fun update(presentationData: PresentationData) {
         presentationData.presentableText = "(${record.line}, ${record.col}) ${record.desc}"
         presentationData.setIcon(AllIcons.General.TodoDefault)
@@ -72,7 +72,11 @@ class LCRecord(project: Project, val file:PsiFile, val record: LuaCheckRecordNod
     override fun canNavigate() = true
 
     override fun navigate(requestFocus: Boolean) {
-        OpenFileDescriptor(project!!, file.virtualFile, record.line - 1, record.col - 1).navigate(requestFocus)
+        getNavigator().navigate(requestFocus)
+    }
+
+    fun getNavigator():OpenFileDescriptor  {
+        return OpenFileDescriptor(project!!, file.virtualFile, record.line, record.col)
     }
 
     override fun isAlwaysLeaf() = true
