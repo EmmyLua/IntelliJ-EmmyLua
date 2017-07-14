@@ -241,4 +241,8 @@ class LuaCheckTreeStructure(project: Project) : AbstractTreeStructureBase(projec
     override fun getRootElement(): Any = root
 
     override fun hasSomethingToCommit(): Boolean = false
+
+    override fun isAlwaysLeaf(element: Any?): Boolean {
+        return element is LCRecord
+    }
 }
