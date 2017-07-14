@@ -25,6 +25,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.util.execution.ParametersListUtil
 import org.intellij.lang.annotations.Language
@@ -43,6 +44,12 @@ private fun applyDefaultArgs(strArgs: String?): List<String> {
 }
 
 fun runLuaCheck(project: Project, file: VirtualFile) {
+    ToolWindowManager.getInstance(project).getToolWindow("LuaCheck").show {
+        runLuaCheckInner(project, file)
+    }
+}
+
+private fun runLuaCheckInner(project: Project, file: VirtualFile) {
     val settings = LuaCheckSettings.getInstance()
     val cmd = GeneralCommandLine(settings.luaCheck)
     val args = settings.luaCheckArgs
