@@ -22,7 +22,7 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.psi.LuaNameExpr;
-import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
+import com.tang.intellij.lua.psi.LuaPsiResolveUtilKt;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +60,7 @@ public class LuaNameReference extends PsiReferenceBase<LuaNameExpr> implements L
 
     @Override
     public PsiElement resolve(SearchContext context) {
-        PsiElement resolve = LuaPsiResolveUtil.resolve(myElement, context);
+        PsiElement resolve = LuaPsiResolveUtilKt.resolve(myElement, context);
         if (resolve == myElement) // LuaVar 全局定义中会发生
             return null;
         return resolve;

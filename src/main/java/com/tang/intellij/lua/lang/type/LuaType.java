@@ -25,7 +25,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaNameExpr;
-import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
+import com.tang.intellij.lua.psi.LuaPsiResolveUtilKt;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
@@ -59,7 +59,7 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     public static LuaType createAnonymousType(PsiElement element) {
-        LuaType type = create(LuaPsiResolveUtil.getAnonymousType(element), null);
+        LuaType type = create(LuaPsiResolveUtilKt.getAnonymousType(element), null);
         type.isAnonymous = true;
         return type;
     }

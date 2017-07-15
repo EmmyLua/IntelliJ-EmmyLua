@@ -121,7 +121,7 @@ class LuaAnnotator : Annotator {
         override fun visitNameExpr(o: LuaNameExpr) {
             val id = o.firstChild
 
-            val res = LuaPsiResolveUtil.resolve(o, SearchContext(o.project))
+            val res = resolve(o, SearchContext(o.project))
             if (res != null) { //std api highlighting
                 val containingFile = res.containingFile
                 if (LuaFileUtil.isStdLibFile(containingFile.virtualFile, o.project)) {
@@ -157,7 +157,7 @@ class LuaAnnotator : Annotator {
         }
 
         private fun checkUpValue(o: LuaNameExpr) {
-            val upValue = LuaPsiResolveUtil.isUpValue(o, SearchContext(o.project))
+            val upValue = isUpValue(o, SearchContext(o.project))
             if (upValue) {
                 val annotation = myHolder!!.createInfoAnnotation(o, null)
                 annotation.textAttributes = LuaHighlightingData.UP_VALUE

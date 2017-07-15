@@ -74,7 +74,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
             }
             var file: LuaFile? = null
             if (filePath != null)
-                file = LuaPsiResolveUtil.resolveRequireFile(filePath, luaCallExpr.project)
+                file = resolveRequireFile(filePath, luaCallExpr.project)
             if (file != null)
                 return file.getReturnedType(context)
         }

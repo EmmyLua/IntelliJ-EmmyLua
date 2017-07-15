@@ -21,7 +21,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReferenceBase;
 import com.tang.intellij.lua.lang.type.LuaString;
 import com.tang.intellij.lua.psi.LuaCallExpr;
-import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
+import com.tang.intellij.lua.psi.LuaPsiResolveUtilKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,7 +66,7 @@ public class LuaRequireReference extends PsiReferenceBase<LuaCallExpr> {
     public PsiElement resolve() {
         if (pathString == null)
             return  null;
-        return LuaPsiResolveUtil.resolveRequireFile(pathString, myElement.getProject());
+        return LuaPsiResolveUtilKt.resolveRequireFile(pathString, myElement.getProject());
     }
 
     @NotNull

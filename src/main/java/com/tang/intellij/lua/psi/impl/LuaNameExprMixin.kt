@@ -39,7 +39,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
 
     internal constructor(node: ASTNode) : super(node)
 
-    internal constructor(stub: LuaNameStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node) {}
+    internal constructor(stub: LuaNameStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
     override fun getReference(): PsiReference? {
         val references = references
@@ -54,7 +54,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
             var typeSet = LuaTypeSet.create()
             val nameExpr = this as LuaNameExpr
 
-            val multiResolve = LuaPsiResolveUtil.multiResolve(nameExpr, context)
+            val multiResolve = multiResolve(nameExpr, context)
             if (multiResolve.isEmpty()) {
                 typeSet.addType(LuaType.createGlobalType(nameExpr))
             } else {
@@ -84,7 +84,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
                     }
                 }
                 //Global
-                if (LuaPsiResolveUtil.resolveLocal(def, context) == null) {
+                if (resolveLocal(def, context) == null) {
                     if (typeSet == null)
                         typeSet = LuaTypeSet.create()
                     typeSet.addType(LuaType.createGlobalType(def))

@@ -22,7 +22,7 @@ import com.intellij.psi.PsiReferenceBase;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.psi.LuaIndexExpr;
-import com.tang.intellij.lua.psi.LuaPsiResolveUtil;
+import com.tang.intellij.lua.psi.LuaPsiResolveUtilKt;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,7 +66,7 @@ public class LuaIndexReference extends PsiReferenceBase<LuaIndexExpr> implements
 
     @Override
     public PsiElement resolve(SearchContext context) {
-        PsiElement ref = LuaPsiResolveUtil.resolve(myElement, context);
+        PsiElement ref = LuaPsiResolveUtilKt.resolve(myElement, context);
         if (ref != null) {
             if (ref.getContainingFile().equals(myElement.getContainingFile())) { //优化，不要去解析 Node Tree
                 if (ref.getNode().getTextRange().equals(myElement.getNode().getTextRange())) {
