@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @State(
         name="LuaSettings",
-        storages = { @Storage("other.xml")}
+        storages = { @Storage("emmy.xml")}
 )
 public class LuaSettings implements PersistentStateComponent<LuaSettings> {
 

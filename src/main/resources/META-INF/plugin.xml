@@ -22,13 +22,25 @@
     <category>Custom Languages</category>
     <description><![CDATA[
     Support for Lua programming language.<br>
+    <p><a href="https://github.com/tangzx/IntelliJ-EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://www.paypal.me/tangzx">Donate</a></p>
     Featrues:
     <ul>
         <li>Syntax highlighting</li>
         <ul>
-            <li>Highlighting global</li>
-            <li>Highlighting local/param</li>
-            <li>Highlighting up value</li>
+            <li>Highlight global value</li>
+            <li>Highlight local/param value</li>
+            <li>Highlight up value</li>
+        </ul>
+        <li>Code completion</li>
+        <ul>
+            <li>Keyword completion</li>
+            <li>Basic completion</li>
+            <li>Type inferred based completion</li>
+        </ul>
+        <li>Debugger</li>
+        <ul>
+            <li>Attach Debugger(Windows only)</li>
+            <li>Remote Debugger(Mobdebug.lua)</li>
         </ul>
         <li>Lua 5.3 support</li>
         <li>Find usages</li>
@@ -38,12 +50,6 @@
         <li>Go to class</li>
         <li>Go to file</li>
         <li>Parameter name hints</li>
-        <li>Code completion</li>
-        <ul>
-            <li>Keyword completion</li>
-            <li>Basic completion</li>
-            <li>Comment based completion</li>
-        </ul>
         <li>Comment based type/class annotation</li>
         <li>Structure view</li>
         <li>Comment in/out</li>
@@ -57,9 +63,8 @@
         <li>Code inspections</li>
         <li>Lua Standard Library/API</li>
         <li>Region folding</li>
-        <li>Attach Debugger(Windows only)</li>
-        <li>Remote Debugger(Mobdebug.lua)</li>
     </ul>
+    <p>中国朋友可以加QQ群29850775交流及反馈BUG</p>
     ]]></description>
 
     <change-notes><![CDATA[
@@ -75,6 +80,16 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!--<errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>-->
+        <toolWindow id="LuaCheck" anchor="bottom" icon="/icons/lua.png"
+                    factoryClass="com.tang.intellij.lua.luacheck.LuaCheckToolWindowFactory" canCloseContents="true"/>
+        <projectService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckView"
+                        serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckView"/>
+        <applicationService serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckSettings"
+                            serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
+        <applicationConfigurable displayName="LuaCheck"
+                                 groupId="language"
+                                 id="preferences.LuaCheck"
+                                 instance="com.tang.intellij.lua.luacheck.LuaCheckSettingsPanel"/>
 
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
         <moduleType id="LUA_MODULE" implementationClass="com.tang.intellij.lua.project.LuaModuleType"/>
@@ -263,6 +278,16 @@
                 text="Lua File"
                 id="lua.newFile">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
+        </action>
+
+        <action id="LuaCheck"
+                text="Run LuaCheck"
+                popup="true"
+                icon="/icons/lua.png"
+                class="com.tang.intellij.lua.luacheck.LuaCheckGroup">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
 

@@ -70,12 +70,13 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
     private fun genDoc(owner: LuaCommentOwner): String? {
         val sb = StringBuilder()
         if (owner is LuaFuncBodyOwner && owner is PsiNameIdentifierOwner) {
-            val funcBodyOwner = owner as LuaFuncBodyOwner
-            val methodDef = owner as PsiNameIdentifierOwner
-            sb.append("<h1>")
-            sb.append(methodDef.name)
-            sb.append(funcBodyOwner.paramSignature)
-            sb.append("</h1><br>")
+            val methodDef: PsiNameIdentifierOwner = owner
+            with(sb) {
+                append("<h1>")
+                append(methodDef.name)
+                append(owner.paramSignature)
+                append("</h1><br>")
+            }
         }
 
         val comment = LuaCommentUtil.findComment(owner)

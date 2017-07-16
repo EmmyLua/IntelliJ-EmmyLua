@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.lang;
+package com.tang.intellij.lua.luacheck
 
-import com.intellij.lang.Language;
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.wm.ToolWindow
+import com.intellij.ui.content.ContentFactory
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ * LuaCheckView
+ * Created by tangzx on 2017/7/12.
  */
-public class LuaLanguage extends Language {
+class LuaCheckView(val project: Project) {
+    val panel: LuaCheckPanel by lazy { LuaCheckPanel(project) }
 
-    public static final int INDEX_VERSION = 13;
-
-    public static final LuaLanguage INSTANCE = new LuaLanguage();
-
-    public LuaLanguage() {
-        super("Lua");
+    fun init(toolWindow: ToolWindow) {
+        panel.init()
+        val contentFactory = ContentFactory.SERVICE.getInstance()
+        val content = contentFactory.createContent(panel, "", false)
+        toolWindow.contentManager.addContent(content)
     }
 }

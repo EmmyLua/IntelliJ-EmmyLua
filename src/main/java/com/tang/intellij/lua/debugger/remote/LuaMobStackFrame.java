@@ -48,7 +48,7 @@ public class LuaMobStackFrame extends XStackFrame {
     @Nullable
     @Override
     public XDebuggerEvaluator getEvaluator() {
-        return  new LuaMobDebuggerEvaluator(process.getSession());
+        return  new LuaMobDebuggerEvaluator(process);
     }
 
     @Nullable

@@ -106,7 +106,12 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
 
         val returnTypeSet = LuaTypeSet.deserialize(stubInputStream)
         val isStatic = stubInputStream.readBoolean()
-        return LuaClassMethodStubImpl(StringRef.toString(shortName), StringRef.toString(className), params, returnTypeSet, isStatic, stubElement)
+        return LuaClassMethodStubImpl(StringRef.toString(shortName)!!,
+                StringRef.toString(className)!!,
+                params,
+                returnTypeSet,
+                isStatic,
+                stubElement)
     }
 
     override fun indexStub(luaClassMethodStub: LuaClassMethodStub, indexSink: IndexSink) {

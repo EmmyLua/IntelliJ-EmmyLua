@@ -87,7 +87,7 @@ class LuaGlobalFuncType : IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef>(
         }
 
         val returnTypeSet = LuaTypeSet.deserialize(stubInputStream)
-        return LuaGlobalFuncStubImpl(StringRef.toString(name), params, returnTypeSet, stubElement)
+        return LuaGlobalFuncStubImpl(StringRef.toString(name)!!, params, returnTypeSet, stubElement)
     }
 
     override fun indexStub(luaGlobalFuncStub: LuaGlobalFuncStub, indexSink: IndexSink) {

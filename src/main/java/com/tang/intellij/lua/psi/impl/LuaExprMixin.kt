@@ -33,11 +33,11 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         return RecursionManager.doPreventingRecursion<LuaTypeSet>(this, true) {
             var set: LuaTypeSet? = null
             if (this is LuaCallExpr)
-                set = guessType(this as LuaCallExpr, context)
+                set = guessType(this, context)
             if (this is LuaParenExpr)
-                set = guessType(this as LuaParenExpr, context)
+                set = guessType(this, context)
             else if (this is LuaLiteralExpr)
-                set = guessType(this as LuaLiteralExpr)
+                set = guessType(this)
             set
         }
     }

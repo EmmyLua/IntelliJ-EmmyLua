@@ -17,7 +17,7 @@
 package com.tang.intellij.lua.debugger.remote.commands;
 
 import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess;
-import com.tang.intellij.lua.debugger.remote.MobServer;
+import com.tang.intellij.lua.debugger.remote.MobClient;
 
 import java.io.IOException;
 
@@ -33,7 +33,7 @@ public abstract class DebugCommand {
         debugProcess = process;
     }
 
-    public abstract void write(MobServer writer) throws IOException;
+    public abstract void write(MobClient writer) throws IOException;
     public abstract int handle(String data);
     public abstract int getRequireRespLines();
     public abstract boolean isFinished();

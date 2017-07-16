@@ -93,12 +93,11 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         val all = LuaClassFieldIndex.findAll(type, fieldName, context)
         for (fieldDef in all) {
             if (fieldDef is LuaIndexExpr) {
-                val indexExpr = fieldDef as LuaIndexExpr
-                val stub = indexExpr.stub
+                val stub = fieldDef.stub
                 if (stub != null)
                     set = set.union(stub.guessValueType())
                 else
-                    set = set.union(indexExpr.guessValueType(context))
+                    set = set.union(fieldDef.guessValueType(context))
 
                 if (fieldDef === this)
                     return set
