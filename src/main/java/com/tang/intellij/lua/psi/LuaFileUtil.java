@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -42,7 +43,7 @@ public class LuaFileUtil {
 
     //有些扩展名也许是txt
     private static String[] extensions = new String[] {
-            "", ".lua", ".txt"
+            "", ".lua", ".txt", ".lua.txt"
     };
 
     public static boolean fileEquals(VirtualFile f1, VirtualFile f2) {
@@ -52,11 +53,23 @@ public class LuaFileUtil {
         return f1.getPath().equals(f2.getPath());
     }
 
+    public static List<String> getNoExtensionUrl(String shortUrl) {
+        SmartList<String> list = new SmartList<>();
+        for (String ext : extensions) {
+            if (!shortUrl.endsWith(ext)) {
+                continue;
+            }
+            list.add(shortUrl.substring(0, shortUrl.length() - ext.length()));
+        }
+        return list;
+    }
+
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
         if (shortUrl == null)
             return null;
 
         shortUrl = shortUrl.replace('\\', '/').trim();
+        shortUrl = shortUrl.replaceAll("\\.", "/");
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
