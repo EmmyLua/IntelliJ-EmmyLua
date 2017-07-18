@@ -79,10 +79,10 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
     private fun sendBreakpoint(client: MobClient, sourcePosition: XSourcePosition) {
         val project = session.project
         val file = sourcePosition.file
-        var fileShortUrl: String? = LuaFileUtil.getShortUrl(project, file)
+        val fileShortUrl: String? = LuaFileUtil.getShortUrl(project, file)
         if (fileShortUrl != null) {
             client.sendAddBreakpoint(fileShortUrl, sourcePosition.line + 1)
-            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{url ->
+            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{ url ->
                 client.sendAddBreakpoint(url, sourcePosition.line + 1)
                 client.sendAddBreakpoint(url.replace('/', '.'), sourcePosition.line + 1)
             }
@@ -98,9 +98,9 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         super.unregisterBreakpoint(sourcePosition, position)
         if (mobClient != null) {
             val file = sourcePosition.file
-            var fileShortUrl = LuaFileUtil.getShortUrl(session.project, file)
+            val fileShortUrl = LuaFileUtil.getShortUrl(session.project, file)
             mobClient!!.sendRemoveBreakpoint(fileShortUrl, sourcePosition.line + 1)
-            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{url ->
+            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{ url ->
                 mobClient!!.sendRemoveBreakpoint(url, sourcePosition.line + 1)
                 mobClient!!.sendRemoveBreakpoint(url.replace('/', '.'), sourcePosition.line + 1)
             }
