@@ -82,10 +82,9 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         var fileShortUrl: String? = LuaFileUtil.getShortUrl(project, file)
         if (fileShortUrl != null) {
             client.sendAddBreakpoint(fileShortUrl, sourcePosition.line + 1)
-            val extension = file.extension
-            if (extension != null) {
-                fileShortUrl = fileShortUrl.substring(0, fileShortUrl.length - extension.length - 1)
-                client.sendAddBreakpoint(fileShortUrl, sourcePosition.line + 1)
+            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{url ->
+                client.sendAddBreakpoint(url, sourcePosition.line + 1)
+                client.sendAddBreakpoint(url.replace('/', '.'), sourcePosition.line + 1)
             }
         }
     }
@@ -101,10 +100,9 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
             val file = sourcePosition.file
             var fileShortUrl = LuaFileUtil.getShortUrl(session.project, file)
             mobClient!!.sendRemoveBreakpoint(fileShortUrl, sourcePosition.line + 1)
-            val extension = file.extension
-            if (extension != null) {
-                fileShortUrl = fileShortUrl.substring(0, fileShortUrl.length - extension.length - 1)
-                mobClient!!.sendRemoveBreakpoint(fileShortUrl, sourcePosition.line + 1)
+            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{url ->
+                mobClient!!.sendRemoveBreakpoint(url, sourcePosition.line + 1)
+                mobClient!!.sendRemoveBreakpoint(url.replace('/', '.'), sourcePosition.line + 1)
             }
         }
     }
