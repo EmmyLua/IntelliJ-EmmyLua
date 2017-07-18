@@ -19,7 +19,7 @@ package com.tang.intellij.lua.stubs
 import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaNameExpr
-import com.tang.intellij.lua.psi.LuaPsiResolveUtil
+import com.tang.intellij.lua.psi.resolveLocal
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.types.LuaNameType
 
@@ -49,7 +49,7 @@ class LuaNameStubImpl : StubBase<LuaNameExpr>, LuaNameStub {
     private fun checkGlobal(): Boolean {
         val context = SearchContext(_nameExpr.project)
         context.setCurrentStubFile(_nameExpr.containingFile)
-        return LuaPsiResolveUtil.resolveLocal(_nameExpr, context) == null
+        return resolveLocal(_nameExpr, context) == null
     }
 
     override val isGlobal: Boolean

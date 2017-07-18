@@ -66,7 +66,7 @@ object LuaPsiImplUtil {
     }
 
     @JvmStatic fun guessType(nameDef: LuaNameDef, context: SearchContext): LuaTypeSet? {
-        return LuaPsiResolveUtil.resolveType(nameDef, context)
+        return resolveType(nameDef, context)
     }
 
     @JvmStatic fun getNameIdentifier(nameDef: LuaNameDef): PsiElement {
@@ -211,11 +211,11 @@ object LuaPsiImplUtil {
             var owner: LuaFuncBodyOwner? = null
             val expr = callExpr.expr
             if (expr is LuaIndexExpr) {
-                val resolve = LuaPsiResolveUtil.resolve(expr, context)
+                val resolve = resolve(expr, context)
                 if (resolve is LuaFuncBodyOwner)
                     owner = resolve
             } else if (expr is LuaNameExpr) {
-                owner = LuaPsiResolveUtil.resolveFuncBodyOwner(expr, context)
+                owner = resolveFuncBodyOwner(expr, context)
             }
             owner
         }

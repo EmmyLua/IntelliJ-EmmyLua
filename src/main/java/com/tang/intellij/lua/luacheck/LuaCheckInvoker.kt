@@ -22,12 +22,18 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileVisitor
 import com.intellij.openapi.wm.ToolWindowManager
+import com.intellij.psi.PsiFile
 import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.util.execution.ParametersListUtil
+import com.tang.intellij.lua.lang.LuaFileType
 import org.intellij.lang.annotations.Language
 import java.io.File
 
@@ -45,31 +51,78 @@ private fun applyDefaultArgs(strArgs: String?): List<String> {
 
 fun runLuaCheck(project: Project, file: VirtualFile) {
     ToolWindowManager.getInstance(project).getToolWindow("LuaCheck").show {
-        runLuaCheckInner(project, file)
+        var dir: VirtualFile = file.parent
+        val list: MutableList<Pair<String, PsiFile>> = mutableListOf()
+        if (file.isDirectory) {
+            val dirPath = file.canonicalPath!!
+            dir = file
+            VfsUtil.visitChildrenRecursively(dir, object: VirtualFileVisitor<VirtualFile>() {
+                override fun visitFile(vf: VirtualFile): Boolean {
+                    if (vf.fileType == LuaFileType.INSTANCE) {
+                        val psiFile = PsiManagerEx.getInstance(project).findFile(vf)
+                        if (psiFile != null) {
+                            val path = vf.canonicalPath!!
+                            list.add(Pair(path.substring(dirPath.length + 1), psiFile))
+                        }
+                    }
+                    return true
+                }
+            })
+        } else {
+            val psiFile = PsiManagerEx.getInstance(project).findFile(file)
+            if (psiFile != null)
+                list.add(Pair(psiFile.name, psiFile))
+        }
+
+        ProgressManager.getInstance().runProcessWithProgressSynchronously({
+            val indicator = ProgressManager.getInstance().progressIndicator
+            runLuaCheck(project, list.toTypedArray(), dir, indicator)
+        }, "LuaCheck", true, project)
     }
 }
 
-private fun runLuaCheckInner(project: Project, file: VirtualFile) {
+private fun runLuaCheck(project: Project,
+                        fileList: Array<Pair<String, PsiFile>>,
+                        dir: VirtualFile,
+                        indicator: ProgressIndicator) {
+    val checkView = ServiceManager.getService(project, LuaCheckView::class.java)
+    val panel = checkView.panel
+    val builder = panel.builder
+    builder.clear()
+
+    var idx = 0
+    for ((first, second) in fileList) {
+        if (indicator.isCanceled) {
+            break
+        }
+        indicator.text = second.name
+        indicator.fraction = idx.toDouble() / fileList.size
+        idx++
+        runLuaCheckInner(first, second, dir, builder)
+    }
+
+    ApplicationManager.getApplication().invokeLater { builder.performUpdate() }
+}
+
+private fun runLuaCheckInner(relativeFilePath: String,
+                             file: PsiFile,
+                             dir: VirtualFile,
+                             builder: LuaCheckTreeBuilder) {
     val settings = LuaCheckSettings.getInstance()
     val cmd = GeneralCommandLine(settings.luaCheck)
     val args = settings.luaCheckArgs
     cmd.addParameters(applyDefaultArgs(args))
-    cmd.addParameter(file.name)
-    cmd.workDirectory = File(file.parent.path)
+    cmd.addParameter(relativeFilePath)
+    cmd.workDirectory = File(dir.path)
 
-    val checkView = ServiceManager.getService(project, LuaCheckView::class.java)
-    val panel = checkView.panel
-    val psiFile = PsiManagerEx.getInstance(project).findFile(file)!!
-    val builder = panel.builder
-    builder.clear()
-    val fileNode = builder.addFile(psiFile)
+    val fileNode = builder.addFile(file)
 
     val handler = OSProcessHandler(cmd)
     @Language("RegExp")
     val reg = "(.+?):(\\d+):(\\d+)-(\\d+):(.+)\\n".toRegex()
     handler.addProcessListener(object : ProcessListener {
         override fun onTextAvailable(event: ProcessEvent, key: Key<*>?) {
-            print(event.text)
+            //print(event.text)
             val matchResult = reg.find(event.text)
             if (matchResult != null) {
                 //val matchGroup = matchResult.groups[1]!!
@@ -87,7 +140,7 @@ private fun runLuaCheckInner(project: Project, file: VirtualFile) {
         }
 
         override fun processTerminated(event: ProcessEvent) {
-            ApplicationManager.getApplication().invokeLater { builder.performUpdate() }
+
         }
 
         override fun processWillTerminate(event: ProcessEvent, p1: Boolean) {
@@ -97,7 +150,6 @@ private fun runLuaCheckInner(project: Project, file: VirtualFile) {
         override fun startNotified(event: ProcessEvent) {
 
         }
-
     })
     handler.startNotify()
 }

@@ -16,22 +16,18 @@
 
 package com.tang.intellij.lua.luacheck
 
-import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataKeys
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-
+import com.tang.intellij.lua.lang.LuaFileType
 
 class LuaCheckGroup : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.getData(DataKeys.PROJECT)!!
-        when (event.place) {
-            ActionPlaces.EDITOR_POPUP -> {
-                val editorManager = FileEditorManager.getInstance(project) as FileEditorManagerEx
-                runLuaCheck(project, editorManager.currentFile!!)
-            }
+        val file = event.getData(CommonDataKeys.VIRTUAL_FILE)
+        if (file != null) {
+            runLuaCheck(project, file)
         }
     }
 
@@ -42,12 +38,9 @@ class LuaCheckGroup : AnAction() {
             presentation.isEnabled = false
             presentation.isVisible = false
         } else {
-            presentation.isVisible = true
+            val file = event.getData(CommonDataKeys.VIRTUAL_FILE)
+            presentation.isVisible = file != null && (file.isDirectory || file.fileType == LuaFileType.INSTANCE)
             presentation.isEnabled = true
-            /*if (event.place == "MainMenu") {
-                val selectedFiles = FileEditorManager.getInstance(project).selectedFiles
-                presentation.isEnabled = selectedFiles.isNotEmpty()
-            }*/
         }
     }
 }
