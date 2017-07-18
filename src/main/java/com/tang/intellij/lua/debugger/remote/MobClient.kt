@@ -52,7 +52,7 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                //e.printStackTrace()
             } finally {
                 onSocketClosed()
             }
@@ -103,10 +103,10 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
                     }
                     Thread.sleep(5)
                 }
-
-                listener.println("Disconnected.")
             } catch (e: Exception) {
-                e.printStackTrace()
+                //e.printStackTrace()
+            } finally {
+                listener.println("Disconnected.")
             }
         }
     }
