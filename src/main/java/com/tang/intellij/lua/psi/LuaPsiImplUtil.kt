@@ -21,7 +21,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.RecursionManager
-import com.intellij.openapi.util.Ref
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.search.GlobalSearchScope
@@ -381,11 +380,14 @@ object LuaPsiImplUtil {
         //infer from return stat
         return CachedValuesManager.getManager(owner.project).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, { ctx ->
             val typeSet = LuaTypeSet.create()
-            val setRef = Ref.create(typeSet)
             owner.acceptChildren(object : LuaVisitor() {
                 override fun visitReturnStat(o: LuaReturnStat) {
-                    val set = setRef.get()
-                    setRef.set(set.union(guessReturnTypeSet(o, 0, ctx)))
+                    val guessReturnTypeSet = guessReturnTypeSet(o, 0, ctx)
+                    guessReturnTypeSet?.types?.forEach {
+                        if (!it.isAnonymous) { //不处理local
+                            typeSet.addType(it)
+                        }
+                    }
                 }
 
                 override fun visitFuncBodyOwner(o: LuaFuncBodyOwner) {
@@ -400,7 +402,7 @@ object LuaPsiImplUtil {
                     o.acceptChildren(this)
                 }
             })
-            CachedValueProvider.Result.create(setRef.get(), owner)
+            CachedValueProvider.Result.create(typeSet, owner)
         }, false, searchContext)
     }
 
