@@ -43,7 +43,10 @@ public class LuaFileUtil {
 
     //有些扩展名也许是txt
     private static String[] extensions = new String[] {
-            "", ".lua", ".txt", ".lua.txt"
+            ".lua.txt",
+            ".lua",
+            ".txt",
+            ""
     };
 
     public static boolean fileEquals(VirtualFile f1, VirtualFile f2) {
@@ -69,14 +72,20 @@ public class LuaFileUtil {
             return null;
 
         shortUrl = shortUrl.replace('\\', '/').trim();
-        shortUrl = shortUrl.replaceAll("\\.", "/");
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
             String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
             //相对路径
             for (String sourceRoot : sourceRoots) {
                 for (String ext : extensions) {
-                    VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + shortUrl + ext);
+                    String fixedURL = shortUrl;
+                    if (shortUrl.endsWith(ext)) { //aa.bb.lua -> aa.bb
+                        fixedURL = shortUrl.substring(0, shortUrl.length() - ext.length());
+                    }
+                    //aa.bb -> aa/bb.lua
+                    fixedURL = fixedURL.replaceAll("\\.", "/") + ext;
+
+                    VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + fixedURL);
                     if (file != null && !file.isDirectory()) {
                         return file;
                     }
