@@ -24,11 +24,10 @@ import com.intellij.psi.PsiReferenceService
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
+import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaType
 import com.tang.intellij.lua.lang.type.LuaTypeSet
-import com.tang.intellij.lua.psi.LuaClassField
-import com.tang.intellij.lua.psi.LuaExpression
-import com.tang.intellij.lua.psi.LuaIndexExpr
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
@@ -60,9 +59,18 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
 
     override fun guessType(context: SearchContext): LuaTypeSet? {
         return RecursionManager.doPreventingRecursion(this, true) {
+
+            //from @type annotation
+            val comment = this.comment
+            if (comment != null) {
+                val set = comment.typeDef?.guessType(context)
+                if (set != null)
+                    return@doPreventingRecursion set
+            }
+
+            //guess from value
             var result = LuaTypeSet.create()
             val indexExpr = this as LuaIndexExpr
-
             // value type
             val stub = indexExpr.stub
             val valueTypeSet: LuaTypeSet?
@@ -120,5 +128,21 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         if (stub != null)
             return stub.fieldName
         return name
+    }
+
+    /**
+     * --- some comment
+     * ---@type type @ annotations
+     * self.field = value
+     *
+     * get comment for `field`
+     */
+    val comment: LuaComment? get() {
+        val p = parent
+        if (p is LuaVarList) {
+            val stat = p.parent as LuaStatement
+            return stat.comment
+        }
+        return null
     }
 }
