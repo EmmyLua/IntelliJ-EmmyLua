@@ -56,7 +56,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
 
             val multiResolve = multiResolve(nameExpr, context)
             if (multiResolve.isEmpty()) {
-                typeSet.addType(LuaType.createGlobalType(nameExpr))
+                typeSet = LuaTypeSet.union(typeSet, LuaType.createGlobalType(nameExpr))
             } else {
                 multiResolve.forEach {
                     val set = getTypeSet(context, it)
@@ -87,7 +87,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
                 if (resolveLocal(def, context) == null) {
                     if (typeSet == null)
                         typeSet = LuaTypeSet.create()
-                    typeSet.addType(LuaType.createGlobalType(def))
+                    typeSet = LuaTypeSet.union(typeSet, LuaType.createGlobalType(def))
                 }
                 return typeSet
             }

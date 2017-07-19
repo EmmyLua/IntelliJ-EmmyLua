@@ -83,11 +83,21 @@ public class LuaTypeSet {
         return newSet;
     }
 
+    public static LuaTypeSet union(LuaTypeSet set, @NotNull LuaType type) {
+        if (set != null) {
+            LuaTypeSet newSet = new LuaTypeSet();
+            newSet.addType(type);
+            return newSet;
+        } else {
+            return LuaTypeSet.create(type);
+        }
+    }
+
     public boolean isEmpty() {
         return types.isEmpty();
     }
 
-    public void addType(LuaType type) {
+    void addType(LuaType type) {
         if (!hasType(type))
             types.add(type);
     }

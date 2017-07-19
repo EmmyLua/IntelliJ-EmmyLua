@@ -231,13 +231,12 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): LuaTypeSe
         if (context.isGuessTypeKind(GuessTypeKind.FromName)) {
             val str = nameDef.text
             if (str.length > 2) {
-                val set = typeSet
                 val matcher = CamelHumpMatcher(str, false)
                 LuaClassIndex.getInstance().processAllKeys(context.project) { cls ->
                     if (matcher.prefixMatches(cls)) {
                         val type = LuaType.create(cls, null)
                         type.isUnreliable = true
-                        set.addType(type)
+                        typeSet = LuaTypeSet.union(typeSet, type)
                     }
                     true
                 }
@@ -281,9 +280,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                             if (paramName == param.name) {
                                 val types = param.types
                                 if (types.isNotEmpty()) {
-                                    val set = LuaTypeSet.create()
+                                    var set = LuaTypeSet.create()
                                     for (type in types) {
-                                        set.addType(LuaType.create(type, null))
+                                        set = LuaTypeSet.union(set, LuaType.create(type, null))
                                     }
                                     return set
                                 }

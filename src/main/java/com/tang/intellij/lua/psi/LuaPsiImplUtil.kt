@@ -379,13 +379,13 @@ object LuaPsiImplUtil {
 
         //infer from return stat
         return CachedValuesManager.getManager(owner.project).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, { ctx ->
-            val typeSet = LuaTypeSet.create()
+            var typeSet = LuaTypeSet.create()
             owner.acceptChildren(object : LuaVisitor() {
                 override fun visitReturnStat(o: LuaReturnStat) {
                     val guessReturnTypeSet = guessReturnTypeSet(o, 0, ctx)
                     guessReturnTypeSet?.types?.forEach {
                         if (!it.isAnonymous) { //不处理local
-                            typeSet.addType(it)
+                            typeSet = LuaTypeSet.union(typeSet, it)
                         }
                     }
                 }

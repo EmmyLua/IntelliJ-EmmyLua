@@ -126,9 +126,9 @@ fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, set: LuaTypeSet?, context: Sea
         for (classNameRef in classNameRefList) {
             val def = LuaClassIndex.find(classNameRef.text, context)
             if (def != null) {
-                typeSet.addType(def.classType)
+                typeSet = LuaTypeSet.union(typeSet, def.classType)
             } else {
-                typeSet.addType(LuaType.create(classNameRef.text, null))
+                typeSet = LuaTypeSet.union(typeSet, LuaType.create(classNameRef.text, null))
             }
         }
     }
