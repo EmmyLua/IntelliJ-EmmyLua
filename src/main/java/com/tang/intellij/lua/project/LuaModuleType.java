@@ -57,7 +57,7 @@ public class LuaModuleType extends ModuleType<LuaModuleBuilder> {
         return "Lua module";
     }
 
-    @Override
+    // IDEA-171
     public Icon getBigIcon() {
         return LuaIcons.MODULE;
     }
