@@ -25,6 +25,7 @@ import com.tang.intellij.lua.debugger.IRemoteConfiguration
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
+import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand
 import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.IOException
@@ -120,6 +121,7 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
     override fun onConnect(client: MobClient) {
         mobClient = client
         registeredBreakpoints.forEach { t, _ -> sendBreakpoint(client, t) }
+        client.addCommand("RUN")
     }
 
     override val process: LuaMobDebugProcess

@@ -80,7 +80,6 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
         ApplicationManager.getApplication().executeOnPooledThread {
             try {
                 streamWriter = OutputStreamWriter(socket.getOutputStream(), Charset.forName("UTF-8"))
-                var firstTime = true
 
                 while (socket.isConnected) {
                     if (isStopped) break
@@ -96,10 +95,6 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
                             if (command.requireRespLines > 0)
                                 currentCommandWaitForResp = command
                         }
-                    }
-                    if (firstTime) {
-                        firstTime = false
-                        addCommand("RUN")
                     }
                     Thread.sleep(5)
                 }
