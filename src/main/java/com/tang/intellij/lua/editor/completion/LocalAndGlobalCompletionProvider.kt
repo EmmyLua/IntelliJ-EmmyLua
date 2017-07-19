@@ -82,35 +82,43 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         val project = cur.project
         if (has(GLOBAL_FUN)) {
             val context = SearchContext(project)
+            val names = mutableListOf<String>()
             LuaGlobalFuncIndex.getInstance().processAllKeys(project) { name ->
                 if (completionResultSet.prefixMatcher.prefixMatches(name)) {
-                    val globalFuncDef = LuaGlobalFuncIndex.find(name, context)
-                    if (globalFuncDef != null) {
-                        session.addWord(name)
-
-                        LuaPsiImplUtil.processOptional(globalFuncDef.params) { signature, mask ->
-                            val elementBuilder = GlobalFunctionLookupElement(name, signature, globalFuncDef)
-                            elementBuilder.setHandler(GlobalFuncInsertHandler(name, project).withMask(mask))
-                            completionResultSet.addElement(elementBuilder)
-                        }
-                    }
+                    names.add(name)
                 }
                 true
+            }
+            names.forEach { name ->
+                val globalFuncDef = LuaGlobalFuncIndex.find(name, context)
+                if (globalFuncDef != null) {
+                    session.addWord(name)
+
+                    LuaPsiImplUtil.processOptional(globalFuncDef.params) { signature, mask ->
+                        val elementBuilder = GlobalFunctionLookupElement(name, signature, globalFuncDef)
+                        elementBuilder.setHandler(GlobalFuncInsertHandler(name, project).withMask(mask))
+                        completionResultSet.addElement(elementBuilder)
+                    }
+                }
             }
         }
         //global fields
         if (has(GLOBAL_VAR)) {
             val context = SearchContext(project)
+            val names = mutableListOf<String>()
             LuaGlobalVarIndex.getInstance().processAllKeys(project) { name ->
                 if (completionResultSet.prefixMatcher.prefixMatches(name)) {
-                    val globalVar = LuaGlobalVarIndex.find(name, context)
-                    if (globalVar != null) {
-                        session.addWord(name)
-                        val elementBuilder = LuaTypeGuessableLookupElement(name, globalVar, false, LuaIcons.GLOBAL_FIELD)
-                        completionResultSet.addElement(elementBuilder)
-                    }
+                    names.add(name)
                 }
                 true
+            }
+            names.forEach { name ->
+                val globalVar = LuaGlobalVarIndex.find(name, context)
+                if (globalVar != null) {
+                    session.addWord(name)
+                    val elementBuilder = LuaTypeGuessableLookupElement(name, globalVar, false, LuaIcons.GLOBAL_FIELD)
+                    completionResultSet.addElement(elementBuilder)
+                }
             }
         }
         //key words
