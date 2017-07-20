@@ -45,13 +45,15 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
     override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
         val session = completionParameters.editor.getUserData(CompletionSession.KEY)!!
+        //local names
+        val localNamesSet = mutableSetOf<String>()
 
         //local
         val cur = completionParameters.position
         if (has(LOCAL_VAR)) {
             LuaPsiTreeUtil.walkUpLocalNameDef(cur) { nameDef ->
                 val name = nameDef.text
-                if (completionResultSet.prefixMatcher.prefixMatches(name)) {
+                if (completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     session.addWord(name)
                     var icon = LuaIcons.LOCAL_VAR
                     if (nameDef is LuaParamNameDef)
@@ -66,7 +68,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         if (has(LOCAL_FUN)) {
             LuaPsiTreeUtil.walkUpLocalFuncDef(cur) { localFuncDef ->
                 val name = localFuncDef.name
-                if (name != null && completionResultSet.prefixMatcher.prefixMatches(name)) {
+                if (name != null && completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     session.addWord(name)
                     LuaPsiImplUtil.processOptional(localFuncDef.params) { signature, mask ->
                         val elementBuilder = LocalFunctionLookupElement(name, signature, localFuncDef)
@@ -84,7 +86,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
             val context = SearchContext(project)
             val names = mutableListOf<String>()
             LuaGlobalFuncIndex.getInstance().processAllKeys(project) { name ->
-                if (completionResultSet.prefixMatcher.prefixMatches(name)) {
+                if (completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     names.add(name)
                 }
                 true
@@ -107,7 +109,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
             val context = SearchContext(project)
             val names = mutableListOf<String>()
             LuaGlobalVarIndex.getInstance().processAllKeys(project) { name ->
-                if (completionResultSet.prefixMatcher.prefixMatches(name)) {
+                if (completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     names.add(name)
                 }
                 true
