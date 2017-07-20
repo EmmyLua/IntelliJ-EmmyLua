@@ -1391,6 +1391,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = tableField1(b, l + 1);
     if (!r) r = tableField2(b, l + 1);
     if (!r) r = expr(b, l + 1, -1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, false, tableField_recover_parser_);
     return r;
   }

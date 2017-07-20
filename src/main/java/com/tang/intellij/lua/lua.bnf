@@ -106,7 +106,7 @@
         DOUBLE_DIV = "//"
   ]
 
-  hooks("localDef|assignStat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
+  hooks("localDef|assignStat|tableField") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
   extends(".*Expr") = expr
@@ -434,12 +434,14 @@ tableField ::= tableField1 | tableField2 | expr {
         getFieldName
         getPresentation
         guessType
+        getComment
         nameDef = "tableFieldNameDef"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaTableFieldStub"
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
         "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.psi.LuaCommentOwner"
     ]
     recoverWhile = tableField_recover
 }

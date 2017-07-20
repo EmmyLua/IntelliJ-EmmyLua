@@ -527,6 +527,13 @@ object LuaPsiImplUtil {
     }
 
     @JvmStatic fun guessType(tableField: LuaTableField, context: SearchContext): LuaTypeSet? {
+        //from comment
+        val comment = tableField.comment
+        if (comment != null) {
+            val tyDef = comment.typeDef?.guessType(context)
+            if (tyDef != null) return tyDef
+        }
+        //guess from value
         val lastChild = tableField.lastChild
         if (lastChild is LuaExpr) {
             return lastChild.guessType(context)

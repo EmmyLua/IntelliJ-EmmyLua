@@ -8,10 +8,11 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 import com.intellij.navigation.ItemPresentation;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 
-public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, StubBasedPsiElement<LuaTableFieldStub> {
+public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, LuaCommentOwner, StubBasedPsiElement<LuaTableFieldStub> {
 
   @NotNull
   List<LuaExpr> getExprList();
@@ -38,5 +39,8 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, St
 
   @Nullable
   LuaTypeSet guessType(SearchContext context);
+
+  @Nullable
+  LuaComment getComment();
 
 }
