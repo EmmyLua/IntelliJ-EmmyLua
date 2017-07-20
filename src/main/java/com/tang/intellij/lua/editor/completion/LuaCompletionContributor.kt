@@ -45,6 +45,7 @@ class LuaCompletionContributor : CompletionContributor() {
         //提示全局函数,local变量,local函数
         extend(CompletionType.BASIC, psiElement().inside(LuaFile::class.java)
                 .andNot(SHOW_CLASS_FIELD)
+                .andNot(IN_LITERAL)
                 .andNot(IN_COMMENT)
                 .andNot(IN_CLASS_METHOD_NAME)
                 .andNot(IN_PARAM_NAME)
@@ -87,6 +88,7 @@ class LuaCompletionContributor : CompletionContributor() {
                 .inside(LuaClassMethodDef::class.java)
         private val SHOW_PATH = psiElement(LuaTypes.STRING)
                 .inside(psiElement(LuaTypes.ARGS).afterLeaf("require"))
+        private val IN_LITERAL = psiElement().inside(LuaLiteralExpr::class.java)
 
         private fun suggestWordsInFile(parameters: CompletionParameters) {
             val session = CompletionSession.get(parameters)!!
