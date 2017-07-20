@@ -144,9 +144,10 @@
         <highlightUsagesHandlerFactory implementation="com.tang.intellij.lua.codeInsight.highlighting.LuaHighlightUsagesHandlerFactory"/>
 
         <!--editor handlers-->
-        <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterAfterUnmatchedBraceHandler" />
-        <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterInDocHandler"/>
-        <enterHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaEnterBetweenBracesHandler"/>
+        <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterAfterUnmatchedBraceHandler" />
+        <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterInDocHandler"/>
+        <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterBetweenBracesHandler"/>
+        <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterBetweenRangeBlockHandler"/>
         <backspaceHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaBackspaceHandlerDelegate"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>

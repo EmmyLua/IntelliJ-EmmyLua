@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.codeInsight;
+package com.tang.intellij.lua.editor;
 
 import com.intellij.codeInsight.editorActions.enter.EnterBetweenBracesHandler;
 import com.intellij.openapi.actionSystem.DataContext;
