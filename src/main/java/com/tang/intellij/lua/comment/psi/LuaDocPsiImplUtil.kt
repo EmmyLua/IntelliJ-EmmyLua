@@ -85,7 +85,7 @@ fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): LuaTypeSet? {
     val stub = fieldDef.stub
     if (stub != null)
         return stub.type
-    return resolveDocTypeSet(fieldDef.typeSet, null, context)
+    return resolveDocTypeSet(fieldDef.typeSet, context)
 }
 
 /**
@@ -96,7 +96,7 @@ fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): LuaTypeSet? {
  */
 fun guessType(paramDec: LuaDocParamDef, context: SearchContext): LuaTypeSet? {
     val docTypeSet = paramDec.typeSet ?: return null
-    return resolveDocTypeSet(docTypeSet, null, context)
+    return resolveDocTypeSet(docTypeSet, context)
 }
 
 /**
@@ -108,19 +108,17 @@ fun guessType(paramDec: LuaDocParamDef, context: SearchContext): LuaTypeSet? {
  * @return 类型集合
  */
 fun resolveTypeAt(returnDef: LuaDocReturnDef, index: Int, context: SearchContext): LuaTypeSet {
-    val typeSet = LuaTypeSet.create()
     val typeList = returnDef.typeList
     if (typeList != null) {
         val typeSetList = typeList.typeSetList
         val docTypeSet = typeSetList[index]
-        resolveDocTypeSet(docTypeSet, typeSet, context)
+        return resolveDocTypeSet(docTypeSet, context)
     }
-    return typeSet
+    return LuaTypeSet.create()
 }
 
-fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, set: LuaTypeSet?, context: SearchContext): LuaTypeSet? {
-    var typeSet = set
-    if (typeSet == null) typeSet = LuaTypeSet.create()
+fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, context: SearchContext): LuaTypeSet {
+    var typeSet = LuaTypeSet.create()
     if (docTypeSet != null) {
         val classNameRefList = docTypeSet.classNameRefList
         for (classNameRef in classNameRefList) {
@@ -195,7 +193,7 @@ fun getClassType(classDef: LuaDocClassDef): LuaType {
  * @return 类型集合
  */
 fun guessType(typeDef: LuaDocTypeDef, context: SearchContext): LuaTypeSet? {
-    return resolveDocTypeSet(typeDef.typeSet, null, context)
+    return resolveDocTypeSet(typeDef.typeSet, context)
 }
 
 @Suppress("UNUSED_PARAMETER")

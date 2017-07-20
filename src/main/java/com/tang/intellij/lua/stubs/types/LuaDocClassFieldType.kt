@@ -56,7 +56,7 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
         }
 
         val searchContext = SearchContext(luaDocFieldDef.project).setCurrentStubFile(luaDocFieldDef.containingFile)
-        val typeSet = resolveDocTypeSet(luaDocFieldDef.typeSet, null, searchContext)
+        val typeSet = resolveDocTypeSet(luaDocFieldDef.typeSet, searchContext)
 
         return LuaDocClassFieldStubImpl(stubElement, name, className, typeSet)
     }
