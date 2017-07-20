@@ -63,7 +63,7 @@
 
     <template resource-bundle="LuaBundle" key="livetemplate.description.else-if"
               name="elseif" toReformat="true" toShortenFQNames="true"
-              value="elseif $VAR$ then&#10;$END$&#10;">
+              value="elseif $VAR$ then&#10;$END$">
         <variable name="VAR" expression="SuggestFirstLuaVarName()" defaultValue="&quot;true&quot;" alwaysStopAt="true" />
         <context>
             <option name="LUA_IF" value="true" />
@@ -72,7 +72,7 @@
 
     <template resource-bundle="LuaBundle" key="livetemplate.description.if-else"
               name="ifelse" toReformat="true" toShortenFQNames="true"
-              value="if $VAR$ then&#10;$END$&#10;else end">
+              value="if $VAR$ then&#10;$END$&#10;else&#10;end">
         <variable name="VAR" expression="SuggestFirstLuaVarName()" defaultValue="&quot;true&quot;" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
@@ -80,8 +80,8 @@
     </template>
 
     <template resource-bundle="LuaBundle" key="livetemplate.description.closure"
-              name="closure" toReformat="true" toShortenFQNames="true"
-              value="function($PARAMS$)&#10;$END$&#10;end">
+              name="closure" toReformat="false" toShortenFQNames="true"
+              value="function($PARAMS$) $END$ end">
         <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
