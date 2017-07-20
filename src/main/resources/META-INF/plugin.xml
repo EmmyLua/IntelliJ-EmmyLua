@@ -149,7 +149,7 @@
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterBetweenBracesHandler"/>
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterBetweenRangeBlockHandler"/>
         <backspaceHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaBackspaceHandlerDelegate"/>
-        <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoPopupHandler"/>
+        <typedHandler implementation="com.tang.intellij.lua.editor.LuaTypedHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
 
         <!--highlighting-->
