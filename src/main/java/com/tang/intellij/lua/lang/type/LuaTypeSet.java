@@ -144,13 +144,21 @@ public class LuaTypeSet {
     @Override
     public String toString() {
         HashSet<String> set = new HashSet<>();
+        LuaType globalType = null;
         for (LuaType type : types) {
-            if (!type.isAnonymous()) {
+            if (type.isGlobalVar()) {
+                globalType = type;
+            }
+            else if (!type.isAnonymous()) {
                 set.add(type.getDisplayName());
             }
         }
 
-        return String.join("|", set.toArray(new String[set.size()]));
+        if (set.isEmpty() && globalType != null) {
+            return globalType.getDisplayName();
+        } else {
+            return String.join("|", set.toArray(new String[set.size()]));
+        }
     }
 
     public String createReturnString() {

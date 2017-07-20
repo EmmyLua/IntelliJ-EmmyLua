@@ -65,7 +65,9 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     public static LuaType createGlobalType(LuaNameExpr ref) {
-        return create(ref.getText(), null);
+        LuaType type = create(ref.getText(), null);
+        type.isGlobalVar = true;
+        return type;
     }
 
     protected LuaType() {
@@ -73,8 +75,9 @@ public class LuaType implements Comparable<LuaType> {
 
     // 模糊匹配的结果
     private boolean isUnreliable;
-    boolean isAnonymous;
-    String clazzName;
+    protected boolean isAnonymous;
+    protected boolean isGlobalVar;
+    protected String clazzName;
     private String aliasName;
     private String superClassName;
 
@@ -114,7 +117,13 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     public String getDisplayName() {
-        return isAnonymous() ? "Anonymous" : getClassName();
+        if (isGlobalVar()) {
+            return "Global Variable";
+        }
+        if (isAnonymous()) {
+            return "Anonymous";
+        }
+        return getClassName();
     }
 
     void serialize(@NotNull StubOutputStream stubOutputStream) throws IOException {
@@ -244,6 +253,10 @@ public class LuaType implements Comparable<LuaType> {
 
     public boolean isAnonymous() {
         return isAnonymous;
+    }
+
+    public boolean isGlobalVar() {
+        return isGlobalVar;
     }
 
     /*private LuaClassMethodDef findStaticMethod(String methodName, @NotNull SearchContext context) {
