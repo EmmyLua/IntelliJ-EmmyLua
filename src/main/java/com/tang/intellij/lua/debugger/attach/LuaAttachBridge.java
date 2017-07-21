@@ -16,7 +16,13 @@
 
 package com.tang.intellij.lua.debugger.attach;
 
+import com.intellij.execution.configurations.GeneralCommandLine;
+import com.intellij.execution.process.OSProcessHandler;
+import com.intellij.execution.process.ProcessEvent;
+import com.intellij.execution.process.ProcessListener;
+import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.ui.ConsoleViewContentType;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XExpression;
@@ -33,11 +39,12 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,13 +52,9 @@ import java.util.Map;
  * Created by tangzx on 2017/3/26.
  */
 public class LuaAttachBridge {
+    private OSProcessHandler handler;
     private XDebugSession session;
-    private Process process;
     private BufferedWriter writer;
-    private BufferedReader reader;
-    private Thread writerThread;
-    private Thread readerThread;
-    private boolean isRunning;
     private ProtoHandler protoHandler;
     private ProtoFactory protoFactory;
     private int evalIdCounter = 0;
@@ -85,38 +88,46 @@ public class LuaAttachBridge {
         this.session = session;
     }
 
-    private Runnable readProcess = new Runnable() {
+    private ProcessListener processListener = new ProcessListener() {
+        private boolean readProto = false;
+        private StringBuilder sb;
+
         @Override
-        public void run() {
-            boolean readProto = false;
-            StringBuilder sb = null;
-            while (isRunning) {
-                try {
-                    String line = reader.readLine();
-                    if (line == null)
-                        break;
-                    if (readProto) {
-                        if (line.startsWith("[end]")) {
-                            readProto = false;
-                            String data = sb.toString();
-                            LuaAttachProto proto = parse(data);
-                            if (proto != null)
-                                handleProto(proto);
-                        } else {
-                            sb.append(line);
-                        }
+        public void startNotified(ProcessEvent processEvent) {
+
+        }
+
+        @Override
+        public void processTerminated(ProcessEvent processEvent) {
+            stop(false);
+        }
+
+        @Override
+        public void processWillTerminate(ProcessEvent processEvent, boolean b) {
+
+        }
+
+        @Override
+        public void onTextAvailable(ProcessEvent processEvent, Key key) {
+            if (key == ProcessOutputTypes.STDOUT) {
+                String line = processEvent.getText();
+                if (readProto) {
+                    if (line.startsWith("[end]")) {
+                        readProto = false;
+                        String data = sb.toString();
+                        LuaAttachProto proto = parse(data);
+                        if (proto != null)
+                            handleProto(proto);
                     } else {
-                        readProto = line.startsWith("[start]");
-                        if (readProto) {
-                            sb = new StringBuilder();
-                        }
+                        sb.append(line);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
+                } else {
+                    readProto = line.startsWith("[start]");
+                    if (readProto) {
+                        sb = new StringBuilder();
+                    }
                 }
             }
-            stop(false);
         }
     };
 
@@ -136,10 +147,6 @@ public class LuaAttachBridge {
             info.callback.onResult(proto);
         }
     }
-
-    private Runnable writeProcess = () -> {
-
-    };
 
     private String getEmmyLua() {
         return LuaFileUtil.getPluginVirtualFile("debugger/Emmy.lua");
@@ -164,26 +171,17 @@ public class LuaAttachBridge {
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
-                processBuilder = new ProcessBuilder(exe, "-m", "attach", "-p", pid, "-e", getEmmyLua());
-
-                process = processBuilder.start();
-                writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8")));
-
-                readerThread = new Thread(readProcess);
-                readerThread.start();
-                writerThread = new Thread(writeProcess);
-                writerThread.start();
-                isRunning = true;
+                GeneralCommandLine commandLine = new GeneralCommandLine(exe);
+                commandLine.addParameters("-m", "attach", "-p", pid, "-e", getEmmyLua());
+                commandLine.setCharset( Charset.forName("UTF-8"));
+                handler = new OSProcessHandler(commandLine);
+                handler.addProcessListener(processListener);
+                handler.startNotify();
+                writer = new BufferedWriter(new OutputStreamWriter(handler.getProcess().getOutputStream()));
             }
         } catch (Exception e) {
-            /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(stream);
-            e.printStackTrace(ps);
-            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);*/
             session.getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
             session.stop();
-            isRunning = false;
         }
     }
 
@@ -212,43 +210,25 @@ public class LuaAttachBridge {
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
-                List<String> argList = new ArrayList<>();
-                argList.add(exe);
-                argList.add("-m"); argList.add("run");
-                argList.add("-c"); argList.add(program);
-                argList.add("-e"); argList.add(getEmmyLua());
-                if (!workingDir.isEmpty()) {
-                    argList.add("-w");
-                    argList.add(workingDir);
-                }
+                GeneralCommandLine commandLine = new GeneralCommandLine(exe);
+                commandLine.setCharset( Charset.forName("UTF-8"));
+                commandLine.addParameters("-m", "run", "-c", program, "-e", getEmmyLua(), "-w", workingDir);
                 if (args != null) {
                     String argString = String.join(" ", args);
                     if (!argString.isEmpty()) {
-                        argList.add("-a");
-                        argList.add(argString);
+                        commandLine.addParameters("-a", argString);
                     }
                 }
 
-                processBuilder = new ProcessBuilder(argList);
+                handler = new OSProcessHandler(commandLine);
+                handler.addProcessListener(processListener);
+                handler.startNotify();
 
-                process = processBuilder.start();
-                writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("UTF-8")));
-
-                readerThread = new Thread(readProcess);
-                readerThread.start();
-                writerThread = new Thread(writeProcess);
-                writerThread.start();
-                isRunning = true;
+                writer = new BufferedWriter(new OutputStreamWriter(handler.getProcess().getOutputStream()));
             }
         } catch (Exception e) {
-            /*ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            PrintStream ps = new PrintStream(stream);
-            e.printStackTrace(ps);
-            session.getConsoleView().print(stream.toString(), ConsoleViewContentType.ERROR_OUTPUT);*/
             session.getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
             session.stop();
-            isRunning = false;
         }
     }
 
@@ -260,18 +240,9 @@ public class LuaAttachBridge {
         if (detach)
             send("detach");
         writer = null;
-        reader = null;
-        isRunning = false;
-        if (process != null) {
-            process.destroy();
-            process = null;
-            isRunning = false;
-        }
-        if (writerThread != null) {
-            writerThread.interrupt();
-        }
-        if (readerThread != null) {
-            readerThread.interrupt();
+        if (handler != null) {
+            handler.destroyProcess();
+            handler = null;
         }
     }
 
