@@ -56,13 +56,27 @@ public class LuaFileUtil {
         return f1.getPath().equals(f2.getPath());
     }
 
-    public static List<String> getNoExtensionUrl(String shortUrl) {
+    public static List<String> getAllAvailablePathsForMob(@Nullable String shortPath, @NotNull VirtualFile file) {
         SmartList<String> list = new SmartList<>();
-        for (String ext : extensions) {
-            if (!shortUrl.endsWith(ext)) {
-                continue;
+        String fullPath = file.getCanonicalPath();
+        if (fullPath != null) {
+            for (String ext : extensions) {
+                if (!fullPath.endsWith(ext)) {
+                    continue;
+                }
+                list.add(fullPath.substring(0, fullPath.length() - ext.length()));
             }
-            list.add(shortUrl.substring(0, shortUrl.length() - ext.length()));
+        }
+        if (shortPath != null) {
+            for (String ext : extensions) {
+                if (!shortPath.endsWith(ext)) {
+                    continue;
+                }
+                String path = shortPath.substring(0, shortPath.length() - ext.length());
+                list.add(path);
+                if (path.indexOf('/') != -1)
+                    list.add(path.replace('/', '.'));
+            }
         }
         return list;
     }

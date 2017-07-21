@@ -25,7 +25,6 @@ import com.tang.intellij.lua.debugger.IRemoteConfiguration
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
-import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand
 import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.IOException
@@ -80,12 +79,10 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
     private fun sendBreakpoint(client: MobClient, sourcePosition: XSourcePosition) {
         val project = session.project
         val file = sourcePosition.file
-        val fileShortUrl: String? = LuaFileUtil.getShortUrl(project, file)
+        val fileShortUrl: String? = LuaFileUtil.getShortPath(project, file)
         if (fileShortUrl != null) {
-            client.sendAddBreakpoint(fileShortUrl, sourcePosition.line + 1)
-            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{ url ->
+            LuaFileUtil.getAllAvailablePathsForMob(fileShortUrl, file).forEach{ url ->
                 client.sendAddBreakpoint(url, sourcePosition.line + 1)
-                client.sendAddBreakpoint(url.replace('/', '.'), sourcePosition.line + 1)
             }
         }
     }
@@ -99,11 +96,9 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         super.unregisterBreakpoint(sourcePosition, position)
         if (mobClient != null) {
             val file = sourcePosition.file
-            val fileShortUrl = LuaFileUtil.getShortUrl(session.project, file)
-            mobClient!!.sendRemoveBreakpoint(fileShortUrl, sourcePosition.line + 1)
-            LuaFileUtil.getNoExtensionUrl(fileShortUrl).forEach{ url ->
+            val fileShortUrl = LuaFileUtil.getShortPath(session.project, file)
+            LuaFileUtil.getAllAvailablePathsForMob(fileShortUrl, file).forEach{ url ->
                 mobClient!!.sendRemoveBreakpoint(url, sourcePosition.line + 1)
-                mobClient!!.sendRemoveBreakpoint(url.replace('/', '.'), sourcePosition.line + 1)
             }
         }
     }
