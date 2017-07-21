@@ -20,6 +20,7 @@ import com.intellij.execution.configurations.GeneralCommandLine;
 import com.intellij.execution.process.OSProcessHandler;
 import com.intellij.execution.process.ProcessEvent;
 import com.intellij.execution.process.ProcessListener;
+import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -85,7 +86,11 @@ class LuaAppMobProcess extends LuaMobDebugProcess {
 
                 @Override
                 public void onTextAvailable(ProcessEvent processEvent, Key key) {
-                    print(processEvent.getText());
+                    if (key == ProcessOutputTypes.STDOUT) {
+                        print(processEvent.getText());
+                    } else if (key == ProcessOutputTypes.STDERR) {
+                        error(processEvent.getText());
+                    }
                 }
             });
             handler.startNotify();
