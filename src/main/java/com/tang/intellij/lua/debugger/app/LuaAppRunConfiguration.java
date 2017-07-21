@@ -31,6 +31,7 @@ import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.execution.ParametersListUtil;
 import com.tang.intellij.lua.debugger.DebuggerType;
 import com.tang.intellij.lua.debugger.IRemoteConfiguration;
 import com.tang.intellij.lua.debugger.LuaCommandLineState;
@@ -152,7 +153,7 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
     public String[] getParametersArray() {
         ArrayList<String> list = new ArrayList<>();
         if (params != null && !params.isEmpty()) {
-            String[] strings = params.split("\\s+");
+            String[] strings = ParametersListUtil.parseToArray(params);
             list.addAll(Arrays.asList(strings));
         }
         if (file != null && !file.isEmpty()) {
