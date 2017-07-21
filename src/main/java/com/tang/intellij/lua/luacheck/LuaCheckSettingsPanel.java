@@ -16,17 +16,21 @@
 
 package com.tang.intellij.lua.luacheck;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.ui.HoverHyperlinkLabel;
+import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.RawCommandLineEditor;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 
 /**
  * lua check settings panel
@@ -36,6 +40,8 @@ public class LuaCheckSettingsPanel implements SearchableConfigurable, Configurab
     private JPanel myPanel;
     private RawCommandLineEditor myCmdLine;
     private TextFieldWithBrowseButton myLuaCheck;
+    private HoverHyperlinkLabel luaCheckReleasePageLink;
+    private HoverHyperlinkLabel commandLineOptionsLink;
     private LuaCheckSettings settings = LuaCheckSettings.getInstance();
 
     public LuaCheckSettingsPanel() {
@@ -72,5 +78,22 @@ public class LuaCheckSettingsPanel implements SearchableConfigurable, Configurab
         settings.setLuaCheck(myLuaCheck.getText());
         //String[] params = ParametersListUtil.parseToArray(myCmdLine.getText());
         settings.setLuaCheckArgs(myCmdLine.getText());
+    }
+
+    private void createUIComponents() {
+        luaCheckReleasePageLink = new HoverHyperlinkLabel("Download LuaCheck");
+        luaCheckReleasePageLink.addHyperlinkListener(new HyperlinkAdapter() {
+            @Override
+            protected void hyperlinkActivated(HyperlinkEvent hyperlinkEvent) {
+                BrowserUtil.browse("https://github.com/mpeterv/luacheck/releases");
+            }
+        });
+        commandLineOptionsLink = new HoverHyperlinkLabel("Command line options");
+        commandLineOptionsLink.addHyperlinkListener(new HyperlinkAdapter() {
+            @Override
+            protected void hyperlinkActivated(HyperlinkEvent hyperlinkEvent) {
+                BrowserUtil.browse("http://luacheck.readthedocs.io/en/stable/cli.html#command-line-options");
+            }
+        });
     }
 }
