@@ -79,7 +79,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
             protected void addCompletions(@NotNull CompletionParameters completionParameters, ProcessingContext processingContext, @NotNull CompletionResultSet completionResultSet) {
                 TokenSet set = LuaSyntaxHighlighter.DOC_KEYWORD_TOKENS;
                 for (IElementType type : set.getTypes()) {
-                    completionResultSet.addElement(LookupElementBuilder.create(type));
+                    completionResultSet.addElement(LookupElementBuilder.create(type).withIcon(LuaIcons.ANNOTATION));
                 }
             }
         });
@@ -148,14 +148,11 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                 LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
                 if (classDef != null) {
                     LuaType classType = classDef.getClassType();
-                    if (classType != null) {
-                        classType.processFields(new SearchContext(classDef.getProject()), (curType, field) -> {
-                            completionResultSet.addElement(LookupElementBuilder.create(field.getFieldName()));
-                        });
-                    }
+                    classType.processFields(new SearchContext(classDef.getProject()), (curType, field) -> {
+                        completionResultSet.addElement(LookupElementBuilder.create(field.getFieldName()));
+                    });
                 }
             }
         });
     }
-
 }
