@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.DataKeys
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.tang.intellij.lua.lang.LuaFileType
 
 class LuaCheckGroup : AnAction() {
@@ -27,7 +28,12 @@ class LuaCheckGroup : AnAction() {
         val project = event.getData(DataKeys.PROJECT)!!
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE)
         if (file != null) {
-            runLuaCheck(project, file)
+            val settings = LuaCheckSettings.getInstance()
+            if (settings.valid) {
+                runLuaCheck(project, file)
+            } else {
+                ShowSettingsUtil.getInstance().showSettingsDialog(project, LuaCheckSettingsPanel::class.java)
+            }
         }
     }
 
