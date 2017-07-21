@@ -27,6 +27,7 @@ import com.intellij.psi.tree.TokenSet;
 
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
+@SuppressWarnings("unused")
 public class LuaParserUtil extends GeneratedParserUtilBase {
 
     public static WhitespacesAndCommentsBinder MY_LEFT_COMMENT_BINDER = (list, b, tokenTextGetter) -> {
@@ -37,6 +38,21 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             }
         }
         return list.size();
+    };
+
+    public static WhitespacesAndCommentsBinder MY_RIGHT_COMMENT_BINDER = (list, b, tokenTextGetter) -> {
+        for (int i = 0; i < list.size(); i++) {
+            IElementType type = list.get(i);
+            if (type == DOC_COMMENT) {
+                return i + 1;
+            } else {
+                String sequence = String.valueOf(tokenTextGetter.get(i));
+                if (sequence.contains("\n")) {
+                    break;
+                }
+            }
+        }
+        return 0;
     };
 
     public static boolean repeat(PsiBuilder builder_, int level_, Parser parser, int times) {

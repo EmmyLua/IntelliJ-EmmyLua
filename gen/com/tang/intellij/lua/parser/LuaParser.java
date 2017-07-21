@@ -270,6 +270,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     p = r; // pin = 2
     r = r && exprList(b, l + 1);
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
+    register_hook_(b, RIGHT_BINDER, MY_RIGHT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -978,6 +979,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = r && report_error_(b, nameList(b, l + 1));
     r = p && localDef_2(b, l + 1) && r;
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
+    register_hook_(b, RIGHT_BINDER, MY_RIGHT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1392,6 +1394,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = tableField2(b, l + 1);
     if (!r) r = expr(b, l + 1, -1);
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
+    register_hook_(b, RIGHT_BINDER, MY_RIGHT_COMMENT_BINDER);
     exit_section_(b, l, m, r, false, tableField_recover_parser_);
     return r;
   }

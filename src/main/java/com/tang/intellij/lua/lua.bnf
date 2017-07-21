@@ -106,7 +106,7 @@
         DOUBLE_DIV = "//"
   ]
 
-  hooks("localDef|assignStat|tableField") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
+  hooks("localDef|assignStat|tableField") = [leftBinder="MY_LEFT_COMMENT_BINDER" rightBinder="MY_RIGHT_COMMENT_BINDER"]
   hooks("globalFuncDef|localFuncDef|classMethodDef") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
   extends(".*Expr") = expr
