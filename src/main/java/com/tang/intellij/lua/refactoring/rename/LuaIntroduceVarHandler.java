@@ -156,8 +156,9 @@ public class LuaIntroduceVarHandler implements RefactoringActionHandler {
     }
 
     private boolean isInline(PsiElement commonParent, IntroduceOperation operation) {
-        return (commonParent instanceof LuaStatement || commonParent == operation.element) &&
-                (!operation.isReplaceAll() || operation.getOccurrences().size() == 1);
+        if (commonParent == operation.element)
+            commonParent = operation.element.getParent();
+        return commonParent instanceof LuaStatement && (!operation.isReplaceAll() || operation.getOccurrences().size() == 1);
     }
 
     private void performReplace(IntroduceOperation operation) {
