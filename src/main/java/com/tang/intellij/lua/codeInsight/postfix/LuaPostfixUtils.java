@@ -75,7 +75,8 @@ public class LuaPostfixUtils {
                             }
                         }
                     }
-                    list.add(expr);
+                    if (!PsiTreeUtil.hasErrorElements(expr))
+                        list.add(expr);
                     expr = PsiTreeUtil.getParentOfType(expr, LuaExpr.class);
                 }
                 return list;
