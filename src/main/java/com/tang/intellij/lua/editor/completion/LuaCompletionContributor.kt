@@ -18,19 +18,19 @@ package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.psi.PsiComment
+import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
+import com.intellij.psi.tree.TokenSet
 import com.intellij.util.containers.HashSet
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
-
-import com.intellij.patterns.PlatformPatterns.psiElement
 
 /**
 
  * Created by tangzx on 2016/11/27.
  */
 class LuaCompletionContributor : CompletionContributor() {
+    private var suggestWords = true
     init {
         //可以override
         extend(CompletionType.BASIC, SHOW_OVERRIDE, OverrideCompletionProvider())
@@ -43,13 +43,7 @@ class LuaCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, SHOW_PATH, RequirePathCompletionProvider())
 
         //提示全局函数,local变量,local函数
-        extend(CompletionType.BASIC, psiElement().inside(LuaFile::class.java)
-                .andNot(SHOW_CLASS_FIELD)
-                .andNot(IN_LITERAL)
-                .andNot(IN_COMMENT)
-                .andNot(IN_CLASS_METHOD_NAME)
-                .andNot(IN_PARAM_NAME)
-                .andNot(SHOW_OVERRIDE), LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL))
+        extend(CompletionType.BASIC, IN_NAME_EXPR, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL))
 
         extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.VARS))
     }
@@ -58,18 +52,32 @@ class LuaCompletionContributor : CompletionContributor() {
         val session = CompletionSession(parameters, result)
         parameters.editor.putUserData(CompletionSession.KEY, session)
         super.fillCompletionVariants(parameters, result)
-        if (session.isSuggestWords && !result.isStopped) {
+        if (suggestWords && session.isSuggestWords && !result.isStopped) {
             suggestWordsInFile(parameters)
         }
     }
 
+    override fun beforeCompletion(context: CompletionInitializationContext) {
+        val file = context.file
+        if (file is LuaFile) {
+            val element = file.findElementAt(context.caret.offset - 1)
+            if (element != null) {
+                val type = element.node.elementType
+                when (type) {
+                    in IGNORE_SET -> {
+                        suggestWords = false
+                        context.dummyIdentifier = ""
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
+        private val IGNORE_SET = TokenSet.create(LuaTypes.STRING, LuaTypes.NUMBER, LuaTypes.CONCAT)
 
         private val SHOW_CLASS_FIELD = psiElement(LuaTypes.ID)
                 .withParent(LuaIndexExpr::class.java)
-        private val IN_PARAM_NAME = psiElement(LuaTypes.ID)
-                .withParent(LuaParamNameDef::class.java)
-
 
         private val IN_FUNC_NAME = psiElement(LuaTypes.ID)
                 .withParent(LuaIndexExpr::class.java)
@@ -78,9 +86,9 @@ class LuaCompletionContributor : CompletionContributor() {
                 .afterLeaf(psiElement(LuaTypes.FUNCTION))
         private val IN_CLASS_METHOD_NAME = psiElement().andOr(IN_FUNC_NAME, AFTER_FUNCTION)
 
+        private val IN_NAME_EXPR = psiElement(LuaTypes.ID)
+                .withParent(LuaNameExpr::class.java)
 
-        private val IN_COMMENT = psiElement()
-                .inside(PsiComment::class.java)
         private val SHOW_OVERRIDE = psiElement()
                 .withParent(LuaClassMethodName::class.java)
         private val IN_CLASS_METHOD = psiElement(LuaTypes.ID)
@@ -88,7 +96,6 @@ class LuaCompletionContributor : CompletionContributor() {
                 .inside(LuaClassMethodDef::class.java)
         private val SHOW_PATH = psiElement(LuaTypes.STRING)
                 .inside(psiElement(LuaTypes.ARGS).afterLeaf("require"))
-        private val IN_LITERAL = psiElement().inside(LuaLiteralExpr::class.java)
 
         private fun suggestWordsInFile(parameters: CompletionParameters) {
             val session = CompletionSession.get(parameters)!!
