@@ -23,7 +23,7 @@
     <description><![CDATA[
     Support for Lua programming language.<br>
     <p><a href="https://github.com/tangzx/IntelliJ-EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://www.paypal.me/tangzx">Donate</a></p>
-    Featrues:
+    Features:
     <ul>
         <li>Syntax highlighting</li>
         <ul>
