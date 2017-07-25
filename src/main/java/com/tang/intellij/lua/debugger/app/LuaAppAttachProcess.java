@@ -37,7 +37,7 @@ public class LuaAppAttachProcess extends LuaAttachDebugProcess {
         assert configuration != null;
         String workingDir = configuration.getWorkingDir();
 
-        bridge = new LuaAttachBridge(getSession());
+        bridge = new LuaAttachBridge(this, getSession());
         bridge.setProtoHandler(this);
         bridge.setProtoFactory(this);
 

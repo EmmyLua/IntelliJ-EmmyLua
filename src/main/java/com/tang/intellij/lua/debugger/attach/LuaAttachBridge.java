@@ -27,6 +27,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XExpression;
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint;
+import com.tang.intellij.lua.debugger.DebugLogger;
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachEvalResultProto;
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto;
 import com.tang.intellij.lua.debugger.attach.value.LuaXValue;
@@ -53,6 +54,7 @@ import java.util.Map;
  */
 public class LuaAttachBridge {
     private OSProcessHandler handler;
+    private DebugLogger logger;
     private XDebugSession session;
     private BufferedWriter writer;
     private ProtoHandler protoHandler;
@@ -84,7 +86,8 @@ public class LuaAttachBridge {
         public String expr;
     }
 
-    public LuaAttachBridge(XDebugSession session) {
+    public LuaAttachBridge(DebugLogger logger, XDebugSession session) {
+        this.logger = logger;
         this.session = session;
     }
 
@@ -167,7 +170,7 @@ public class LuaAttachBridge {
                 isX86 = exitValue == 1;
 
                 String archType = isX86 ? "x86" : "x64";
-                session.getConsoleView().print(String.format("Try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
+                logger.print(String.format("Try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
@@ -180,7 +183,7 @@ public class LuaAttachBridge {
                 writer = new BufferedWriter(new OutputStreamWriter(handler.getProcess().getOutputStream()));
             }
         } catch (Exception e) {
-            session.getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
+            logger.error(e.getMessage());
             session.stop();
         }
     }
@@ -206,7 +209,7 @@ public class LuaAttachBridge {
                 isX86 = exitValue == 1;
 
                 String archType = isX86 ? "x86" : "x64";
-                session.getConsoleView().print(String.format("Try launch program:%s with %s debugger.\n", program, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
+                logger.print(String.format("Try launch program:%s with %s debugger.\n", program, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
@@ -227,7 +230,7 @@ public class LuaAttachBridge {
                 writer = new BufferedWriter(new OutputStreamWriter(handler.getProcess().getOutputStream()));
             }
         } catch (Exception e) {
-            session.getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
+            logger.error(e.getMessage());
             session.stop();
         }
     }

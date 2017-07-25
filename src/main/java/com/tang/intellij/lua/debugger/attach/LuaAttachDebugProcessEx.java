@@ -33,7 +33,7 @@ public class LuaAttachDebugProcessEx extends LuaAttachDebugProcess {
 
     @Override
     protected LuaAttachBridge startBridge() {
-        bridge = new LuaAttachBridge(getSession());
+        bridge = new LuaAttachBridge(this, getSession());
         bridge.setProtoHandler(this);
         bridge.setProtoFactory(this);
         bridge.attach(processInfo.getPid());

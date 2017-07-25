@@ -87,7 +87,7 @@ class LuaAppMobProcess extends LuaMobDebugProcess {
                 @Override
                 public void onTextAvailable(ProcessEvent processEvent, Key key) {
                     if (key == ProcessOutputTypes.STDOUT) {
-                        print(processEvent.getText());
+                        print(processEvent.getText(), ConsoleViewContentType.NORMAL_OUTPUT);
                     } else if (key == ProcessOutputTypes.STDERR) {
                         error(processEvent.getText());
                     }
@@ -95,7 +95,7 @@ class LuaAppMobProcess extends LuaMobDebugProcess {
             });
             handler.startNotify();
         } catch (Exception e) {
-            getSession().getConsoleView().print(e.getMessage(), ConsoleViewContentType.ERROR_OUTPUT);
+            error(e.getMessage());
             getSession().stop();
         }
     }

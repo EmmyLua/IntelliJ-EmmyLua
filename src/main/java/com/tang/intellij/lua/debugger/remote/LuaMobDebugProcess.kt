@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.remote
 
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -48,8 +49,8 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         super.sessionInitialized()
 
         try {
-            println("Start mobdebug server at port:" + runProfile.port)
-            println("Waiting for process connection...")
+            println("Start mobdebug server at port:" + runProfile.port, ConsoleViewContentType.SYSTEM_OUTPUT)
+            println("Waiting for process connection...", ConsoleViewContentType.SYSTEM_OUTPUT)
             mobServer.start(runProfile.port)
         } catch (e: IOException) {
             e.printStackTrace()

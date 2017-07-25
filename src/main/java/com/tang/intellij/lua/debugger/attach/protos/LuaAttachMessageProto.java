@@ -57,6 +57,6 @@ public class LuaAttachMessageProto extends LuaAttachProto {
             contentType = ConsoleViewContentType.SYSTEM_OUTPUT;
         else if (messageType == Error)
             contentType = ConsoleViewContentType.ERROR_OUTPUT;
-        getProcess().getSession().getConsoleView().print(message + '\n', contentType);
+        getProcess().print(message + '\n', contentType);
     }
 }

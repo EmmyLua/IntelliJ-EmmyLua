@@ -125,11 +125,11 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
     private void onLoadScript(LuaAttachLoadScriptProto proto) {
         VirtualFile file = LuaFileUtil.findFile(getSession().getProject(), proto.getName());
         if (file == null) {
-            getSession().getConsoleView().print(String.format("[✘] File not found : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
+            print(String.format("[✘] File not found : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
         } else {
             LoadedScript script = new LoadedScript(file, proto.getIndex(), proto.getName());
             loadedScriptMap.put(proto.getIndex(), script);
-            getSession().getConsoleView().print(String.format("[✔] File was loaded : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
+            print(String.format("[✔] File was loaded : %s\n", proto.getName()), ConsoleViewContentType.SYSTEM_OUTPUT);
 
             for (XSourcePosition pos : registeredBreakpoints.keySet()) {
                 if (LuaFileUtil.fileEquals(file, pos.getFile())) {

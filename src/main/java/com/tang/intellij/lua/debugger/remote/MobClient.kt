@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.remote
 
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.util.TimeoutUtil
 import com.intellij.util.io.BaseOutputReader
@@ -101,7 +102,7 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
             } catch (e: Exception) {
                 //e.printStackTrace()
             } finally {
-                listener.println("Disconnected.")
+                listener.println("Disconnected.", ConsoleViewContentType.SYSTEM_OUTPUT)
             }
         }
     }
