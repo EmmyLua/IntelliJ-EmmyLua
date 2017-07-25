@@ -28,12 +28,15 @@ import com.intellij.util.SmartList;
 import com.intellij.util.containers.ContainerUtil;
 import com.tang.intellij.lua.psi.LuaExpr;
 import com.tang.intellij.lua.psi.LuaExprStat;
+import com.tang.intellij.lua.psi.LuaParenExpr;
 import com.tang.intellij.lua.psi.LuaValueExpr;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 public class LuaPostfixUtils {
+
+    public static final Condition<PsiElement> IS_NON_PAR = (element) -> element instanceof LuaExpr && !(element instanceof LuaParenExpr);
 
     public static PostfixTemplateExpressionSelector selectorTopmost() {
         return selectorTopmost(Conditions.alwaysTrue());
