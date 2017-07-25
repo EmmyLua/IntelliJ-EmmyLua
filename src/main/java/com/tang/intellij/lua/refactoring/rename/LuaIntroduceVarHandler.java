@@ -155,28 +155,38 @@ public class LuaIntroduceVarHandler implements RefactoringActionHandler {
         while (true);
     }
 
+    private boolean isInline(PsiElement commonParent, IntroduceOperation operation) {
+        return (commonParent instanceof LuaStatement || commonParent == operation.element) &&
+                (!operation.isReplaceAll() || operation.getOccurrences().size() == 1);
+    }
+
     private void performReplace(IntroduceOperation operation) {
         if (!operation.isReplaceAll())
             operation.setOccurrences(Collections.singletonList(operation.element));
 
         PsiElement commonParent = PsiTreeUtil.findCommonParent(operation.getOccurrences());
         if (commonParent != null) {
-            PsiElement anchor = findAnchor(operation.getOccurrences());
-            commonParent = anchor.getParent();
-
-            PsiElement localDef = LuaElementFactory.createWith(operation.project, "local var = " + operation.getElement().getText());
-            localDef = commonParent.addBefore(localDef, anchor);
-
-            commonParent.addAfter(LuaElementFactory.newLine(operation.project), localDef);
-
             List<PsiElement> newOccurrences = new SmartList<>();
-            for (PsiElement occ : operation.getOccurrences()) {
-                PsiElement identifier = LuaElementFactory.createName(operation.project, operation.name);
-                identifier = occ.replace(identifier);
-                newOccurrences.add(identifier);
-            }
-            operation.setNewOccurrences(newOccurrences);
+            PsiElement localDef = LuaElementFactory.createWith(operation.project, "local var = " + operation.getElement().getText());
 
+            if (isInline(commonParent, operation)) {
+                localDef = operation.element.replace(localDef);
+                LuaNameDef nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef.class);
+                assert nameDef != null;
+                operation.editor.getCaretModel().moveToOffset(nameDef.getTextOffset());
+            } else {
+                PsiElement anchor = findAnchor(operation.getOccurrences());
+                commonParent = anchor.getParent();
+                localDef = commonParent.addBefore(localDef, anchor);
+                commonParent.addAfter(LuaElementFactory.newLine(operation.project), localDef);
+                for (PsiElement occ : operation.getOccurrences()) {
+                    PsiElement identifier = LuaElementFactory.createName(operation.project, operation.name);
+                    identifier = occ.replace(identifier);
+                    newOccurrences.add(identifier);
+                }
+            }
+
+            operation.setNewOccurrences(newOccurrences);
             localDef = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(localDef);
             LuaNameDef nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef.class);
             operation.setVar(nameDef);
