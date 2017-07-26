@@ -53,7 +53,7 @@ class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
                     if (methodName != null) {
                         LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
                             val elementBuilder = LuaMethodLookupElement("self:" + methodName, signature, curType === type, def)
-                            elementBuilder.setHandler(FuncInsertHandler(def).withMask(mask))
+                            elementBuilder.handler = FuncInsertHandler(def).withMask(mask)
                             elementBuilder.setTailText("  [" + curType.displayName + "]")
                             completionResultSet.addElement(elementBuilder)
                         }

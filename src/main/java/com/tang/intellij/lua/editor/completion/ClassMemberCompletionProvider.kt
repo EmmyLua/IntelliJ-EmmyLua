@@ -16,16 +16,14 @@
 
 package com.tang.intellij.lua.editor.completion
 
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionProvider
-import com.intellij.codeInsight.completion.CompletionResultSet
-import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.codeInsight.completion.*
+import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
+import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.psi.LuaClassField
-import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaPsiImplUtil
+import com.tang.intellij.lua.lang.type.LuaTypeSet
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 
 /**
@@ -33,80 +31,124 @@ import com.tang.intellij.lua.search.SearchContext
  * Created by tangzx on 2016/12/25.
  */
 class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>() {
+    private interface HandlerProcessor {
+        fun process(element: LuaLookupElement)
+    }
+
+    private class InsertHandlerWrapper(val deleteLen: Int, val name:String, val base: InsertHandler<LookupElement>?) : InsertHandler<LookupElement> {
+        override fun handleInsert(insertionContext: InsertionContext, lookupElement: LookupElement) {
+            base?.handleInsert(insertionContext, lookupElement)
+            val startOffset = insertionContext.startOffset - deleteLen
+            insertionContext.document.replaceString(startOffset, insertionContext.startOffset - 1, name)
+        }
+    }
+
     override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
-        val element = completionParameters.position
-        val parent = element.parent
+        val psi = completionParameters.position
+        val parent = psi.parent
 
         if (parent is LuaIndexExpr) {
             val indexExpr = parent
-            val prefixTypeSet = indexExpr.guessPrefixType(SearchContext(indexExpr.project))
+            val project = indexExpr.project
+            val prefixTypeSet = indexExpr.guessPrefixType(SearchContext(project))
             if (prefixTypeSet != null) {
-                if (indexExpr.colon != null) {
-                    prefixTypeSet.types.forEach { luaType ->
-                        val context = SearchContext(indexExpr.getProject())
-                        luaType.initAliasName(context)
-                        luaType.processMethods(context) { curType, def ->
-                            val className = curType.displayName
-                            addMethod(completionResultSet, curType === luaType, false, className, def)
+                complete(indexExpr, prefixTypeSet, completionResultSet, completionResultSet.prefixMatcher, null)
+            }
+            //smart
+            val nameExpr = PsiTreeUtil.getChildOfType(indexExpr, LuaNameExpr::class.java)
+            if (nameExpr != null) {
+                val colon = if (indexExpr.colon != null) ":" else "."
+                val nameText = nameExpr.text
+                val matcher = CamelHumpMatcher(nameText)
+                LuaPsiTreeUtil.walkUpLocalNameDef(indexExpr, {
+                    val txt = it.text
+                    if (nameText != txt && matcher.prefixMatches(txt)) {
+                        val typeSet = it.guessType(SearchContext(project))
+                        if (typeSet != null) {
+                            val prefixMatcher = completionResultSet.prefixMatcher
+                            val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)
+                            complete(indexExpr, typeSet, resultSet, prefixMatcher, object : HandlerProcessor {
+                                override fun process(element: LuaLookupElement) {
+                                    element.itemText = txt + colon + element.itemText
+                                    element.handler = InsertHandlerWrapper(nameExpr.textLength + 1, txt, element.handler)
+                                }
+                            })
                         }
                     }
-                } else {
-                    prefixTypeSet.types.forEach { luaType ->
-                        val context = SearchContext(indexExpr.getProject())
-                        luaType.initAliasName(context)
-                        luaType.processMethods(context) { curType, def ->
-                            val className = curType.displayName
-                            addMethod(completionResultSet, curType === luaType, true, className, def)
-                        }
-                        luaType.processFields(context) { curType, field ->
-                            val className = curType.displayName
-                            addField(completionResultSet, curType === luaType, className, field)
-                        }
-                        luaType.processStaticMethods(context) { curType, def -> addStaticMethod(completionResultSet, curType === luaType, curType.displayName, def) }
-                    }
+                    true
+                })
+            }
+        }
+    }
+
+    private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: LuaTypeSet, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
+        if (indexExpr.colon != null) {
+            prefixTypeSet.types.forEach { luaType ->
+                val context = SearchContext(indexExpr.project)
+                luaType.initAliasName(context)
+                luaType.processMethods(context) { curType, def ->
+                    val className = curType.displayName
+                    addMethod(completionResultSet, prefixMatcher, curType === luaType, false, className, def, handlerProcessor)
+                }
+            }
+        } else {
+            prefixTypeSet.types.forEach { luaType ->
+                val context = SearchContext(indexExpr.project)
+                luaType.initAliasName(context)
+                luaType.processMethods(context) { curType, def ->
+                    val className = curType.displayName
+                    addMethod(completionResultSet, prefixMatcher, curType === luaType, true, className, def, handlerProcessor)
+                }
+                luaType.processFields(context) { curType, field ->
+                    val className = curType.displayName
+                    addField(completionResultSet, prefixMatcher, curType === luaType, className, field, handlerProcessor)
+                }
+                luaType.processStaticMethods(context) { curType, def ->
+                    addStaticMethod(completionResultSet, prefixMatcher, curType === luaType, curType.displayName, def, handlerProcessor)
                 }
             }
         }
     }
 
-    private fun addField(completionResultSet: CompletionResultSet, bold: Boolean, clazzName: String, field: LuaClassField) {
+    private fun addField(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
         val name = field.fieldName
-        if (name != null && completionResultSet.prefixMatcher.prefixMatches(name)) {
+        if (name != null && prefixMatcher.prefixMatches(name)) {
             val elementBuilder = LuaFieldLookupElement(name, field, bold)
             elementBuilder.setTailText("  [$clazzName]")
+            handlerProcessor?.process(elementBuilder)
             completionResultSet.addElement(elementBuilder)
         }
     }
 
-    private fun addMethod(completionResultSet: CompletionResultSet, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethodDef) {
+    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethodDef, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
-        if (methodName != null && completionResultSet.prefixMatcher.prefixMatches(methodName)) {
+        if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
             if (useAsField) {
-                var elementBuilder = LookupElementBuilder.create(methodName)
-                        .withIcon(LuaIcons.CLASS_METHOD)
-                        .withTailText(def.paramSignature + "  [" + clazzName + "]")
-                if (bold)
-                    elementBuilder = elementBuilder.bold()
+                val elementBuilder = LuaLookupElement(methodName, bold, LuaIcons.CLASS_METHOD)
+                elementBuilder.setTailText(def.paramSignature + "  [" + clazzName + "]")
+                handlerProcessor?.process(elementBuilder)
                 completionResultSet.addElement(elementBuilder)
             } else {
                 LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
                     val elementBuilder = LuaMethodLookupElement(methodName, signature, bold, def)
-                    elementBuilder.setHandler(FuncInsertHandler(def).withMask(mask))
+                    elementBuilder.handler = FuncInsertHandler(def).withMask(mask)
                     elementBuilder.setTailText("  [$clazzName]")
+                    handlerProcessor?.process(elementBuilder)
                     completionResultSet.addElement(elementBuilder)
                 }
             }
         }
     }
 
-    private fun addStaticMethod(completionResultSet: CompletionResultSet, bold: Boolean, clazzName: String, def: LuaClassMethodDef) {
+    private fun addStaticMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, def: LuaClassMethodDef, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
-        if (methodName != null && completionResultSet.prefixMatcher.prefixMatches(methodName)) {
+        if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
             LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
                 val elementBuilder = LuaMethodLookupElement(methodName, signature, bold, def)
-                elementBuilder.setHandler(FuncInsertHandler(def).withMask(mask))
+                elementBuilder.handler = FuncInsertHandler(def).withMask(mask)
                 elementBuilder.setItemTextUnderlined(true)
                 elementBuilder.setTailText("  [$clazzName]")
+                handlerProcessor?.process(elementBuilder)
                 completionResultSet.addElement(elementBuilder)
             }
         }

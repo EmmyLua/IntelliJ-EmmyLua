@@ -28,12 +28,12 @@ import javax.swing.Icon
  * Created by TangZX on 2017/5/22.
  */
 
-open class LuaTypeGuessableLookupElement(private val name: String, private val guessable: LuaTypeGuessable, bold: Boolean, icon: Icon)
+open class LuaTypeGuessableLookupElement(name: String, private val guessable: LuaTypeGuessable, bold: Boolean, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
     private var typeString: String? = null
 
-    override fun getLookupString(): String {
-        return name
+    init {
+        lookupString = name
     }
 
     override fun getTypeText(): String? {
@@ -55,8 +55,11 @@ open class LuaTypeGuessableLookupElement(private val name: String, private val g
 class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boolean)
     : LuaTypeGuessableLookupElement(fieldName, field, bold, LuaIcons.CLASS_FIELD)
 
-abstract class LuaFunctionLookupElement(name:String, val signature: String, bold:Boolean, val bodyOwner: LuaFuncBodyOwner, icon: Icon)
+abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boolean, val bodyOwner: LuaFuncBodyOwner, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
+    init {
+        itemText = lookupString + signature
+    }
 
     var typeDesc: String? = null
 
@@ -70,10 +73,6 @@ abstract class LuaFunctionLookupElement(name:String, val signature: String, bold
             typeDesc = set.createReturnString()
         }
         return typeDesc
-    }
-
-    override fun getItemText(): String {
-        return lookupString + signature
     }
 
     override fun getObject(): Any {
