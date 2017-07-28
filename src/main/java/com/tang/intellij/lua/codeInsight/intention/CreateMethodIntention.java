@@ -58,7 +58,7 @@ public class CreateMethodIntention extends BaseIntentionAction {
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile psiFile) {
-        LuaCallExpr callExpr = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaCallExpr.class, false);
+        LuaCallExpr callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaCallExpr.class, false);
         if (callExpr != null && !callExpr.isFunctionCall()) {
             LuaFuncBodyOwner bodyOwner = callExpr.resolveFuncBodyOwner(new SearchContext(project));
             return bodyOwner == null;
@@ -68,7 +68,7 @@ public class CreateMethodIntention extends BaseIntentionAction {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        LuaCallExpr callExpr = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaCallExpr.class, false);
+        LuaCallExpr callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaCallExpr.class, false);
         if (callExpr != null && !callExpr.isFunctionCall()) {
             LuaExpr expr = callExpr.getExpr();
             if (expr instanceof LuaIndexExpr) {

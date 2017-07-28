@@ -93,7 +93,7 @@ class AppendCallParenIntention : BaseIntentionAction() {
     override fun getText() = familyName
 
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
-        val callExpr = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
+        val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null) {
             val childByType = callExpr.args.node.findChildByType(LuaTypes.LPAREN)
             return childByType == null
@@ -102,7 +102,7 @@ class AppendCallParenIntention : BaseIntentionAction() {
     }
 
     override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
-        val callExpr = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
+        val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null) {
             val argsNode = callExpr.args.node
             editor.document.insertString(argsNode.startOffset + argsNode.textLength, ")")
@@ -120,7 +120,7 @@ class RemoveCallParenIntention : BaseIntentionAction() {
     override fun getText() = familyName
 
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
-        val callExpr = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
+        val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null) {
             callExpr.args.node.findChildByType(LuaTypes.LPAREN) ?: return false
 
@@ -139,7 +139,7 @@ class RemoveCallParenIntention : BaseIntentionAction() {
     }
 
     override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
-        val callExpr = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
+        val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null) {
             val argsNode = callExpr.args.node
 
@@ -158,7 +158,7 @@ class RemoveCallParenIntention : BaseIntentionAction() {
 
 abstract class FunctionIntention : BaseIntentionAction() {
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
-        val bodyOwner = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaFuncBodyOwner::class.java, false)
+        val bodyOwner = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaFuncBodyOwner::class.java, false)
         //不对Closure生效
         if (bodyOwner == null || bodyOwner is LuaClosureExpr)
             return false
@@ -175,7 +175,7 @@ abstract class FunctionIntention : BaseIntentionAction() {
 
     @Throws(IncorrectOperationException::class)
     override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
-        val bodyOwner = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaFuncBodyOwner::class.java, false)
+        val bodyOwner = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaFuncBodyOwner::class.java, false)
         if (bodyOwner != null) invoke(bodyOwner, editor)
     }
 
@@ -268,7 +268,7 @@ class InvertBooleanIntention : BaseIntentionAction() {
     override fun getText() = "Invert boolean value"
 
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
-        val element = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaLiteralExpr::class.java, false)
+        val element = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaLiteralExpr::class.java, false)
         if (element is LuaLiteralExpr && element.kind == LuaLiteralKind.Bool) {
             return true
         }
@@ -276,7 +276,7 @@ class InvertBooleanIntention : BaseIntentionAction() {
     }
 
     override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
-        val element = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaLiteralExpr::class.java, false)
+        val element = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaLiteralExpr::class.java, false)
         if (element is LuaLiteralExpr && element.kind == LuaLiteralKind.Bool) {
             val lit = LuaElementFactory.createLiteral(project, if (element.text == "true") "false" else "true")
             element.replace(lit)

@@ -19,6 +19,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaBlock;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
 import org.jetbrains.annotations.Nls;
@@ -56,7 +57,7 @@ public class CreateFieldFromParameterIntention extends BaseIntentionAction {
 
     private LuaParamNameDef getLuaParamNameDef(Editor editor, PsiFile psiFile) {
         int offset = editor.getCaretModel().getOffset();
-        return PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset, LuaParamNameDef.class, false);
+        return LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, offset, LuaParamNameDef.class, false);
     }
 
     @Override

@@ -18,6 +18,9 @@ package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.PsiTreeUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -159,5 +162,13 @@ public class LuaPsiTreeUtil {
             }
         }
         return true;
+    }
+
+    @Nullable
+    public static <T extends PsiElement> T findElementOfClassAtOffset(@NotNull PsiFile file, int offset, @NotNull Class<T> clazz, boolean strictStart) {
+        T t = PsiTreeUtil.findElementOfClassAtOffset(file, offset, clazz, strictStart);
+        if (t == null)
+            t = PsiTreeUtil.findElementOfClassAtOffset(file, offset - 1, clazz, strictStart);
+        return t;
     }
 }

@@ -24,10 +24,10 @@ import com.intellij.codeInsight.template.impl.TextExpression;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.LuaLocalDef;
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +51,7 @@ public class CreateTypeAnnotationIntention extends BaseIntentionAction {
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, PsiFile psiFile) {
-        LuaLocalDef localDef = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaLocalDef.class, false);
+        LuaLocalDef localDef = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaLocalDef.class, false);
         if (localDef != null) {
             LuaComment comment = localDef.getComment();
             return comment == null || comment.getTypeDef() == null;
@@ -61,7 +61,7 @@ public class CreateTypeAnnotationIntention extends BaseIntentionAction {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        LuaLocalDef localDef = PsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaLocalDef.class, false);
+        LuaLocalDef localDef = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.getCaretModel().getOffset(), LuaLocalDef.class, false);
         if (localDef != null) {
             LuaComment comment = localDef.getComment();
 
