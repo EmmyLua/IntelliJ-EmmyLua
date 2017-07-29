@@ -31,7 +31,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.tree.IElementType;
-import com.tang.intellij.lua.editor.completion.KeywordInsertHandler;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.psi.LuaIndentRange;
 import com.tang.intellij.lua.psi.LuaTypes;
 import org.jetbrains.annotations.NotNull;
@@ -86,13 +86,15 @@ public class LuaEnterAfterUnmatchedBraceHandler implements EnterHandlerDelegate 
                 document.insertString(caretOffset, "\n" + endType.toString());
                 Project project = element.getProject();
 
-                final TextRange textRange = range.getTextRange();
                 PsiDocumentManager.getInstance(project).commitDocument(document);
-                ApplicationManager.getApplication().runWriteAction(() -> {
-                    CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
-                    styleManager.adjustLineIndent(psiFile, textRange);
-                    KeywordInsertHandler.autoIndent(endType, psiFile, project, document, caretOffset);
-                });
+                LuaIndentRange newRange = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset, LuaIndentRange.class, false);
+                if (newRange != null) {
+                    final TextRange textRange = newRange.getTextRange();
+                    ApplicationManager.getApplication().runWriteAction(() -> {
+                        CodeStyleManager styleManager = CodeStyleManager.getInstance(project);
+                        styleManager.adjustLineIndent(psiFile, textRange);
+                    });
+                }
                 return Result.Stop;
             }
         }
