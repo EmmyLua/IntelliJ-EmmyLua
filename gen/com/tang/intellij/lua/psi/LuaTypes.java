@@ -41,6 +41,7 @@ public interface LuaTypes {
   IElementType PAREN_EXPR = LuaParserDefinition.createType("PAREN_EXPR");
   IElementType REPEAT_STAT = LuaParserDefinition.createType("REPEAT_STAT");
   IElementType RETURN_STAT = LuaParserDefinition.createType("RETURN_STAT");
+  IElementType SHEBANG_LINE = LuaParserDefinition.createType("SHEBANG_LINE");
   IElementType TABLE_EXPR = LuaParserDefinition.createType("TABLE_EXPR");
   IElementType TABLE_FIELD = LuaParserDefinition.createType("TABLE_FIELD");
   IElementType TABLE_FIELD_SEP = LuaParserDefinition.createType("TABLE_FIELD_SEP");
@@ -109,6 +110,7 @@ public interface LuaTypes {
   IElementType RPAREN = LuaParserDefinition.createToken(")");
   IElementType SEMI = LuaParserDefinition.createToken(";");
   IElementType SHEBANG = LuaParserDefinition.createToken("#!");
+  IElementType SHEBANG_CONTENT = LuaParserDefinition.createToken("SHEBANG_CONTENT");
   IElementType SHORT_COMMENT = LuaParserDefinition.createToken("SHORT_COMMENT");
   IElementType STRING = LuaParserDefinition.createToken("STRING");
   IElementType THEN = LuaParserDefinition.createToken("then");
@@ -211,6 +213,9 @@ public interface LuaTypes {
       }
       else if (type == RETURN_STAT) {
         return new LuaReturnStatImpl(node);
+      }
+      else if (type == SHEBANG_LINE) {
+        return new LuaShebangLineImpl(node);
       }
       else if (type == TABLE_EXPR) {
         return new LuaTableExprImpl(node);

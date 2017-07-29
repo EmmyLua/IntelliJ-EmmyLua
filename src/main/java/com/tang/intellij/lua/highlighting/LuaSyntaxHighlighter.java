@@ -91,6 +91,9 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
         fillMap(ourMap1, LuaHighlightingData.BRACES, LuaTypes.LCURLY, LuaTypes.RCURLY);
         fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaTypes.LPAREN, LuaTypes.RPAREN);
         //comment
+        fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHEBANG);
+        fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.SHEBANG_CONTENT);
+
         fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT);
         fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION);
         fillMap(ourMap1, DOC_KEYWORD_TOKENS, LuaHighlightingData.DOC_COMMENT_TAG);

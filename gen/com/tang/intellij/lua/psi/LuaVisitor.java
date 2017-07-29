@@ -170,6 +170,10 @@ public class LuaVisitor extends PsiElementVisitor {
     visitStatement(o);
   }
 
+  public void visitShebangLine(@NotNull LuaShebangLine o) {
+    visitPsiElement(o);
+  }
+
   public void visitStatement(@NotNull LuaStatement o) {
     visitCommentOwner(o);
   }

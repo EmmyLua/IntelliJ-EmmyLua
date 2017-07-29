@@ -74,6 +74,7 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 //[[]]
 LONG_STRING=\[=*\[[\s\S]*\]=*\]
 
+%state xSHEBANG
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
 %state xBLOCK_STRING
@@ -112,7 +113,7 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "until"                     { return UNTIL; }
   "while"                     { return WHILE; }
   "goto"                      { return GOTO; } //lua5.3
-  "#!"                        { return SHEBANG; }
+  "#!"                        { yybegin(xSHEBANG); return SHEBANG; }
   "..."                       { return ELLIPSIS; }
   ".."                        { return CONCAT; }
   "=="                        { return EQ; }
@@ -156,6 +157,10 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   {NUMBER}                    { return NUMBER; }
 
   [^] { return TokenType.BAD_CHARACTER; }
+}
+
+<xSHEBANG> {
+    [^\r\n]* { yybegin(YYINITIAL);return SHEBANG_CONTENT; }
 }
 
 <xCOMMENT> {

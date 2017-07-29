@@ -117,6 +117,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == RETURN_STAT) {
       r = returnStat(b, 0);
     }
+    else if (t == SHEBANG_LINE) {
+      r = shebang_line(b, 0);
+    }
     else if (t == TABLE_EXPR) {
       r = tableExpr(b, 0);
     }
@@ -1018,13 +1021,31 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // stat_semi*
+  // shebang_line? stat_semi*
   static boolean luaFile(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "luaFile")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = luaFile_0(b, l + 1);
+    r = r && luaFile_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // shebang_line?
+  private static boolean luaFile_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "luaFile_0")) return false;
+    shebang_line(b, l + 1);
+    return true;
+  }
+
+  // stat_semi*
+  private static boolean luaFile_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "luaFile_1")) return false;
     int c = current_position_(b);
     while (true) {
       if (!stat_semi(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "luaFile", c)) break;
+      if (!empty_element_parsed_guard_(b, "luaFile_1", c)) break;
       c = current_position_(b);
     }
     return true;
@@ -1253,6 +1274,18 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "returnStat_1")) return false;
     exprList(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // SHEBANG SHEBANG_CONTENT
+  public static boolean shebang_line(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "shebang_line")) return false;
+    if (!nextTokenIs(b, SHEBANG)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, SHEBANG, SHEBANG_CONTENT);
+    exit_section_(b, m, SHEBANG_LINE, r);
+    return r;
   }
 
   /* ********************************************************** */

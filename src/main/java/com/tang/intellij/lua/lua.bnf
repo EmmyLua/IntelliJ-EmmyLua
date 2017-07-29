@@ -61,6 +61,7 @@
         ENDREGION = "ENDREGION"
 
         SHEBANG = "#!"
+        SHEBANG_CONTENT = "SHEBANG_CONTENT"
         ELLIPSIS = "..."
         CONCAT = ".."
         EQ = "=="
@@ -114,7 +115,9 @@
   hooks(".*Stat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
 }
 
-luaFile ::= stat_semi*
+luaFile ::= shebang_line? stat_semi*
+
+shebang_line ::= SHEBANG SHEBANG_CONTENT
 
 private stat_semi ::= stat_impl ';'?
 block ::= stat_semi* (lastStat ';'?)?
