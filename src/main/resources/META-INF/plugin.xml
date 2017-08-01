@@ -91,10 +91,6 @@
                         serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckView"/>
         <applicationService serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckSettings"
                             serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
-        <applicationConfigurable displayName="LuaCheck"
-                                 groupId="language"
-                                 id="preferences.LuaCheck"
-                                 instance="com.tang.intellij.lua.luacheck.LuaCheckSettingsPanel"/>
 
         <!--CreateFromTemplate-->
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
@@ -197,9 +193,13 @@
         <applicationService serviceInterface="com.tang.intellij.lua.project.LuaSettings"
                             serviceImplementation="com.tang.intellij.lua.project.LuaSettings"/>
         <applicationConfigurable groupId="language"
-                                 displayName="Lua"
+                                 displayName="EmmyLua"
                                  id="preferences.Lua"
-                                 instance="com.tang.intellij.lua.project.LuaSettingsPanel" />
+                                 instance="com.tang.intellij.lua.project.LuaSettingsPanel">
+            <configurable instance="com.tang.intellij.lua.luacheck.LuaCheckSettingsPanel"
+                          displayName="LuaCheck"
+                          id="preferences.LuaCheck"/>
+        </applicationConfigurable>
 
         <!--intentions-->
         <intentionAction>
