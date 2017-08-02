@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -211,6 +212,7 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
         String[] params = getParametersArray();
         commandLine.addParameters(params);
         commandLine.setWorkDirectory(getWorkingDir());
+        commandLine.setCharset(Charset.forName("UTF-8"));
         return commandLine;
     }
 }
