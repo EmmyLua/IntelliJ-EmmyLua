@@ -270,17 +270,15 @@ object LuaPsiImplUtil {
         return callExpr.expr is LuaNameExpr
     }
 
-    @JvmStatic fun guessTypeAt(list: LuaExprList, index: Int, context: SearchContext): LuaTypeSet? {
-        var cur = 0
-        var child: PsiElement? = list.firstChild
-        while (child != null) {
-            if (child is LuaExpr) {
-                if (cur == index) {
-                    return child.guessType(context)
-                }
-                cur++
-            }
-            child = child.nextSibling
+    @JvmStatic fun guessTypeAt(list: LuaExprList, context: SearchContext): LuaTypeSet? {
+        val exprList = list.exprList
+        val index = context.index
+        if (exprList.size > index) {
+            context.index = 0
+            return exprList[index].guessType(context)
+        } else if (exprList.size == 1) {
+            val exp0 = exprList[0]
+            return exp0.guessType(context)
         }
         return null
     }
@@ -330,7 +328,8 @@ object LuaPsiImplUtil {
                 .map<PsiElement>({ it.parent })
                 .map<LuaTypeSet> { s ->
                     val assignStat = s as LuaAssignStat
-                    assignStat.valueExprList?.guessTypeAt(0, context)
+                    context.index = assignStat.getIndexFor(indexExpr)
+                    assignStat.valueExprList?.guessTypeAt(context)
                 }
         return setOptional.orElse(null)
     }
@@ -372,7 +371,7 @@ object LuaPsiImplUtil {
             if (comment != null) {
                 val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
                 if (returnDef != null) {
-                    return returnDef.resolveTypeAt(0, searchContext) //TODO : multi
+                    return returnDef.resolveTypeAt(searchContext)
                 }
             }
         }
@@ -382,7 +381,7 @@ object LuaPsiImplUtil {
             var typeSet = LuaTypeSet.create()
             owner.acceptChildren(object : LuaVisitor() {
                 override fun visitReturnStat(o: LuaReturnStat) {
-                    val guessReturnTypeSet = guessReturnTypeSet(o, 0, ctx)
+                    val guessReturnTypeSet = guessReturnTypeSet(o, ctx.index, ctx)
                     guessReturnTypeSet?.types?.forEach {
                         if (!it.isAnonymous) { //不处理local
                             typeSet = LuaTypeSet.union(typeSet, it)
@@ -630,8 +629,10 @@ object LuaPsiImplUtil {
     @JvmStatic fun guessReturnTypeSet(returnStat: LuaReturnStat?, index: Int, context: SearchContext): LuaTypeSet? {
         if (returnStat != null) {
             val returnExpr = returnStat.exprList
-            if (returnExpr != null)
-                return returnExpr.guessTypeAt(index, context)
+            if (returnExpr != null) {
+                context.index = index
+                return returnExpr.guessTypeAt(context)
+            }
         }
         return null
     }

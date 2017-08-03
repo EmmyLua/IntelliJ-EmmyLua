@@ -30,6 +30,10 @@ import com.tang.intellij.lua.project.LuaPredefinedLibraryProvider
  * Created by tangzx on 2017/1/14.
  */
 class SearchContext(val project: Project) {
+    /**
+     * 用于有多返回值的索引设定
+     */
+    var index: Int = 0
 
     private var currentStubFile: PsiFile? = null
     private var scope: GlobalSearchScope? = null

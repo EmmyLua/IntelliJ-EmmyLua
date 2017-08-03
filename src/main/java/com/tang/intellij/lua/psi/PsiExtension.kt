@@ -21,6 +21,34 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.lang.type.LuaTableType
 
+/**
+ * 获取所在的位置
+ */
+fun LuaLocalDef.getIndexFor(psi: LuaNameDef): Int {
+    var idx = 0
+    PsiTreeUtil.processElements(this.nameList, {
+        if (it is LuaNameDef) {
+            if (it == psi)
+                return@processElements false
+            idx++
+        }
+        return@processElements true
+    })
+    return idx
+}
+
+fun LuaAssignStat.getIndexFor(psi: LuaExpr): Int {
+    var idx = 0
+    PsiTreeUtil.processElements(this.varExprList, {
+        if (it is LuaExpr) {
+            if (it == psi)
+                return@processElements false
+            idx++
+        }
+        return@processElements true
+    })
+    return idx
+}
 
 fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     val list = this.varExprList.exprList

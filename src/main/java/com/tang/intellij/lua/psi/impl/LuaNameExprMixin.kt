@@ -79,8 +79,10 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
                     //再从赋值猜
                     if (typeSet == null) {
                         val exprList = luaAssignStat.valueExprList
-                        if (exprList != null)
-                            typeSet = exprList.guessTypeAt(0, context)//TODO : multi
+                        if (exprList != null) {
+                            context.index = luaAssignStat.getIndexFor(def)
+                            typeSet = exprList.guessTypeAt(context)
+                        }
                     }
                 }
                 //Global

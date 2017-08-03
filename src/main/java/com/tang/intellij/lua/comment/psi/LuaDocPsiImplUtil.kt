@@ -102,17 +102,17 @@ fun guessType(paramDec: LuaDocParamDef, context: SearchContext): LuaTypeSet? {
 /**
  * 获取返回类型
  * @param returnDef 返回定义
- * *
- * @param index 索引
- * *
+ *
  * @return 类型集合
  */
-fun resolveTypeAt(returnDef: LuaDocReturnDef, index: Int, context: SearchContext): LuaTypeSet {
+fun resolveTypeAt(returnDef: LuaDocReturnDef, context: SearchContext): LuaTypeSet {
     val typeList = returnDef.typeList
     if (typeList != null) {
         val typeSetList = typeList.typeSetList
-        val docTypeSet = typeSetList[index]
-        return resolveDocTypeSet(docTypeSet, context)
+        if (typeSetList.size > context.index) {
+            val docTypeSet = typeSetList[context.index]
+            return resolveDocTypeSet(docTypeSet, context)
+        }
     }
     return LuaTypeSet.create()
 }

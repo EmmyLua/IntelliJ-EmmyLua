@@ -209,14 +209,8 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): LuaTypeSe
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
-                    val index = nameList.nameDefList.indexOf(nameDef)
-                    if (index != -1) {
-                        val exprs = exprList.exprList
-                        if (index < exprs.size) {
-                            val expr = exprs[index]
-                            typeSet = expr.guessType(context)
-                        }
-                    }
+                    context.index = localDef.getIndexFor(nameDef)
+                    typeSet = exprList.guessTypeAt(context)
                 }
             }
 

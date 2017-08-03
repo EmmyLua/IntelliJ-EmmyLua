@@ -16,6 +16,6 @@ public interface LuaDocReturnDef extends LuaDocPsiElement {
   LuaDocTypeList getTypeList();
 
   @NotNull
-  LuaTypeSet resolveTypeAt(int index, SearchContext context);
+  LuaTypeSet resolveTypeAt(SearchContext context);
 
 }
