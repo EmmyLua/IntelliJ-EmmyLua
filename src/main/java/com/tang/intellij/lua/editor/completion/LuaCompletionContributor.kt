@@ -58,6 +58,7 @@ class LuaCompletionContributor : CompletionContributor() {
     }
 
     override fun beforeCompletion(context: CompletionInitializationContext) {
+        suggestWords = true
         val file = context.file
         if (file is LuaFile) {
             val element = file.findElementAt(context.caret.offset - 1)
