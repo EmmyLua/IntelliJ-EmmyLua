@@ -45,20 +45,13 @@ class LuaFindUsagesHandlerFactory : FindUsagesHandlerFactory() {
  * 查找方法的引用-》同时查找重写的子类方法
  */
 class FindMethodUsagesHandler(val methodDef: LuaClassMethodDef) : FindUsagesHandler(methodDef) {
-    override fun getSecondaryElements(): Array<PsiElement> {
-        val arr = arrayListOf<PsiElement>()
-        val query = LuaOverridingMethodsSearch.search(methodDef, true)
-        query.forEach {
-            arr.add(it)
-        }
-        return arr.toTypedArray()
-    }
-
     override fun findReferencesToHighlight(target: PsiElement, searchScope: SearchScope): MutableCollection<PsiReference> {
         val collection = super.findReferencesToHighlight(target, searchScope)
         val query = LuaOverridingMethodsSearch.search(methodDef, true)
+        val psiFile = target.containingFile
         query.forEach {
-            collection.add(LuaOverridingMethodReference(it, methodDef))
+            if (psiFile == it.containingFile)
+                collection.add(LuaOverridingMethodReference(it, methodDef))
         }
         return collection
     }
