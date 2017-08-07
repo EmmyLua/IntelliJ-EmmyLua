@@ -96,8 +96,14 @@ public class LuaFileUtil {
                     if (shortUrl.endsWith(ext)) { //aa.bb.lua -> aa.bb
                         fixedURL = shortUrl.substring(0, shortUrl.length() - ext.length());
                     }
-                    //aa.bb -> aa/bb.lua
-                    fixedURL = fixedURL.replaceAll("\\.", "/") + ext;
+
+                    //将.转为/，但不处理 ..
+                    if (!fixedURL.contains("/")) {
+                        //aa.bb -> aa/bb.lua
+                        fixedURL = fixedURL.replaceAll("\\.", "/");
+                    }
+
+                    fixedURL = fixedURL + ext;
 
                     VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + fixedURL);
                     if (file != null && !file.isDirectory()) {
