@@ -311,7 +311,7 @@ literalExpr ::= nil | false | true | NUMBER | STRING | "..."
 
 valueExpr ::= varExpr | literalExpr | closureExpr | tableExpr | parenExpr
 
-// 最终产生 call expr | index expr | nameRef
+// 最终产生 callExpr | indexExpr | nameExpr
 private varExpr ::= callOrIndexExpr | nameExpr
 
 expr ::=
