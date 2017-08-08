@@ -108,8 +108,8 @@ class LuaCompletionContributor : CompletionContributor() {
                     o.acceptChildren(this)
                 }
 
-                override fun visitElement(element: PsiElement?) {
-                    if (element!!.node.elementType === LuaTypes.ID && element!!.textLength > 2) {
+                override fun visitElement(element: PsiElement) {
+                    if (element.node.elementType === LuaTypes.ID && element.textLength > 2) {
                         val text = element.text
                         if (session.resultSet.prefixMatcher.prefixMatches(text) && session.addWord(text))
                             wordsInFileSet.add(text)
