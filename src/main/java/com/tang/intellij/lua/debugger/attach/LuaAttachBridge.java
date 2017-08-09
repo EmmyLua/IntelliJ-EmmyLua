@@ -17,10 +17,7 @@
 package com.tang.intellij.lua.debugger.attach;
 
 import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessEvent;
-import com.intellij.execution.process.ProcessListener;
-import com.intellij.execution.process.ProcessOutputTypes;
+import com.intellij.execution.process.*;
 import com.intellij.execution.ui.ConsoleViewContentType;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -155,8 +152,8 @@ public class LuaAttachBridge {
         return LuaFileUtil.getPluginVirtualFile("debugger/Emmy.lua");
     }
 
-    public void attach(int processId) {
-        String pid = String.valueOf(processId);
+    public void attach(ProcessInfo processInfo) {
+        String pid = String.valueOf(processInfo.getPid());
         VirtualFile pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory();
         try {
             if (pluginVirtualDirectory != null) {
@@ -170,7 +167,7 @@ public class LuaAttachBridge {
                 isX86 = exitValue == 1;
 
                 String archType = isX86 ? "x86" : "x64";
-                logger.print(String.format("Try attach to pid:%s with %s debugger.\n", pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
+                logger.print(String.format("Try attach to \"%s\" pid:%s with %s debugger.\n", processInfo.getExecutableName(), pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT);
                 // attach debugger
                 String exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType));
 
