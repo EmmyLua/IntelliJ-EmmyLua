@@ -59,7 +59,7 @@ public:
     /**
      * Waits for someone to connect to the channel.
      */
-    bool WaitForConnection();
+    bool WaitForConnection() const;
 
     /**
      * Shuts down the channel.
@@ -69,62 +69,62 @@ public:
     /**
      * Writes a 32-bit unsigned integer to the channel and returns immediately.
      */
-    bool WriteUInt32(unsigned int value);
+    bool WriteUInt32(unsigned int value) const;
 
-	bool WriteSize(size_t size);
-
-    /**
-     * Writes a string to the channel and returns immediately.
-     */
-    bool WriteString(const char* value);
+	bool WriteSize(size_t size) const;
 
     /**
      * Writes a string to the channel and returns immediately.
      */
-    bool WriteString(const std::string& value);
+    bool WriteString(const char* value) const;
+
+    /**
+     * Writes a string to the channel and returns immediately.
+     */
+    bool WriteString(const std::string& value) const;
 
     /**
      * Writes a boolean to the channel and returns immediately.
      */
-    bool WriteBool(bool value);
+    bool WriteBool(bool value) const;
 
     /**
      * Reads a 32-bit unsigned integer from the channel. This operation blocks
      * until the data is available.
      */
-    bool ReadUInt32(unsigned int& value);
+    bool ReadUInt32(unsigned int& value) const;
 
-	bool ReadSize(size_t& size);
+	bool ReadSize(size_t& size) const;
 
     /**
      * Reads a string from the channel. This operation blocks until the
      * data is available.
      */
-    bool ReadString(std::string& value);
+    bool ReadString(std::string& value) const;
 
     /**
      * Reads a boolean from the channel. This operation blocks until the
      * data is available.
      */
-    bool ReadBool(bool& value);
+    bool ReadBool(bool& value) const;
 
     /**
      * Flushes the buffers, causing any written data to be sent.
      */
-    void Flush();
+    void Flush() const;
 
 private:
 
     /**
      * Writes data to the channel and returns immediately.
      */
-    bool Write(const void* buffer, unsigned int length);
+    bool Write(const void* buffer, unsigned int length) const;
 
     /**
      * Reads data to the channel. Returns when the specified amount has been
      * read or when an error occurs.
      */
-    bool Read(void* buffer, unsigned int length);
+    bool Read(void* buffer, unsigned int length) const;
 
 private:
 

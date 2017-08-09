@@ -46,7 +46,7 @@ bool Channel::Create(const char* name)
     DWORD bufferSize = 2048;
 
     m_pipe = CreateNamedPipe(pipeName, PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
-        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, 1, bufferSize, bufferSize, 0, NULL);
+        PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE, 1, bufferSize, bufferSize, 0, nullptr);
 
     if (m_pipe != INVALID_HANDLE_VALUE)
     {
@@ -57,8 +57,8 @@ bool Channel::Create(const char* name)
 
     if (m_pipe != INVALID_HANDLE_VALUE)
     {
-        m_doneEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-        m_readEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+        m_doneEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        m_readEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
     }
 
     return m_pipe != INVALID_HANDLE_VALUE;
@@ -71,23 +71,23 @@ bool Channel::Connect(const char* name)
     char pipeName[256];
     _snprintf(pipeName, 256, "\\\\.\\pipe\\%s", name);
 
-    m_pipe = CreateFile(pipeName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+    m_pipe = CreateFile(pipeName, GENERIC_READ | GENERIC_WRITE, 0, nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, nullptr);
 
     if (m_pipe != INVALID_HANDLE_VALUE)
     {
-        m_doneEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-        m_readEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+        m_doneEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+        m_readEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
         DWORD flags = PIPE_READMODE_MESSAGE;
-        SetNamedPipeHandleState(m_pipe, &flags, NULL, NULL);
+        SetNamedPipeHandleState(m_pipe, &flags, nullptr, nullptr);
     }
 
     return m_pipe != INVALID_HANDLE_VALUE;
 
 }
 
-bool Channel::WaitForConnection()
+bool Channel::WaitForConnection() const
 {
-    return ConnectNamedPipe(m_pipe, NULL) != FALSE;
+    return ConnectNamedPipe(m_pipe, nullptr) != FALSE;
 }
 
 void Channel::Destroy()
@@ -127,7 +127,7 @@ void Channel::Destroy()
 
 }
 
-bool Channel::Write(const void* buffer, unsigned int length)
+bool Channel::Write(const void* buffer, unsigned int length) const
 {
 
     assert(m_pipe != INVALID_HANDLE_VALUE);
@@ -142,7 +142,7 @@ bool Channel::Write(const void* buffer, unsigned int length)
     OVERLAPPED overlapped = { 0 };
     overlapped.hEvent = m_readEvent;
 
-    BOOL result = WriteFile(m_pipe, buffer, length, NULL, &overlapped) != 0;
+    BOOL result = WriteFile(m_pipe, buffer, length, nullptr, &overlapped) != 0;
 
     if (result == FALSE)
     {
@@ -167,19 +167,19 @@ bool Channel::Write(const void* buffer, unsigned int length)
 
 }
 
-bool Channel::WriteUInt32(unsigned int value)
+bool Channel::WriteUInt32(unsigned int value) const
 {
     DWORD temp = value;
     return Write(&temp, 4);
 }
 
-bool Channel::WriteSize(size_t size)
+bool Channel::WriteSize(size_t size) const
 {
 	size_t temp = size;
 	return Write(&temp, 8);
 }
 
-bool Channel::WriteString(const char* value)
+bool Channel::WriteString(const char* value) const
 {
     unsigned int length = static_cast<int>(strlen(value));
     if (!WriteUInt32(length))
@@ -193,7 +193,7 @@ bool Channel::WriteString(const char* value)
     return true;
 }
 
-bool Channel::WriteString(const std::string& value)
+bool Channel::WriteString(const std::string& value) const
 {
 	unsigned int length = value.length();
     if (!WriteUInt32(length))
@@ -207,12 +207,12 @@ bool Channel::WriteString(const std::string& value)
     return true;
 }
 
-bool Channel::WriteBool(bool value)
+bool Channel::WriteBool(bool value) const
 {
     return WriteUInt32(value ? 1 : 0);
 }
 
-bool Channel::ReadUInt32(unsigned int& value)
+bool Channel::ReadUInt32(unsigned int& value) const
 {
     DWORD temp;
     if (!Read(&temp, 4))
@@ -223,7 +223,7 @@ bool Channel::ReadUInt32(unsigned int& value)
     return true;
 }
 
-bool Channel::ReadSize(size_t& size)
+bool Channel::ReadSize(size_t& size) const
 {
 	size_t temp;
 	if (!Read(&temp, 8)) {
@@ -233,7 +233,7 @@ bool Channel::ReadSize(size_t& size)
 	return true;
 }
 
-bool Channel::ReadString(std::string& value)
+bool Channel::ReadString(std::string& value) const
 {
     unsigned int length;
     
@@ -268,7 +268,7 @@ bool Channel::ReadString(std::string& value)
 
 }
 
-bool Channel::ReadBool(bool& value)
+bool Channel::ReadBool(bool& value) const
 {
 
     unsigned int temp;
@@ -283,7 +283,7 @@ bool Channel::ReadBool(bool& value)
 
 }
 
-bool Channel::Read(void* buffer, unsigned int length)
+bool Channel::Read(void* buffer, unsigned int length) const
 {
 
     assert(m_pipe != INVALID_HANDLE_VALUE);
@@ -337,7 +337,7 @@ bool Channel::Read(void* buffer, unsigned int length)
 
 }
 
-void Channel::Flush()
+void Channel::Flush() const
 {
     //FlushFileBuffers(m_pipe);
 }

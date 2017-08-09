@@ -298,7 +298,7 @@ private:
     /**
      * Outputs the error message for Win32 error code.
      */
-    void OutputError(DWORD error);
+    void OutputError(DWORD error) const;
 
 private:
 

@@ -171,6 +171,7 @@ bool DebugFrontend::Attach(unsigned int processId, const char* symbolsDirectory)
 
 bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 {
+	//MessageBox(nullptr, "Waiting to attach the debugger", nullptr, MB_OK);
 
     if (GetIsBeingDebugged(m_processId))
     {
@@ -341,7 +342,6 @@ void DebugFrontend::Stop(bool kill)
 
 bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 {
-
     bool success = true;
 
     // Get the absolute path to the DLL.
@@ -378,13 +378,14 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
         success = false;
     }
     HMODULE dllHandle = reinterpret_cast<HMODULE>(exitCode);
+	if (dllHandle == nullptr)
+	{
+		success = false;
+		OutputError(GetLastError());
+	}
 
 	// reset dll directory
 	ExecuteRemoteKernelFuntion(process, "SetDllDirectoryA", nullptr, exitCode);
-    if (dllHandle == nullptr)
-    {
-        success = false;
-    }
 
     /*
     // Unload the DLL.
@@ -1151,7 +1152,7 @@ bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandL
 
 }
 
-void DebugFrontend::OutputError(DWORD error)
+void DebugFrontend::OutputError(DWORD error) const
 {
 
     char buffer[1024];
