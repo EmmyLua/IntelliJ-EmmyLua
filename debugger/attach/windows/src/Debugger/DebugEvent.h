@@ -40,8 +40,9 @@ class wxDebugEvent// : public wxEvent
 {
 
 public:
+	virtual ~wxDebugEvent() = default;
 
-    /**
+	/**
      * Constructor.
      */
     wxDebugEvent(EventId eventId, size_t vm);
@@ -136,11 +137,5 @@ private:
 	bool m_evalResult;
 	int m_evalId;
 };
-
-//typedef void (wxEvtHandler::*wxDebugEventFunction)(wxDebugEvent&);
-
-#define EVT_DEBUG(fn) \
-    DECLARE_EVENT_TABLE_ENTRY( wxEVT_DEBUG_EVENT, 0, -1, \
-    (wxObjectEventFunction) (wxEventFunction) wxStaticCastEvent( wxDebugEventFunction, & fn ), (wxObject *) NULL ),
 
 #endif

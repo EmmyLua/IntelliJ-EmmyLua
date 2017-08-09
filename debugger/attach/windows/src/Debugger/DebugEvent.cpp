@@ -22,16 +22,14 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "DebugEvent.h"
 
-//DEFINE_EVENT_TYPE(wxEVT_DEBUG_EVENT)
-
-wxDebugEvent::wxDebugEvent(EventId eventId, size_t vm)
+wxDebugEvent::wxDebugEvent(EventId eventId, size_t vm): m_evalResult(false), m_evalId(0)
 {
-    m_eventId       = eventId;
-    m_vm            = vm;
-    m_scriptIndex   = -1;
-    m_line          = 0;
-    m_enabled       = false;
-    m_messageType   = MessageType_Normal;
+	m_eventId = eventId;
+	m_vm = vm;
+	m_scriptIndex = -1;
+	m_line = 0;
+	m_enabled = false;
+	m_messageType = MessageType_Normal;
 }
 
 EventId wxDebugEvent::GetEventId() const

@@ -6,8 +6,8 @@ class wxDebugEvent;
 class wxEvtHandler
 {
 public:
+	wxEvtHandler();
 	void AddPendingEvent(wxDebugEvent &event);
-public:
 	size_t vm;
 };
 

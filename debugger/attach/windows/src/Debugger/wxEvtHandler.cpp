@@ -8,9 +8,15 @@
 
 using namespace std;
 
+wxEvtHandler::wxEvtHandler(): vm(0)
+{
+}
+
 void wxEvtHandler::AddPendingEvent(wxDebugEvent & event)
 {
-	this->vm = event.GetVm();
+	auto vm = event.GetVm();
+	if (vm != 0)
+		this->vm = event.GetVm();
 
 	EventId id = event.GetEventId();
 	DebugFrontend& df = DebugFrontend::Get();
@@ -69,6 +75,11 @@ void wxEvtHandler::AddPendingEvent(wxDebugEvent & event)
 		}
 		break;
 	}
+	case EventId_Initialize: break;
+	case EventId_CreateVM: break;
+	case EventId_DestroyVM: break;
+	case EventId_SessionEnd: break;
+	default: ;
 	}
 
 	TiXmlPrinter printer;
