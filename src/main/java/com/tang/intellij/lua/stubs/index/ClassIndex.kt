@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.stubs.index
 
-import com.intellij.psi.PsiComment
 import com.intellij.util.indexing.*
 import com.intellij.util.io.DataExternalizer
 import com.intellij.util.io.EnumeratorStringDescriptor

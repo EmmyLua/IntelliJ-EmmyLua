@@ -105,11 +105,9 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
         if (this.myNode.elementType === CALL_EXPR) {
-            if (child1 is LuaScriptBlock) {
-                val c2 = child2 as LuaScriptBlock
-
+            if (child1 is LuaScriptBlock && child2 is LuaScriptBlock) {
                 // call(param)
-                if (c2.myNode.findChildByType(LuaTypes.LPAREN) != null) {
+                if (child2.myNode.findChildByType(LuaTypes.LPAREN) != null) {
                     return Spacing.createSpacing(0, 0, 0, false, 0)
                 } else {
                     return Spacing.createSpacing(1, 1, 0, false, 0)

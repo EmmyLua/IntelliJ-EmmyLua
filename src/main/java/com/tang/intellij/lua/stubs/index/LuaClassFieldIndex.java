@@ -78,13 +78,11 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
         LuaDocClassDef classDef = LuaClassIndex.find(className, context);
         if (classDef != null) {
             LuaType type = classDef.getClassType();
-            if (type != null) {
-                String superClassName = type.getSuperClassName();
-                if (superClassName != null) {
-                    list = find(superClassName, fieldName, context);
-                    if (!list.isEmpty())
-                        return list;
-                }
+            String superClassName = type.getSuperClassName();
+            if (superClassName != null) {
+                list = find(superClassName, fieldName, context);
+                if (!list.isEmpty())
+                    return list;
             }
         }
 
