@@ -21,7 +21,7 @@ package = {}
 --- or a default path defined in `luaconf.h`.
 --- function package.cpath end
 --- * `package.cpath`: package.cpath
-package.cpath = [[.\?.dll;.\?51.dll;E:\Lua\5.1\?.dll;E:\Lua\5.1\?51.dll;E:\Lua\5.1\clibs\?.dll;E:\Lua\5.1\clibs\?51.dll;E:\Lua\5.1\loadall.dll;E:\Lua\5.1\clibs\loadall.dll]]
+package.cpath = nil
 
 
 ---
@@ -97,7 +97,7 @@ function package.loadlib(libname, funcname) end
 --- environment variable is replaced by the default path.
 --- function package.path end
 --- * `package.path`: package.path
-package.path = [[;.\?.lua;E:\Lua\5.1\lua\?.lua;E:\Lua\5.1\lua\?\init.lua;E:\Lua\5.1\?.lua;E:\Lua\5.1\?\init.lua;e:\Lua\5.1\lua\?.luac]]
+package.path = nil
 
 ---
 --- A table to store loaders for specific modules (see `require`).

@@ -12,6 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+---@class table
 table = {}
 
 ---
@@ -54,6 +55,8 @@ function table.remove(t, pos) end
 --- table elements, and returns true when the first is less than the second
 --- (so that `not comp(a[i+1],a[i])` will be true after the sort). If `comp`
 --- is not given, then the '<' operator will be used.
+---@param t table
+---@param comp function
 function table.sort(t, comp) end
 
 return table
