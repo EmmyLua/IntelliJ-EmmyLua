@@ -46,7 +46,7 @@ class LuaCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, IN_NAME_EXPR, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL))
 
         //_G.xxx
-        extend(CompletionType.BASIC, AFTER_G, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.GLOBALS))
+        //extend(CompletionType.BASIC, AFTER_G, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.GLOBALS))
 
         extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.VARS))
     }

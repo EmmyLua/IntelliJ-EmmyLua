@@ -23,4 +23,5 @@ package com.tang.intellij.lua;
 public class Constants {
     public static final String WORD_SELF = "self";
     public static final String WORD_UNDERLINE = "_";
+    public static final String WORD_G = "_G";
 }

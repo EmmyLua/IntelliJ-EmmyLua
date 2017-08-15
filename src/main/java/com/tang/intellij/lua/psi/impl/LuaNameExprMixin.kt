@@ -98,5 +98,9 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
         }
     }
 
+    override fun getFieldName(): String {
+        return name!!
+    }
+
     override fun getNameRef(): LuaNameExpr? = this as LuaNameExpr
 }

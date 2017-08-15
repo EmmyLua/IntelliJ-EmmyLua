@@ -19,12 +19,14 @@ package com.tang.intellij.lua.stubs.types
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
 import com.tang.intellij.lua.stubs.LuaNameStub
 import com.tang.intellij.lua.stubs.LuaNameStubImpl
+import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import java.io.IOException
@@ -61,6 +63,9 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
 
     override fun indexStub(luaNameStub: LuaNameStub, indexSink: IndexSink) {
         if (luaNameStub.isGlobal) {
+            indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G)
+            indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G + "." + luaNameStub.name)
+
             indexSink.occurrence(LuaGlobalVarIndex.KEY, luaNameStub.name)
             indexSink.occurrence(LuaShortNameIndex.KEY, luaNameStub.name)
         }

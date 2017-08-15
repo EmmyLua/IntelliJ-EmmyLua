@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs.index;
 
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndexKey;
+import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
@@ -110,5 +111,9 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
                 fields = find(type.getAliasName(), fieldName, context);
         }
         return fields;
+    }
+
+    public static Collection<LuaClassField> findGlobal(String name, SearchContext context) {
+        return find(Constants.WORD_G, name, context);
     }
 }
