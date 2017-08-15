@@ -45,6 +45,9 @@ class LuaCompletionContributor : CompletionContributor() {
         //提示全局函数,local变量,local函数
         extend(CompletionType.BASIC, IN_NAME_EXPR, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL))
 
+        //_G.xxx
+        extend(CompletionType.BASIC, AFTER_G, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.GLOBALS))
+
         extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.VARS))
     }
 
@@ -89,6 +92,8 @@ class LuaCompletionContributor : CompletionContributor() {
 
         private val IN_NAME_EXPR = psiElement(LuaTypes.ID)
                 .withParent(LuaNameExpr::class.java)
+        private val AFTER_G = psiElement(LuaTypes.ID)
+                .afterLeafSkipping(psiElement(LuaTypes.DOT), psiElement().withText("_G"))
 
         private val SHOW_OVERRIDE = psiElement()
                 .withParent(LuaClassMethodName::class.java)
