@@ -31,13 +31,13 @@ import java.util.Collection;
  *
  * Created by tangzx on 2017/1/16.
  */
-public class LuaGlobalVarIndex extends StringStubIndexExtension<LuaGlobal> {
+public class LuaGlobalIndex extends StringStubIndexExtension<LuaGlobal> {
 
     public static final StubIndexKey<String, LuaGlobal> KEY = StubIndexKey.createIndexKey("lua.index.global.var");
 
-    private static final LuaGlobalVarIndex INSTANCE = new LuaGlobalVarIndex();
+    private static final LuaGlobalIndex INSTANCE = new LuaGlobalIndex();
 
-    public static LuaGlobalVarIndex getInstance() {
+    public static LuaGlobalIndex getInstance() {
         return INSTANCE;
     }
 

@@ -27,7 +27,7 @@ import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
 import com.tang.intellij.lua.stubs.LuaNameStub
 import com.tang.intellij.lua.stubs.LuaNameStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
-import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex
+import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import java.io.IOException
 
@@ -66,7 +66,7 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
             indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G)
             indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G + "." + luaNameStub.name)
 
-            indexSink.occurrence(LuaGlobalVarIndex.KEY, luaNameStub.name)
+            indexSink.occurrence(LuaGlobalIndex.KEY, luaNameStub.name)
             indexSink.occurrence(LuaShortNameIndex.KEY, luaNameStub.name)
         }
     }

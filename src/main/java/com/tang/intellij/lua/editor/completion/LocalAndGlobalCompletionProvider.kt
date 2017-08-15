@@ -27,7 +27,7 @@ import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex
+import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 
 /**
  * suggest local/global vars and functions
@@ -81,14 +81,14 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         if (has(GLOBAL_FUN) || has(GLOBAL_VAR)) {
             val context = SearchContext(project)
             val names = mutableListOf<String>()
-            LuaGlobalVarIndex.getInstance().processAllKeys(project) { name ->
+            LuaGlobalIndex.getInstance().processAllKeys(project) { name ->
                 if (completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     names.add(name)
                 }
                 true
             }
             names.forEach { name ->
-                val global = LuaGlobalVarIndex.find(name, context)
+                val global = LuaGlobalIndex.find(name, context)
                 if (global != null) {
                     session.addWord(name)
 
