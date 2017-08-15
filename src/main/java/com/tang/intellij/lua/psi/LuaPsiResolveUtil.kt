@@ -29,7 +29,6 @@ import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.reference.LuaReference
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
-import com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex
 
 internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): LuaFuncBodyOwner? {
@@ -46,7 +45,8 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
 
     //global function
     if (ret == null) {
-        ret = LuaGlobalFuncIndex.find(refName, context)
+        val global = LuaGlobalVarIndex.find(refName, context)
+        if (global is LuaFuncBodyOwner) ret = global
     }
 
     return ret
@@ -134,14 +134,9 @@ fun resolve(ref: LuaNameExpr, context: SearchContext): PsiElement? {
     var resolveResult = resolveLocal(ref, context)
 
     val refName = ref.name
-    //global field
+    //global
     if (resolveResult == null) {
         resolveResult = LuaGlobalVarIndex.find(refName, context)
-    }
-
-    //global function
-    if (resolveResult == null) {
-        resolveResult = LuaGlobalFuncIndex.find(refName, context)
     }
 
     return resolveResult
@@ -158,10 +153,6 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
         //global field
         val globalVars = LuaGlobalVarIndex.findAll(refName, context)
         list.addAll(globalVars)
-
-        //global function
-        val globalFuns = LuaGlobalFuncIndex.findAll(refName, context)
-        list.addAll(globalFuns)
     }
     return list.toTypedArray()
 }

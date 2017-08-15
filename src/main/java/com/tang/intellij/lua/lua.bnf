@@ -215,6 +215,7 @@ globalFuncDef ::= 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
+        "com.tang.intellij.lua.psi.LuaGlobal"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     methods = [

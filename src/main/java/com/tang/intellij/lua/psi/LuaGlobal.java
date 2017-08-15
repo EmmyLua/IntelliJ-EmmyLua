@@ -14,27 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor.completion;
+package com.tang.intellij.lua.psi;
 
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef;
-import com.tang.intellij.lua.psi.LuaParamInfo;
+import com.intellij.navigation.NavigationItem;
 
 /**
- *
- * Created by TangZX on 2016/12/20.
+ * 全局的对象
  */
-public class GlobalFuncInsertHandler extends ArgsInsertHandler {
-    private LuaGlobalFuncDef luaGlobalFuncDef;
-
-    GlobalFuncInsertHandler(LuaGlobalFuncDef globalFuncDef) {
-        luaGlobalFuncDef = globalFuncDef;
-    }
-
-    @Override
-    protected LuaParamInfo[] getParams() {
-        if (luaGlobalFuncDef != null) {
-            return luaGlobalFuncDef.getParams();
-        }
-        return null;
-    }
+public interface LuaGlobal extends LuaPsiElement, NavigationItem {
 }

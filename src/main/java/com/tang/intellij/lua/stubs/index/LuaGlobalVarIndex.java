@@ -19,7 +19,7 @@ package com.tang.intellij.lua.stubs.index;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.stubs.StubIndexKey;
-import com.tang.intellij.lua.psi.LuaGlobalVar;
+import com.tang.intellij.lua.psi.LuaGlobal;
 import com.tang.intellij.lua.search.SearchContext;
 import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
@@ -31,9 +31,9 @@ import java.util.Collection;
  *
  * Created by tangzx on 2017/1/16.
  */
-public class LuaGlobalVarIndex extends StringStubIndexExtension<LuaGlobalVar> {
+public class LuaGlobalVarIndex extends StringStubIndexExtension<LuaGlobal> {
 
-    public static final StubIndexKey<String, LuaGlobalVar> KEY = StubIndexKey.createIndexKey("lua.index.global.var");
+    public static final StubIndexKey<String, LuaGlobal> KEY = StubIndexKey.createIndexKey("lua.index.global.var");
 
     private static final LuaGlobalVarIndex INSTANCE = new LuaGlobalVarIndex();
 
@@ -43,13 +43,13 @@ public class LuaGlobalVarIndex extends StringStubIndexExtension<LuaGlobalVar> {
 
     @NotNull
     @Override
-    public StubIndexKey<String, LuaGlobalVar> getKey() {
+    public StubIndexKey<String, LuaGlobal> getKey() {
         return KEY;
     }
 
     @Nullable
-    public static LuaGlobalVar find(String key, SearchContext context) {
-        Collection<LuaGlobalVar> vars = findAll(key, context);
+    public static LuaGlobal find(String key, SearchContext context) {
+        Collection<LuaGlobal> vars = findAll(key, context);
         if (!vars.isEmpty()) {
             return vars.iterator().next();
         }
@@ -57,10 +57,10 @@ public class LuaGlobalVarIndex extends StringStubIndexExtension<LuaGlobalVar> {
     }
 
     @NotNull
-    public static Collection<LuaGlobalVar> findAll(String key, SearchContext context) {
-        Collection<LuaGlobalVar> vars = new SmartList<>();
+    public static Collection<LuaGlobal> findAll(String key, SearchContext context) {
+        Collection<LuaGlobal> vars = new SmartList<>();
         if (!context.isDumb()) {
-            StubIndex.getInstance().processElements(KEY, key, context.getProject(), context.getScope(), LuaGlobalVar.class, (s) -> {
+            StubIndex.getInstance().processElements(KEY, key, context.getProject(), context.getScope(), LuaGlobal.class, (s) -> {
                 vars.add(s);
                 return true;
             });

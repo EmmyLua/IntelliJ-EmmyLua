@@ -159,7 +159,6 @@
         <!--stub & index-->
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
         <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
-        <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaGlobalFuncIndex" />
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMethodIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaGlobalVarIndex"/>

@@ -96,6 +96,7 @@ public class LuaVisitor extends PsiElementVisitor {
     visitFuncBodyOwner(o);
     // visitDeclaration(o);
     // visitStatement(o);
+    // visitGlobal(o);
     // visitPsiNameIdentifierOwner(o);
   }
 
