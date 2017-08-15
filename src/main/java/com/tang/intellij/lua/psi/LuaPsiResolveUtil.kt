@@ -136,8 +136,7 @@ fun resolve(ref: LuaNameExpr, context: SearchContext): PsiElement? {
     val refName = ref.name
     //global field
     if (resolveResult == null) {
-        val globalVar = LuaGlobalVarIndex.find(refName, context)
-        resolveResult = globalVar?.nameRef
+        resolveResult = LuaGlobalVarIndex.find(refName, context)
     }
 
     //global function
@@ -158,7 +157,7 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
         val refName = ref.name
         //global field
         val globalVars = LuaGlobalVarIndex.findAll(refName, context)
-        globalVars.mapTo(list) { it.nameRef }
+        list.addAll(globalVars)
 
         //global function
         val globalFuns = LuaGlobalFuncIndex.findAll(refName, context)

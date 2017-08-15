@@ -16,13 +16,10 @@
 
 package com.tang.intellij.lua.psi;
 
-import org.jetbrains.annotations.Nullable;
-
 /**
  * _G.xxx
  * Created by tangzx on 2017/1/16.
  */
 public interface LuaGlobalVar extends LuaClassField {
-    @Nullable
-    LuaNameExpr getNameRef();
+
 }
