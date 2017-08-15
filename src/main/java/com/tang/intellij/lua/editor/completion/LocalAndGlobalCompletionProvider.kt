@@ -72,7 +72,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                     session.addWord(name)
                     LuaPsiImplUtil.processOptional(localFuncDef.params) { signature, mask ->
                         val elementBuilder = LocalFunctionLookupElement(name, signature, localFuncDef)
-                        elementBuilder.setHandler(FuncInsertHandler(localFuncDef).withMask(mask))
+                        elementBuilder.handler = FuncInsertHandler(localFuncDef).withMask(mask)
                         completionResultSet.addElement(elementBuilder)
                     }
                 }
@@ -98,7 +98,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
                     LuaPsiImplUtil.processOptional(globalFuncDef.params) { signature, mask ->
                         val elementBuilder = GlobalFunctionLookupElement(name, signature, globalFuncDef)
-                        elementBuilder.setHandler(GlobalFuncInsertHandler(name, project).withMask(mask))
+                        elementBuilder.handler = GlobalFuncInsertHandler(name, project).withMask(mask)
                         completionResultSet.addElement(elementBuilder)
                     }
                 }
@@ -145,7 +145,6 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         private val GLOBAL_FUN = 8
         private val KEY_WORDS = 16
 
-        @JvmStatic val GLOBALS = GLOBAL_FUN or GLOBAL_VAR
         @JvmStatic val ALL = LOCAL_VAR or LOCAL_FUN or GLOBAL_VAR or GLOBAL_FUN or KEY_WORDS
         @JvmStatic val VARS = LOCAL_VAR or GLOBAL_VAR
 
