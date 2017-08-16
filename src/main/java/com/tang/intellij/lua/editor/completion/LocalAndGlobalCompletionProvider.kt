@@ -92,8 +92,9 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 if (global != null) {
                     session.addWord(name)
 
-                    if (has(GLOBAL_VAR) && global is LuaGlobalVar) {
-                        val elementBuilder = LuaTypeGuessableLookupElement(name, global, false, LuaIcons.GLOBAL_FIELD)
+                    //todo 将不分 LuaGlobalVar 和 LuaGlobalFunc
+                    if (has(GLOBAL_VAR) && (global is LuaGlobalVar || global is LuaIndexExpr)) {
+                        val elementBuilder = LuaTypeGuessableLookupElement(name, global as LuaTypeGuessable, false, LuaIcons.GLOBAL_FIELD)
                         completionResultSet.addElement(elementBuilder)
                     }
                     else if (has(GLOBAL_FUN) && global is LuaGlobalFuncDef) {

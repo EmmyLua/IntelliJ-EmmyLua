@@ -19,7 +19,7 @@ package com.tang.intellij.lua.stubs.index;
 import com.intellij.psi.stubs.StringStubIndexExtension;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.stubs.StubIndexKey;
-import com.tang.intellij.lua.psi.LuaGlobal;
+import com.tang.intellij.lua.psi.LuaPsiElement;
 import com.tang.intellij.lua.search.SearchContext;
 import kotlin.reflect.jvm.internal.impl.utils.SmartList;
 import org.jetbrains.annotations.NotNull;
@@ -31,9 +31,9 @@ import java.util.Collection;
  *
  * Created by tangzx on 2017/1/16.
  */
-public class LuaGlobalIndex extends StringStubIndexExtension<LuaGlobal> {
+public class LuaGlobalIndex extends StringStubIndexExtension<LuaPsiElement> {
 
-    public static final StubIndexKey<String, LuaGlobal> KEY = StubIndexKey.createIndexKey("lua.index.global.var");
+    public static final StubIndexKey<String, LuaPsiElement> KEY = StubIndexKey.createIndexKey("lua.index.global.var");
 
     private static final LuaGlobalIndex INSTANCE = new LuaGlobalIndex();
 
@@ -43,13 +43,13 @@ public class LuaGlobalIndex extends StringStubIndexExtension<LuaGlobal> {
 
     @NotNull
     @Override
-    public StubIndexKey<String, LuaGlobal> getKey() {
+    public StubIndexKey<String, LuaPsiElement> getKey() {
         return KEY;
     }
 
     @Nullable
-    public static LuaGlobal find(String key, SearchContext context) {
-        Collection<LuaGlobal> vars = findAll(key, context);
+    public static LuaPsiElement find(String key, SearchContext context) {
+        Collection<LuaPsiElement> vars = findAll(key, context);
         if (!vars.isEmpty()) {
             return vars.iterator().next();
         }
@@ -57,10 +57,10 @@ public class LuaGlobalIndex extends StringStubIndexExtension<LuaGlobal> {
     }
 
     @NotNull
-    public static Collection<LuaGlobal> findAll(String key, SearchContext context) {
-        Collection<LuaGlobal> vars = new SmartList<>();
+    public static Collection<LuaPsiElement> findAll(String key, SearchContext context) {
+        Collection<LuaPsiElement> vars = new SmartList<>();
         if (!context.isDumb()) {
-            StubIndex.getInstance().processElements(KEY, key, context.getProject(), context.getScope(), LuaGlobal.class, (s) -> {
+            StubIndex.getInstance().processElements(KEY, key, context.getProject(), context.getScope(), LuaPsiElement.class, (s) -> {
                 vars.add(s);
                 return true;
             });
