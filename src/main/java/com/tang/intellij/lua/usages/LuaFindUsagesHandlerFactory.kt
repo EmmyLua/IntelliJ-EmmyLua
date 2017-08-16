@@ -25,26 +25,26 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.search.SearchScope
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.Processor
-import com.tang.intellij.lua.psi.LuaClassMethodDef
+import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
 import com.tang.intellij.lua.reference.LuaOverridingMethodReference
 
 class LuaFindUsagesHandlerFactory : FindUsagesHandlerFactory() {
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler? {
-        if (element is LuaClassMethodDef)
+        if (element is LuaClassMethod)
             return FindMethodUsagesHandler(element)
         return null
     }
 
     override fun canFindUsages(element: PsiElement): Boolean {
-        return element is LuaClassMethodDef
+        return element is LuaClassMethod
     }
 }
 
 /**
  * 查找方法的引用-》同时查找重写的子类方法
  */
-class FindMethodUsagesHandler(val methodDef: LuaClassMethodDef) : FindUsagesHandler(methodDef) {
+class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler(methodDef) {
     override fun findReferencesToHighlight(target: PsiElement, searchScope: SearchScope): MutableCollection<PsiReference> {
         val collection = super.findReferencesToHighlight(target, searchScope)
         val query = LuaOverridingMethodsSearch.search(methodDef, true)
@@ -62,7 +62,8 @@ class FindMethodUsagesHandler(val methodDef: LuaClassMethodDef) : FindUsagesHand
                 val query = LuaOverridingMethodsSearch.search(methodDef, true)
                 query.forEach {
                     val identifier = it.nameIdentifier
-                    processor.process(UsageInfo(identifier))
+                    if (identifier != null)
+                        processor.process(UsageInfo(identifier))
                 }
             })
         }

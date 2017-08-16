@@ -80,7 +80,7 @@ abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boo
     }
 }
 
-class LuaMethodLookupElement(name:String, signature: String, bold:Boolean, method: LuaClassMethodDef)
+class LuaMethodLookupElement(name:String, signature: String, bold:Boolean, method: LuaClassMethod)
     : LuaFunctionLookupElement(name, signature, bold, method, LuaIcons.CLASS_METHOD)
 
 class LocalFunctionLookupElement(name:String, signature: String, method: LuaLocalFuncDef)

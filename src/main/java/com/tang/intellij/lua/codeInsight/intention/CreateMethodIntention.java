@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
@@ -97,17 +96,20 @@ public class CreateMethodIntention extends BaseIntentionAction {
 
     @Nullable
     private InsertPosition calcInsertPosition(LuaType perfect, Project project) {
-        Collection<LuaClassMethodDef> methods = LuaClassMethodIndex.getInstance().get(perfect.getClassName(),
+        Collection<LuaClassMethod> methods = LuaClassMethodIndex.getInstance().get(perfect.getClassName(),
                 project,
                 new LuaPredefinedScope(project));
         if (!methods.isEmpty()) {
-            LuaClassMethodDef methodDef = methods.iterator().next();
-            LuaExpr expr = methodDef.getClassMethodName().getExpr();
-            TextRange textRange = methodDef.getTextRange();
-            InsertPosition position = new InsertPosition();
-            position.offset = textRange.getEndOffset();
-            position.perfix = expr.getText();
-            return position;
+            LuaClassMethod methodDef = methods.iterator().next();
+            if (methodDef instanceof LuaClassMethodDef) {
+                LuaClassMethodDef def = (LuaClassMethodDef) methodDef;
+                LuaExpr expr = def.getClassMethodName().getExpr();
+                TextRange textRange = methodDef.getTextRange();
+                InsertPosition position = new InsertPosition();
+                position.offset = textRange.getEndOffset();
+                position.perfix = expr.getText();
+                return position;
+            }
         }
         return null;
     }

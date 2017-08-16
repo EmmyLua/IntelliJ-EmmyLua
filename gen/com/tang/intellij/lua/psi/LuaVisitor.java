@@ -41,11 +41,9 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitClassMethodDef(@NotNull LuaClassMethodDef o) {
-    visitFuncBodyOwner(o);
+    visitClassMethod(o);
     // visitDeclaration(o);
-    // visitClassMember(o);
     // visitStatement(o);
-    // visitPsiNameIdentifierOwner(o);
   }
 
   public void visitClassMethodName(@NotNull LuaClassMethodName o) {
@@ -93,11 +91,10 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitGlobalFuncDef(@NotNull LuaGlobalFuncDef o) {
-    visitFuncBodyOwner(o);
+    visitClassMethod(o);
     // visitDeclaration(o);
     // visitStatement(o);
     // visitGlobal(o);
-    // visitPsiNameIdentifierOwner(o);
   }
 
   public void visitGotoStat(@NotNull LuaGotoStat o) {
@@ -221,6 +218,10 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitClassField(@NotNull LuaClassField o) {
+    visitPsiElement(o);
+  }
+
+  public void visitClassMethod(@NotNull LuaClassMethod o) {
     visitPsiElement(o);
   }
 

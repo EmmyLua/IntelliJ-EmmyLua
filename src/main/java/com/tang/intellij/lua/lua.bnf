@@ -212,11 +212,10 @@ uncompletedStat ::= expr { extends = exprStat }
 globalFuncDef ::= 'function' ID funcBody {
     pin = 1
     implements = [
-        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+        "com.tang.intellij.lua.psi.LuaClassMethod"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
         "com.tang.intellij.lua.psi.LuaGlobal"
-        "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     methods = [
         getComment
@@ -228,6 +227,7 @@ globalFuncDef ::= 'function' ID funcBody {
         getTextOffset
         toString
         guessReturnTypeSet
+        getClassType
         getParams
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaGlobalFuncStub"
@@ -246,11 +246,9 @@ classMethodName ::=  nameExpr (funcPrefixRef)* (('.' ID) | (':' ID)) {
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
     implements = [
-        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+        "com.tang.intellij.lua.psi.LuaClassMethod"
         "com.tang.intellij.lua.psi.LuaDeclaration"
-        "com.tang.intellij.lua.psi.LuaClassMember"
         "com.tang.intellij.lua.psi.LuaStatement"
-        "com.intellij.psi.PsiNameIdentifierOwner"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
     methods = [

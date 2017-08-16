@@ -4,7 +4,6 @@ package com.tang.intellij.lua.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.intellij.navigation.ItemPresentation;
@@ -13,7 +12,7 @@ import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
 
-public interface LuaClassMethodDef extends LuaFuncBodyOwner, LuaDeclaration, LuaClassMember, LuaStatement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaClassMethodStub> {
+public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaStatement, StubBasedPsiElement<LuaClassMethodStub> {
 
   @NotNull
   LuaClassMethodName getClassMethodName();

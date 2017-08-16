@@ -23,7 +23,7 @@ import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.psi.LuaClassField;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaClassMethod;
 import com.tang.intellij.lua.psi.LuaNameExpr;
 import com.tang.intellij.lua.psi.LuaPsiResolveUtilKt;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
@@ -174,18 +174,18 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     public void processMethods(@NotNull SearchContext context,
-                               Processor<LuaClassMethodDef> processor) {
+                               Processor<LuaClassMethod> processor) {
         String clazzName = getClassName();
         if (clazzName == null)
             return;
         Project project = context.getProject();
 
         LuaClassMethodIndex methodIndex = LuaClassMethodIndex.getInstance();
-        Collection<LuaClassMethodDef> list = methodIndex.get(clazzName, project, new LuaPredefinedScope(project));
+        Collection<LuaClassMethod> list = methodIndex.get(clazzName, project, new LuaPredefinedScope(project));
         if (aliasName != null) {
             list.addAll(methodIndex.get(aliasName, project, new LuaPredefinedScope(project)));
         }
-        for (LuaClassMethodDef def : list) {
+        for (LuaClassMethod def : list) {
             String methodName = def.getName();
             if (methodName != null) {
                 processor.process(this, def);
@@ -198,15 +198,15 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     public void processStaticMethods(@NotNull SearchContext context,
-                                     Processor<LuaClassMethodDef> processor) {
+                                     Processor<LuaClassMethod> processor) {
         String clazzName = getClassName();
         if (clazzName == null)
             return;
-        Collection<LuaClassMethodDef> list = LuaClassMethodIndex.findStaticMethods(clazzName, context);
+        Collection<LuaClassMethod> list = LuaClassMethodIndex.findStaticMethods(clazzName, context);
         if (aliasName != null) {
             list.addAll(LuaClassMethodIndex.findStaticMethods(aliasName, context));
         }
-        for (LuaClassMethodDef def : list) {
+        for (LuaClassMethod def : list) {
             String methodName = def.getName();
             if (methodName != null) {
                 processor.process(this, def);
@@ -229,9 +229,9 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     @Nullable
-    public LuaClassMethodDef findMethod(String methodName, SearchContext context) {
+    public LuaClassMethod findMethod(String methodName, SearchContext context) {
         String className = getClassName();
-        LuaClassMethodDef def = LuaClassMethodIndex.findMethodWithName(className, methodName, context);
+        LuaClassMethod def = LuaClassMethodIndex.findMethodWithName(className, methodName, context);
         if (def == null) { // static
             def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
         }

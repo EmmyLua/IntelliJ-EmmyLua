@@ -28,6 +28,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaIcons;
 import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.psi.LuaClassMethod;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.LuaParamInfo;
@@ -62,8 +63,8 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
             Project project = completionParameters.getOriginalFile().getProject();
             SearchContext context = new SearchContext(project);
             String clazzName = sup.getClassName();
-            Collection<LuaClassMethodDef> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new LuaPredefinedScope(project));
-            for (LuaClassMethodDef def : list) {
+            Collection<LuaClassMethod> list = LuaClassMethodIndex.getInstance().get(clazzName, project, new LuaPredefinedScope(project));
+            for (LuaClassMethod def : list) {
                 String methodName = def.getName();
                 if (methodName != null) {
                     LookupElementBuilder elementBuilder = LookupElementBuilder.create(def.getName())

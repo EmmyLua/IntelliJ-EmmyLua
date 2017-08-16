@@ -54,20 +54,21 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
 
     private static final Function<LuaClassMethodName, String> overridingMethodTooltipProvider = (methodName) -> {
         final StringBuilder builder = new StringBuilder("<html>Is overridden in:");
-        LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(methodName, LuaClassMethodDef.class);
+        LuaClassMethod methodDef = PsiTreeUtil.getParentOfType(methodName, LuaClassMethod.class);
         assert methodDef != null;
         LuaOverridingMethodsSearch.search(methodDef).forEach(luaClassMethodDef -> {
-            LuaClassMethodStub stub = luaClassMethodDef.getStub();
+            //todo getClassName
+            /*LuaClassMethodStub stub = luaClassMethodDef.getStub();
             if (stub != null) {
                 builder.append("<br>");
                 builder.append(stub.getClassName());
-            }
+            }*/
         });
 
         return builder.toString();
     };
 
-    private static final LuaLineMarkerNavigator<LuaClassMethodName, LuaClassMethodDef> overridingMethodNavigator = new LuaLineMarkerNavigator<LuaClassMethodName, LuaClassMethodDef>() {
+    private static final LuaLineMarkerNavigator<LuaClassMethodName, LuaClassMethod> overridingMethodNavigator = new LuaLineMarkerNavigator<LuaClassMethodName, LuaClassMethod>() {
 
         @Override
         protected String getTitle(LuaClassMethodName elt) {
@@ -76,8 +77,8 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
 
         @Nullable
         @Override
-        protected Query<LuaClassMethodDef> search(LuaClassMethodName elt) {
-            LuaClassMethodDef def = PsiTreeUtil.getParentOfType(elt, LuaClassMethodDef.class);
+        protected Query<LuaClassMethod> search(LuaClassMethodName elt) {
+            LuaClassMethod def = PsiTreeUtil.getParentOfType(elt, LuaClassMethod.class);
             if (def == null)
                 return null;
             return LuaOverridingMethodsSearch.search(def);
@@ -103,7 +104,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
     private void collectNavigationMarkers(@NotNull PsiElement element, Collection<? super LineMarkerInfo> result) {
         if (element instanceof LuaClassMethodName) {
             LuaClassMethodName classMethodName = (LuaClassMethodName) element;
-            LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(element, LuaClassMethodDef.class);
+            LuaClassMethod methodDef = PsiTreeUtil.getParentOfType(element, LuaClassMethod.class);
             assert methodDef != null;
             Project project = methodDef.getProject();
             SearchContext context = new SearchContext(project);
@@ -118,7 +119,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
 
                 while (superType != null) {
                     String superTypeName = superType.getClassName();
-                    LuaClassMethodDef superMethod = LuaClassMethodIndex.findMethodWithName(superTypeName, methodName, context);
+                    LuaClassMethod superMethod = LuaClassMethodIndex.findMethodWithName(superTypeName, methodName, context);
                     if (superMethod != null) {
                         NavigationGutterIconBuilder<PsiElement> builder =
                                 NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
@@ -132,7 +133,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
             }
 
             // OverridenMethod
-            Query<LuaClassMethodDef> search = LuaOverridingMethodsSearch.search(methodDef);
+            Query<LuaClassMethod> search = LuaOverridingMethodsSearch.search(methodDef);
             if (search.findFirst() != null) {
                 result.add(new LineMarkerInfo<>(classMethodName,
                         classMethodName.getTextRange(),

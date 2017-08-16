@@ -19,6 +19,7 @@ package com.tang.intellij.lua.stubs.types
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef
@@ -28,6 +29,7 @@ import com.tang.intellij.lua.psi.impl.LuaGlobalFuncDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStub
 import com.tang.intellij.lua.stubs.LuaGlobalFuncStubImpl
+import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import java.io.IOException
@@ -92,8 +94,9 @@ class LuaGlobalFuncType : IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef>(
 
     override fun indexStub(luaGlobalFuncStub: LuaGlobalFuncStub, indexSink: IndexSink) {
         val name = luaGlobalFuncStub.name
+        indexSink.occurrence(LuaClassMethodIndex.KEY, Constants.WORD_G)
+        indexSink.occurrence(LuaClassMethodIndex.KEY, Constants.WORD_G + "." + name)
         indexSink.occurrence(LuaShortNameIndex.KEY, name)
-
         indexSink.occurrence(LuaGlobalIndex.KEY, name)
     }
 }

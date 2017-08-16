@@ -20,7 +20,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.refactoring.rename.RenamePsiElementProcessor;
 import com.intellij.util.Query;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaClassMethod;
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,13 +33,13 @@ import java.util.Map;
 public class RenameLuaMethodProcessor extends RenamePsiElementProcessor {
     @Override
     public boolean canProcessElement(@NotNull PsiElement psiElement) {
-        return psiElement instanceof LuaClassMethodDef;
+        return psiElement instanceof LuaClassMethod;
     }
 
     @Override
     public void prepareRenaming(PsiElement element, String newName, Map<PsiElement, String> allRenames, SearchScope scope) {
-        LuaClassMethodDef methodDef = (LuaClassMethodDef) element;
-        Query<LuaClassMethodDef> search = LuaOverridingMethodsSearch.search(methodDef);
+        LuaClassMethod methodDef = (LuaClassMethod) element;
+        Query<LuaClassMethod> search = LuaOverridingMethodsSearch.search(methodDef);
         search.forEach(methodDef1 -> {
             allRenames.put(methodDef1, newName);
         });

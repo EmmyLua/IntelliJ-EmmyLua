@@ -18,28 +18,28 @@ package com.tang.intellij.lua.psi.search;
 
 import com.intellij.psi.search.searches.ExtensibleQueryFactory;
 import com.intellij.util.Query;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaClassMethod;
 import org.jetbrains.annotations.NotNull;
 
 /**
  *
  * Created by tangzx on 2017/3/29.
  */
-public class LuaOverridingMethodsSearch extends ExtensibleQueryFactory<LuaClassMethodDef, LuaOverridingMethodsSearch.SearchParameters> {
+public class LuaOverridingMethodsSearch extends ExtensibleQueryFactory<LuaClassMethod, LuaOverridingMethodsSearch.SearchParameters> {
     private static LuaOverridingMethodsSearch INSTANCE = new LuaOverridingMethodsSearch();
 
     static class SearchParameters {
 
-        private LuaClassMethodDef method;
+        private LuaClassMethod method;
         private boolean deep;
 
-        SearchParameters(LuaClassMethodDef methodDef, boolean deep) {
+        SearchParameters(LuaClassMethod methodDef, boolean deep) {
 
             method = methodDef;
             this.deep = deep;
         }
 
-        public LuaClassMethodDef getMethod() {
+        public LuaClassMethod getMethod() {
             return method;
         }
 
@@ -52,11 +52,11 @@ public class LuaOverridingMethodsSearch extends ExtensibleQueryFactory<LuaClassM
         super("com.tang.intellij.lua");
     }
 
-    public static Query<LuaClassMethodDef> search(@NotNull LuaClassMethodDef methodDef) {
+    public static Query<LuaClassMethod> search(@NotNull LuaClassMethod methodDef) {
         return search(methodDef, true);
     }
 
-    public static Query<LuaClassMethodDef> search(@NotNull LuaClassMethodDef methodDef, boolean deep) {
+    public static Query<LuaClassMethod> search(@NotNull LuaClassMethod methodDef, boolean deep) {
         return INSTANCE.createUniqueResultsQuery(new SearchParameters(methodDef, deep));
     }
 }

@@ -23,7 +23,7 @@ import com.intellij.util.Query;
 import com.intellij.util.QueryExecutor;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.psi.LuaClassMethodDef;
+import com.tang.intellij.lua.psi.LuaClassMethod;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +32,10 @@ import org.jetbrains.annotations.NotNull;
  *
  * Created by tangzx on 2017/3/29.
  */
-public class LuaOverridingMethodsSearchExecutor implements QueryExecutor<LuaClassMethodDef, LuaOverridingMethodsSearch.SearchParameters> {
+public class LuaOverridingMethodsSearchExecutor implements QueryExecutor<LuaClassMethod, LuaOverridingMethodsSearch.SearchParameters> {
     @Override
-    public boolean execute(@NotNull LuaOverridingMethodsSearch.SearchParameters searchParameters, @NotNull Processor<LuaClassMethodDef> processor) {
-        LuaClassMethodDef method = searchParameters.getMethod();
+    public boolean execute(@NotNull LuaOverridingMethodsSearch.SearchParameters searchParameters, @NotNull Processor<LuaClassMethod> processor) {
+        LuaClassMethod method = searchParameters.getMethod();
         Project project = method.getProject();
         SearchContext context = new SearchContext(project);
         LuaType type = method.getClassType(context);
@@ -46,13 +46,8 @@ public class LuaOverridingMethodsSearchExecutor implements QueryExecutor<LuaClas
 
             return search.forEach(luaClass -> {
                 String name = luaClass.getName();
-                if (name != null) {
-                    LuaClassMethodDef methodDef = LuaClassMethodIndex.findMethodWithName(name, methodName, context);
-                    if (methodDef != null) {
-                        return processor.process(methodDef);
-                    }
-                }
-                return true;
+                LuaClassMethod methodDef = LuaClassMethodIndex.findMethodWithName(name, methodName, context);
+                return methodDef == null || processor.process(methodDef);
             });
         }
         return false;

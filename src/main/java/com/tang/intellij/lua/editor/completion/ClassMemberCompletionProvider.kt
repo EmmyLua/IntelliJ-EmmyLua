@@ -120,7 +120,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethodDef, handlerProcessor: HandlerProcessor?) {
+    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
         if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
             if (useAsField) {
@@ -140,7 +140,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun addStaticMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, def: LuaClassMethodDef, handlerProcessor: HandlerProcessor?) {
+    private fun addStaticMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
         if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
             LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
