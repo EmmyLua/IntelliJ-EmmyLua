@@ -564,7 +564,10 @@ object LuaPsiImplUtil {
     }
 
     @JvmStatic fun getNameIdentifier(tableField: LuaTableField): PsiElement? {
-        return tableField.id
+        val id = tableField.id
+        if (id != null)
+            return id
+        return tableField.idExpr
     }
 
     @JvmStatic fun guessType(tableField: LuaTableField, context: SearchContext): LuaTypeSet? {
@@ -586,7 +589,14 @@ object LuaPsiImplUtil {
         val stub = tableField.stub
         if (stub != null)
             return stub.fieldName
-        return getName(tableField as PsiNameIdentifierOwner)
+        val id = tableField.id
+        if (id != null)
+            return id.text
+
+        val idExpr = tableField.idExpr
+        if (idExpr != null)
+            return LuaString.getContent(idExpr.text).value
+        return null
     }
 
     @JvmStatic fun getFieldName(tableField: LuaTableField): String? {
@@ -607,6 +617,19 @@ object LuaPsiImplUtil {
                 return LuaIcons.CLASS_FIELD
             }
         }
+    }
+
+    /**
+     * xx['id']
+     */
+    @JvmStatic fun getIdExpr(tableField: LuaTableField): LuaLiteralExpr? {
+        val bracket = tableField.lbrack
+        if (bracket != null) {
+            val nextLeaf = PsiTreeUtil.getNextSiblingOfType(bracket, LuaExpr::class.java)
+            if (nextLeaf is LuaLiteralExpr && nextLeaf.kind == LuaLiteralKind.String)
+                return nextLeaf
+        }
+        return null
     }
 
     @JvmStatic fun toString(stubElement: StubBasedPsiElement<out StubElement<*>>): String {

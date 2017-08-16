@@ -441,7 +441,9 @@ tableField ::= tableField1 | tableField2 | expr {
         getPresentation
         guessType
         getComment
+        getIdExpr
         nameDef = "tableFieldNameDef"
+        lbrack = 'LBRACK'
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaTableFieldStub"
     implements = [

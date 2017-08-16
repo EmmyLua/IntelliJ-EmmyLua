@@ -97,4 +97,15 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     return LuaPsiImplUtil.getComment(this);
   }
 
+  @Nullable
+  public LuaLiteralExpr getIdExpr() {
+    return LuaPsiImplUtil.getIdExpr(this);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getLbrack() {
+    return findChildByType(LBRACK);
+  }
+
 }

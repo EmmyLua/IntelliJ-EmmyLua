@@ -43,4 +43,10 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, Lu
   @Nullable
   LuaComment getComment();
 
+  @Nullable
+  LuaLiteralExpr getIdExpr();
+
+  @Nullable
+  PsiElement getLbrack();
+
 }
