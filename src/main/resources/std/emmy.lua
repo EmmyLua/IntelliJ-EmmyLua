@@ -5,3 +5,5 @@
 ---@class number
 
 ---@class function
+
+---@class void
