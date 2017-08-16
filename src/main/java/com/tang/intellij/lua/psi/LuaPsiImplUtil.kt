@@ -289,7 +289,10 @@ object LuaPsiImplUtil {
     }
 
     @JvmStatic fun getNameIdentifier(indexExpr: LuaIndexExpr): PsiElement? {
-        return indexExpr.id
+        val id = indexExpr.id
+        if (id != null)
+            return id
+        return indexExpr.idExpr
     }
 
     @JvmStatic fun getPresentation(indexExpr: LuaIndexExpr): ItemPresentation {
@@ -306,6 +309,19 @@ object LuaPsiImplUtil {
                 return LuaIcons.CLASS_FIELD
             }
         }
+    }
+
+    /**
+     * xx['id']
+     */
+    @JvmStatic fun getIdExpr(indexExpr: LuaIndexExpr): LuaLiteralExpr? {
+        val bracket = indexExpr.lbrack
+        if (bracket != null) {
+            val nextLeaf = PsiTreeUtil.getNextSiblingOfType(bracket, LuaExpr::class.java)
+            if (nextLeaf is LuaLiteralExpr && nextLeaf.kind == LuaLiteralKind.String)
+                return nextLeaf
+        }
+        return null
     }
 
     @JvmStatic fun getName(indexExpr: LuaIndexExpr): String? {

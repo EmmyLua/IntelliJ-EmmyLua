@@ -75,6 +75,11 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
     return LuaPsiImplUtil.getPresentation(this);
   }
 
+  @Nullable
+  public LuaLiteralExpr getIdExpr() {
+    return LuaPsiImplUtil.getIdExpr(this);
+  }
+
   @NotNull
   public String toString() {
     return LuaPsiImplUtil.toString(this);
@@ -100,6 +105,12 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
   @Nullable
   public PsiElement getColon() {
     return findChildByType(COLON);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getLbrack() {
+    return findChildByType(LBRACK);
   }
 
 }

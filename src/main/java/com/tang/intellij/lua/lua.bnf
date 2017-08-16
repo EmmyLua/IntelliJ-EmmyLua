@@ -359,6 +359,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         getName
         getTextOffset
         getPresentation
+        getIdExpr
         toString
 
         guessPrefixType
@@ -366,6 +367,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
 
         dot = 'DOT'
         colon = 'COLON'
+        lbrack = 'LBRACK'
     ]
     implements = [
         "com.intellij.psi.PsiNameIdentifierOwner"

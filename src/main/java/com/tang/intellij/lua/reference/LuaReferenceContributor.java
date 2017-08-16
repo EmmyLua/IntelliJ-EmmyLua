@@ -61,6 +61,10 @@ public class LuaReferenceContributor extends PsiReferenceContributor {
             if (id != null) {
                 return new PsiReference[] { new LuaIndexReference(indexExpr, id) };
             }
+            LuaLiteralExpr idExpr = indexExpr.getIdExpr();
+            if (idExpr != null) {
+                return new PsiReference[] { new LuaIndexBracketReference(indexExpr, idExpr) };
+            }
             return PsiReference.EMPTY_ARRAY;
         }
     }

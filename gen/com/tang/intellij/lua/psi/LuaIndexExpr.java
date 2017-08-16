@@ -34,6 +34,9 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
   ItemPresentation getPresentation();
 
   @Nullable
+  LuaLiteralExpr getIdExpr();
+
+  @Nullable
   LuaTypeSet guessPrefixType(SearchContext context);
 
   @Nullable
@@ -44,5 +47,8 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
 
   @Nullable
   PsiElement getColon();
+
+  @Nullable
+  PsiElement getLbrack();
 
 }

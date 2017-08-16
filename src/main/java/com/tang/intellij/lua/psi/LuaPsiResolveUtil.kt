@@ -159,10 +159,12 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
 
 fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
     val id = indexExpr.id ?: return null
+    return resolve(indexExpr, id.text, context)
+}
 
+fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
     val typeSet = indexExpr.guessPrefixType(context)
     if (typeSet != null) {
-        val idString = id.text
         for (type in typeSet.types) {
             //属性
             val fieldDef = type.findField(idString, context)
