@@ -24,6 +24,7 @@ import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.search.SearchContext
 
 /**
@@ -114,6 +115,15 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         val name = field.fieldName
         if (name != null && prefixMatcher.prefixMatches(name)) {
             val elementBuilder = LuaFieldLookupElement(name, field, bold)
+            if (!LuaRefactoringUtil.isLuaIdentifier(name)) {
+                elementBuilder.lookupString = "['$name']"
+                val baseHandler = elementBuilder.handler
+                elementBuilder.handler = InsertHandler<LookupElement> { insertionContext, lookupElement ->
+                    baseHandler.handleInsert(insertionContext, lookupElement)
+                    // remove '.'
+                    insertionContext.document.deleteString(insertionContext.startOffset - 1, insertionContext.startOffset)
+                }
+            }
             elementBuilder.setTailText("  [$clazzName]")
             handlerProcessor?.process(elementBuilder)
             completionResultSet.addElement(elementBuilder)
