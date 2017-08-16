@@ -16,7 +16,10 @@
 
 package com.tang.intellij.lua.stubs.index;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
@@ -52,6 +55,11 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     @Override
     public StubIndexKey<String, LuaClassField> getKey() {
         return KEY;
+    }
+
+    @Override
+    public Collection<LuaClassField> get(@NotNull String s, @NotNull Project project, @NotNull GlobalSearchScope scope) {
+        return StubIndex.getElements(KEY, s, project, scope, LuaClassField.class);
     }
 
     public static LuaClassField find(@NotNull String key, @NotNull SearchContext context) {

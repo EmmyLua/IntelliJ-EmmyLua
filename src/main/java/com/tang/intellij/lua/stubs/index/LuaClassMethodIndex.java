@@ -16,7 +16,10 @@
 
 package com.tang.intellij.lua.stubs.index;
 
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StringStubIndexExtension;
+import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.stubs.StubIndexKey;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.psi.LuaClassMethod;
@@ -45,6 +48,11 @@ public class LuaClassMethodIndex extends StringStubIndexExtension<LuaClassMethod
     @Override
     public StubIndexKey<String, LuaClassMethod> getKey() {
         return KEY;
+    }
+
+    @Override
+    public Collection<LuaClassMethod> get(@NotNull String s, @NotNull Project project, @NotNull GlobalSearchScope scope) {
+        return StubIndex.getElements(KEY, s, project, scope, LuaClassMethod.class);
     }
 
     public static Collection<LuaClassMethod> findStaticMethods(@NotNull String className, @NotNull SearchContext context) {
