@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.refactoring;
 
 import com.intellij.codeInsight.PsiEquivalenceUtil;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.psi.LuaVisitor;
 import org.jetbrains.annotations.NotNull;
@@ -48,5 +49,9 @@ public class LuaRefactoringUtil {
         };
         context.acceptChildren(visitor);
         return occurrences;
+    }
+
+    public static boolean isLuaIdentifier(String name) {
+        return StringUtil.isJavaIdentifier(name);
     }
 }
