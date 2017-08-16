@@ -54,4 +54,8 @@ public class LuaString {
         }
         return content;
     }
+
+    public int getLength() {
+        return end - start;
+    }
 }

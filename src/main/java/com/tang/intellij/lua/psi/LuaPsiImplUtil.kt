@@ -34,6 +34,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.lang.type.LuaType
 import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.search.SearchContext
@@ -328,7 +329,32 @@ object LuaPsiImplUtil {
         val stub = indexExpr.stub
         if (stub != null)
             return stub.fieldName
-        return getName(indexExpr as PsiNameIdentifierOwner)
+
+        // var.name
+        val id = indexExpr.id
+        if (id != null)
+            return id.text
+
+        // var['name']
+        val idExpr = indexExpr.idExpr
+        if (idExpr != null)
+            return LuaString.getContent(idExpr.text).value
+
+        return null;
+    }
+
+    @JvmStatic fun setName(indexExpr: LuaIndexExpr, name: String): PsiElement {
+        if (indexExpr.id != null)
+            return setName(indexExpr as PsiNameIdentifierOwner, name)
+        val idExpr = indexExpr.idExpr
+        if (idExpr != null) {
+            val text = idExpr.text
+            val content = LuaString.getContent(text)
+            val newText = text.substring(0, content.start) + name + text.substring(content.end)
+            val newId = LuaElementFactory.createLiteral(indexExpr.project, newText)
+            return idExpr.replace(newId)
+        }
+        return indexExpr;
     }
 
     @JvmStatic fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): LuaTypeSet? {

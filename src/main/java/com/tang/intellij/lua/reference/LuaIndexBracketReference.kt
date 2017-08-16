@@ -20,6 +20,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.util.IncorrectOperationException
+import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.LuaLiteralExpr
@@ -29,14 +30,19 @@ import com.tang.intellij.lua.search.SearchContext
 class LuaIndexBracketReference internal constructor(element: LuaIndexExpr, private val id: LuaLiteralExpr)
     : PsiReferenceBase<LuaIndexExpr>(element), LuaReference {
 
+    private val content:LuaString = LuaString.getContent(id.text)
+
     override fun getRangeInElement(): TextRange {
-        val start = id.node.startOffset - myElement.node.startOffset
-        return TextRange(start, start + id.textLength)
+        var start = id.node.startOffset - myElement.node.startOffset
+        start += content.start
+        return TextRange(start, start + content.length)
     }
 
     @Throws(IncorrectOperationException::class)
     override fun handleElementRename(newElementName: String): PsiElement {
-        val newId = LuaElementFactory.createIdentifier(myElement.project, newElementName)
+        val text = id.text
+        val newText = text.substring(0, content.start) + newElementName + text.substring(content.end)
+        val newId = LuaElementFactory.createLiteral(myElement.project, newText)
         id.replace(newId)
         return newId
     }
@@ -50,8 +56,7 @@ class LuaIndexBracketReference internal constructor(element: LuaIndexExpr, priva
     }
 
     override fun resolve(context: SearchContext): PsiElement? {
-        val s = id.text
-        val ref = resolve(myElement, s.substring(1, s.length - 1), context)
+        val ref = resolve(myElement, content.value, context)
         if (ref != null) {
             if (ref.containingFile == myElement.containingFile) { //优化，不要去解析 Node Tree
                 if (ref.node.textRange == myElement.node.textRange) {

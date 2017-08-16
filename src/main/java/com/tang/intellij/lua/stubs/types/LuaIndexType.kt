@@ -43,7 +43,7 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val psi = node.psi as LuaIndexExpr
-        if (psi.id != null) {
+        if (psi.id != null || psi.idExpr != null) {
             if (psi.parent is LuaVarList) {
                 return true
             }
