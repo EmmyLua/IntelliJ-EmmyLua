@@ -36,7 +36,7 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner) : TyFunction() {
         get() = psi.params
 }
 
-class TyDocPsiFunction(luaDocFunctionTy: LuaDocFunctionTy) : TyFunction() {
+class TyDocPsiFunction(private val func: LuaDocFunctionTy) : TyFunction() {
     override val returnTy: Ty
         get() = UNKNOWN
     override val params: Array<LuaParamInfo>

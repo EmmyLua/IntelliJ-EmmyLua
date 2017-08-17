@@ -78,8 +78,8 @@ general_ty ::= class_name_ref {
 }
 
 function_param ::= ID ':' type_set
-function_ty ::= function '(' function_param ')' {
-    methods = [getType]
+function_ty ::= function '(' function_param ')' (':' type_set)? {
+    methods = [getType getReturnType]
 }
 
 //todo : remove # ,

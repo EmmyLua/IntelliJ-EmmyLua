@@ -11,6 +11,7 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.TySet;
 
 public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunctionTy {
 
@@ -33,9 +34,20 @@ public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunction
     return notNullChild(PsiTreeUtil.getChildOfType(this, LuaDocFunctionParam.class));
   }
 
+  @Override
+  @Nullable
+  public LuaDocTypeSet getTypeSet() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocTypeSet.class);
+  }
+
   @NotNull
   public Ty getType(SearchContext searchContext) {
     return LuaDocPsiImplUtilKt.getType(this, searchContext);
+  }
+
+  @NotNull
+  public TySet getReturnType(SearchContext searchContext) {
+    return LuaDocPsiImplUtilKt.getReturnType(this, searchContext);
   }
 
 }

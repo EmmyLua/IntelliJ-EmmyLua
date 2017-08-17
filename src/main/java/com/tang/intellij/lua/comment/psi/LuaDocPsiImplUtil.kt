@@ -235,3 +235,8 @@ fun getType(luaDocGeneralTy: LuaDocGeneralTy, searchContext: SearchContext): Ty 
 fun getType(luaDocFunctionTy: LuaDocFunctionTy, searchContext: SearchContext): Ty {
     return TyDocPsiFunction(luaDocFunctionTy)
 }
+
+fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy, searchContext: SearchContext): TySet {
+    val set = luaDocFunctionTy.typeSet
+    return resolveDocTypeSet(set, searchContext)
+}

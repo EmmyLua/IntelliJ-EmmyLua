@@ -527,7 +527,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // function '(' function_param ')'
+  // function '(' function_param ')' (':' type_set)?
   public static boolean function_ty(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_ty")) return false;
     if (!nextTokenIsSmart(b, FUNCTION)) return false;
@@ -536,7 +536,26 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = consumeTokensSmart(b, 0, FUNCTION, LPAREN);
     r = r && function_param(b, l + 1);
     r = r && consumeToken(b, RPAREN);
+    r = r && function_ty_4(b, l + 1);
     exit_section_(b, m, FUNCTION_TY, r);
+    return r;
+  }
+
+  // (':' type_set)?
+  private static boolean function_ty_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_ty_4")) return false;
+    function_ty_4_0(b, l + 1);
+    return true;
+  }
+
+  // ':' type_set
+  private static boolean function_ty_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_ty_4_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, EXTENDS);
+    r = r && type_set(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
