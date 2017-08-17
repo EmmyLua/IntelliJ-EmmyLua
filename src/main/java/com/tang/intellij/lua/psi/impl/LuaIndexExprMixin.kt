@@ -29,10 +29,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyArray
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.*
 
 /**
 
@@ -106,6 +103,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
     private fun guessFieldType(fieldName: String, type: TyClass, context: SearchContext): Ty {
         var set:Ty = Ty.UNKNOWN
 
+        //todo: use findField()
         val all = LuaClassFieldIndex.findAll(type, fieldName, context)
         for (fieldDef in all) {
             if (fieldDef is LuaIndexExpr) {
@@ -127,6 +125,11 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
                     set = set.union(guessFieldType(fieldName, superType, context))
             }
         }
+
+        //class method
+        val method = type.findMethod(fieldName, context)
+        if (method != null)
+            set = set.union(TyPsiFunction(method))
 
         return set
     }

@@ -19,6 +19,7 @@ package com.tang.intellij.lua.ty
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
+import com.tang.intellij.lua.search.SearchContext
 
 
 abstract class TyFunction : Ty(TyKind.Function) {
@@ -31,17 +32,16 @@ abstract class TyFunction : Ty(TyKind.Function) {
 
 class TyPsiFunction(val psi: LuaFuncBodyOwner) : TyFunction() {
     override val returnTy: Ty
-        get() = UNKNOWN
+        get() = psi.guessReturnTypeSet(SearchContext(psi.project))
     override val params: Array<LuaParamInfo>
         get() = psi.params
 }
 
 class TyDocPsiFunction(private val func: LuaDocFunctionTy) : TyFunction() {
     override val returnTy: Ty
-        get() = UNKNOWN
+        get() = func.getReturnType(SearchContext(func.project))
     override val params: Array<LuaParamInfo>
         get() = arrayOf()
-
 }
 
 class TySerializedFunction(override val returnTy: Ty, override val params: Array<LuaParamInfo>) : TyFunction()

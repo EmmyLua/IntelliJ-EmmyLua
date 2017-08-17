@@ -21,7 +21,9 @@ import com.intellij.openapi.util.RecursionManager
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyFunction
 import com.tang.intellij.lua.ty.TyPsiFunction
+import com.tang.intellij.lua.ty.TyUnion
 
 /**
  * 表达式基类
@@ -76,11 +78,19 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 file = resolveRequireFile(filePath, luaCallExpr.project)
             if (file != null)
                 return file.getReturnedType(context)
+
+            return Ty.UNKNOWN
         }
         // find in comment
-        val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
-        if (bodyOwner != null)
-            return bodyOwner.guessReturnTypeSet(context)
+//        val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
+//        if (bodyOwner != null)
+//            return bodyOwner.guessReturnTypeSet(context)
+
+        val ty = ref.guessType(context)
+        val tyFunc = TyUnion.find(ty, TyFunction::class.java)
+        if (tyFunc != null)
+            return tyFunc.returnTy
+
         return Ty.UNKNOWN
     }
 }
