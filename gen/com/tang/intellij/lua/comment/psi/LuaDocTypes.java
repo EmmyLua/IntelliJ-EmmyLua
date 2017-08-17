@@ -15,6 +15,8 @@ public interface LuaDocTypes {
   IElementType CLASS_NAME_REF = LuaParserDefinition.createDocType("CLASS_NAME_REF");
   IElementType COMMENT_STRING = LuaParserDefinition.createDocType("COMMENT_STRING");
   IElementType FIELD_DEF = LuaParserDefinition.createDocType("FIELD_DEF");
+  IElementType FUNCTION_PARAM = LuaParserDefinition.createDocType("FUNCTION_PARAM");
+  IElementType FUNCTION_TY = LuaParserDefinition.createDocType("FUNCTION_TY");
   IElementType GENERAL_TY = LuaParserDefinition.createDocType("GENERAL_TY");
   IElementType PARAM_DEF = LuaParserDefinition.createDocType("PARAM_DEF");
   IElementType PARAM_NAME_REF = LuaParserDefinition.createDocType("PARAM_NAME_REF");
@@ -34,11 +36,14 @@ public interface LuaDocTypes {
   IElementType EQ = new LuaDocTokenType("=");
   IElementType EXTENDS = new LuaDocTokenType(":");
   IElementType FIELD = new LuaDocTokenType("field");
+  IElementType FUNCTION = new LuaDocTokenType("function");
   IElementType ID = new LuaDocTokenType("ID");
+  IElementType LPAREN = new LuaDocTokenType("(");
   IElementType OPTIONAL = new LuaDocTokenType("optional");
   IElementType OR = new LuaDocTokenType("|");
   IElementType PROTECTED = new LuaDocTokenType("protected");
   IElementType PUBLIC = new LuaDocTokenType("public");
+  IElementType RPAREN = new LuaDocTokenType(")");
   IElementType SHARP = new LuaDocTokenType("#");
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
@@ -67,6 +72,12 @@ public interface LuaDocTypes {
       }
       else if (type == FIELD_DEF) {
         return new LuaDocFieldDefImpl(node);
+      }
+      else if (type == FUNCTION_PARAM) {
+        return new LuaDocFunctionParamImpl(node);
+      }
+      else if (type == FUNCTION_TY) {
+        return new LuaDocFunctionTyImpl(node);
       }
       else if (type == GENERAL_TY) {
         return new LuaDocGeneralTyImpl(node);

@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.ty
 
+import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
 
@@ -33,6 +34,14 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner) : TyFunction() {
         get() = UNKNOWN
     override val params: Array<LuaParamInfo>
         get() = psi.params
+}
+
+class TyDocPsiFunction(luaDocFunctionTy: LuaDocFunctionTy) : TyFunction() {
+    override val returnTy: Ty
+        get() = UNKNOWN
+    override val params: Array<LuaParamInfo>
+        get() = arrayOf()
+
 }
 
 class TySerializedFunction(override val returnTy: Ty, override val params: Array<LuaParamInfo>) : TyFunction()

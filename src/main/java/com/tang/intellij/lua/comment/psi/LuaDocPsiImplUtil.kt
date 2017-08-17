@@ -231,3 +231,7 @@ fun getType(luaDocArrTy: LuaDocArrTy, searchContext: SearchContext): Ty {
 fun getType(luaDocGeneralTy: LuaDocGeneralTy, searchContext: SearchContext): Ty {
     return resolveType(luaDocGeneralTy.classNameRef, searchContext)
 }
+
+fun getType(luaDocFunctionTy: LuaDocFunctionTy, searchContext: SearchContext): Ty {
+    return TyDocPsiFunction(luaDocFunctionTy)
+}

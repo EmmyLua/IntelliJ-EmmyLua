@@ -78,7 +78,10 @@ DOC_DASHES = --+
     "#"                        { return SHARP; }
     ":"                        { return EXTENDS;}
     "|"                        { return OR; }
+    "("                        { return LPAREN; }
+    ")"                        { return RPAREN; }
     "[]"                        { return ARR; }
+    "function"                { return FUNCTION; }
     "optional"                 { return OPTIONAL; }
     "protected"                { yybegin(xTAG); return PROTECTED; }
     "public"                   { yybegin(xTAG); return PUBLIC; }

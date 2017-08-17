@@ -34,6 +34,14 @@ public class LuaDocVisitor extends PsiElementVisitor {
     // visitPsiNameIdentifierOwner(o);
   }
 
+  public void visitFunctionParam(@NotNull LuaDocFunctionParam o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFunctionTy(@NotNull LuaDocFunctionTy o) {
+    visitTy(o);
+  }
+
   public void visitGeneralTy(@NotNull LuaDocGeneralTy o) {
     visitTy(o);
   }

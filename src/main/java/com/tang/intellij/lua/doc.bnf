@@ -41,7 +41,10 @@
         COMMA = ','
         EXTENDS = ':'
         OR = '|'
+        LPAREN = "("
+        RPAREN = ")"
         ARR = '[]'
+        FUNCTION = 'function'
         TAG_NAME = 'TAG_NAME'
         TAG_PARAM = 'param'
         OPTIONAL = 'optional'
@@ -63,7 +66,7 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 //private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def)
 
-ty ::= arr_ty | general_ty {
+ty ::= function_ty | arr_ty | general_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
 }
 
@@ -71,6 +74,11 @@ arr_ty ::= ty '[]' {
     methods = [getType]
 }
 general_ty ::= class_name_ref {
+    methods = [getType]
+}
+
+function_param ::= ID ':' type_set
+function_ty ::= function '(' function_param ')' {
     methods = [getType]
 }
 
