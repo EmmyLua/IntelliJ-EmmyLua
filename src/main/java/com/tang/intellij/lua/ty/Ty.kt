@@ -26,7 +26,8 @@ enum class TyKind {
     Primitive,
     Array,
     Function,
-    Class
+    Class,
+    Union
 }
 
 abstract class Ty(val kind: TyKind) {
@@ -55,6 +56,12 @@ abstract class Ty(val kind: TyKind) {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
         }
 
+        fun each(ty: Ty, process: (Ty) -> Unit) {
+            if (ty is TyUnion) {
+                ty.each(process)
+            } else process(ty)
+        }
+
         fun serialize(ty: Ty, stream: StubOutputStream) {
             stream.writeByte(ty.kind.ordinal)
             when(ty) {
@@ -75,6 +82,10 @@ abstract class Ty(val kind: TyKind) {
                 }
                 is TyPrimitive -> {
                     stream.writeName(ty.name)
+                }
+                is TyUnion -> {
+                    stream.writeByte(ty.size)
+                    ty.each { serialize(it, stream) }
                 }
             }
         }
@@ -105,6 +116,14 @@ abstract class Ty(val kind: TyKind) {
                     val ref = stream.readName()
                     getPrimitive(StringRef.toString(ref))
                 }
+                TyKind.Union -> {
+                    val union = TyUnion()
+                    val size = stream.readByte()
+                    for (i in 1 until size) {
+                        union.union(deserialize(stream))
+                    }
+                    union
+                }
                 else -> TyUnknown()
             }
         }
@@ -116,6 +135,30 @@ class TyPrimitive(val name: String, override val displayName: String) : Ty(TyKin
 class TyArray(val base: Ty) : Ty(TyKind.Array) {
     override val displayName: String
         get() = "${base.displayName}[]"
+}
+
+class TyUnion : Ty(TyKind.Union) {
+    private val children = mutableListOf<Ty>()
+
+    override val displayName: String
+        get() = "Union"
+
+    val size:Int
+        get() = children.size
+
+    fun union(ty: Ty): TyUnion {
+        if (ty is TyUnion)
+            children.addAll(ty.children)
+        else
+            children.add(ty)
+        return this
+    }
+
+    fun each(process: (Ty) -> Unit) {
+        children.forEach {
+            Ty.each(it, process)
+        }
+    }
 }
 
 class TyUnknown : Ty(TyKind.Unknown) {
