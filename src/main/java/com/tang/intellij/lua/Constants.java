@@ -17,11 +17,13 @@
 package com.tang.intellij.lua;
 
 /**
- * 一些常量
+ * Constants
  * Created by TangZX on 2017/1/19.
  */
 public class Constants {
     public static final String WORD_SELF = "self";
     public static final String WORD_UNDERLINE = "_";
     public static final String WORD_G = "_G";
+    public static final String WORD_PAIRS = "pairs";
+    public static final String WORD_IPAIRS = "ipairs";
 }

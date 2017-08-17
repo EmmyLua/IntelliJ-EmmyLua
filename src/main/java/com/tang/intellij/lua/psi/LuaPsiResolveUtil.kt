@@ -25,6 +25,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.reference.LuaReference
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
+import com.tang.intellij.lua.ty.TyArray
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TySerializedClass
 import com.tang.intellij.lua.ty.TySet
@@ -273,6 +274,32 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                             }
                         }
                     }
+                }
+            }
+        }
+
+        //for
+        if (owner is LuaForBStat) {
+            val exprList = owner.exprList
+            val callExpr = PsiTreeUtil.findChildOfType(exprList, LuaCallExpr::class.java)
+            val expr = callExpr?.expr
+            if (expr != null) {
+                // ipairs
+                if (expr.text == Constants.WORD_IPAIRS) {
+                    val argExprList = callExpr.args.exprList
+                    val argObject = PsiTreeUtil.findChildOfType(argExprList, LuaNameExpr::class.java)
+                    if (argObject != null) {
+                        val set = argObject.guessType(context)
+                        for (ty in set.types) {
+                            if (ty is TyArray) {
+                                return TySet.create(ty.base)
+                            }
+                        }
+                    }
+                }
+                // pairs
+                if (expr.text == Constants.WORD_PAIRS) {
+                    //todo resolve for for k, v in pairs
                 }
             }
         }
