@@ -30,6 +30,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
+import com.tang.intellij.lua.ty.TyArray
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TySet
 
@@ -60,6 +61,16 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
 
     override fun guessType(context: SearchContext): TySet {
         return RecursionManager.doPreventingRecursion(this, true) {
+            val indexExpr = this as LuaIndexExpr
+            // xxx[1]
+            if (indexExpr.lbrack != null) {
+                val tySet = indexExpr.guessPrefixType(context)
+                for (ty in tySet.types) {
+                    if (ty is TyArray) {
+                        return@doPreventingRecursion TySet.create(ty.base)
+                    }
+                }
+            }
 
             //from @type annotation
             val comment = this.comment
@@ -71,7 +82,6 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
 
             //guess from value
             var result = TySet.create()
-            val indexExpr = this as LuaIndexExpr
             // value type
             val stub = indexExpr.stub
             val valueTypeSet: TySet?
