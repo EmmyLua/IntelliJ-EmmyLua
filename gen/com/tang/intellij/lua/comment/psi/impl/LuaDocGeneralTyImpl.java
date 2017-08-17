@@ -8,17 +8,18 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
+import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.Ty;
 
-public class LuaDocTypeSetImpl extends ASTWrapperPsiElement implements LuaDocTypeSet {
+public class LuaDocGeneralTyImpl extends LuaDocTyImpl implements LuaDocGeneralTy {
 
-  public LuaDocTypeSetImpl(ASTNode node) {
+  public LuaDocGeneralTyImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitTypeSet(this);
+    visitor.visitGeneralTy(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -28,8 +29,13 @@ public class LuaDocTypeSetImpl extends ASTWrapperPsiElement implements LuaDocTyp
 
   @Override
   @NotNull
-  public List<LuaDocTy> getTyList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTy.class);
+  public LuaDocClassNameRef getClassNameRef() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaDocClassNameRef.class));
+  }
+
+  @NotNull
+  public Ty getType(SearchContext searchContext) {
+    return LuaDocPsiImplUtilKt.getType(this, searchContext);
   }
 
 }

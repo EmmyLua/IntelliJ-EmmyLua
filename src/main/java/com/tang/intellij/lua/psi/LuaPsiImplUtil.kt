@@ -484,10 +484,10 @@ object LuaPsiImplUtil {
                         paramInfo.isOptional = paramDef.optional != null
                         val luaDocTypeSet = paramDef.typeSet
                         if (luaDocTypeSet != null) {
-                            val classNameRefList = luaDocTypeSet.classNameRefList
-                            val types = arrayOfNulls<String>(classNameRefList.size)
-                            for (j in classNameRefList.indices) {
-                                types[j] = classNameRefList[j].text
+                            val list = luaDocTypeSet.tyList
+                            val types = arrayOfNulls<String>(list.size)
+                            for (j in list.indices) {
+                                types[j] = list[j].text
                             }
                             paramInfo.types = types
                         }

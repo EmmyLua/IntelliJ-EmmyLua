@@ -21,7 +21,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
 
   public void parseLight(IElementType t, PsiBuilder b) {
     boolean r;
-    b = adapt_builder_(t, b, this, null);
+    b = adapt_builder_(t, b, this, EXTENDS_SETS_);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
     if (t == ACCESS_MODIFIER) {
       r = access_modifier(b, 0);
@@ -53,6 +53,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == TAG_VALUE) {
       r = tag_value(b, 0);
     }
+    else if (t == TY) {
+      r = ty(b, 0, -1);
+    }
     else if (t == TYPE_DEF) {
       r = type_def(b, 0);
     }
@@ -71,6 +74,10 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
     return doc(b, l + 1);
   }
+
+  public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
+    create_token_set_(ARR_TY, GENERAL_TY, TY),
+  };
 
   /* ********************************************************** */
   // "protected" | "public"
@@ -419,14 +426,14 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '#'? class_name_ref ('|'? class_name_ref)*
+  // '#'? ty ('|'? ty)*
   public static boolean type_set(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_set")) return false;
     if (!nextTokenIs(b, "<type set>", SHARP, ID)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE_SET, "<type set>");
     r = type_set_0(b, l + 1);
-    r = r && class_name_ref(b, l + 1);
+    r = r && ty(b, l + 1, -1);
     r = r && type_set_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -439,7 +446,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ('|'? class_name_ref)*
+  // ('|'? ty)*
   private static boolean type_set_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_set_2")) return false;
     int c = current_position_(b);
@@ -451,13 +458,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // '|'? class_name_ref
+  // '|'? ty
   private static boolean type_set_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_set_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = type_set_2_0_0(b, l + 1);
-    r = r && class_name_ref(b, l + 1);
+    r = r && ty(b, l + 1, -1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -467,6 +474,52 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "type_set_2_0_0")) return false;
     consumeToken(b, OR);
     return true;
+  }
+
+  /* ********************************************************** */
+  // Expression root: ty
+  // Operator priority table:
+  // 0: POSTFIX(arr_ty)
+  // 1: ATOM(general_ty)
+  public static boolean ty(PsiBuilder b, int l, int g) {
+    if (!recursion_guard_(b, l, "ty")) return false;
+    addVariant(b, "<ty>");
+    if (!nextTokenIs(b, ID)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, "<ty>");
+    r = general_ty(b, l + 1);
+    p = r;
+    r = r && ty_0(b, l + 1, g);
+    exit_section_(b, l, m, null, r, p, null);
+    return r || p;
+  }
+
+  public static boolean ty_0(PsiBuilder b, int l, int g) {
+    if (!recursion_guard_(b, l, "ty_0")) return false;
+    boolean r = true;
+    while (true) {
+      Marker m = enter_section_(b, l, _LEFT_, null);
+      if (g < 0 && consumeTokenSmart(b, ARR)) {
+        r = true;
+        exit_section_(b, l, m, ARR_TY, r, true, null);
+      }
+      else {
+        exit_section_(b, l, m, null, false, false, null);
+        break;
+      }
+    }
+    return r;
+  }
+
+  // class_name_ref
+  public static boolean general_ty(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "general_ty")) return false;
+    if (!nextTokenIsSmart(b, ID)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = class_name_ref(b, l + 1);
+    exit_section_(b, m, GENERAL_TY, r);
+    return r;
   }
 
 }

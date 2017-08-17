@@ -118,14 +118,15 @@ fun resolveTypeAt(returnDef: LuaDocReturnDef, context: SearchContext): TySet {
 fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, context: SearchContext): TySet {
     var typeSet = TySet.create()
     if (docTypeSet != null) {
-        val classNameRefList = docTypeSet.classNameRefList
-        for (classNameRef in classNameRefList) {
-            val def = LuaClassIndex.find(classNameRef.text, context)
+        val list = docTypeSet.tyList
+        for (ty in list) {
+            typeSet = TySet.union(typeSet, ty.getType(context))
+            /*val def = LuaClassIndex.find(ty.text, context)
             if (def != null) {
                 typeSet = TySet.union(typeSet, def.classType)
             } else {
-                typeSet = TySet.union(typeSet, TySerializedClass(classNameRef.text))
-            }
+                typeSet = TySet.union(typeSet, TySerializedClass(ty.text))
+            }*/
         }
     }
     return typeSet
@@ -220,4 +221,13 @@ fun getPresentation(fieldDef: LuaDocFieldDef): ItemPresentation {
             return AllIcons.Nodes.Field
         }
     }
+}
+
+fun getType(luaDocArrTy: LuaDocArrTy, searchContext: SearchContext): Ty {
+    val baseTy = luaDocArrTy.ty.getType(searchContext)
+    return TyArray(baseTy)
+}
+
+fun getType(luaDocGeneralTy: LuaDocGeneralTy, searchContext: SearchContext): Ty {
+    return resolveType(luaDocGeneralTy.classNameRef, searchContext)
 }

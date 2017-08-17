@@ -10,19 +10,23 @@ import com.tang.intellij.lua.comment.psi.impl.*;
 public interface LuaDocTypes {
 
   IElementType ACCESS_MODIFIER = LuaParserDefinition.createDocType("ACCESS_MODIFIER");
+  IElementType ARR_TY = LuaParserDefinition.createDocType("ARR_TY");
   IElementType CLASS_DEF = LuaParserDefinition.createDocType("CLASS_DEF");
   IElementType CLASS_NAME_REF = LuaParserDefinition.createDocType("CLASS_NAME_REF");
   IElementType COMMENT_STRING = LuaParserDefinition.createDocType("COMMENT_STRING");
   IElementType FIELD_DEF = LuaParserDefinition.createDocType("FIELD_DEF");
+  IElementType GENERAL_TY = LuaParserDefinition.createDocType("GENERAL_TY");
   IElementType PARAM_DEF = LuaParserDefinition.createDocType("PARAM_DEF");
   IElementType PARAM_NAME_REF = LuaParserDefinition.createDocType("PARAM_NAME_REF");
   IElementType RETURN_DEF = LuaParserDefinition.createDocType("RETURN_DEF");
   IElementType TAG_DEF = LuaParserDefinition.createDocType("TAG_DEF");
   IElementType TAG_VALUE = LuaParserDefinition.createDocType("TAG_VALUE");
+  IElementType TY = LuaParserDefinition.createDocType("TY");
   IElementType TYPE_DEF = LuaParserDefinition.createDocType("TYPE_DEF");
   IElementType TYPE_LIST = LuaParserDefinition.createDocType("TYPE_LIST");
   IElementType TYPE_SET = LuaParserDefinition.createDocType("TYPE_SET");
 
+  IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
   IElementType CLASS = new LuaDocTokenType("class");
   IElementType COMMA = new LuaDocTokenType(",");
@@ -49,6 +53,9 @@ public interface LuaDocTypes {
        if (type == ACCESS_MODIFIER) {
         return new LuaDocAccessModifierImpl(node);
       }
+      else if (type == ARR_TY) {
+        return new LuaDocArrTyImpl(node);
+      }
       else if (type == CLASS_DEF) {
         return new LuaDocClassDefImpl(node);
       }
@@ -60,6 +67,9 @@ public interface LuaDocTypes {
       }
       else if (type == FIELD_DEF) {
         return new LuaDocFieldDefImpl(node);
+      }
+      else if (type == GENERAL_TY) {
+        return new LuaDocGeneralTyImpl(node);
       }
       else if (type == PARAM_DEF) {
         return new LuaDocParamDefImpl(node);

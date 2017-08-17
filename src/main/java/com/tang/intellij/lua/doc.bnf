@@ -31,6 +31,7 @@
   elementTypeClass="com.tang.intellij.lua.comment.psi.LuaDocElementType"
   elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createDocType"
   tokenTypeClass="com.tang.intellij.lua.comment.psi.LuaDocTokenType"
+  extends(".*ty") = 'ty'
 
   tokens = [
         ID="regexp:[A-Za-z0-9_]+"
@@ -40,6 +41,7 @@
         COMMA = ','
         EXTENDS = ':'
         OR = '|'
+        ARR = '[]'
         TAG_NAME = 'TAG_NAME'
         TAG_PARAM = 'param'
         OPTIONAL = 'optional'
@@ -61,8 +63,19 @@ private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
 //private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def)
 
+ty ::= arr_ty | general_ty {
+    implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
+}
+
+arr_ty ::= ty '[]' {
+    methods = [getType]
+}
+general_ty ::= class_name_ref {
+    methods = [getType]
+}
+
 //todo : remove # ,
-type_set ::= '#'? class_name_ref ('|'? class_name_ref)*
+type_set ::= '#'? ty ('|'? ty)*
 access_modifier ::= "protected" | "public"
 
 field_def ::= FIELD access_modifier ID type_set comment_string? {

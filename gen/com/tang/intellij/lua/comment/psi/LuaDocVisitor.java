@@ -3,13 +3,17 @@ package com.tang.intellij.lua.comment.psi;
 
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
-import com.tang.intellij.lua.psi.LuaClassField;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.tang.intellij.lua.psi.LuaClassField;
 
 public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitAccessModifier(@NotNull LuaDocAccessModifier o) {
     visitPsiElement(o);
+  }
+
+  public void visitArrTy(@NotNull LuaDocArrTy o) {
+    visitTy(o);
   }
 
   public void visitClassDef(@NotNull LuaDocClassDef o) {
@@ -28,6 +32,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
   public void visitFieldDef(@NotNull LuaDocFieldDef o) {
     visitLuaClassField(o);
     // visitPsiNameIdentifierOwner(o);
+  }
+
+  public void visitGeneralTy(@NotNull LuaDocGeneralTy o) {
+    visitTy(o);
   }
 
   public void visitParamDef(@NotNull LuaDocParamDef o) {
@@ -50,6 +58,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitTy(@NotNull LuaDocTy o) {
+    visitType(o);
+  }
+
   public void visitTypeDef(@NotNull LuaDocTypeDef o) {
     visitPsiElement(o);
   }
@@ -64,6 +76,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitLuaClassField(@NotNull LuaClassField o) {
     visitElement(o);
+  }
+
+  public void visitType(@NotNull LuaDocType o) {
+    visitPsiElement(o);
   }
 
   public void visitPsiElement(@NotNull LuaDocPsiElement o) {

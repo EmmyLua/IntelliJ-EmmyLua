@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaDocTypeSet extends LuaDocPsiElement {
-
-  @NotNull
-  List<LuaDocTy> getTyList();
+public interface LuaDocTy extends LuaDocType {
 
 }

@@ -137,7 +137,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
     private fun getTypeSet(typeSet: LuaDocTypeSet?, sb: StringBuilder) {
         if (typeSet != null) {
             sb.append("(")
-            val nameRefList = typeSet.classNameRefList
+            val nameRefList = typeSet.tyList
             val names = arrayOfNulls<String>(nameRefList.size)
             for (i in nameRefList.indices) {
                 names[i] = nameRefList[i].text
