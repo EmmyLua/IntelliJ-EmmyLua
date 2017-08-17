@@ -16,8 +16,8 @@
 
 package com.tang.intellij.lua.psi;
 
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +37,7 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner {
      * 返回类型
      * @return LuaTypeSet
      */
-    LuaTypeSet guessReturnTypeSet(SearchContext searchContext);
+    TySet guessReturnTypeSet(SearchContext searchContext);
 
     @NotNull
     LuaParamInfo[] getParams();

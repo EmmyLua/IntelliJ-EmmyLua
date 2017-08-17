@@ -6,8 +6,8 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocTyStub;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 
 public interface LuaDocTypeDef extends LuaDocPsiElement, StubBasedPsiElement<LuaDocTyStub> {
 
@@ -17,7 +17,7 @@ public interface LuaDocTypeDef extends LuaDocPsiElement, StubBasedPsiElement<Lua
   @Nullable
   LuaDocTypeSet getTypeSet();
 
-  @Nullable
-  LuaTypeSet guessType(SearchContext context);
+  @NotNull
+  TySet guessType(SearchContext context);
 
 }

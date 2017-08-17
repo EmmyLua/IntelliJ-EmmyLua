@@ -36,7 +36,7 @@ class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
         val position = completionParameters.position
         val methodDef = PsiTreeUtil.getParentOfType(position, LuaClassMethodDef::class.java)
         if (methodDef != null && !methodDef.isStatic) {
-            val searchContext = SearchContext(position.project)
+            /*val searchContext = SearchContext(position.project)
             val type = methodDef.getClassType(searchContext)
             if (type != null) {
                 type.processFields(searchContext) { curType, field ->
@@ -59,7 +59,7 @@ class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
                         }
                     }
                 }
-            }
+            }*/
         }
     }
 }

@@ -25,12 +25,10 @@ import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
-import com.tang.intellij.lua.lang.type.LuaType
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.psi.aliasName
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
 
 /**
@@ -45,12 +43,12 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
     return LuaClassNameReference(docClassNameRef)
 }
 
-fun resolveType(nameRef: LuaDocClassNameRef, context: SearchContext): LuaType? {
+fun resolveType(nameRef: LuaDocClassNameRef, context: SearchContext): Ty {
     val classDef = LuaClassIndex.find(nameRef.text, context)
     if (classDef != null) {
         return classDef.classType
     }
-    return null
+    return Ty.UNKNOWN
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {
@@ -81,7 +79,7 @@ fun getNameIdentifier(classDef: LuaDocClassDef): PsiElement {
     return classDef.id
 }
 
-fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): LuaTypeSet? {
+fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): TySet {
     val stub = fieldDef.stub
     if (stub != null)
         return stub.type
@@ -94,8 +92,8 @@ fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): LuaTypeSet? {
  * *
  * @return 类型集合
  */
-fun guessType(paramDec: LuaDocParamDef, context: SearchContext): LuaTypeSet? {
-    val docTypeSet = paramDec.typeSet ?: return null
+fun guessType(paramDec: LuaDocParamDef, context: SearchContext): TySet {
+    val docTypeSet = paramDec.typeSet ?: return TySet.EMPTY
     return resolveDocTypeSet(docTypeSet, context)
 }
 
@@ -105,7 +103,7 @@ fun guessType(paramDec: LuaDocParamDef, context: SearchContext): LuaTypeSet? {
  *
  * @return 类型集合
  */
-fun resolveTypeAt(returnDef: LuaDocReturnDef, context: SearchContext): LuaTypeSet {
+fun resolveTypeAt(returnDef: LuaDocReturnDef, context: SearchContext): TySet {
     val typeList = returnDef.typeList
     if (typeList != null) {
         val typeSetList = typeList.typeSetList
@@ -114,19 +112,19 @@ fun resolveTypeAt(returnDef: LuaDocReturnDef, context: SearchContext): LuaTypeSe
             return resolveDocTypeSet(docTypeSet, context)
         }
     }
-    return LuaTypeSet.create()
+    return TySet.EMPTY
 }
 
-fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, context: SearchContext): LuaTypeSet {
-    var typeSet = LuaTypeSet.create()
+fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, context: SearchContext): TySet {
+    var typeSet = TySet.create()
     if (docTypeSet != null) {
         val classNameRefList = docTypeSet.classNameRefList
         for (classNameRef in classNameRefList) {
             val def = LuaClassIndex.find(classNameRef.text, context)
             if (def != null) {
-                typeSet = LuaTypeSet.union(typeSet, def.classType)
+                typeSet = TySet.union(typeSet, def.classType)
             } else {
-                typeSet = LuaTypeSet.union(typeSet, LuaType.create(classNameRef.text, null))
+                typeSet = TySet.union(typeSet, TySerializedClass(classNameRef.text))
             }
         }
     }
@@ -168,20 +166,13 @@ fun getPresentation(classDef: LuaDocClassDef): ItemPresentation {
     }
 }
 
-fun getClassType(classDef: LuaDocClassDef): LuaType {
+fun getClassType(classDef: LuaDocClassDef): TyClass {
     val stub = classDef.stub
-    val luaType: LuaType
+    val luaType: TyClass
     if (stub != null) {
         luaType = stub.classType
     } else {
-        val clazzName = classDef.name
-        var superClassName: String? = null
-        val supperRef = classDef.superClassNameRef
-        if (supperRef != null)
-            superClassName = supperRef.text
-
-        luaType = LuaType.create(clazzName, superClassName)
-        luaType.aliasName = classDef.aliasName
+        luaType = TyPsiDocClass(classDef)
     }
     return luaType
 }
@@ -192,7 +183,7 @@ fun getClassType(classDef: LuaDocClassDef): LuaType {
  * *
  * @return 类型集合
  */
-fun guessType(typeDef: LuaDocTypeDef, context: SearchContext): LuaTypeSet? {
+fun guessType(typeDef: LuaDocTypeDef, context: SearchContext): TySet {
     return resolveDocTypeSet(typeDef.typeSet, context)
 }
 

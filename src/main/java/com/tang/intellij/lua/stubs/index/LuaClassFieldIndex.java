@@ -25,9 +25,9 @@ import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TyClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -86,7 +86,7 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
         // from supper
         LuaDocClassDef classDef = LuaClassIndex.find(className, context);
         if (classDef != null) {
-            LuaType type = classDef.getClassType();
+            TyClass type = classDef.getClassType();
             String superClassName = type.getSuperClassName();
             if (superClassName != null) {
                 list = find(superClassName, fieldName, context);
@@ -99,7 +99,7 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     }
 
     @Nullable
-    public static LuaClassField find(LuaType type, String fieldName, SearchContext context) {
+    public static LuaClassField find(TyClass type, String fieldName, SearchContext context) {
         Collection<LuaClassField> fields = findAll(type, fieldName, context);
         LuaClassField perfect = null;
         for (LuaClassField field : fields) {
@@ -111,7 +111,7 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     }
 
     @NotNull
-    public static Collection<LuaClassField> findAll(LuaType type, String fieldName, SearchContext context) {
+    public static Collection<LuaClassField> findAll(TyClass type, String fieldName, SearchContext context) {
         Collection<LuaClassField> fields = find(type.getClassName(), fieldName, context);
         if (fields.isEmpty()) {
             type.initAliasName(context);

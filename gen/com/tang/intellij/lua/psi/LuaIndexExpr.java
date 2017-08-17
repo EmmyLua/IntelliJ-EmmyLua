@@ -8,8 +8,8 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.intellij.navigation.ItemPresentation;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 
 public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBasedPsiElement<LuaIndexStub> {
 
@@ -36,11 +36,11 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
   @Nullable
   LuaLiteralExpr getIdExpr();
 
-  @Nullable
-  LuaTypeSet guessPrefixType(SearchContext context);
+  @NotNull
+  TySet guessPrefixType(SearchContext context);
 
-  @Nullable
-  LuaTypeSet guessValueType(SearchContext context);
+  @NotNull
+  TySet guessValueType(SearchContext context);
 
   @Nullable
   PsiElement getDot();

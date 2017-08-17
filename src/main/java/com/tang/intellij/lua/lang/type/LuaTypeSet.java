@@ -41,9 +41,9 @@ public class LuaTypeSet {
 
     public static LuaTypeSet create(LuaDocClassDef ... classDefs) {
         LuaTypeSet set = new LuaTypeSet();
-        for (LuaDocClassDef def : classDefs) {
-            set.types.add(def.getClassType());
-        }
+//        for (LuaDocClassDef def : classDefs) {
+//            set.types.add(def.getClassType());
+//        }
         return set;
     }
 

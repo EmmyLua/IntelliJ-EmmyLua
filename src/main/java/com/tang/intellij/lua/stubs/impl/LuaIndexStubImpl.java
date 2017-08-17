@@ -20,12 +20,16 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.stubs.StubBase;
 import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.PowerLevel;
-import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
-import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.psi.LuaAssignStat;
+import com.tang.intellij.lua.psi.LuaExprList;
+import com.tang.intellij.lua.psi.LuaIndexExpr;
+import com.tang.intellij.lua.psi.LuaVarList;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.tang.intellij.lua.stubs.types.LuaIndexType;
+import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.TySet;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -37,7 +41,7 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
     private LuaIndexExpr indexExpr;
     private String typeName;
     private String fieldName;
-    private LuaTypeSet valueType;
+    private TySet valueType = TySet.Companion.getEMPTY();
 
     public LuaIndexStubImpl(LuaIndexExpr indexExpr, StubElement parent, LuaIndexType elementType) {
         super(parent, elementType);
@@ -46,11 +50,12 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
         fieldName = indexExpr.getName();
     }
 
-    public LuaIndexStubImpl(String typeName, String fieldName, LuaTypeSet valueType, StubElement stubElement, LuaIndexType indexType) {
+    public LuaIndexStubImpl(String typeName, String fieldName, TySet valueType, StubElement stubElement, LuaIndexType indexType) {
         super(stubElement, indexType);
         this.typeName = typeName;
         this.fieldName = fieldName;
-        this.valueType = valueType;
+        if (valueType != null)
+            this.valueType = valueType;
     }
 
     @Override
@@ -58,12 +63,10 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
         if (typeName == null && indexExpr != null) {
             SearchContext context = new SearchContext(indexExpr.getProject());
             context.setCurrentStubFile(indexExpr.getContainingFile());
-            LuaTypeSet typeSet = indexExpr.guessPrefixType(context);
-            if (typeSet != null) {
-                LuaType type = typeSet.getPerfect();
-                if (type != null)
-                    typeName = type.getClassName();
-            }
+            TySet typeSet = indexExpr.guessPrefixType(context);
+            TyClass type = typeSet.getPerfectClass();
+            if (type != null)
+                typeName = type.getClassName();
         }
         return typeName;
     }
@@ -73,10 +76,11 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
         return fieldName;
     }
 
+    @NotNull
     @Override
-    public LuaTypeSet guessValueType() {
+    public TySet guessValueType() {
         if (PowerLevel.isFullPower() && valueType == null && indexExpr != null) {
-            Optional<LuaTypeSet> setOptional = Optional.of(indexExpr)
+            Optional<TySet> setOptional = Optional.of(indexExpr)
                     .filter(s -> s.getParent() instanceof LuaVarList)
                     .map(PsiElement::getParent)
                     .filter(s -> s.getParent() instanceof LuaAssignStat)
@@ -90,7 +94,7 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
                         }
                         return null;
                     });
-            valueType = setOptional.orElse(null);
+            valueType = setOptional.orElse(TySet.Companion.getEMPTY());
         }
         return valueType;
     }

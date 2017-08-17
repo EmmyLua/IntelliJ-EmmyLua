@@ -16,9 +16,9 @@
 
 package com.tang.intellij.lua.psi;
 
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
-import org.jetbrains.annotations.Nullable;
+import com.tang.intellij.lua.ty.TySet;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 表达式，可以推算计算后的数据类型
@@ -27,6 +27,6 @@ import org.jetbrains.annotations.Nullable;
 public interface LuaExpression extends LuaPsiElement {
 
     // 表达式计算后的结果推算
-    @Nullable
-    LuaTypeSet guessType(SearchContext context);
+    @NotNull
+    TySet guessType(SearchContext context);
 }

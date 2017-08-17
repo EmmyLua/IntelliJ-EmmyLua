@@ -20,7 +20,6 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaPsiImplUtil
@@ -30,6 +29,7 @@ import com.tang.intellij.lua.stubs.LuaClassMethodStub
 import com.tang.intellij.lua.stubs.LuaClassMethodStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.ty.TySet
 import java.io.IOException
 
 /**
@@ -50,11 +50,9 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         val searchContext = SearchContext(methodDef.project).setCurrentStubFile(methodDef.containingFile)
 
         val typeSet = expr.guessType(searchContext)
-        if (typeSet != null) {
-            val type = typeSet.perfect
-            if (type != null)
-                clazzName = type.className
-        }
+        val type = typeSet.perfectClass
+        if (type != null)
+            clazzName = type.className
 
         val returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(methodDef, searchContext)
         val params = LuaPsiImplUtil.getParamsOriginal(methodDef)
@@ -86,7 +84,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
 
         //return type set
         val returnTypeSet = luaClassMethodStub.returnTypeSet
-        LuaTypeSet.serialize(returnTypeSet, stubOutputStream)
+        TySet.serialize(returnTypeSet, stubOutputStream)
 
         // is static ?
         stubOutputStream.writeBoolean(luaClassMethodStub.isStatic)
@@ -100,11 +98,11 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         // params
         val len = stubInputStream.readByte().toInt()
         val params = arrayOfNulls<LuaParamInfo>(len)
-        for (i in 0..len - 1) {
+        for (i in 0 until len) {
             params[i] = LuaParamInfo.deserialize(stubInputStream)
         }
 
-        val returnTypeSet = LuaTypeSet.deserialize(stubInputStream)
+        val returnTypeSet = TySet.deserialize(stubInputStream)
         val isStatic = stubInputStream.readBoolean()
         return LuaClassMethodStubImpl(StringRef.toString(shortName)!!,
                 StringRef.toString(className)!!,

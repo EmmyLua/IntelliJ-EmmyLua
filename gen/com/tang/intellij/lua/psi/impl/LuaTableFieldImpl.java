@@ -13,8 +13,8 @@ import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
@@ -87,8 +87,8 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     return LuaPsiImplUtil.getPresentation(this);
   }
 
-  @Nullable
-  public LuaTypeSet guessType(SearchContext context) {
+  @NotNull
+  public TySet guessType(SearchContext context) {
     return LuaPsiImplUtil.guessType(this, context);
   }
 

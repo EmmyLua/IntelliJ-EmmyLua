@@ -15,13 +15,13 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaBlock;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
+import com.tang.intellij.lua.ty.TyClass;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -80,7 +80,7 @@ public class CreateFieldFromParameterIntention extends BaseIntentionAction {
                     boolean createDoc = dialog.isCreateDoc();
                     if (createDoc) {
                         SearchContext context = new SearchContext(project);
-                        LuaType classType = methodDef.getClassType(context);
+                        TyClass classType = methodDef.getClassType(context);
                         if (classType != null) {
                             LuaDocClassDef def = LuaClassIndex.find(classType.getClassName(), context);
                             if (def != null) {

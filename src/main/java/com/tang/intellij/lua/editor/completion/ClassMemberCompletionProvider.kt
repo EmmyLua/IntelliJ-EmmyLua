@@ -22,10 +22,11 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TySet
 
 /**
 
@@ -52,7 +53,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
             val indexExpr = parent
             val project = indexExpr.project
             val prefixTypeSet = indexExpr.guessPrefixType(SearchContext(project))
-            if (prefixTypeSet != null) {
+            if (!prefixTypeSet.isEmpty()) {
                 complete(indexExpr, prefixTypeSet, completionResultSet, completionResultSet.prefixMatcher, null)
             }
             //smart
@@ -65,7 +66,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
                     val txt = it.text
                     if (nameText != txt && matcher.prefixMatches(txt)) {
                         val typeSet = it.guessType(SearchContext(project))
-                        if (typeSet != null) {
+                        if (!typeSet.isEmpty()) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)
                             complete(indexExpr, typeSet, resultSet, prefixMatcher, object : HandlerProcessor {
@@ -82,30 +83,34 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: LuaTypeSet, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
+    private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: TySet, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
         if (indexExpr.colon != null) {
             prefixTypeSet.types.forEach { luaType ->
-                val context = SearchContext(indexExpr.project)
-                luaType.initAliasName(context)
-                luaType.processMethods(context) { curType, def ->
-                    val className = curType.displayName
-                    addMethod(completionResultSet, prefixMatcher, curType === luaType, false, className, def, handlerProcessor)
+                if (luaType is TyClass) {
+                    val context = SearchContext(indexExpr.project)
+                    luaType.initAliasName(context)
+                    luaType.processMethods(context) { curType, def ->
+                        val className = curType.displayName
+                        addMethod(completionResultSet, prefixMatcher, curType === luaType, false, className, def, handlerProcessor)
+                    }
                 }
             }
         } else {
             prefixTypeSet.types.forEach { luaType ->
-                val context = SearchContext(indexExpr.project)
-                luaType.initAliasName(context)
-                luaType.processMethods(context) { curType, def ->
-                    val className = curType.displayName
-                    addMethod(completionResultSet, prefixMatcher, curType === luaType, true, className, def, handlerProcessor)
-                }
-                luaType.processFields(context) { curType, field ->
-                    val className = curType.displayName
-                    addField(completionResultSet, prefixMatcher, curType === luaType, className, field, handlerProcessor)
-                }
-                luaType.processStaticMethods(context) { curType, def ->
-                    addStaticMethod(completionResultSet, prefixMatcher, curType === luaType, curType.displayName, def, handlerProcessor)
+                if (luaType is TyClass) {
+                    val context = SearchContext(indexExpr.project)
+                    luaType.initAliasName(context)
+                    luaType.processMethods(context) { curType, def ->
+                        val className = curType.displayName
+                        addMethod(completionResultSet, prefixMatcher, curType === luaType, true, className, def, handlerProcessor)
+                    }
+                    luaType.processFields(context) { curType, field ->
+                        val className = curType.displayName
+                        addField(completionResultSet, prefixMatcher, curType === luaType, className, field, handlerProcessor)
+                    }
+                    luaType.processStaticMethods(context) { curType, def ->
+                        addStaticMethod(completionResultSet, prefixMatcher, curType === luaType, curType.displayName, def, handlerProcessor)
+                    }
                 }
             }
         }

@@ -6,13 +6,13 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.SearchScope;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 
 public interface LuaNameDef extends LuaName, LuaTypeGuessable, PsiNameIdentifierOwner {
 
-  @Nullable
-  LuaTypeSet guessType(SearchContext context);
+  @NotNull
+  TySet guessType(SearchContext context);
 
   @NotNull
   PsiElement getNameIdentifier();

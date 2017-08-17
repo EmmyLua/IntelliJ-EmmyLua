@@ -19,12 +19,7 @@ package com.tang.intellij.lua.ty
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.psi.LuaClassField
-import com.tang.intellij.lua.psi.LuaClassMethod
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.search.SearchContext
 
 enum class TyKind {
     Unknown,
@@ -34,13 +29,28 @@ enum class TyKind {
     Class
 }
 
-class TySet {
-
-}
-
 abstract class Ty(val kind: TyKind) {
 
+    val isAnonymous: Boolean = false
+
+    abstract val displayName: String
+
     companion object {
+
+        val UNKNOWN = TyUnknown()
+        val BOOLEAN = TyPrimitive("b", "boolean")
+        val STRING = TyPrimitive("s", "string")
+        val NUMBER = TyPrimitive("n", "number")
+
+        private fun getPrimitive(mark: String): Ty {
+            return when (mark) {
+                "b" -> BOOLEAN
+                "s" -> STRING
+                "n" -> NUMBER
+                else -> UNKNOWN
+            }
+        }
+
         private fun getKind(ordinal: Int): TyKind {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
         }
@@ -59,6 +69,11 @@ abstract class Ty(val kind: TyKind) {
                     serialize(ty.returnTy, stream)
                 }
                 is TyClass -> {
+                    stream.writeName(ty.className)
+                    stream.writeName(ty.superClassName)
+                    stream.writeName(ty.aliasName)
+                }
+                is TyPrimitive -> {
                     stream.writeName(ty.name)
                 }
             }
@@ -66,7 +81,7 @@ abstract class Ty(val kind: TyKind) {
 
         fun deserialize(stream: StubInputStream): Ty {
             val kind = getKind(stream.readByte().toInt())
-            val ty = when (kind) {
+            return when (kind) {
                 TyKind.Array -> {
                     val base = deserialize(stream)
                     TyArray(base)
@@ -74,56 +89,36 @@ abstract class Ty(val kind: TyKind) {
                 TyKind.Function -> {
                     val size = stream.readByte()
                     val arr = mutableListOf<LuaParamInfo>()
-                    for (i in 0 .. size) {
+                    for (i in 0 until size) {
                         arr.add(LuaParamInfo.deserialize(stream))
                     }
                     val retTy = deserialize(stream)
                     TySerializedFunction(retTy, arr.toTypedArray())
                 }
                 TyKind.Class -> {
+                    val className = stream.readName()
+                    val superName = stream.readName()
+                    val aliasName = stream.readName()
+                    TySerializedClass(StringRef.toString(className), StringRef.toString(superName), StringRef.toString(aliasName))
+                }
+                TyKind.Primitive -> {
                     val ref = stream.readName()
-                    TySerializedClass(StringRef.toString(ref))
+                    getPrimitive(StringRef.toString(ref))
                 }
                 else -> TyUnknown()
             }
-            return ty
         }
-
-        val UNKNOWN = TyUnknown()
     }
 }
 
-abstract class TyPrimitive : Ty(TyKind.Primitive) {
-    companion object {
+class TyPrimitive(val name: String, override val displayName: String) : Ty(TyKind.Primitive)
 
-    }
+class TyArray(val base: Ty) : Ty(TyKind.Array) {
+    override val displayName: String
+        get() = "${base.displayName}[]"
 }
 
-class TyArray(val base: Ty) : Ty(TyKind.Array)
-
-abstract class TyFunction : Ty(TyKind.Function) {
-    abstract val returnTy: Ty
-    abstract val params: Array<LuaParamInfo>
+class TyUnknown : Ty(TyKind.Unknown) {
+    override val displayName: String
+        get() = "Unknown"
 }
-
-class TyPsiFunction(val psi: LuaFuncBodyOwner) : TyFunction() {
-    override val returnTy: Ty
-        get() = UNKNOWN
-    override val params: Array<LuaParamInfo>
-        get() = psi.params
-}
-
-class TySerializedFunction(override val returnTy: Ty, override val params: Array<LuaParamInfo>) : TyFunction()
-
-abstract class TyClass(val name: String) : Ty(TyKind.Class) {
-    open fun processFields(searchContext: SearchContext, processor: (ty:Ty, t:LuaClassField) -> Unit) {}
-    open fun processMethods(searchContext: SearchContext, processor: (ty:Ty, t:LuaClassMethod) -> Unit) {}
-}
-
-class TyPsiDocClass(val dc: LuaDocClassDef) : TyClass(dc.name) {
-
-}
-
-class TySerializedClass(name: String) : TyClass(name)
-
-class TyUnknown : Ty(TyKind.Unknown)

@@ -11,8 +11,8 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaDocTyStub;
 import com.tang.intellij.lua.comment.psi.*;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
@@ -51,8 +51,8 @@ public class LuaDocTypeDefImpl extends StubBasedPsiElementBase<LuaDocTyStub> imp
     return PsiTreeUtil.getChildOfType(this, LuaDocTypeSet.class);
   }
 
-  @Nullable
-  public LuaTypeSet guessType(SearchContext context) {
+  @NotNull
+  public TySet guessType(SearchContext context) {
     return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 

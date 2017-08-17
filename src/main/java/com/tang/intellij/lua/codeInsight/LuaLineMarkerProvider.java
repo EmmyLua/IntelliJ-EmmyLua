@@ -33,13 +33,12 @@ import com.intellij.util.FunctionUtil;
 import com.intellij.util.Query;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.ty.TyClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,14 +107,14 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
             assert methodDef != null;
             Project project = methodDef.getProject();
             SearchContext context = new SearchContext(project);
-            LuaType type = methodDef.getClassType(context);
+            TyClass type = methodDef.getClassType(context);
 
             //OverridingMethod
             PsiElement classMethodNameId = classMethodName.getId();
             if (type != null) {
                 String methodName = methodDef.getName();
                 assert methodName != null;
-                LuaType superType = type.getSuperClass(context);
+                TyClass superType = type.getSuperClass(context);
 
                 while (superType != null) {
                     String superTypeName = superType.getClassName();
@@ -152,7 +151,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
         }
         else if (element instanceof LuaDocClassDef) {
             LuaDocClassDef docClassDef = (LuaDocClassDef) element;
-            LuaType classType = docClassDef.getClassType();
+            TyClass classType = docClassDef.getClassType();
             Project project = element.getProject();
             Query<LuaDocClassDef> query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.getClassName());
             if (query.findFirst() != null) {

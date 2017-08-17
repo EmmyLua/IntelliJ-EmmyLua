@@ -25,6 +25,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -56,7 +57,8 @@ public class LuaClassIndex extends StringStubIndexExtension<LuaDocClassDef> {
         return StubIndex.getElements(KEY, s, project, scope, LuaDocClassDef.class);
     }
 
-    public static LuaDocClassDef find(String name, SearchContext context) {
+    @Nullable
+    public static LuaDocClassDef find(@NotNull String name, SearchContext context) {
         if (context.isDumb())
             return null;
         Collection<LuaDocClassDef> list = getInstance().get(name, context.getProject(), context.getScope());

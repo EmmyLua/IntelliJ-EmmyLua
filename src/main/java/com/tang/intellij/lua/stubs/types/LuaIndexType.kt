@@ -21,7 +21,6 @@ import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
@@ -30,7 +29,7 @@ import com.tang.intellij.lua.stubs.impl.LuaIndexStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-
+import com.tang.intellij.lua.ty.TySet
 import java.io.IOException
 
 /**
@@ -63,14 +62,14 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
     override fun serialize(indexStub: LuaIndexStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(indexStub.typeName)
         stubOutputStream.writeName(indexStub.fieldName)
-        LuaTypeSet.serialize(indexStub.guessValueType(), stubOutputStream)
+        TySet.serialize(indexStub.guessValueType(), stubOutputStream)
     }
 
     @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexStub {
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
-        val valueType = LuaTypeSet.deserialize(stubInputStream)
+        val valueType = TySet.deserialize(stubInputStream)
         return LuaIndexStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), valueType, stubElement, this)
     }
 

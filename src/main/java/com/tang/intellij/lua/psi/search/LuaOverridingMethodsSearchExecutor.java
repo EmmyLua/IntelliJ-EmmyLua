@@ -22,10 +22,10 @@ import com.intellij.util.Processor;
 import com.intellij.util.Query;
 import com.intellij.util.QueryExecutor;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethod;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.ty.TyClass;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,7 +38,7 @@ public class LuaOverridingMethodsSearchExecutor implements QueryExecutor<LuaClas
         LuaClassMethod method = searchParameters.getMethod();
         Project project = method.getProject();
         SearchContext context = new SearchContext(project);
-        LuaType type = method.getClassType(context);
+        TyClass type = method.getClassType(context);
         String methodName = method.getName();
         if (type != null && methodName != null) {
             GlobalSearchScope scope = GlobalSearchScope.allScope(project);

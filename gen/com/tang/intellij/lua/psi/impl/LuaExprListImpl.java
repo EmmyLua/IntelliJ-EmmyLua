@@ -10,8 +10,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 
 public class LuaExprListImpl extends ASTWrapperPsiElement implements LuaExprList {
 
@@ -34,8 +34,8 @@ public class LuaExprListImpl extends ASTWrapperPsiElement implements LuaExprList
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaExpr.class);
   }
 
-  @Nullable
-  public LuaTypeSet guessTypeAt(SearchContext context) {
+  @NotNull
+  public TySet guessTypeAt(SearchContext context) {
     return LuaPsiImplUtil.guessTypeAt(this, context);
   }
 

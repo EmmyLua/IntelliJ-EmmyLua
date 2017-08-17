@@ -13,9 +13,9 @@ import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
-import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.TySet;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
@@ -93,13 +93,13 @@ public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncS
     return LuaPsiImplUtil.toString(this);
   }
 
-  @Nullable
-  public LuaTypeSet guessReturnTypeSet(SearchContext searchContext) {
+  @NotNull
+  public TySet guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }
 
   @NotNull
-  public LuaType getClassType(SearchContext searchContext) {
+  public TyClass getClassType(SearchContext searchContext) {
     return LuaPsiImplUtil.getClassType(this, searchContext);
   }
 

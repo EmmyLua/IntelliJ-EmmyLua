@@ -24,12 +24,12 @@ import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl
 import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.ty.TySet
 import java.io.IOException
 
 /**
@@ -67,14 +67,14 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
     override fun serialize(luaFieldStub: LuaDocClassFieldStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaFieldStub.name)
         stubOutputStream.writeName(luaFieldStub.className)
-        LuaTypeSet.serialize(luaFieldStub.type, stubOutputStream)
+        TySet.serialize(luaFieldStub.type, stubOutputStream)
     }
 
     @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocClassFieldStub {
         val name = stubInputStream.readName()
         val className = stubInputStream.readName()
-        val typeSet = LuaTypeSet.deserialize(stubInputStream)
+        val typeSet = TySet.deserialize(stubInputStream)
         return LuaDocClassFieldStubImpl(stubElement,
                 StringRef.toString(name)!!,
                 StringRef.toString(className)!!,

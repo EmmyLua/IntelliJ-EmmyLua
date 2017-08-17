@@ -25,10 +25,11 @@ import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef;
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.psi.LuaTypes;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by Tangzx on 2016/11/21.
@@ -90,15 +91,16 @@ public class LuaCommentImpl extends LazyParseablePsiElement implements LuaCommen
         return null;
     }
 
+    @NotNull
     @Override
-    public LuaTypeSet guessType(SearchContext context) {
+    public TySet guessType(SearchContext context) {
         LuaDocClassDef classDef = getClassDef();
         if (classDef != null)
-            return LuaTypeSet.create(classDef);
+            return TySet.Companion.create(classDef.getClassType());
         LuaDocTypeDef typeDef = getTypeDef();
         if (typeDef != null)
             return typeDef.guessType(context);
-        return null;
+        return TySet.Companion.getEMPTY();
     }
 
     @Override

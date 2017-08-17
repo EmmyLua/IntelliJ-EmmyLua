@@ -25,12 +25,13 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.lang.type.LuaType
 import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
+import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TySet
 
 /**
 
@@ -57,7 +58,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         return null
     }
 
-    override fun guessType(context: SearchContext): LuaTypeSet? {
+    override fun guessType(context: SearchContext): TySet {
         return RecursionManager.doPreventingRecursion(this, true) {
 
             //from @type annotation
@@ -69,11 +70,11 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
             }
 
             //guess from value
-            var result = LuaTypeSet.create()
+            var result = TySet.create()
             val indexExpr = this as LuaIndexExpr
             // value type
             val stub = indexExpr.stub
-            val valueTypeSet: LuaTypeSet?
+            val valueTypeSet: TySet?
             if (stub != null)
                 valueTypeSet = stub.guessValueType()
             else
@@ -84,28 +85,27 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
             val propName = this.fieldName
             if (propName != null) {
                 val prefixType = indexExpr.guessPrefixType(context)
-                if (prefixType != null && !prefixType.isEmpty) {
-                    prefixType.types
-                            .asSequence()
-                            .map { guessFieldType(propName, it, context) }
-                            .forEach { result = result.union(it) }
-                }
+                prefixType.types
+                        .asSequence()
+                        .filterIsInstance<TyClass>()
+                        .map { guessFieldType(propName, it, context) }
+                        .forEach { result = result.union(it) }
             }
             result
-        }
+        }!!
     }
 
-    private fun guessFieldType(fieldName: String, type: LuaType, context: SearchContext): LuaTypeSet? {
-        var set = LuaTypeSet.create()
+    private fun guessFieldType(fieldName: String, type: TyClass, context: SearchContext): TySet {
+        var set = TySet.create()
 
         val all = LuaClassFieldIndex.findAll(type, fieldName, context)
         for (fieldDef in all) {
             if (fieldDef is LuaIndexExpr) {
                 val stub = fieldDef.stub
-                if (stub != null)
-                    set = set.union(stub.guessValueType())
+                set = if (stub != null)
+                    set.union(stub.guessValueType())
                 else
-                    set = set.union(fieldDef.guessValueType(context))
+                    set.union(fieldDef.guessValueType(context))
 
                 if (fieldDef === this)
                     return set

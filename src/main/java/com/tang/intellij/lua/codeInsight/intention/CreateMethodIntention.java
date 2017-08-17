@@ -25,12 +25,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.IncorrectOperationException;
-import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.TySet;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,10 +72,10 @@ public class CreateMethodIntention extends BaseIntentionAction {
             LuaExpr expr = callExpr.getExpr();
             if (expr instanceof LuaIndexExpr) {
                 LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
-                LuaTypeSet typeSet = indexExpr.guessPrefixType(new SearchContext(project));
-                if (typeSet == null || typeSet.isEmpty()) return;
+                TySet typeSet = indexExpr.guessPrefixType(new SearchContext(project));
+                if (typeSet.isEmpty()) return;
 
-                InsertPosition position = calcInsertPosition(typeSet.getPerfect(), project);
+                InsertPosition position = calcInsertPosition(typeSet.getPerfectClass(), project);
                 if (position != null) {
                     editor.getCaretModel().moveToOffset(position.offset);
 
@@ -95,7 +95,7 @@ public class CreateMethodIntention extends BaseIntentionAction {
     }
 
     @Nullable
-    private InsertPosition calcInsertPosition(LuaType perfect, Project project) {
+    private InsertPosition calcInsertPosition(TyClass perfect, Project project) {
         Collection<LuaClassMethod> methods = LuaClassMethodIndex.getInstance().get(perfect.getClassName(),
                 project,
                 new LuaPredefinedScope(project));

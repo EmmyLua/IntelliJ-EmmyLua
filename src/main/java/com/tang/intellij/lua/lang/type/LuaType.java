@@ -22,10 +22,7 @@ import com.intellij.psi.stubs.StubInputStream;
 import com.intellij.psi.stubs.StubOutputStream;
 import com.intellij.util.io.StringRef;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
-import com.tang.intellij.lua.psi.LuaClassField;
-import com.tang.intellij.lua.psi.LuaClassMethod;
-import com.tang.intellij.lua.psi.LuaNameExpr;
-import com.tang.intellij.lua.psi.LuaPsiResolveUtilKt;
+import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex;
@@ -83,20 +80,20 @@ public class LuaType implements Comparable<LuaType> {
 
     public void initAliasName(SearchContext context) {
         if (aliasName == null) {
-            LuaDocClassDef classDef = LuaClassIndex.find(clazzName, context);
+            /*LuaDocClassDef classDef = LuaClassIndex.find(clazzName, context);
             if (classDef != null) {
                 LuaType classType = classDef.getClassType();
                 setAliasName(classType.getAliasName());
-            }
+            }*/
         }
     }
 
     public LuaType getSuperClass(SearchContext context) {
-        if (superClassName != null) {
+        /*if (superClassName != null) {
             LuaDocClassDef superClassDef = LuaClassIndex.find(superClassName, context);
             if (superClassDef != null)
                 return superClassDef.getClassType();
-        }
+        }*/
         return null;
     }
 
@@ -219,18 +216,20 @@ public class LuaType implements Comparable<LuaType> {
     }
 
     public LuaClassField findField(String fieldName, SearchContext context) {
-        LuaClassField def = LuaClassFieldIndex.find(this, fieldName, context);
+        /*LuaClassField def = LuaClassFieldIndex.find(this, fieldName, context);
         if (def == null) {
             LuaType superType = getSuperClass(context);
             if (superType != null)
                 def = superType.findField(fieldName, context);
         }
-        return def;
+        return def;*/
+        return null;
     }
 
     @Nullable
-    public LuaClassMethod findMethod(String methodName, SearchContext context) {
-        String className = getClassName();
+    public LuaClassMethodDef findMethod(String methodName, SearchContext context) {
+        return null;
+        /*String className = getClassName();
         LuaClassMethod def = LuaClassMethodIndex.findMethodWithName(className, methodName, context);
         if (def == null) { // static
             def = LuaClassMethodIndex.findStaticMethod(className, methodName, context);
@@ -240,7 +239,7 @@ public class LuaType implements Comparable<LuaType> {
             if (superType != null)
                 def = superType.findMethod(methodName, context);
         }
-        return def;
+        return def;*/
     }
 
     public boolean isUnreliable() {

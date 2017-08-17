@@ -27,7 +27,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.ProcessingContext;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.psi.LuaClassMethod;
 import com.tang.intellij.lua.psi.LuaClassMethodDef;
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
@@ -35,6 +34,7 @@ import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.ty.TyClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -50,15 +50,15 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
         LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(id, LuaClassMethodDef.class);
         if (methodDef != null) {
             SearchContext context = new SearchContext(methodDef.getProject());
-            LuaType classType = methodDef.getClassType(context);
+            TyClass classType = methodDef.getClassType(context);
             if (classType != null) {
-                LuaType sup = classType.getSuperClass(context);
+                TyClass sup = classType.getSuperClass(context);
                 addOverrideMethod(completionParameters, completionResultSet, sup);
             }
         }
     }
 
-    private void addOverrideMethod(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, LuaType sup) {
+    private void addOverrideMethod(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, TyClass sup) {
         if (sup != null) {
             Project project = completionParameters.getOriginalFile().getProject();
             SearchContext context = new SearchContext(project);

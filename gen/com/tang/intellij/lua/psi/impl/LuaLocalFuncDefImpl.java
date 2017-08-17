@@ -12,8 +12,8 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.psi.search.SearchScope;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 
 public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLocalFuncDef {
 
@@ -76,8 +76,8 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
     return LuaPsiImplUtil.getUseScope(this);
   }
 
-  @Nullable
-  public LuaTypeSet guessReturnTypeSet(SearchContext searchContext) {
+  @NotNull
+  public TySet guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }
 

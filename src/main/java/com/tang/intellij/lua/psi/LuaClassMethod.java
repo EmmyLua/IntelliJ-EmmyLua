@@ -17,11 +17,11 @@
 package com.tang.intellij.lua.psi;
 
 import com.intellij.psi.PsiNameIdentifierOwner;
-import com.tang.intellij.lua.lang.type.LuaType;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TyClass;
 import org.jetbrains.annotations.Nullable;
 
 public interface LuaClassMethod extends LuaFuncBodyOwner, LuaClassMember, PsiNameIdentifierOwner {
     @Nullable
-    LuaType getClassType(SearchContext context);
+    TyClass getClassType(SearchContext context);
 }

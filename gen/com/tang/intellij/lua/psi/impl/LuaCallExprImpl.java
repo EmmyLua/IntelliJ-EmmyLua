@@ -9,8 +9,8 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
 
 public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
 
@@ -39,8 +39,8 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
     return notNullChild(PsiTreeUtil.getChildOfType(this, LuaExpr.class));
   }
 
-  @Nullable
-  public LuaTypeSet guessPrefixType(SearchContext context) {
+  @NotNull
+  public TySet guessPrefixType(SearchContext context) {
     return LuaPsiImplUtil.guessPrefixType(this, context);
   }
 

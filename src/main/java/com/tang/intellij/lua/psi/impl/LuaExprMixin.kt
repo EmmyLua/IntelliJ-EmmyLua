@@ -18,10 +18,11 @@ package com.tang.intellij.lua.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.RecursionManager
-import com.tang.intellij.lua.lang.type.LuaType
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyPsiFunction
+import com.tang.intellij.lua.ty.TySet
 
 /**
  * 表达式基类
@@ -29,39 +30,38 @@ import com.tang.intellij.lua.search.SearchContext
  */
 open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpression {
 
-    override fun guessType(context: SearchContext): LuaTypeSet? {
-        return RecursionManager.doPreventingRecursion<LuaTypeSet>(this, true) {
-            var set: LuaTypeSet? = null
-            if (this is LuaCallExpr)
-                set = guessType(this, context)
-            if (this is LuaParenExpr)
-                set = guessType(this, context)
-            else if (this is LuaLiteralExpr)
-                set = guessType(this)
-            set
-        }
+    override fun guessType(context: SearchContext): TySet {
+        return RecursionManager.doPreventingRecursion<TySet>(this, true) {
+            when {
+                this is LuaCallExpr -> guessType(this, context)
+                this is LuaParenExpr -> guessType(this, context)
+                this is LuaLiteralExpr -> guessType(this)
+                this is LuaClosureExpr -> TySet.create(TyPsiFunction(this))
+                else -> TySet.EMPTY
+            }
+        }!!
     }
 
-    private fun guessType(literalExpr: LuaLiteralExpr): LuaTypeSet? {
+    private fun guessType(literalExpr: LuaLiteralExpr): TySet {
         val child = literalExpr.firstChild
         val type = child.node.elementType
         if (type === LuaTypes.TRUE || type === LuaTypes.FALSE)
-            return LuaTypeSet.create(LuaType.BOOLEAN)
+            return TySet.create(Ty.BOOLEAN)
         if (type === LuaTypes.STRING)
-            return LuaTypeSet.create(LuaType.STRING)
+            return TySet.create(Ty.STRING)
         if (type === LuaTypes.NUMBER)
-            return LuaTypeSet.create(LuaType.NUMBER)
-        return null
+            return TySet.create(Ty.NUMBER)
+        return TySet.EMPTY
     }
 
-    private fun guessType(luaParenExpr: LuaParenExpr, context: SearchContext): LuaTypeSet? {
+    private fun guessType(luaParenExpr: LuaParenExpr, context: SearchContext): TySet {
         val inner = luaParenExpr.expr
         if (inner != null)
             return inner.guessType(context)
-        return null
+        return TySet.EMPTY
     }
 
-    private fun guessType(luaCallExpr: LuaCallExpr, context: SearchContext): LuaTypeSet? {
+    private fun guessType(luaCallExpr: LuaCallExpr, context: SearchContext): TySet {
         // xxx()
         val ref = luaCallExpr.expr
         // 从 require 'xxx' 中获取返回类型
@@ -82,6 +82,6 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
         if (bodyOwner != null)
             return bodyOwner.guessReturnTypeSet(context)
-        return null
+        return TySet.EMPTY
     }
 }

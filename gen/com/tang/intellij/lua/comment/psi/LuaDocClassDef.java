@@ -8,7 +8,7 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.intellij.navigation.ItemPresentation;
-import com.tang.intellij.lua.lang.type.LuaType;
+import com.tang.intellij.lua.ty.TyClass;
 
 public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocClassStub> {
 
@@ -19,7 +19,7 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
   PsiElement getId();
 
   @NotNull
-  LuaType getClassType();
+  TyClass getClassType();
 
   @NotNull
   ItemPresentation getPresentation();

@@ -21,9 +21,10 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef;
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaCommentOwner;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.TySet;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -39,6 +40,6 @@ public interface LuaComment extends PsiComment, LuaDocPsiElement {
     LuaDocClassDef getClassDef();
     @Nullable
     LuaDocTypeDef getTypeDef();
-    @Nullable
-    LuaTypeSet guessType(SearchContext context);
+    @NotNull
+    TySet guessType(SearchContext context);
 }

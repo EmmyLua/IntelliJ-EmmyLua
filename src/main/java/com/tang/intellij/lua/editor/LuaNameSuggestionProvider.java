@@ -20,10 +20,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.codeStyle.NameUtil;
 import com.intellij.psi.codeStyle.SuggestedNameInfo;
 import com.intellij.refactoring.rename.NameSuggestionProvider;
-import com.tang.intellij.lua.lang.type.LuaType;
-import com.tang.intellij.lua.lang.type.LuaTypeSet;
 import com.tang.intellij.lua.psi.LuaNameDef;
 import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.TySet;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -42,15 +43,17 @@ public class LuaNameSuggestionProvider implements NameSuggestionProvider {
         if (psiElement instanceof LuaNameDef) {
             LuaNameDef nameDef = (LuaNameDef) psiElement;
             SearchContext context = new SearchContext(psiElement.getProject());
-            LuaTypeSet typeSet = nameDef.guessType(context);
-            if (typeSet != null) {
+            TySet typeSet = nameDef.guessType(context);
+            if (!typeSet.isEmpty()) {
                 Set<String> classNames = new HashSet<>();
 
-                for (LuaType type : typeSet.getTypes()) {
-                    LuaType cur = type;
+                for (Ty type : typeSet.getTypes()) {
+                    if (!(type instanceof TyClass))
+                        continue;
+                    TyClass cur = (TyClass) type;
                     while (cur != null) {
                         String className = cur.getClassName();
-                        if (className != null && !cur.isAnonymous())
+                        if (!cur.isAnonymous())
                             classNames.add(className);
                         cur = cur.getSuperClass(context);
                     }

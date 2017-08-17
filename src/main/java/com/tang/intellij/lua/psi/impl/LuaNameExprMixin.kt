@@ -24,11 +24,11 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.lang.type.LuaType
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaNameStub
+import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TySet
 
 /**
 
@@ -49,14 +49,14 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
         return null
     }
 
-    override fun guessType(context: SearchContext): LuaTypeSet? {
-        return RecursionManager.doPreventingRecursion(this, true) {
-            var typeSet = LuaTypeSet.create()
+    override fun guessType(context: SearchContext): TySet {
+        val set = RecursionManager.doPreventingRecursion(this, true) {
+            var typeSet = TySet.create()
             val nameExpr = this as LuaNameExpr
 
             val multiResolve = multiResolve(nameExpr, context)
             if (multiResolve.isEmpty()) {
-                typeSet = LuaTypeSet.union(typeSet, LuaType.createGlobalType(nameExpr))
+                typeSet = TySet.union(typeSet, TyClass.createGlobalType(nameExpr))
             } else {
                 multiResolve.forEach {
                     val set = getTypeSet(context, it)
@@ -65,19 +65,21 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
             }
             typeSet
         }
+        return set ?: TySet.EMPTY
     }
 
-    private fun getTypeSet(context: SearchContext, def: PsiElement): LuaTypeSet? {
+    private fun getTypeSet(context: SearchContext, def: PsiElement): TySet {
         when (def) {
             is LuaNameExpr -> {
-                var typeSet: LuaTypeSet? = null
+                var typeSet: TySet = TySet.create()
                 val luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat::class.java)
                 if (luaAssignStat != null) {
                     val comment = luaAssignStat.comment
                     //优先从 Comment 猜
-                    typeSet = comment?.guessType(context)
+                    if (comment != null)
+                        typeSet = comment.guessType(context)
                     //再从赋值猜
-                    if (typeSet == null) {
+                    if (typeSet.isEmpty()) {
                         val exprList = luaAssignStat.valueExprList
                         if (exprList != null) {
                             context.index = luaAssignStat.getIndexFor(def)
@@ -87,14 +89,12 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
                 }
                 //Global
                 if (resolveLocal(def, context) == null) {
-                    if (typeSet == null)
-                        typeSet = LuaTypeSet.create()
-                    typeSet = LuaTypeSet.union(typeSet, LuaType.createGlobalType(def))
+                    typeSet = TySet.union(typeSet, TyClass.createGlobalType(def))
                 }
                 return typeSet
             }
             is LuaTypeGuessable -> return def.guessType(context)
-            else -> return null
+            else -> return TySet.EMPTY
         }
     }
 

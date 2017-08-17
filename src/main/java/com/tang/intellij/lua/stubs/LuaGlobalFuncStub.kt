@@ -19,10 +19,10 @@ package com.tang.intellij.lua.stubs
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.psi.LuaGlobalFuncDef
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.ty.TySet
 
 /**
 
@@ -34,6 +34,6 @@ interface LuaGlobalFuncStub : LuaFuncBodyOwnerStub<LuaGlobalFuncDef> {
 
 class LuaGlobalFuncStubImpl(override val name: String,
                             override val params: Array<LuaParamInfo?>,
-                            override val returnTypeSet: LuaTypeSet?,
+                            override val returnTypeSet: TySet,
                             parent: StubElement<*>)
     : StubBase<LuaGlobalFuncDef>(parent, LuaTypes.GLOBAL_FUNC_DEF as IStubElementType<*, *>), LuaGlobalFuncStub

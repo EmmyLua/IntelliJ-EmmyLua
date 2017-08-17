@@ -19,8 +19,9 @@ package com.tang.intellij.lua.stubs
 import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.lang.type.LuaType
 import com.tang.intellij.lua.psi.LuaElementType
+import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TySerializedClass
 
 /**
 
@@ -30,7 +31,7 @@ interface LuaDocClassStub : StubElement<LuaDocClassDef> {
     val className: String
     val aliasName: String?
     val superClassName: String?
-    val classType: LuaType
+    val classType: TyClass
 }
 
 class LuaDocClassStubImpl(override val className: String,
@@ -39,9 +40,9 @@ class LuaDocClassStubImpl(override val className: String,
                           parent: StubElement<*>)
     : StubBase<LuaDocClassDef>(parent, LuaElementType.CLASS_DEF), LuaDocClassStub {
 
-    override val classType: LuaType
+    override val classType: TyClass
         get() {
-            val luaType = LuaType.create(className, superClassName)
+            val luaType = TySerializedClass(className, superClassName)
             luaType.aliasName = aliasName
             return luaType
         }
