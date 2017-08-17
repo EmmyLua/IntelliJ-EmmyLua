@@ -139,7 +139,7 @@ abstract class Ty(val kind: TyKind) {
                 TyKind.Union -> {
                     var union:Ty = TyUnion()
                     val size = stream.readByte()
-                    for (i in 1 until size) {
+                    for (i in 0 until size) {
                         union = TyUnion.union(union, deserialize(stream))
                     }
                     union
