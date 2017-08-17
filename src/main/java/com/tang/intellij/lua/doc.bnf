@@ -41,10 +41,12 @@
         COMMA = ','
         EXTENDS = ':'
         OR = '|'
+        GT = ">"
+        LT = "<"
         LPAREN = "("
         RPAREN = ")"
         ARR = '[]'
-        FUNCTION = 'function'
+        FUN = 'fun'
         TAG_NAME = 'TAG_NAME'
         TAG_PARAM = 'param'
         OPTIONAL = 'optional'
@@ -78,7 +80,7 @@ general_ty ::= class_name_ref {
 }
 
 function_param ::= ID ':' type_set
-function_ty ::= function '(' function_param ')' (':' type_set)? {
+function_ty ::= fun '(' function_param ')' (':' type_set)? {
     methods = [getType getReturnType]
 }
 

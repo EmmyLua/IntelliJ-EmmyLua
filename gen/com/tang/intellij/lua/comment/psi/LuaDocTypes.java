@@ -36,9 +36,11 @@ public interface LuaDocTypes {
   IElementType EQ = new LuaDocTokenType("=");
   IElementType EXTENDS = new LuaDocTokenType(":");
   IElementType FIELD = new LuaDocTokenType("field");
-  IElementType FUNCTION = new LuaDocTokenType("function");
+  IElementType FUN = new LuaDocTokenType("fun");
+  IElementType GT = new LuaDocTokenType(">");
   IElementType ID = new LuaDocTokenType("ID");
   IElementType LPAREN = new LuaDocTokenType("(");
+  IElementType LT = new LuaDocTokenType("<");
   IElementType OPTIONAL = new LuaDocTokenType("optional");
   IElementType OR = new LuaDocTokenType("|");
   IElementType PROTECTED = new LuaDocTokenType("protected");
