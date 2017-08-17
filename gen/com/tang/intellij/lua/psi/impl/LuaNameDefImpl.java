@@ -11,7 +11,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.psi.search.SearchScope;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public class LuaNameDefImpl extends LuaNameImpl implements LuaNameDef {
 
@@ -29,7 +29,7 @@ public class LuaNameDefImpl extends LuaNameImpl implements LuaNameDef {
   }
 
   @NotNull
-  public TySet guessType(SearchContext context) {
+  public Ty guessType(SearchContext context) {
     return LuaPsiImplUtil.guessType(this, context);
   }
 

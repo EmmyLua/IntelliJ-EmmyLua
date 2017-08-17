@@ -17,7 +17,7 @@
 package com.tang.intellij.lua.psi;
 
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,5 +28,5 @@ public interface LuaExpression extends LuaPsiElement {
 
     // 表达式计算后的结果推算
     @NotNull
-    TySet guessType(SearchContext context);
+    Ty guessType(SearchContext context);
 }

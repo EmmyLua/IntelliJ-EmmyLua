@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.*;
 import com.intellij.psi.search.SearchScope;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLocalFuncDef {
 
@@ -77,7 +77,7 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
   }
 
   @NotNull
-  public TySet guessReturnTypeSet(SearchContext searchContext) {
+  public Ty guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }
 

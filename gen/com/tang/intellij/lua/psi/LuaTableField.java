@@ -10,7 +10,7 @@ import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, LuaCommentOwner, StubBasedPsiElement<LuaTableFieldStub> {
 
@@ -38,7 +38,7 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, Lu
   ItemPresentation getPresentation();
 
   @NotNull
-  TySet guessType(SearchContext context);
+  Ty guessType(SearchContext context);
 
   @Nullable
   LuaComment getComment();

@@ -27,7 +27,7 @@ import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaFile
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFileStub
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
 /**
@@ -55,12 +55,12 @@ class LuaFileType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
     @Throws(IOException::class)
     override fun serialize(stub: LuaFileStub, dataStream: StubOutputStream) {
         val returnedType = stub.getReturnedType(SearchContext(stub.project))
-        TySet.serialize(returnedType, dataStream)
+        Ty.serialize(returnedType, dataStream)
     }
 
     @Throws(IOException::class)
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaFileStub {
-        val typeSet = TySet.deserialize(dataStream)
+        val typeSet = Ty.deserialize(dataStream)
         return LuaFileStub(null, typeSet)
     }
 

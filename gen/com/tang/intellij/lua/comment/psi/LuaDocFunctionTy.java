@@ -6,7 +6,6 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.Ty;
-import com.tang.intellij.lua.ty.TySet;
 
 public interface LuaDocFunctionTy extends LuaDocTy {
 
@@ -20,6 +19,6 @@ public interface LuaDocFunctionTy extends LuaDocTy {
   Ty getType(SearchContext searchContext);
 
   @NotNull
-  TySet getReturnType(SearchContext searchContext);
+  Ty getReturnType(SearchContext searchContext);
 
 }

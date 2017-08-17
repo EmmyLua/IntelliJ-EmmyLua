@@ -36,6 +36,28 @@ abstract class Ty(val kind: TyKind) {
 
     abstract val displayName: String
 
+    fun union(ty: Ty): Ty {
+        return TyUnion.union(this, ty)
+    }
+
+    fun createTypeString(): String? {
+        val s = toString()
+        return if (s.isEmpty()) "any" else s
+    }
+
+    fun createReturnString(): String? {
+        val s = toString()
+        return if (s.isEmpty()) "void" else s
+    }
+
+    override fun toString(): String {
+        val list = mutableListOf<String>()
+        TyUnion.each(this) {
+            list.add(it.displayName)
+        }
+        return list.joinToString("|")
+    }
+
     companion object {
 
         val UNKNOWN = TyUnknown()
@@ -56,10 +78,8 @@ abstract class Ty(val kind: TyKind) {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
         }
 
-        fun each(ty: Ty, process: (Ty) -> Unit) {
-            if (ty is TyUnion) {
-                ty.each(process)
-            } else process(ty)
+        fun isInvalid(ty: Ty): Boolean {
+            return ty is TyUnknown
         }
 
         fun serialize(ty: Ty, stream: StubOutputStream) {
@@ -85,7 +105,7 @@ abstract class Ty(val kind: TyKind) {
                 }
                 is TyUnion -> {
                     stream.writeByte(ty.size)
-                    ty.each { serialize(it, stream) }
+                    TyUnion.each(ty) { serialize(it, stream) }
                 }
             }
         }
@@ -117,10 +137,10 @@ abstract class Ty(val kind: TyKind) {
                     getPrimitive(StringRef.toString(ref))
                 }
                 TyKind.Union -> {
-                    val union = TyUnion()
+                    var union:Ty = TyUnion()
                     val size = stream.readByte()
                     for (i in 1 until size) {
-                        union.union(deserialize(stream))
+                        union = TyUnion.union(union, deserialize(stream))
                     }
                     union
                 }
@@ -146,7 +166,7 @@ class TyUnion : Ty(TyKind.Union) {
     val size:Int
         get() = children.size
 
-    fun union(ty: Ty): TyUnion {
+    private fun union2(ty: Ty): TyUnion {
         if (ty is TyUnion)
             children.addAll(ty.children)
         else
@@ -154,9 +174,63 @@ class TyUnion : Ty(TyKind.Union) {
         return this
     }
 
-    fun each(process: (Ty) -> Unit) {
-        children.forEach {
-            Ty.each(it, process)
+    companion object {
+        fun <T : Ty> find(ty: Ty, clazz: Class<T>): T? {
+            if (clazz.isInstance(ty))
+                return clazz.cast(ty)
+            var ret: T? = null
+            process(ty) {
+                if (clazz.isInstance(it)) {
+                    ret = clazz.cast(it)
+                    return@process false
+                }
+                true
+            }
+            return ret
+        }
+
+        fun process(ty: Ty, process: (Ty) -> Boolean) {
+            if (ty is TyUnion) {
+                for (child in ty.children) {
+                    if (!process(child))
+                        break
+                }
+            } else process(ty)
+        }
+
+        fun each(ty: Ty, process: (Ty) -> Unit) {
+            if (ty is TyUnion) {
+                ty.children.forEach(process)
+            } else process(ty)
+        }
+
+        fun union(t1: Ty, t2: Ty): Ty {
+            if (t1 is TyUnknown)
+                return t2
+            else if (t2 is TyUnknown)
+                return t1
+            else if (t1 is TyUnion)
+                return t1.union2(t2)
+            else if (t2 is TyUnion)
+                return t2.union2(t1)
+            else {
+                val u = TyUnion()
+                u.children.add(t1)
+                u.children.add(t2)
+                return u
+            }
+        }
+
+        fun getPrefectClass(ty: Ty): TyClass? {
+            var tc: TyClass? = null
+            process(ty) {
+                if (it is TyClass) {
+                    tc = it
+                    return@process false
+                }
+                true
+            }
+            return tc
         }
     }
 }

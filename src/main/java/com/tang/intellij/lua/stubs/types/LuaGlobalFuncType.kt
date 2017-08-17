@@ -31,7 +31,7 @@ import com.tang.intellij.lua.stubs.LuaGlobalFuncStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
 /**
@@ -74,7 +74,7 @@ class LuaGlobalFuncType : IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef>(
             LuaParamInfo.serialize(param, stubOutputStream)
         }
 
-        TySet.serialize(luaGlobalFuncStub.returnTypeSet, stubOutputStream)
+        Ty.serialize(luaGlobalFuncStub.returnTypeSet, stubOutputStream)
     }
 
     @Throws(IOException::class)
@@ -88,7 +88,7 @@ class LuaGlobalFuncType : IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef>(
             params[i] = LuaParamInfo.deserialize(stubInputStream)
         }
 
-        val returnTypeSet = TySet.deserialize(stubInputStream)
+        val returnTypeSet = Ty.deserialize(stubInputStream)
         return LuaGlobalFuncStubImpl(StringRef.toString(name)!!, params, returnTypeSet, stubElement)
     }
 

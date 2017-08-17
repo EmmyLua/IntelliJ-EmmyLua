@@ -11,7 +11,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public class LuaExprListImpl extends ASTWrapperPsiElement implements LuaExprList {
 
@@ -35,7 +35,7 @@ public class LuaExprListImpl extends ASTWrapperPsiElement implements LuaExprList
   }
 
   @NotNull
-  public TySet guessTypeAt(SearchContext context) {
+  public Ty guessTypeAt(SearchContext context) {
     return LuaPsiImplUtil.guessTypeAt(this, context);
   }
 

@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public class LuaClosureExprImpl extends LuaExprImpl implements LuaClosureExpr {
 
@@ -39,7 +39,7 @@ public class LuaClosureExprImpl extends LuaExprImpl implements LuaClosureExpr {
   }
 
   @NotNull
-  public TySet guessReturnTypeSet(SearchContext searchContext) {
+  public Ty guessReturnTypeSet(SearchContext searchContext) {
     return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
   }
 

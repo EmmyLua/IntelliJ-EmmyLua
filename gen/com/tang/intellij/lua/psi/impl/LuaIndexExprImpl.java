@@ -11,7 +11,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
@@ -86,12 +86,12 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
   }
 
   @NotNull
-  public TySet guessPrefixType(SearchContext context) {
+  public Ty guessPrefixType(SearchContext context) {
     return LuaPsiImplUtil.guessPrefixType(this, context);
   }
 
   @NotNull
-  public TySet guessValueType(SearchContext context) {
+  public Ty guessValueType(SearchContext context) {
     return LuaPsiImplUtil.guessValueType(this, context);
   }
 

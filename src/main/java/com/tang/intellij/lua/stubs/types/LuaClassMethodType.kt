@@ -29,7 +29,8 @@ import com.tang.intellij.lua.stubs.LuaClassMethodStub
 import com.tang.intellij.lua.stubs.LuaClassMethodStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyUnion
 import java.io.IOException
 
 /**
@@ -50,7 +51,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         val searchContext = SearchContext(methodDef.project).setCurrentStubFile(methodDef.containingFile)
 
         val typeSet = expr.guessType(searchContext)
-        val type = typeSet.perfectClass
+        val type = TyUnion.getPrefectClass(typeSet)
         if (type != null)
             clazzName = type.className
 
@@ -84,7 +85,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
 
         //return type set
         val returnTypeSet = luaClassMethodStub.returnTypeSet
-        TySet.serialize(returnTypeSet, stubOutputStream)
+        Ty.serialize(returnTypeSet, stubOutputStream)
 
         // is static ?
         stubOutputStream.writeBoolean(luaClassMethodStub.isStatic)
@@ -102,7 +103,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
             params[i] = LuaParamInfo.deserialize(stubInputStream)
         }
 
-        val returnTypeSet = TySet.deserialize(stubInputStream)
+        val returnTypeSet = Ty.deserialize(stubInputStream)
         val isStatic = stubInputStream.readBoolean()
         return LuaClassMethodStubImpl(StringRef.toString(shortName)!!,
                 StringRef.toString(className)!!,

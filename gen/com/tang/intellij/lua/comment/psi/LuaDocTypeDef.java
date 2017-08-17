@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocTyStub;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public interface LuaDocTypeDef extends LuaDocPsiElement, StubBasedPsiElement<LuaDocTyStub> {
 
@@ -18,6 +18,6 @@ public interface LuaDocTypeDef extends LuaDocPsiElement, StubBasedPsiElement<Lua
   LuaDocTypeSet getTypeSet();
 
   @NotNull
-  TySet guessType(SearchContext context);
+  Ty guessType(SearchContext context);
 
 }

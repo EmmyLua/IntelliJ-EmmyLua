@@ -8,7 +8,7 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.SearchScope;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaStatement, PsiNameIdentifierOwner {
 
@@ -39,7 +39,7 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaSt
   SearchScope getUseScope();
 
   @NotNull
-  TySet guessReturnTypeSet(SearchContext searchContext);
+  Ty guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull
   LuaParamInfo[] getParams();

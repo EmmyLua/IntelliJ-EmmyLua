@@ -29,7 +29,7 @@ import com.tang.intellij.lua.stubs.impl.LuaIndexStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
 /**
@@ -62,14 +62,14 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
     override fun serialize(indexStub: LuaIndexStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(indexStub.typeName)
         stubOutputStream.writeName(indexStub.fieldName)
-        TySet.serialize(indexStub.guessValueType(), stubOutputStream)
+        Ty.serialize(indexStub.guessValueType(), stubOutputStream)
     }
 
     @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexStub {
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
-        val valueType = TySet.deserialize(stubInputStream)
+        val valueType = Ty.deserialize(stubInputStream)
         return LuaIndexStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), valueType, stubElement, this)
     }
 

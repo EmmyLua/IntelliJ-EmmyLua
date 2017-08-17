@@ -7,12 +7,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.search.SearchScope;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public interface LuaNameDef extends LuaName, LuaTypeGuessable, PsiNameIdentifierOwner {
 
   @NotNull
-  TySet guessType(SearchContext context);
+  Ty guessType(SearchContext context);
 
   @NotNull
   PsiElement getNameIdentifier();

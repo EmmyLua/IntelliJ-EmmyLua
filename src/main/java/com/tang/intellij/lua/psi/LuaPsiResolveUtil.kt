@@ -25,10 +25,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.reference.LuaReference
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
-import com.tang.intellij.lua.ty.TyArray
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TySerializedClass
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.*
 
 internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): LuaFuncBodyOwner? {
     var ret:LuaFuncBodyOwner? = null
@@ -163,23 +160,25 @@ fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
     val typeSet = indexExpr.guessPrefixType(context)
-    for (type in typeSet.types) {
+    var ret: PsiElement? = null
+    TyUnion.process(typeSet) { type ->
         if (type is TyClass) {
             //属性
-            val fieldDef = type.findField(idString, context)
-            if (fieldDef != null)
-                return fieldDef
+            ret = type.findField(idString, context)
+            if (ret != null)
+                return@process false
             //方法
-            val methodDef = type.findMethod(idString, context)
-            if (methodDef != null)
-                return methodDef
+            ret = type.findMethod(idString, context)
+            if (ret != null)
+                return@process false
         }
+        true
     }
-    return null
+    return ret
 }
 
-internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): TySet {
-    var typeSet: TySet? = null
+internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): Ty {
+    var typeSet: Ty? = null
     //作为函数参数，类型在函数注释里找
     if (nameDef is LuaParamNameDef) {
         typeSet = resolveParamType(nameDef, context)
@@ -196,7 +195,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): TySet {
             }
 
             //计算 expr 返回类型
-            if (typeSet == null || typeSet.isEmpty()) {
+            if (typeSet == null || typeSet is TyUnknown) {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
@@ -206,8 +205,8 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): TySet {
             }
 
             //anonymous
-            if (typeSet == null || typeSet.isEmpty())
-                typeSet = TySet.create(TyClass.createAnonymousType(nameDef))
+            if (typeSet == null || typeSet is TyUnknown)
+                typeSet = TyClass.createAnonymousType(nameDef)
         }
     }//变量声明，local x = 0
     //在Table字段里
@@ -228,7 +227,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): TySet {
             }
         }
     }*/
-    return typeSet ?: TySet.EMPTY
+    return typeSet ?: Ty.UNKNOWN
 }
 
 /**
@@ -239,7 +238,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): TySet {
  * *
  * @return LuaTypeSet
  */
-private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): TySet {
+private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): Ty {
     val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
     if (owner != null) {
         val paramName = paramNameDef.text
@@ -265,9 +264,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                             if (paramName == param.name) {
                                 val types = param.types
                                 if (types.isNotEmpty()) {
-                                    var set = TySet.create()
+                                    var set: Ty = Ty.UNKNOWN
                                     for (type in types) {
-                                        set = TySet.union(set, TySerializedClass(type))
+                                        set = set.union(TySerializedClass(type))
                                     }
                                     return set
                                 }
@@ -290,11 +289,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     val argObject = PsiTreeUtil.findChildOfType(argExprList, LuaNameExpr::class.java)
                     if (argObject != null) {
                         val set = argObject.guessType(context)
-                        for (ty in set.types) {
-                            if (ty is TyArray) {
-                                return TySet.create(ty.base)
-                            }
-                        }
+                        val array = TyUnion.find(set, TyArray::class.java)
+                        if (array != null)
+                            return array.base
                     }
                 }
                 // pairs
@@ -304,7 +301,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
             }
         }
     }
-    return TySet.EMPTY
+    return Ty.UNKNOWN
 }
 
 /**

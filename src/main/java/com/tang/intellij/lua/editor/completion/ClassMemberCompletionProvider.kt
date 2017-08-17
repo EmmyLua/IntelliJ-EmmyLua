@@ -25,8 +25,10 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.TyUnknown
 
 /**
 
@@ -53,7 +55,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
             val indexExpr = parent
             val project = indexExpr.project
             val prefixTypeSet = indexExpr.guessPrefixType(SearchContext(project))
-            if (!prefixTypeSet.isEmpty()) {
+            if (prefixTypeSet !is TyUnknown) {
                 complete(indexExpr, prefixTypeSet, completionResultSet, completionResultSet.prefixMatcher, null)
             }
             //smart
@@ -66,7 +68,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
                     val txt = it.text
                     if (nameText != txt && matcher.prefixMatches(txt)) {
                         val typeSet = it.guessType(SearchContext(project))
-                        if (!typeSet.isEmpty()) {
+                        if (prefixTypeSet !is TyUnknown) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)
                             complete(indexExpr, typeSet, resultSet, prefixMatcher, object : HandlerProcessor {
@@ -83,9 +85,9 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: TySet, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
+    private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: Ty, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
         if (indexExpr.colon != null) {
-            prefixTypeSet.types.forEach { luaType ->
+            TyUnion.each(prefixTypeSet) { luaType ->
                 if (luaType is TyClass) {
                     val context = SearchContext(indexExpr.project)
                     luaType.initAliasName(context)
@@ -96,7 +98,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
                 }
             }
         } else {
-            prefixTypeSet.types.forEach { luaType ->
+            TyUnion.each(prefixTypeSet)  { luaType ->
                 if (luaType is TyClass) {
                     val context = SearchContext(indexExpr.project)
                     luaType.initAliasName(context)

@@ -20,7 +20,7 @@ import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.psi.LuaElementType
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.Ty
 
 /**
 
@@ -29,7 +29,7 @@ import com.tang.intellij.lua.ty.TySet
 interface LuaDocClassFieldStub : StubElement<LuaDocFieldDef> {
     val name: String
 
-    val type: TySet
+    val type: Ty
 
     val className: String?
 }
@@ -37,5 +37,5 @@ interface LuaDocClassFieldStub : StubElement<LuaDocFieldDef> {
 class LuaDocClassFieldStubImpl(parent: StubElement<*>,
                                override val name: String,
                                override val className: String?,
-                               override val type: TySet)
+                               override val type: Ty)
     : StubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocClassFieldStub

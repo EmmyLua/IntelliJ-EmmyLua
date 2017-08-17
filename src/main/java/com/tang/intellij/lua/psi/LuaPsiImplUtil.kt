@@ -36,12 +36,12 @@ import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
-import com.tang.intellij.lua.lang.type.LuaTypeSet
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
+import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TySerializedClass
-import com.tang.intellij.lua.ty.TySet
+import com.tang.intellij.lua.ty.TyUnion
 import java.util.*
 import javax.swing.Icon
 
@@ -68,7 +68,7 @@ object LuaPsiImplUtil {
         return identifier.text
     }
 
-    @JvmStatic fun guessType(nameDef: LuaNameDef, context: SearchContext): TySet {
+    @JvmStatic fun guessType(nameDef: LuaNameDef, context: SearchContext): Ty {
         return resolveType(nameDef, context)
     }
 
@@ -156,8 +156,8 @@ object LuaPsiImplUtil {
                 type = TySerializedClass(stub.className)
             } else {
                 val expr = classMethodDef.classMethodName.expr
-                val typeSet = expr.guessType(ctx)
-                val perfect = typeSet.perfect
+                val ty = expr.guessType(ctx)
+                val perfect = TyUnion.getPrefectClass(ty)
                 if (perfect is TyClass)
                     type = perfect
             }
@@ -202,7 +202,7 @@ object LuaPsiImplUtil {
      * *
      * @return LuaTypeSet
      */
-    @JvmStatic fun guessPrefixType(callExpr: LuaCallExpr, context: SearchContext): TySet {
+    @JvmStatic fun guessPrefixType(callExpr: LuaCallExpr, context: SearchContext): Ty {
         val prefix = callExpr.firstChild as LuaExpr
         return prefix.guessType(context)
     }
@@ -278,7 +278,7 @@ object LuaPsiImplUtil {
         return callExpr.expr is LuaNameExpr
     }
 
-    @JvmStatic fun guessTypeAt(list: LuaExprList, context: SearchContext): TySet {
+    @JvmStatic fun guessTypeAt(list: LuaExprList, context: SearchContext): Ty {
         val exprList = list.exprList
         val index = context.index
         if (exprList.size > index) {
@@ -288,10 +288,10 @@ object LuaPsiImplUtil {
             val exp0 = exprList[0]
             return exp0.guessType(context)
         }
-        return TySet.EMPTY
+        return Ty.UNKNOWN
     }
 
-    @JvmStatic fun guessPrefixType(indexExpr: LuaIndexExpr, context: SearchContext): TySet {
+    @JvmStatic fun guessPrefixType(indexExpr: LuaIndexExpr, context: SearchContext): Ty {
         val prefix = indexExpr.firstChild as LuaExpr
         return prefix.guessType(context)
     }
@@ -347,7 +347,7 @@ object LuaPsiImplUtil {
         if (idExpr != null)
             return LuaString.getContent(idExpr.text).value
 
-        return null;
+        return null
     }
 
     @JvmStatic fun setName(indexExpr: LuaIndexExpr, name: String): PsiElement {
@@ -361,10 +361,10 @@ object LuaPsiImplUtil {
             val newId = LuaElementFactory.createLiteral(indexExpr.project, newText)
             return idExpr.replace(newId)
         }
-        return indexExpr;
+        return indexExpr
     }
 
-    @JvmStatic fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): TySet {
+    @JvmStatic fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): Ty {
         val stub = indexExpr.stub
         if (stub != null) {
             return stub.guessValueType()
@@ -375,12 +375,12 @@ object LuaPsiImplUtil {
                 .map<PsiElement>({ it.parent })
                 .filter { s -> s.parent is LuaAssignStat }
                 .map<PsiElement>({ it.parent })
-                .map<TySet> { s ->
+                .map<Ty> { s ->
                     val assignStat = s as LuaAssignStat
                     context.index = assignStat.getIndexFor(indexExpr)
                     assignStat.valueExprList?.guessTypeAt(context)
                 }
-        return setOptional.orElse(TySet.EMPTY)
+        return setOptional.orElse(Ty.UNKNOWN)
     }
 
     @JvmStatic fun findField(table: LuaTableExpr, fieldName: String): LuaTableField? {
@@ -401,7 +401,7 @@ object LuaPsiImplUtil {
         return list
     }
 
-    @JvmStatic fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): TySet {
+    @JvmStatic fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): Ty {
         if (owner is StubBasedPsiElementBase<*>) {
             val stub = owner.stub
             if (stub is LuaFuncBodyOwnerStub<*>) {
@@ -412,9 +412,9 @@ object LuaPsiImplUtil {
         return guessReturnTypeSetOriginal(owner, searchContext)
     }
 
-    private val FUNCTION_RETURN_TYPESET = Key.create<ParameterizedCachedValue<TySet, SearchContext>>("lua.function.return_typeset")
+    private val FUNCTION_RETURN_TYPESET = Key.create<ParameterizedCachedValue<Ty, SearchContext>>("lua.function.return_typeset")
 
-    @JvmStatic fun guessReturnTypeSetOriginal(owner: LuaFuncBodyOwner, searchContext: SearchContext): TySet {
+    @JvmStatic fun guessReturnTypeSetOriginal(owner: LuaFuncBodyOwner, searchContext: SearchContext): Ty {
         if (owner is LuaCommentOwner) {
             val comment = LuaCommentUtil.findComment(owner)
             if (comment != null) {
@@ -427,13 +427,13 @@ object LuaPsiImplUtil {
 
         //infer from return stat
         return CachedValuesManager.getManager(owner.project).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, { ctx ->
-            var typeSet = TySet.create()
+            var typeSet: Ty = Ty.UNKNOWN
             owner.acceptChildren(object : LuaVisitor() {
                 override fun visitReturnStat(o: LuaReturnStat) {
                     val guessReturnTypeSet = guessReturnTypeSet(o, ctx.index, ctx)
-                    guessReturnTypeSet.types.forEach {
+                    TyUnion.each(guessReturnTypeSet) {
                         if (!it.isAnonymous) { //不处理local
-                            typeSet = TySet.union(typeSet, it)
+                            typeSet = typeSet.union(it)
                         }
                     }
                 }
@@ -577,7 +577,7 @@ object LuaPsiImplUtil {
         return tableField.idExpr
     }
 
-    @JvmStatic fun guessType(tableField: LuaTableField, context: SearchContext): TySet {
+    @JvmStatic fun guessType(tableField: LuaTableField, context: SearchContext): Ty {
         //from comment
         val comment = tableField.comment
         if (comment != null) {
@@ -589,7 +589,7 @@ object LuaPsiImplUtil {
         if (lastChild is LuaExpr) {
             return lastChild.guessType(context)
         }
-        return TySet.EMPTY
+        return Ty.UNKNOWN
     }
 
     @JvmStatic fun getName(tableField: LuaTableField): String? {
@@ -698,7 +698,7 @@ object LuaPsiImplUtil {
         return typeName
     }
 
-    @JvmStatic fun guessReturnTypeSet(returnStat: LuaReturnStat?, index: Int, context: SearchContext): TySet {
+    @JvmStatic fun guessReturnTypeSet(returnStat: LuaReturnStat?, index: Int, context: SearchContext): Ty {
         if (returnStat != null) {
             val returnExpr = returnStat.exprList
             if (returnExpr != null) {
@@ -706,6 +706,6 @@ object LuaPsiImplUtil {
                 return returnExpr.guessTypeAt(context)
             }
         }
-        return TySet.EMPTY
+        return Ty.UNKNOWN
     }
 }

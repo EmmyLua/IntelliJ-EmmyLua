@@ -29,8 +29,9 @@ import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.ty.Ty;
 import com.tang.intellij.lua.ty.TyClass;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.TyUnion;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,10 +73,10 @@ public class CreateMethodIntention extends BaseIntentionAction {
             LuaExpr expr = callExpr.getExpr();
             if (expr instanceof LuaIndexExpr) {
                 LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
-                TySet typeSet = indexExpr.guessPrefixType(new SearchContext(project));
-                if (typeSet.isEmpty()) return;
+                Ty typeSet = indexExpr.guessPrefixType(new SearchContext(project));
+                if (Ty.Companion.isInvalid(typeSet)) return;
 
-                InsertPosition position = calcInsertPosition(typeSet.getPerfectClass(), project);
+                InsertPosition position = calcInsertPosition(TyUnion.Companion.getPrefectClass(typeSet), project);
                 if (position != null) {
                     editor.getCaretModel().moveToOffset(position.offset);
 

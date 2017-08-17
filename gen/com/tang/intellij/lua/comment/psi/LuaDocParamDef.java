@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.TySet;
+import com.tang.intellij.lua.ty.Ty;
 
 public interface LuaDocParamDef extends LuaDocPsiElement {
 
@@ -19,7 +19,7 @@ public interface LuaDocParamDef extends LuaDocPsiElement {
   LuaDocTypeSet getTypeSet();
 
   @NotNull
-  TySet guessType(SearchContext context);
+  Ty guessType(SearchContext context);
 
   @Nullable
   PsiElement getOptional();
