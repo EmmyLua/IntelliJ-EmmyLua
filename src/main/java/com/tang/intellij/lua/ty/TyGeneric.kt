@@ -58,3 +58,5 @@ class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContex
         get() = _baseTy
 
 }
+
+class TySerializedGeneric(override val params: Array<Ty>, override val base: Ty) : TyGeneric()

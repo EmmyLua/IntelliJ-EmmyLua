@@ -108,6 +108,11 @@ abstract class Ty(val kind: TyKind) {
                     stream.writeByte(ty.size)
                     TyUnion.each(ty) { serialize(it, stream) }
                 }
+                is TyGeneric -> {
+                    serialize(ty.base, stream)
+                    stream.writeByte(ty.params.size)
+                    ty.params.forEach { serialize(it, stream) }
+                }
             }
         }
 
@@ -144,6 +149,15 @@ abstract class Ty(val kind: TyKind) {
                         union = TyUnion.union(union, deserialize(stream))
                     }
                     union
+                }
+                TyKind.Generic -> {
+                    val base = deserialize(stream)
+                    val size = stream.readByte()
+                    val params = mutableListOf<Ty>()
+                    for (i in 0 until size) {
+                        params.add(deserialize(stream))
+                    }
+                    TySerializedGeneric(params.toTypedArray(), base)
                 }
                 else -> TyUnknown()
             }
