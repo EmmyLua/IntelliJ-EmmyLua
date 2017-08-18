@@ -81,15 +81,16 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
 
             return Ty.UNKNOWN
         }
-        // find in comment
-//        val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
-//        if (bodyOwner != null)
-//            return bodyOwner.guessReturnTypeSet(context)
 
         val ty = ref.guessType(context)
         val tyFunc = TyUnion.find(ty, TyFunction::class.java)
         if (tyFunc != null)
             return tyFunc.returnTy
+
+        //todo TyFunction
+        val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
+        if (bodyOwner != null)
+            return bodyOwner.guessReturnTypeSet(context)
 
         return Ty.UNKNOWN
     }
