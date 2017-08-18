@@ -30,6 +30,11 @@ enum class TyKind {
     Union,
     Generic
 }
+enum class TyPrimitiveKind {
+    String,
+    Number,
+    Boolean
+}
 
 abstract class Ty(val kind: TyKind) {
 
@@ -62,15 +67,15 @@ abstract class Ty(val kind: TyKind) {
     companion object {
 
         val UNKNOWN = TyUnknown()
-        val BOOLEAN = TyPrimitive("b", "boolean")
-        val STRING = TyPrimitive("s", "string")
-        val NUMBER = TyPrimitive("n", "number")
+        val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
+        val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
+        val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
 
-        private fun getPrimitive(mark: String): Ty {
-            return when (mark) {
-                "b" -> BOOLEAN
-                "s" -> STRING
-                "n" -> NUMBER
+        private fun getPrimitive(mark: Byte): Ty {
+            return when (mark.toInt()) {
+                TyPrimitiveKind.Boolean.ordinal -> BOOLEAN
+                TyPrimitiveKind.String.ordinal -> STRING
+                TyPrimitiveKind.Number.ordinal -> NUMBER
                 else -> UNKNOWN
             }
         }
@@ -102,7 +107,7 @@ abstract class Ty(val kind: TyKind) {
                     stream.writeName(ty.aliasName)
                 }
                 is TyPrimitive -> {
-                    stream.writeName(ty.name)
+                    stream.writeByte(ty.primitiveKind.ordinal)
                 }
                 is TyUnion -> {
                     stream.writeByte(ty.size)
@@ -138,10 +143,7 @@ abstract class Ty(val kind: TyKind) {
                     val aliasName = stream.readName()
                     TySerializedClass(StringRef.toString(className), StringRef.toString(superName), StringRef.toString(aliasName))
                 }
-                TyKind.Primitive -> {
-                    val ref = stream.readName()
-                    getPrimitive(StringRef.toString(ref))
-                }
+                TyKind.Primitive -> getPrimitive(stream.readByte())
                 TyKind.Union -> {
                     var union:Ty = TyUnion()
                     val size = stream.readByte()
@@ -165,7 +167,7 @@ abstract class Ty(val kind: TyKind) {
     }
 }
 
-class TyPrimitive(val name: String, override val displayName: String) : Ty(TyKind.Primitive)
+class TyPrimitive(val primitiveKind: TyPrimitiveKind, override val displayName: String) : Ty(TyKind.Primitive)
 
 class TyArray(val base: Ty) : Ty(TyKind.Array) {
     override val displayName: String
