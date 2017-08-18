@@ -18,6 +18,8 @@ package com.tang.intellij.lua.psi;
 
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.TyFunction;
+import com.tang.intellij.lua.ty.TyPsiFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +43,11 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner {
 
     @NotNull
     LuaParamInfo[] getParams();
+
+    @NotNull
+    default TyFunction asTy(SearchContext searchContext) {
+        return new TyPsiFunction(this, searchContext);
+    }
 
     default String getParamSignature() {
         return LuaPsiImplUtil.getParamSignature(this);

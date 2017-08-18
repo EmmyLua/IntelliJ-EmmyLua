@@ -22,7 +22,6 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyFunction
-import com.tang.intellij.lua.ty.TyPsiFunction
 import com.tang.intellij.lua.ty.TyUnion
 
 /**
@@ -37,7 +36,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 this is LuaCallExpr -> guessType(this, context)
                 this is LuaParenExpr -> guessType(this, context)
                 this is LuaLiteralExpr -> guessType(this)
-                this is LuaClosureExpr -> TyPsiFunction(this, context)
+                this is LuaClosureExpr -> asTy(context)
                 else -> Ty.UNKNOWN
             }
         }!!

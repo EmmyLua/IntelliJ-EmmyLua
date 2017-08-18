@@ -29,7 +29,10 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
-import com.tang.intellij.lua.ty.*
+import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyArray
+import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TyUnion
 
 /**
 
@@ -129,7 +132,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         //class method
         val method = type.findMethod(fieldName, context)
         if (method != null)
-            set = set.union(TyPsiFunction(method, context))
+            set = set.union(method.asTy(context))
 
         return set
     }
