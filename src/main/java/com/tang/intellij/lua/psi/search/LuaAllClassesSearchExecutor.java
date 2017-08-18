@@ -20,7 +20,7 @@ import com.intellij.openapi.application.QueryExecutorBase;
 import com.intellij.openapi.project.DumbService;
 import com.intellij.util.Processor;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
-import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.ITyClass;
 import com.tang.intellij.lua.ty.TySerializedClass;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,9 +28,9 @@ import org.jetbrains.annotations.NotNull;
  *
  * Created by tangzx on 2017/3/29.
  */
-public class LuaAllClassesSearchExecutor extends QueryExecutorBase<TyClass, LuaAllClassesSearch.SearchParameters> {
+public class LuaAllClassesSearchExecutor extends QueryExecutorBase<ITyClass, LuaAllClassesSearch.SearchParameters> {
     @Override
-    public void processQuery(@NotNull LuaAllClassesSearch.SearchParameters searchParameters, @NotNull Processor<TyClass> processor) {
+    public void processQuery(@NotNull LuaAllClassesSearch.SearchParameters searchParameters, @NotNull Processor<ITyClass> processor) {
         DumbService.getInstance(searchParameters.getProject()).runReadActionInSmartMode(() -> {
             LuaClassIndex.getInstance().processAllKeys(searchParameters.getProject(), typeName -> {
                 return processor.process(new TySerializedClass(typeName, null, null));

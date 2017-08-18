@@ -10,7 +10,7 @@ import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocClassFieldStub> {
 
@@ -27,7 +27,7 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   PsiElement getId();
 
   @NotNull
-  Ty guessType(SearchContext context);
+  ITy guessType(SearchContext context);
 
   @Nullable
   PsiElement getNameIdentifier();

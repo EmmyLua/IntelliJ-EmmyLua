@@ -37,7 +37,7 @@ import com.tang.intellij.lua.psi.LuaFuncBodyOwner;
 import com.tang.intellij.lua.psi.LuaParamNameDef;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassIndex;
-import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.ITyClass;
 import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 
@@ -148,7 +148,7 @@ public class LuaCommentCompletionContributor extends CompletionContributor {
                 LuaComment comment = PsiTreeUtil.getParentOfType(position, LuaComment.class);
                 LuaDocClassDef classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef.class);
                 if (classDef != null) {
-                    TyClass classType = classDef.getClassType();
+                    ITyClass classType = classDef.getClassType();
                     classType.processFields(new SearchContext(classDef.getProject()), (curType, field) -> {
                         completionResultSet.addElement(LookupElementBuilder.create(field.getFieldName()));
                         return Unit.INSTANCE;

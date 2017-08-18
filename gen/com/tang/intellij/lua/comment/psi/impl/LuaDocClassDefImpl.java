@@ -12,7 +12,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.tang.intellij.lua.comment.psi.*;
 import com.intellij.navigation.ItemPresentation;
-import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.ITyClass;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
@@ -52,7 +52,7 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
   }
 
   @NotNull
-  public TyClass getClassType() {
+  public ITyClass getClassType() {
     return LuaDocPsiImplUtilKt.getClassType(this);
   }
 

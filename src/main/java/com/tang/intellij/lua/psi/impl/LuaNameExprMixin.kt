@@ -27,6 +27,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaNameStub
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
 
@@ -49,9 +50,9 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
         return null
     }
 
-    override fun guessType(context: SearchContext): Ty {
+    override fun guessType(context: SearchContext): ITy {
         val set = RecursionManager.doPreventingRecursion(this, true) {
-            var typeSet:Ty = Ty.UNKNOWN
+            var typeSet:ITy = Ty.UNKNOWN
             val nameExpr = this as LuaNameExpr
 
             val multiResolve = multiResolve(nameExpr, context)
@@ -68,10 +69,10 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpressio
         return set ?: Ty.UNKNOWN
     }
 
-    private fun getTypeSet(context: SearchContext, def: PsiElement): Ty {
+    private fun getTypeSet(context: SearchContext, def: PsiElement): ITy {
         when (def) {
             is LuaNameExpr -> {
-                var typeSet: Ty = Ty.UNKNOWN
+                var typeSet: ITy = Ty.UNKNOWN
                 val luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat::class.java)
                 if (luaAssignStat != null) {
                     val comment = luaAssignStat.comment

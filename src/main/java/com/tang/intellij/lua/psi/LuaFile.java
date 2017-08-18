@@ -27,7 +27,7 @@ import com.tang.intellij.lua.lang.LuaFileType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaFileStub;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -49,16 +49,16 @@ public class LuaFile extends PsiFileBase {
      * 获取最后返回的类型
      * @return LuaTypeSet
      */
-    public Ty getReturnedType(SearchContext context) {
+    public ITy getReturnedType(SearchContext context) {
         StubElement greenStub = getGreenStub();
         if (greenStub instanceof LuaFileStub)
             return ((LuaFileStub) greenStub).getReturnedType(context);
         return guessReturnedType(context);
     }
 
-    public Ty guessReturnedType(SearchContext context) {
+    public ITy guessReturnedType(SearchContext context) {
         return RecursionManager.doPreventingRecursion(this, true, () -> {
-            Ty set;
+            ITy set;
             PsiElement lastChild = getLastChild();
             Ref<LuaReturnStat> returnStatRef = Ref.create();
             LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat.class, luaReturnStat -> {

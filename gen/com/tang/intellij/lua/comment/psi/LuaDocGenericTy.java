@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaDocGenericTy extends LuaDocTy {
 
@@ -13,6 +13,6 @@ public interface LuaDocGenericTy extends LuaDocTy {
   List<LuaDocTy> getTyList();
 
   @NotNull
-  Ty getType(SearchContext searchContext);
+  ITy getType(SearchContext searchContext);
 
 }

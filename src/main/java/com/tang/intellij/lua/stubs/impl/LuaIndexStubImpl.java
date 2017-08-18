@@ -27,8 +27,9 @@ import com.tang.intellij.lua.psi.LuaVarList;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.LuaIndexStub;
 import com.tang.intellij.lua.stubs.types.LuaIndexType;
+import com.tang.intellij.lua.ty.ITy;
+import com.tang.intellij.lua.ty.ITyClass;
 import com.tang.intellij.lua.ty.Ty;
-import com.tang.intellij.lua.ty.TyClass;
 import com.tang.intellij.lua.ty.TyUnion;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +43,7 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
     private LuaIndexExpr indexExpr;
     private String typeName;
     private String fieldName;
-    private Ty valueType = Ty.Companion.getUNKNOWN();
+    private ITy valueType = Ty.Companion.getUNKNOWN();
 
     public LuaIndexStubImpl(LuaIndexExpr indexExpr, StubElement parent, LuaIndexType elementType) {
         super(parent, elementType);
@@ -51,7 +52,7 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
         fieldName = indexExpr.getName();
     }
 
-    public LuaIndexStubImpl(String typeName, String fieldName, Ty valueType, StubElement stubElement, LuaIndexType indexType) {
+    public LuaIndexStubImpl(String typeName, String fieldName, ITy valueType, StubElement stubElement, LuaIndexType indexType) {
         super(stubElement, indexType);
         this.typeName = typeName;
         this.fieldName = fieldName;
@@ -64,8 +65,8 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
         if (typeName == null && indexExpr != null) {
             SearchContext context = new SearchContext(indexExpr.getProject());
             context.setCurrentStubFile(indexExpr.getContainingFile());
-            Ty ty = indexExpr.guessPrefixType(context);
-            TyClass type = TyUnion.Companion.getPrefectClass(ty);
+            ITy ty = indexExpr.guessPrefixType(context);
+            ITyClass type = TyUnion.Companion.getPrefectClass(ty);
             if (type != null)
                 typeName = type.getClassName();
         }
@@ -79,9 +80,9 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
 
     @NotNull
     @Override
-    public Ty guessValueType() {
+    public ITy guessValueType() {
         if (PowerLevel.isFullPower() && valueType == null && indexExpr != null) {
-            Optional<Ty> setOptional = Optional.of(indexExpr)
+            Optional<ITy> setOptional = Optional.of(indexExpr)
                     .filter(s -> s.getParent() instanceof LuaVarList)
                     .map(PsiElement::getParent)
                     .filter(s -> s.getParent() instanceof LuaAssignStat)

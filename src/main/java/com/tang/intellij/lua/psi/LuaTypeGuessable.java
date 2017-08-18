@@ -17,7 +17,7 @@
 package com.tang.intellij.lua.psi;
 
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -26,5 +26,5 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface LuaTypeGuessable extends LuaPsiElement {
     @NotNull
-    Ty guessType(SearchContext context);
+    ITy guessType(SearchContext context);
 }

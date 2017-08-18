@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaCallExpr extends LuaExpr {
 
@@ -16,7 +16,7 @@ public interface LuaCallExpr extends LuaExpr {
   LuaExpr getExpr();
 
   @NotNull
-  Ty guessPrefixType(SearchContext context);
+  ITy guessPrefixType(SearchContext context);
 
   @Nullable
   LuaFuncBodyOwner resolveFuncBodyOwner(SearchContext context);

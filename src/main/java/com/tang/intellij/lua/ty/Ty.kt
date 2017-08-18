@@ -36,22 +36,35 @@ enum class TyPrimitiveKind {
     Boolean
 }
 
-abstract class Ty(val kind: TyKind) {
+interface ITy {
 
-    val isAnonymous: Boolean = false
+    val isAnonymous: Boolean
 
-    abstract val displayName: String
+    val kind: TyKind
 
-    fun union(ty: Ty): Ty {
+    val displayName: String
+
+    fun union(ty: ITy): ITy
+
+    fun createTypeString(): String
+
+    fun createReturnString(): String
+}
+
+abstract class Ty(override val kind: TyKind) : ITy {
+
+    override val isAnonymous: Boolean = false
+
+    override fun union(ty: ITy): ITy {
         return TyUnion.union(this, ty)
     }
 
-    fun createTypeString(): String {
+    override fun createTypeString(): String {
         val s = toString()
         return if (s.isEmpty()) "any" else s
     }
 
-    fun createReturnString(): String {
+    override fun createReturnString(): String {
         val s = toString()
         return if (s.isEmpty()) "void" else s
     }
@@ -84,24 +97,24 @@ abstract class Ty(val kind: TyKind) {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
         }
 
-        fun isInvalid(ty: Ty?): Boolean {
+        fun isInvalid(ty: ITy?): Boolean {
             return ty == null || ty is TyUnknown
         }
 
-        fun serialize(ty: Ty, stream: StubOutputStream) {
+        fun serialize(ty: ITy, stream: StubOutputStream) {
             stream.writeByte(ty.kind.ordinal)
             when(ty) {
-                is TyArray -> {
+                is ITyArray -> {
                     serialize(ty.base, stream)
                 }
-                is TyFunction -> {
+                is ITyFunction -> {
                     stream.writeByte(ty.params.size)
                     for (param in ty.params) {
                         LuaParamInfo.serialize(param, stream)
                     }
                     serialize(ty.returnTy, stream)
                 }
-                is TyClass -> {
+                is ITyClass -> {
                     stream.writeName(ty.className)
                     stream.writeName(ty.superClassName)
                     stream.writeName(ty.aliasName)
@@ -113,7 +126,7 @@ abstract class Ty(val kind: TyKind) {
                     stream.writeByte(ty.size)
                     TyUnion.each(ty) { serialize(it, stream) }
                 }
-                is TyGeneric -> {
+                is ITyGeneric -> {
                     serialize(ty.base, stream)
                     stream.writeByte(ty.params.size)
                     ty.params.forEach { serialize(it, stream) }
@@ -121,7 +134,7 @@ abstract class Ty(val kind: TyKind) {
             }
         }
 
-        fun deserialize(stream: StubInputStream): Ty {
+        fun deserialize(stream: StubInputStream): ITy {
             val kind = getKind(stream.readByte().toInt())
             return when (kind) {
                 TyKind.Array -> {
@@ -145,7 +158,7 @@ abstract class Ty(val kind: TyKind) {
                 }
                 TyKind.Primitive -> getPrimitive(stream.readByte())
                 TyKind.Union -> {
-                    var union:Ty = TyUnion()
+                    var union:ITy = TyUnion()
                     val size = stream.readByte()
                     for (i in 0 until size) {
                         union = TyUnion.union(union, deserialize(stream))
@@ -155,7 +168,7 @@ abstract class Ty(val kind: TyKind) {
                 TyKind.Generic -> {
                     val base = deserialize(stream)
                     val size = stream.readByte()
-                    val params = mutableListOf<Ty>()
+                    val params = mutableListOf<ITy>()
                     for (i in 0 until size) {
                         params.add(deserialize(stream))
                     }
@@ -169,13 +182,17 @@ abstract class Ty(val kind: TyKind) {
 
 class TyPrimitive(val primitiveKind: TyPrimitiveKind, override val displayName: String) : Ty(TyKind.Primitive)
 
-class TyArray(val base: Ty) : Ty(TyKind.Array) {
+interface ITyArray : ITy {
+    val base: ITy
+}
+
+class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override val displayName: String
         get() = "${base.displayName}[]"
 }
 
 class TyUnion : Ty(TyKind.Union) {
-    private val children = mutableListOf<Ty>()
+    private val children = mutableListOf<ITy>()
 
     override val displayName: String
         get() = "Union"
@@ -183,7 +200,7 @@ class TyUnion : Ty(TyKind.Union) {
     val size:Int
         get() = children.size
 
-    private fun union2(ty: Ty): TyUnion {
+    private fun union2(ty: ITy): TyUnion {
         if (ty is TyUnion)
             children.addAll(ty.children)
         else
@@ -192,7 +209,7 @@ class TyUnion : Ty(TyKind.Union) {
     }
 
     companion object {
-        fun <T : Ty> find(ty: Ty, clazz: Class<T>): T? {
+        fun <T : ITy> find(ty: ITy, clazz: Class<T>): T? {
             if (clazz.isInstance(ty))
                 return clazz.cast(ty)
             var ret: T? = null
@@ -206,7 +223,7 @@ class TyUnion : Ty(TyKind.Union) {
             return ret
         }
 
-        fun process(ty: Ty, process: (Ty) -> Boolean) {
+        fun process(ty: ITy, process: (ITy) -> Boolean) {
             if (ty is TyUnion) {
                 for (child in ty.children) {
                     if (!process(child))
@@ -215,13 +232,13 @@ class TyUnion : Ty(TyKind.Union) {
             } else process(ty)
         }
 
-        fun each(ty: Ty, process: (Ty) -> Unit) {
+        fun each(ty: ITy, process: (ITy) -> Unit) {
             if (ty is TyUnion) {
                 ty.children.forEach(process)
             } else process(ty)
         }
 
-        fun union(t1: Ty, t2: Ty): Ty {
+        fun union(t1: ITy, t2: ITy): ITy {
             if (t1 is TyUnknown)
                 return t2
             else if (t2 is TyUnknown)
@@ -238,10 +255,10 @@ class TyUnion : Ty(TyKind.Union) {
             }
         }
 
-        fun getPrefectClass(ty: Ty): TyClass? {
-            var tc: TyClass? = null
+        fun getPrefectClass(ty: ITy): ITyClass? {
+            var tc: ITyClass? = null
             process(ty) {
-                if (it is TyClass) {
+                if (it is ITyClass) {
                     tc = it
                     return@process false
                 }

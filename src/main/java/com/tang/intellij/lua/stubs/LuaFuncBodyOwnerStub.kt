@@ -11,14 +11,14 @@ package com.tang.intellij.lua.stubs
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.ITy
 
 /**
  * func body owner stub
  * Created by TangZX on 2017/2/4.
  */
 interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
-    val returnTypeSet: Ty
+    val returnTypeSet: ITy
 
     val params: Array<LuaParamInfo>
 }

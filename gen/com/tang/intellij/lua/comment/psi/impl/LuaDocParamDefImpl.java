@@ -11,7 +11,7 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocParamDefImpl extends ASTWrapperPsiElement implements LuaDocParamDef {
 
@@ -47,7 +47,7 @@ public class LuaDocParamDefImpl extends ASTWrapperPsiElement implements LuaDocPa
   }
 
   @NotNull
-  public Ty guessType(SearchContext context) {
+  public ITy guessType(SearchContext context) {
     return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 

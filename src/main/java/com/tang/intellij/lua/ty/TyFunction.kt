@@ -22,26 +22,27 @@ import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.search.SearchContext
 
+interface ITyFunction : ITy {
+    val returnTy: ITy
+    val params: Array<LuaParamInfo>
+}
 
-abstract class TyFunction : Ty(TyKind.Function) {
-    abstract val returnTy: Ty
-    abstract val params: Array<LuaParamInfo>
-
+abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     override val displayName: String
         get() = "function"
 }
 
 class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : TyFunction() {
-    private val _retTy: Ty = psi.guessReturnTypeSet(searchContext)
+    private val _retTy: ITy = psi.guessReturnTypeSet(searchContext)
 
-    override val returnTy: Ty
+    override val returnTy: ITy
         get() = _retTy
     override val params: Array<LuaParamInfo>
         get() = psi.params
 }
 
 class TyDocPsiFunction(func: LuaDocFunctionTy, searchContext: SearchContext) : TyFunction() {
-    private val _retTy: Ty = func.getReturnType(searchContext)
+    private val _retTy: ITy = func.getReturnType(searchContext)
 
     private fun initParams(func: LuaDocFunctionTy, searchContext: SearchContext): Array<LuaParamInfo> {
         val list = mutableListOf<LuaParamInfo>()
@@ -56,10 +57,10 @@ class TyDocPsiFunction(func: LuaDocFunctionTy, searchContext: SearchContext) : T
 
     private val _params = initParams(func, searchContext)
 
-    override val returnTy: Ty
+    override val returnTy: ITy
         get() = _retTy
     override val params: Array<LuaParamInfo>
         get() = _params
 }
 
-class TySerializedFunction(override val returnTy: Ty, override val params: Array<LuaParamInfo>) : TyFunction()
+class TySerializedFunction(override val returnTy: ITy, override val params: Array<LuaParamInfo>) : TyFunction()

@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
 
@@ -40,7 +40,7 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
   }
 
   @NotNull
-  public Ty guessPrefixType(SearchContext context) {
+  public ITy guessPrefixType(SearchContext context) {
     return LuaPsiImplUtil.guessPrefixType(this, context);
   }
 

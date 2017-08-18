@@ -29,10 +29,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyArray
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.*
 
 /**
 
@@ -59,13 +56,13 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         return null
     }
 
-    override fun guessType(context: SearchContext): Ty {
+    override fun guessType(context: SearchContext): ITy {
         return RecursionManager.doPreventingRecursion(this, true) {
             val indexExpr = this as LuaIndexExpr
             // xxx[1]
             if (indexExpr.lbrack != null) {
                 val tySet = indexExpr.guessPrefixType(context)
-                val array = TyUnion.find(tySet, TyArray::class.java)
+                val array = TyUnion.find(tySet, ITyArray::class.java)
                 if (array != null)
                     return@doPreventingRecursion array.base
             }
@@ -79,10 +76,10 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
             }
 
             //guess from value
-            var result:Ty = Ty.UNKNOWN
+            var result:ITy = Ty.UNKNOWN
             // value type
             val stub = indexExpr.stub
-            val valueTypeSet: Ty?
+            val valueTypeSet: ITy?
             if (stub != null)
                 valueTypeSet = stub.guessValueType()
             else
@@ -103,8 +100,8 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         }!!
     }
 
-    private fun guessFieldType(fieldName: String, type: TyClass, context: SearchContext): Ty {
-        var set:Ty = Ty.UNKNOWN
+    private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchContext): ITy {
+        var set:ITy = Ty.UNKNOWN
 
         //todo: use findField()
         val all = LuaClassFieldIndex.findAll(type, fieldName, context)

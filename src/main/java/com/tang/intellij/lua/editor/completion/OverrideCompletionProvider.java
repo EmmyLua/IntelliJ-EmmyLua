@@ -34,7 +34,7 @@ import com.tang.intellij.lua.psi.LuaParamInfo;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
-import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.ITyClass;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -50,15 +50,15 @@ public class OverrideCompletionProvider extends CompletionProvider<CompletionPar
         LuaClassMethodDef methodDef = PsiTreeUtil.getParentOfType(id, LuaClassMethodDef.class);
         if (methodDef != null) {
             SearchContext context = new SearchContext(methodDef.getProject());
-            TyClass classType = methodDef.getClassType(context);
+            ITyClass classType = methodDef.getClassType(context);
             if (classType != null) {
-                TyClass sup = classType.getSuperClass(context);
+                ITyClass sup = classType.getSuperClass(context);
                 addOverrideMethod(completionParameters, completionResultSet, sup);
             }
         }
     }
 
-    private void addOverrideMethod(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, TyClass sup) {
+    private void addOverrideMethod(@NotNull CompletionParameters completionParameters, @NotNull CompletionResultSet completionResultSet, ITyClass sup) {
         if (sup != null) {
             Project project = completionParameters.getOriginalFile().getProject();
             SearchContext context = new SearchContext(project);

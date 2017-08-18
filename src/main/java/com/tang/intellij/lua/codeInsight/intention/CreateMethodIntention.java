@@ -29,8 +29,9 @@ import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
+import com.tang.intellij.lua.ty.ITy;
+import com.tang.intellij.lua.ty.ITyClass;
 import com.tang.intellij.lua.ty.Ty;
-import com.tang.intellij.lua.ty.TyClass;
 import com.tang.intellij.lua.ty.TyUnion;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +74,7 @@ public class CreateMethodIntention extends BaseIntentionAction {
             LuaExpr expr = callExpr.getExpr();
             if (expr instanceof LuaIndexExpr) {
                 LuaIndexExpr indexExpr = (LuaIndexExpr) expr;
-                Ty typeSet = indexExpr.guessPrefixType(new SearchContext(project));
+                ITy typeSet = indexExpr.guessPrefixType(new SearchContext(project));
                 if (Ty.Companion.isInvalid(typeSet)) return;
 
                 InsertPosition position = calcInsertPosition(TyUnion.Companion.getPrefectClass(typeSet), project);
@@ -96,7 +97,7 @@ public class CreateMethodIntention extends BaseIntentionAction {
     }
 
     @Nullable
-    private InsertPosition calcInsertPosition(TyClass perfect, Project project) {
+    private InsertPosition calcInsertPosition(ITyClass perfect, Project project) {
         Collection<LuaClassMethod> methods = LuaClassMethodIndex.getInstance().get(perfect.getClassName(),
                 project,
                 new LuaPredefinedScope(project));

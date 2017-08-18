@@ -177,8 +177,8 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
     return ret
 }
 
-internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): Ty {
-    var typeSet: Ty? = null
+internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
+    var typeSet: ITy? = null
     //作为函数参数，类型在函数注释里找
     if (nameDef is LuaParamNameDef) {
         typeSet = resolveParamType(nameDef, context)
@@ -238,7 +238,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): Ty {
  * *
  * @return LuaTypeSet
  */
-private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): Ty {
+private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
     val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
     if (owner != null) {
         val paramName = paramNameDef.text
@@ -263,7 +263,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                         for (param in params) {
                             if (paramName == param.name) {
                                 val types = param.ty
-                                var set: Ty = Ty.UNKNOWN
+                                var set: ITy = Ty.UNKNOWN
                                 TyUnion.each(types) { set = set.union(it) }
                                 return set
                             }
@@ -289,7 +289,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
                     if (argExpr != null) {
                         val set = argExpr.guessType(context)
-                        val tyArray = TyUnion.find(set, TyArray::class.java)
+                        val tyArray = TyUnion.find(set, ITyArray::class.java)
                         if (tyArray != null)
                             return tyArray.base
                     }
@@ -300,7 +300,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
                     if (argExpr != null) {
                         val set = argExpr.guessType(context)
-                        val tyGeneric = TyUnion.find(set, TyGeneric::class.java)
+                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
                         if (tyGeneric != null)
                             return tyGeneric.getParamTy(paramIndex)
                     }

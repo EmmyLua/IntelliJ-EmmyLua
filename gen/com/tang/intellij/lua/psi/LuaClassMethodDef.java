@@ -9,8 +9,8 @@ import com.tang.intellij.lua.stubs.LuaClassMethodStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
-import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.ITy;
+import com.tang.intellij.lua.ty.ITyClass;
 
 public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaStatement, StubBasedPsiElement<LuaClassMethodStub> {
 
@@ -24,7 +24,7 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   LuaComment getComment();
 
   @Nullable
-  TyClass getClassType(SearchContext context);
+  ITyClass getClassType(SearchContext context);
 
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
@@ -41,7 +41,7 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   int getTextOffset();
 
   @NotNull
-  Ty guessReturnTypeSet(SearchContext searchContext);
+  ITy guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull
   LuaParamInfo[] getParams();

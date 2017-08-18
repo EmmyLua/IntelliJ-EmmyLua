@@ -25,8 +25,9 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyUnion
 
 /**
@@ -84,10 +85,10 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: Ty, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
+    private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: ITy, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
         if (indexExpr.colon != null) {
             TyUnion.each(prefixTypeSet) { luaType ->
-                if (luaType is TyClass) {
+                if (luaType is ITyClass) {
                     val context = SearchContext(indexExpr.project)
                     luaType.lazyInit(context)
                     luaType.processMethods(context) { curType, def ->
@@ -98,7 +99,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
             }
         } else {
             TyUnion.each(prefixTypeSet)  { luaType ->
-                if (luaType is TyClass) {
+                if (luaType is ITyClass) {
                     val context = SearchContext(indexExpr.project)
                     luaType.lazyInit(context)
                     luaType.processMethods(context) { curType, def ->

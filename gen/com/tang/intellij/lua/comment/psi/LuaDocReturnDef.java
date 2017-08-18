@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaDocReturnDef extends LuaDocPsiElement {
 
@@ -16,6 +16,6 @@ public interface LuaDocReturnDef extends LuaDocPsiElement {
   LuaDocTypeList getTypeList();
 
   @NotNull
-  Ty resolveTypeAt(SearchContext context);
+  ITy resolveTypeAt(SearchContext context);
 
 }

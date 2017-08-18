@@ -20,14 +20,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.searches.ExtensibleQueryFactory;
 import com.intellij.util.Query;
-import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.ITyClass;
 import org.jetbrains.annotations.NotNull;
 
 /**
  *
  * Created by tangzx on 2017/3/29.
  */
-public class LuaAllClassesSearch extends ExtensibleQueryFactory<TyClass, LuaAllClassesSearch.SearchParameters> {
+public class LuaAllClassesSearch extends ExtensibleQueryFactory<ITyClass, LuaAllClassesSearch.SearchParameters> {
 
     private static LuaAllClassesSearch INSTANCE = new LuaAllClassesSearch();
 
@@ -55,7 +55,7 @@ public class LuaAllClassesSearch extends ExtensibleQueryFactory<TyClass, LuaAllC
         super("com.tang.intellij.lua");
     }
 
-    public static Query<TyClass> search(@NotNull SearchScope searchScope, @NotNull Project project) {
+    public static Query<ITyClass> search(@NotNull SearchScope searchScope, @NotNull Project project) {
         return INSTANCE.createUniqueResultsQuery(new SearchParameters(searchScope, project));
     }
 }

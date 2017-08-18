@@ -17,8 +17,8 @@
 package com.tang.intellij.lua.comment.psi
 
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.ITy
 
 interface LuaDocType : LuaDocPsiElement {
-    fun getType(searchContext: SearchContext): Ty
+    fun getType(searchContext: SearchContext): ITy
 }

@@ -22,21 +22,21 @@ import com.intellij.psi.tree.IStubFileElementType
 import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.LuaFile
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.ITy
 
 /**
 
  * Created by tangzx on 2016/11/27.
  */
 class LuaFileStub : PsiFileStubImpl<LuaFile> {
-    private var retTypeRef: Ref<Ty>? = null
+    private var retTypeRef: Ref<ITy>? = null
     private var file: LuaFile? = null
 
     constructor(file: LuaFile) : super(file) {
         this.file = file
     }
 
-    constructor(file: LuaFile?, typeSet: Ty) : super(file) {
+    constructor(file: LuaFile?, typeSet: ITy) : super(file) {
         this.file = file
         retTypeRef = Ref.create(typeSet)
     }
@@ -45,7 +45,7 @@ class LuaFileStub : PsiFileStubImpl<LuaFile> {
         return LuaParserDefinition.FILE
     }
 
-    fun getReturnedType(context: SearchContext): Ty {
+    fun getReturnedType(context: SearchContext): ITy {
         if (retTypeRef == null && file != null) {
             val returnedType = file!!.guessReturnedType(context)
             retTypeRef = Ref.create(returnedType)

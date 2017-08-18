@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaExprList extends LuaPsiElement {
 
@@ -13,6 +13,6 @@ public interface LuaExprList extends LuaPsiElement {
   List<LuaExpr> getExprList();
 
   @NotNull
-  Ty guessTypeAt(SearchContext context);
+  ITy guessTypeAt(SearchContext context);
 
 }

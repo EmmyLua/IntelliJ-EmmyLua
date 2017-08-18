@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 
 import java.io.IOException
@@ -32,7 +33,7 @@ class LuaParamInfo {
 
     var isOptional: Boolean = false
     var name: String = ""
-    var ty: Ty = Ty.UNKNOWN
+    var ty: ITy = Ty.UNKNOWN
 
     companion object {
 

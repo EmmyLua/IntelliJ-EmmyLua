@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaClosureExpr extends LuaExpr, LuaFuncBodyOwner {
 
@@ -16,7 +16,7 @@ public interface LuaClosureExpr extends LuaExpr, LuaFuncBodyOwner {
   List<LuaParamNameDef> getParamNameDefList();
 
   @NotNull
-  Ty guessReturnTypeSet(SearchContext searchContext);
+  ITy guessReturnTypeSet(SearchContext searchContext);
 
   @NotNull
   LuaParamInfo[] getParams();

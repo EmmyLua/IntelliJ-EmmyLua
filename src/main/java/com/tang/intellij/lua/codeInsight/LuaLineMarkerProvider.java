@@ -38,7 +38,7 @@ import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch;
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex;
-import com.tang.intellij.lua.ty.TyClass;
+import com.tang.intellij.lua.ty.ITyClass;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,14 +107,14 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
             assert methodDef != null;
             Project project = methodDef.getProject();
             SearchContext context = new SearchContext(project);
-            TyClass type = methodDef.getClassType(context);
+            ITyClass type = methodDef.getClassType(context);
 
             //OverridingMethod
             PsiElement classMethodNameId = classMethodName.getId();
             if (type != null) {
                 String methodName = methodDef.getName();
                 assert methodName != null;
-                TyClass superType = type.getSuperClass(context);
+                ITyClass superType = type.getSuperClass(context);
 
                 while (superType != null) {
                     String superTypeName = superType.getClassName();
@@ -151,7 +151,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
         }
         else if (element instanceof LuaDocClassDef) {
             LuaDocClassDef docClassDef = (LuaDocClassDef) element;
-            TyClass classType = docClassDef.getClassType();
+            ITyClass classType = docClassDef.getClassType();
             Project project = element.getProject();
             Query<LuaDocClassDef> query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.getClassName());
             if (query.findFirst() != null) {

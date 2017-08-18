@@ -18,7 +18,7 @@ package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.ITy
 
 /**
 
@@ -27,5 +27,5 @@ import com.tang.intellij.lua.ty.Ty
 interface LuaIndexStub : StubElement<LuaIndexExpr> {
     val typeName: String?
     val fieldName: String?
-    fun guessValueType(): Ty
+    fun guessValueType(): ITy
 }

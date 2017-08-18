@@ -20,43 +20,45 @@ import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.search.SearchContext
 
-abstract class TyGeneric : Ty(TyKind.Generic) {
+interface ITyGeneric : ITy {
+    val params: Array<ITy>
+    val base: ITy
+
+    fun getParamTy(index: Int): ITy {
+        return params.getOrElse(index) { Ty.UNKNOWN }
+    }
+}
+
+abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     override val displayName: String
         get() = "Generic"
-
-    abstract val params: Array<Ty>
-    abstract val base: Ty
-
-    fun getParamTy(index: Int): Ty {
-        return params.getOrElse(index) { UNKNOWN }
-    }
 }
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext) : TyGeneric() {
 
-    private fun initBaseTy(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext): Ty {
+    private fun initBaseTy(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext): ITy {
         val firstTyPsi = luaDocGenericTy.firstChild as LuaDocTy
         return firstTyPsi.getType(searchContext)
     }
 
-    private val _baseTy:Ty = initBaseTy(luaDocGenericTy, searchContext)
+    private val _baseTy:ITy = initBaseTy(luaDocGenericTy, searchContext)
 
-    private fun initParams(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext): Array<Ty> {
+    private fun initParams(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext): Array<ITy> {
         val tyList = luaDocGenericTy.tyList
-        val tbl = mutableListOf<Ty>()
+        val tbl = mutableListOf<ITy>()
         tyList.forEach { tbl.add(it.getType(searchContext)) }
         //第一个是 base
         tbl.removeAt(0)
         return tbl.toTypedArray()
     }
 
-    private val _params: Array<Ty> = initParams(luaDocGenericTy, searchContext)
+    private val _params: Array<ITy> = initParams(luaDocGenericTy, searchContext)
 
-    override val params: Array<Ty>
+    override val params: Array<ITy>
         get() = _params
-    override val base: Ty
+    override val base: ITy
         get() = _baseTy
 
 }
 
-class TySerializedGeneric(override val params: Array<Ty>, override val base: Ty) : TyGeneric()
+class TySerializedGeneric(override val params: Array<ITy>, override val base: ITy) : TyGeneric()

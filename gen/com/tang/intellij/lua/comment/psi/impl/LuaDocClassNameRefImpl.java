@@ -12,7 +12,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
 import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.Ty;
+import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocClassNameRefImpl extends ASTWrapperPsiElement implements LuaDocClassNameRef {
 
@@ -41,7 +41,7 @@ public class LuaDocClassNameRefImpl extends ASTWrapperPsiElement implements LuaD
   }
 
   @NotNull
-  public Ty resolveType(SearchContext context) {
+  public ITy resolveType(SearchContext context) {
     return LuaDocPsiImplUtilKt.resolveType(this, context);
   }
 

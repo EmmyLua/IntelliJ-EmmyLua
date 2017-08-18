@@ -22,8 +22,8 @@ import com.intellij.psi.codeStyle.SuggestedNameInfo
 import com.intellij.refactoring.rename.NameSuggestionProvider
 import com.tang.intellij.lua.psi.LuaNameDef
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyUnion
 import java.util.*
 
@@ -41,8 +41,8 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
                 val classNames = HashSet<String>()
 
                 TyUnion.each(typeSet) { type ->
-                    if (type is TyClass) {
-                        var cur: TyClass? = type
+                    if (type is ITyClass) {
+                        var cur: ITyClass? = type
                         while (cur != null) {
                             val className = cur.className
                             if (!cur.isAnonymous)

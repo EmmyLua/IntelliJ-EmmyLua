@@ -25,14 +25,26 @@ import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 
+interface ITyClass : ITy {
+    val className: String
+    var superClassName: String?
+    var aliasName: String?
+    fun lazyInit(searchContext: SearchContext)
+    fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit)
+    fun processMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
+    fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
+    fun findMethod(name: String, searchContext: SearchContext): LuaClassMethod?
+    fun findField(name: String, searchContext: SearchContext): LuaClassField?
+    fun getSuperClass(context: SearchContext): ITyClass?
+}
 
-abstract class TyClass(val className: String, var superClassName: String? = null) : Ty(TyKind.Class) {
+abstract class TyClass(override val className: String, override var superClassName: String? = null) : Ty(TyKind.Class), ITyClass {
 
-    var aliasName: String? = null
+    final override var aliasName: String? = null
 
     private var _lazyInitialized: Boolean = false
 
-    open fun processFields(context: SearchContext, processor: (TyClass, LuaClassField) -> Unit) {
+    override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {
         val clazzName = className
         val project = context.project
 
@@ -54,7 +66,7 @@ abstract class TyClass(val className: String, var superClassName: String? = null
         superType?.processFields(context, processor)
     }
 
-    open fun processMethods(context: SearchContext, processor: (TyClass, LuaClassMethod) -> Unit) {
+    override fun processMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit) {
         val clazzName = className
         val project = context.project
 
@@ -76,8 +88,7 @@ abstract class TyClass(val className: String, var superClassName: String? = null
         superType?.processMethods(context, processor)
     }
 
-    fun processStaticMethods(context: SearchContext,
-                             processor: (TyClass, LuaClassMethod) -> Unit) {
+    override fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit) {
         val clazzName = className
         val list = LuaClassMethodIndex.findStaticMethods(clazzName, context)
 
@@ -98,7 +109,7 @@ abstract class TyClass(val className: String, var superClassName: String? = null
 
     override val displayName: String get() = className
 
-    fun lazyInit(searchContext: SearchContext) {
+    override fun lazyInit(searchContext: SearchContext) {
         if (!_lazyInitialized) {
             _lazyInitialized = true
             doLazyInit(searchContext)
@@ -114,7 +125,7 @@ abstract class TyClass(val className: String, var superClassName: String? = null
         }
     }
 
-    fun getSuperClass(context: SearchContext): TyClass? {
+    override fun getSuperClass(context: SearchContext): ITyClass? {
         val clsName = superClassName
         if (clsName != null) {
             val def = LuaClassIndex.find(clsName, context)
@@ -123,7 +134,7 @@ abstract class TyClass(val className: String, var superClassName: String? = null
         return null
     }
 
-    fun findMethod(name: String, searchContext: SearchContext): LuaClassMethod? {
+    override fun findMethod(name: String, searchContext: SearchContext): LuaClassMethod? {
         val className = className
         var def = LuaClassMethodIndex.findMethodWithName(className, name, searchContext)
         if (def == null) { // static
@@ -137,7 +148,7 @@ abstract class TyClass(val className: String, var superClassName: String? = null
         return def
     }
 
-    fun findField(name: String, searchContext: SearchContext): LuaClassField? {
+    override fun findField(name: String, searchContext: SearchContext): LuaClassField? {
         var def = LuaClassFieldIndex.find(this, name, searchContext)
         if (def == null) {
             val superType = getSuperClass(searchContext)
@@ -191,7 +202,7 @@ fun getTableTypeName(table: LuaTableExpr): String {
 }
 
 class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
-    override fun processFields(context: SearchContext, processor: (TyClass, LuaClassField) -> Unit) {
+    override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {
         for (field in table.tableFieldList) {
             processor(this, field)
         }

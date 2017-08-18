@@ -20,8 +20,9 @@ import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.RecursionManager
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyFunction
 import com.tang.intellij.lua.ty.TyUnion
 
 /**
@@ -30,8 +31,8 @@ import com.tang.intellij.lua.ty.TyUnion
  */
 open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpression {
 
-    override fun guessType(context: SearchContext): Ty {
-        return RecursionManager.doPreventingRecursion<Ty>(this, true) {
+    override fun guessType(context: SearchContext): ITy {
+        return RecursionManager.doPreventingRecursion<ITy>(this, true) {
             when {
                 this is LuaCallExpr -> guessType(this, context)
                 this is LuaParenExpr -> guessType(this, context)
@@ -54,14 +55,14 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         return Ty.UNKNOWN
     }
 
-    private fun guessType(luaParenExpr: LuaParenExpr, context: SearchContext): Ty {
+    private fun guessType(luaParenExpr: LuaParenExpr, context: SearchContext): ITy {
         val inner = luaParenExpr.expr
         if (inner != null)
             return inner.guessType(context)
         return Ty.UNKNOWN
     }
 
-    private fun guessType(luaCallExpr: LuaCallExpr, context: SearchContext): Ty {
+    private fun guessType(luaCallExpr: LuaCallExpr, context: SearchContext): ITy {
         // xxx()
         val ref = luaCallExpr.expr
         // 从 require 'xxx' 中获取返回类型
@@ -82,7 +83,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         }
 
         val ty = ref.guessType(context)
-        val tyFunc = TyUnion.find(ty, TyFunction::class.java)
+        val tyFunc = TyUnion.find(ty, ITyFunction::class.java)
         if (tyFunc != null)
             return tyFunc.returnTy
 
