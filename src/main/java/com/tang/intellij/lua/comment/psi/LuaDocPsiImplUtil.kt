@@ -234,7 +234,7 @@ fun getType(luaDocGeneralTy: LuaDocGeneralTy, searchContext: SearchContext): Ty 
 }
 
 fun getType(luaDocFunctionTy: LuaDocFunctionTy, searchContext: SearchContext): Ty {
-    return TyDocPsiFunction(luaDocFunctionTy)
+    return TyDocPsiFunction(luaDocFunctionTy, searchContext)
 }
 
 fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy, searchContext: SearchContext): Ty {

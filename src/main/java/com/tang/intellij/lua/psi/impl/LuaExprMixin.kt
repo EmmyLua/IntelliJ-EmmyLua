@@ -37,7 +37,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 this is LuaCallExpr -> guessType(this, context)
                 this is LuaParenExpr -> guessType(this, context)
                 this is LuaLiteralExpr -> guessType(this)
-                this is LuaClosureExpr -> TyPsiFunction(this)
+                this is LuaClosureExpr -> TyPsiFunction(this, context)
                 else -> Ty.UNKNOWN
             }
         }!!

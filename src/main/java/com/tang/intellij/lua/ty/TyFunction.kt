@@ -30,16 +30,20 @@ abstract class TyFunction : Ty(TyKind.Function) {
         get() = "function"
 }
 
-class TyPsiFunction(val psi: LuaFuncBodyOwner) : TyFunction() {
+class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : TyFunction() {
+    private val _retTy: Ty = psi.guessReturnTypeSet(searchContext)
+
     override val returnTy: Ty
-        get() = psi.guessReturnTypeSet(SearchContext(psi.project))
+        get() = _retTy
     override val params: Array<LuaParamInfo>
         get() = psi.params
 }
 
-class TyDocPsiFunction(private val func: LuaDocFunctionTy) : TyFunction() {
+class TyDocPsiFunction(func: LuaDocFunctionTy, searchContext: SearchContext) : TyFunction() {
+    private val _retTy: Ty = func.getReturnType(searchContext)
+
     override val returnTy: Ty
-        get() = func.getReturnType(SearchContext(func.project))
+        get() = _retTy
     override val params: Array<LuaParamInfo>
         get() = arrayOf()
 }

@@ -129,7 +129,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpress
         //class method
         val method = type.findMethod(fieldName, context)
         if (method != null)
-            set = set.union(TyPsiFunction(method))
+            set = set.union(TyPsiFunction(method, context))
 
         return set
     }

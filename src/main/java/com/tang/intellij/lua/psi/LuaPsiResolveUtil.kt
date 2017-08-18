@@ -286,9 +286,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 // ipairs
                 if (expr.text == Constants.WORD_IPAIRS) {
                     val argExprList = callExpr.args.exprList
-                    val argObject = PsiTreeUtil.findChildOfType(argExprList, LuaNameExpr::class.java)
-                    if (argObject != null) {
-                        val set = argObject.guessType(context)
+                    val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
+                    if (argExpr != null) {
+                        val set = argExpr.guessType(context)
                         val array = TyUnion.find(set, TyArray::class.java)
                         if (array != null)
                             return array.base
