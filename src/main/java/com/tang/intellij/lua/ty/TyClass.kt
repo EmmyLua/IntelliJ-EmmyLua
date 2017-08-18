@@ -166,8 +166,11 @@ class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
     }
 }
 
-class TySerializedClass(name: String, supper: String? = null, override var aliasName: String? = null)
+open class TySerializedClass(name: String, supper: String? = null, override var aliasName: String? = null)
     : TyClass(name, supper)
+
+//todo Lazy class ty
+class TyLazyClass(name: String) : TySerializedClass(name)
 
 fun getTableTypeName(table: LuaTableExpr): String {
     val fileName = table.containingFile.name

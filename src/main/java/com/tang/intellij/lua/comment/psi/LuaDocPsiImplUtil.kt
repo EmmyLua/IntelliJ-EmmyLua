@@ -43,12 +43,7 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef, context: SearchContext): Ty {
-    /*val classDef = LuaClassIndex.find(nameRef.text, context)
-    if (classDef != null) {
-        return classDef.classType
-    }
-    return Ty.UNKNOWN*/
-    return TySerializedClass(nameRef.text)
+    return TyLazyClass(nameRef.text)
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {
@@ -121,12 +116,6 @@ fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?, context: SearchContext): Ty {
         var retTy: Ty = Ty.UNKNOWN
         for (ty in list) {
             retTy = retTy.union(ty.getType(context))
-            /*val def = LuaClassIndex.find(ty.text, context)
-            if (def != null) {
-                typeSet = Ty.union(typeSet, def.classType)
-            } else {
-                typeSet = Ty.union(typeSet, TySerializedClass(ty.text))
-            }*/
         }
         return retTy
     }
