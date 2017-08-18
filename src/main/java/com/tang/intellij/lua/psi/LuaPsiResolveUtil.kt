@@ -283,15 +283,19 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
             val callExpr = PsiTreeUtil.findChildOfType(exprList, LuaCallExpr::class.java)
             val expr = callExpr?.expr
             if (expr != null) {
+                val paramIndex = owner.getIndexFor(paramNameDef)
                 // ipairs
                 if (expr.text == Constants.WORD_IPAIRS) {
+                    if (paramIndex == 0)
+                        return Ty.NUMBER
+
                     val argExprList = callExpr.args.exprList
                     val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
                     if (argExpr != null) {
                         val set = argExpr.guessType(context)
-                        val array = TyUnion.find(set, TyArray::class.java)
-                        if (array != null)
-                            return array.base
+                        val tyArray = TyUnion.find(set, TyArray::class.java)
+                        if (tyArray != null)
+                            return tyArray.base
                     }
                 }
                 // pairs
@@ -300,9 +304,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
                     if (argExpr != null) {
                         val set = argExpr.guessType(context)
-                        val array = TyUnion.find(set, TyGeneric::class.java)
-                        if (array != null)
-                            return array.getParamTy(1)
+                        val tyGeneric = TyUnion.find(set, TyGeneric::class.java)
+                        if (tyGeneric != null)
+                            return tyGeneric.getParamTy(paramIndex)
                     }
                 }
             }

@@ -59,6 +59,16 @@ fun LuaExprList.getExprAt(idx: Int): LuaExpr? {
     return exprList[idx]
 }
 
+fun LuaParametersOwner.getIndexFor(paramNameDef: LuaParamNameDef): Int {
+    val list = this.paramNameDefList
+    if (list != null) {
+        list.indices
+                .filter { list[it].name == paramNameDef.name }
+                .forEach { return it }
+    }
+    return 0
+}
+
 fun LuaLocalDef.getExprFor(nameDef: LuaNameDef): LuaExpr? {
     val nameList = this.nameList
     nameList ?: return null
