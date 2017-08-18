@@ -195,7 +195,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): Ty {
             }
 
             //计算 expr 返回类型
-            if (typeSet == null || typeSet is TyUnknown) {
+            if (Ty.isInvalid(typeSet)) {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
@@ -205,7 +205,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): Ty {
             }
 
             //anonymous
-            if (typeSet == null || typeSet is TyUnknown)
+            if (Ty.isInvalid(typeSet))
                 typeSet = TyClass.createAnonymousType(nameDef)
         }
     }//变量声明，local x = 0

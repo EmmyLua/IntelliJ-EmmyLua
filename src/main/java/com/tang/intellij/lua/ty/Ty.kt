@@ -79,8 +79,8 @@ abstract class Ty(val kind: TyKind) {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
         }
 
-        fun isInvalid(ty: Ty): Boolean {
-            return ty is TyUnknown
+        fun isInvalid(ty: Ty?): Boolean {
+            return ty == null || ty is TyUnknown
         }
 
         fun serialize(ty: Ty, stream: StubOutputStream) {

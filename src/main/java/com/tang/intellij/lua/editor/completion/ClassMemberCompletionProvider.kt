@@ -28,7 +28,6 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyUnion
-import com.tang.intellij.lua.ty.TyUnknown
 
 /**
 
@@ -55,7 +54,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
             val indexExpr = parent
             val project = indexExpr.project
             val prefixTypeSet = indexExpr.guessPrefixType(SearchContext(project))
-            if (prefixTypeSet !is TyUnknown) {
+            if (!Ty.isInvalid(prefixTypeSet)) {
                 complete(indexExpr, prefixTypeSet, completionResultSet, completionResultSet.prefixMatcher, null)
             }
             //smart
@@ -68,7 +67,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
                     val txt = it.text
                     if (nameText != txt && matcher.prefixMatches(txt)) {
                         val typeSet = it.guessType(SearchContext(project))
-                        if (prefixTypeSet !is TyUnknown) {
+                        if (!Ty.isInvalid(prefixTypeSet)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)
                             complete(indexExpr, typeSet, resultSet, prefixMatcher, object : HandlerProcessor {
