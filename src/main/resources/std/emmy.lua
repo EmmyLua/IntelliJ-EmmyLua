@@ -4,6 +4,6 @@
 
 ---@class number
 
----@class function
-
 ---@class void
+
+---@class table

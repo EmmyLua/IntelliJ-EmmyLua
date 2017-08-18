@@ -27,7 +27,8 @@ enum class TyKind {
     Array,
     Function,
     Class,
-    Union
+    Union,
+    Generic
 }
 
 abstract class Ty(val kind: TyKind) {

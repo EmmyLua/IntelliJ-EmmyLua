@@ -241,3 +241,7 @@ fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy, searchContext: SearchConte
     val set = luaDocFunctionTy.typeSet
     return resolveDocTypeSet(set, searchContext)
 }
+
+fun getType(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext): Ty {
+    return TyDocGeneric(luaDocGenericTy, searchContext)
+}

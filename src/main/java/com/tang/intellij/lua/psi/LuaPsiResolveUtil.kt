@@ -296,7 +296,14 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 }
                 // pairs
                 if (expr.text == Constants.WORD_PAIRS) {
-                    //todo resolve for for k, v in pairs
+                    val argExprList = callExpr.args.exprList
+                    val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
+                    if (argExpr != null) {
+                        val set = argExpr.guessType(context)
+                        val array = TyUnion.find(set, TyGeneric::class.java)
+                        if (array != null)
+                            return array.getParamTy(1)
+                    }
                 }
             }
         }
