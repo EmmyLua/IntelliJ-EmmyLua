@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.ty
 
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.LuaPredefinedScope
@@ -137,6 +138,9 @@ abstract class TyClass(val className: String, open val superClassName: String? =
     }
 
     companion object {
+        // for _G
+        val G:TyClass = TySerializedClass(Constants.WORD_G)
+
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
             return TySerializedClass(nameDef.name)
         }

@@ -30,7 +30,6 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
@@ -193,7 +192,7 @@ object LuaPsiImplUtil {
     }
 
     @JvmStatic fun getClassType(globalFuncDef: LuaGlobalFuncDef, searchContext: SearchContext): TyClass {
-        return TySerializedClass(Constants.WORD_G)
+        return TyClass.G
     }
 
     /**
