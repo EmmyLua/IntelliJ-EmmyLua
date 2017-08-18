@@ -89,7 +89,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
             TyUnion.each(prefixTypeSet) { luaType ->
                 if (luaType is TyClass) {
                     val context = SearchContext(indexExpr.project)
-                    luaType.initAliasName(context)
+                    luaType.lazyInit(context)
                     luaType.processMethods(context) { curType, def ->
                         val className = curType.displayName
                         addMethod(completionResultSet, prefixMatcher, curType === luaType, false, className, def, handlerProcessor)
@@ -100,7 +100,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
             TyUnion.each(prefixTypeSet)  { luaType ->
                 if (luaType is TyClass) {
                     val context = SearchContext(indexExpr.project)
-                    luaType.initAliasName(context)
+                    luaType.lazyInit(context)
                     luaType.processMethods(context) { curType, def ->
                         val className = curType.displayName
                         addMethod(completionResultSet, prefixMatcher, curType === luaType, true, className, def, handlerProcessor)

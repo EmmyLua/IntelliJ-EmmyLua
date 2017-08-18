@@ -26,9 +26,11 @@ import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 
 
-abstract class TyClass(val className: String, open val superClassName: String? = null) : Ty(TyKind.Class) {
+abstract class TyClass(val className: String, var superClassName: String? = null) : Ty(TyKind.Class) {
 
-    open var aliasName: String? = null
+    var aliasName: String? = null
+
+    private var _lazyInitialized: Boolean = false
 
     open fun processFields(context: SearchContext, processor: (TyClass, LuaClassField) -> Unit) {
         val clazzName = className
@@ -51,6 +53,7 @@ abstract class TyClass(val className: String, open val superClassName: String? =
         val superType = getSuperClass(context)
         superType?.processFields(context, processor)
     }
+
     open fun processMethods(context: SearchContext, processor: (TyClass, LuaClassMethod) -> Unit) {
         val clazzName = className
         val project = context.project
@@ -95,12 +98,19 @@ abstract class TyClass(val className: String, open val superClassName: String? =
 
     override val displayName: String get() = className
 
-    open fun initAliasName(context: SearchContext) {
-        if (aliasName == null) {
-            val classDef = LuaClassIndex.find(className, context)
-            if (classDef != null) {
-                aliasName = classDef.classType.className
-            }
+    fun lazyInit(searchContext: SearchContext) {
+        if (!_lazyInitialized) {
+            _lazyInitialized = true
+            doLazyInit(searchContext)
+        }
+    }
+
+    open fun doLazyInit(searchContext: SearchContext) {
+        val classDef = LuaClassIndex.find(className, searchContext)
+        if (classDef != null) {
+            val tyClass = classDef.classType
+            aliasName = tyClass.className
+            superClassName = tyClass.superClassName
         }
     }
 
@@ -158,16 +168,19 @@ class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
             return@lazy supperRef.text
         else null
     }
-    override val superClassName: String?
-        get() = _supperName
 
-    override fun initAliasName(context: SearchContext) {
+    override fun doLazyInit(searchContext: SearchContext) {
         aliasName = classDef.aliasName
+        superClassName = _supperName
     }
 }
 
-open class TySerializedClass(name: String, supper: String? = null, override var aliasName: String? = null)
-    : TyClass(name, supper)
+open class TySerializedClass(name: String, supper: String? = null, alias: String? = null)
+    : TyClass(name, supper) {
+    init {
+        aliasName = alias
+    }
+}
 
 //todo Lazy class ty
 class TyLazyClass(name: String) : TySerializedClass(name)
@@ -188,5 +201,5 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override val displayName: String
         get() = "table"
 
-    override fun initAliasName(context: SearchContext) = Unit
+    override fun doLazyInit(searchContext: SearchContext) = Unit
 }

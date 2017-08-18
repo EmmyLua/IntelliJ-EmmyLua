@@ -114,7 +114,7 @@ public class LuaClassFieldIndex extends StringStubIndexExtension<LuaClassField> 
     public static Collection<LuaClassField> findAll(TyClass type, String fieldName, SearchContext context) {
         Collection<LuaClassField> fields = find(type.getClassName(), fieldName, context);
         if (fields.isEmpty()) {
-            type.initAliasName(context);
+            type.lazyInit(context);
             if (type.getAliasName() != null)
                 fields = find(type.getAliasName(), fieldName, context);
         }
