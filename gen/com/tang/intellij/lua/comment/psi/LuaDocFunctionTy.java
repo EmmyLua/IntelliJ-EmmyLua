@@ -10,7 +10,7 @@ import com.tang.intellij.lua.ty.Ty;
 public interface LuaDocFunctionTy extends LuaDocTy {
 
   @NotNull
-  LuaDocFunctionParam getFunctionParam();
+  List<LuaDocFunctionParam> getFunctionParamList();
 
   @Nullable
   LuaDocTypeSet getTypeSet();

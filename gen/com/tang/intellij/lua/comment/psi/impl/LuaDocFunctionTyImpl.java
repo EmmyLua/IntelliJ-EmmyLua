@@ -29,8 +29,8 @@ public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunction
 
   @Override
   @NotNull
-  public LuaDocFunctionParam getFunctionParam() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaDocFunctionParam.class));
+  public List<LuaDocFunctionParam> getFunctionParamList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocFunctionParam.class);
   }
 
   @Override

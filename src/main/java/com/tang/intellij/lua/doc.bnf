@@ -80,7 +80,8 @@ general_ty ::= class_name_ref {
 }
 
 function_param ::= ID ':' type_set
-function_ty ::= fun '(' function_param ')' (':' type_set)? {
+private function_param_list::= (function_param ',')* (function_param |& ')')
+function_ty ::= fun '(' function_param_list ')' (':' type_set)? {
     methods = [getType getReturnType]
 }
 
