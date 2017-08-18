@@ -46,12 +46,12 @@ abstract class Ty(val kind: TyKind) {
         return TyUnion.union(this, ty)
     }
 
-    fun createTypeString(): String? {
+    fun createTypeString(): String {
         val s = toString()
         return if (s.isEmpty()) "any" else s
     }
 
-    fun createReturnString(): String? {
+    fun createReturnString(): String {
         val s = toString()
         return if (s.isEmpty()) "void" else s
     }

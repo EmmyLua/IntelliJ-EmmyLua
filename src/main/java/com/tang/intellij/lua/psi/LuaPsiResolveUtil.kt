@@ -262,14 +262,10 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                         val params = superMethod.params//todo : 优化
                         for (param in params) {
                             if (paramName == param.name) {
-                                val types = param.types
-                                if (types.isNotEmpty()) {
-                                    var set: Ty = Ty.UNKNOWN
-                                    for (type in types) {
-                                        set = set.union(TySerializedClass(type))
-                                    }
-                                    return set
-                                }
+                                val types = param.ty
+                                var set: Ty = Ty.UNKNOWN
+                                TyUnion.each(types) { set = set.union(it) }
+                                return set
                             }
                         }
                     }

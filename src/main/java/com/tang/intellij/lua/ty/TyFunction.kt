@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.ty
 
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
+import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.search.SearchContext
@@ -42,10 +43,23 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : T
 class TyDocPsiFunction(func: LuaDocFunctionTy, searchContext: SearchContext) : TyFunction() {
     private val _retTy: Ty = func.getReturnType(searchContext)
 
+    private fun initParams(func: LuaDocFunctionTy, searchContext: SearchContext): Array<LuaParamInfo> {
+        val list = mutableListOf<LuaParamInfo>()
+        func.functionParamList.forEach {
+            val p = LuaParamInfo()
+            p.name = it.id.text
+            p.ty = resolveDocTypeSet(it.typeSet, searchContext)
+            list.add(p)
+        }
+        return list.toTypedArray()
+    }
+
+    private val _params = initParams(func, searchContext)
+
     override val returnTy: Ty
         get() = _retTy
     override val params: Array<LuaParamInfo>
-        get() = arrayOf()
+        get() = _params
 }
 
 class TySerializedFunction(override val returnTy: Ty, override val params: Array<LuaParamInfo>) : TyFunction()

@@ -27,7 +27,6 @@ import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
 
@@ -44,11 +43,12 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef, context: SearchContext): Ty {
-    val classDef = LuaClassIndex.find(nameRef.text, context)
+    /*val classDef = LuaClassIndex.find(nameRef.text, context)
     if (classDef != null) {
         return classDef.classType
     }
-    return Ty.UNKNOWN
+    return Ty.UNKNOWN*/
+    return TySerializedClass(nameRef.text)
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {

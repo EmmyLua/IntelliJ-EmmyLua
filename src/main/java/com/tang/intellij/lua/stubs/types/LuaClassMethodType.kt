@@ -98,16 +98,16 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
 
         // params
         val len = stubInputStream.readByte().toInt()
-        val params = arrayOfNulls<LuaParamInfo>(len)
+        val params = mutableListOf<LuaParamInfo>()
         for (i in 0 until len) {
-            params[i] = LuaParamInfo.deserialize(stubInputStream)
+            params.add(LuaParamInfo.deserialize(stubInputStream))
         }
 
         val returnTypeSet = Ty.deserialize(stubInputStream)
         val isStatic = stubInputStream.readBoolean()
         return LuaClassMethodStubImpl(StringRef.toString(shortName)!!,
                 StringRef.toString(className)!!,
-                params,
+                params.toTypedArray(),
                 returnTypeSet,
                 isStatic,
                 stubElement)

@@ -20,5 +20,5 @@ import com.tang.intellij.lua.ty.Ty
 interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
     val returnTypeSet: Ty
 
-    val params: Array<LuaParamInfo?>
+    val params: Array<LuaParamInfo>
 }

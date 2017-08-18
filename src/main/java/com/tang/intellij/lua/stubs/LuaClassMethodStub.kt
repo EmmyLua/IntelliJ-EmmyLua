@@ -38,7 +38,7 @@ interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef> {
 
 class LuaClassMethodStubImpl(override val shortName: String,
                              override val className: String,
-                             override val params: Array<LuaParamInfo?>,
+                             override val params: Array<LuaParamInfo>,
                              override val returnTypeSet: Ty,
                              override val isStatic: Boolean,
                              parent: StubElement<*>)

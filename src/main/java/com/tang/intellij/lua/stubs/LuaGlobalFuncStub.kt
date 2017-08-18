@@ -33,7 +33,7 @@ interface LuaGlobalFuncStub : LuaFuncBodyOwnerStub<LuaGlobalFuncDef> {
 }
 
 class LuaGlobalFuncStubImpl(override val name: String,
-                            override val params: Array<LuaParamInfo?>,
+                            override val params: Array<LuaParamInfo>,
                             override val returnTypeSet: Ty,
                             parent: StubElement<*>)
     : StubBase<LuaGlobalFuncDef>(parent, LuaTypes.GLOBAL_FUNC_DEF as IStubElementType<*, *>), LuaGlobalFuncStub

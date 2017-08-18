@@ -33,6 +33,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
@@ -453,7 +454,7 @@ object LuaPsiImplUtil {
         }, false, searchContext)
     }
 
-    @JvmStatic fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo?> {
+    @JvmStatic fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {
         if (owner is StubBasedPsiElementBase<*>) {
             val stub = owner.stub
             if (stub is LuaFuncBodyOwnerStub<*>) {
@@ -463,7 +464,7 @@ object LuaPsiImplUtil {
         return getParamsOriginal(owner)
     }
 
-    @JvmStatic fun getParamsOriginal(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo?> {
+    @JvmStatic fun getParamsOriginal(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo> {
         var comment: LuaComment? = null
         if (funcBodyOwner is LuaCommentOwner) {
             comment = LuaCommentUtil.findComment(funcBodyOwner)
@@ -471,7 +472,7 @@ object LuaPsiImplUtil {
 
         val paramNameList = funcBodyOwner.paramNameDefList
         if (paramNameList != null) {
-            val array = arrayOfNulls<LuaParamInfo>(paramNameList.size)
+            val list = mutableListOf<LuaParamInfo>()
             for (i in paramNameList.indices) {
                 val paramInfo = LuaParamInfo()
                 val paramName = paramNameList[i].text
@@ -481,20 +482,12 @@ object LuaPsiImplUtil {
                     val paramDef = comment.getParamDef(paramName)
                     if (paramDef != null) {
                         paramInfo.isOptional = paramDef.optional != null
-                        val luaDocTypeSet = paramDef.typeSet
-                        if (luaDocTypeSet != null) {
-                            val list = luaDocTypeSet.tyList
-                            val types = arrayOfNulls<String>(list.size)
-                            for (j in list.indices) {
-                                types[j] = list[j].text
-                            }
-                            paramInfo.types = types
-                        }
+                        paramInfo.ty = resolveDocTypeSet(paramDef.typeSet, SearchContext(funcBodyOwner.project))
                     }
                 }
-                array[i] = paramInfo
+                list.add(paramInfo)
             }
-            return array
+            return list.toTypedArray()
         }
         return emptyArray()
     }

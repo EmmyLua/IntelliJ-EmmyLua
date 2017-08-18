@@ -83,13 +83,13 @@ class LuaGlobalFuncType : IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef>(
 
         // params
         val len = stubInputStream.readByte().toInt()
-        val params = arrayOfNulls<LuaParamInfo>(len)
-        for (i in 0..len - 1) {
-            params[i] = LuaParamInfo.deserialize(stubInputStream)
+        val params = mutableListOf<LuaParamInfo>()
+        for (i in 0 until len) {
+            params.add(LuaParamInfo.deserialize(stubInputStream))
         }
 
         val returnTypeSet = Ty.deserialize(stubInputStream)
-        return LuaGlobalFuncStubImpl(StringRef.toString(name)!!, params, returnTypeSet, stubElement)
+        return LuaGlobalFuncStubImpl(StringRef.toString(name)!!, params.toTypedArray(), returnTypeSet, stubElement)
     }
 
     override fun indexStub(luaGlobalFuncStub: LuaGlobalFuncStub, indexSink: IndexSink) {
