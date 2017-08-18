@@ -165,7 +165,7 @@ class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
 class TySerializedClass(name: String, supper: String? = null, override var aliasName: String? = null)
     : TyClass(name, supper)
 
-private fun getTableTypeName(table: LuaTableExpr): String {
+fun getTableTypeName(table: LuaTableExpr): String {
     val fileName = table.containingFile.name
     return "$fileName@(${table.node.startOffset})table"
 }

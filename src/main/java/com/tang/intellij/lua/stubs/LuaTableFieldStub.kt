@@ -21,8 +21,8 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.lang.type.LuaTableType
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.ty.getTableTypeName
 import java.util.*
 
 /**
@@ -65,7 +65,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
                             val assignStat = s as LuaAssignStat
                             LuaPsiImplUtil.getTypeName(assignStat, 0)
                         }
-                _typeName = optional.orElse(LuaTableType.getTypeName(table))
+                _typeName = optional.orElse(if (table != null) getTableTypeName(table) else null)
             }
             return _typeName
         }

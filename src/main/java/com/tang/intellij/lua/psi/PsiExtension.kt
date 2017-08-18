@@ -19,7 +19,7 @@ package com.tang.intellij.lua.psi
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.lang.type.LuaTableType
+import com.tang.intellij.lua.ty.getTableTypeName
 
 /**
  * 获取所在的位置
@@ -126,7 +126,7 @@ val LuaDocClassDef.aliasName: String? get() {
         is LuaLocalDef -> {
             val expr = owner.exprList?.getExprAt(0)
             if (expr is LuaTableExpr)
-                return LuaTableType.getTypeName(expr)
+                return getTableTypeName(expr)
         }
     }
     return null
