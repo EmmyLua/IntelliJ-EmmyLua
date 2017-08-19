@@ -120,7 +120,8 @@ abstract class TyClass(override val className: String, override var superClassNa
         val classDef = LuaClassIndex.find(className, searchContext)
         if (classDef != null) {
             val tyClass = classDef.classType
-            aliasName = tyClass.className
+            tyClass.lazyInit(searchContext)
+            aliasName = tyClass.aliasName
             superClassName = tyClass.superClassName
         }
     }
