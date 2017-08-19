@@ -29,7 +29,7 @@ import com.tang.intellij.lua.ty.TyUnion
  * 表达式基类
  * Created by TangZX on 2016/12/4.
  */
-open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpression {
+open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpr {
 
     override fun guessType(context: SearchContext): ITy {
         return RecursionManager.doPreventingRecursion<ITy>(this, true) {

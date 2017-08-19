@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * Created by TangZX on 2016/12/9.
  */
-public interface LuaFuncBodyOwner extends LuaParametersOwner {
+public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
     @Nullable
     LuaFuncBody getFuncBody();
 
@@ -43,6 +43,9 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner {
 
     @NotNull
     LuaParamInfo[] getParams();
+
+    @NotNull
+    default ITy guessType(SearchContext context) { return asTy(context); }
 
     @NotNull
     default ITyFunction asTy(SearchContext searchContext) {

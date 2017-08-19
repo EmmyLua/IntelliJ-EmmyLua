@@ -35,7 +35,7 @@ import com.tang.intellij.lua.ty.TyClass
 
  * Created by TangZX on 2017/4/12.
  */
-open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpression, LuaGlobalVar {
+open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, LuaGlobalVar {
     internal constructor(stub: LuaNameStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     internal constructor(node: ASTNode) : super(node)

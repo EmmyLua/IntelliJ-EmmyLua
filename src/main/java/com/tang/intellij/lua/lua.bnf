@@ -329,7 +329,7 @@ expr ::=
     valueExpr {
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
     implements = [
-        "com.tang.intellij.lua.psi.LuaExpression"
+        "com.tang.intellij.lua.psi.LuaTypeGuessable"
     ]
 }
 

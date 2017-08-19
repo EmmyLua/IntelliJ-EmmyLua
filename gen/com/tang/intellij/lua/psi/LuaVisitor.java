@@ -61,7 +61,7 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitExpr(@NotNull LuaExpr o) {
-    visitExpression(o);
+    visitTypeGuessable(o);
   }
 
   public void visitExprList(@NotNull LuaExprList o) {
@@ -233,10 +233,6 @@ public class LuaVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitExpression(@NotNull LuaExpression o) {
-    visitPsiElement(o);
-  }
-
   public void visitFuncBodyOwner(@NotNull LuaFuncBodyOwner o) {
     visitPsiElement(o);
   }
@@ -246,6 +242,10 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitNamedElement(@NotNull LuaNamedElement o) {
+    visitPsiElement(o);
+  }
+
+  public void visitTypeGuessable(@NotNull LuaTypeGuessable o) {
     visitPsiElement(o);
   }
 
