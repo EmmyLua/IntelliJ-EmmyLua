@@ -118,7 +118,7 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     open fun doLazyInit(searchContext: SearchContext) {
         val classDef = LuaClassIndex.find(className, searchContext)
-        if (classDef != null) {
+        if (classDef != null && aliasName == null) {
             val tyClass = classDef.classType
             tyClass.lazyInit(searchContext)
             aliasName = tyClass.aliasName
