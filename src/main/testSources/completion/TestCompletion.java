@@ -103,4 +103,31 @@ public class TestCompletion extends LightCodeInsightFixtureTestCase {
         assertNotNull(strings);
         assertTrue(strings.contains("method"));
     }
+
+    public void testAnnotationArray() {
+        myFixture.configureByFiles("class.lua", "testAnnotationArray.lua");
+        myFixture.complete(CompletionType.BASIC, 1);
+        List<String> strings = myFixture.getLookupElementStrings();
+
+        assertNotNull(strings);
+        assertTrue(strings.containsAll(Arrays.asList("name", "age", "sayHello")));
+    }
+
+    public void testAnnotationFun() {
+        myFixture.configureByFiles("class.lua", "testAnnotationFun.lua");
+        myFixture.complete(CompletionType.BASIC);
+        List<String> strings = myFixture.getLookupElementStrings();
+
+        assertNotNull(strings);
+        assertTrue(strings.containsAll(Arrays.asList("name", "age", "sayHello")));
+    }
+
+    public void testAnnotationDict() {
+        myFixture.configureByFiles("class.lua", "testAnnotationDict.lua");
+        myFixture.complete(CompletionType.BASIC);
+        List<String> strings = myFixture.getLookupElementStrings();
+
+        assertNotNull(strings);
+        assertTrue(strings.containsAll(Arrays.asList("name", "age", "sayHello")));
+    }
 }
