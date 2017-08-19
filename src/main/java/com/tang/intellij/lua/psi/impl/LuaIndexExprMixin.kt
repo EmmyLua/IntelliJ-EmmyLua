@@ -59,12 +59,21 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
     override fun guessType(context: SearchContext): ITy {
         return RecursionManager.doPreventingRecursion(this, true) {
             val indexExpr = this as LuaIndexExpr
-            // xxx[1]
+            // xxx[yyy]
             if (indexExpr.lbrack != null) {
                 val tySet = indexExpr.guessPrefixType(context)
+
+                // Type[]
                 val array = TyUnion.find(tySet, ITyArray::class.java)
                 if (array != null)
                     return@doPreventingRecursion array.base
+
+                // table<number, Type>
+                val table = TyUnion.find(tySet, ITyGeneric::class.java)
+                if (table != null)
+                    return@doPreventingRecursion table.getParamTy(1)
+
+                return@doPreventingRecursion Ty.UNKNOWN
             }
 
             //from @type annotation
@@ -79,13 +88,13 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
             var result:ITy = Ty.UNKNOWN
             // value type
             val stub = indexExpr.stub
-            val valueTypeSet: ITy?
+            val valueTy: ITy?
             if (stub != null)
-                valueTypeSet = stub.guessValueType()
+                valueTy = stub.guessValueType()
             else
-                valueTypeSet = indexExpr.guessValueType(context)
+                valueTy = indexExpr.guessValueType(context)
 
-            result = result.union(valueTypeSet)
+            result = result.union(valueTy)
 
             val propName = this.fieldName
             if (propName != null) {
