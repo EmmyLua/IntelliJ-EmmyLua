@@ -44,16 +44,28 @@ interface ITy {
 
     val displayName: String
 
+    val flags: Int
+
     fun union(ty: ITy): ITy
 
     fun createTypeString(): String
 
     fun createReturnString(): String
+
+    fun isFlag(flag: Int): Boolean
 }
 
 abstract class Ty(override val kind: TyKind) : ITy {
 
+    override var flags: Int = 0
+
     override val isAnonymous: Boolean = false
+
+    override fun isFlag(flag: Int): Boolean = flags and flag == flag
+
+    fun writeFlag(flag: Int) {
+        flags = flags or flag
+    }
 
     override fun union(ty: ITy): ITy {
         return TyUnion.union(this, ty)
