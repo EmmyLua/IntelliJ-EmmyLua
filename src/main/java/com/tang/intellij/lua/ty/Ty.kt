@@ -283,5 +283,5 @@ class TyUnion : Ty(TyKind.Union) {
 
 class TyUnknown : Ty(TyKind.Unknown) {
     override val displayName: String
-        get() = "Unknown"
+        get() = "Any"
 }

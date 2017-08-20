@@ -28,8 +28,13 @@ interface ITyFunction : ITy {
 }
 
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
-    override val displayName: String
-        get() = "function"
+    override val displayName: String get() {
+        val paramSB = mutableListOf<String>()
+        params.forEach {
+            paramSB.add(it.name + ":" + it.ty.displayName)
+        }
+        return "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
+    }
 }
 
 class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : TyFunction() {
