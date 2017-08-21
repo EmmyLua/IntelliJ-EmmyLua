@@ -100,12 +100,22 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // doc_item | STRING
   static boolean after_dash(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "after_dash")) return false;
-    if (!nextTokenIs(b, "", AT, STRING)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_);
     r = doc_item(b, l + 1);
     if (!r) r = consumeToken(b, STRING);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, after_dash_recover_parser_);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // !(DASHES)
+  static boolean after_dash_recover(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "after_dash_recover")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NOT_);
+    r = !consumeToken(b, DASHES);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -242,7 +252,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // FIELD access_modifier ID type_set comment_string?
+  // FIELD access_modifier? ID type_set comment_string?
   public static boolean field_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field_def")) return false;
     if (!nextTokenIs(b, FIELD)) return false;
@@ -250,12 +260,19 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, FIELD_DEF, null);
     r = consumeToken(b, FIELD);
     p = r; // pin = 1
-    r = r && report_error_(b, access_modifier(b, l + 1));
+    r = r && report_error_(b, field_def_1(b, l + 1));
     r = p && report_error_(b, consumeToken(b, ID)) && r;
     r = p && report_error_(b, type_set(b, l + 1)) && r;
     r = p && field_def_4(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // access_modifier?
+  private static boolean field_def_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "field_def_1")) return false;
+    access_modifier(b, l + 1);
+    return true;
   }
 
   // comment_string?
@@ -681,4 +698,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
+  final static Parser after_dash_recover_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return after_dash_recover(b, l + 1);
+    }
+  };
 }

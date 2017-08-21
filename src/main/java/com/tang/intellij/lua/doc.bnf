@@ -64,8 +64,8 @@
 
 doc ::= (DASHES after_dash?)*
 
-private after_dash ::= doc_item | STRING //{ recoverWhile=after_dash_recover }
-//private after_dash_recover ::= !(DASHES)
+private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
+private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def)
 
 ty ::= function_ty | generic_ty | arr_ty | general_ty {
@@ -94,7 +94,7 @@ function_ty ::= fun '(' function_param_list ')' (':' type_set)? {
 type_set ::= '#'? ty ('|'? ty)*
 access_modifier ::= "protected" | "public"
 
-field_def ::= FIELD access_modifier ID type_set comment_string? {
+field_def ::= FIELD access_modifier? ID type_set comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
