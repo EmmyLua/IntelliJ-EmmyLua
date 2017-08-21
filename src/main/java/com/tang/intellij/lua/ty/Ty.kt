@@ -226,8 +226,7 @@ class TyUnion : Ty(TyKind.Union) {
 
     private fun union2(ty: ITy): TyUnion {
         if (ty is TyUnion) {
-            children.addAll(ty.children)
-            childSet.addAll(ty.childSet)
+            ty.children.forEach { addChild(it) }
         }
         else addChild(ty)
         return this

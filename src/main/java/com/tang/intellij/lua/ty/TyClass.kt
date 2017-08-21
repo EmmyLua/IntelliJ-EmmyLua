@@ -173,17 +173,15 @@ abstract class TyClass(override val className: String, override var superClassNa
 }
 
 class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
-    private val _supperName: String? by lazy {
+
+    init {
         val supperRef = classDef.superClassNameRef
         if (supperRef != null)
-            return@lazy supperRef.text
-        else null
+            superClassName = supperRef.text
+        aliasName = classDef.aliasName
     }
 
-    override fun doLazyInit(searchContext: SearchContext) {
-        aliasName = classDef.aliasName
-        superClassName = _supperName
-    }
+    override fun doLazyInit(searchContext: SearchContext) {}
 }
 
 open class TySerializedClass(name: String, supper: String? = null,
