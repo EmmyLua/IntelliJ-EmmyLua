@@ -160,14 +160,14 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     companion object {
         // for _G
-        val G:TyClass = TySerializedClass(Constants.WORD_G)
+        val G: TyClass = TySerializedClass(Constants.WORD_G)
 
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
-            return TySerializedClass(nameDef.name)
+            return TySerializedClass(nameDef.name, null, null, TyFlags.ANONYMOUS)
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr): TyClass {
-            return TySerializedClass(nameExpr.text)
+            return TySerializedClass(nameExpr.text, null, null, TyFlags.GLOBAL)
         }
     }
 }
@@ -186,10 +186,13 @@ class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
     }
 }
 
-open class TySerializedClass(name: String, supper: String? = null, alias: String? = null)
+open class TySerializedClass(name: String, supper: String? = null,
+                             alias: String? = null,
+                             flags: Int = 0)
     : TyClass(name, supper) {
     init {
         aliasName = alias
+        this.flags = flags
     }
 }
 
@@ -202,6 +205,9 @@ fun getTableTypeName(table: LuaTableExpr): String {
 }
 
 class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
+    init {
+        this.flags = TyFlags.ANONYMOUS
+    }
     override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {
         for (field in table.tableFieldList) {
             processor(this, field)

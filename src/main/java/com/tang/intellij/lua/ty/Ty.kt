@@ -35,6 +35,12 @@ enum class TyPrimitiveKind {
     Number,
     Boolean
 }
+class TyFlags {
+    companion object {
+        val ANONYMOUS = 0x1
+        val GLOBAL = 0x2
+    }
+}
 
 interface ITy {
 
@@ -57,11 +63,12 @@ fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
 
 abstract class Ty(override val kind: TyKind) : ITy {
 
-    override var flags: Int = 0
+    override final var flags: Int = 0
 
-    override val isAnonymous: Boolean = false
+    override val isAnonymous: Boolean
+        get() = hasFlag(TyFlags.ANONYMOUS)
 
-    fun writeFlag(flag: Int) {
+    fun addFlag(flag: Int) {
         flags = flags or flag
     }
 
@@ -82,7 +89,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
     override fun toString(): String {
         val list = mutableListOf<String>()
         TyUnion.each(this) {
-            list.add(it.displayName)
+            if (!it.isAnonymous)
+                list.add(it.displayName)
         }
         return list.joinToString("|")
     }
@@ -113,6 +121,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
         fun serialize(ty: ITy, stream: StubOutputStream) {
             stream.writeByte(ty.kind.ordinal)
+            stream.writeInt(ty.flags)
             when(ty) {
                 is ITyArray -> {
                     serialize(ty.base, stream)
@@ -146,6 +155,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
         fun deserialize(stream: StubInputStream): ITy {
             val kind = getKind(stream.readByte().toInt())
+            val flags = stream.readInt()
             return when (kind) {
                 TyKind.Array -> {
                     val base = deserialize(stream)
@@ -158,13 +168,16 @@ abstract class Ty(override val kind: TyKind) : ITy {
                         arr.add(LuaParamInfo.deserialize(stream))
                     }
                     val retTy = deserialize(stream)
-                    TySerializedFunction(retTy, arr.toTypedArray())
+                    TySerializedFunction(retTy, arr.toTypedArray(), flags)
                 }
                 TyKind.Class -> {
                     val className = stream.readName()
                     val superName = stream.readName()
                     val aliasName = stream.readName()
-                    TySerializedClass(StringRef.toString(className), StringRef.toString(superName), StringRef.toString(aliasName))
+                    TySerializedClass(StringRef.toString(className),
+                            StringRef.toString(superName),
+                            StringRef.toString(aliasName),
+                            flags)
                 }
                 TyKind.Primitive -> getPrimitive(stream.readByte())
                 TyKind.Union -> {

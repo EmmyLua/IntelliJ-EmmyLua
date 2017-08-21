@@ -28,13 +28,14 @@ interface ITyFunction : ITy {
 }
 
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
-    override val displayName: String get() {
-        val paramSB = mutableListOf<String>()
-        params.forEach {
-            paramSB.add(it.name + ":" + it.ty.displayName)
+    override val displayName: String
+        get() {
+            val paramSB = mutableListOf<String>()
+            params.forEach {
+                paramSB.add(it.name + ":" + it.ty.displayName)
+            }
+            return "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
         }
-        return "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
-    }
 }
 
 class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : TyFunction() {
@@ -68,4 +69,10 @@ class TyDocPsiFunction(func: LuaDocFunctionTy, searchContext: SearchContext) : T
         get() = _params
 }
 
-class TySerializedFunction(override val returnTy: ITy, override val params: Array<LuaParamInfo>) : TyFunction()
+class TySerializedFunction(override val returnTy: ITy,
+                           override val params: Array<LuaParamInfo>,
+                           flags: Int = 0) : TyFunction() {
+    init {
+        this.flags = flags
+    }
+}
