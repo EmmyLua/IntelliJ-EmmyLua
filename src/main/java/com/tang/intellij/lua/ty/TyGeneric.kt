@@ -30,8 +30,11 @@ interface ITyGeneric : ITy {
 }
 
 abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
-    override val displayName: String
-        get() = "Generic"
+    override val displayName: String get() {
+        val list = mutableListOf<String>()
+        params.forEach { list.add(it.displayName) }
+        return "${base.displayName}<${list.joinToString(", ")}>"
+    }
 }
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext) : TyGeneric() {
