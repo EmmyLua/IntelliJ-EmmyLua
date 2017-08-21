@@ -216,6 +216,7 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
 
 class TyUnion : Ty(TyKind.Union) {
     private val children = mutableListOf<ITy>()
+    private val childSet = mutableSetOf<String>()
 
     override val displayName: String
         get() = "Union"
@@ -224,11 +225,20 @@ class TyUnion : Ty(TyKind.Union) {
         get() = children.size
 
     private fun union2(ty: ITy): TyUnion {
-        if (ty is TyUnion)
+        if (ty is TyUnion) {
             children.addAll(ty.children)
-        else
-            children.add(ty)
+            childSet.addAll(ty.childSet)
+        }
+        else addChild(ty)
         return this
+    }
+
+    private fun addChild(ty: ITy): Boolean {
+        if (childSet.add(ty.displayName)) {
+            children.add(ty)
+            return true
+        }
+        return false
     }
 
     companion object {
@@ -262,19 +272,17 @@ class TyUnion : Ty(TyKind.Union) {
         }
 
         fun union(t1: ITy, t2: ITy): ITy {
-            if (t1 is TyUnknown)
-                return t2
-            else if (t2 is TyUnknown)
-                return t1
-            else if (t1 is TyUnion)
-                return t1.union2(t2)
-            else if (t2 is TyUnion)
-                return t2.union2(t1)
-            else {
-                val u = TyUnion()
-                u.children.add(t1)
-                u.children.add(t2)
-                return u
+            return when {
+                t1 is TyUnknown -> t2
+                t2 is TyUnknown -> t1
+                t1 is TyUnion -> t1.union2(t2)
+                t2 is TyUnion -> t2.union2(t1)
+                else -> {
+                    val u = TyUnion()
+                    u.addChild(t1)
+                    u.addChild(t2)
+                    u
+                }
             }
         }
 
