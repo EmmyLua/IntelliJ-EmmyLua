@@ -64,7 +64,7 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
     override fun indexStub(luaNameStub: LuaNameStub, indexSink: IndexSink) {
         if (luaNameStub.isGlobal) {
             indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G)
-            indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G + "." + luaNameStub.name)
+            indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G + "*" + luaNameStub.name)
 
             indexSink.occurrence(LuaGlobalIndex.KEY, luaNameStub.name)
             indexSink.occurrence(LuaShortNameIndex.KEY, luaNameStub.name)

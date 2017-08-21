@@ -73,7 +73,7 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
         val typeName = fieldStub.typeName
         if (fieldName != null && typeName != null) {
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName)
-            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "." + fieldName)
+            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "*" + fieldName)
             indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
         }
     }

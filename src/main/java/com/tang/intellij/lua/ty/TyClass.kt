@@ -48,7 +48,7 @@ abstract class TyClass(override val className: String, override var superClassNa
         val clazzName = className
         val project = context.project
 
-        val fieldIndex = LuaClassFieldIndex.getInstance()
+        val fieldIndex = LuaClassFieldIndex.instance
         val list = fieldIndex.get(clazzName, project, LuaPredefinedScope(project))
 
         val alias = aliasName
