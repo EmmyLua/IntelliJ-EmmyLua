@@ -51,17 +51,15 @@ interface ITy {
     fun createTypeString(): String
 
     fun createReturnString(): String
-
-    fun isFlag(flag: Int): Boolean
 }
+
+fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
 
 abstract class Ty(override val kind: TyKind) : ITy {
 
     override var flags: Int = 0
 
     override val isAnonymous: Boolean = false
-
-    override fun isFlag(flag: Int): Boolean = flags and flag == flag
 
     fun writeFlag(flag: Int) {
         flags = flags or flag
