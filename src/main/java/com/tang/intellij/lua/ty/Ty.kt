@@ -19,6 +19,7 @@ package com.tang.intellij.lua.ty
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaParamInfo
 
 enum class TyKind {
@@ -78,12 +79,12 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun createTypeString(): String {
         val s = toString()
-        return if (s.isEmpty()) "any" else s
+        return if (s.isEmpty()) Constants.WORD_ANY else s
     }
 
     override fun createReturnString(): String {
         val s = toString()
-        return if (s.isEmpty()) "void" else s
+        return if (s.isEmpty()) Constants.WORD_ANY else s
     }
 
     override fun toString(): String {
@@ -301,5 +302,5 @@ class TyUnion : Ty(TyKind.Union) {
 
 class TyUnknown : Ty(TyKind.Unknown) {
     override val displayName: String
-        get() = "Any"
+        get() = Constants.WORD_ANY
 }

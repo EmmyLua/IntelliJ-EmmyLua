@@ -26,4 +26,5 @@ public class Constants {
     public static final String WORD_G = "_G";
     public static final String WORD_PAIRS = "pairs";
     public static final String WORD_IPAIRS = "ipairs";
+    public static final String WORD_ANY = "any";
 }
