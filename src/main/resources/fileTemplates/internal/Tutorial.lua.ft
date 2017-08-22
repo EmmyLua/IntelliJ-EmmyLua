@@ -1,4 +1,6 @@
 -- Tutorial for annotations
+-- https://tangzx.github.io/emmydoc
+-- https://github.com/tangzx/IntelliJ-EmmyLua
 
 --------------------------------------------------------------------------------
 -- Tutorial for annotation "@class" and "@field"
