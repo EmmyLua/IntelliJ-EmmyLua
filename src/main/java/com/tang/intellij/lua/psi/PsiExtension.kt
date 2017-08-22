@@ -55,6 +55,19 @@ fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     return list[index]
 }
 
+fun LuaExprList.getIndexFor(psi: LuaExpr): Int {
+    var idx = 0
+    PsiTreeUtil.processElements(this, {
+        if (it is LuaExpr) {
+            if (it == psi)
+                return@processElements false
+            idx++
+        }
+        return@processElements true
+    })
+    return idx
+}
+
 fun LuaExprList.getExprAt(idx: Int): LuaExpr? {
     return exprList[idx]
 }

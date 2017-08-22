@@ -27,6 +27,11 @@ interface ITyFunction : ITy {
     val params: Array<LuaParamInfo>
 }
 
+fun ITyFunction.getParamTy(index: Int): ITy {
+    val info = params.getOrNull(index)
+    return info?.ty ?: Ty.UNKNOWN
+}
+
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     override val displayName: String
         get() {

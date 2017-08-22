@@ -307,6 +307,32 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 }
             }
         }
+
+        /**
+         * ---@param processor fun(p1:TYPE):void
+         * local function test(processor)
+         * end
+         *
+         * test(function(p1)  end)
+         *
+         * guess type for p1
+         */
+        if (owner is LuaCallStat) {
+            val closure = LuaPsiTreeUtil.getParentOfType(paramNameDef, LuaClosureExpr::class.java, LuaFuncBody::class.java)
+            if (closure != null) {
+                val callExpr = owner.expr as LuaCallExpr
+                val type = callExpr.guessPrefixType(context)
+                //test
+                if (type is ITyFunction) {
+                    val closureIndex = callExpr.args.exprList!!.getIndexFor(closure)
+                    val paramTy = type.getParamTy(closureIndex)
+                    if (paramTy is ITyFunction) {
+                        val paramIndex = closure.getIndexFor(paramNameDef)
+                        return paramTy.getParamTy(paramIndex)
+                    }
+                }
+            }
+        }
     }
     return Ty.UNKNOWN
 }

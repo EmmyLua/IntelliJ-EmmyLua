@@ -171,4 +171,24 @@ public class LuaPsiTreeUtil {
             t = PsiTreeUtil.findElementOfClassAtOffset(file, offset - 1, clazz, strictStart);
         return t;
     }
+
+    public static <T extends PsiElement> T getParentOfType(@Nullable PsiElement element, @NotNull Class<T> aClass, @NotNull Class... skips) {
+        if (element == null) {
+            return null;
+        } else {
+            element = element.getParent();
+
+            while(element != null && !aClass.isInstance(element) && PsiTreeUtil.instanceOf(element, skips)) {
+                if (element instanceof PsiFile) {
+                    return null;
+                }
+
+                element = element.getParent();
+            }
+
+            @SuppressWarnings("unchecked")
+            T e = (T) element;
+            return e;
+        }
+    }
 }
