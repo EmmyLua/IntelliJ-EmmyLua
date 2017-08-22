@@ -35,6 +35,14 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         params.forEach { list.add(it.displayName) }
         return "${base.displayName}<${list.joinToString(", ")}>"
     }
+
+    override fun equals(other: Any?): Boolean {
+        return other is ITyGeneric && other.base == base && other.displayName == displayName
+    }
+
+    override fun hashCode(): Int {
+        return displayName.hashCode()
+    }
 }
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext) : TyGeneric() {

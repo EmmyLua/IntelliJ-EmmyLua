@@ -36,6 +36,14 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
             }
             return "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
         }
+
+    override fun equals(other: Any?): Boolean {
+        return other is ITyFunction && other.displayName == displayName
+    }
+
+    override fun hashCode(): Int {
+        return displayName.hashCode()
+    }
 }
 
 class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : TyFunction() {

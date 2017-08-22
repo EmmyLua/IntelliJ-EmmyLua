@@ -44,6 +44,14 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     private var _lazyInitialized: Boolean = false
 
+    override fun equals(other: Any?): Boolean {
+        return other is ITyClass && other.className == className
+    }
+
+    override fun hashCode(): Int {
+        return className.hashCode()
+    }
+
     override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {
         val clazzName = className
         val project = context.project

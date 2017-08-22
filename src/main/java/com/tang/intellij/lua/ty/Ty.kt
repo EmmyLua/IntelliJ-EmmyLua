@@ -204,7 +204,15 @@ abstract class Ty(override val kind: TyKind) : ITy {
     }
 }
 
-class TyPrimitive(val primitiveKind: TyPrimitiveKind, override val displayName: String) : Ty(TyKind.Primitive)
+class TyPrimitive(val primitiveKind: TyPrimitiveKind, override val displayName: String) : Ty(TyKind.Primitive) {
+    override fun equals(other: Any?): Boolean {
+        return other is TyPrimitive && other.primitiveKind == primitiveKind
+    }
+
+    override fun hashCode(): Int {
+        return primitiveKind.hashCode()
+    }
+}
 
 interface ITyArray : ITy {
     val base: ITy
@@ -213,32 +221,35 @@ interface ITyArray : ITy {
 class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override val displayName: String
         get() = "${base.displayName}[]"
+
+    override fun equals(other: Any?): Boolean {
+        return other is ITyArray && base.equals(other.base)
+    }
+
+    override fun hashCode(): Int {
+        return displayName.hashCode()
+    }
 }
 
 class TyUnion : Ty(TyKind.Union) {
-    private val children = mutableListOf<ITy>()
-    private val childSet = mutableSetOf<String>()
+    private val childSet = mutableSetOf<ITy>()
 
     override val displayName: String
         get() = "Union"
 
     val size:Int
-        get() = children.size
+        get() = childSet.size
 
     private fun union2(ty: ITy): TyUnion {
         if (ty is TyUnion) {
-            ty.children.forEach { addChild(it) }
+            ty.childSet.forEach { addChild(it) }
         }
         else addChild(ty)
         return this
     }
 
     private fun addChild(ty: ITy): Boolean {
-        if (childSet.add(ty.displayName)) {
-            children.add(ty)
-            return true
-        }
-        return false
+        return childSet.add(ty)
     }
 
     companion object {
@@ -258,7 +269,7 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun process(ty: ITy, process: (ITy) -> Boolean) {
             if (ty is TyUnion) {
-                for (child in ty.children) {
+                for (child in ty.childSet) {
                     if (!process(child))
                         break
                 }
@@ -267,7 +278,7 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun each(ty: ITy, process: (ITy) -> Unit) {
             if (ty is TyUnion) {
-                ty.children.forEach(process)
+                ty.childSet.forEach(process)
             } else process(ty)
         }
 
@@ -303,4 +314,12 @@ class TyUnion : Ty(TyKind.Union) {
 class TyUnknown : Ty(TyKind.Unknown) {
     override val displayName: String
         get() = Constants.WORD_ANY
+
+    override fun equals(other: Any?): Boolean {
+        return other is TyUnknown
+    }
+
+    override fun hashCode(): Int {
+        return Constants.WORD_ANY.hashCode()
+    }
 }
