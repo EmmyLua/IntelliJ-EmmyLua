@@ -299,6 +299,11 @@
                 id="lua.newFile">
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFile"/>
         </action>
+        <action class="com.tang.intellij.lua.actions.CreateTutorialFileAction"
+                text="Lua Tutorial"
+                id="lua.newTutorial">
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="lua.newFile"/>
+        </action>
 
         <action id="LuaCheck"
                 text="Run LuaCheck"
