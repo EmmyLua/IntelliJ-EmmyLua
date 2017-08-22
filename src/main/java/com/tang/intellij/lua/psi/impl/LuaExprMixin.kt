@@ -32,7 +32,7 @@ import com.tang.intellij.lua.ty.TyUnion
 open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpr {
 
     override fun guessType(context: SearchContext): ITy {
-        return RecursionManager.doPreventingRecursion<ITy>(this, true) {
+        val iTy = RecursionManager.doPreventingRecursion<ITy>(this, true) {
             when {
                 this is LuaCallExpr -> guessType(this, context)
                 this is LuaParenExpr -> guessType(this, context)
@@ -40,7 +40,8 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 this is LuaClosureExpr -> asTy(context)
                 else -> Ty.UNKNOWN
             }
-        }!!
+        }
+        return iTy ?: Ty.UNKNOWN
     }
 
     private fun guessType(literalExpr: LuaLiteralExpr): Ty {
