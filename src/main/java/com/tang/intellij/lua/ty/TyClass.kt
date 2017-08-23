@@ -115,7 +115,7 @@ abstract class TyClass(override val className: String, override var superClassNa
         superType?.processStaticMethods(context, processor)
     }
 
-    override val displayName: String get() = className
+    override val displayName: String get() = if(isAnonymous) "Anonymous" else className
 
     override fun lazyInit(searchContext: SearchContext) {
         if (!_lazyInitialized) {
@@ -171,7 +171,8 @@ abstract class TyClass(override val className: String, override var superClassNa
         val G: TyClass = TySerializedClass(Constants.WORD_G)
 
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
-            return TySerializedClass(nameDef.name, null, null, TyFlags.ANONYMOUS)
+            val tyName = "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
+            return TySerializedClass(tyName, null, null, TyFlags.ANONYMOUS)
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr): TyClass {

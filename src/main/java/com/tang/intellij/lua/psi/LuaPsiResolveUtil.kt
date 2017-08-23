@@ -208,25 +208,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
             if (Ty.isInvalid(typeSet))
                 typeSet = TyClass.createAnonymousType(nameDef)
         }
-    }//变量声明，local x = 0
-    //在Table字段里
-
-    /*if (typeSet != null) {
-        if (context.isGuessTypeKind(GuessTypeKind.FromName)) {
-            val str = nameDef.text
-            if (str.length > 2) {
-                val matcher = CamelHumpMatcher(str, false)
-                LuaClassIndex.getInstance().processAllKeys(context.project) { cls ->
-                    if (matcher.prefixMatches(cls)) {
-                        val type = LuaType.create(cls, null)
-                        type.isUnreliable = true
-                        typeSet = TySet.union(typeSet, type)
-                    }
-                    true
-                }
-            }
-        }
-    }*/
+    }
     return typeSet ?: Ty.UNKNOWN
 }
 
@@ -356,11 +338,4 @@ fun resolveRequireFile(pathString: String?, project: Project): LuaFile? {
             return psiFile
     }
     return null
-}
-
-fun getAnonymousType(element: PsiElement): String {
-    val fileName = element.containingFile.name
-    val startOffset = element.node.startOffset
-
-    return String.format("%s@(%d)%s", fileName, startOffset, element.text)
 }
