@@ -429,9 +429,19 @@ object LuaPsiImplUtil {
                 override fun visitReturnStat(o: LuaReturnStat) {
                     val guessReturnTypeSet = guessReturnTypeSet(o, ctx.index, ctx)
                     TyUnion.each(guessReturnTypeSet) {
-                        if (!it.isAnonymous) { //不处理local
-                            typeSet = typeSet.union(it)
-                        }
+                        /**
+                         * 注意，不能排除anonymous
+                         * local function test()
+                         *      local v = xxx()
+                         *      v.yyy = zzz
+                         *      return v
+                         * end
+                         *
+                         * local r = test()
+                         *
+                         * type of r is an anonymous ty
+                         */
+                        typeSet = typeSet.union(it)
                     }
                 }
 
