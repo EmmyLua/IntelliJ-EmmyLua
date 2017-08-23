@@ -130,4 +130,13 @@ public class TestCompletion extends LightCodeInsightFixtureTestCase {
         assertNotNull(strings);
         assertTrue(strings.containsAll(Arrays.asList("name", "age", "sayHello")));
     }
+
+    public void testAnonymous() {
+        myFixture.configureByFiles("testAnonymous.lua");
+        myFixture.complete(CompletionType.BASIC);
+        List<String> strings = myFixture.getLookupElementStrings();
+
+        assertNotNull(strings);
+        assertTrue(strings.contains("pp"));
+    }
 }
