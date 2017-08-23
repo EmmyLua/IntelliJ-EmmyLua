@@ -43,11 +43,18 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
         }
 
     override fun equals(other: Any?): Boolean {
-        return other is ITyFunction && other.displayName == displayName
+        if (other is ITyFunction) {
+            return params.indices.none { params[it] != other.params.getOrNull(it) }
+        }
+        return false
     }
 
     override fun hashCode(): Int {
-        return displayName.hashCode()
+        var code = returnTy.hashCode()
+        params.forEach {
+            code += it.ty.hashCode() * 31
+        }
+        return code
     }
 }
 

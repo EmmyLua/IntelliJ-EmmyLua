@@ -292,7 +292,8 @@ class TyUnion : Ty(TyKind.Union) {
                     val u = TyUnion()
                     u.addChild(t1)
                     u.addChild(t2)
-                    u
+                    //if t1 == t2
+                    if (u.childSet.size == 1) t1 else u
                 }
             }
         }

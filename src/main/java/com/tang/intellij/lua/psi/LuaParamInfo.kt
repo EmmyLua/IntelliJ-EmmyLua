@@ -35,6 +35,15 @@ class LuaParamInfo {
     var name: String = ""
     var ty: ITy = Ty.UNKNOWN
 
+    override fun equals(other: Any?): Boolean {
+        //only check ty
+        return other is LuaParamInfo && other.ty == ty
+    }
+
+    override fun hashCode(): Int {
+        return ty.hashCode()
+    }
+
     companion object {
 
         @Throws(IOException::class)
