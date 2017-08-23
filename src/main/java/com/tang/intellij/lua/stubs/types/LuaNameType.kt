@@ -53,12 +53,14 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
     @Throws(IOException::class)
     override fun serialize(luaNameStub: LuaNameStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaNameStub.name)
+        stubOutputStream.writeBoolean(luaNameStub.isGlobal)
     }
 
     @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameStub {
         val nameRef = stubInputStream.readName()
-        return LuaNameStubImpl(StringRef.toString(nameRef)!!, stubElement, this)
+        val isGlobal = stubInputStream.readBoolean()
+        return LuaNameStubImpl(StringRef.toString(nameRef)!!, isGlobal, stubElement,this)
     }
 
     override fun indexStub(luaNameStub: LuaNameStub, indexSink: IndexSink) {

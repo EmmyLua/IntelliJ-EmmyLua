@@ -20,7 +20,6 @@ import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.resolveLocal
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.types.LuaNameType
 
 /**
@@ -34,22 +33,24 @@ interface LuaNameStub : StubElement<LuaNameExpr> {
 
 class LuaNameStubImpl : StubBase<LuaNameExpr>, LuaNameStub {
 
-    private lateinit var _nameExpr: LuaNameExpr
+    private var _nameExpr: LuaNameExpr? = null
     private var _name: String
+    private var _isGlobal:Boolean = false
 
     constructor(luaNameExpr: LuaNameExpr, parent: StubElement<*>, elementType: LuaNameType) : super(parent, elementType) {
         _nameExpr = luaNameExpr
         _name = luaNameExpr.name
     }
 
-    constructor(name: String, stubElement: StubElement<*>, luaNameType: LuaNameType) : super(stubElement, luaNameType) {
+    constructor(name: String, isGlobal: Boolean, stubElement: StubElement<*>, luaNameType: LuaNameType) : super(stubElement, luaNameType) {
         _name = name
+        _isGlobal = isGlobal
     }
 
     private fun checkGlobal(): Boolean {
-        val context = SearchContext(_nameExpr.project)
-        context.setCurrentStubFile(_nameExpr.containingFile)
-        return resolveLocal(_nameExpr, context) == null
+        if (_nameExpr != null)
+            _isGlobal = resolveLocal(_nameExpr!!, null) == null
+        return _isGlobal
     }
 
     override val isGlobal: Boolean
