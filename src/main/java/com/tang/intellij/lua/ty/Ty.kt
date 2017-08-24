@@ -89,9 +89,15 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun toString(): String {
         val list = mutableListOf<String>()
-        TyUnion.each(this) {
-            if (!it.isAnonymous)
+        TyUnion.each(this) { //尽量不使用Global
+            if (!it.isAnonymous && !(it is ITyClass && it.hasFlag(TyFlags.GLOBAL)))
                 list.add(it.displayName)
+        }
+        if (list.isEmpty()) { //使用Global
+            TyUnion.each(this) {
+                if (!it.isAnonymous && (it is ITyClass && it.hasFlag(TyFlags.GLOBAL)))
+                    list.add(it.displayName)
+            }
         }
         return list.joinToString("|")
     }
