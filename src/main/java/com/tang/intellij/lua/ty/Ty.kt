@@ -300,14 +300,19 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun getPrefectClass(ty: ITy): ITyClass? {
             var tc: ITyClass? = null
+            var anonymous: ITyClass? = null
             process(ty) {
                 if (it is ITyClass) {
-                    tc = it
-                    return@process false
+                    if (it.isAnonymous)
+                        anonymous = it
+                    else {
+                        tc = it
+                        return@process false
+                    }
                 }
                 true
             }
-            return tc
+            return tc ?: anonymous
         }
     }
 }
