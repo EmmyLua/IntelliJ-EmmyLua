@@ -102,7 +102,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, Lua
     private fun isGlobal(nameExpr: LuaNameExpr):Boolean {
         val minx = nameExpr as LuaNameExprMixin
         val gs = minx.greenStub
-        return gs?.isGlobal ?: resolveLocal(nameExpr, null) == null
+        return gs?.isGlobal ?: (resolveLocal(nameExpr, null) == null)
     }
 
     override fun getFieldName(): String {
