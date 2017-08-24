@@ -89,7 +89,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, Lua
                     }
                 }
                 //Global
-                if (isGlobal()) {
+                if (isGlobal(def)) {
                     typeSet = typeSet.union(TyClass.createGlobalType(def))
                 }
                 return typeSet
@@ -99,9 +99,10 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, Lua
         }
     }
 
-    private fun isGlobal():Boolean {
-        val gs = greenStub
-        return gs?.isGlobal ?: resolveLocal(this as LuaNameExpr, null) == null
+    private fun isGlobal(nameExpr: LuaNameExpr):Boolean {
+        val minx = nameExpr as LuaNameExprMixin
+        val gs = minx.greenStub
+        return gs?.isGlobal ?: resolveLocal(nameExpr, null) == null
     }
 
     override fun getFieldName(): String {
