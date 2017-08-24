@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
+import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.LuaFuncBody
 
 /**
@@ -31,22 +32,26 @@ import com.tang.intellij.lua.psi.LuaFuncBody
 class LuaTypedHandler : TypedHandlerDelegate() {
 
     override fun checkAutoPopup(charTyped: Char, project: Project, editor: Editor, file: PsiFile): TypedHandlerDelegate.Result {
-        if (charTyped == ':' || charTyped == '@') {
-            AutoPopupController.getInstance(project).autoPopupMemberLookup(editor, null)
-            return TypedHandlerDelegate.Result.STOP
+        if (file.fileType == LuaFileType.INSTANCE) {
+            if (charTyped == ':' || charTyped == '@') {
+                AutoPopupController.getInstance(project).autoPopupMemberLookup(editor, null)
+                return TypedHandlerDelegate.Result.STOP
+            }
         }
         return super.checkAutoPopup(charTyped, project, editor, file)
     }
 
     override fun charTyped(c: Char, project: Project, editor: Editor, file: PsiFile): TypedHandlerDelegate.Result {
-        // function() <caret> end 自动加上end
-        if (c == '(') {
-            PsiDocumentManager.getInstance(project).commitDocument(editor.document)
-            val pos = editor.caretModel.offset
-            val element = file.findElementAt(pos)
-            if (element != null && element.parent is LuaFuncBody) {
-                editor.document.insertString(pos + 1, " end")
-                return TypedHandlerDelegate.Result.STOP
+        if (file.fileType == LuaFileType.INSTANCE) {
+            // function() <caret> end 自动加上end
+            if (c == '(') {
+                PsiDocumentManager.getInstance(project).commitDocument(editor.document)
+                val pos = editor.caretModel.offset
+                val element = file.findElementAt(pos)
+                if (element != null && element.parent is LuaFuncBody) {
+                    editor.document.insertString(pos + 1, " end")
+                    return TypedHandlerDelegate.Result.STOP
+                }
             }
         }
         return super.charTyped(c, project, editor, file)
