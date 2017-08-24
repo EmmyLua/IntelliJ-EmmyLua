@@ -16,6 +16,8 @@
 --- Issues an error when the value of its argument `v` is false (i.e.,
 --- nil or false); otherwise, returns all its arguments. `message` is an error
 --- message; when absent, it defaults to "assertion failed!"
+---@param v any
+---@param message string
 function assert(v, message) end
 
 ---
@@ -35,6 +37,8 @@ function assert(v, message) end
 --- * "setstepmul": sets `arg` as the new value for the *step multiplier*
 --- of the collector (see §2.10). Returns the previous value for *step*.
 ---
+---@param opt string
+---@param arg string
 function collectgarbage(opt, arg) end
 
 ---
@@ -43,6 +47,7 @@ function collectgarbage(opt, arg) end
 --- `dofile` executes the contents of the standard input (`stdin`). Returns
 --- all values returned by the chunk. In case of errors, `dofile` propagates
 --- the error to its caller (that is, `dofile` does not run in protected mode).
+---@param filename string
 function dofile(filename) end
 
 ---
@@ -54,6 +59,7 @@ function dofile(filename) end
 --- `error` function was called. Level 2 points the error to where the function
 --- that called `error` was called; and so on. Passing a level 0 avoids the
 --- addition of error position information to the message.
+---@param message string
 ---@param optional level number
 function error(message, level) end
 
@@ -77,6 +83,7 @@ function getfenv(f) end
 --- If `object` does not have a metatable, returns nil. Otherwise, if the
 --- object's metatable has a `"__metatable"` field, returns the associated
 --- value. Otherwise, returns the metatable of the given object.
+---@param object any
 function getmetatable(object) end
 
 ---
@@ -85,6 +92,7 @@ function getmetatable(object) end
 --- for i,v in ipairs(t) do *body* end
 --- will iterate over the pairs (`1,t[1]`), (`2,t[2]`), ..., up to the
 --- first integer key absent from the table.
+---@param t table
 function ipairs(t) end
 
 ---
@@ -96,12 +104,14 @@ function ipairs(t) end
 --- is the global environment.
 --- `chunkname` is used as the chunk name for error messages and debug
 --- information. When absent, it defaults to "`=(load)`".
+---@param func fun():string
 ---@param optional chunkname string
 function load(func, chunkname) end
 
 ---
 --- Similar to `load`, but gets the chunk from file `filename` or from the
 --- standard input, if no file name is given.
+---@param filename string
 function loadfile(filename) end
 
 ---
@@ -109,6 +119,7 @@ function loadfile(filename) end
 --- To load and run a given string, use the idiom
 --- assert(loadstring(s))()
 --- When absent, `chunkname` defaults to the given string.
+---@param string string
 ---@param optional chunkname string
 function loadstring(string, chunkname) end
 
@@ -131,6 +142,8 @@ function loadstring(string, chunkname) end
 --- The behavior of `next` is *undefined* if, during the traversal, you assign
 --- any value to a non-existent field in the table. You may however modify
 --- existing fields. In particular, you may clear existing fields.
+---@param table table
+---@param index number
 function next(table, index) end
 
 ---
@@ -140,6 +153,7 @@ function next(table, index) end
 --- will iterate over all key–value pairs of table `t`.
 --- See function `next` for the caveats of modifying the table during its
 --- traversal.
+---@param t table
 function pairs(t) end
 
 ---
@@ -149,6 +163,7 @@ function pairs(t) end
 --- boolean), which is true if the call succeeds without errors. In such case,
 --- `pcall` also returns all results from the call, after this first result. In
 --- case of any error, `pcall` returns false plus the error message.
+---@param f fun()
 function pcall(f, arg1, ...) end
 
 ---
@@ -161,11 +176,15 @@ function print(...) end
 ---
 --- Checks whether `v1` is equal to `v2`, without invoking any
 --- metamethod. Returns a boolean.
+---@param v1 any
+---@param v2 any
 function rawequal(v1, v2) end
 
 ---
 --- Gets the real value of `table[index]`, without invoking any
 --- metamethod. `table` must be a table; `index` may be any value.
+---@param table table
+---@param index number
 function rawget(table, index) end
 
 ---
@@ -173,12 +192,16 @@ function rawget(table, index) end
 --- metamethod. `table` must be a table, `index` any value different from nil,
 --- and `value` any Lua value.
 --- This function returns `table`.
+---@param table table
+---@param index number
+---@param value any
 function rawset(table, index, value) end
 
 ---
 --- If `index` is a number, returns all arguments after argument number
 --- `index`. Otherwise, `index` must be the string `"#"`, and `select` returns
 --- the total number of extra arguments it received.
+---@param index number|string
 function select(index, ...) end
 
 ---
@@ -187,6 +210,8 @@ function select(index, ...) end
 --- 1 is the function calling `setfenv`. `setfenv` returns the given function.
 --- As a special case, when `f` is 0 `setfenv` changes the environment of the
 --- running thread. In this case, `setfenv` returns no values.
+---@param f number
+---@param table table
 function setfenv(f, table) end
 
 ---
@@ -195,6 +220,8 @@ function setfenv(f, table) end
 --- metatable of the given table. If the original metatable has a `"__metatable"`
 --- field, raises an error.
 --- This function returns `table`.
+---@param table table
+---@param metatable table
 function setmetatable(table, metatable) end
 
 ---
@@ -207,6 +234,7 @@ function setmetatable(table, metatable) end
 --- 11, and so forth, with '`Z`' representing 35. In base 10 (the default),
 --- the number can have a decimal part, as well as an optional exponent part
 --- (see §2.1). In other bases, only unsigned integers are accepted.
+---@param e any
 ---@param optional base number
 function tonumber(e, base) end
 
@@ -217,6 +245,7 @@ function tonumber(e, base) end
 --- If the metatable of `e` has a `"__tostring"` field, then `tostring` calls
 --- the corresponding value with `e` as argument, and uses the result of the
 --- call as its result.
+---@param e any
 function tostring(e) end
 
 ---
@@ -224,6 +253,7 @@ function tostring(e) end
 --- results of this function are "
 --- `nil`" (a string, not the value nil), "`number`", "`string`", "`boolean`",
 --- "`table`", "`function`", "`thread`", and "`userdata`".
+---@param v any
 function type(v) end
 
 ---
@@ -232,6 +262,9 @@ function type(v) end
 --- except that the above code can be written only for a fixed number of
 --- elements. By default, `i` is 1 and `j` is the length of the list, as
 --- defined by the length operator (see §2.5.5).
+---@param list table
+---@param optional i number
+---@param optional j number
 function unpack(list, i, j) end
 
 ---
@@ -269,6 +302,7 @@ function xpcall(f, err) end
 --- module table in field `c` of field `b` of global `a`.
 --- This function can receive optional *options* after the module name, where
 --- each option is a function to be applied over the module.
+---@param name string
 function module(name, ...) end
 
 ---
@@ -295,4 +329,5 @@ function module(name, ...) end
 --- of `package.loaded[modname]`.
 --- If there is any error loading or running the module, or if it cannot find
 --- any loader for the module, then `require` signals an error.
+---@param modname string
 function require(modname) end

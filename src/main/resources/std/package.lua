@@ -87,6 +87,9 @@ package.loaders = {}
 --- This function is not supported by ANSI C. As such, it is only available
 --- on some platforms (Windows, Linux, Mac OS X, Solaris, BSD, plus other Unix
 --- systems that support the `dlfcn` standard).
+---@param libname string
+---@param funcname string
+---@return fun():void
 function package.loadlib(libname, funcname) end
 
 ---
