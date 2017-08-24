@@ -128,13 +128,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
                     return set
             }
 
-            if (fieldDef != null) {
-                set = set.union(fieldDef.guessType(context))
-            } else {
-                val superType = type.getSuperClass(context)
-                if (superType != null)
-                    set = set.union(guessFieldType(fieldName, superType, context))
-            }
+            set = set.union(fieldDef.guessType(context))
         }
 
         //class method
