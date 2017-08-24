@@ -19,6 +19,7 @@ package com.tang.intellij.lua.debugger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.breakpoints.XLineBreakpointTypeBase;
+import com.tang.intellij.lua.lang.LuaFileType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,6 +37,6 @@ public class LuaLineBreakpointType extends XLineBreakpointTypeBase {
 
     @Override
     public boolean canPutAt(@NotNull VirtualFile file, int line, @NotNull Project project) {
-        return true;
+        return file.getFileType() == LuaFileType.INSTANCE;
     }
 }
