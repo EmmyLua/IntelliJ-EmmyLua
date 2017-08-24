@@ -14,7 +14,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 
     private int nBrackets = 0;
     private boolean checkAhead(char c, int offset) {
-        return this.zzMarkedPos >= this.zzBuffer.length()?false:this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
+        return this.zzMarkedPos + offset >= this.zzBuffer.length() ? false : this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
     }
 
     private boolean checkBlock() {
