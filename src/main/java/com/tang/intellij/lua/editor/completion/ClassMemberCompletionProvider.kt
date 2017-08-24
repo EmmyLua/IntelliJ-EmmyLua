@@ -49,10 +49,9 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
 
     override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
         val psi = completionParameters.position
-        val parent = psi.parent
+        val indexExpr = psi.parent
 
-        if (parent is LuaIndexExpr) {
-            val indexExpr = parent
+        if (indexExpr is LuaIndexExpr) {
             val project = indexExpr.project
             val prefixTypeSet = indexExpr.guessPrefixType(SearchContext(project))
             if (!Ty.isInvalid(prefixTypeSet)) {
