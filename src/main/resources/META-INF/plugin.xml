@@ -107,8 +107,6 @@
         <lang.braceMatcher language="Lua" implementationClass="com.tang.intellij.lua.braces.LuaBraceMatcher"/>
         <lang.syntaxHighlighterFactory language="Lua" implementationClass="com.tang.intellij.lua.highlighting.LuaSyntaxHighlighterFactory"/>
         <lang.parserDefinition language="Lua" implementationClass="com.tang.intellij.lua.lang.LuaParserDefinition"/>
-        <lang.findUsagesProvider language="Lua" implementationClass="com.tang.intellij.lua.usages.LuaFindUsagesProvider"/>
-        <findUsagesHandlerFactory implementation="com.tang.intellij.lua.usages.LuaFindUsagesHandlerFactory"/>
         <lang.documentationProvider language="Lua" implementationClass="com.tang.intellij.lua.documentation.LuaDocumentationProvider"/>
         <lang.psiStructureViewFactory language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaStructureViewFactory"/>
         <lang.commenter language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaCommenter"/>
@@ -117,6 +115,11 @@
         <iconProvider implementation="com.tang.intellij.lua.editor.LuaIconProvider"/>
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
         <psi.referenceContributor language="Lua" implementation="com.tang.intellij.lua.reference.LuaReferenceContributor"/>
+
+        <!--usage-->
+        <lang.findUsagesProvider language="Lua" implementationClass="com.tang.intellij.lua.usages.LuaFindUsagesProvider"/>
+        <findUsagesHandlerFactory implementation="com.tang.intellij.lua.usages.LuaFindUsagesHandlerFactory"/>
+        <usageTypeProvider implementation="com.tang.intellij.lua.usages.UsageTypeProvider"/>
 
         <!--refactor-->
         <lang.refactoringSupport language="Lua" implementationClass="com.tang.intellij.lua.editor.LuaRefactoringSupportProvider"/>
