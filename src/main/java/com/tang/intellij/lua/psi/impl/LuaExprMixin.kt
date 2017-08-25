@@ -83,16 +83,26 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
             return Ty.UNKNOWN
         }
 
+        var ret: ITy = Ty.UNKNOWN
         val ty = ref.guessType(context)
         val tyFunc = TyUnion.find(ty, ITyFunction::class.java)
         if (tyFunc != null)
-            return tyFunc.returnTy
+            ret = tyFunc.returnTy
 
         //todo TyFunction
-        val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
-        if (bodyOwner != null)
-            return bodyOwner.guessReturnTypeSet(context)
+        if (Ty.isInvalid(ret)) {
+            val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
+            if (bodyOwner != null)
+                ret = bodyOwner.guessReturnTypeSet(context)
+        }
 
-        return Ty.UNKNOWN
+        // xxx.new()
+        if (Ty.isInvalid(ret) && ref is LuaIndexExpr) {
+            if (ref.name?.toLowerCase() == "new") {
+                ret = ref.guessPrefixType(context)
+            }
+        }
+
+        return ret
     }
 }
