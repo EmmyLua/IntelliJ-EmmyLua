@@ -19,6 +19,7 @@ package com.tang.intellij.lua.project;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,10 +31,13 @@ import javax.swing.*;
  * Created by Administrator on 2017/6/12.
  */
 public class LuaSettingsPanel implements SearchableConfigurable, Configurable.NoScroll {
+    private LuaSettings settings;
     private JPanel myPanel;
+    private JTextField constructorNames;
 
     public LuaSettingsPanel(LuaSettings settings) {
-        System.out.println(settings);
+        this.settings = settings;
+        constructorNames.setText(settings.getConstructorNames());
     }
 
     @NotNull
@@ -56,11 +60,11 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
 
     @Override
     public boolean isModified() {
-        return false;
+        return !StringUtil.equals(settings.getConstructorNames(), constructorNames.getText());
     }
 
     @Override
     public void apply() throws ConfigurationException {
-
+        settings.setConstructorNames(constructorNames.getText());
     }
 }

@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.RecursionManager
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
@@ -99,7 +100,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         // xxx.new()
         if (expr is LuaIndexExpr) {
             val fnName = expr.name
-            if (fnName != null && fnName.equals("new", true)) {
+            if (fnName != null && LuaSettings.isConstructorName(fnName)) {
                 ret = ret.union(expr.guessPrefixType(context))
             }
         }
