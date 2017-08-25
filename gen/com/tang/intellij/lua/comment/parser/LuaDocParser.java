@@ -520,6 +520,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // type_set(',' type_set)*
   public static boolean type_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_list")) return false;
+    if (!nextTokenIs(b, "<type list>", ID, FUN)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE_LIST, "<type list>");
     r = type_set(b, l + 1);
@@ -552,53 +553,39 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '#'? ty ('|'? ty)*
+  // ty ('|' ty)*
   public static boolean type_set(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_set")) return false;
+    if (!nextTokenIs(b, "<type set>", ID, FUN)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE_SET, "<type set>");
-    r = type_set_0(b, l + 1);
-    r = r && ty(b, l + 1, -1);
-    r = r && type_set_2(b, l + 1);
+    r = ty(b, l + 1, -1);
+    r = r && type_set_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // '#'?
-  private static boolean type_set_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "type_set_0")) return false;
-    consumeToken(b, SHARP);
-    return true;
-  }
-
-  // ('|'? ty)*
-  private static boolean type_set_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "type_set_2")) return false;
+  // ('|' ty)*
+  private static boolean type_set_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_set_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!type_set_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "type_set_2", c)) break;
+      if (!type_set_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "type_set_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
-  // '|'? ty
-  private static boolean type_set_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "type_set_2_0")) return false;
+  // '|' ty
+  private static boolean type_set_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "type_set_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = type_set_2_0_0(b, l + 1);
+    r = consumeToken(b, OR);
     r = r && ty(b, l + 1, -1);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  // '|'?
-  private static boolean type_set_2_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "type_set_2_0_0")) return false;
-    consumeToken(b, OR);
-    return true;
   }
 
   /* ********************************************************** */

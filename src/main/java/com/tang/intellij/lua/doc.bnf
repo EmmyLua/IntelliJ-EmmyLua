@@ -91,7 +91,7 @@ function_ty ::= fun '(' function_param_list ')' (':' type_set)? {
 }
 
 //todo : remove # ,
-type_set ::= '#'? ty ('|'? ty)*
+type_set ::= ty ('|' ty)*
 access_modifier ::= "protected" | "public"
 
 field_def ::= FIELD access_modifier? ID type_set comment_string? {
