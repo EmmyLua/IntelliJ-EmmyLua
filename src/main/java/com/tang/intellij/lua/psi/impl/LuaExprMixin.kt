@@ -65,9 +65,9 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
 
     private fun guessType(luaCallExpr: LuaCallExpr, context: SearchContext): ITy {
         // xxx()
-        val ref = luaCallExpr.expr
+        val expr = luaCallExpr.expr
         // 从 require 'xxx' 中获取返回类型
-        if (ref.textMatches("require")) {
+        if (expr.textMatches("require")) {
             var filePath: String? = null
             val string = luaCallExpr.firstStringArg
             if (string != null) {
@@ -84,7 +84,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         }
 
         var ret: ITy = Ty.UNKNOWN
-        val ty = ref.guessType(context)
+        val ty = expr.guessType(context)
         val tyFunc = TyUnion.find(ty, ITyFunction::class.java)
         if (tyFunc != null)
             ret = tyFunc.returnTy
@@ -97,9 +97,10 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         }
 
         // xxx.new()
-        if (Ty.isInvalid(ret) && ref is LuaIndexExpr) {
-            if (ref.name?.toLowerCase() == "new") {
-                ret = ref.guessPrefixType(context)
+        if (expr is LuaIndexExpr) {
+            val fnName = expr.name
+            if (fnName != null && fnName.equals("new", true)) {
+                ret = ret.union(expr.guessPrefixType(context))
             }
         }
 
