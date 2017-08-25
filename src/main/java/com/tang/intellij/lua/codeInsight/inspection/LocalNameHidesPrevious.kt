@@ -20,6 +20,7 @@ import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaLocalDef
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 import com.tang.intellij.lua.psi.LuaVisitor
@@ -29,12 +30,15 @@ class LocalNameHidesPrevious : LocalInspectionTool() {
         return object : LuaVisitor() {
             override fun visitLocalDef(o: LuaLocalDef) {
                 o.nameList?.nameDefList?.forEach {
-                    LuaPsiTreeUtil.walkUpLocalNameDef(it) { name ->
-                        if (it.name == name.name) {
-                            holder.registerProblem(it, "Local name hides previous.")
-                            return@walkUpLocalNameDef false
+                    val name = it.name
+                    if (name != Constants.WORD_UNDERLINE) {
+                        LuaPsiTreeUtil.walkUpLocalNameDef(it) { nameDef ->
+                            if (it.name == nameDef.name) {
+                                holder.registerProblem(it, "Local name hides previous")
+                                return@walkUpLocalNameDef false
+                            }
+                            return@walkUpLocalNameDef true
                         }
-                        return@walkUpLocalNameDef true
                     }
                 }
                 super.visitLocalDef(o)
