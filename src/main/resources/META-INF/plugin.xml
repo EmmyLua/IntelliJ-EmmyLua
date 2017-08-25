@@ -280,10 +280,15 @@
             groupName="Lua"
             implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
         <localInspection
-            displayName="0 index"
-            enabledByDefault="true"
-            groupName="Lua"
-            implementationClass="com.tang.intellij.lua.codeInsight.inspection.ArrayIndexZero"/>
+                displayName="0 index"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.ArrayIndexZero"/>
+        <localInspection
+                displayName="Local name hides previous"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious"/>
     </extensions>
 
     <application-components>
