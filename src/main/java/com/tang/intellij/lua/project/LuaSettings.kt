@@ -28,7 +28,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
  */
 @State(name = "LuaSettings", storages = arrayOf(Storage("emmy.xml")))
 class LuaSettings : PersistentStateComponent<LuaSettings> {
-    var constructorNames:String = "new;get"
+    var constructorNames: Array<String> = arrayOf("new", "get")
 
     override fun getState(): LuaSettings? {
         return this
@@ -38,13 +38,21 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
         XmlSerializerUtil.copyBean(luaSettings, this)
     }
 
+    var constructorNamesString: String
+        get() {
+            return constructorNames.joinToString(";")
+        }
+        set(value) {
+            constructorNames = value.split(";").map { it.trim() }.toTypedArray()
+        }
+
     companion object {
 
         val instance: LuaSettings
             get() = ServiceManager.getService(LuaSettings::class.java)
 
         fun isConstructorName(name: String): Boolean {
-            return instance.constructorNames.toLowerCase().split(";").contains(name.toLowerCase())
+            return instance.constructorNames.contains(name.toLowerCase())
         }
     }
 }
