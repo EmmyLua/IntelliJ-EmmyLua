@@ -18,9 +18,11 @@ package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.icons.AllIcons
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
+import com.intellij.util.ProcessingContext
 import com.intellij.util.containers.HashSet
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
@@ -46,6 +48,19 @@ class LuaCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, IN_NAME_EXPR, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL))
 
         extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.VARS))
+
+        extend(CompletionType.BASIC, GOTO, object : CompletionProvider<CompletionParameters>(){
+            override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext?, resultSet: CompletionResultSet) {
+                LuaPsiTreeUtil.walkUpLabel(parameters.position) {
+                    val name = it.name
+                    if (name != null) {
+                        resultSet.addElement(LookupElementBuilder.create(name).withIcon(AllIcons.Actions.Rollback))
+                    }
+                    return@walkUpLabel true
+                }
+                resultSet.stopHere()
+            }
+        })
     }
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
@@ -63,11 +78,16 @@ class LuaCompletionContributor : CompletionContributor() {
         if (file is LuaFile) {
             val element = file.findElementAt(context.caret.offset - 1)
             if (element != null) {
-                val type = element.node.elementType
-                when (type) {
-                    in IGNORE_SET -> {
-                        suggestWords = false
-                        context.dummyIdentifier = ""
+                if (element.parent is LuaLabelStat) {
+                    suggestWords = false
+                    context.dummyIdentifier = ""
+                } else {
+                    val type = element.node.elementType
+                    when (type) {
+                        in IGNORE_SET -> {
+                            suggestWords = false
+                            context.dummyIdentifier = ""
+                        }
                     }
                 }
             }
@@ -97,6 +117,8 @@ class LuaCompletionContributor : CompletionContributor() {
                 .inside(LuaClassMethodDef::class.java)
         private val SHOW_PATH = psiElement(LuaTypes.STRING)
                 .inside(psiElement(LuaTypes.ARGS).afterLeaf("require"))
+
+        private val GOTO = psiElement(LuaTypes.ID).withParent(LuaGotoStat::class.java)
 
         private fun suggestWordsInFile(parameters: CompletionParameters) {
             val session = CompletionSession.get(parameters)!!

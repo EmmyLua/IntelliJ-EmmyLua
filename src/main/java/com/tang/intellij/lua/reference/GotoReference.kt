@@ -24,6 +24,7 @@ import com.intellij.util.IncorrectOperationException
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.LuaGotoStat
 import com.tang.intellij.lua.psi.LuaLabelStat
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 
 class GotoReference(val goto: LuaGotoStat)
     : PsiReferenceBase<LuaGotoStat>(goto) {
@@ -50,16 +51,14 @@ class GotoReference(val goto: LuaGotoStat)
 
     override fun resolve(): PsiElement? {
         val name = id.text
-        var prev = goto.prevSibling
-        while (true) {
-            if (prev == null)
-                prev = goto.parent
-            if (prev == null || prev is PsiFile)
-                break
-            if (prev is LuaLabelStat && prev.name == name)
-                return prev;
-            prev = prev.prevSibling
+        var result: PsiElement? = null
+        LuaPsiTreeUtil.walkUpLabel(goto) {
+            if (it.name == name) {
+                result = it
+                return@walkUpLabel false
+            }
+            return@walkUpLabel true
         }
-        return null
+        return result
     }
 }

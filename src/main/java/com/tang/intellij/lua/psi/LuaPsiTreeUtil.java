@@ -34,6 +34,20 @@ public class LuaPsiTreeUtil {
         boolean accept(T t);
     }
 
+    public static void walkUpLabel(PsiElement current, ElementProcessor<LuaLabelStat> processor) {
+        PsiElement prev = current.getPrevSibling();
+        while (true) {
+            if (prev == null)
+                prev = current.getParent();
+            if (prev == null || prev instanceof PsiFile)
+                break;
+            if (prev instanceof LuaLabelStat && !processor.accept((LuaLabelStat) prev))
+                break;
+            current = prev;
+            prev = prev.getPrevSibling();
+        }
+    }
+
     public static <T extends PsiElement> void walkTopLevelInFile(PsiElement element, Class<T> cls, ElementProcessor<T> processor) {
         if (element == null || processor == null)
             return;
