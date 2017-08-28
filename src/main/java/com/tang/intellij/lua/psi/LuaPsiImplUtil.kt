@@ -707,4 +707,8 @@ object LuaPsiImplUtil {
         }
         return Ty.UNKNOWN
     }
+
+    @JvmStatic fun getNameIdentifier(label: LuaLabelStat): PsiElement? {
+        return label.id
+    }
 }

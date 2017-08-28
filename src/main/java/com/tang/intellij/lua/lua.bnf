@@ -203,8 +203,24 @@ forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' {
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
 }
-labelStat ::= '::' ID '::' { pin = 1 }
-gotoStat ::= 'goto' ID { pin = 1 }
+labelStat ::= '::' ID '::' {
+    pin = 1
+    implements = [
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
+    methods = [
+        getNameIdentifier
+        getTextOffset
+        setName
+        getName
+    ]
+}
+gotoStat ::= 'goto' ID {
+    pin = 1
+    methods = [
+        getReferences
+    ]
+}
 private defStat ::= classMethodDef | globalFuncDef | localFuncDef | localDef
 callStat ::= funcCallExpr { extends = exprStat }
 uncompletedStat ::= expr { extends = exprStat }

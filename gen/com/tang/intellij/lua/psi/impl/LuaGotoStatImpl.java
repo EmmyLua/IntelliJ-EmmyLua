@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.psi.PsiReference;
 
 public class LuaGotoStatImpl extends LuaStatementImpl implements LuaGotoStat {
 
@@ -29,6 +30,11 @@ public class LuaGotoStatImpl extends LuaStatementImpl implements LuaGotoStat {
   @Nullable
   public PsiElement getId() {
     return findChildByType(ID);
+  }
+
+  @NotNull
+  public PsiReference[] getReferences() {
+    return LuaPsiImplUtil.getReferences(this);
   }
 
 }
