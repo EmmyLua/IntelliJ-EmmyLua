@@ -274,6 +274,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                         val tyArray = TyUnion.find(set, ITyArray::class.java)
                         if (tyArray != null)
                             return tyArray.base
+                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
+                        if (tyGeneric != null)
+                            return tyGeneric.getParamTy(1)
                     }
                 }
                 // pairs
@@ -285,6 +288,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                         val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
                         if (tyGeneric != null)
                             return tyGeneric.getParamTy(paramIndex)
+                        val tyArray = TyUnion.find(set, ITyArray::class.java)
+                        if (tyArray != null)
+                            return if (paramIndex == 0) Ty.NUMBER else tyArray.base
                     }
                 }
             }
