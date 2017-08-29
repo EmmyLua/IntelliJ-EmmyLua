@@ -34,10 +34,12 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private LuaSettings settings;
     private JPanel myPanel;
     private JTextField constructorNames;
+    private JCheckBox strictDoc;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
         constructorNames.setText(settings.getConstructorNamesString());
+        strictDoc.setSelected(settings.isStrictDoc());
     }
 
     @NotNull
@@ -60,12 +62,14 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
 
     @Override
     public boolean isModified() {
-        return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText());
+        return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
+                settings.isStrictDoc() != strictDoc.isSelected();
     }
 
     @Override
     public void apply() throws ConfigurationException {
         settings.setConstructorNamesString(constructorNames.getText());
         constructorNames.setText(settings.getConstructorNamesString());
+        settings.setStrictDoc(strictDoc.isSelected());
     }
 }

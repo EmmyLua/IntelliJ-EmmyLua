@@ -29,6 +29,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 @State(name = "LuaSettings", storages = arrayOf(Storage("emmy.xml")))
 class LuaSettings : PersistentStateComponent<LuaSettings> {
     var constructorNames: Array<String> = arrayOf("new", "get")
+    var isStrictDoc: Boolean = false
 
     override fun getState(): LuaSettings? {
         return this
