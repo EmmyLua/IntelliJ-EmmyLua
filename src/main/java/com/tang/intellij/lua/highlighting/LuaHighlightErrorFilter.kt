@@ -30,6 +30,6 @@ class LuaHighlightErrorFilter : HighlightErrorFilter() {
         val parent = psiErrorElement.parent
         if (parent is LuaDocPsiElement)
             return LuaSettings.instance.isStrictDoc
-        return parent == null
+        return true
     }
 }
