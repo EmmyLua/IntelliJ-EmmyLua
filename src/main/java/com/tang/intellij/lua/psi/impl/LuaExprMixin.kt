@@ -21,10 +21,7 @@ import com.intellij.openapi.util.RecursionManager
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyFunction
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.*
 
 /**
  * 表达式基类
@@ -86,9 +83,13 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
 
         var ret: ITy = Ty.UNKNOWN
         val ty = expr.guessType(context)
-        val tyFunc = TyUnion.find(ty, ITyFunction::class.java)
-        if (tyFunc != null)
-            ret = tyFunc.returnTy
+        TyUnion.each(ty) {
+            when(it) {
+                is ITyFunction -> ret = ret.union(it.returnTy)
+                //constructor : Class table __call
+                is ITyClass -> ret = ret.union(it)
+            }
+        }
 
         //todo TyFunction
         if (Ty.isInvalid(ret)) {

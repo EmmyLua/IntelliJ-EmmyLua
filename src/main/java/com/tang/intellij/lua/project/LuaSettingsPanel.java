@@ -37,7 +37,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
-        constructorNames.setText(settings.getConstructorNames());
+        constructorNames.setText(settings.getConstructorNamesString());
     }
 
     @NotNull
@@ -60,11 +60,12 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
 
     @Override
     public boolean isModified() {
-        return !StringUtil.equals(settings.getConstructorNames(), constructorNames.getText());
+        return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText());
     }
 
     @Override
     public void apply() throws ConfigurationException {
-        settings.setConstructorNames(constructorNames.getText());
+        settings.setConstructorNamesString(constructorNames.getText());
+        constructorNames.setText(settings.getConstructorNamesString());
     }
 }
