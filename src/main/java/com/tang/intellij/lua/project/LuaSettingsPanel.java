@@ -35,11 +35,13 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JPanel myPanel;
     private JTextField constructorNames;
     private JCheckBox strictDoc;
+    private JCheckBox smartCloseEnd;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
         constructorNames.setText(settings.getConstructorNamesString());
         strictDoc.setSelected(settings.isStrictDoc());
+        smartCloseEnd.setSelected(settings.isSmartCloseEnd());
     }
 
     @NotNull
@@ -63,7 +65,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     @Override
     public boolean isModified() {
         return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
-                settings.isStrictDoc() != strictDoc.isSelected();
+                settings.isStrictDoc() != strictDoc.isSelected() ||
+                settings.isSmartCloseEnd() != smartCloseEnd.isSelected();
     }
 
     @Override
@@ -71,5 +74,6 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setConstructorNamesString(constructorNames.getText());
         constructorNames.setText(settings.getConstructorNamesString());
         settings.setStrictDoc(strictDoc.isSelected());
+        settings.setSmartCloseEnd(smartCloseEnd.isSelected());
     }
 }

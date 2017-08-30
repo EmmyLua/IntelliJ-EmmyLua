@@ -30,6 +30,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 class LuaSettings : PersistentStateComponent<LuaSettings> {
     var constructorNames: Array<String> = arrayOf("new", "get")
     var isStrictDoc: Boolean = false
+    var isSmartCloseEnd: Boolean = true
 
     override fun getState(): LuaSettings? {
         return this
