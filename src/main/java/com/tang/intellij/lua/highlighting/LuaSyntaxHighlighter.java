@@ -72,7 +72,8 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaDocTypes.TAG_RETURN,
             LuaDocTypes.CLASS,
             LuaDocTypes.TYPE,
-            LuaDocTypes.FIELD
+            LuaDocTypes.FIELD,
+            LuaDocTypes.LANGUAGE
     );
 
     private static final Map<IElementType, TextAttributesKey> ourMap1;

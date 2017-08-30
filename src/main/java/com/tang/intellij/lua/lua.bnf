@@ -322,7 +322,9 @@ nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
-literalExpr ::= nil | false | true | NUMBER | STRING | "..."
+literalExpr ::= nil | false | true | NUMBER | STRING | "..." {
+    mixin = 'com.tang.intellij.lua.psi.impl.LuaLiteralExprMixin'
+}
 
 valueExpr ::= varExpr | literalExpr | closureExpr | tableExpr | parenExpr
 

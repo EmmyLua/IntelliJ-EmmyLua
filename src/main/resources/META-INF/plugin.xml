@@ -115,6 +115,7 @@
         <iconProvider implementation="com.tang.intellij.lua.editor.LuaIconProvider"/>
         <fileTypeFactory implementation="com.tang.intellij.lua.lang.LuaFileTypeFactory"/>
         <psi.referenceContributor language="Lua" implementation="com.tang.intellij.lua.reference.LuaReferenceContributor"/>
+        <languageInjector implementation="com.tang.intellij.lua.lang.LuaLanguageInjector"/>
 
         <!--usage-->
         <lang.findUsagesProvider language="Lua" implementationClass="com.tang.intellij.lua.usages.LuaFindUsagesProvider"/>

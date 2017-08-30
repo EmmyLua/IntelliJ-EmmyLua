@@ -39,7 +39,7 @@ public class LuaString {
     public static LuaString getContent(String text) {
         LuaString content = new LuaString();
         if (text.startsWith("[")) {
-            Pattern pattern = Pattern.compile("\\[(=*)\\[(.*)]\\1]");
+            Pattern pattern = Pattern.compile("\\[(=*)\\[([\\s\\S]*)]\\1]");
             Matcher matcher = pattern.matcher(text);
             if (matcher.find()) {
                 String contentString = matcher.group(2);

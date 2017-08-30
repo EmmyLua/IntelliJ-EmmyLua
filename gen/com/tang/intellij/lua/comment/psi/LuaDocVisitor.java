@@ -50,6 +50,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
+  public void visitLanDef(@NotNull LuaDocLanDef o) {
+    visitPsiElement(o);
+  }
+
   public void visitParamDef(@NotNull LuaDocParamDef o) {
     visitPsiElement(o);
   }

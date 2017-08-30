@@ -19,6 +19,7 @@ public interface LuaDocTypes {
   IElementType FUNCTION_TY = LuaParserDefinition.createDocType("FUNCTION_TY");
   IElementType GENERAL_TY = LuaParserDefinition.createDocType("GENERAL_TY");
   IElementType GENERIC_TY = LuaParserDefinition.createDocType("GENERIC_TY");
+  IElementType LAN_DEF = LuaParserDefinition.createDocType("LAN_DEF");
   IElementType PARAM_DEF = LuaParserDefinition.createDocType("PARAM_DEF");
   IElementType PARAM_NAME_REF = LuaParserDefinition.createDocType("PARAM_NAME_REF");
   IElementType RETURN_DEF = LuaParserDefinition.createDocType("RETURN_DEF");
@@ -40,6 +41,7 @@ public interface LuaDocTypes {
   IElementType FUN = new LuaDocTokenType("fun");
   IElementType GT = new LuaDocTokenType(">");
   IElementType ID = new LuaDocTokenType("ID");
+  IElementType LANGUAGE = new LuaDocTokenType("language");
   IElementType LPAREN = new LuaDocTokenType("(");
   IElementType LT = new LuaDocTokenType("<");
   IElementType OPTIONAL = new LuaDocTokenType("optional");
@@ -87,6 +89,9 @@ public interface LuaDocTypes {
       }
       else if (type == GENERIC_TY) {
         return new LuaDocGenericTyImpl(node);
+      }
+      else if (type == LAN_DEF) {
+        return new LuaDocLanDefImpl(node);
       }
       else if (type == PARAM_DEF) {
         return new LuaDocParamDefImpl(node);

@@ -59,6 +59,7 @@
         STRING_BEGIN = 'STRING_BEGIN'
         STRING = 'STRING'
         TYPE = 'type'
+        LANGUAGE = 'language'
   ]
 }
 
@@ -66,7 +67,7 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def)
+private doc_item ::= '@' (param_def | return_def | tag_def | class_def | field_def | type_def | lan_def)
 
 ty ::= function_ty | generic_ty | arr_ty | general_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
@@ -117,6 +118,9 @@ field_def ::= FIELD access_modifier? ID type_set comment_string? {
 //--- tag
 tag_value ::= ID
 tag_def ::= TAG_NAME tag_value? comment_string? { pin = 1 }
+
+//@language json
+lan_def ::= LANGUAGE ID { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {

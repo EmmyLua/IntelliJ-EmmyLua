@@ -41,6 +41,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == FUNCTION_PARAM) {
       r = function_param(b, 0);
     }
+    else if (t == LAN_DEF) {
+      r = lan_def(b, 0);
+    }
     else if (t == PARAM_DEF) {
       r = param_def(b, 0);
     }
@@ -224,7 +227,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '@' (param_def | return_def | tag_def | class_def | field_def | type_def)
+  // '@' (param_def | return_def | tag_def | class_def | field_def | type_def | lan_def)
   static boolean doc_item(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item")) return false;
     if (!nextTokenIs(b, AT)) return false;
@@ -236,7 +239,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // param_def | return_def | tag_def | class_def | field_def | type_def
+  // param_def | return_def | tag_def | class_def | field_def | type_def | lan_def
   private static boolean doc_item_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
@@ -247,6 +250,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = class_def(b, l + 1);
     if (!r) r = field_def(b, l + 1);
     if (!r) r = type_def(b, l + 1);
+    if (!r) r = lan_def(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -386,6 +390,19 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, COMMA);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // LANGUAGE ID
+  public static boolean lan_def(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lan_def")) return false;
+    if (!nextTokenIs(b, LANGUAGE)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, LAN_DEF, null);
+    r = consumeTokens(b, 1, LANGUAGE, ID);
+    p = r; // pin = 1
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
