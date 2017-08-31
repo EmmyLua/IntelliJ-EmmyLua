@@ -21,7 +21,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StringStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
-import com.tang.intellij.lua.Constants
+import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaClassField
@@ -52,62 +52,48 @@ class LuaClassFieldIndex : StringStubIndexExtension<LuaClassField>() {
 
         val instance = LuaClassFieldIndex()
 
-        fun find(key: String, context: SearchContext): LuaClassField? {
+        fun process(key: String, context: SearchContext, processor: Processor<LuaClassField>): Boolean {
             if (context.isDumb)
-                return null
-
-            val list = instance.get(key, context.project, context.getScope())
-            return if (!list.isEmpty()) list.iterator().next() else null
+                return false
+            return StubIndex.getInstance().processElements(KEY, key, context.project, context.getScope(), null, LuaClassField::class.java, processor)
         }
 
-        fun find(className: String, fieldName: String, context: SearchContext): MutableCollection<LuaClassField> {
-            if (context.isDumb)
-                return mutableListOf()
-
+        fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassField>): Boolean {
             val key = className + "*" + fieldName
-            var list = instance.get(key, context.project, context.getScope())
-
-            if (!list.isEmpty())
-                return list
-
-            // from supper
-            val classDef = LuaClassIndex.find(className, context)
-            if (classDef != null) {
-                val type = classDef.classType
-                val superClassName = type.superClassName
-                if (superClassName != null) {
-                    list = find(superClassName, fieldName, context)
-                    if (!list.isEmpty())
-                        return list
+            if (process(key, context, processor)) {
+                // from supper
+                val classDef = LuaClassIndex.find(className, context)
+                if (classDef != null) {
+                    val type = classDef.classType
+                    val superClassName = type.superClassName
+                    if (superClassName != null) {
+                        return process(superClassName, fieldName, context, processor)
+                    }
                 }
+                return false
             }
-
-            return list
+            return true
         }
 
         fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassField? {
-            val fields = findAll(type, fieldName, context)
             var perfect: LuaClassField? = null
-            for (field in fields) {
-                perfect = field
-                if (field is LuaDocFieldDef)
-                    break
-            }
+            processAll(type, fieldName, context, Processor {
+                perfect = it
+                if (it is LuaDocFieldDef)
+                    return@Processor false
+                true
+            })
             return perfect
         }
 
-        fun findAll(type: ITyClass, fieldName: String, context: SearchContext): Collection<LuaClassField> {
-            var fields = find(type.className, fieldName, context)
-            if (fields.isEmpty()) {
+        fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassField>) {
+            if (process(type.className, fieldName, context, processor)) {
                 type.lazyInit(context)
-                if (type.aliasName != null)
-                    fields = find(type.aliasName!!, fieldName, context)
+                val alias = type.aliasName
+                if (alias != null) {
+                    process(alias, fieldName, context, processor)
+                }
             }
-            return fields
-        }
-
-        fun findGlobal(name: String, context: SearchContext): Collection<LuaClassField> {
-            return find(Constants.WORD_G, name, context)
         }
     }
 }

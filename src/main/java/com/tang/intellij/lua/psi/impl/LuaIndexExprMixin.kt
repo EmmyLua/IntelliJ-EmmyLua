@@ -24,6 +24,7 @@ import com.intellij.psi.PsiReferenceService
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
+import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -115,7 +116,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
         var set:ITy = Ty.UNKNOWN
 
         //todo: use findField()
-        val all = LuaClassFieldIndex.findAll(type, fieldName, context)
+        /*val all = LuaClassFieldIndex.findAll(type, fieldName, context)
         for (fieldDef in all) {
             if (fieldDef is LuaIndexExpr) {
                 val stub = fieldDef.stub
@@ -129,7 +130,22 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
             }
 
             set = set.union(fieldDef.guessType(context))
-        }
+        }*/
+
+        LuaClassFieldIndex.processAll(type, fieldName, context, Processor { fieldDef->
+            if (fieldDef is LuaIndexExpr) {
+                val stub = fieldDef.stub
+                set = if (stub != null)
+                    set.union(stub.guessValueType())
+                else
+                    set.union(fieldDef.guessValueType(context))
+
+                if (fieldDef === this)
+                    return@Processor false
+            }
+            set = set.union(fieldDef.guessType(context))
+            true
+        })
 
         //class method
         val method = type.findMethod(fieldName, context)
