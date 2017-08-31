@@ -78,12 +78,12 @@ abstract class TyClass(override val className: String, override var superClassNa
         val clazzName = className
         val project = context.project
 
-        val methodIndex = LuaClassMethodIndex.getInstance()
-        val list = methodIndex.get(clazzName, project, LuaPredefinedScope(project))
+        val methodIndex = LuaClassMethodIndex.instance
+        var list = methodIndex.get(clazzName, project, LuaPredefinedScope(project))
 
         val alias = aliasName
         if (alias != null) {
-            list.addAll(methodIndex.get(alias, project, LuaPredefinedScope(project)))
+            list += methodIndex.get(alias, project, LuaPredefinedScope(project))
         }
         for (def in list) {
             val methodName = def.name
@@ -98,11 +98,11 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     override fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit) {
         val clazzName = className
-        val list = LuaClassMethodIndex.findStaticMethods(clazzName, context)
+        var list = LuaClassMethodIndex.findStaticMethods(clazzName, context)
 
         val alias = aliasName
         if (alias != null) {
-            list.addAll(LuaClassMethodIndex.findStaticMethods(alias, context))
+            list += LuaClassMethodIndex.findStaticMethods(alias, context)
         }
         for (def in list) {
             val methodName = def.name

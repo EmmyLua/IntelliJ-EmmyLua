@@ -118,7 +118,7 @@ public class LuaLineMarkerProvider implements LineMarkerProvider {
 
                 while (superType != null) {
                     String superTypeName = superType.getClassName();
-                    LuaClassMethod superMethod = LuaClassMethodIndex.findMethodWithName(superTypeName, methodName, context);
+                    LuaClassMethod superMethod = LuaClassMethodIndex.Companion.findMethodWithName(superTypeName, methodName, context);
                     if (superMethod != null) {
                         NavigationGutterIconBuilder<PsiElement> builder =
                                 NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)

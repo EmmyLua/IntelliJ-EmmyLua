@@ -46,7 +46,7 @@ public class LuaOverridingMethodsSearchExecutor implements QueryExecutor<LuaClas
 
             return search.forEach(luaClass -> {
                 String name = luaClass.getName();
-                LuaClassMethod methodDef = LuaClassMethodIndex.findMethodWithName(name, methodName, context);
+                LuaClassMethod methodDef = LuaClassMethodIndex.Companion.findMethodWithName(name, methodName, context);
                 return methodDef == null || processor.process(methodDef);
             });
         }
