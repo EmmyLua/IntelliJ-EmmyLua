@@ -102,13 +102,14 @@ public class LuaPsiTreeUtil {
         if (element == null || processor == null)
             return;
         boolean continueSearch = true;
-        boolean searchParList = false;
 
         PsiElement curr = element;
         do {
             PsiElement next = curr.getPrevSibling();
+            boolean isParent = false;
             if (next == null) {
                 next = curr.getParent();
+                isParent = true;
             }
             curr = next;
 
@@ -120,32 +121,19 @@ public class LuaPsiTreeUtil {
                     LuaNameList nameList = localDef.getNameList();
                     continueSearch = resolveInNameList(nameList, processor);
                 }
-            } else {
-                //check if we can search in params
-                //
-                // local name
-                // function(name) end //skip this `name`
-                // name = nil
-                //
-                // for i, name in paris(name) do end // skip first `name`
-                if (!searchParList && curr instanceof LuaBlock) {
-                    LuaBlock block = (LuaBlock) curr;
-                    searchParList = block.getNode().getStartOffset() <= curr.getNode().getStartOffset();
-                }
-
+            } else if (isParent) {
                 if (curr instanceof LuaFuncBody) {
-                    //参数部分
-                    if (searchParList) continueSearch = resolveInFuncBody((LuaFuncBody) curr, processor);
+                    continueSearch = resolveInFuncBody((LuaFuncBody) curr, processor);
                 }
                 // for name = x, y do end
                 else if (curr instanceof LuaForAStat) {
                     LuaForAStat forAStat = (LuaForAStat) curr;
-                    if (searchParList) continueSearch = processor.accept(forAStat.getParamNameDef());
+                    continueSearch = processor.accept(forAStat.getParamNameDef());
                 }
                 // for name in xxx do end
                 else if (curr instanceof LuaForBStat) {
                     LuaForBStat forBStat = (LuaForBStat) curr;
-                    if (searchParList) continueSearch = resolveInNameList(forBStat.getParamNameDefList(), processor);
+                    continueSearch = resolveInNameList(forBStat.getParamNameDefList(), processor);
                 }
             }
         } while (continueSearch && !(curr instanceof PsiFile));
