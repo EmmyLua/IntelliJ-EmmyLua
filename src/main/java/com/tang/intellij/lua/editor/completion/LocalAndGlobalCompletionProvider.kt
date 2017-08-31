@@ -81,7 +81,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         if (has(GLOBAL_FUN) || has(GLOBAL_VAR)) {
             val context = SearchContext(project)
             val names = mutableListOf<String>()
-            LuaGlobalIndex.getInstance().processAllKeys(project) { name ->
+            LuaGlobalIndex.instance.processAllKeys(project) { name ->
                 if (completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     names.add(name)
                 }
