@@ -21,6 +21,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StringStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
+import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.search.SearchContext
@@ -53,28 +54,37 @@ class LuaClassMethodIndex : StringStubIndexExtension<LuaClassMethod>() {
             return instance.get(key, context.project, context.getScope())
         }
 
+        fun process(key: String, context: SearchContext, processor: Processor<LuaClassMethod>): Boolean {
+            if (context.isDumb)
+                return false
+            return StubIndex.getInstance().processElements(KEY, key, context.project, context.getScope(), null, LuaClassMethod::class.java, processor)
+        }
+
         fun findStaticMethod(className: String, methodName: String, context: SearchContext): LuaClassMethod? {
             if (context.isDumb)
                 return null
 
-            val collection = instance.get(className + ".static." + methodName, context.project, context.getScope())
-            return if (collection.isEmpty())
-                null
-            else
-                collection.iterator().next()
+            val key = className + ".static." + methodName
+            var result: LuaClassMethod? = null
+            process(key, context, Processor {
+                result = it
+                false
+            })
+            return result
         }
 
         fun findMethodWithName(className: String, methodName: String, context: SearchContext): LuaClassMethod? {
             if (context.isDumb)
                 return null
-
-            val collection = instance.get(className, context.project, context.getScope())
-            for (methodDef in collection) {
-                if (methodName == methodDef.name) {
-                    return methodDef
+            var result: LuaClassMethod? = null
+            process(className, context, Processor {
+                if (methodName == it.name) {
+                    result = it
+                    return@Processor false
                 }
-            }
-            return null
+                true
+            })
+            return result
         }
     }
 }
