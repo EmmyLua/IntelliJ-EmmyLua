@@ -19,6 +19,7 @@ package com.tang.intellij.lua.stubs.index
 import com.intellij.psi.stubs.StringStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
+import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaPsiElement
 import com.tang.intellij.lua.search.SearchContext
 import kotlin.reflect.jvm.internal.impl.utils.SmartList
@@ -39,11 +40,19 @@ class LuaGlobalIndex : StringStubIndexExtension<LuaPsiElement>() {
 
         val instance = LuaGlobalIndex()
 
+        fun process(key: String, context: SearchContext, processor: Processor<LuaPsiElement>): Boolean {
+            if (context.isDumb)
+                return false
+            return StubIndex.getInstance().processElements(KEY, key, context.project, context.getScope(), null, LuaPsiElement::class.java, processor)
+        }
+
         fun find(key: String, context: SearchContext): LuaPsiElement? {
-            val vars = findAll(key, context)
-            return if (!vars.isEmpty()) {
-                vars.iterator().next()
-            } else null
+            var result: LuaPsiElement? = null
+            process(key, context, Processor {
+                result = it
+                false
+            })
+            return result
         }
 
         fun findAll(key: String, context: SearchContext): Collection<LuaPsiElement> {
