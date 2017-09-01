@@ -80,7 +80,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
             //from @type annotation
             val comment = this.comment
             if (comment != null) {
-                val set = comment.typeDef?.guessType(context)
+                val set = comment.typeDef?.type
                 if (set != null)
                     return@doPreventingRecursion set
             }

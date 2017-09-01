@@ -105,7 +105,7 @@ class LuaCommentCompletionContributor : CompletionContributor() {
                 val comment = PsiTreeUtil.getParentOfType(position, LuaComment::class.java)
                 val classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef::class.java)
                 if (classDef != null) {
-                    val classType = classDef.classType
+                    val classType = classDef.type
                     classType.processFields(SearchContext(classDef.project)) { _, field ->
                         completionResultSet.addElement(LookupElementBuilder.create(field.fieldName))
                         Unit

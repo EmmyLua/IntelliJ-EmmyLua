@@ -88,7 +88,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             lineSeparator.separatorPlacement = SeparatorPlacement.TOP;
             result.add(lineSeparator);*/
         } else if (element is LuaDocClassDef) {
-            val classType = element.classType
+            val classType = element.type
             val project = element.getProject()
             val query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.className)
             if (query.findFirst() != null) {

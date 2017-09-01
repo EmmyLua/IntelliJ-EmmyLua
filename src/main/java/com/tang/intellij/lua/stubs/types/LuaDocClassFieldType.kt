@@ -24,7 +24,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl
 import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
@@ -55,8 +54,7 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
             className = classDef.name
         }
 
-        val searchContext = SearchContext(luaDocFieldDef.project).setCurrentStubFile(luaDocFieldDef.containingFile)
-        val typeSet = resolveDocTypeSet(luaDocFieldDef.typeSet, searchContext)
+        val typeSet = resolveDocTypeSet(luaDocFieldDef.typeSet)
 
         return LuaDocClassFieldStubImpl(stubElement, name, className, typeSet)
     }

@@ -419,7 +419,7 @@ object LuaPsiImplUtil {
             if (comment != null) {
                 val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
                 if (returnDef != null) {
-                    return returnDef.resolveTypeAt(searchContext)
+                    return returnDef.resolveTypeAt(searchContext.index)
                 }
             }
         }
@@ -491,7 +491,7 @@ object LuaPsiImplUtil {
                     val paramDef = comment.getParamDef(paramName)
                     if (paramDef != null) {
                         paramInfo.isOptional = paramDef.optional != null
-                        paramInfo.ty = resolveDocTypeSet(paramDef.typeSet, SearchContext(funcBodyOwner.project))
+                        paramInfo.ty = resolveDocTypeSet(paramDef.typeSet)
                     }
                 }
                 list.add(paramInfo)
@@ -582,7 +582,7 @@ object LuaPsiImplUtil {
         //from comment
         val comment = tableField.comment
         if (comment != null) {
-            val tyDef = comment.typeDef?.guessType(context)
+            val tyDef = comment.typeDef?.type
             if (tyDef != null) return tyDef
         }
         //guess from value

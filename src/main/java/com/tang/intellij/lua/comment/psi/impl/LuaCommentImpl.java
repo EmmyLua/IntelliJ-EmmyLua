@@ -35,7 +35,6 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by Tangzx on 2016/11/21.
  *
- * @qq 272669294
  */
 public class LuaCommentImpl extends LazyParseablePsiElement implements LuaComment {
 
@@ -97,10 +96,10 @@ public class LuaCommentImpl extends LazyParseablePsiElement implements LuaCommen
     public ITy guessType(SearchContext context) {
         LuaDocClassDef classDef = getClassDef();
         if (classDef != null)
-            return classDef.getClassType();
+            return classDef.getType();
         LuaDocTypeDef typeDef = getTypeDef();
         if (typeDef != null)
-            return typeDef.guessType(context);
+            return typeDef.getType();
         return Ty.Companion.getUNKNOWN();
     }
 

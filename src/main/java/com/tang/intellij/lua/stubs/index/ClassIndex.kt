@@ -39,7 +39,7 @@ class ClassIndex : FileBasedIndexExtension<String, ClassEntry>() {
         fileContent.psiFile.acceptChildren(object :LuaVisitor() {
             override fun visitPsiElement(o: LuaPsiElement) {
                 if (o is LuaComment) {
-                    val type = o.classDef?.classType
+                    val type = o.classDef?.type
                     if (type != null) {
                         map.put(type.className, ClassEntry(type.className, type.superClassName))
                     }

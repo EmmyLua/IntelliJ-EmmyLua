@@ -228,7 +228,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
         if (comment != null) {
             val paramDef = comment.getParamDef(paramName)
             if (paramDef != null) {
-                return paramDef.guessType(context)
+                return paramDef.type
             }
         }
 

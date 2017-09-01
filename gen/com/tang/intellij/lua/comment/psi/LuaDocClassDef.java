@@ -19,7 +19,7 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
   PsiElement getId();
 
   @NotNull
-  ITyClass getClassType();
+  ITyClass getType();
 
   @NotNull
   ItemPresentation getPresentation();

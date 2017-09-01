@@ -9,7 +9,6 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.tang.intellij.lua.comment.psi.*;
-import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunctionTy {
@@ -40,13 +39,13 @@ public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunction
   }
 
   @NotNull
-  public ITy getType(SearchContext searchContext) {
-    return LuaDocPsiImplUtilKt.getType(this, searchContext);
+  public ITy getType() {
+    return LuaDocPsiImplUtilKt.getType(this);
   }
 
   @NotNull
-  public ITy getReturnType(SearchContext searchContext) {
-    return LuaDocPsiImplUtilKt.getReturnType(this, searchContext);
+  public ITy getReturnType() {
+    return LuaDocPsiImplUtilKt.getReturnType(this);
   }
 
 }

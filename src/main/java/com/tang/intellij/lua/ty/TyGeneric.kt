@@ -45,25 +45,25 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     }
 }
 
-class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext) : TyGeneric() {
+class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {
 
-    private fun initBaseTy(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext): ITy {
+    private fun initBaseTy(luaDocGenericTy: LuaDocGenericTy): ITy {
         val firstTyPsi = luaDocGenericTy.firstChild as LuaDocTy
-        return firstTyPsi.getType(searchContext)
+        return firstTyPsi.getType()
     }
 
-    private val _baseTy:ITy = initBaseTy(luaDocGenericTy, searchContext)
+    private val _baseTy:ITy = initBaseTy(luaDocGenericTy)
 
-    private fun initParams(luaDocGenericTy: LuaDocGenericTy, searchContext: SearchContext): Array<ITy> {
+    private fun initParams(luaDocGenericTy: LuaDocGenericTy): Array<ITy> {
         val tyList = luaDocGenericTy.tyList
         val tbl = mutableListOf<ITy>()
-        tyList.forEach { tbl.add(it.getType(searchContext)) }
+        tyList.forEach { tbl.add(it.getType()) }
         //第一个是 base
         tbl.removeAt(0)
         return tbl.toTypedArray()
     }
 
-    private val _params: Array<ITy> = initParams(luaDocGenericTy, searchContext)
+    private val _params: Array<ITy> = initParams(luaDocGenericTy)
 
     override val params: Array<ITy>
         get() = _params

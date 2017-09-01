@@ -131,7 +131,7 @@ param_name_ref ::= ID {
 }
 param_def ::= TAG_PARAM OPTIONAL? param_name_ref type_set comment_string? {
     pin = 1
-    methods = [guessType optional = 'OPTIONAL']
+    methods = [getType optional = 'OPTIONAL']
 }
 
 //--- return
@@ -152,7 +152,7 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)? comment_string? {
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocClassStub"
     methods = [
-        getClassType
+        getType
         
         getPresentation
         getNameIdentifier
@@ -169,7 +169,7 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)? comment_string? {
 type_def ::= TYPE type_set comment_string? {
     pin = 1
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTyStub"
-    methods = [guessType]
+    methods = [getType]
 }
 
 comment_string ::= STRING_BEGIN STRING? {

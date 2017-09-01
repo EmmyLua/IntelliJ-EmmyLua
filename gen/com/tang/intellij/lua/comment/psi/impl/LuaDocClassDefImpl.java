@@ -52,8 +52,8 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
   }
 
   @NotNull
-  public ITyClass getClassType() {
-    return LuaDocPsiImplUtilKt.getClassType(this);
+  public ITyClass getType() {
+    return LuaDocPsiImplUtilKt.getType(this);
   }
 
   @NotNull

@@ -4,7 +4,6 @@ package com.tang.intellij.lua.comment.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaDocGeneralTy extends LuaDocTy {
@@ -13,6 +12,6 @@ public interface LuaDocGeneralTy extends LuaDocTy {
   LuaDocClassNameRef getClassNameRef();
 
   @NotNull
-  ITy getType(SearchContext searchContext);
+  ITy getType();
 
 }

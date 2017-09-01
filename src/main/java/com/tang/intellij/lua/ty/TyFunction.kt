@@ -76,21 +76,21 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, fla
         get() = psi.params
 }
 
-class TyDocPsiFunction(func: LuaDocFunctionTy, searchContext: SearchContext) : TyFunction() {
-    private val _retTy: ITy = func.getReturnType(searchContext)
+class TyDocPsiFunction(func: LuaDocFunctionTy) : TyFunction() {
+    private val _retTy: ITy = func.returnType
 
-    private fun initParams(func: LuaDocFunctionTy, searchContext: SearchContext): Array<LuaParamInfo> {
+    private fun initParams(func: LuaDocFunctionTy): Array<LuaParamInfo> {
         val list = mutableListOf<LuaParamInfo>()
         func.functionParamList.forEach {
             val p = LuaParamInfo()
             p.name = it.id.text
-            p.ty = resolveDocTypeSet(it.typeSet, searchContext)
+            p.ty = resolveDocTypeSet(it.typeSet)
             list.add(p)
         }
         return list.toTypedArray()
     }
 
-    private val _params = initParams(func, searchContext)
+    private val _params = initParams(func)
 
     override val returnTy: ITy
         get() = _retTy

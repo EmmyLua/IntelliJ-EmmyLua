@@ -4,7 +4,6 @@ package com.tang.intellij.lua.comment.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaDocParamDef extends LuaDocPsiElement {
@@ -19,7 +18,7 @@ public interface LuaDocParamDef extends LuaDocPsiElement {
   LuaDocTypeSet getTypeSet();
 
   @NotNull
-  ITy guessType(SearchContext context);
+  ITy getType();
 
   @Nullable
   PsiElement getOptional();

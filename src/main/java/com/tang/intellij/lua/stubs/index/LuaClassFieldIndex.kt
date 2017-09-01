@@ -65,7 +65,7 @@ class LuaClassFieldIndex : StringStubIndexExtension<LuaClassField>() {
                 // from supper
                 val classDef = LuaClassIndex.find(className, context)
                 if (classDef != null) {
-                    val type = classDef.classType
+                    val type = classDef.type
                     val superClassName = type.superClassName
                     if (superClassName != null) {
                         return process(superClassName, fieldName, context, processor)
