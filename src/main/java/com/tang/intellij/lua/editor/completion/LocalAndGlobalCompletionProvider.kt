@@ -44,16 +44,18 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
     private fun addCompletion(name:String, session: CompletionSession, psi: LuaPsiElement) {
         val addTy = {ty: ITyFunction ->
-            var arr: Array<LuaParamInfo?> = emptyArray()
-            arr += ty.params
             val icon = if (ty.hasFlag(TyFlags.GLOBAL))
                 LuaIcons.GLOBAL_FUNCTION
             else
                 LuaIcons.LOCAL_FUNCTION
 
-            LuaPsiImplUtil.processOptional(arr) { signature, mask ->
-                val le = TyFunctionLookupElement(name, signature, false, ty, icon)
-                le.handler = FunctionInsertHandler(ty).withMask(mask)
+            ty.signatures.forEach {
+                val list = mutableListOf<String>()
+                it.params.forEach {
+                    list.add(it.name)
+                }
+                val le = TyFunctionLookupElement(name, "(${list.joinToString(", ")})", false, ty, icon)
+                le.handler = SignatureInsertHandler(it)
                 session.resultSet.addElement(le)
             }
         }

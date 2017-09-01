@@ -16,16 +16,34 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
+import com.tang.intellij.lua.comment.psi.LuaDocSignatureDef
 import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.psi.LuaClassMethodDef
+import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.search.SearchContext
 
+interface IFunSignature {
+    val returnTy: ITy
+    val params: Array<LuaParamInfo>
+}
+
+class FunSignature(override val returnTy: ITy, override val params: Array<LuaParamInfo>) : IFunSignature {
+    companion object {
+        fun create(functionTy: LuaDocFunctionTy): IFunSignature {
+            val ty: ITyFunction = TyDocPsiFunction(functionTy)
+            return FunSignature(ty.returnTy, ty.params)
+        }
+    }
+}
+
 interface ITyFunction : ITy {
     val returnTy: ITy
     val params: Array<LuaParamInfo>
+    val signatures: Array<IFunSignature>
 }
 
 val ITyFunction.isSelfCall get() = hasFlag(TyFlags.SELF_FUNCTION)
@@ -44,6 +62,10 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
             }
             return "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
         }
+
+    override val signatures: Array<IFunSignature> by lazy {
+        arrayOf<IFunSignature>(FunSignature(returnTy, params))
+    }
 
     override fun equals(other: Any?): Boolean {
         if (other is ITyFunction) {
@@ -67,9 +89,26 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, fla
         if (psi is LuaClassMethodDef && !psi.isStatic) {
             this.flags = this.flags and TyFlags.SELF_FUNCTION
         }
+
     }
     private val _retTy: ITy = psi.guessReturnTypeSet(searchContext)
 
+    override val signatures: Array<IFunSignature> by lazy {
+        val list = mutableListOf<IFunSignature>()
+        if (psi is LuaCommentOwner) {
+            val comment = psi.comment
+            if (comment != null) {
+                val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocSignatureDef::class.java)
+                children.forEach {
+                    val fty = it.functionTy
+                    if (fty != null)
+                        list.add(FunSignature.create(fty))
+                }
+            }
+        }
+        list.add(FunSignature(returnTy, params))
+        list.toTypedArray()
+    }
     override val returnTy: ITy
         get() = _retTy
     override val params: Array<LuaParamInfo>
