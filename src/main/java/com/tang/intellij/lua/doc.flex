@@ -69,6 +69,7 @@ DOC_DASHES = --+
     "class"                    { yybegin(xTAG); return CLASS; }
     "type"                     { yybegin(xTAG); return TYPE;}
     "language"                 { yybegin(xTAG); return LANGUAGE;}
+    "signature"                { yybegin(xTAG); return SIGNATURE; }
     {ID}                       { yybegin(xTAG); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

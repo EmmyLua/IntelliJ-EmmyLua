@@ -73,7 +73,8 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaDocTypes.CLASS,
             LuaDocTypes.TYPE,
             LuaDocTypes.FIELD,
-            LuaDocTypes.LANGUAGE
+            LuaDocTypes.LANGUAGE,
+            LuaDocTypes.SIGNATURE
     );
 
     private static final Map<IElementType, TextAttributesKey> ourMap1;
