@@ -15,8 +15,8 @@
 os = {}
 
 ---
--- Returns an approximation of the amount in seconds of CPU time used by
--- the program.
+--- Returns an approximation of the amount in seconds of CPU time used by
+--- the program.
 ---@return number
 function os.clock() end
 
