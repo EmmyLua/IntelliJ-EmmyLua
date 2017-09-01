@@ -21,9 +21,9 @@ import com.intellij.lang.parameterInfo.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.LuaArgs
 import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.TyFunction
 import com.tang.intellij.lua.ty.TyUnion
 import java.util.*
 
@@ -31,7 +31,7 @@ import java.util.*
  *
  * Created by tangzx on 2016/12/25.
  */
-class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, LuaFuncBodyOwner> {
+class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, TyFunction> {
     override fun couldShowInLookup(): Boolean {
         return false
     }
@@ -40,7 +40,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, LuaFuncBodyOwner> 
         return emptyArray()
     }
 
-    override fun getParametersForDocumentation(o: LuaFuncBodyOwner, parameterInfoContext: ParameterInfoContext): Array<Any>? {
+    override fun getParametersForDocumentation(o: TyFunction, parameterInfoContext: ParameterInfoContext): Array<Any>? {
         return emptyArray()
     }
 
@@ -49,12 +49,12 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, LuaFuncBodyOwner> 
         val luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.offset, LuaArgs::class.java, false)
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
-            val bodyOwner = callExpr.resolveFuncBodyOwner(SearchContext(context.project))
-            if (bodyOwner != null) {
-                val params = bodyOwner.params
+            val type = callExpr.guessPrefixType(SearchContext(context.project))
+            if (type is TyFunction) {
+                val params = type.params
                 if (params.isEmpty())
                     return null
-                context.itemsToShow = arrayOf<Any>(bodyOwner)
+                context.itemsToShow = arrayOf<Any>(type)
             }
         }
         return luaArgs
@@ -85,18 +85,18 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, LuaFuncBodyOwner> 
         return true
     }
 
-    override fun updateUI(o: LuaFuncBodyOwner?, context: ParameterInfoUIContext) {
+    override fun updateUI(o: TyFunction?, context: ParameterInfoUIContext) {
         if (o == null)
             return
-        val paramInfos = o.params
-        if (paramInfos.isNotEmpty()) {
+        val params = o.params
+        if (params.isNotEmpty()) {
             val sb = StringBuilder()
             val index = context.currentParameterIndex
             var start = 0
             var end = 0
 
-            for (i in paramInfos.indices) {
-                val paramInfo = paramInfos[i]
+            for (i in params.indices) {
+                val paramInfo = params[i]
                 if (i > 0)
                     sb.append(", ")
                 if (i == index)
