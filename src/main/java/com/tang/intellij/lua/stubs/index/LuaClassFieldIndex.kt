@@ -70,9 +70,9 @@ class LuaClassFieldIndex : StringStubIndexExtension<LuaClassField>() {
                         return process(superClassName, fieldName, context, processor)
                     }
                 }
-                return false
+                return true
             }
-            return true
+            return false
         }
 
         fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassField? {
