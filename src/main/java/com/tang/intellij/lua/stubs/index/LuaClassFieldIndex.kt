@@ -55,7 +55,8 @@ class LuaClassFieldIndex : StringStubIndexExtension<LuaClassField>() {
         fun process(key: String, context: SearchContext, processor: Processor<LuaClassField>): Boolean {
             if (context.isDumb)
                 return false
-            return StubIndex.getInstance().processElements(KEY, key, context.project, context.getScope(), null, LuaClassField::class.java, processor)
+            val all = instance.get(key, context.project, context.getScope())
+            return all.any { processor.process(it) }
         }
 
         fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassField>): Boolean {
