@@ -49,8 +49,9 @@ class CreateParameterAnnotationIntention : BaseIntentionAction() {
         if (element != null) {
             element = element.parent
             if (element is LuaParamNameDef) {
-                //TODO: 并且没有相应 Doc
-                return element
+                val commentOwner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner::class.java)
+                val comment = commentOwner?.comment
+                comment?.getParamDef(element.name) ?: return element
             }
         }
         return null
@@ -281,21 +282,6 @@ class InvertBooleanIntention : BaseIntentionAction() {
             val lit = LuaElementFactory.createLiteral(project, if (element.text == "true") "false" else "true")
             element.replace(lit)
         }
-    }
-
-}
-
-class InvertConditionIntention : BaseIntentionAction() {
-    override fun getFamilyName() = text
-
-    override fun getText() = "Invert condition"
-
-    override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
 }
