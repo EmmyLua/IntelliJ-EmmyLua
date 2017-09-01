@@ -29,7 +29,7 @@ import com.tang.intellij.lua.lang.LuaFileType
  * Created by TangZX on 2016/12/20.
  */
 class LuaAutoIndentHandler : TypedHandlerDelegate() {
-    override fun charTyped(c: Char, project: Project?, editor: Editor, file: PsiFile): TypedHandlerDelegate.Result {
+    override fun charTyped(c: Char, project: Project, editor: Editor, file: PsiFile): TypedHandlerDelegate.Result {
         if (file.fileType == LuaFileType.INSTANCE) {
             val caretModel = editor.caretModel
             val ex = editor as EditorEx
