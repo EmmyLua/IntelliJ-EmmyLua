@@ -28,6 +28,9 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
+import com.tang.intellij.lua.ty.ITyFunction
+import com.tang.intellij.lua.ty.TyFlags
+import com.tang.intellij.lua.ty.hasFlag
 
 /**
  * suggest local/global vars and functions
@@ -37,6 +40,41 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
     private fun has(flag: Int): Boolean {
         return mask and flag == flag
+    }
+
+    private fun addCompletion(name:String, session: CompletionSession, psi: LuaPsiElement) {
+        val addTy = {ty: ITyFunction ->
+            var arr: Array<LuaParamInfo?> = emptyArray()
+            arr += ty.params
+            val icon = if (ty.hasFlag(TyFlags.GLOBAL))
+                LuaIcons.GLOBAL_FUNCTION
+            else
+                LuaIcons.LOCAL_FUNCTION
+
+            LuaPsiImplUtil.processOptional(arr) { signature, mask ->
+                val le = TyFunctionLookupElement(name, signature, false, ty, icon)
+                le.handler = FunctionInsertHandler(ty).withMask(mask)
+                session.resultSet.addElement(le)
+            }
+        }
+        when (psi) {
+            is LuaFuncBodyOwner -> {
+                addTy(psi.asTy(SearchContext(psi.project)))
+            }
+            is LuaTypeGuessable -> {
+                val type = psi.guessType(SearchContext(psi.project))
+                if (type is ITyFunction) {
+                    addTy(type)
+                } else {
+                    var icon = LuaIcons.LOCAL_VAR
+                    if (psi is LuaParamNameDef)
+                        icon = LuaIcons.PARAMETER
+
+                    val elementBuilder = LuaTypeGuessableLookupElement(name, psi, false, icon)
+                    session.resultSet.addElement(elementBuilder)
+                }
+            }
+        }
     }
 
     override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
@@ -51,12 +89,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 val name = nameDef.text
                 if (completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     session.addWord(name)
-                    var icon = LuaIcons.LOCAL_VAR
-                    if (nameDef is LuaParamNameDef)
-                        icon = LuaIcons.PARAMETER
-
-                    val elementBuilder = LuaTypeGuessableLookupElement(name, nameDef, false, icon)
-                    completionResultSet.addElement(elementBuilder)
+                    addCompletion(name, session, nameDef)
                 }
                 true
             }
@@ -66,11 +99,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 val name = localFuncDef.name
                 if (name != null && completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
                     session.addWord(name)
-                    LuaPsiImplUtil.processOptional(localFuncDef.params) { signature, mask ->
-                        val elementBuilder = LocalFunctionLookupElement(name, signature, localFuncDef)
-                        elementBuilder.handler = FuncInsertHandler(localFuncDef).withMask(mask)
-                        completionResultSet.addElement(elementBuilder)
-                    }
+                    addCompletion(name, session, localFuncDef)
                 }
                 true
             }
@@ -91,19 +120,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 val global = LuaGlobalIndex.find(name, context)
                 if (global != null) {
                     session.addWord(name)
-
-                    //todo 将不分 LuaGlobalVar 和 LuaGlobalFunc
-                    if (has(GLOBAL_VAR) && (global is LuaGlobalVar || global is LuaIndexExpr)) {
-                        val elementBuilder = LuaTypeGuessableLookupElement(name, global as LuaTypeGuessable, false, LuaIcons.GLOBAL_FIELD)
-                        completionResultSet.addElement(elementBuilder)
-                    }
-                    else if (has(GLOBAL_FUN) && global is LuaGlobalFuncDef) {
-                        LuaPsiImplUtil.processOptional(global.params) { signature, mask ->
-                            val elementBuilder = GlobalFunctionLookupElement(name, signature, global)
-                            elementBuilder.handler = GlobalFuncInsertHandler(global).withMask(mask)
-                            completionResultSet.addElement(elementBuilder)
-                        }
-                    }
+                    addCompletion(name, session, global)
                 }
             }
         }

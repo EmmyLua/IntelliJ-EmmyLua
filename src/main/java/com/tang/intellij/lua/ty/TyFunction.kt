@@ -61,10 +61,11 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 }
 
-class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : TyFunction() {
+class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
     init {
+        this.flags = flags
         if (psi is LuaClassMethodDef && !psi.isStatic) {
-            flags = TyFlags.SELF_FUNCTION
+            this.flags = this.flags and TyFlags.SELF_FUNCTION
         }
     }
     private val _retTy: ITy = psi.guessReturnTypeSet(searchContext)

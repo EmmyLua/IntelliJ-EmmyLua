@@ -21,6 +21,7 @@ package com.tang.intellij.lua.editor.completion
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITyFunction
 import javax.swing.Icon
 
 /**
@@ -88,3 +89,14 @@ class LocalFunctionLookupElement(name:String, signature: String, method: LuaLoca
 
 class GlobalFunctionLookupElement(name:String, signature: String, method: LuaGlobalFuncDef)
     : LuaFunctionLookupElement(name, signature, false, method, LuaIcons.GLOBAL_FUNCTION)
+
+class TyFunctionLookupElement(name: String, signature: String, bold: Boolean, val ty: ITyFunction, icon: Icon)
+    : LuaLookupElement(name, bold, icon) {
+    init {
+        itemText = lookupString + signature
+    }
+
+    override fun getObject(): Any {
+        return ty
+    }
+}

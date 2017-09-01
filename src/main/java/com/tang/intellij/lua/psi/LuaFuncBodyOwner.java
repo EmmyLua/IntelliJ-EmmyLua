@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.tang.intellij.lua.ty.ITyFunction;
+import com.tang.intellij.lua.ty.TyFlags;
 import com.tang.intellij.lua.ty.TyPsiFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,7 +50,9 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
 
     @NotNull
     default ITyFunction asTy(SearchContext searchContext) {
-        return new TyPsiFunction(this, searchContext);
+        if (this instanceof LuaGlobalFuncDef)
+            return new TyPsiFunction(this, searchContext, TyFlags.Companion.getGLOBAL());
+        return new TyPsiFunction(this, searchContext, 0);
     }
 
     default String getParamSignature() {
