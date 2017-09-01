@@ -676,7 +676,6 @@ object LuaPsiImplUtil {
      * @param index index
      * *
      * @return type string
-     * * todo 处理多个var的情况
      */
     @JvmStatic fun getTypeName(stat: LuaAssignStat, index: Int): String? {
         val expr = stat.getExprAt(index)

@@ -79,7 +79,6 @@ public class LuaPsiTreeUtil {
         do {
             if (curr instanceof LuaLocalFuncDef) {
                 LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
-                //todo 第一级local function不能使用
                 continueSearch = processor.accept(localFuncDef);
                 funcDeep++;
             }

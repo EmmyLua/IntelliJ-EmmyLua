@@ -105,7 +105,6 @@ public abstract class LuaAttachDebugProcess extends LuaDebugProcess implements L
                 break;
             case LuaAttachProto.SessionEnd:
             case LuaAttachProto.DestroyVM:
-                // todo : 发送detach命令Server端会挂
                 bridge.stop(false);
                 getSession().stop();
                 break;
