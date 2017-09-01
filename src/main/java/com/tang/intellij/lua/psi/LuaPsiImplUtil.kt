@@ -263,6 +263,8 @@ object LuaPsiImplUtil {
 
     @JvmStatic fun isStaticMethodCall(callExpr: LuaCallExpr): Boolean {
         val expr = callExpr.expr
+        if (expr is LuaNameExpr)
+            return true
         return expr is LuaIndexExpr && expr.colon == null
     }
 

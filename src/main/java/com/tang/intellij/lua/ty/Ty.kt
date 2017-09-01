@@ -40,6 +40,7 @@ class TyFlags {
     companion object {
         val ANONYMOUS = 0x1
         val GLOBAL = 0x2
+        val SELF_FUNCTION = 0x4 // xxx.method()
     }
 }
 

@@ -18,6 +18,7 @@ package com.tang.intellij.lua.ty
 
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
+import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.search.SearchContext
@@ -26,6 +27,8 @@ interface ITyFunction : ITy {
     val returnTy: ITy
     val params: Array<LuaParamInfo>
 }
+
+val ITyFunction.isSelfCall get() = hasFlag(TyFlags.SELF_FUNCTION)
 
 fun ITyFunction.getParamTy(index: Int): ITy {
     val info = params.getOrNull(index)
@@ -59,6 +62,11 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
 }
 
 class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext) : TyFunction() {
+    init {
+        if (psi is LuaClassMethodDef && !psi.isStatic) {
+            flags = TyFlags.SELF_FUNCTION
+        }
+    }
     private val _retTy: ITy = psi.guessReturnTypeSet(searchContext)
 
     override val returnTy: ITy

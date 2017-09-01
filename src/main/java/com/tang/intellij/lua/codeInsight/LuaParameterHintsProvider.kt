@@ -23,6 +23,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITyFunction
+import com.tang.intellij.lua.ty.isSelfCall
 import java.util.*
 
 /**
@@ -31,26 +33,20 @@ import java.util.*
  */
 class LuaParameterHintsProvider : InlayParameterHintsProvider {
 
-    internal var EXPR_HINT = arrayOf(LuaLiteralExpr::class.java, LuaBinaryExpr::class.java, LuaUnaryExpr::class.java, LuaClosureExpr::class.java)
+    private var EXPR_HINT = arrayOf(LuaLiteralExpr::class.java, LuaBinaryExpr::class.java, LuaUnaryExpr::class.java, LuaClosureExpr::class.java)
 
-    override fun getParameterHints(psiElement: PsiElement): List<InlayInfo> {
+    override fun getParameterHints(callExpr: PsiElement): List<InlayInfo> {
         val list = ArrayList<InlayInfo>()
-        if (psiElement is LuaCallExpr) {
-            val callExpr = psiElement
+        if (callExpr is LuaCallExpr) {
             val parameters: Array<LuaParamInfo>?
-            val methodDef = callExpr.resolveFuncBodyOwner(SearchContext(psiElement.getProject()))
-            methodDef ?: return list
-
+            val context = SearchContext(callExpr.getProject())
+            val ty = callExpr.guessPrefixType(context) as? ITyFunction ?: return list
 
             // 是否是 inst:method() 被用为 inst.method(self) 形式
-            var isInstanceMethodUsedAsStaticMethod = false
-            var isStaticMethodUsedAsInstanceMethod = false
+            val isInstanceMethodUsedAsStaticMethod = ty.isSelfCall && callExpr.isStaticMethodCall
+            val isStaticMethodUsedAsInstanceMethod = !ty.isSelfCall && !callExpr.isStaticMethodCall
 
-            parameters = methodDef.params
-            if (methodDef is LuaClassMethodDef) {
-                isInstanceMethodUsedAsStaticMethod = !methodDef.isStatic && callExpr.isStaticMethodCall
-                isStaticMethodUsedAsInstanceMethod = methodDef.isStatic && !callExpr.isStaticMethodCall
-            }
+            parameters = ty.params
 
             val args = callExpr.args
             val luaExprList = args.exprList
