@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.RecursionManager
+import com.intellij.util.Processor
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -85,7 +86,12 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         val ty = expr.guessType(context)
         TyUnion.each(ty) {
             when(it) {
-                is ITyFunction -> ret = ret.union(it.returnTy)
+                is ITyFunction -> {
+                    it.process(Processor {sig ->
+                        ret = ret.union(sig.returnTy)
+                        true
+                    })
+                }
                 //constructor : Class table __call
                 is ITyClass -> ret = ret.union(it)
             }

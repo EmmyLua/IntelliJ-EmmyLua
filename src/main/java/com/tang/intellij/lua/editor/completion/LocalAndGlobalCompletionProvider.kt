@@ -22,6 +22,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.tree.TokenSet
 import com.intellij.util.ProcessingContext
+import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
@@ -31,6 +32,7 @@ import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.TyFlags
 import com.tang.intellij.lua.ty.hasFlag
+import com.tang.intellij.lua.ty.process
 
 /**
  * suggest local/global vars and functions
@@ -49,7 +51,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
             else
                 LuaIcons.LOCAL_FUNCTION
 
-            ty.signatures.forEach {
+            ty.process(Processor {
                 val list = mutableListOf<String>()
                 it.params.forEach {
                     list.add(it.name)
@@ -57,7 +59,8 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 val le = TyFunctionLookupElement(name, "(${list.joinToString(", ")})", false, ty, icon)
                 le.handler = SignatureInsertHandler(it)
                 session.resultSet.addElement(le)
-            }
+                true
+            })
         }
         when (psi) {
             is LuaFuncBodyOwner -> {

@@ -52,7 +52,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
             val callExpr = luaArgs.parent as LuaCallExpr
             val type = callExpr.guessPrefixType(SearchContext(context.project))
             if (type is ITyFunction) {
-                context.itemsToShow = type.signatures
+                context.itemsToShow = type.signatures + type.mainSignature
             }
         }
         return luaArgs

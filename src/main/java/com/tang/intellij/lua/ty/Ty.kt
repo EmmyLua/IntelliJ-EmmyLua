@@ -20,7 +20,6 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.psi.LuaParamInfo
 
 enum class TyKind {
     Unknown,
@@ -135,11 +134,11 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     serialize(ty.base, stream)
                 }
                 is ITyFunction -> {
-                    stream.writeByte(ty.params.size)
-                    for (param in ty.params) {
-                        LuaParamInfo.serialize(param, stream)
+                    FunSignature.serialize(ty.mainSignature, stream)
+                    stream.writeByte(ty.signatures.size)
+                    for (sig in ty.signatures) {
+                        FunSignature.serialize(sig, stream)
                     }
-                    serialize(ty.returnTy, stream)
                 }
                 is ITyClass -> {
                     stream.writeName(ty.className)
@@ -170,13 +169,13 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     TyArray(base)
                 }
                 TyKind.Function -> {
+                    val mainSig = FunSignature.deserialize(stream)
                     val size = stream.readByte()
-                    val arr = mutableListOf<LuaParamInfo>()
+                    val arr = mutableListOf<IFunSignature>()
                     for (i in 0 until size) {
-                        arr.add(LuaParamInfo.deserialize(stream))
+                        arr.add(FunSignature.deserialize(stream))
                     }
-                    val retTy = deserialize(stream)
-                    TySerializedFunction(retTy, arr.toTypedArray(), flags)
+                    TySerializedFunction(mainSig, arr.toTypedArray(), flags)
                 }
                 TyKind.Class -> {
                     val className = stream.readName()
@@ -230,7 +229,7 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
         get() = "${base.displayName}[]"
 
     override fun equals(other: Any?): Boolean {
-        return other is ITyArray && base.equals(other.base)
+        return other is ITyArray && base == other.base
     }
 
     override fun hashCode(): Int {

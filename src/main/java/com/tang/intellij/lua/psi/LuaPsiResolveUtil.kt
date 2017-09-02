@@ -305,7 +305,8 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
          *
          * guess type for p1
          */
-        if (owner is LuaCallStat) {
+        //fixme
+        /*if (owner is LuaCallStat) {
             val closure = LuaPsiTreeUtil.getParentOfType(paramNameDef, LuaClosureExpr::class.java, LuaFuncBody::class.java)
             if (closure != null) {
                 val callExpr = owner.expr as LuaCallExpr
@@ -320,7 +321,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     }
                 }
             }
-        }
+        }*/
     }
     return Ty.UNKNOWN
 }
