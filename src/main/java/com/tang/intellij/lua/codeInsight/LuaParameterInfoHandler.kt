@@ -23,7 +23,8 @@ import com.tang.intellij.lua.psi.LuaArgs
 import com.tang.intellij.lua.psi.LuaCallExpr
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.TyFunction
+import com.tang.intellij.lua.ty.IFunSignature
+import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.TyUnion
 import java.util.*
 
@@ -31,7 +32,7 @@ import java.util.*
  *
  * Created by tangzx on 2016/12/25.
  */
-class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, TyFunction> {
+class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
     override fun couldShowInLookup(): Boolean {
         return false
     }
@@ -40,7 +41,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, TyFunction> {
         return emptyArray()
     }
 
-    override fun getParametersForDocumentation(o: TyFunction, parameterInfoContext: ParameterInfoContext): Array<Any>? {
+    override fun getParametersForDocumentation(o: IFunSignature, parameterInfoContext: ParameterInfoContext): Array<Any>? {
         return emptyArray()
     }
 
@@ -50,11 +51,8 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, TyFunction> {
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
             val type = callExpr.guessPrefixType(SearchContext(context.project))
-            if (type is TyFunction) {
-                val params = type.params
-                if (params.isEmpty())
-                    return null
-                context.itemsToShow = arrayOf<Any>(type)
+            if (type is ITyFunction) {
+                context.itemsToShow = type.signatures
             }
         }
         return luaArgs
@@ -85,7 +83,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, TyFunction> {
         return true
     }
 
-    override fun updateUI(o: TyFunction?, context: ParameterInfoUIContext) {
+    override fun updateUI(o: IFunSignature?, context: ParameterInfoUIContext) {
         if (o == null)
             return
         val params = o.params
