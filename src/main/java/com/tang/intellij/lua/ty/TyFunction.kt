@@ -30,6 +30,7 @@ import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.search.SearchContext
 
 interface IFunSignature {
+    val selfCall: Boolean
     val returnTy: ITy
     val params: Array<LuaParamInfo>
     val displayName: String
@@ -40,7 +41,7 @@ fun IFunSignature.getParamTy(index: Int): ITy {
     return info?.ty ?: Ty.UNKNOWN
 }
 
-class FunSignature(override val returnTy: ITy, override val params: Array<LuaParamInfo>) : IFunSignature {
+class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, override val params: Array<LuaParamInfo>) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
             return params.indices.none { params[it] != other.params.getOrNull(it) }
@@ -68,11 +69,12 @@ class FunSignature(override val returnTy: ITy, override val params: Array<LuaPar
             return list.toTypedArray()
         }
 
-        fun create(functionTy: LuaDocFunctionTy): IFunSignature {
-            return FunSignature(functionTy.returnType, initParams(functionTy))
+        fun create(selfCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
+            return FunSignature(selfCall, functionTy.returnType, initParams(functionTy))
         }
 
         fun serialize(sig: IFunSignature, stream: StubOutputStream) {
+            stream.writeBoolean(sig.selfCall)
             Ty.serialize(sig.returnTy, stream)
             stream.writeByte(sig.params.size)
             for (param in sig.params) {
@@ -81,13 +83,14 @@ class FunSignature(override val returnTy: ITy, override val params: Array<LuaPar
         }
 
         fun deserialize(stream: StubInputStream): IFunSignature {
+            val selfCall = stream.readBoolean()
             val ret = Ty.deserialize(stream)
             val paramSize = stream.readByte()
             val params = mutableListOf<LuaParamInfo>()
             for (j in 0 until paramSize) {
                 params.add(LuaParamInfo.deserialize(stream))
             }
-            return FunSignature(ret, params.toTypedArray())
+            return FunSignature(selfCall, ret, params.toTypedArray())
         }
     }
 
@@ -140,7 +143,7 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 }
 
-class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
+class TyPsiFunction(val selfCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
     init {
         this.flags = flags
         if (psi is LuaClassMethodDef && !psi.isStatic) {
@@ -149,7 +152,7 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, fla
     }
 
     override val mainSignature: IFunSignature by lazy {
-        FunSignature(psi.guessReturnTypeSet(searchContext), psi.params)
+        FunSignature(selfCall, psi.guessReturnTypeSet(searchContext), psi.params)
     }
 
     override val signatures: Array<IFunSignature> by lazy {
@@ -161,7 +164,7 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, fla
                 children.forEach {
                     val fty = it.functionTy
                     if (fty != null)
-                        list.add(FunSignature.create(fty))
+                        list.add(FunSignature.create(selfCall, fty))
                 }
             }
         }
@@ -170,7 +173,7 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, fla
 }
 
 class TyDocPsiFunction(func: LuaDocFunctionTy) : TyFunction() {
-    private val main = FunSignature.create(func)
+    private val main = FunSignature.create(false, func)
     override val mainSignature: IFunSignature = main
     override val signatures: Array<IFunSignature> = emptyArray()
 }

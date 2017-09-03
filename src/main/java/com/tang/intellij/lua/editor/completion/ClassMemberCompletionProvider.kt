@@ -143,13 +143,16 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
                 handlerProcessor?.process(elementBuilder)
                 completionResultSet.addElement(elementBuilder)
             } else {
-                LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
-                    val elementBuilder = LuaMethodLookupElement(methodName, signature, bold, def)
-                    elementBuilder.handler = FuncInsertHandler(def).withMask(mask)
-                    elementBuilder.setTailText("  [$clazzName]")
-                    handlerProcessor?.process(elementBuilder)
-                    completionResultSet.addElement(elementBuilder)
-                }
+                val ty = def.asTy(SearchContext(def.project))
+                ty.process(Processor {
+                    val le = TyFunctionLookupElement(methodName, it, bold, ty, LuaIcons.CLASS_METHOD)
+                    le.handler = SignatureInsertHandler(it)
+                    le.setItemTextUnderlined(true)
+                    le.setTailText("  [$clazzName]")
+                    handlerProcessor?.process(le)
+                    completionResultSet.addElement(le)
+                    true
+                })
             }
         }
     }

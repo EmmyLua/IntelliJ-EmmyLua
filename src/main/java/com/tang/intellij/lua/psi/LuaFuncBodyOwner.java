@@ -51,8 +51,12 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
     @NotNull
     default ITyFunction asTy(SearchContext searchContext) {
         if (this instanceof LuaGlobalFuncDef)
-            return new TyPsiFunction(this, searchContext, TyFlags.Companion.getGLOBAL());
-        return new TyPsiFunction(this, searchContext, 0);
+            return new TyPsiFunction(false, this, searchContext, TyFlags.Companion.getGLOBAL());
+        if (this instanceof LuaClassMethodDef) {
+            LuaClassMethodDef classMethodDef = (LuaClassMethodDef) this;
+            return new TyPsiFunction(!classMethodDef.isStatic(), this, searchContext, 0);
+        }
+        return new TyPsiFunction(false, this, searchContext, 0);
     }
 
     default String getParamSignature() {
