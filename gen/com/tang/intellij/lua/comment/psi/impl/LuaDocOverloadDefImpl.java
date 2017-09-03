@@ -11,14 +11,14 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
 
-public class LuaDocSignatureDefImpl extends ASTWrapperPsiElement implements LuaDocSignatureDef {
+public class LuaDocOverloadDefImpl extends ASTWrapperPsiElement implements LuaDocOverloadDef {
 
-  public LuaDocSignatureDefImpl(ASTNode node) {
+  public LuaDocOverloadDefImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitSignatureDef(this);
+    visitor.visitOverloadDef(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

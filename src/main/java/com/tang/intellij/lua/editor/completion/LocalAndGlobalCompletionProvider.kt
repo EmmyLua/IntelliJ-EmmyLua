@@ -52,11 +52,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 LuaIcons.LOCAL_FUNCTION
 
             ty.process(Processor {
-                val list = mutableListOf<String>()
-                it.params.forEach {
-                    list.add(it.name)
-                }
-                val le = TyFunctionLookupElement(name, "(${list.joinToString(", ")})", false, ty, icon)
+                val le = TyFunctionLookupElement(name, it, false, ty, icon)
                 le.handler = SignatureInsertHandler(it)
                 session.resultSet.addElement(le)
                 true

@@ -21,14 +21,12 @@ import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
+import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.*
 
 /**
 
@@ -159,14 +157,24 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
     private fun addStaticMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
         if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
-            LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
+            val ty = def.asTy(SearchContext(def.project))
+            ty.process(Processor {
+                val le = TyFunctionLookupElement(methodName, it, bold, ty, LuaIcons.CLASS_METHOD)
+                le.handler = SignatureInsertHandler(it)
+                le.setItemTextUnderlined(true)
+                le.setTailText("  [$clazzName]")
+                handlerProcessor?.process(le)
+                completionResultSet.addElement(le)
+                true
+            })
+            /*LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
                 val elementBuilder = LuaMethodLookupElement(methodName, signature, bold, def)
                 elementBuilder.handler = FuncInsertHandler(def).withMask(mask)
                 elementBuilder.setItemTextUnderlined(true)
                 elementBuilder.setTailText("  [$clazzName]")
                 handlerProcessor?.process(elementBuilder)
                 completionResultSet.addElement(elementBuilder)
-            }
+            }*/
         }
     }
 }

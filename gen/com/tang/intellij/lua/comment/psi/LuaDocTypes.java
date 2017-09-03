@@ -20,10 +20,10 @@ public interface LuaDocTypes {
   IElementType GENERAL_TY = LuaParserDefinition.createDocType("GENERAL_TY");
   IElementType GENERIC_TY = LuaParserDefinition.createDocType("GENERIC_TY");
   IElementType LAN_DEF = LuaParserDefinition.createDocType("LAN_DEF");
+  IElementType OVERLOAD_DEF = LuaParserDefinition.createDocType("OVERLOAD_DEF");
   IElementType PARAM_DEF = LuaParserDefinition.createDocType("PARAM_DEF");
   IElementType PARAM_NAME_REF = LuaParserDefinition.createDocType("PARAM_NAME_REF");
   IElementType RETURN_DEF = LuaParserDefinition.createDocType("RETURN_DEF");
-  IElementType SIGNATURE_DEF = LuaParserDefinition.createDocType("SIGNATURE_DEF");
   IElementType TAG_DEF = LuaParserDefinition.createDocType("TAG_DEF");
   IElementType TAG_VALUE = LuaParserDefinition.createDocType("TAG_VALUE");
   IElementType TY = LuaParserDefinition.createDocType("TY");
@@ -47,11 +47,11 @@ public interface LuaDocTypes {
   IElementType LT = new LuaDocTokenType("<");
   IElementType OPTIONAL = new LuaDocTokenType("optional");
   IElementType OR = new LuaDocTokenType("|");
+  IElementType OVERLOAD = new LuaDocTokenType("overload");
   IElementType PROTECTED = new LuaDocTokenType("protected");
   IElementType PUBLIC = new LuaDocTokenType("public");
   IElementType RPAREN = new LuaDocTokenType(")");
   IElementType SHARP = new LuaDocTokenType("#");
-  IElementType SIGNATURE = new LuaDocTokenType("signature");
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
   IElementType TAG_NAME = new LuaDocTokenType("TAG_NAME");
@@ -95,6 +95,9 @@ public interface LuaDocTypes {
       else if (type == LAN_DEF) {
         return new LuaDocLanDefImpl(node);
       }
+      else if (type == OVERLOAD_DEF) {
+        return new LuaDocOverloadDefImpl(node);
+      }
       else if (type == PARAM_DEF) {
         return new LuaDocParamDefImpl(node);
       }
@@ -103,9 +106,6 @@ public interface LuaDocTypes {
       }
       else if (type == RETURN_DEF) {
         return new LuaDocReturnDefImpl(node);
-      }
-      else if (type == SIGNATURE_DEF) {
-        return new LuaDocSignatureDefImpl(node);
       }
       else if (type == TAG_DEF) {
         return new LuaDocTagDefImpl(node);

@@ -60,7 +60,7 @@
         STRING = 'STRING'
         TYPE = 'type'
         LANGUAGE = 'language'
-        SIGNATURE = 'signature'
+        OVERLOAD = 'overload'
   ]
 }
 
@@ -68,7 +68,7 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def | return_def | class_def | field_def | type_def | lan_def | signature_def | tag_def)
+private doc_item ::= '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def)
 
 ty ::= function_ty | generic_ty | arr_ty | general_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
@@ -119,8 +119,8 @@ field_def ::= FIELD access_modifier? ID type_set comment_string? {
 tag_value ::= ID
 tag_def ::= TAG_NAME tag_value? comment_string? { pin = 1 }
 
-//@signature
-signature_def ::= SIGNATURE function_ty { pin = 1 }
+//@overload
+overload_def ::= OVERLOAD function_ty { pin = 1 }
 
 //@language json
 lan_def ::= LANGUAGE ID { pin = 1 }

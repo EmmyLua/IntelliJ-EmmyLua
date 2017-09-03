@@ -44,6 +44,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == LAN_DEF) {
       r = lan_def(b, 0);
     }
+    else if (t == OVERLOAD_DEF) {
+      r = overload_def(b, 0);
+    }
     else if (t == PARAM_DEF) {
       r = param_def(b, 0);
     }
@@ -52,9 +55,6 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     }
     else if (t == RETURN_DEF) {
       r = return_def(b, 0);
-    }
-    else if (t == SIGNATURE_DEF) {
-      r = signature_def(b, 0);
     }
     else if (t == TAG_DEF) {
       r = tag_def(b, 0);
@@ -230,7 +230,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '@' (param_def | return_def | class_def | field_def | type_def | lan_def | signature_def | tag_def)
+  // '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def)
   static boolean doc_item(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item")) return false;
     if (!nextTokenIs(b, AT)) return false;
@@ -242,7 +242,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // param_def | return_def | class_def | field_def | type_def | lan_def | signature_def | tag_def
+  // param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def
   private static boolean doc_item_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
@@ -253,7 +253,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = field_def(b, l + 1);
     if (!r) r = type_def(b, l + 1);
     if (!r) r = lan_def(b, l + 1);
-    if (!r) r = signature_def(b, l + 1);
+    if (!r) r = overload_def(b, l + 1);
     if (!r) r = tag_def(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -410,6 +410,20 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // OVERLOAD function_ty
+  public static boolean overload_def(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "overload_def")) return false;
+    if (!nextTokenIs(b, OVERLOAD)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, OVERLOAD_DEF, null);
+    r = consumeToken(b, OVERLOAD);
+    p = r; // pin = 1
+    r = r && function_ty(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // TAG_PARAM OPTIONAL? param_name_ref type_set comment_string?
   public static boolean param_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "param_def")) return false;
@@ -472,20 +486,6 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "return_def_2")) return false;
     comment_string(b, l + 1);
     return true;
-  }
-
-  /* ********************************************************** */
-  // SIGNATURE function_ty
-  public static boolean signature_def(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "signature_def")) return false;
-    if (!nextTokenIs(b, SIGNATURE)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, SIGNATURE_DEF, null);
-    r = consumeToken(b, SIGNATURE);
-    p = r; // pin = 1
-    r = r && function_ty(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
   }
 
   /* ********************************************************** */

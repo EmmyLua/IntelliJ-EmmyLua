@@ -54,6 +54,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitOverloadDef(@NotNull LuaDocOverloadDef o) {
+    visitPsiElement(o);
+  }
+
   public void visitParamDef(@NotNull LuaDocParamDef o) {
     visitPsiElement(o);
   }
@@ -63,10 +67,6 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitReturnDef(@NotNull LuaDocReturnDef o) {
-    visitPsiElement(o);
-  }
-
-  public void visitSignatureDef(@NotNull LuaDocSignatureDef o) {
     visitPsiElement(o);
   }
 

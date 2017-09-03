@@ -21,7 +21,7 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
-import com.tang.intellij.lua.comment.psi.LuaDocSignatureDef
+import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
 import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaCommentOwner
@@ -157,7 +157,7 @@ class TyPsiFunction(val psi: LuaFuncBodyOwner, searchContext: SearchContext, fla
         if (psi is LuaCommentOwner) {
             val comment = psi.comment
             if (comment != null) {
-                val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocSignatureDef::class.java)
+                val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocOverloadDef::class.java)
                 children.forEach {
                     val fty = it.functionTy
                     if (fty != null)
