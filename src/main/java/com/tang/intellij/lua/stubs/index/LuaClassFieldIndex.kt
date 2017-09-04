@@ -56,6 +56,7 @@ class LuaClassFieldIndex : StringStubIndexExtension<LuaClassField>() {
             if (context.isDumb)
                 return false
             val all = instance.get(key, context.project, context.getScope())
+            if (all.isEmpty()) return true
             return all.any { processor.process(it) }
         }
 
