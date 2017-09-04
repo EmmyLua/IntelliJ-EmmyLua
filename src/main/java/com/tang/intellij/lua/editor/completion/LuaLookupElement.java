@@ -113,6 +113,14 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
         return !StringUtil.isEmpty(myTypeText) ? myTypeText : null;
     }
 
+    protected void setTypeText(String value) {
+        myTypeText = value;
+    }
+
+    public void setIcon(Icon icon) {
+        myIcon = icon;
+    }
+
     public Icon getIcon() {
         return myIcon;
     }

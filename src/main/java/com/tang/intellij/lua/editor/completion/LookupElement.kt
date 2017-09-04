@@ -18,11 +18,11 @@
 
 package com.tang.intellij.lua.editor.completion
 
+import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.IFunSignature
-import com.tang.intellij.lua.ty.ITyFunction
+import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
 
 /**
@@ -55,7 +55,40 @@ open class LuaTypeGuessableLookupElement(name: String, private val guessable: Lu
 }
 
 class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boolean)
-    : LuaTypeGuessableLookupElement(fieldName, field, bold, LuaIcons.CLASS_FIELD)
+    : LuaLookupElement(fieldName, bold, null) {
+    private val ty: ITy by lazy {
+        field.guessType(SearchContext(field.project))
+    }
+
+    private fun lazyInit() {
+        val _ty = ty
+        if (_ty is ITyFunction) {
+            val list = mutableListOf<String>()
+            _ty.mainSignature.params.forEach {
+                list.add(it.name)
+            }
+            itemText = lookupString + "(${list.joinToString(", ")})"
+
+            icon = when {
+                _ty.isSelfCall -> LuaIcons.CLASS_METHOD
+                _ty.hasFlag(TyFlags.GLOBAL) -> LuaIcons.GLOBAL_FUNCTION
+                else -> LuaIcons.LOCAL_FUNCTION
+            }
+
+            handler = SignatureInsertHandler(_ty.mainSignature)
+        } else {
+            icon = LuaIcons.CLASS_FIELD
+        }
+
+        typeText = _ty.createTypeString()
+    }
+
+    override fun renderElement(presentation: LookupElementPresentation?) {
+        if (icon == null)
+            lazyInit()
+        super.renderElement(presentation)
+    }
+}
 
 abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boolean, val bodyOwner: LuaFuncBodyOwner, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
