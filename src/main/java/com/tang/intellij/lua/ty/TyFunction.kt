@@ -143,11 +143,11 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 }
 
-class TyPsiFunction(val selfCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
+class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
     init {
         this.flags = flags
-        if (psi is LuaClassMethodDef && !psi.isStatic) {
-            this.flags = this.flags and TyFlags.SELF_FUNCTION
+        if (selfCall) {
+            this.flags = this.flags or TyFlags.SELF_FUNCTION
         }
     }
 
