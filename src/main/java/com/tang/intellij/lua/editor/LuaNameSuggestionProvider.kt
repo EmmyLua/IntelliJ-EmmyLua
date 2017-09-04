@@ -21,6 +21,7 @@ import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.psi.codeStyle.SuggestedNameInfo
 import com.intellij.refactoring.rename.NameSuggestionProvider
 import com.tang.intellij.lua.psi.LuaNameDef
+import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.Ty
@@ -36,7 +37,7 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
     override fun getSuggestedNames(psiElement: PsiElement, psiElement1: PsiElement?, set: MutableSet<String>): SuggestedNameInfo? {
         if (psiElement is LuaNameDef) {
             val context = SearchContext(psiElement.getProject())
-            val typeSet = psiElement.guessType(context)
+            val typeSet = psiElement.guessTypeFromCache(context)
             if (!Ty.isInvalid(typeSet)) {
                 val classNames = HashSet<String>()
 

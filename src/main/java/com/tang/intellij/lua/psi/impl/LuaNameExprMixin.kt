@@ -94,7 +94,7 @@ open class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, Lua
                 }
                 return typeSet
             }
-            is LuaTypeGuessable -> return def.guessType(context)
+            is LuaTypeGuessable -> return def.guessTypeFromCache(context)
             else -> return Ty.UNKNOWN
         }
     }

@@ -143,7 +143,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
                 if (fieldDef === this)
                     return@Processor false
             }
-            set = set.union(fieldDef.guessType(context))
+            set = set.union(fieldDef.guessTypeFromCache(context))
             true
         })
 

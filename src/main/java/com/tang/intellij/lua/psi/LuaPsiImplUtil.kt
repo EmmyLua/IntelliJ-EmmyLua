@@ -153,7 +153,7 @@ object LuaPsiImplUtil {
                 type = TySerializedClass(stub.className)
             } else {
                 val expr = classMethodDef.classMethodName.expr
-                val ty = expr.guessType(ctx)
+                val ty = expr.guessTypeFromCache(ctx)
                 val perfect = TyUnion.getPrefectClass(ty)
                 if (perfect is ITyClass)
                     type = perfect
@@ -201,7 +201,7 @@ object LuaPsiImplUtil {
      */
     @JvmStatic fun guessPrefixType(callExpr: LuaCallExpr, context: SearchContext): ITy {
         val prefix = callExpr.firstChild as LuaExpr
-        return prefix.guessType(context)
+        return prefix.guessTypeFromCache(context)
     }
 
     /**
@@ -282,17 +282,17 @@ object LuaPsiImplUtil {
         val index = context.index
         if (exprList.size > index) {
             context.index = 0
-            return exprList[index].guessType(context)
+            return exprList[index].guessTypeFromCache(context)
         } else if (exprList.size == 1) {
             val exp0 = exprList[0]
-            return exp0.guessType(context)
+            return exp0.guessTypeFromCache(context)
         }
         return Ty.UNKNOWN
     }
 
     @JvmStatic fun guessPrefixType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
         val prefix = indexExpr.firstChild as LuaExpr
-        return prefix.guessType(context)
+        return prefix.guessTypeFromCache(context)
     }
 
     @JvmStatic fun getNameIdentifier(indexExpr: LuaIndexExpr): PsiElement? {
@@ -588,7 +588,7 @@ object LuaPsiImplUtil {
         //guess from value
         val lastChild = tableField.lastChild
         if (lastChild is LuaExpr) {
-            return lastChild.guessType(context)
+            return lastChild.guessTypeFromCache(context)
         }
         return Ty.UNKNOWN
     }

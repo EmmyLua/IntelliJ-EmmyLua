@@ -17,8 +17,12 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
+import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.SmartList
 import com.tang.intellij.lua.Constants
@@ -185,7 +189,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
     } else if (nameDef.parent is LuaTableField) {
         val field = nameDef.parent as LuaTableField
         val expr = PsiTreeUtil.findChildOfType(field, LuaExpr::class.java)
-        if (expr != null) typeSet = expr.guessType(context)
+        if (expr != null) typeSet = expr.guessTypeFromCache(context)
     } else {
         val localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef::class.java)
         if (localDef != null) {
@@ -270,7 +274,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     val argExprList = callExpr.args.exprList
                     val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
                     if (argExpr != null) {
-                        val set = argExpr.guessType(context)
+                        val set = argExpr.guessTypeFromCache(context)
                         val tyArray = TyUnion.find(set, ITyArray::class.java)
                         if (tyArray != null)
                             return tyArray.base
@@ -345,4 +349,14 @@ fun resolveRequireFile(pathString: String?, project: Project): LuaFile? {
             return psiFile
     }
     return null
+}
+
+private val GUESS_FROM_CACHE_KEY = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.ty.guess_from_cache")
+
+fun LuaTypeGuessable.guessTypeFromCache(searchContext: SearchContext): ITy {
+    val ty = CachedValuesManager.getManager(searchContext.project).getParameterizedCachedValue(this, GUESS_FROM_CACHE_KEY, { ctx ->
+        val ty = guessType(ctx)
+        CachedValueProvider.Result.create(ty, this)
+    }, false, searchContext)
+    return ty ?: Ty.UNKNOWN
 }

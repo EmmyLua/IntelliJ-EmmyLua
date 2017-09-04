@@ -64,7 +64,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
                 LuaPsiTreeUtil.walkUpLocalNameDef(indexExpr, {
                     val txt = it.text
                     if (nameText != txt && matcher.prefixMatches(txt)) {
-                        val typeSet = it.guessType(SearchContext(project))
+                        val typeSet = it.guessTypeFromCache(SearchContext(project))
                         if (!Ty.isInvalid(prefixTypeSet)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)

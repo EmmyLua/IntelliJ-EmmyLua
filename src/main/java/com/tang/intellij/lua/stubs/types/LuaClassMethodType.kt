@@ -23,6 +23,7 @@ import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaPsiImplUtil
+import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMethodStub
@@ -50,7 +51,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         var clazzName = expr.text
         val searchContext = SearchContext(methodDef.project).setCurrentStubFile(methodDef.containingFile)
 
-        val typeSet = expr.guessType(searchContext)
+        val typeSet = expr.guessTypeFromCache(searchContext)
         val type = TyUnion.getPrefectClass(typeSet)
         if (type != null)
             clazzName = type.className

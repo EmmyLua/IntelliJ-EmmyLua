@@ -58,7 +58,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
     private fun guessType(luaParenExpr: LuaParenExpr, context: SearchContext): ITy {
         val inner = luaParenExpr.expr
         if (inner != null)
-            return inner.guessType(context)
+            return inner.guessTypeFromCache(context)
         return Ty.UNKNOWN
     }
 
@@ -83,7 +83,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         }
 
         var ret: ITy = Ty.UNKNOWN
-        val ty = expr.guessType(context)
+        val ty = expr.guessTypeFromCache(context)
         TyUnion.each(ty) {
             when(it) {
                 is ITyFunction -> {

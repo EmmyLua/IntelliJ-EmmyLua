@@ -57,7 +57,7 @@ open class LuaTypeGuessableLookupElement(name: String, private val type: ITy, bo
 class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boolean)
     : LuaLookupElement(fieldName, bold, null) {
     private val ty: ITy by lazy {
-        field.guessType(SearchContext(field.project))
+        field.guessTypeFromCache(SearchContext(field.project))
     }
 
     private fun lazyInit() {
