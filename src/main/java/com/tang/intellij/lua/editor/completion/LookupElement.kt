@@ -19,6 +19,7 @@
 package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.lookup.LookupElementPresentation
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -42,7 +43,7 @@ open class LuaTypeGuessableLookupElement(name: String, private val type: ITy, bo
         if (typeString == null) {
             typeString = type.createTypeString()
             if (typeString == null) {
-                typeString = "any"
+                typeString = Constants.WORD_ANY
             }
         }
         return typeString
