@@ -24,6 +24,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyFunction
+import com.tang.intellij.lua.ty.TyUnion
 import com.tang.intellij.lua.ty.findPrefectSignature
 import com.tang.intellij.lua.ty.isSelfCall
 import java.util.*
@@ -44,7 +45,9 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             val exprList = args.exprList?.exprList
             if (exprList != null) {
                 val context = SearchContext(callExpr.getProject())
-                val ty = callExpr.guessPrefixType(context) as? ITyFunction ?: return list
+                val type = callExpr.guessPrefixType(context)
+                val ty = TyUnion.find(type, ITyFunction::class.java) ?: return list
+
                 // 是否是 inst:method() 被用为 inst.method(self) 形式
                 val isInstanceMethodUsedAsStaticMethod = ty.isSelfCall && callExpr.isStaticMethodCall
                 val isStaticMethodUsedAsInstanceMethod = !ty.isSelfCall && !callExpr.isStaticMethodCall

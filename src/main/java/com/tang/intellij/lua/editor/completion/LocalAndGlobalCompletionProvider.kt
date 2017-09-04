@@ -29,10 +29,7 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
-import com.tang.intellij.lua.ty.ITyFunction
-import com.tang.intellij.lua.ty.TyFlags
-import com.tang.intellij.lua.ty.hasFlag
-import com.tang.intellij.lua.ty.process
+import com.tang.intellij.lua.ty.*
 
 /**
  * suggest local/global vars and functions
@@ -64,15 +61,17 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
             }
             is LuaTypeGuessable -> {
                 val type = psi.guessType(SearchContext(psi.project))
-                if (type is ITyFunction) {
-                    addTy(type)
-                } else {
-                    var icon = LuaIcons.LOCAL_VAR
-                    if (psi is LuaParamNameDef)
-                        icon = LuaIcons.PARAMETER
+                TyUnion.each(type) {
+                    if (it is ITyFunction) {
+                        addTy(it)
+                    } else {
+                        var icon = LuaIcons.LOCAL_VAR
+                        if (psi is LuaParamNameDef)
+                            icon = LuaIcons.PARAMETER
 
-                    val elementBuilder = LuaTypeGuessableLookupElement(name, psi, false, icon)
-                    session.resultSet.addElement(elementBuilder)
+                        val elementBuilder = LuaTypeGuessableLookupElement(name, it, false, icon)
+                        session.resultSet.addElement(elementBuilder)
+                    }
                 }
             }
         }

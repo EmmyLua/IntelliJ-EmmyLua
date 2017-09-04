@@ -30,7 +30,7 @@ import javax.swing.Icon
  * Created by TangZX on 2017/5/22.
  */
 
-open class LuaTypeGuessableLookupElement(name: String, private val guessable: LuaTypeGuessable, bold: Boolean, icon: Icon)
+open class LuaTypeGuessableLookupElement(name: String, private val type: ITy, bold: Boolean, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
     private var typeString: String? = null
 
@@ -40,8 +40,7 @@ open class LuaTypeGuessableLookupElement(name: String, private val guessable: Lu
 
     override fun getTypeText(): String? {
         if (typeString == null) {
-            val set = guessable.guessType(SearchContext(guessable.project))
-            typeString = set.createTypeString()
+            typeString = type.createTypeString()
             if (typeString == null) {
                 typeString = "any"
             }
