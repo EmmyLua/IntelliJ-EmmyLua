@@ -20,13 +20,12 @@ import com.intellij.codeInsight.hints.InlayInfo
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyFunction
+import com.tang.intellij.lua.ty.findPrefectSignature
 import com.tang.intellij.lua.ty.isSelfCall
-import com.tang.intellij.lua.ty.process
 import java.util.*
 
 /**
@@ -51,14 +50,8 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
                 val isStaticMethodUsedAsInstanceMethod = !ty.isSelfCall && !callExpr.isStaticMethodCall
                 var paramIndex = 0
                 var argIndex = 0
-                var parameters: Array<LuaParamInfo> = emptyArray()
-                ty.process(Processor {
-                    if (it.params.size == exprList.size) {
-                        parameters = it.params
-                        return@Processor false
-                    }
-                    true
-                })
+                val sig = ty.findPrefectSignature(if (isInstanceMethodUsedAsStaticMethod) exprList.size - 1 else exprList.size)
+                val parameters: Array<LuaParamInfo> = sig.params
                 val paramCount = parameters.size
 
                 if (isStaticMethodUsedAsInstanceMethod)

@@ -23,7 +23,6 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
 import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
-import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
@@ -117,6 +116,21 @@ fun ITyFunction.process(processor: Processor<IFunSignature>) {
                 break
         }
     }
+}
+
+fun ITyFunction.findPrefectSignature(nArgs: Int): IFunSignature {
+    var sgi: IFunSignature? = null
+    var prefectN = Int.MAX_VALUE
+    process(Processor {
+        val offset = Math.abs(it.params.size - nArgs)
+        if (offset < prefectN) {
+            prefectN = offset
+            sgi = it
+            if (prefectN == 0) return@Processor false
+        }
+        true
+    })
+    return sgi ?: mainSignature
 }
 
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
