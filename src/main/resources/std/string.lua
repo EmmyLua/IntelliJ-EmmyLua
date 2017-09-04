@@ -153,10 +153,11 @@ function string.gmatch(s, pattern) end
 --- local t = {name="lua", version="5.1"}
 --- x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)
 --- -- > x="lua-5.1.tar.gz"
+---@overload fun(s:string, pattern:string, repl:table|fun()):void
 ---@param s string
 ---@param pattern string
 ---@param repl table|fun()
----@param optional n number
+---@param n number
 function string.gsub(s, pattern, repl, n) end
 
 ---
@@ -180,9 +181,10 @@ function string.lower(s) end
 --- it returns nil. If `pattern` specifies no captures, then the whole match
 --- is returned. A third, optional numerical argument `init` specifies where
 --- to start the search; its default value is 1 and can be negative.
+---@overload fun(s:string, pattern:string):void
 ---@param s string
 ---@param pattern string
----@param optional init number
+---@param init number
 function string.match(s, pattern, init) end
 
 ---

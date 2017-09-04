@@ -59,8 +59,9 @@ function dofile(filename) end
 --- `error` function was called. Level 2 points the error to where the function
 --- that called `error` was called; and so on. Passing a level 0 avoids the
 --- addition of error position information to the message.
+---@overload fun(message:string):void
 ---@param message string
----@param optional level number
+---@param level number
 function error(message, level) end
 
 ---
@@ -76,7 +77,9 @@ function error(message, level) end
 --- stack level: Level 1 is the function calling `getfenv`. If the given
 --- function is not a Lua function, or if `f` is 0, `getfenv` returns the
 --- global environment. The default for `f` is 1.
----@param optional f number
+---@overload fun():table
+---@param f number
+---@return table
 function getfenv(f) end
 
 ---
@@ -104,8 +107,9 @@ function ipairs(t) end
 --- is the global environment.
 --- `chunkname` is used as the chunk name for error messages and debug
 --- information. When absent, it defaults to "`=(load)`".
+---@overload fun(func:fun():string):void
 ---@param func fun():string
----@param optional chunkname string
+---@param chunkname string
 function load(func, chunkname) end
 
 ---
@@ -119,8 +123,9 @@ function loadfile(filename) end
 --- To load and run a given string, use the idiom
 --- assert(loadstring(s))()
 --- When absent, `chunkname` defaults to the given string.
+---@overload fun(string:string):void
 ---@param string string
----@param optional chunkname string
+---@param chunkname string
 function loadstring(string, chunkname) end
 
 ---
@@ -234,8 +239,9 @@ function setmetatable(table, metatable) end
 --- 11, and so forth, with '`Z`' representing 35. In base 10 (the default),
 --- the number can have a decimal part, as well as an optional exponent part
 --- (see §2.1). In other bases, only unsigned integers are accepted.
+---@overload fun(e:any):number
 ---@param e any
----@param optional base number
+---@param base number
 function tonumber(e, base) end
 
 ---
@@ -262,9 +268,10 @@ function type(v) end
 --- except that the above code can be written only for a fixed number of
 --- elements. By default, `i` is 1 and `j` is the length of the list, as
 --- defined by the length operator (see §2.5.5).
+---@overload fun(list:table):void
 ---@param list table
----@param optional i number
----@param optional j number
+---@param i number
+---@param j number
 function unpack(list, i, j) end
 
 ---

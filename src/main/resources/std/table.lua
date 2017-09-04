@@ -20,10 +20,11 @@ table = {}
 --- `sep` is the empty string, the default for `i` is 1, and the default for
 --- `j` is the length of the table. If `i` is greater than `j`, returns the
 --- empty string.
+---@overload fun(t:table, sep:string):string
 ---@param t table
 ---@param sep string
----@param optional i number
----@param optional j number
+---@param i number
+---@param j number
 ---@return string
 function table.concat(t, sep, i, j) end
 
@@ -32,8 +33,9 @@ function table.concat(t, sep, i, j) end
 --- other elements to open space, if necessary. The default value for `pos` is
 --- `n+1`, where `n` is the length of the table (see §2.5.5), so that a call
 --- `table.insert(t,x)` inserts `x` at the end of table `t`.
+---@overload fun(t:table, value:any):void
 ---@param t table
----@param optional pos number
+---@param pos number
 ---@param value any
 function table.insert(t, pos, value) end
 
@@ -51,8 +53,9 @@ function table.maxn(t) return 0 end
 --- element. The default value for `pos` is `n`, where `n` is the length of the
 --- table, so that a call `table.remove(t)` removes the last element of table
 --- `t`.
+---@overload fun(t:table):void
 ---@param t table
----@param optional pos number
+---@param pos number
 function table.remove(t, pos) end
 
 ---

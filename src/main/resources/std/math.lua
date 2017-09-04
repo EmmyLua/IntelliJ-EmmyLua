@@ -169,8 +169,9 @@ function math.rad(x) end
 --- `math.random` returns a uniform pseudo-random integer in the range *[1,
 --- m]*. When called with two integer numbers `m` and `n`, `math.random`
 --- returns a uniform pseudo-random integer in the range *[m, n]*.
----@param optional m number
----@param optional n number
+---@overload fun():number
+---@param m number
+---@param n number
 ---@return number
 function math.random(m, n) end
 

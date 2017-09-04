@@ -113,7 +113,9 @@ function io.flush() end
 --- called without parameters, it returns the current default input file.
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
----@param optional file string|file
+---@overload fun():number
+---@param file string|file
+---@return number
 function io.input(file) end
 
 ---
@@ -180,7 +182,7 @@ function io.tmpfile() end
 --- Checks whether `obj` is a valid file handle. Returns the string `"file"`
 --- if `obj` is an open file handle, `"closed file"` if `obj` is a closed file
 --- handle, or nil if `obj` is not a file handle.
-function io.type(obj) return "" or nil end
+function io.type(obj) end
 
 ---
 --- Equivalent to `io.output():write`.
