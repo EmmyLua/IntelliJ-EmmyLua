@@ -19,6 +19,7 @@ package com.tang.intellij.lua.codeInsight
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.parameterInfo.*
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaArgs
 import com.tang.intellij.lua.psi.LuaCallExpr
 import com.tang.intellij.lua.psi.LuaTypes
@@ -26,6 +27,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.process
 import java.util.*
 
 /**
@@ -52,7 +54,14 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
             val callExpr = luaArgs.parent as LuaCallExpr
             val type = callExpr.guessPrefixType(SearchContext(context.project))
             if (type is ITyFunction) {
-                context.itemsToShow = type.signatures + type.mainSignature
+                val list = mutableListOf<IFunSignature>()
+                type.process(Processor {
+                    if (it.params.isNotEmpty()) {
+                        list.add(it)
+                    }
+                    true
+                })
+                context.itemsToShow = list.toTypedArray()
             }
         }
         return luaArgs
@@ -105,7 +114,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
                 TyUnion.each(paramInfo.ty) {
                     typeNames.add(it.createTypeString())
                 }
-                sb.append(" : ")
+                sb.append(":")
                 sb.append(typeNames.joinToString("|"))
 
                 if (i == index)
