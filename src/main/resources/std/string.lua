@@ -51,10 +51,12 @@ function string.dump(func) end
 --- "magic". Note that if `plain` is given, then `init` must be given as well.
 --- If the pattern has captures, then in a successful match the captured values
 --- are also returned, after the two indices.
+---@overload fun(s:string, pattern:string):number, number
+---@overload fun(s:string, pattern:string, init:number):number, number
 ---@param s string
 ---@param pattern string
----@param optional init number
----@param optional plain boolean
+---@param init number
+---@param plain boolean
 ---@return number, number
 function string.find(s, pattern, init, plain) end
 
