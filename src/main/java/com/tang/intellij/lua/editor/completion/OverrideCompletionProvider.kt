@@ -77,6 +77,8 @@ class OverrideCompletionProvider : CompletionProvider<CompletionParameters>() {
 
     internal class OverrideInsertHandler(funcBodyOwner: LuaFuncBodyOwner) : FuncInsertHandler(funcBodyOwner) {
 
+        override val autoInsertParameters = true
+
         override fun createTemplate(manager: TemplateManager, paramNameDefList: Array<LuaParamInfo>): Template {
             val template = super.createTemplate(manager, paramNameDefList)
             template.addEndVariable()

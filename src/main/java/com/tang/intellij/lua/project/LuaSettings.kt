@@ -29,8 +29,15 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 @State(name = "LuaSettings", storages = arrayOf(Storage("emmy.xml")))
 class LuaSettings : PersistentStateComponent<LuaSettings> {
     var constructorNames: Array<String> = arrayOf("new", "get")
+
+    //Doc文档严格模式，对不合法的注解报错
     var isStrictDoc: Boolean = false
+
+    //在未匹配end的statement后回车会自动补全
     var isSmartCloseEnd: Boolean = true
+
+    //在代码完成时使用参数完成模板
+    var autoInsertParameters: Boolean = false
 
     override fun getState(): LuaSettings? {
         return this
