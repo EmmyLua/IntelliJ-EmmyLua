@@ -16,7 +16,10 @@
 
 package com.tang.intellij.lua.stubs.index
 
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StringStubIndexExtension
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
@@ -24,6 +27,10 @@ import com.tang.intellij.lua.ty.ITyClass
 
 class LuaClassMemberIndex : StringStubIndexExtension<LuaClassMember>() {
     override fun getKey() = StubKeys.CLASS_MEMBER
+
+    override fun get(s: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> {
+        return StubIndex.getElements(StubKeys.CLASS_MEMBER, s, project, scope, LuaClassMember::class.java)
+    }
 
     companion object {
         val instance = LuaClassMemberIndex()

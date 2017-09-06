@@ -27,7 +27,6 @@ import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.ty.*
 
@@ -82,18 +81,20 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         val cur = completionParameters.position
         val nameExpr = cur.parent
 
+        //module members
         if (nameExpr is LuaNameExpr) {
             val moduleName = nameExpr.moduleName
             if (moduleName != null) {
+                val ty = TyLazyClass(moduleName)
                 val context = SearchContext(nameExpr.project)
-                LuaClassMemberIndex.process(moduleName, context, Processor {
-                    if (it is LuaClassField) {
-                        addField(completionResultSet, completionResultSet.prefixMatcher, false, moduleName, it, null)
-                    } else if (it is LuaClassMethod) {
-                        addMethod(completionResultSet, completionResultSet.prefixMatcher, false, false, moduleName, it, null)
+                ty.lazyInit(context)
+                ty.processMembers(context) { curType, def ->
+                    if (def is LuaClassField) {
+                        addField(completionResultSet, completionResultSet.prefixMatcher, ty == curType, moduleName, def, null)
+                    } else if (def is LuaClassMethod) {
+                        addMethod(completionResultSet, completionResultSet.prefixMatcher, ty == curType, false, moduleName, def, null)
                     }
-                    true
-                })
+                }
             }
         }
 

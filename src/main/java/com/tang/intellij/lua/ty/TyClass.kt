@@ -23,6 +23,7 @@ import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 
 interface ITyClass : ITy {
@@ -30,6 +31,7 @@ interface ITyClass : ITy {
     var superClassName: String?
     var aliasName: String?
     fun lazyInit(searchContext: SearchContext)
+    fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit)
     fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit)
     fun processMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
     fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
@@ -50,6 +52,28 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     override fun hashCode(): Int {
         return className.hashCode()
+    }
+
+    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
+        val clazzName = className
+        val project = context.project
+
+        val memberIndex = LuaClassMemberIndex.instance
+        val list = memberIndex.get(clazzName, project, LuaPredefinedScope(project))
+
+        val alias = aliasName
+        if (alias != null) {
+            val classMembers = memberIndex.get(alias, project, LuaPredefinedScope(project))
+            list.addAll(classMembers)
+        }
+
+        for (member in list) {
+            processor(this, member)
+        }
+
+        // super
+        val superType = getSuperClass(context)
+        superType?.processMembers(context, processor)
     }
 
     override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {
