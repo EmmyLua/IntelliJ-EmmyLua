@@ -23,6 +23,7 @@ import com.intellij.openapi.util.Ref
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaFileType
@@ -31,6 +32,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFileStub
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyLazyClass
 
 /**
  * Created by TangZhiXu on 2015/11/15.
@@ -59,7 +61,7 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
             } else if (child is LuaCallStat) { // module("name")
                 val callExpr = child.expr as LuaCallExpr
                 val expr = callExpr.expr
-                if (expr is LuaNameExpr && expr.textMatches("module")) {
+                if (expr is LuaNameExpr && expr.textMatches(Constants.WORD_MODULE)) {
                     val stringArg = callExpr.firstStringArg
                     if (stringArg != null)
                         return stringArg.text
@@ -81,15 +83,19 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
 
     fun guessReturnedType(context: SearchContext): ITy {
         return RecursionManager.doPreventingRecursion(this, true) {
-            val set: ITy
-            val lastChild = lastChild
-            val returnStatRef = Ref.create<LuaReturnStat>()
-            LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) { luaReturnStat ->
-                returnStatRef.set(luaReturnStat)
-                false
+            val moduleName = this.moduleName
+            val ty:ITy = if (moduleName != null)
+                TyLazyClass(moduleName)
+            else {
+                val lastChild = lastChild
+                val returnStatRef = Ref.create<LuaReturnStat>()
+                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) { luaReturnStat ->
+                    returnStatRef.set(luaReturnStat)
+                    false
+                }
+                LuaPsiImplUtil.guessReturnTypeSet(returnStatRef.get(), 0, context)
             }
-            set = LuaPsiImplUtil.guessReturnTypeSet(returnStatRef.get(), 0, context)
-            set
+            ty
         } ?: Ty.UNKNOWN
     }
 }

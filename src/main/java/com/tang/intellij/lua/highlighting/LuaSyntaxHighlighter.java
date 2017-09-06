@@ -71,6 +71,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaDocTypes.TAG_PARAM,
             LuaDocTypes.TAG_RETURN,
             LuaDocTypes.CLASS,
+            LuaDocTypes.MODULE,
             LuaDocTypes.TYPE,
             LuaDocTypes.FIELD,
             LuaDocTypes.LANGUAGE,

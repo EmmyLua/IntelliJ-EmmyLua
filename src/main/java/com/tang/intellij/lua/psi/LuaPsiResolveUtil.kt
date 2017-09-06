@@ -54,9 +54,6 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
             }
             true
         })
-
-        /*val global = LuaGlobalIndex.find(refName, context)
-        if (global is LuaFuncBodyOwner) ret = global*/
     }
 
     return ret
@@ -281,6 +278,15 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                         }
                     }
                 }
+            }
+        }
+
+        // module fun
+        // function method(self) end
+        if (owner is LuaGlobalFuncDef && paramName == Constants.WORD_SELF) {
+            val moduleName = paramNameDef.moduleName
+            if (moduleName != null) {
+                return TyLazyClass(moduleName)
             }
         }
 
