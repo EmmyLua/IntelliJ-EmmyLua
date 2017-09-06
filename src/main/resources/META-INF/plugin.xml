@@ -17,7 +17,7 @@
 <idea-plugin>
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.1.0f4</version>
+    <version>1.1.9</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
