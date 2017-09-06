@@ -44,26 +44,31 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
 
     val moduleName: String?
         get() {
-            var child: PsiElement? = firstChild
-            while (child != null) {
-                if (child is LuaComment) { // ---@module name
-                    val classDef = PsiTreeUtil.getChildOfType(child, LuaDocClassDef::class.java)
-                    if (classDef != null && classDef.module != null) {
-                        return classDef.name
-                    }
-                } else if (child is LuaCallStat) { // module("name")
-                    val callExpr = child.expr as LuaCallExpr
-                    val expr = callExpr.expr
-                    if (expr is LuaNameExpr && expr.textMatches("module")) {
-                        val stringArg = callExpr.firstStringArg
-                        if (stringArg != null)
-                            return stringArg.text
-                    }
-                }
-                child = child.nextSibling
-            }
-            return null
+            val greenStub = greenStub as? LuaFileStub
+            return greenStub?.module ?: findModuleName()
         }
+
+    fun findModuleName():String? {
+        var child: PsiElement? = firstChild
+        while (child != null) {
+            if (child is LuaComment) { // ---@module name
+                val classDef = PsiTreeUtil.getChildOfType(child, LuaDocClassDef::class.java)
+                if (classDef != null && classDef.module != null) {
+                    return classDef.name
+                }
+            } else if (child is LuaCallStat) { // module("name")
+                val callExpr = child.expr as LuaCallExpr
+                val expr = callExpr.expr
+                if (expr is LuaNameExpr && expr.textMatches("module")) {
+                    val stringArg = callExpr.firstStringArg
+                    if (stringArg != null)
+                        return stringArg.text
+                }
+            }
+            child = child.nextSibling
+        }
+        return null
+    }
 
     /**
      * 获取最后返回的类型

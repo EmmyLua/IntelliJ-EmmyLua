@@ -32,6 +32,7 @@ import com.tang.intellij.lua.stubs.LuaGlobalFuncStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
@@ -107,7 +108,11 @@ class LuaGlobalFuncType : IStubElementType<LuaGlobalFuncStub, LuaGlobalFuncDef>(
         val moduleName = luaGlobalFuncStub.module
 
         indexSink.occurrence(LuaClassMethodIndex.KEY, moduleName)
-        indexSink.occurrence(LuaClassMethodIndex.KEY, moduleName + "." + name)
+        indexSink.occurrence(LuaClassMethodIndex.KEY, moduleName + "*" + name)
+
+        indexSink.occurrence(StubKeys.CLASS_MEMBER, moduleName)
+        indexSink.occurrence(StubKeys.CLASS_MEMBER, moduleName + "*" + name)
+
         indexSink.occurrence(LuaShortNameIndex.KEY, name)
         if (moduleName == Constants.WORD_G)
             indexSink.occurrence(LuaGlobalIndex.KEY, name)

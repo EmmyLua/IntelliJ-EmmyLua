@@ -27,6 +27,7 @@ import com.tang.intellij.lua.stubs.LuaTableFieldStub
 import com.tang.intellij.lua.stubs.LuaTableFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import java.io.IOException
 
 /**
@@ -74,6 +75,10 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
         if (fieldName != null && typeName != null) {
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName)
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "*" + fieldName)
+
+            indexSink.occurrence(StubKeys.CLASS_MEMBER, typeName)
+            indexSink.occurrence(StubKeys.CLASS_MEMBER, typeName + "*" + fieldName)
+
             indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
         }
     }

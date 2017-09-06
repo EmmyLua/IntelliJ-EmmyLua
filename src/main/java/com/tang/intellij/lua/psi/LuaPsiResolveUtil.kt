@@ -24,10 +24,12 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.Processor
 import com.intellij.util.SmartList
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.reference.LuaReference
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.ty.*
 
@@ -136,7 +138,10 @@ fun resolve(ref: LuaNameExpr, context: SearchContext): PsiElement? {
     val refName = ref.name
     //global
     if (resolveResult == null) {
-        resolveResult = LuaGlobalIndex.find(refName, context)
+        LuaClassMemberIndex.process(ref.moduleName ?: Constants.WORD_G, refName, context, Processor {
+            resolveResult = it
+            false
+        })
     }
 
     return resolveResult

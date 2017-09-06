@@ -23,6 +23,7 @@ import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.psi.tree.IStubFileElementType
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaFile
 import com.tang.intellij.lua.search.SearchContext
@@ -43,25 +44,21 @@ class LuaFileType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
                     return LuaFileStub(file)
                 return super.createStubForFile(file)
             }
-
-            /*@Override
-            public boolean skipChildProcessingWhenBuildingStubs(@NotNull ASTNode parent, @NotNull ASTNode node) {
-                IElementType type = node.getElementType();
-                return type == LuaTypes.BLOCK;
-            }*/
         }
     }
 
     @Throws(IOException::class)
     override fun serialize(stub: LuaFileStub, dataStream: StubOutputStream) {
+        dataStream.writeName(stub.module)
         val returnedType = stub.getReturnedType(SearchContext(stub.project))
         Ty.serialize(returnedType, dataStream)
     }
 
     @Throws(IOException::class)
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaFileStub {
+        val moduleRef = dataStream.readName()
         val typeSet = Ty.deserialize(dataStream)
-        return LuaFileStub(null, typeSet)
+        return LuaFileStub(null, StringRef.toString(moduleRef), typeSet)
     }
 
     override fun getExternalId() = "lua.file"
