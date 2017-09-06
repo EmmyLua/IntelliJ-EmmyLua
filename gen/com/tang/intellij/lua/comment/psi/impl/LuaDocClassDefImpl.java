@@ -91,4 +91,10 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
     return PsiTreeUtil.getChildOfType(this, LuaDocClassNameRef.class);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getModule() {
+    return findChildByType(MODULE);
+  }
+
 }

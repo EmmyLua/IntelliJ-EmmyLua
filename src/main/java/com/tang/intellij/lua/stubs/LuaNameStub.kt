@@ -28,21 +28,28 @@ import com.tang.intellij.lua.stubs.types.LuaNameType
  */
 interface LuaNameStub : StubElement<LuaNameExpr> {
     val name: String
+    val module: String
     val isGlobal: Boolean
 }
 
 class LuaNameStubImpl : StubBase<LuaNameExpr>, LuaNameStub {
 
+    override var module: String
+
     private var _nameExpr: LuaNameExpr? = null
     private var _name: String
     private var _isGlobal:Boolean = false
 
-    constructor(luaNameExpr: LuaNameExpr, parent: StubElement<*>, elementType: LuaNameType) : super(parent, elementType) {
+    constructor(luaNameExpr: LuaNameExpr, module: String, parent: StubElement<*>, elementType: LuaNameType)
+            : super(parent, elementType) {
+        this.module = module
         _nameExpr = luaNameExpr
         _name = luaNameExpr.name
     }
 
-    constructor(name: String, isGlobal: Boolean, stubElement: StubElement<*>, luaNameType: LuaNameType) : super(stubElement, luaNameType) {
+    constructor(name: String, module: String, isGlobal: Boolean, stubElement: StubElement<*>, luaNameType: LuaNameType)
+            : super(stubElement, luaNameType) {
+        this.module = module
         _name = name
         _isGlobal = isGlobal
     }

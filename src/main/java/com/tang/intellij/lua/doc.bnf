@@ -145,7 +145,7 @@ return_def ::= TAG_RETURN type_list comment_string? {
 class_name_ref ::= ID {
     methods = [getReference resolveType]
 }
-class_def ::= CLASS ID (EXTENDS class_name_ref)? comment_string? {
+class_def ::= (CLASS|MODULE) ID (EXTENDS class_name_ref)? comment_string? {
     pin = 2
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
@@ -163,6 +163,7 @@ class_def ::= CLASS ID (EXTENDS class_name_ref)? comment_string? {
         toString
 
         superClassNameRef = 'class_name_ref'
+        module = 'MODULE'
     ]
 }
 

@@ -38,4 +38,7 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
   @Nullable
   LuaDocClassNameRef getSuperClassNameRef();
 
+  @Nullable
+  PsiElement getModule();
+
 }

@@ -45,6 +45,7 @@ public interface LuaDocTypes {
   IElementType LANGUAGE = new LuaDocTokenType("language");
   IElementType LPAREN = new LuaDocTokenType("(");
   IElementType LT = new LuaDocTokenType("<");
+  IElementType MODULE = new LuaDocTokenType("module");
   IElementType OPTIONAL = new LuaDocTokenType("optional");
   IElementType OR = new LuaDocTokenType("|");
   IElementType OVERLOAD = new LuaDocTokenType("overload");

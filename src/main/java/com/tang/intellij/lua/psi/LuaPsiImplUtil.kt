@@ -249,7 +249,7 @@ object LuaPsiImplUtil {
             val exprList = args.exprList
             if (exprList != null) {
                 val list = exprList.exprList
-                if (list.size == 1 && list[0] is LuaLiteralExpr) {
+                if (list.isNotEmpty() && list[0] is LuaLiteralExpr) {
                     val valueExpr = list[0] as LuaLiteralExpr
                     val node = valueExpr.firstChild
                     if (node.node.elementType === LuaTypes.STRING) {

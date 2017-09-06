@@ -126,18 +126,30 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // CLASS ID (EXTENDS class_name_ref)? comment_string?
+  // (CLASS|MODULE) ID (EXTENDS class_name_ref)? comment_string?
   public static boolean class_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_def")) return false;
-    if (!nextTokenIs(b, CLASS)) return false;
+    if (!nextTokenIs(b, "<class def>", CLASS, MODULE)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, CLASS_DEF, null);
-    r = consumeTokens(b, 2, CLASS, ID);
+    Marker m = enter_section_(b, l, _NONE_, CLASS_DEF, "<class def>");
+    r = class_def_0(b, l + 1);
+    r = r && consumeToken(b, ID);
     p = r; // pin = 2
     r = r && report_error_(b, class_def_2(b, l + 1));
     r = p && class_def_3(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // CLASS|MODULE
+  private static boolean class_def_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_def_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, CLASS);
+    if (!r) r = consumeToken(b, MODULE);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   // (EXTENDS class_name_ref)?

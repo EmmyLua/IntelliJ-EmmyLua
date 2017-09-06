@@ -21,6 +21,7 @@ import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
+import com.tang.intellij.lua.psi.LuaFile
 import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
@@ -45,7 +46,9 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
     }
 
     override fun createStub(luaNameExpr: LuaNameExpr, stubElement: StubElement<*>): LuaNameStub {
-        return LuaNameStubImpl(luaNameExpr, stubElement, this)
+        val psiFile = luaNameExpr.containingFile
+        val module = if (psiFile is LuaFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
+        return LuaNameStubImpl(luaNameExpr, module, stubElement, this)
     }
 
     override fun getExternalId() = "lua.name_expr"
@@ -53,22 +56,26 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
     @Throws(IOException::class)
     override fun serialize(luaNameStub: LuaNameStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaNameStub.name)
+        stubOutputStream.writeName(luaNameStub.module)
         stubOutputStream.writeBoolean(luaNameStub.isGlobal)
     }
 
     @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameStub {
         val nameRef = stubInputStream.readName()
+        val moduleRef = stubInputStream.readName()
         val isGlobal = stubInputStream.readBoolean()
-        return LuaNameStubImpl(StringRef.toString(nameRef)!!, isGlobal, stubElement,this)
+        return LuaNameStubImpl(StringRef.toString(nameRef)!!, StringRef.toString(moduleRef)!!, isGlobal, stubElement,this)
     }
 
     override fun indexStub(luaNameStub: LuaNameStub, indexSink: IndexSink) {
         if (luaNameStub.isGlobal) {
-            indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G)
-            indexSink.occurrence(LuaClassFieldIndex.KEY, Constants.WORD_G + "*" + luaNameStub.name)
+            val module = luaNameStub.module
+            indexSink.occurrence(LuaClassFieldIndex.KEY, module)
+            indexSink.occurrence(LuaClassFieldIndex.KEY, module + "*" + luaNameStub.name)
 
-            indexSink.occurrence(LuaGlobalIndex.KEY, luaNameStub.name)
+            if (module == Constants.WORD_G)
+                indexSink.occurrence(LuaGlobalIndex.KEY, luaNameStub.name)
             indexSink.occurrence(LuaShortNameIndex.KEY, luaNameStub.name)
         }
     }

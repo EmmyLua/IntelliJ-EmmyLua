@@ -37,12 +37,15 @@ class LuaAnnotator : Annotator {
     private val luaVisitor = LuaElementVisitor()
     private val docVisitor = LuaDocElementVisitor()
     private val STD_MARKER = Key.create<Boolean>("lua.std.marker")
+    private var isModuleFile: Boolean = false
 
     override fun annotate(psiElement: PsiElement, annotationHolder: AnnotationHolder) {
         myHolder = annotationHolder
         if (psiElement is LuaDocPsiElement) {
             psiElement.accept(docVisitor)
         } else if (psiElement is LuaPsiElement) {
+            val psiFile = psiElement.containingFile
+            isModuleFile = if (psiFile is LuaFile) { psiFile.moduleName != null } else false
             psiElement.accept(luaVisitor)
         }
         myHolder = null
@@ -91,7 +94,7 @@ class LuaAnnotator : Annotator {
             val name = o.nameIdentifier
             if (name != null) {
                 val annotation = myHolder!!.createInfoAnnotation(name, null)
-                annotation.textAttributes = LuaHighlightingData.GLOBAL_FUNCTION
+                annotation.textAttributes = if (isModuleFile) LuaHighlightingData.INSTANCE_METHOD else LuaHighlightingData.GLOBAL_FUNCTION
             }
         }
 
@@ -148,10 +151,9 @@ class LuaAnnotator : Annotator {
                     val annotation = myHolder!!.createInfoAnnotation(o, null)
                     annotation.textAttributes = LuaHighlightingData.LOCAL_VAR
                     checkUpValue(o)
-                } else
-                /* if (res instanceof LuaNameRef) */ { // 未知的，视为Global
+                } else { // 未知的，视为Global
                     val annotation = myHolder!!.createInfoAnnotation(o, null)
-                    annotation.textAttributes = LuaHighlightingData.GLOBAL_VAR
+                    annotation.textAttributes = if (isModuleFile) LuaHighlightingData.FIELD else LuaHighlightingData.GLOBAL_VAR
                 }
             }
         }

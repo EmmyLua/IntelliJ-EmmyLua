@@ -21,6 +21,7 @@ import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.WhitespacesAndCommentsBinder;
 import com.intellij.lang.WhitespacesBinders;
 import com.intellij.lang.parser.GeneratedParserUtilBase;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
@@ -30,11 +31,28 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 @SuppressWarnings("unused")
 public class LuaParserUtil extends GeneratedParserUtilBase {
 
+    /**
+     * right:
+     * --- comment
+     * local obj
+     *
+     * wrong:
+     * --- comment
+     *
+     * local obj
+     */
     public static WhitespacesAndCommentsBinder MY_LEFT_COMMENT_BINDER = (list, b, tokenTextGetter) -> {
+        int lines = 0;
         for (int i = list.size() - 1; i >= 0; i--) {
             IElementType type = list.get(i);
             if (type == DOC_COMMENT) {
                 return i;
+            } else {
+                String sequence = String.valueOf(tokenTextGetter.get(i));
+                lines += StringUtil.getLineBreakCount(sequence);
+                if (lines > 1) {
+                    break;
+                }
             }
         }
         return list.size();

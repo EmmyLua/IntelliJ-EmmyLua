@@ -30,9 +30,11 @@ import com.tang.intellij.lua.ty.ITy
  */
 interface LuaGlobalFuncStub : LuaFuncBodyOwnerStub<LuaGlobalFuncDef> {
     val name: String
+    val module: String
 }
 
 class LuaGlobalFuncStubImpl(override val name: String,
+                            override val module: String,
                             override val params: Array<LuaParamInfo>,
                             override val returnTypeSet: ITy,
                             parent: StubElement<*>)
