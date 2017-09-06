@@ -33,7 +33,13 @@ class LuaClassMemberIndex : StringStubIndexExtension<LuaClassMember>() {
                 return false
             val all = LuaClassMemberIndex.instance.get(key, context.project, context.getScope())
             if (all.isEmpty()) return true
-            return all.any { processor.process(it) }
+            @Suppress("LoopToCallChain")
+            for (member in all) {
+                if (!processor.process(member)) {
+                    return false
+                }
+            }
+            return true
         }
 
         fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {

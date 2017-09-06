@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.tree.TokenSet
@@ -28,6 +27,7 @@ import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.ty.*
 
@@ -35,7 +35,7 @@ import com.tang.intellij.lua.ty.*
  * suggest local/global vars and functions
  * Created by TangZX on 2017/4/11.
  */
-class LocalAndGlobalCompletionProvider internal constructor(private val mask: Int) : CompletionProvider<CompletionParameters>() {
+class LocalAndGlobalCompletionProvider internal constructor(private val mask: Int) : ClassMemberCompletionProvider() {
 
     private fun has(flag: Int): Boolean {
         return mask and flag == flag
@@ -79,11 +79,28 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
     override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
         val session = completionParameters.editor.getUserData(CompletionSession.KEY)!!
+        val cur = completionParameters.position
+        val nameExpr = cur.parent
+
+        if (nameExpr is LuaNameExpr) {
+            val moduleName = nameExpr.moduleName
+            if (moduleName != null) {
+                val context = SearchContext(nameExpr.project)
+                LuaClassMemberIndex.process(moduleName, context, Processor {
+                    if (it is LuaClassField) {
+                        addField(completionResultSet, completionResultSet.prefixMatcher, false, moduleName, it, null)
+                    } else if (it is LuaClassMethod) {
+                        addMethod(completionResultSet, completionResultSet.prefixMatcher, false, false, moduleName, it, null)
+                    }
+                    true
+                })
+            }
+        }
+
         //local names
         val localNamesSet = mutableSetOf<String>()
 
         //local
-        val cur = completionParameters.position
         if (has(LOCAL_VAR)) {
             LuaPsiTreeUtil.walkUpLocalNameDef(cur) { nameDef ->
                 val name = nameDef.text

@@ -32,8 +32,8 @@ import com.tang.intellij.lua.ty.*
 
  * Created by tangzx on 2016/12/25.
  */
-class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>() {
-    private interface HandlerProcessor {
+open class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>() {
+    protected interface HandlerProcessor {
         fun process(element: LuaLookupElement)
     }
 
@@ -115,7 +115,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun addField(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
+    protected fun addField(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
         val name = field.fieldName
         if (name != null && prefixMatcher.prefixMatches(name)) {
             val elementBuilder = LuaFieldLookupElement(name, field, bold)
@@ -134,7 +134,7 @@ class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>()
         }
     }
 
-    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
+    protected fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
         if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
             if (useAsField) {

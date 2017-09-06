@@ -30,7 +30,6 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.reference.LuaReference
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.ty.*
 
 internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): LuaFuncBodyOwner? {
@@ -47,8 +46,17 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
 
     //global function
     if (ret == null) {
-        val global = LuaGlobalIndex.find(refName, context)
-        if (global is LuaFuncBodyOwner) ret = global
+        val module = ref.moduleName ?: Constants.WORD_G
+        LuaClassMemberIndex.process(module, refName, context, Processor {
+            if (it is LuaFuncBodyOwner) {
+                ret = it
+                return@Processor false
+            }
+            true
+        })
+
+        /*val global = LuaGlobalIndex.find(refName, context)
+        if (global is LuaFuncBodyOwner) ret = global*/
     }
 
     return ret
@@ -138,10 +146,20 @@ fun resolve(ref: LuaNameExpr, context: SearchContext): PsiElement? {
     val refName = ref.name
     //global
     if (resolveResult == null) {
-        LuaClassMemberIndex.process(ref.moduleName ?: Constants.WORD_G, refName, context, Processor {
-            resolveResult = it
-            false
-        })
+        val moduleName = ref.moduleName
+        if (moduleName != null) {
+            LuaClassMemberIndex.process(moduleName, refName, context, Processor {
+                resolveResult = it
+                false
+            })
+        }
+
+        if (resolveResult == null) {
+            LuaClassMemberIndex.process(Constants.WORD_G, refName, context, Processor {
+                resolveResult = it
+                false
+            })
+        }
     }
 
     return resolveResult
@@ -155,9 +173,11 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
         list.add(resolveResult)
     } else {
         val refName = ref.name
-        //global field
-        val globalVars = LuaGlobalIndex.findAll(refName, context)
-        list.addAll(globalVars)
+        val module = ref.moduleName ?: Constants.WORD_G
+        LuaClassMemberIndex.process(module, refName, context, Processor {
+            list.add(it)
+            true
+        })
     }
     return list.toTypedArray()
 }
