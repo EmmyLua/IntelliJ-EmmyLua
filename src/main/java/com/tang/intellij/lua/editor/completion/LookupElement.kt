@@ -132,6 +132,7 @@ class TyFunctionLookupElement(name: String, signature: IFunSignature, bold: Bool
             list.add(it.name)
         }
         itemText = lookupString + "(${list.joinToString(", ")})"
+        typeText = signature.returnTy.createReturnString()
     }
 
     override fun getObject(): Any {
