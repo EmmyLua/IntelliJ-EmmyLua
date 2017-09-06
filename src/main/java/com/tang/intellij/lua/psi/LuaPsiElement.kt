@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi;
+package com.tang.intellij.lua.psi
 
-import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.psi.PsiElement;
+import com.intellij.psi.NavigatablePsiElement
+import com.intellij.psi.PsiElement
 
 /**
  * LuaPsiElement
  * Created by TangZX on 2016/11/22.
  */
-public interface LuaPsiElement extends PsiElement, NavigatablePsiElement {
+interface LuaPsiElement : PsiElement, NavigatablePsiElement
+
+val LuaPsiElement.moduleName: String? get() {
+    val file = containingFile
+    if (file is LuaFile)
+        return file.moduleName
+    return null
 }
