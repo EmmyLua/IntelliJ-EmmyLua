@@ -61,6 +61,7 @@
         TYPE = 'type'
         LANGUAGE = 'language'
         OVERLOAD = 'overload'
+        MODULE = 'module'
   ]
 }
 
