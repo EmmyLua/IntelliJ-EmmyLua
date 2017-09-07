@@ -75,8 +75,12 @@ abstract class ArgsInsertHandler : InsertHandler<LookupElement> {
                 manager.startTemplate(editor, template)
             } else {
                 editor.document.insertString(insertionContext.selectionEndOffset, "()")
-                editor.caretModel.moveToOffset(insertionContext.selectionEndOffset - 1)
-                AutoPopupController.getInstance(insertionContext.project).autoPopupParameterInfo(editor, element)
+                if (getParams().isEmpty()) {
+                    editor.caretModel.moveToOffset(insertionContext.selectionEndOffset)
+                } else {
+                    editor.caretModel.moveToOffset(insertionContext.selectionEndOffset - 1)
+                    AutoPopupController.getInstance(insertionContext.project).autoPopupParameterInfo(editor, element)
+                }
             }
         }
     }
