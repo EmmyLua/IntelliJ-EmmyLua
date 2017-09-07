@@ -22,9 +22,7 @@ import com.intellij.openapi.util.RecursionManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaLanguage
@@ -54,17 +52,22 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
         var child: PsiElement? = firstChild
         while (child != null) {
             if (child is LuaComment) { // ---@module name
-                val classDef = PsiTreeUtil.getChildOfType(child, LuaDocClassDef::class.java)
-                if (classDef != null && classDef.module != null) {
-                    return classDef.name
+                val name = child.moduleName
+                if (name != null) return name
+            } else if (child is LuaStatement) {
+                val comment = child.comment
+                if (comment != null) {
+                    val name = comment.moduleName
+                    if (name != null) return name
                 }
-            } else if (child is LuaCallStat) { // module("name")
-                val callExpr = child.expr as LuaCallExpr
-                val expr = callExpr.expr
-                if (expr is LuaNameExpr && expr.textMatches(Constants.WORD_MODULE)) {
-                    val stringArg = callExpr.firstStringArg
-                    if (stringArg != null)
-                        return stringArg.text
+                if (child is LuaCallStat) { // module("name")
+                    val callExpr = child.expr as LuaCallExpr
+                    val expr = callExpr.expr
+                    if (expr is LuaNameExpr && expr.textMatches(Constants.WORD_MODULE)) {
+                        val stringArg = callExpr.firstStringArg
+                        if (stringArg != null)
+                            return stringArg.text
+                    }
                 }
             }
             child = child.nextSibling
