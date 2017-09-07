@@ -40,7 +40,7 @@ class KeywordInsertHandler internal constructor(private val keyWordToken: IEleme
         val file = insertionContext.file
         val project = insertionContext.project
         val document = insertionContext.document
-        val offset = insertionContext.startOffset
+        val offset = insertionContext.tailOffset
         val element = file.findElementAt(offset)
         if (element !is PsiWhiteSpace) {
             document.insertString(insertionContext.tailOffset, " ")
