@@ -141,7 +141,8 @@ class LuaAnnotator : Annotator {
                 checkUpValue(o)
             } else if (res is LuaGlobalFuncDef) {
                 val annotation = myHolder!!.createInfoAnnotation(o, null)
-                if (res.containingFile != o.containingFile || !isModuleFile)
+                val resolvedFile = res.containingFile
+                if (resolvedFile !is LuaFile || resolvedFile.moduleName == null)
                     annotation.textAttributes = LuaHighlightingData.GLOBAL_FUNCTION
             } else {
                 if (id.textMatches(Constants.WORD_SELF)) {
