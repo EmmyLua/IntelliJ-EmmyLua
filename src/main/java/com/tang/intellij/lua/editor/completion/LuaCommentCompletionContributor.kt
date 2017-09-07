@@ -44,6 +44,7 @@ class LuaCommentCompletionContributor : CompletionContributor() {
                 for (type in set.types) {
                     completionResultSet.addElement(LookupElementBuilder.create(type).withIcon(LuaIcons.ANNOTATION))
                 }
+                completionResultSet.stopHere()
             }
         })
 
