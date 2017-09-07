@@ -74,7 +74,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
                 if (table != null)
                     return@doPreventingRecursion table.getParamTy(1)
 
-                return@doPreventingRecursion Ty.UNKNOWN
+                //return@doPreventingRecursion Ty.UNKNOWN
             }
 
             //from @type annotation
@@ -85,15 +85,12 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
                     return@doPreventingRecursion set
             }
 
+            // xxx.yyy = zzz
             //guess from value
             var result: ITy = Ty.UNKNOWN
             // value type
             val stub = indexExpr.stub
-            val valueTy: ITy?
-            if (stub != null)
-                valueTy = stub.guessValueType()
-            else
-                valueTy = indexExpr.guessValueType(context)
+            val valueTy: ITy = stub?.guessValueType() ?: indexExpr.guessValueType(context)
 
             result = result.union(valueTy)
 
