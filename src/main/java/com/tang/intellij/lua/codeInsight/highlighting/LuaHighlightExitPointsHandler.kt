@@ -22,11 +22,9 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Consumer
+import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
-import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.*
-
-import java.util.Collections
 
 /**
 
@@ -67,6 +65,13 @@ class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: P
             val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
             if (returnDef != null)
                 addOccurrence(returnDef)
+
+            val overloads = PsiTreeUtil.findChildrenOfType(comment, LuaDocOverloadDef::class.java)
+            overloads.forEach {
+                val typeSet = it.functionTy?.typeSet
+                if (typeSet != null)
+                    addOccurrence(typeSet)
+            }
         }
     }
 }
