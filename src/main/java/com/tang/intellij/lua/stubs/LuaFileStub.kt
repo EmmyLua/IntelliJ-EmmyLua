@@ -24,6 +24,7 @@ import com.tang.intellij.lua.psi.LuaFile
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.types.LuaFileType
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 
 /**
 
@@ -56,6 +57,6 @@ class LuaFileStub : PsiFileStubImpl<LuaFile> {
             val returnedType = file!!.guessReturnedType(context)
             retTypeRef = Ref.create(returnedType)
         }
-        return retTypeRef?.get()!!
+        return retTypeRef?.get() ?: Ty.UNKNOWN
     }
 }
