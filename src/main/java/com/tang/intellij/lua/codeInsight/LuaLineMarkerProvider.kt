@@ -73,7 +73,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             // OverridenMethod
             val search = LuaOverridingMethodsSearch.search(methodDef)
             if (search.findFirst() != null) {
-                result.add(LineMarkerInfo(element,
+                result.add(LineMarkerInfo(methodDef,
                         element.textRange,
                         AllIcons.Gutter.OverridenMethod,
                         Pass.LINE_MARKERS,
@@ -162,7 +162,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
 
     companion object {
 
-        private val overridingMethodTooltipProvider = Function<LuaClassMethodName, String> {
+        private val overridingMethodTooltipProvider = Function<LuaClassMethod, String> {
             /*final StringBuilder builder = new StringBuilder("<html>Is overridden in:");
             LuaClassMethod methodDef = PsiTreeUtil.getParentOfType(methodName, LuaClassMethod.class);
             assert methodDef != null;
@@ -172,15 +172,14 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             "<html>Is overridden in"
         }
 
-        private val overridingMethodNavigator = object : LuaLineMarkerNavigator<LuaClassMethodName, LuaClassMethod>() {
+        private val overridingMethodNavigator = object : LuaLineMarkerNavigator<LuaClassMethod, LuaClassMethod>() {
 
-            override fun getTitle(elt: LuaClassMethodName): String {
+            override fun getTitle(elt: LuaClassMethod): String {
                 return "Choose Overriding Method of " + elt.name!!
             }
 
-            override fun search(elt: LuaClassMethodName): Query<LuaClassMethod>? {
-                val def = PsiTreeUtil.getParentOfType(elt, LuaClassMethod::class.java) ?: return null
-                return LuaOverridingMethodsSearch.search(def)
+            override fun search(elt: LuaClassMethod): Query<LuaClassMethod>? {
+                return LuaOverridingMethodsSearch.search(elt)
             }
         }
 
