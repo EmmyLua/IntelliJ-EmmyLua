@@ -39,6 +39,9 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     //在代码完成时使用参数完成模板
     var autoInsertParameters: Boolean = false
 
+    //class 方法上加横线
+    var showMethodLineSeparator: Boolean = true
+
     override fun getState(): LuaSettings? {
         return this
     }

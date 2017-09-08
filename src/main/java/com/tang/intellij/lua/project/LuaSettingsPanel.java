@@ -16,9 +16,12 @@
 
 package com.tang.intellij.lua.project;
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -36,12 +39,14 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JTextField constructorNames;
     private JCheckBox strictDoc;
     private JCheckBox smartCloseEnd;
+    private JCheckBox showClassMethodLineCheckBox;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
         constructorNames.setText(settings.getConstructorNamesString());
         strictDoc.setSelected(settings.isStrictDoc());
         smartCloseEnd.setSelected(settings.isSmartCloseEnd());
+        showClassMethodLineCheckBox.setSelected(settings.getShowMethodLineSeparator());
     }
 
     @NotNull
@@ -66,7 +71,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     public boolean isModified() {
         return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
                 settings.isStrictDoc() != strictDoc.isSelected() ||
-                settings.isSmartCloseEnd() != smartCloseEnd.isSelected();
+                settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
+                settings.getShowMethodLineSeparator() != showClassMethodLineCheckBox.isSelected();
     }
 
     @Override
@@ -75,5 +81,10 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         constructorNames.setText(settings.getConstructorNamesString());
         settings.setStrictDoc(strictDoc.isSelected());
         settings.setSmartCloseEnd(smartCloseEnd.isSelected());
+        settings.setShowMethodLineSeparator(showClassMethodLineCheckBox.isSelected());
+
+        for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+            DaemonCodeAnalyzer.getInstance(project).restart();
+        }
     }
 }

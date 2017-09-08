@@ -21,7 +21,10 @@ import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.editor.colors.CodeInsightColors
+import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.GutterIconRenderer
+import com.intellij.openapi.editor.markup.SeparatorPlacement
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
@@ -31,6 +34,7 @@ import com.intellij.util.FunctionUtil
 import com.intellij.util.Query
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
@@ -83,10 +87,12 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             }
 
             //line separator
-            /*LineMarkerInfo lineSeparator = new LineMarkerInfo<>(classMethodName, classMethodName.getNode().getStartOffset(), null, Pass.LINE_MARKERS, null, null);
-            lineSeparator.separatorColor = EditorColorsManager.getInstance().getGlobalScheme().getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR);
-            lineSeparator.separatorPlacement = SeparatorPlacement.TOP;
-            result.add(lineSeparator);*/
+            if (LuaSettings.instance.showMethodLineSeparator) {
+                val lineSeparator = LineMarkerInfo(element, element.getNode().startOffset, null, Pass.LINE_MARKERS, null, null)
+                lineSeparator.separatorColor = EditorColorsManager.getInstance().globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
+                lineSeparator.separatorPlacement = SeparatorPlacement.TOP
+                result.add(lineSeparator)
+            }
         } else if (element is LuaDocClassDef) {
             val classType = element.type
             val project = element.getProject()
