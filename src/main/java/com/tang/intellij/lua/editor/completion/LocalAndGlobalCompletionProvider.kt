@@ -144,13 +144,16 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         }
         //key words
         if (has(KEY_WORDS)) {
-            val keywords = TokenSet.orSet(KEYWORD_TOKENS, LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET)
-            for (keyWordToken in keywords.types) {
+            for (keyWordToken in KEYWORD_TOKENS.types) {
                 session.addWord(keyWordToken.toString())
 
                 completionResultSet.addElement(LookupElementBuilder.create(keyWordToken)
                         .withInsertHandler(KeywordInsertHandler(keyWordToken))
                 )
+            }
+            for (primitiveToken in LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET.types) {
+                session.addWord(primitiveToken.toString())
+                completionResultSet.addElement(LookupElementBuilder.create(primitiveToken))
             }
             completionResultSet.addElement(LookupElementBuilder.create(Constants.WORD_SELF))
         }
