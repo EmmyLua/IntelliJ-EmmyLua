@@ -21,7 +21,10 @@ package com.tang.intellij.lua.editor.completion
 import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaClassField
+import com.tang.intellij.lua.psi.LuaClassMethod
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner
+import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -90,13 +93,13 @@ class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boole
     }
 }
 
-abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boolean, val bodyOwner: LuaFuncBodyOwner, icon: Icon)
+abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boolean, private val bodyOwner: LuaFuncBodyOwner, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
     init {
         itemText = lookupString + signature
     }
 
-    var typeDesc: String? = null
+    private var typeDesc: String? = null
 
     override fun equals(other: Any?): Boolean {
         return other is LuaFunctionLookupElement && super.equals(other)
@@ -117,12 +120,6 @@ abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boo
 
 class LuaMethodLookupElement(name:String, signature: String, bold:Boolean, method: LuaClassMethod)
     : LuaFunctionLookupElement(name, signature, bold, method, LuaIcons.CLASS_METHOD)
-
-class LocalFunctionLookupElement(name:String, signature: String, method: LuaLocalFuncDef)
-    : LuaFunctionLookupElement(name, signature, false, method, LuaIcons.LOCAL_FUNCTION)
-
-class GlobalFunctionLookupElement(name:String, signature: String, method: LuaGlobalFuncDef)
-    : LuaFunctionLookupElement(name, signature, false, method, LuaIcons.GLOBAL_FUNCTION)
 
 class TyFunctionLookupElement(name: String, signature: IFunSignature, bold: Boolean, val ty: ITyFunction, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
