@@ -116,7 +116,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
     }
 
     protected fun addField(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
-        val name = field.fieldName
+        val name = field.name
         if (name != null && prefixMatcher.prefixMatches(name)) {
             val elementBuilder = LuaFieldLookupElement(name, field, bold)
             if (!LuaRefactoringUtil.isLuaIdentifier(name)) {

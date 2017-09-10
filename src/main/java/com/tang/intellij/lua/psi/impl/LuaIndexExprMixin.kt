@@ -36,7 +36,7 @@ import com.tang.intellij.lua.ty.*
 
  * Created by TangZX on 2017/4/12.
  */
-open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, LuaClassField {
+abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, LuaClassField {
 
     internal constructor(stub: LuaIndexStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
@@ -94,7 +94,7 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
 
             result = result.union(valueTy)
 
-            val propName = this.fieldName
+            val propName = indexExpr.name
             if (propName != null) {
                 val prefixType = indexExpr.guessPrefixType(context)
                 TyUnion.each(prefixType) {
@@ -150,13 +150,6 @@ open class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, L
             set = set.union(method.asTy(context))
 
         return set
-    }
-
-    override fun getFieldName(): String? {
-        val stub = stub
-        if (stub != null)
-            return stub.fieldName
-        return name
     }
 
     /**

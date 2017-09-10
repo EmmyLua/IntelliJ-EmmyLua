@@ -42,7 +42,7 @@ class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
             val type = methodDef.getClassType(searchContext)
             type?.processMembers(searchContext) { curType, member ->
                 if (member is LuaClassField) {
-                    val fieldName = member.fieldName
+                    val fieldName = member.name
                     if (fieldName != null) {
                         val elementBuilder = LuaFieldLookupElement("self." + fieldName, member, curType === type)
                         elementBuilder.setTailText("  [" + curType.displayName + "]")

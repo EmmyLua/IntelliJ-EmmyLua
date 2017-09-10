@@ -23,5 +23,5 @@ import com.intellij.navigation.NavigationItem;
  * Created by tangzx on 2016/12/21.
  */
 public interface LuaClassField extends LuaClassMember, NavigationItem {
-    String getFieldName();
+
 }

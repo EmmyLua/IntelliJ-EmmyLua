@@ -107,7 +107,7 @@ class LuaCommentCompletionContributor : CompletionContributor() {
                 if (classDef != null) {
                     val classType = classDef.type
                     classType.processFields(SearchContext(classDef.project)) { _, field ->
-                        completionResultSet.addElement(LookupElementBuilder.create(field.fieldName))
+                        completionResultSet.addElement(LookupElementBuilder.create(field.name!!))
                         Unit
                     }
                 }
