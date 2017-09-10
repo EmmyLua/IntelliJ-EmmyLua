@@ -57,7 +57,12 @@ class LuaClassFieldIndex : StringStubIndexExtension<LuaClassField>() {
                 return false
             val all = instance.get(key, context.project, context.getScope())
             if (all.isEmpty()) return true
-            return all.any { processor.process(it) }
+            @Suppress("LoopToCallChain")
+            for (field in all) {
+                if (!processor.process(field))
+                    return false
+            }
+            return true
         }
 
         fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassField>): Boolean {
