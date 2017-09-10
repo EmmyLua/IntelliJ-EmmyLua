@@ -21,6 +21,8 @@ import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
+import com.tang.intellij.lua.psi.LuaClassField
+import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaPsiImplUtil
 import com.tang.intellij.lua.search.SearchContext
@@ -38,22 +40,20 @@ class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
         if (methodDef != null && !methodDef.isStatic) {
             val searchContext = SearchContext(position.project)
             val type = methodDef.getClassType(searchContext)
-            if (type != null) {
-                type.processFields(searchContext) { curType, field ->
-                    val fieldName = field.fieldName
+            type?.processMembers(searchContext) { curType, member ->
+                if (member is LuaClassField) {
+                    val fieldName = member.fieldName
                     if (fieldName != null) {
-                        val elementBuilder = LuaFieldLookupElement("self." + fieldName, field, curType === type)
+                        val elementBuilder = LuaFieldLookupElement("self." + fieldName, member, curType === type)
                         elementBuilder.setTailText("  [" + curType.displayName + "]")
                         completionResultSet.addElement(elementBuilder)
                     }
-                }
-
-                type.processMethods(searchContext) { curType, def ->
-                    val methodName = def.name
+                } else if (member is LuaClassMethod) {
+                    val methodName = member.name
                     if (methodName != null) {
-                        LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
-                            val elementBuilder = LuaMethodLookupElement("self:" + methodName, signature, curType === type, def)
-                            elementBuilder.handler = FuncInsertHandler(def).withMask(mask)
+                        LuaPsiImplUtil.processOptional(member.params) { signature, mask ->
+                            val elementBuilder = LuaMethodLookupElement("self:" + methodName, signature, curType === type, member)
+                            elementBuilder.handler = FuncInsertHandler(member).withMask(mask)
                             elementBuilder.setTailText("  [" + curType.displayName + "]")
                             completionResultSet.addElement(elementBuilder)
                         }
