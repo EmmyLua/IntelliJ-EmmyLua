@@ -338,23 +338,22 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
          *
          * guess type for p1
          */
-        //fixme
-        /*if (owner is LuaCallStat) {
+        if (owner is LuaCallStat) {
             val closure = LuaPsiTreeUtil.getParentOfType(paramNameDef, LuaClosureExpr::class.java, LuaFuncBody::class.java)
             if (closure != null) {
                 val callExpr = owner.expr as LuaCallExpr
                 val type = callExpr.guessPrefixType(context)
-                //test
+                //todo mainSignature ?
                 if (type is ITyFunction) {
                     val closureIndex = callExpr.args.exprList!!.getIndexFor(closure)
-                    val paramTy = type.getParamTy(closureIndex)
+                    val paramTy = type.mainSignature.getParamTy(closureIndex)
                     if (paramTy is ITyFunction) {
                         val paramIndex = closure.getIndexFor(paramNameDef)
-                        return paramTy.getParamTy(paramIndex)
+                        return paramTy.mainSignature.getParamTy(paramIndex)
                     }
                 }
             }
-        }*/
+        }
     }
     return Ty.UNKNOWN
 }
