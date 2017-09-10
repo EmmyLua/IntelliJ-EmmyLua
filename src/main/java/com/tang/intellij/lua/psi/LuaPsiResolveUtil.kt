@@ -283,7 +283,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
 
         // module fun
         // function method(self) end
-        if (owner is LuaGlobalFuncDef && paramName == Constants.WORD_SELF) {
+        if (owner is LuaFuncDef && paramName == Constants.WORD_SELF) {
             val moduleName = paramNameDef.moduleName
             if (moduleName != null) {
                 return TyLazyClass(moduleName)

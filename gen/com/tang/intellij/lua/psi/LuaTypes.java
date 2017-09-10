@@ -26,7 +26,7 @@ public interface LuaTypes {
   IElementType FOR_A_STAT = LuaParserDefinition.createType("FOR_A_STAT");
   IElementType FOR_B_STAT = LuaParserDefinition.createType("FOR_B_STAT");
   IElementType FUNC_BODY = LuaParserDefinition.createType("FUNC_BODY");
-  IElementType GLOBAL_FUNC_DEF = LuaParserDefinition.createType("GLOBAL_FUNC_DEF");
+  IElementType FUNC_DEF = LuaParserDefinition.createType("FUNC_DEF");
   IElementType GOTO_STAT = LuaParserDefinition.createType("GOTO_STAT");
   IElementType IF_STAT = LuaParserDefinition.createType("IF_STAT");
   IElementType INDEX_EXPR = LuaParserDefinition.createType("INDEX_EXPR");
@@ -169,8 +169,8 @@ public interface LuaTypes {
       else if (type == FUNC_BODY) {
         return new LuaFuncBodyImpl(node);
       }
-      else if (type == GLOBAL_FUNC_DEF) {
-        return new LuaGlobalFuncDefImpl(node);
+      else if (type == FUNC_DEF) {
+        return new LuaFuncDefImpl(node);
       }
       else if (type == GOTO_STAT) {
         return new LuaGotoStatImpl(node);

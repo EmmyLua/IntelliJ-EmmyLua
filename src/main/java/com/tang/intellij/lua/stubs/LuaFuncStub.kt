@@ -19,7 +19,7 @@ package com.tang.intellij.lua.stubs
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.psi.LuaGlobalFuncDef
+import com.tang.intellij.lua.psi.LuaFuncDef
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.ty.ITy
@@ -28,14 +28,14 @@ import com.tang.intellij.lua.ty.ITy
 
  * Created by tangzx on 2016/11/26.
  */
-interface LuaGlobalFuncStub : LuaFuncBodyOwnerStub<LuaGlobalFuncDef> {
+interface LuaFuncStub : LuaFuncBodyOwnerStub<LuaFuncDef> {
     val name: String
     val module: String
 }
 
-class LuaGlobalFuncStubImpl(override val name: String,
-                            override val module: String,
-                            override val params: Array<LuaParamInfo>,
-                            override val returnTypeSet: ITy,
-                            parent: StubElement<*>)
-    : StubBase<LuaGlobalFuncDef>(parent, LuaTypes.GLOBAL_FUNC_DEF as IStubElementType<*, *>), LuaGlobalFuncStub
+class LuaFuncStubImpl(override val name: String,
+                      override val module: String,
+                      override val params: Array<LuaParamInfo>,
+                      override val returnTypeSet: ITy,
+                      parent: StubElement<*>)
+    : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub

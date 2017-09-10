@@ -162,25 +162,25 @@ object LuaPsiImplUtil {
         }, false, context)
     }
 
-    @JvmStatic fun getNameIdentifier(globalFuncDef: LuaGlobalFuncDef): PsiElement? {
-        return globalFuncDef.id
+    @JvmStatic fun getNameIdentifier(funcDef: LuaFuncDef): PsiElement? {
+        return funcDef.id
     }
 
-    @JvmStatic fun getName(globalFuncDef: LuaGlobalFuncDef): String? {
-        val stub = globalFuncDef.stub
+    @JvmStatic fun getName(funcDef: LuaFuncDef): String? {
+        val stub = funcDef.stub
         if (stub != null)
             return stub.name
-        return getName(globalFuncDef as PsiNameIdentifierOwner)
+        return getName(funcDef as PsiNameIdentifierOwner)
     }
 
-    @JvmStatic fun getPresentation(globalFuncDef: LuaGlobalFuncDef): ItemPresentation {
+    @JvmStatic fun getPresentation(funcDef: LuaFuncDef): ItemPresentation {
         return object : ItemPresentation {
             override fun getPresentableText(): String? {
-                return globalFuncDef.name!! + globalFuncDef.paramSignature
+                return funcDef.name!! + funcDef.paramSignature
             }
 
             override fun getLocationString(): String {
-                return globalFuncDef.containingFile.name
+                return funcDef.containingFile.name
             }
 
             override fun getIcon(b: Boolean): Icon? {
@@ -189,7 +189,7 @@ object LuaPsiImplUtil {
         }
     }
 
-    @JvmStatic fun getClassType(globalFuncDef: LuaGlobalFuncDef, searchContext: SearchContext): ITyClass {
+    @JvmStatic fun getClassType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass {
         return TyClass.G
     }
 

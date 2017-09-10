@@ -67,7 +67,7 @@ public class LuaElementType extends IElementType {
         }
     };
 
-    public static IStubElementType GLOBAL_FUNC_DEF = new LuaGlobalFuncType();
+    public static IStubElementType FUNC_DEF = new LuaFuncType();
     public static IStubElementType CLASS_METHOD_DEF = new LuaClassMethodType();
     public static IStubElementType CLASS_FIELD_DEF = new LuaDocClassFieldType();
     public static IStubElementType TYPE_DEF = new LuaDocTyType();

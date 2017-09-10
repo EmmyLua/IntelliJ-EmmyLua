@@ -53,7 +53,7 @@ class LuaFindUsagesProvider : FindUsagesProvider {
             return "Class"
         if (psiElement is LuaDocFieldDef)
             return "Class Field"
-        if (psiElement is LuaGlobalFuncDef)
+        if (psiElement is LuaFuncDef)
             return "Global Function"
         if (psiElement is LuaLocalFuncDef)
             return "Local Function"

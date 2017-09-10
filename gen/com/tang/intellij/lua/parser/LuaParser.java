@@ -72,8 +72,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == FUNC_BODY) {
       r = funcBody(b, 0);
     }
-    else if (t == GLOBAL_FUNC_DEF) {
-      r = globalFuncDef(b, 0);
+    else if (t == FUNC_DEF) {
+      r = funcDef(b, 0);
     }
     else if (t == GOTO_STAT) {
       r = gotoStat(b, 0);
@@ -548,14 +548,14 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // classMethodDef | globalFuncDef | localFuncDef | localDef
+  // classMethodDef | funcDef | localFuncDef | localDef
   static boolean defStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "defStat")) return false;
     if (!nextTokenIs(b, "", FUNCTION, LOCAL)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = classMethodDef(b, l + 1);
-    if (!r) r = globalFuncDef(b, l + 1);
+    if (!r) r = funcDef(b, l + 1);
     if (!r) r = localFuncDef(b, l + 1);
     if (!r) r = localDef(b, l + 1);
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
@@ -789,6 +789,20 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // 'function' ID funcBody
+  public static boolean funcDef(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "funcDef")) return false;
+    if (!nextTokenIs(b, FUNCTION)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, FUNC_DEF, null);
+    r = consumeTokens(b, 1, FUNCTION, ID);
+    p = r; // pin = 1
+    r = r && funcBody(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // '.' <<repeat checkFuncPrefix 1>> ID
   public static boolean funcPrefixRef(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "funcPrefixRef")) return false;
@@ -800,21 +814,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = r && consumeToken(b, ID);
     exit_section_(b, l, m, r, false, null);
     return r;
-  }
-
-  /* ********************************************************** */
-  // 'function' ID funcBody
-  public static boolean globalFuncDef(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "globalFuncDef")) return false;
-    if (!nextTokenIs(b, FUNCTION)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, GLOBAL_FUNC_DEF, null);
-    r = consumeTokens(b, 1, FUNCTION, ID);
-    p = r; // pin = 1
-    r = r && funcBody(b, l + 1);
-    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
   }
 
   /* ********************************************************** */

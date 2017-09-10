@@ -34,8 +34,8 @@ public class LuaBlockImpl extends ASTWrapperPsiElement implements LuaBlock {
 
   @Override
   @NotNull
-  public List<LuaGlobalFuncDef> getGlobalFuncDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaGlobalFuncDef.class);
+  public List<LuaFuncDef> getFuncDefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaFuncDef.class);
   }
 
   @Override

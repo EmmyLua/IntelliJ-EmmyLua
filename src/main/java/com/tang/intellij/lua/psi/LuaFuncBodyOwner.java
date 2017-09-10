@@ -50,7 +50,7 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
 
     @NotNull
     default ITyFunction asTy(SearchContext searchContext) {
-        if (this instanceof LuaGlobalFuncDef)
+        if (this instanceof LuaFuncDef)
             return new TyPsiFunction(false, this, searchContext, TyFlags.Companion.getGLOBAL());
         if (this instanceof LuaClassMethodDef) {
             LuaClassMethodDef classMethodDef = (LuaClassMethodDef) this;

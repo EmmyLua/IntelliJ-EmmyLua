@@ -9,7 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
+import com.tang.intellij.lua.stubs.LuaFuncStub;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
@@ -19,22 +19,22 @@ import com.tang.intellij.lua.ty.ITyClass;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaGlobalFuncDefImpl extends StubBasedPsiElementBase<LuaGlobalFuncStub> implements LuaGlobalFuncDef {
+public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> implements LuaFuncDef {
 
-  public LuaGlobalFuncDefImpl(LuaGlobalFuncStub stub, IStubElementType type) {
+  public LuaFuncDefImpl(LuaFuncStub stub, IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaGlobalFuncDefImpl(ASTNode node) {
+  public LuaFuncDefImpl(ASTNode node) {
     super(node);
   }
 
-  public LuaGlobalFuncDefImpl(LuaGlobalFuncStub stub, IElementType type, ASTNode node) {
+  public LuaFuncDefImpl(LuaFuncStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
-    visitor.visitGlobalFuncDef(this);
+    visitor.visitFuncDef(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

@@ -88,8 +88,8 @@ class LuaFileElement(private val file: LuaFile) : StructureViewTreeElement {
                 list.add(LuaAssignElement(o))
             }
 
-            override fun visitGlobalFuncDef(o: LuaGlobalFuncDef) {
-                list.add(LuaGlobalFuncElement(o))
+            override fun visitFuncDef(o: LuaFuncDef) {
+                list.add(LuaFuncElement(o))
             }
 
             override fun visitElement(element: PsiElement?) {

@@ -5,14 +5,14 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaGlobalFuncStub;
+import com.tang.intellij.lua.stubs.LuaFuncStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.tang.intellij.lua.ty.ITyClass;
 
-public interface LuaGlobalFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement, LuaGlobal, StubBasedPsiElement<LuaGlobalFuncStub> {
+public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement, LuaGlobal, StubBasedPsiElement<LuaFuncStub> {
 
   @Nullable
   LuaFuncBody getFuncBody();

@@ -11,7 +11,7 @@ public interface LuaBlock extends LuaPsiElement {
   List<LuaClassMethodDef> getClassMethodDefList();
 
   @NotNull
-  List<LuaGlobalFuncDef> getGlobalFuncDefList();
+  List<LuaFuncDef> getFuncDefList();
 
   @NotNull
   List<LuaLocalDef> getLocalDefList();

@@ -90,7 +90,7 @@ class LuaAnnotator : Annotator {
             }
         }
 
-        override fun visitGlobalFuncDef(o: LuaGlobalFuncDef) {
+        override fun visitFuncDef(o: LuaFuncDef) {
             val name = o.nameIdentifier
             if (name != null) {
                 val annotation = myHolder!!.createInfoAnnotation(name, null)
@@ -139,7 +139,7 @@ class LuaAnnotator : Annotator {
                 val annotation = myHolder!!.createInfoAnnotation(o, null)
                 annotation.textAttributes = LuaHighlightingData.PARAMETER
                 checkUpValue(o)
-            } else if (res is LuaGlobalFuncDef) {
+            } else if (res is LuaFuncDef) {
                 val annotation = myHolder!!.createInfoAnnotation(o, null)
                 val resolvedFile = res.containingFile
                 if (resolvedFile !is LuaFile || resolvedFile.moduleName == null)

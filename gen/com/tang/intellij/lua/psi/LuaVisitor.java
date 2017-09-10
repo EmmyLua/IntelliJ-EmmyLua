@@ -90,7 +90,7 @@ public class LuaVisitor extends PsiElementVisitor {
     visitIndentRange(o);
   }
 
-  public void visitGlobalFuncDef(@NotNull LuaGlobalFuncDef o) {
+  public void visitFuncDef(@NotNull LuaFuncDef o) {
     visitClassMethod(o);
     // visitDeclaration(o);
     // visitStatement(o);
