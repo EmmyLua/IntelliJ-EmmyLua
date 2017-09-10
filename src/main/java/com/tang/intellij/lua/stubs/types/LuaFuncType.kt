@@ -21,10 +21,7 @@ import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.psi.LuaFile
-import com.tang.intellij.lua.psi.LuaFuncDef
-import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.psi.LuaPsiImplUtil
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaFuncDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncStub
@@ -63,7 +60,7 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val element = node.psi
         if (element is LuaFuncDef) {
-            return element.nameIdentifier != null
+            return element.nameIdentifier != null && element.forwardDeclaration == null
         }
         return false
     }
