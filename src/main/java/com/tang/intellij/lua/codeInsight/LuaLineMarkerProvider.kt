@@ -88,7 +88,9 @@ class LuaLineMarkerProvider : LineMarkerProvider {
 
             //line separator
             if (LuaSettings.instance.showMethodLineSeparator) {
-                val lineSeparator = LineMarkerInfo(element, element.getNode().startOffset, null, Pass.LINE_MARKERS, null, null)
+                //todo : module file method
+                val startOffset = methodDef.node.startOffset
+                val lineSeparator = LineMarkerInfo(element, TextRange(startOffset, startOffset), null, Pass.LINE_MARKERS, null, null, GutterIconRenderer.Alignment.RIGHT)
                 lineSeparator.separatorColor = EditorColorsManager.getInstance().globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
                 lineSeparator.separatorPlacement = SeparatorPlacement.TOP
                 result.add(lineSeparator)
