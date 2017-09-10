@@ -93,11 +93,10 @@ class CreateMethodIntention : BaseIntentionAction() {
         if (!methods.isEmpty()) {
             val methodDef = methods.iterator().next()
             if (methodDef is LuaClassMethodDef) {
-                val def = methodDef
-                val expr = def.classMethodName.expr
+                val expr = methodDef.classMethodName.expr
                 val textRange = methodDef.getTextRange()
                 val position = InsertPosition()
-                position.offset = textRange.getEndOffset()
+                position.offset = textRange.endOffset
                 position.prefix = expr.text
                 return position
             }
