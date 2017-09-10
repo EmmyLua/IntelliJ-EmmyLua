@@ -32,6 +32,7 @@ interface ITyClass : ITy {
     var aliasName: String?
     fun lazyInit(searchContext: SearchContext)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit)
+    fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
     fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit)
     fun processMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
     fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
@@ -74,6 +75,10 @@ abstract class TyClass(override val className: String, override var superClassNa
         // super
         val superType = getSuperClass(context)
         superType?.processMembers(context, processor)
+    }
+
+    override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        return LuaClassMemberIndex.find(this, name, searchContext)
     }
 
     override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {

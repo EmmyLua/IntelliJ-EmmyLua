@@ -192,12 +192,7 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
     var ret: PsiElement? = null
     TyUnion.process(typeSet) { type ->
         if (type is TyClass) {
-            //属性
-            ret = type.findField(idString, context)
-            if (ret != null)
-                return@process false
-            //方法
-            ret = type.findMethod(idString, context)
+            ret = type.findMember(idString, context)
             if (ret != null)
                 return@process false
         }
