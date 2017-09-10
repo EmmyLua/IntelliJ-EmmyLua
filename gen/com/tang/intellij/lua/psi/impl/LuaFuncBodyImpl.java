@@ -32,4 +32,10 @@ public class LuaFuncBodyImpl extends ASTWrapperPsiElement implements LuaFuncBody
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaParamNameDef.class);
   }
 
+  @Override
+  @NotNull
+  public PsiElement getRparen() {
+    return notNullChild(findChildByType(RPAREN));
+  }
+
 }

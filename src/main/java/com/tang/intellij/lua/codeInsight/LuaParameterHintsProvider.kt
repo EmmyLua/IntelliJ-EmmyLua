@@ -18,15 +18,13 @@ package com.tang.intellij.lua.codeInsight
 
 import com.intellij.codeInsight.hints.InlayInfo
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider
+import com.intellij.codeInsight.hints.Option
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITyFunction
-import com.tang.intellij.lua.ty.TyUnion
-import com.tang.intellij.lua.ty.findPrefectSignature
-import com.tang.intellij.lua.ty.isSelfCall
+import com.tang.intellij.lua.ty.*
 import java.util.*
 
 /**
@@ -34,13 +32,14 @@ import java.util.*
  * Created by TangZX on 2016/12/14.
  */
 class LuaParameterHintsProvider : InlayParameterHintsProvider {
-
+    private val TYPE_INFO_PREFIX = "@TYPE@"
     private var EXPR_HINT = arrayOf(LuaLiteralExpr::class.java, LuaBinaryExpr::class.java, LuaUnaryExpr::class.java, LuaClosureExpr::class.java)
 
-    override fun getParameterHints(callExpr: PsiElement): List<InlayInfo> {
+    override fun getParameterHints(psi: PsiElement): List<InlayInfo> {
         val list = ArrayList<InlayInfo>()
-        if (callExpr is LuaCallExpr) {
-
+        if (psi is LuaCallExpr) {
+            @Suppress("UnnecessaryVariable")
+            val callExpr = psi
             val args = callExpr.args
             val exprList = args.exprList?.exprList
             if (exprList != null) {
@@ -74,6 +73,31 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
                 }
             }
         }
+        else if (psi is LuaParamNameDef) {
+            if (PARAMETER_TYPE_HINT.get()) {
+                val type = psi.guessType(SearchContext(psi.project))
+                if (!Ty.isInvalid(type)) {
+                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", psi.textOffset + psi.textLength))
+                }
+            }
+        }
+        else if (psi is LuaNameDef) {
+            if (LOCAL_VARIABLE_HINT.get()) {
+                val type = psi.guessType(SearchContext(psi.project))
+                if (!Ty.isInvalid(type)) {
+                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", psi.textOffset + psi.textLength))
+                }
+            }
+        }
+        else if (psi is LuaFuncBodyOwner) {
+            val paren = psi.funcBody?.rparen
+            if (FUNCTION_HINT.get() && paren != null) {
+                val type = psi.guessReturnTypeSet(SearchContext(psi.project))
+                if (!Ty.isInvalid(type)) {
+                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", paren.textOffset + paren.textLength))
+                }
+            }
+        }
 
         return list
     }
@@ -86,11 +110,24 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
 
     override fun isBlackListSupported() = false
 
-    /*val isDoNotShowIfMethodNameContainsParameterName = Option("java.method.name.contains.parameter.name",
-            "Do not show if method name contains parameter name",
-            true)
+    private val LOCAL_VARIABLE_HINT = Option("lua.hints.show_local_var_type",
+            "Show local variable type hints",
+            false)
+    private val PARAMETER_TYPE_HINT = Option("lua.hints.show_parameter_type",
+            "Show parameter type hints",
+            false)
+    private val FUNCTION_HINT = Option("lua.hints.show_function_type",
+            "Show function return type hints",
+            false)
 
     override fun getSupportedOptions(): List<Option> {
-        return listOf(isDoNotShowIfMethodNameContainsParameterName)
-    }*/
+        return listOf(LOCAL_VARIABLE_HINT, PARAMETER_TYPE_HINT, FUNCTION_HINT)
+    }
+
+    override fun getInlayPresentation(inlayText: String): String {
+        if (inlayText.startsWith(TYPE_INFO_PREFIX)) {
+            return ":${inlayText.substring(TYPE_INFO_PREFIX.length)}"
+        }
+        return "$inlayText:"
+    }
 }

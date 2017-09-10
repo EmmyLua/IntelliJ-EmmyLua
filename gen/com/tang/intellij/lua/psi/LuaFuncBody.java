@@ -10,4 +10,7 @@ public interface LuaFuncBody extends LuaIndentRange {
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
+  @NotNull
+  PsiElement getRparen();
+
 }

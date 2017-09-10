@@ -425,6 +425,9 @@ funcBody ::= '(' (parList)? ')' lazy_block? 'end' {
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
+    methods = [
+        RPAREN = 'RPAREN'
+    ]
 }
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...' { recoverWhile = parList_recover }
