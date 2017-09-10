@@ -31,6 +31,19 @@ class LuaReferenceContributor : PsiReferenceContributor() {
         psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.INDEX_EXPR), IndexExprReferenceProvider())
         psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.NAME_EXPR), NameReferenceProvider())
         psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.GOTO_STAT), GotoReferenceProvider())
+        psiReferenceRegistrar.registerReferenceProvider(psiElement().withElementType(LuaTypes.FUNC_DEF), FuncReferenceProvider())
+    }
+
+    internal inner class FuncReferenceProvider : PsiReferenceProvider() {
+        override fun getReferencesByElement(psiElement: PsiElement, processingContext: ProcessingContext): Array<PsiReference> {
+            if (psiElement is LuaFuncDef) {
+                val forwardDeclaration = psiElement.forwardDeclaration
+                if (forwardDeclaration != null) {
+                    return arrayOf(LuaFuncForwardDecReference(psiElement, forwardDeclaration))
+                }
+            }
+            return PsiReference.EMPTY_ARRAY
+        }
     }
 
     internal inner class GotoReferenceProvider : PsiReferenceProvider() {

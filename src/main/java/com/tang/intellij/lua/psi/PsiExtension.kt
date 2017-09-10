@@ -16,9 +16,11 @@
 
 package com.tang.intellij.lua.psi
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.getTableTypeName
 
 /**
@@ -171,4 +173,20 @@ val LuaTableExpr.shouldCreateStub: Boolean get() {
         }
         else-> true
     }
+}
+
+val LuaFuncDef.forwardDeclaration: PsiElement? get() {
+    val refName = name
+    if (refName != null) {
+        return resolveLocal(refName, this, SearchContext(project))
+    }
+    return null
+}
+
+val LuaFuncDef.isGlobal: Boolean get() {
+    if (forwardDeclaration != null)
+        return false
+    if (moduleName != null)
+        return false
+    return true
 }

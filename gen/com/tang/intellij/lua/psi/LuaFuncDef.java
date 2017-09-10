@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaFuncStub;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
@@ -48,5 +49,8 @@ public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement
 
   @NotNull
   LuaParamInfo[] getParams();
+
+  @NotNull
+  PsiReference[] getReferences();
 
 }

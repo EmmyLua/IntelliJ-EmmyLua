@@ -245,6 +245,7 @@ funcDef ::= 'function' ID funcBody {
         guessReturnTypeSet
         getClassType
         getParams
+        getReferences
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaFuncStub"
 }

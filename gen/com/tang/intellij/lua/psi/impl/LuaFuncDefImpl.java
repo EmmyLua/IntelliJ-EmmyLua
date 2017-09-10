@@ -12,6 +12,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaFuncStub;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
@@ -106,6 +107,11 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
   @NotNull
   public LuaParamInfo[] getParams() {
     return LuaPsiImplUtil.getParams(this);
+  }
+
+  @NotNull
+  public PsiReference[] getReferences() {
+    return LuaPsiImplUtil.getReferences(this);
   }
 
 }

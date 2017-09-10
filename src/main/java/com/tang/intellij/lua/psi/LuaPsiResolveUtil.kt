@@ -60,8 +60,11 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
 }
 
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? {
+    return resolveLocal(ref.name, ref, context)
+}
+
+fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
-    val refName = ref.name
 
     if (refName == Constants.WORD_SELF) {
         val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
