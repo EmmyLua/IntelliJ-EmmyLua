@@ -148,6 +148,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
                     }
                     is LuaDocClassDef -> renderClassDef(sb, child)
                     is LuaDocOverloadDef -> renderOverload(sb, child)
+                    is LuaDocTypeDef -> renderTypeDef(sb, child)
                     else -> {
                         val elementType = child.node.elementType
                         if (elementType === LuaDocTypes.STRING) {
@@ -210,5 +211,9 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
     private fun renderOverload(sb: StringBuilder, overloadDef: LuaDocOverloadDef) {
         sb.append("<li><b>overload</b> ")
         sb.append(overloadDef.functionTy.toString())
+    }
+
+    private fun renderTypeDef(sb: StringBuilder, typeDef: LuaDocTypeDef) {
+        sb.append(typeDef.type.createTypeString())
     }
 }
