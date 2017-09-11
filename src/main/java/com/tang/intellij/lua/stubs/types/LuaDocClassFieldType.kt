@@ -85,9 +85,9 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
         className ?: return
 
         indexSink.occurrence(LuaClassFieldIndex.KEY, className)
-        indexSink.occurrence(LuaClassFieldIndex.KEY, className + "*" + luaFieldStub.name)
+        indexSink.occurrence(LuaClassFieldIndex.KEY, "$className*${luaFieldStub.name}")
         indexSink.occurrence(StubKeys.CLASS_MEMBER, className)
-        indexSink.occurrence(StubKeys.CLASS_MEMBER, className + "*" + luaFieldStub.name)
+        indexSink.occurrence(StubKeys.CLASS_MEMBER, "$className*${luaFieldStub.name}")
         indexSink.occurrence(LuaShortNameIndex.KEY, luaFieldStub.name)
     }
 }

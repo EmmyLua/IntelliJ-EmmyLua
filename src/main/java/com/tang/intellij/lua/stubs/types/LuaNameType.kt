@@ -73,10 +73,10 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
         if (luaNameStub.isGlobal) {
             val module = luaNameStub.module
             indexSink.occurrence(LuaClassFieldIndex.KEY, module)
-            indexSink.occurrence(LuaClassFieldIndex.KEY, module + "*" + luaNameStub.name)
+            indexSink.occurrence(LuaClassFieldIndex.KEY, "$module*${luaNameStub.name}")
 
             indexSink.occurrence(StubKeys.CLASS_MEMBER, module)
-            indexSink.occurrence(StubKeys.CLASS_MEMBER, module + "*" + luaNameStub.name)
+            indexSink.occurrence(StubKeys.CLASS_MEMBER, "$module*${luaNameStub.name}")
 
             if (module == Constants.WORD_G)
                 indexSink.occurrence(LuaGlobalIndex.KEY, luaNameStub.name)

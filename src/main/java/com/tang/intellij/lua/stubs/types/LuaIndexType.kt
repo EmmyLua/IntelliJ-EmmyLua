@@ -79,10 +79,10 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
         val typeName = indexStub.typeName
         if (typeName != null && fieldName != null) {
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName)
-            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName + "*" + fieldName)
+            indexSink.occurrence(LuaClassFieldIndex.KEY, "$typeName*$fieldName")
 
             indexSink.occurrence(StubKeys.CLASS_MEMBER, typeName)
-            indexSink.occurrence(StubKeys.CLASS_MEMBER, typeName + "*" + fieldName)
+            indexSink.occurrence(StubKeys.CLASS_MEMBER, "$typeName*$fieldName")
 
             indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
             if (typeName == Constants.WORD_G) {

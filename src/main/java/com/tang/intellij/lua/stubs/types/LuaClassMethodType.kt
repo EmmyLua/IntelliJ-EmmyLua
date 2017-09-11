@@ -125,6 +125,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
             indexSink.occurrence(LuaClassMethodIndex.KEY, className)
 
             indexSink.occurrence(StubKeys.CLASS_MEMBER, className)
+            indexSink.occurrence(StubKeys.CLASS_MEMBER, "$className*$shortName")
         }
         indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
     }

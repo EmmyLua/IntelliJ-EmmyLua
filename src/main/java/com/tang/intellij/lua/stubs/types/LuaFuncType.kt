@@ -105,10 +105,10 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
         val moduleName = luaGlobalFuncStub.module
 
         indexSink.occurrence(LuaClassMethodIndex.KEY, moduleName)
-        indexSink.occurrence(LuaClassMethodIndex.KEY, moduleName + "*" + name)
+        indexSink.occurrence(LuaClassMethodIndex.KEY, "$moduleName*$name")
 
         indexSink.occurrence(StubKeys.CLASS_MEMBER, moduleName)
-        indexSink.occurrence(StubKeys.CLASS_MEMBER, moduleName + "*" + name)
+        indexSink.occurrence(StubKeys.CLASS_MEMBER, "$moduleName*$name")
 
         indexSink.occurrence(LuaShortNameIndex.KEY, name)
         if (moduleName == Constants.WORD_G)
