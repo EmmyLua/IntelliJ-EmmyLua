@@ -50,7 +50,7 @@ class LuaClassMemberIndex : StringStubIndexExtension<LuaClassMember>() {
         }
 
         fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
-            val key = className + "*" + fieldName
+            val key = "$className*$fieldName"
             if (process(key, context, processor)) {
                 // from supper
                 val classDef = LuaClassIndex.find(className, context)
