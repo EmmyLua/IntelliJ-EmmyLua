@@ -798,6 +798,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = consumeTokens(b, 1, FUNCTION, ID);
     p = r; // pin = 1
     r = r && funcBody(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
