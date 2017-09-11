@@ -108,7 +108,7 @@ abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boo
     override fun getTypeText(): String? {
         if (typeDesc == null) {
             val set = bodyOwner.guessReturnTypeSet(SearchContext(bodyOwner.project))
-            typeDesc = set.createReturnString()
+            typeDesc = set.createTypeString()
         }
         return typeDesc
     }
@@ -129,7 +129,7 @@ class TyFunctionLookupElement(name: String, signature: IFunSignature, bold: Bool
             list.add(it.name)
         }
         itemText = lookupString + "(${list.joinToString(", ")})"
-        typeText = signature.returnTy.createReturnString()
+        typeText = signature.returnTy.createTypeString()
     }
 
     override fun getObject(): Any {

@@ -56,8 +56,6 @@ interface ITy {
     fun union(ty: ITy): ITy
 
     fun createTypeString(): String
-
-    fun createReturnString(): String
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -78,11 +76,6 @@ abstract class Ty(override val kind: TyKind) : ITy {
     }
 
     override fun createTypeString(): String {
-        val s = toString()
-        return if (s.isEmpty()) Constants.WORD_ANY else s
-    }
-
-    override fun createReturnString(): String {
         val s = toString()
         return if (s.isEmpty()) Constants.WORD_ANY else s
     }
