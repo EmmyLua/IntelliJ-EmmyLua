@@ -58,8 +58,10 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
                 is LuaTypeGuessable -> {
                     val ty = element.guessTypeFromCache(SearchContext(element.project))
                     return buildString {
+                        var index = 0
                         TyUnion.each(ty) {
-                            wrapTag("br") { append(it.toString()) }
+                            if (index++ == 0) append(it.toString())
+                            else wrapTag("br") { append(it.toString()) }
                         }
                     }
                 }
