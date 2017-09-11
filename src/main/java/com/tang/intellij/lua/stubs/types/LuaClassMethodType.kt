@@ -123,8 +123,8 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
             indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + shortName)
         } else {
             indexSink.occurrence(LuaClassMethodIndex.KEY, className)
-            LuaClassMemberIndex.indexStub(indexSink, className, shortName)
         }
+        LuaClassMemberIndex.indexStub(indexSink, className, shortName)
         indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
     }
 }
