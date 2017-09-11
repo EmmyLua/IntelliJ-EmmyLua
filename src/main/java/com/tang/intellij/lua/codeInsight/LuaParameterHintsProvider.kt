@@ -38,6 +38,8 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
     override fun getParameterHints(psi: PsiElement): List<InlayInfo> {
         val list = ArrayList<InlayInfo>()
         if (psi is LuaCallExpr) {
+            if (!ARGS_HINT.get())
+                return list
             @Suppress("UnnecessaryVariable")
             val callExpr = psi
             val args = callExpr.args
@@ -110,6 +112,10 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
 
     override fun isBlackListSupported() = false
 
+    private val ARGS_HINT = Option("lua.hints.show_args_type",
+            "Show argument name hints",
+            true)
+
     private val LOCAL_VARIABLE_HINT = Option("lua.hints.show_local_var_type",
             "Show local variable type hints",
             false)
@@ -121,7 +127,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             false)
 
     override fun getSupportedOptions(): List<Option> {
-        return listOf(LOCAL_VARIABLE_HINT, PARAMETER_TYPE_HINT, FUNCTION_HINT)
+        return listOf(ARGS_HINT, LOCAL_VARIABLE_HINT, PARAMETER_TYPE_HINT, FUNCTION_HINT)
     }
 
     override fun getInlayPresentation(inlayText: String): String {
