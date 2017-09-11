@@ -26,10 +26,10 @@ import com.tang.intellij.lua.psi.impl.LuaFuncDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncStub
 import com.tang.intellij.lua.stubs.LuaFuncStubImpl
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
@@ -107,8 +107,7 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
         indexSink.occurrence(LuaClassMethodIndex.KEY, moduleName)
         indexSink.occurrence(LuaClassMethodIndex.KEY, "$moduleName*$name")
 
-        indexSink.occurrence(StubKeys.CLASS_MEMBER, moduleName)
-        indexSink.occurrence(StubKeys.CLASS_MEMBER, "$moduleName*$name")
+        LuaClassMemberIndex.indexStub(indexSink, moduleName, name)
 
         indexSink.occurrence(LuaShortNameIndex.KEY, name)
         if (moduleName == Constants.WORD_G)

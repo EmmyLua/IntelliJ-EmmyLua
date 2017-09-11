@@ -22,5 +22,5 @@ import org.jetbrains.annotations.NotNull;
 
 public class StubKeys {
     @NotNull
-    public static final StubIndexKey<String, LuaClassMember> CLASS_MEMBER = StubIndexKey.createIndexKey("lua.index.class.member");
+    public static final StubIndexKey<Integer, LuaClassMember> CLASS_MEMBER = StubIndexKey.createIndexKey("lua.index.class.member");
 }

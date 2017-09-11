@@ -28,9 +28,9 @@ import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMethodStub
 import com.tang.intellij.lua.stubs.LuaClassMethodStubImpl
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnion
 import java.io.IOException
@@ -123,9 +123,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
             indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + shortName)
         } else {
             indexSink.occurrence(LuaClassMethodIndex.KEY, className)
-
-            indexSink.occurrence(StubKeys.CLASS_MEMBER, className)
-            indexSink.occurrence(StubKeys.CLASS_MEMBER, "$className*$shortName")
+            LuaClassMemberIndex.indexStub(indexSink, className, shortName)
         }
         indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
     }

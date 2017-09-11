@@ -27,9 +27,9 @@ import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.impl.LuaIndexStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
@@ -81,8 +81,7 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
             indexSink.occurrence(LuaClassFieldIndex.KEY, typeName)
             indexSink.occurrence(LuaClassFieldIndex.KEY, "$typeName*$fieldName")
 
-            indexSink.occurrence(StubKeys.CLASS_MEMBER, typeName)
-            indexSink.occurrence(StubKeys.CLASS_MEMBER, "$typeName*$fieldName")
+            LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
 
             indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
             if (typeName == Constants.WORD_G) {

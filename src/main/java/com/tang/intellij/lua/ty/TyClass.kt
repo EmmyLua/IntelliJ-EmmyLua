@@ -60,11 +60,11 @@ abstract class TyClass(override val className: String, override var superClassNa
         val project = context.project
 
         val memberIndex = LuaClassMemberIndex.instance
-        val list = memberIndex.get(clazzName, project, LuaPredefinedScope(project))
+        val list = memberIndex.get(clazzName.hashCode(), project, LuaPredefinedScope(project))
 
         val alias = aliasName
         if (alias != null) {
-            val classMembers = memberIndex.get(alias, project, LuaPredefinedScope(project))
+            val classMembers = memberIndex.get(alias.hashCode(), project, LuaPredefinedScope(project))
             list.addAll(classMembers)
         }
 
