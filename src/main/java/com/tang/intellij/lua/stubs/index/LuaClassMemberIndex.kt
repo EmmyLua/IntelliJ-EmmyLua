@@ -22,6 +22,7 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.IntStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
+import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
@@ -71,7 +72,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             var perfect: LuaClassMember? = null
             processAll(type, fieldName, context, Processor {
                 perfect = it
-                false
+                it !is LuaDocPsiElement
             })
             return perfect
         }
