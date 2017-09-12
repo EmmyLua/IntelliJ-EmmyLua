@@ -382,6 +382,9 @@ fun resolveRequireFile(pathString: String?, project: Project): LuaFile? {
 private val GUESS_FROM_CACHE_KEY = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.ty.guess_from_cache")
 
 fun LuaTypeGuessable.guessTypeFromCache(searchContext: SearchContext): ITy {
+    //todo: 缓存有BUG，可能一直是旧的？
+    if (searchContext.isDumb)
+        return Ty.UNKNOWN
     val ty = CachedValuesManager.getManager(searchContext.project).getParameterizedCachedValue(this, GUESS_FROM_CACHE_KEY, { ctx ->
         val ty = guessType(ctx)
         CachedValueProvider.Result.create(ty, this)
