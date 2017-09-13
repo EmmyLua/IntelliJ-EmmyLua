@@ -58,7 +58,8 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
         val caretOffset = caretOffsetRef.get()
 
         val lElement = psiFile.findElementAt(caretOffset - 1)
-        if (lElement != null) {
+        val rElement = psiFile.findElementAt(caretOffset)
+        if (lElement != null && lElement != rElement) {
             var shouldClose = false
             var range: PsiElement? = null
             var cur: PsiElement = lElement
@@ -78,13 +79,12 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
             }
 
             if (shouldClose && range != null) {
-                val rElement = psiFile.findElementAt(caretOffset)
                 val endType = getEnd(range.node.elementType)
                 val document = editor.document
                 if (rElement !is PsiWhiteSpace)
-                    document.insertString(caretOffset, "\n$endType ")
+                    document.insertString(caretOffset, "$endType ")
                 else
-                    document.insertString(caretOffset, "\n$endType")
+                    document.insertString(caretOffset, "$endType")
                 editorActionHandler?.execute(editor, editor.caretModel.currentCaret, dataContext)
 
                 val project = lElement.project
@@ -97,12 +97,11 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
                 if (newRange != null) {
                     val textRange = newRange.textRange
                     ApplicationManager.getApplication().runWriteAction {
-                        val styleManager = CodeStyleManager.getInstance(project)
                         styleManager.adjustLineIndent(psiFile, textRange)
                         styleManager.adjustLineIndent(psiFile, editor.caretModel.offset)
                     }
                 }*/
-                return EnterHandlerDelegate.Result.Stop
+                return EnterHandlerDelegate.Result.DefaultForceIndent
             }
         }
 
