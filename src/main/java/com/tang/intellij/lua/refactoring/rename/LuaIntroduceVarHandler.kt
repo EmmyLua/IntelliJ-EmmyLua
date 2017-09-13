@@ -29,10 +29,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.introduce.inplace.InplaceVariableIntroducer
 import com.intellij.refactoring.introduce.inplace.OccurrencesChooser
-import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.psi.LuaExpr
-import com.tang.intellij.lua.psi.LuaNameDef
-import com.tang.intellij.lua.psi.LuaStatement
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import kotlin.reflect.jvm.internal.impl.utils.SmartList
 
@@ -104,11 +101,14 @@ class LuaIntroduceVarHandler : RefactoringActionHandler {
 
         var commonParent = PsiTreeUtil.findCommonParent(operation.occurrences!!)
         if (commonParent != null) {
+            var element = operation.element
             val newOccurrences = SmartList<PsiElement>()
-            var localDef = LuaElementFactory.createWith(operation.project, "local var = " + operation.element.text)
+            var localDef = LuaElementFactory.createWith(operation.project, "local var = " + element.text)
 
             if (isInline(commonParent, operation)) {
-                localDef = operation.element.replace(localDef)
+                if (element is LuaCallExpr && element.parent is LuaCallStat) element = element.parent
+
+                localDef = element.replace(localDef)
                 val nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef::class.java)!!
                 operation.editor.caretModel.moveToOffset(nameDef.textOffset)
             } else {
