@@ -564,7 +564,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'do' lazy_block 'end'
+  // 'do' <<lazyBlock>> 'end'
   public static boolean doStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doStat")) return false;
     if (!nextTokenIs(b, DO)) return false;
@@ -572,7 +572,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, DO_STAT, null);
     r = consumeToken(b, DO);
     p = r; // pin = 1
-    r = r && report_error_(b, lazy_block(b, l + 1));
+    r = r && report_error_(b, lazyBlock(b, l + 1));
     r = p && consumeToken(b, END) && r;
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
@@ -675,7 +675,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end'
+  // 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' <<lazyBlock>> 'end'
   public static boolean forAStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "forAStat")) return false;
     if (!nextTokenIs(b, FOR)) return false;
@@ -690,7 +690,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = p && report_error_(b, expr(b, l + 1, -1)) && r;
     r = p && report_error_(b, forAStat_6(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, DO)) && r;
-    r = p && report_error_(b, lazy_block(b, l + 1)) && r;
+    r = p && report_error_(b, lazyBlock(b, l + 1)) && r;
     r = p && consumeToken(b, END) && r;
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
@@ -716,7 +716,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'for' parList 'in' exprList 'do' lazy_block 'end'
+  // 'for' parList 'in' exprList 'do' <<lazyBlock>> 'end'
   public static boolean forBStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "forBStat")) return false;
     if (!nextTokenIs(b, FOR)) return false;
@@ -728,7 +728,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = p && report_error_(b, consumeToken(b, IN)) && r;
     r = p && report_error_(b, exprList(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, DO)) && r;
-    r = p && report_error_(b, lazy_block(b, l + 1)) && r;
+    r = p && report_error_(b, lazyBlock(b, l + 1)) && r;
     r = p && consumeToken(b, END) && r;
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
@@ -736,7 +736,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '(' (parList)? ')' lazy_block? 'end'
+  // '(' (parList)? ')' <<lazyBlock>>? 'end'
   public static boolean funcBody(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "funcBody")) return false;
     if (!nextTokenIs(b, LPAREN)) return false;
@@ -769,10 +769,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // lazy_block?
+  // <<lazyBlock>>?
   private static boolean funcBody_3(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "funcBody_3")) return false;
-    lazy_block(b, l + 1);
+    lazyBlock(b, l + 1);
     return true;
   }
 
@@ -832,7 +832,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end'
+  // 'if' expr 'then' <<lazyBlock>> ('elseif' expr 'then' <<lazyBlock>>)* ('else' <<lazyBlock>>)? 'end'
   public static boolean ifStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ifStat")) return false;
     if (!nextTokenIs(b, IF)) return false;
@@ -842,7 +842,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, expr(b, l + 1, -1));
     r = p && report_error_(b, consumeToken(b, THEN)) && r;
-    r = p && report_error_(b, lazy_block(b, l + 1)) && r;
+    r = p && report_error_(b, lazyBlock(b, l + 1)) && r;
     r = p && report_error_(b, ifStat_4(b, l + 1)) && r;
     r = p && report_error_(b, ifStat_5(b, l + 1)) && r;
     r = p && consumeToken(b, END) && r;
@@ -851,7 +851,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // ('elseif' expr 'then' lazy_block)*
+  // ('elseif' expr 'then' <<lazyBlock>>)*
   private static boolean ifStat_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ifStat_4")) return false;
     int c = current_position_(b);
@@ -863,7 +863,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // 'elseif' expr 'then' lazy_block
+  // 'elseif' expr 'then' <<lazyBlock>>
   private static boolean ifStat_4_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ifStat_4_0")) return false;
     boolean r;
@@ -871,25 +871,25 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, ELSEIF);
     r = r && expr(b, l + 1, -1);
     r = r && consumeToken(b, THEN);
-    r = r && lazy_block(b, l + 1);
+    r = r && lazyBlock(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // ('else' lazy_block)?
+  // ('else' <<lazyBlock>>)?
   private static boolean ifStat_5(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ifStat_5")) return false;
     ifStat_5_0(b, l + 1);
     return true;
   }
 
-  // 'else' lazy_block
+  // 'else' <<lazyBlock>>
   private static boolean ifStat_5_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ifStat_5_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, ELSE);
-    r = r && lazy_block(b, l + 1);
+    r = r && lazyBlock(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -946,12 +946,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, m, null, r);
     return r;
-  }
-
-  /* ********************************************************** */
-  // <<lazyBlock>>
-  static boolean lazy_block(PsiBuilder b, int l) {
-    return lazyBlock(b, l + 1);
   }
 
   /* ********************************************************** */
@@ -1239,7 +1233,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'repeat' lazy_block 'until' expr
+  // 'repeat' <<lazyBlock>> 'until' expr
   public static boolean repeatStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "repeatStat")) return false;
     if (!nextTokenIs(b, REPEAT)) return false;
@@ -1247,7 +1241,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, REPEAT_STAT, null);
     r = consumeToken(b, REPEAT);
     p = r; // pin = 1
-    r = r && report_error_(b, lazy_block(b, l + 1));
+    r = r && report_error_(b, lazyBlock(b, l + 1));
     r = p && report_error_(b, consumeToken(b, UNTIL)) && r;
     r = p && expr(b, l + 1, -1) && r;
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
@@ -1574,7 +1568,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'while' expr 'do' lazy_block 'end'
+  // 'while' expr 'do' <<lazyBlock>> 'end'
   public static boolean whileStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "whileStat")) return false;
     if (!nextTokenIs(b, WHILE)) return false;
@@ -1584,7 +1578,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, expr(b, l + 1, -1));
     r = p && report_error_(b, consumeToken(b, DO)) && r;
-    r = p && report_error_(b, lazy_block(b, l + 1)) && r;
+    r = p && report_error_(b, lazyBlock(b, l + 1)) && r;
     r = p && consumeToken(b, END) && r;
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);

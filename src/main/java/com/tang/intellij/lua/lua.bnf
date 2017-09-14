@@ -121,7 +121,6 @@ shebang_line ::= SHEBANG SHEBANG_CONTENT
 
 private stat_semi ::= stat_impl ';'?
 block ::= stat_semi* (lastStat ';'?)?
-private lazy_block ::= <<lazyBlock>>
 
 fake statement ::= () {
     implements = "com.tang.intellij.lua.psi.LuaCommentOwner"
@@ -157,20 +156,20 @@ assignStat ::= varList '=' exprList {
     ]
     methods = [assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
 }
-doStat ::= 'do' lazy_block 'end' {
+doStat ::= 'do' <<lazyBlock>> 'end' {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
 }
-whileStat ::= 'while' expr 'do' lazy_block 'end' {
+whileStat ::= 'while' expr 'do' <<lazyBlock>> 'end' {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaLoop"
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
 }
-repeatStat ::= 'repeat' lazy_block 'until' expr {
+repeatStat ::= 'repeat' <<lazyBlock>> 'until' expr {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaLoop"
@@ -180,13 +179,13 @@ repeatStat ::= 'repeat' lazy_block 'until' expr {
         until = 'UNTIL'
     ]
 }
-ifStat ::= 'if' expr 'then' lazy_block ('elseif' expr 'then' lazy_block)* ('else' lazy_block)? 'end' {
+ifStat ::= 'if' expr 'then' <<lazyBlock>> ('elseif' expr 'then' <<lazyBlock>>)* ('else' <<lazyBlock>>)? 'end' {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
 }
-forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'end' {
+forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' <<lazyBlock>> 'end' {
     pin = 3
     methods = [getParamNameDefList]
     implements = [
@@ -195,7 +194,7 @@ forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' lazy_block 'e
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
 }
-forBStat ::= 'for' parList 'in' exprList 'do' lazy_block 'end' {
+forBStat ::= 'for' parList 'in' exprList 'do' <<lazyBlock>> 'end' {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaParametersOwner"
@@ -420,7 +419,7 @@ closureExpr ::= 'function' funcBody {
     methods = [getParamNameDefList guessReturnTypeSet getParams]
 }
 
-funcBody ::= '(' (parList)? ')' lazy_block? 'end' {
+funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
     pin = 3
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
