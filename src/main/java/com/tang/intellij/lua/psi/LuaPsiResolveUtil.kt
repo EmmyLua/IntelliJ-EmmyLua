@@ -383,11 +383,12 @@ private val GUESS_FROM_CACHE_KEY = Key.create<ParameterizedCachedValue<ITy, Sear
 
 fun LuaTypeGuessable.guessTypeFromCache(searchContext: SearchContext): ITy {
     //todo: 缓存有BUG，可能一直是旧的？
-    if (searchContext.isDumb)
+    /*if (searchContext.isDumb)
         return Ty.UNKNOWN
     val ty = CachedValuesManager.getManager(searchContext.project).getParameterizedCachedValue(this, GUESS_FROM_CACHE_KEY, { ctx ->
         val ty = guessType(ctx)
         CachedValueProvider.Result.create(ty, this)
     }, false, searchContext)
-    return ty ?: Ty.UNKNOWN
+    return ty ?: Ty.UNKNOWN*/
+    return this.guessType(searchContext)
 }
