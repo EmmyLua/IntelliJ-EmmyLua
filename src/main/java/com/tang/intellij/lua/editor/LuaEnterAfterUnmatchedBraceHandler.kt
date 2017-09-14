@@ -18,6 +18,7 @@ package com.tang.intellij.lua.editor
 
 import com.intellij.codeInsight.editorActions.enter.EnterHandlerDelegate
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.util.Ref
@@ -27,6 +28,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.tree.IElementType
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.LuaIndentRange
@@ -43,6 +45,8 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
             return LuaTypes.RCURLY
         return if (range === LuaTypes.REPEAT_STAT) LuaTypes.UNTIL else LuaTypes.END
     }
+
+    private var shouldSmartIndent = false
 
     override fun preprocessEnter(psiFile: PsiFile,
                                  editor: Editor,
@@ -88,19 +92,9 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
                 editorActionHandler?.execute(editor, editor.caretModel.currentCaret, dataContext)
 
                 val project = lElement.project
-
                 PsiDocumentManager.getInstance(project).commitDocument(document)
-                val styleManager = CodeStyleManager.getInstance(project)
-                styleManager.adjustLineIndent(psiFile, editor.caretModel.offset)
 
-                /*val newRange = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset, LuaIndentRange::class.java, false)
-                if (newRange != null) {
-                    val textRange = newRange.textRange
-                    ApplicationManager.getApplication().runWriteAction {
-                        styleManager.adjustLineIndent(psiFile, textRange)
-                        styleManager.adjustLineIndent(psiFile, editor.caretModel.offset)
-                    }
-                }*/
+                shouldSmartIndent = true
                 return EnterHandlerDelegate.Result.DefaultForceIndent
             }
         }
@@ -109,6 +103,31 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
     }
 
     override fun postProcessEnter(psiFile: PsiFile, editor: Editor, dataContext: DataContext): EnterHandlerDelegate.Result {
+        if (!psiFile.language.`is`(LuaLanguage.INSTANCE))
+            return EnterHandlerDelegate.Result.Continue
+
+        if (shouldSmartIndent) {
+            shouldSmartIndent = false
+            val project = editor.project!!
+            val document = editor.document
+            PsiDocumentManager.getInstance(project).commitDocument(document)
+            val caretOffset = editor.caretModel.offset
+            val newRange = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset, LuaIndentRange::class.java, false)
+            if (newRange != null) {
+                val textRange = newRange.textRange
+                val marker = document.createRangeMarker(textRange)
+                ApplicationManager.getApplication().runWriteAction {
+                    val styleManager = CodeStyleManager.getInstance(editor.project!!)
+                    styleManager.adjustLineIndent(psiFile, textRange)
+
+                    val endLine = document.getLineNumber(marker.endOffset)
+                    val lineEnd = document.getLineEndOffset(endLine - 1)
+                    editor.caretModel.moveToOffset(lineEnd)
+                    styleManager.adjustLineIndent(psiFile, lineEnd)
+                    //editor.selectionModel.setSelection(marker.startOffset, marker.endOffset)
+                }
+            }
+        }
         return EnterHandlerDelegate.Result.Continue
     }
 }
