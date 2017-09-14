@@ -121,7 +121,10 @@ class LuaCompletionContributor : CompletionContributor() {
         private val GOTO = psiElement(LuaTypes.ID).withParent(LuaGotoStat::class.java)
 
         private fun suggestWordsInFile(parameters: CompletionParameters) {
-            val session = CompletionSession.get(parameters)!!
+            val session = CompletionSession[parameters]!!
+            val originalPosition = parameters.originalPosition
+            if (originalPosition != null)
+                session.addWord(originalPosition.text)
 
             val wordsInFileSet = HashSet<String>()
             val file = session.parameters.originalFile
