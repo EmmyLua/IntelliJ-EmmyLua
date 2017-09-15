@@ -19,6 +19,7 @@ package com.tang.intellij.lua.editor.completion
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.openapi.project.Project
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
@@ -113,9 +114,31 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                 }
             }
         }
+
+        val isColon = indexExpr.colon != null
+        TyUnion.each(prefixTypeSet) { luaType ->
+            if (luaType is ITyClass)
+                addClass(luaType, indexExpr.project, isColon, completionResultSet, prefixMatcher, handlerProcessor)
+        }
     }
 
-    protected fun addField(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
+    protected fun addClass(luaType:ITyClass, project: Project, isColon:Boolean, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
+        val context = SearchContext(project)
+        luaType.lazyInit(context)
+        luaType.processMethods(context) { curType, def ->
+            val className = curType.displayName
+            addMethod(completionResultSet, prefixMatcher, curType === luaType, !isColon, className, def, handlerProcessor)
+        }
+        luaType.processFields(context) { curType, field ->
+            val className = curType.displayName
+            addField(completionResultSet, prefixMatcher, curType === luaType, className, field, handlerProcessor)
+        }
+        luaType.processStaticMethods(context) { curType, def ->
+            addStaticMethod(completionResultSet, prefixMatcher, curType === luaType, curType.displayName, def, handlerProcessor)
+        }
+    }
+
+    private fun addField(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
         val name = field.name
         if (name != null && prefixMatcher.prefixMatches(name)) {
             val elementBuilder = LuaFieldLookupElement(name, field, bold)
@@ -134,7 +157,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         }
     }
 
-    protected fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
+    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
         if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
             if (useAsField) {

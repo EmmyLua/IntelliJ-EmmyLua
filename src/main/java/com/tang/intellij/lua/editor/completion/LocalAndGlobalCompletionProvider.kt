@@ -86,15 +86,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
             val moduleName = nameExpr.moduleName
             if (moduleName != null) {
                 val ty = TyLazyClass(moduleName)
-                val context = SearchContext(nameExpr.project)
-                ty.lazyInit(context)
-                ty.processMembers(context) { curType, def ->
-                    if (def is LuaClassField) {
-                        addField(completionResultSet, completionResultSet.prefixMatcher, ty == curType, moduleName, def, null)
-                    } else if (def is LuaClassMethod) {
-                        addMethod(completionResultSet, completionResultSet.prefixMatcher, ty == curType, false, moduleName, def, null)
-                    }
-                }
+                addClass(ty, cur.project, true, completionResultSet, completionResultSet.prefixMatcher, null)
             }
         }
 

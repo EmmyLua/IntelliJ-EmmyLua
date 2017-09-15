@@ -28,6 +28,7 @@ import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
@@ -104,8 +105,9 @@ class LuaCommentCompletionContributor : CompletionContributor() {
                 val classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef::class.java)
                 if (classDef != null) {
                     val classType = classDef.type
-                    classType.processFields(SearchContext(classDef.project)) { _, field ->
-                        completionResultSet.addElement(LookupElementBuilder.create(field.name!!))
+                    classType.processMembers(SearchContext(classDef.project)) { _, member ->
+                        if (member is LuaClassField)
+                            completionResultSet.addElement(LookupElementBuilder.create(member.name!!).withIcon(LuaIcons.CLASS_FIELD))
                         Unit
                     }
                 }
