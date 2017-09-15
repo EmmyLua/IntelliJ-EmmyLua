@@ -20,8 +20,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
-import com.intellij.psi.util.CachedValueProvider
-import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
@@ -263,8 +261,8 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
             while (classType != null) {
                 classType = classType.getSuperClass(context)
                 if (classType != null && methodName != null) {
-                    val superMethod = classType.findMethod(methodName, context)
-                    if (superMethod != null) {
+                    val superMethod = classType.findMember(methodName, context)
+                    if (superMethod is LuaClassMethod) {
                         val params = superMethod.params//todo : 优化
                         for (param in params) {
                             if (paramName == param.name) {

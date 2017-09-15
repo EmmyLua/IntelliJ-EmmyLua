@@ -36,8 +36,6 @@ interface ITyClass : ITy {
     fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit)
     fun processMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
     fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
-    fun findMethod(name: String, searchContext: SearchContext): LuaClassMethod?
-    fun findField(name: String, searchContext: SearchContext): LuaClassField?
     fun getSuperClass(context: SearchContext): ITyClass?
 }
 
@@ -169,30 +167,6 @@ abstract class TyClass(override val className: String, override var superClassNa
             return def?.type
         }
         return null
-    }
-
-    override fun findMethod(name: String, searchContext: SearchContext): LuaClassMethod? {
-        val className = className
-        var def = LuaClassMethodIndex.findMethodWithName(className, name, searchContext)
-        if (def == null) { // static
-            def = LuaClassMethodIndex.findStaticMethod(className, name, searchContext)
-        }
-        if (def == null) { // super
-            val superType = getSuperClass(searchContext)
-            if (superType != null)
-                def = superType.findMethod(name, searchContext)
-        }
-        return def
-    }
-
-    override fun findField(name: String, searchContext: SearchContext): LuaClassField? {
-        var def = LuaClassFieldIndex.find(this, name, searchContext)
-        if (def == null) {
-            val superType = getSuperClass(searchContext)
-            if (superType != null)
-                def = superType.findField(name, searchContext)
-        }
-        return def
     }
 
     companion object {
