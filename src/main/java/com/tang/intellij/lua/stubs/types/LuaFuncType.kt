@@ -27,7 +27,6 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncStub
 import com.tang.intellij.lua.stubs.LuaFuncStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.Ty
@@ -103,9 +102,6 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
     override fun indexStub(luaGlobalFuncStub: LuaFuncStub, indexSink: IndexSink) {
         val name = luaGlobalFuncStub.name
         val moduleName = luaGlobalFuncStub.module
-
-        indexSink.occurrence(LuaClassMethodIndex.KEY, moduleName)
-        indexSink.occurrence(LuaClassMethodIndex.KEY, "$moduleName*$name")
 
         LuaClassMemberIndex.indexStub(indexSink, moduleName, name)
 

@@ -24,14 +24,16 @@ import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
+import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyLazyClass
 
 /**
  * override supper
@@ -57,18 +59,17 @@ class OverrideCompletionProvider : CompletionProvider<CompletionParameters>() {
             val project = completionParameters.originalFile.project
             val context = SearchContext(project)
             val clazzName = superCls.className
-            val list = LuaClassMethodIndex.instance.get(clazzName, project, LuaPredefinedScope(project))
-            for (def in list) {
-                val methodName = def.name
-                if (methodName != null) {
-                    val elementBuilder = LookupElementBuilder.create(def.getName()!!)
+            LuaClassMemberIndex.processAll(TyLazyClass(clazzName), context, Processor { def ->
+                if (def is LuaClassMethod) {
+                    val elementBuilder = LookupElementBuilder.create(def.name!!)
                             .withIcon(LuaIcons.CLASS_METHOD_OVERRIDING)
                             .withInsertHandler(OverrideInsertHandler(def))
-                            .withTailText(def.getParamSignature())
+                            .withTailText(def.paramSignature)
 
                     completionResultSet.addElement(elementBuilder)
                 }
-            }
+                true
+            })
 
             superCls = superCls.getSuperClass(context)
             addOverrideMethod(completionParameters, completionResultSet, superCls)

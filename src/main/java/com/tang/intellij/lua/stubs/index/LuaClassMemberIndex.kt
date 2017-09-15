@@ -24,6 +24,7 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
 import com.tang.intellij.lua.psi.LuaClassMember
+import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
 
@@ -85,6 +86,28 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                     process(alias, fieldName, context, processor)
                 }
             }
+        }
+
+        fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {
+            if (process(type.className, context, processor)) {
+                type.lazyInit(context)
+                val alias = type.aliasName
+                if (alias != null) {
+                    process(alias, context, processor)
+                }
+            }
+        }
+
+        fun findMethod(className: String, memberName: String, context: SearchContext): LuaClassMethod? {
+            var target: LuaClassMethod? = null
+            process(className, memberName, context, Processor {
+                if (it is LuaClassMethod) {
+                    target = it
+                    return@Processor false
+                }
+                true
+            })
+            return target
         }
 
         fun indexStub(indexSink: IndexSink, className: String, memberName: String) {

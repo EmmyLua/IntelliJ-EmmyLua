@@ -21,7 +21,7 @@ import com.intellij.util.Processor
 import com.intellij.util.QueryExecutor
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
 /**
  *
@@ -40,7 +40,7 @@ class LuaOverridingMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOver
 
             return search.forEach(Processor { luaClass ->
                 val name = luaClass.name
-                val methodDef = LuaClassMethodIndex.findMethodWithName(name, methodName, context)
+                val methodDef = LuaClassMemberIndex.findMethod(name, methodName, context)
                 methodDef == null || processor.process(methodDef)
             })
         }

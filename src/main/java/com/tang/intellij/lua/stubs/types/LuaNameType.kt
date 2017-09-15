@@ -27,7 +27,6 @@ import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
 import com.tang.intellij.lua.stubs.LuaNameStub
 import com.tang.intellij.lua.stubs.LuaNameStubImpl
-import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
@@ -72,8 +71,6 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
     override fun indexStub(luaNameStub: LuaNameStub, indexSink: IndexSink) {
         if (luaNameStub.isGlobal) {
             val module = luaNameStub.module
-            indexSink.occurrence(LuaClassFieldIndex.KEY, module)
-            indexSink.occurrence(LuaClassFieldIndex.KEY, "$module*${luaNameStub.name}")
 
             LuaClassMemberIndex.indexStub(indexSink, module, luaNameStub.name)
 

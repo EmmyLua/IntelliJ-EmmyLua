@@ -164,9 +164,7 @@
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
         <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassIndex"/>
-        <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMethodIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaGlobalIndex"/>
-        <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassFieldIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMemberIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaSuperClassIndex"/>

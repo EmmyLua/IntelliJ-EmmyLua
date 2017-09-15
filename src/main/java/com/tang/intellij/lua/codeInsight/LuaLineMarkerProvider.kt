@@ -39,7 +39,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
 /**
  * line marker
@@ -62,7 +62,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
 
                 while (superType != null) {
                     val superTypeName = superType.className
-                    val superMethod = LuaClassMethodIndex.findMethodWithName(superTypeName, methodName, context)
+                    val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
                     if (superMethod != null) {
                         val builder = NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
                                 .setTargets(superMethod)

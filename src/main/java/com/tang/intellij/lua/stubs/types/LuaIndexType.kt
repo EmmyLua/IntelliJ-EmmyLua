@@ -26,7 +26,6 @@ import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.impl.LuaIndexStubImpl
-import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
@@ -78,9 +77,6 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
         val fieldName = indexStub.fieldName
         val typeName = indexStub.typeName
         if (typeName != null && fieldName != null) {
-            indexSink.occurrence(LuaClassFieldIndex.KEY, typeName)
-            indexSink.occurrence(LuaClassFieldIndex.KEY, "$typeName*$fieldName")
-
             LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
 
             indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)

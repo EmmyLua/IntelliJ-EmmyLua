@@ -29,7 +29,6 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMethodStub
 import com.tang.intellij.lua.stubs.LuaClassMethodStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnion
@@ -118,12 +117,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
     override fun indexStub(luaClassMethodStub: LuaClassMethodStub, indexSink: IndexSink) {
         val className = luaClassMethodStub.className
         val shortName = luaClassMethodStub.shortName
-        if (luaClassMethodStub.isStatic) {
-            indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static")
-            indexSink.occurrence(LuaClassMethodIndex.KEY, className + ".static." + shortName)
-        } else {
-            indexSink.occurrence(LuaClassMethodIndex.KEY, className)
-        }
+
         LuaClassMemberIndex.indexStub(indexSink, className, shortName)
         indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
     }

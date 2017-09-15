@@ -17,22 +17,10 @@
 package com.tang.intellij.lua.codeInsight.intention
 
 import com.intellij.codeInsight.intention.impl.BaseIntentionAction
-import com.intellij.codeInsight.template.TemplateManager
-import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.util.IncorrectOperationException
-import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaPsiTreeUtil
-import com.tang.intellij.lua.search.LuaPredefinedScope
-import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyUnion
 import org.jetbrains.annotations.Nls
 
 /**
@@ -50,17 +38,17 @@ class CreateMethodIntention : BaseIntentionAction() {
     }
 
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
-        val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
+        /*val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null && !callExpr.isFunctionCall) {
             val bodyOwner = callExpr.resolveFuncBodyOwner(SearchContext(project))
             return bodyOwner == null
-        }
+        }*/
         return false
     }
 
     @Throws(IncorrectOperationException::class)
     override fun invoke(project: Project, editor: Editor, psiFile: PsiFile) {
-        val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
+        /*val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null && !callExpr.isFunctionCall) {
             val expr = callExpr.expr
             if (expr is LuaIndexExpr) {
@@ -78,10 +66,10 @@ class CreateMethodIntention : BaseIntentionAction() {
                     manager.startTemplate(editor, template)
                 }
             }
-        }
+        }*/
     }
 
-    private class InsertPosition {
+    /*private class InsertPosition {
         internal var offset: Int = 0
         internal var prefix: String? = null
     }
@@ -102,5 +90,5 @@ class CreateMethodIntention : BaseIntentionAction() {
             }
         }
         return null
-    }
+    }*/
 }
