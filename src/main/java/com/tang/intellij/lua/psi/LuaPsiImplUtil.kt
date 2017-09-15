@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNUSED_PARAMETER")
+
 package com.tang.intellij.lua.psi
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase
@@ -388,10 +390,7 @@ object LuaPsiImplUtil {
 
     @JvmStatic fun getParamNameDefList(funcBodyOwner: LuaFuncBodyOwner): List<LuaParamNameDef> {
         val funcBody = funcBodyOwner.funcBody
-        if (funcBody != null)
-            return funcBody.paramNameDefList
-        else
-            return emptyList()
+        return funcBody?.paramNameDefList ?: emptyList()
     }
 
     @JvmStatic fun getParamNameDefList(forAStat: LuaForAStat): List<LuaParamNameDef> {
