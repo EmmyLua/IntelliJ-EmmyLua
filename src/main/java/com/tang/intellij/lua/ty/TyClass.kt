@@ -21,10 +21,8 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaClassMethodIndex
 
 interface ITyClass : ITy {
     val className: String
@@ -33,9 +31,6 @@ interface ITyClass : ITy {
     fun lazyInit(searchContext: SearchContext)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit)
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
-    fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit)
-    fun processMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
-    fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit)
     fun getSuperClass(context: SearchContext): ITyClass?
 }
 
@@ -77,69 +72,6 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
         return LuaClassMemberIndex.find(this, name, searchContext)
-    }
-
-    override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {
-        val clazzName = className
-        val project = context.project
-
-        val fieldIndex = LuaClassFieldIndex.instance
-        val list = fieldIndex.get(clazzName, project, LuaPredefinedScope(project))
-
-        val alias = aliasName
-        if (alias != null) {
-            val classFields = fieldIndex.get(alias, project, LuaPredefinedScope(project))
-            list.addAll(classFields)
-        }
-
-        for (field in list) {
-            processor(this, field)
-        }
-
-        // super
-        val superType = getSuperClass(context)
-        superType?.processFields(context, processor)
-    }
-
-    override fun processMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit) {
-        val clazzName = className
-        val project = context.project
-
-        val methodIndex = LuaClassMethodIndex.instance
-        var list = methodIndex.get(clazzName, project, LuaPredefinedScope(project))
-
-        val alias = aliasName
-        if (alias != null) {
-            list += methodIndex.get(alias, project, LuaPredefinedScope(project))
-        }
-        for (def in list) {
-            val methodName = def.name
-            if (methodName != null) {
-                processor(this, def)
-            }
-        }
-
-        val superType = getSuperClass(context)
-        superType?.processMethods(context, processor)
-    }
-
-    override fun processStaticMethods(context: SearchContext, processor: (ITyClass, LuaClassMethod) -> Unit) {
-        val clazzName = className
-        var list = LuaClassMethodIndex.findStaticMethods(clazzName, context)
-
-        val alias = aliasName
-        if (alias != null) {
-            list += LuaClassMethodIndex.findStaticMethods(alias, context)
-        }
-        for (def in list) {
-            val methodName = def.name
-            if (methodName != null) {
-                processor(this, def)
-            }
-        }
-
-        val superType = getSuperClass(context)
-        superType?.processStaticMethods(context, processor)
     }
 
     override val displayName: String get() = if(isAnonymous) "Anonymous" else className
@@ -218,11 +150,12 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     init {
         this.flags = TyFlags.ANONYMOUS
     }
-    override fun processFields(context: SearchContext, processor: (ITyClass, LuaClassField) -> Unit) {
+
+    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
         for (field in table.tableFieldList) {
             processor(this, field)
         }
-        super.processFields(context, processor)
+        super.processMembers(context, processor)
     }
 
     override val displayName: String

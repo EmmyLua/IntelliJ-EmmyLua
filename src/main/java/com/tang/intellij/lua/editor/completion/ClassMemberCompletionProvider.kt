@@ -84,37 +84,6 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
     }
 
     private fun complete(indexExpr: LuaIndexExpr, prefixTypeSet: ITy, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
-        if (indexExpr.colon != null) {
-            TyUnion.each(prefixTypeSet) { luaType ->
-                if (luaType is ITyClass) {
-                    val context = SearchContext(indexExpr.project)
-                    luaType.lazyInit(context)
-                    luaType.processMethods(context) { curType, def ->
-                        val className = curType.displayName
-                        addMethod(completionResultSet, prefixMatcher, curType === luaType, false, className, def, handlerProcessor)
-                    }
-                }
-            }
-        } else {
-            TyUnion.each(prefixTypeSet)  { luaType ->
-                if (luaType is ITyClass) {
-                    val context = SearchContext(indexExpr.project)
-                    luaType.lazyInit(context)
-                    luaType.processMethods(context) { curType, def ->
-                        val className = curType.displayName
-                        addMethod(completionResultSet, prefixMatcher, curType === luaType, true, className, def, handlerProcessor)
-                    }
-                    luaType.processFields(context) { curType, field ->
-                        val className = curType.displayName
-                        addField(completionResultSet, prefixMatcher, curType === luaType, className, field, handlerProcessor)
-                    }
-                    luaType.processStaticMethods(context) { curType, def ->
-                        addStaticMethod(completionResultSet, prefixMatcher, curType === luaType, curType.displayName, def, handlerProcessor)
-                    }
-                }
-            }
-        }
-
         val isColon = indexExpr.colon != null
         TyUnion.each(prefixTypeSet) { luaType ->
             if (luaType is ITyClass)
@@ -125,16 +94,13 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
     protected fun addClass(luaType:ITyClass, project: Project, isColon:Boolean, completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, handlerProcessor: HandlerProcessor?) {
         val context = SearchContext(project)
         luaType.lazyInit(context)
-        luaType.processMethods(context) { curType, def ->
+        luaType.processMembers(context) { curType, def ->
             val className = curType.displayName
-            addMethod(completionResultSet, prefixMatcher, curType === luaType, !isColon, className, def, handlerProcessor)
-        }
-        luaType.processFields(context) { curType, field ->
-            val className = curType.displayName
-            addField(completionResultSet, prefixMatcher, curType === luaType, className, field, handlerProcessor)
-        }
-        luaType.processStaticMethods(context) { curType, def ->
-            addStaticMethod(completionResultSet, prefixMatcher, curType === luaType, curType.displayName, def, handlerProcessor)
+            if (def is LuaClassField) {
+                addField(completionResultSet, prefixMatcher, curType === luaType, className, def, handlerProcessor)
+            } else if (def is LuaClassMethod) {
+                addMethod(completionResultSet, prefixMatcher, curType === luaType, isColon, className, def, handlerProcessor)
+            }
         }
     }
 
@@ -157,30 +123,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         }
     }
 
-    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, useAsField: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
-        val methodName = def.name
-        if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
-            if (useAsField) {
-                val elementBuilder = LuaLookupElement(methodName, bold, LuaIcons.CLASS_METHOD)
-                elementBuilder.setTailText(def.paramSignature + "  [" + clazzName + "]")
-                handlerProcessor?.process(elementBuilder)
-                completionResultSet.addElement(elementBuilder)
-            } else {
-                val ty = def.asTy(SearchContext(def.project))
-                ty.process(Processor {
-                    val le = TyFunctionLookupElement(methodName, it, bold, ty, LuaIcons.CLASS_METHOD)
-                    le.handler = SignatureInsertHandler(it)
-                    le.setItemTextUnderlined(true)
-                    le.setTailText("  [$clazzName]")
-                    handlerProcessor?.process(le)
-                    completionResultSet.addElement(le)
-                    true
-                })
-            }
-        }
-    }
-
-    private fun addStaticMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
+    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, isColon: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
         if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
             val ty = def.asTy(SearchContext(def.project))
@@ -193,14 +136,6 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                 completionResultSet.addElement(le)
                 true
             })
-            /*LuaPsiImplUtil.processOptional(def.params) { signature, mask ->
-                val elementBuilder = LuaMethodLookupElement(methodName, signature, bold, def)
-                elementBuilder.handler = FuncInsertHandler(def).withMask(mask)
-                elementBuilder.setItemTextUnderlined(true)
-                elementBuilder.setTailText("  [$clazzName]")
-                handlerProcessor?.process(elementBuilder)
-                completionResultSet.addElement(elementBuilder)
-            }*/
         }
     }
 }
