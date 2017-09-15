@@ -36,7 +36,7 @@ class LuaPredefinedLibraryProvider : IndexableSetContributor() {
         return list
     }*/
 
-    val predefined: Set<VirtualFile> by lazy {
+    private val predefined: Set<VirtualFile> by lazy {
         val dir = LuaFileUtil.getPluginVirtualFile("std")
         val file = VfsUtil.findFileByIoFile(File(dir), false)
         val set = mutableSetOf<VirtualFile>()

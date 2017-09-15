@@ -21,7 +21,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.Language
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.TokenType
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.comment.LuaCommentUtil
@@ -82,7 +81,7 @@ class LuaCommentCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, SHOW_CLASS, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 val project = completionParameters.position.project
-                LuaClassIndex.processKeys(project, GlobalSearchScope.projectScope(project), {
+                LuaClassIndex.processKeys(project, {
                     completionResultSet.addElement(LookupElementBuilder.create(it).withIcon(LuaIcons.CLASS))
                     true
                 })

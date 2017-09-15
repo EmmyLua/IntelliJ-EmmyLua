@@ -22,7 +22,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.intellij.util.indexing.AdditionalIndexedRootsScope
-import com.tang.intellij.lua.lang.GuessTypeKind
 import com.tang.intellij.lua.project.LuaPredefinedLibraryProvider
 
 /**
@@ -37,7 +36,7 @@ class SearchContext(val project: Project) {
 
     private var currentStubFile: PsiFile? = null
     private var scope: GlobalSearchScope? = null
-    private var guessTypeKind = GuessTypeKind.Standard
+    /*private var guessTypeKind = GuessTypeKind.Standard
 
     fun setGuessTypeKind(value: Int) {
         guessTypeKind = value
@@ -45,7 +44,7 @@ class SearchContext(val project: Project) {
 
     fun isGuessTypeKind(kind: Int): Boolean {
         return guessTypeKind and kind == kind
-    }
+    }*/
 
     fun setCurrentStubFile(currentStubFile: PsiFile): SearchContext {
         this.currentStubFile = currentStubFile
@@ -54,10 +53,10 @@ class SearchContext(val project: Project) {
 
     fun getScope(): GlobalSearchScope {
         if (scope == null) {
-            if (isDumb) {
-                scope = GlobalSearchScope.EMPTY_SCOPE
+            scope = if (isDumb) {
+                GlobalSearchScope.EMPTY_SCOPE
             } else {
-                scope = LuaPredefinedScope(project)
+                LuaPredefinedScope(project)
             }
         }
         return scope!!

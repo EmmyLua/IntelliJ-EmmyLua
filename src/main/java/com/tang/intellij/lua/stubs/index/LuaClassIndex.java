@@ -24,6 +24,7 @@ import com.intellij.psi.stubs.StubIndexKey;
 import com.intellij.util.Processor;
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.search.LuaPredefinedScope;
 import com.tang.intellij.lua.search.SearchContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +68,8 @@ public class LuaClassIndex extends StringStubIndexExtension<LuaDocClassDef> {
         return null;
     }
 
-    public static void processKeys(@NotNull Project project, @NotNull GlobalSearchScope scope, @NotNull Processor<String> processor) {
+    public static void processKeys(@NotNull Project project, @NotNull Processor<String> processor) {
+        GlobalSearchScope scope = new LuaPredefinedScope(project);
         Collection<String> allKeys = getInstance().getAllKeys(project);
         for (String key : allKeys) {
             Collection<LuaDocClassDef> collection = getInstance().get(key, project, scope);
