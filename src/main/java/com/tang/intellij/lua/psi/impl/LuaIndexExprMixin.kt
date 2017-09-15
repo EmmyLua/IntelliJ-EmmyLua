@@ -29,7 +29,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
-import com.tang.intellij.lua.stubs.index.LuaClassFieldIndex
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
 
 /**
@@ -86,14 +86,13 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
             }
 
             // xxx.yyy = zzz
-            //guess from value
+            //from value
             var result: ITy = Ty.UNKNOWN
-            // value type
             val stub = indexExpr.stub
             val valueTy: ITy = stub?.guessValueType() ?: indexExpr.guessValueType(context)
-
             result = result.union(valueTy)
 
+            //from other class member
             val propName = indexExpr.name
             if (propName != null) {
                 val prefixType = indexExpr.guessPrefixType(context)
@@ -112,42 +111,10 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
     private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchContext): ITy {
         var set:ITy = Ty.UNKNOWN
 
-        //todo: use findField()
-        /*val all = LuaClassFieldIndex.findAll(type, fieldName, context)
-        for (fieldDef in all) {
-            if (fieldDef is LuaIndexExpr) {
-                val stub = fieldDef.stub
-                set = if (stub != null)
-                    set.union(stub.guessValueType())
-                else
-                    set.union(fieldDef.guessValueType(context))
-
-                if (fieldDef === this)
-                    return set
-            }
-
-            set = set.union(fieldDef.guessType(context))
-        }*/
-
-        LuaClassFieldIndex.processAll(type, fieldName, context, Processor { fieldDef->
-            if (fieldDef is LuaIndexExpr) {
-                val stub = fieldDef.stub
-                set = if (stub != null)
-                    set.union(stub.guessValueType())
-                else
-                    set.union(fieldDef.guessValueType(context))
-
-                if (fieldDef === this)
-                    return@Processor false
-            }
-            set = set.union(fieldDef.guessTypeFromCache(context))
+        LuaClassMemberIndex.processAll(type, fieldName, context, Processor {
+            set = set.union(it.guessTypeFromCache(context))
             true
         })
-
-        //class method
-        val method = type.findMethod(fieldName, context)
-        if (method != null)
-            set = set.union(method.asTy(context))
 
         return set
     }
