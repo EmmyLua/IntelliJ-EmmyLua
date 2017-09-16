@@ -121,7 +121,7 @@ private fun runLuaCheckInner(relativeFilePath: String,
     @Language("RegExp")
     val reg = "(.+?):(\\d+):(\\d+)-(\\d+):(.+)\\n".toRegex()
     handler.addProcessListener(object : ProcessListener {
-        override fun onTextAvailable(event: ProcessEvent, key: Key<*>?) {
+        override fun onTextAvailable(event: ProcessEvent, key: Key<*>) {
             //print(event.text)
             val matchResult = reg.find(event.text)
             if (matchResult != null) {
