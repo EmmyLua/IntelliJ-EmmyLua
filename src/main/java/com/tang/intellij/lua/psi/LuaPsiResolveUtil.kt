@@ -57,9 +57,7 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
     return ret
 }
 
-fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? {
-    return resolveLocal(ref.name, ref, context)
-}
+fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? = resolveLocal(ref.name, ref, context)
 
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null

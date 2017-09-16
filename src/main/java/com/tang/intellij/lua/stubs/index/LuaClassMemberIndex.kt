@@ -31,9 +31,8 @@ import com.tang.intellij.lua.ty.ITyClass
 class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
     override fun getKey() = StubKeys.CLASS_MEMBER
 
-    override fun get(s: Int, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> {
-        return StubIndex.getElements(StubKeys.CLASS_MEMBER, s, project, scope, LuaClassMember::class.java)
-    }
+    override fun get(s: Int, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> =
+            StubIndex.getElements(StubKeys.CLASS_MEMBER, s, project, scope, LuaClassMember::class.java)
 
     companion object {
         val instance = LuaClassMemberIndex()
@@ -42,7 +41,6 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             if (context.isDumb)
                 return false
             val all = LuaClassMemberIndex.instance.get(key.hashCode(), context.project, context.getScope())
-            if (all.isEmpty()) return true
             @Suppress("LoopToCallChain")
             for (member in all) {
                 if (!processor.process(member)) {

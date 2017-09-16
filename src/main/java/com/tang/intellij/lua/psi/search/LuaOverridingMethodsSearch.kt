@@ -32,8 +32,7 @@ class LuaOverridingMethodsSearch private constructor() : ExtensibleQueryFactory<
         private val INSTANCE = LuaOverridingMethodsSearch()
 
         @JvmOverloads
-        fun search(methodDef: LuaClassMethod, deep: Boolean = true): Query<LuaClassMethod> {
-            return INSTANCE.createUniqueResultsQuery(SearchParameters(methodDef, deep))
-        }
+        fun search(methodDef: LuaClassMethod, deep: Boolean = true): Query<LuaClassMethod> =
+                INSTANCE.createUniqueResultsQuery(SearchParameters(methodDef, deep))
     }
 }
