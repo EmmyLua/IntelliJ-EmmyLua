@@ -50,9 +50,9 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return true
         }
 
-        fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+        fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
             val key = "$className*$fieldName"
-            if (process(key, context, processor)) {
+            if (process(key, context, processor) && deep) {
                 // from supper
                 val classDef = LuaClassIndex.find(className, context)
                 if (classDef != null) {
@@ -96,7 +96,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             }
         }
 
-        fun findMethod(className: String, memberName: String, context: SearchContext): LuaClassMethod? {
+        fun findMethod(className: String, memberName: String, context: SearchContext, deep: Boolean = true): LuaClassMethod? {
             var target: LuaClassMethod? = null
             process(className, memberName, context, Processor {
                 if (it is LuaClassMethod) {
@@ -104,7 +104,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                     return@Processor false
                 }
                 true
-            })
+            }, deep)
             return target
         }
 

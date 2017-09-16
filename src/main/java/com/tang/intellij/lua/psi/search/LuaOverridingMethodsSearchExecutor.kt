@@ -40,7 +40,7 @@ class LuaOverridingMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOver
 
             return search.forEach(Processor { luaClass ->
                 val name = luaClass.name
-                val methodDef = LuaClassMemberIndex.findMethod(name, methodName, context)
+                val methodDef = LuaClassMemberIndex.findMethod(name, methodName, context, false)
                 methodDef == null || processor.process(methodDef)
             })
         }
