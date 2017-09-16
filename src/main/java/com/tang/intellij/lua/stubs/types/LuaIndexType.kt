@@ -24,12 +24,14 @@ import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
+import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
 import com.tang.intellij.lua.stubs.impl.LuaIndexStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyUnion
 import java.io.IOException
 
 /**
@@ -53,7 +55,16 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
     }
 
     override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexStub {
-        return LuaIndexStubImpl(indexExpr, stubElement, this)
+        val context = SearchContext(indexExpr.project)
+        context.setCurrentStubFile(indexExpr.containingFile)
+        val ty = indexExpr.guessPrefixType(context)
+        val type = TyUnion.getPrefectClass(ty)
+        var typeName: String? = null
+        if (type != null)
+            typeName = type.className
+        val valueType = indexExpr.guessValueType(context)
+
+        return LuaIndexStubImpl(typeName, indexExpr.name, valueType, stubElement, this)
     }
 
     override fun getExternalId() = "lua.index_expr"
@@ -62,7 +73,7 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
     override fun serialize(indexStub: LuaIndexStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(indexStub.typeName)
         stubOutputStream.writeName(indexStub.name)
-        Ty.serialize(indexStub.guessValueType(), stubOutputStream)
+        Ty.serialize(indexStub.valueType, stubOutputStream)
     }
 
     @Throws(IOException::class)

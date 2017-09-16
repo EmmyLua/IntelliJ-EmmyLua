@@ -368,7 +368,7 @@ object LuaPsiImplUtil {
     @JvmStatic fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
         val stub = indexExpr.stub
         if (stub != null) {
-            return stub.guessValueType()
+            return stub.valueType
         }
 
         val setOptional = Optional.of(indexExpr)

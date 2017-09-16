@@ -88,8 +88,7 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
             // xxx.yyy = zzz
             //from value
             var result: ITy = Ty.UNKNOWN
-            val stub = indexExpr.stub
-            val valueTy: ITy = stub?.guessValueType() ?: indexExpr.guessValueType(context)
+            val valueTy: ITy = indexExpr.guessValueType(context)
             result = result.union(valueTy)
 
             //from other class member

@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs
+package com.tang.intellij.lua.stubs.impl
 
+import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaIndexExpr
+import com.tang.intellij.lua.stubs.LuaIndexStub
+import com.tang.intellij.lua.stubs.types.LuaIndexType
 import com.tang.intellij.lua.ty.ITy
 
 /**
-
+ *
  * Created by TangZX on 2017/4/12.
  */
-interface LuaIndexStub : StubElement<LuaIndexExpr> {
-    val typeName: String?
-    val name: String?
-    val valueType: ITy
-}
+class LuaIndexStubImpl(override val typeName: String?, override val name: String?, override val valueType: ITy, stubElement: StubElement<*>, indexType: LuaIndexType) : StubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexStub
