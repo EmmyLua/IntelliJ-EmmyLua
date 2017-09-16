@@ -22,7 +22,6 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.psi.LuaPsiImplUtil
 import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
 import com.tang.intellij.lua.search.SearchContext
@@ -56,8 +55,8 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         if (type != null)
             clazzName = type.className
 
-        val returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(methodDef, searchContext)
-        val params = LuaPsiImplUtil.getParamsOriginal(methodDef)
+        val returnTypeSet = methodDef.guessReturnTypeSet(searchContext)
+        val params = methodDef.params
 
         val isStatic = methodName.dot != null
 
@@ -75,7 +74,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
     @Throws(IOException::class)
     override fun serialize(luaClassMethodStub: LuaClassMethodStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaClassMethodStub.className)
-        stubOutputStream.writeName(luaClassMethodStub.shortName)
+        stubOutputStream.writeName(luaClassMethodStub.name)
 
         // params
         val params = luaClassMethodStub.params
@@ -116,7 +115,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
 
     override fun indexStub(luaClassMethodStub: LuaClassMethodStub, indexSink: IndexSink) {
         val className = luaClassMethodStub.className
-        val shortName = luaClassMethodStub.shortName
+        val shortName = luaClassMethodStub.name
 
         LuaClassMemberIndex.indexStub(indexSink, className, shortName)
         indexSink.occurrence(LuaShortNameIndex.KEY, shortName)

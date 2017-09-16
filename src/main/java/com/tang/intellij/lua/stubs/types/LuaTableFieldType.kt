@@ -54,7 +54,7 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
     override fun serialize(fieldStub: LuaTableFieldStub, stubOutputStream: StubOutputStream) {
         val typeName = fieldStub.typeName
         stubOutputStream.writeName(typeName)
-        val fieldName = fieldStub.fieldName
+        val fieldName = fieldStub.name
         stubOutputStream.writeName(fieldName)
     }
 
@@ -69,7 +69,7 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
     }
 
     override fun indexStub(fieldStub: LuaTableFieldStub, indexSink: IndexSink) {
-        val fieldName = fieldStub.fieldName
+        val fieldName = fieldStub.name
         val typeName = fieldStub.typeName
         if (fieldName != null && typeName != null) {
             LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)

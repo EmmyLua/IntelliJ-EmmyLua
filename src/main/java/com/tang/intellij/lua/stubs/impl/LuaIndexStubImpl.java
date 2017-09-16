@@ -74,7 +74,7 @@ public class LuaIndexStubImpl extends StubBase<LuaIndexExpr> implements LuaIndex
     }
 
     @Override
-    public String getFieldName() {
+    public String getName() {
         return fieldName;
     }
 

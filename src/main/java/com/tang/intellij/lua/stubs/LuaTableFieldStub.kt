@@ -31,7 +31,7 @@ import java.util.*
  */
 interface LuaTableFieldStub : StubElement<LuaTableField> {
     val typeName: String?
-    val fieldName: String?
+    val name: String?
 }
 class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
     private var tableField: LuaTableField? = null
@@ -70,7 +70,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
             return _typeName
         }
 
-    override val fieldName: String?
+    override val name: String?
         get() {
             if (_fieldName != null)
                 return _fieldName

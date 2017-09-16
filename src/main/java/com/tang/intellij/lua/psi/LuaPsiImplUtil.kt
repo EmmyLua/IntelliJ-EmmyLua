@@ -106,7 +106,7 @@ object LuaPsiImplUtil {
     @JvmStatic fun getName(classMethodDef: LuaClassMethodDef): String? {
         val stub = classMethodDef.stub
         if (stub != null)
-            return stub.shortName
+            return stub.name
         return getName(classMethodDef as PsiNameIdentifierOwner)
     }
 
@@ -336,7 +336,7 @@ object LuaPsiImplUtil {
     @JvmStatic fun getName(indexExpr: LuaIndexExpr): String? {
         val stub = indexExpr.stub
         if (stub != null)
-            return stub.fieldName
+            return stub.name
 
         // var.name
         val id = indexExpr.id
@@ -407,12 +407,12 @@ object LuaPsiImplUtil {
             }
         }
 
-        return guessReturnTypeSetOriginal(owner, searchContext)
+        return guessReturnTypeSetInner(owner, searchContext)
     }
 
     private val FUNCTION_RETURN_TYPESET = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.function.return_typeset")
 
-    @JvmStatic fun guessReturnTypeSetOriginal(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
+    private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
         if (owner is LuaCommentOwner) {
             val comment = LuaCommentUtil.findComment(owner)
             if (comment != null) {
@@ -469,10 +469,10 @@ object LuaPsiImplUtil {
                 return stub.params
             }
         }
-        return getParamsOriginal(owner)
+        return getParamsInner(owner)
     }
 
-    @JvmStatic fun getParamsOriginal(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo> {
+    private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo> {
         var comment: LuaComment? = null
         if (funcBodyOwner is LuaCommentOwner) {
             comment = LuaCommentUtil.findComment(funcBodyOwner)
@@ -595,7 +595,7 @@ object LuaPsiImplUtil {
     @JvmStatic fun getName(tableField: LuaTableField): String? {
         val stub = tableField.stub
         if (stub != null)
-            return stub.fieldName
+            return stub.name
         val id = tableField.id
         if (id != null)
             return id.text

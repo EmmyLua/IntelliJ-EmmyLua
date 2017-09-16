@@ -45,8 +45,8 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
     override fun createStub(funcDef: LuaFuncDef, stubElement: StubElement<*>): LuaFuncStub {
         val nameRef = funcDef.nameIdentifier!!
         val searchContext = SearchContext(funcDef.project).setCurrentStubFile(funcDef.containingFile)
-        val returnTypeSet = LuaPsiImplUtil.guessReturnTypeSetOriginal(funcDef, searchContext)
-        val params = LuaPsiImplUtil.getParamsOriginal(funcDef)
+        val returnTypeSet = funcDef.guessReturnTypeSet(searchContext)
+        val params = funcDef.params
         var moduleName = Constants.WORD_G
         val file = funcDef.containingFile
         if (file is LuaFile) moduleName = file.moduleName ?: Constants.WORD_G

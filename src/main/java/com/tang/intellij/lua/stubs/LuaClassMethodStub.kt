@@ -31,12 +31,12 @@ interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef> {
 
     val className: String
 
-    val shortName: String
+    val name: String
 
     val isStatic: Boolean
 }
 
-class LuaClassMethodStubImpl(override val shortName: String,
+class LuaClassMethodStubImpl(override val name: String,
                              override val className: String,
                              override val params: Array<LuaParamInfo>,
                              override val returnTypeSet: ITy,

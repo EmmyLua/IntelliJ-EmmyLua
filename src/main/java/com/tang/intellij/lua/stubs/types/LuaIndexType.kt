@@ -61,7 +61,7 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
     @Throws(IOException::class)
     override fun serialize(indexStub: LuaIndexStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(indexStub.typeName)
-        stubOutputStream.writeName(indexStub.fieldName)
+        stubOutputStream.writeName(indexStub.name)
         Ty.serialize(indexStub.guessValueType(), stubOutputStream)
     }
 
@@ -74,7 +74,7 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
     }
 
     override fun indexStub(indexStub: LuaIndexStub, indexSink: IndexSink) {
-        val fieldName = indexStub.fieldName
+        val fieldName = indexStub.name
         val typeName = indexStub.typeName
         if (typeName != null && fieldName != null) {
             LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
