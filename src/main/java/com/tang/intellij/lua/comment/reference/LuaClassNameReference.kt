@@ -19,7 +19,9 @@ package com.tang.intellij.lua.comment.reference
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
+import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 
@@ -33,6 +35,12 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
 
     override fun isReferenceTo(element: PsiElement): Boolean {
         return myElement.manager.areElementsEquivalent(element, resolve())
+    }
+
+    override fun handleElementRename(newElementName: String): PsiElement {
+        val element = LuaElementFactory.createWith(myElement.project, "---@type $newElementName")
+        val classNameRef = PsiTreeUtil.findChildOfType(element, LuaDocClassNameRef::class.java)
+        return myElement.replace(classNameRef!!)
     }
 
     override fun resolve(): PsiElement? {
