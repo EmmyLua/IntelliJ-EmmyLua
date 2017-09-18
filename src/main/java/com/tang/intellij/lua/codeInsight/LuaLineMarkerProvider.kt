@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.codeInsight
 
 import com.intellij.codeHighlighting.Pass
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzerSettings
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
@@ -45,7 +46,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
  * line marker
  * Created by tangzx on 2016/12/11.
  */
-class LuaLineMarkerProvider : LineMarkerProvider {
+class LuaLineMarkerProvider(val daemonSettings: DaemonCodeAnalyzerSettings, val colorsManager:EditorColorsManager) : LineMarkerProvider {
 
     private fun collectNavigationMarkers(element: PsiElement, result: MutableCollection<in LineMarkerInfo<*>>) {
         if (element is LuaClassMethodName) {
@@ -87,11 +88,11 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             }
 
             //line separator
-            if (LuaSettings.instance.showMethodLineSeparator) {
+            if (daemonSettings.SHOW_METHOD_SEPARATORS) {
                 //todo : module file method
                 val startOffset = methodDef.node.startOffset
                 val lineSeparator = LineMarkerInfo(element, TextRange(startOffset, startOffset), null, Pass.LINE_MARKERS, null, null, GutterIconRenderer.Alignment.RIGHT)
-                lineSeparator.separatorColor = EditorColorsManager.getInstance().globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
+                lineSeparator.separatorColor = colorsManager.globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
                 lineSeparator.separatorPlacement = SeparatorPlacement.TOP
                 result.add(lineSeparator)
             }
