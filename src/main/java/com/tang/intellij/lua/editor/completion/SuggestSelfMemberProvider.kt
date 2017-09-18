@@ -24,7 +24,7 @@ import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.LuaPsiImplUtil
+import com.tang.intellij.lua.psi.processOptional
 import com.tang.intellij.lua.search.SearchContext
 
 /**
@@ -51,7 +51,8 @@ class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
                 } else if (member is LuaClassMethod) {
                     val methodName = member.name
                     if (methodName != null) {
-                        LuaPsiImplUtil.processOptional(member.params) { signature, mask ->
+                        //todo no processOptional
+                        processOptional(member.params) { signature, mask ->
                             val elementBuilder = LuaMethodLookupElement("self:" + methodName, signature, curType === type, member)
                             elementBuilder.handler = FuncInsertHandler(member).withMask(mask)
                             elementBuilder.setTailText("  [" + curType.displayName + "]")

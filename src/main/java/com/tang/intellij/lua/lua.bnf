@@ -24,7 +24,7 @@
   psiImplClassSuffix="Impl"
   psiPackage="com.tang.intellij.lua.psi"
   psiImplPackage="com.tang.intellij.lua.psi.impl"
-  psiImplUtilClass="com.tang.intellij.lua.psi.LuaPsiImplUtil"
+  psiImplUtilClass="com.tang.intellij.lua.psi.LuaPsiImplUtilKt"
 
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.psi.LuaTypes"

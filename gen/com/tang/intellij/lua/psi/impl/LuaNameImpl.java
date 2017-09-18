@@ -34,12 +34,12 @@ public class LuaNameImpl extends ASTWrapperPsiElement implements LuaName {
 
   @NotNull
   public PsiElement setName(String name) {
-    return LuaPsiImplUtil.setName(this, name);
+    return LuaPsiImplUtilKt.setName(this, name);
   }
 
   @NotNull
   public String getName() {
-    return LuaPsiImplUtil.getName(this);
+    return LuaPsiImplUtilKt.getName(this);
   }
 
 }

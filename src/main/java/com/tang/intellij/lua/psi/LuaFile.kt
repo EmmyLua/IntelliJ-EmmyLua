@@ -96,7 +96,7 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
                     returnStatRef.set(luaReturnStat)
                     false
                 }
-                LuaPsiImplUtil.guessReturnTypeSet(returnStatRef.get(), 0, context)
+                guessReturnTypeSet(returnStatRef.get(), 0, context)
             }
             ty
         } ?: Ty.UNKNOWN

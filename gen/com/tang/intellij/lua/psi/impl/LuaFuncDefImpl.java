@@ -57,61 +57,61 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
 
   @Nullable
   public LuaComment getComment() {
-    return LuaPsiImplUtil.getComment(this);
+    return LuaPsiImplUtilKt.getComment(this);
   }
 
   @NotNull
   public ItemPresentation getPresentation() {
-    return LuaPsiImplUtil.getPresentation(this);
+    return LuaPsiImplUtilKt.getPresentation(this);
   }
 
   @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
-    return LuaPsiImplUtil.getParamNameDefList(this);
+    return LuaPsiImplUtilKt.getParamNameDefList(this);
   }
 
   @Nullable
   public PsiElement getNameIdentifier() {
-    return LuaPsiImplUtil.getNameIdentifier(this);
+    return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @NotNull
   public PsiElement setName(String name) {
-    return LuaPsiImplUtil.setName(this, name);
+    return LuaPsiImplUtilKt.setName(this, name);
   }
 
   @Nullable
   public String getName() {
-    return LuaPsiImplUtil.getName(this);
+    return LuaPsiImplUtilKt.getName(this);
   }
 
   public int getTextOffset() {
-    return LuaPsiImplUtil.getTextOffset(this);
+    return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
   @NotNull
   public String toString() {
-    return LuaPsiImplUtil.toString(this);
+    return LuaPsiImplUtilKt.toString(this);
   }
 
   @NotNull
   public ITy guessReturnTypeSet(SearchContext searchContext) {
-    return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
+    return LuaPsiImplUtilKt.guessReturnTypeSet(this, searchContext);
   }
 
   @NotNull
   public ITyClass getClassType(SearchContext searchContext) {
-    return LuaPsiImplUtil.getClassType(this, searchContext);
+    return LuaPsiImplUtilKt.getClassType(this, searchContext);
   }
 
   @NotNull
   public LuaParamInfo[] getParams() {
-    return LuaPsiImplUtil.getParams(this);
+    return LuaPsiImplUtilKt.getParams(this);
   }
 
   @NotNull
   public PsiReference[] getReferences() {
-    return LuaPsiImplUtil.getReferences(this);
+    return LuaPsiImplUtilKt.getReferences(this);
   }
 
 }

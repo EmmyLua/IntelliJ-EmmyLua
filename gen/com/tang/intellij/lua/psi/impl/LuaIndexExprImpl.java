@@ -53,46 +53,46 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
 
   @Nullable
   public PsiElement getNameIdentifier() {
-    return LuaPsiImplUtil.getNameIdentifier(this);
+    return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @NotNull
   public PsiElement setName(String name) {
-    return LuaPsiImplUtil.setName(this, name);
+    return LuaPsiImplUtilKt.setName(this, name);
   }
 
   @Nullable
   public String getName() {
-    return LuaPsiImplUtil.getName(this);
+    return LuaPsiImplUtilKt.getName(this);
   }
 
   public int getTextOffset() {
-    return LuaPsiImplUtil.getTextOffset(this);
+    return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
   @NotNull
   public ItemPresentation getPresentation() {
-    return LuaPsiImplUtil.getPresentation(this);
+    return LuaPsiImplUtilKt.getPresentation(this);
   }
 
   @Nullable
   public LuaLiteralExpr getIdExpr() {
-    return LuaPsiImplUtil.getIdExpr(this);
+    return LuaPsiImplUtilKt.getIdExpr(this);
   }
 
   @NotNull
   public String toString() {
-    return LuaPsiImplUtil.toString(this);
+    return LuaPsiImplUtilKt.toString(this);
   }
 
   @NotNull
   public ITy guessPrefixType(SearchContext context) {
-    return LuaPsiImplUtil.guessPrefixType(this, context);
+    return LuaPsiImplUtilKt.guessPrefixType(this, context);
   }
 
   @NotNull
   public ITy guessValueType(SearchContext context) {
-    return LuaPsiImplUtil.guessValueType(this, context);
+    return LuaPsiImplUtilKt.guessValueType(this, context);
   }
 
   @Override

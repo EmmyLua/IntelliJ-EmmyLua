@@ -41,7 +41,7 @@ public class LuaLocalDefImpl extends ASTWrapperPsiElement implements LuaLocalDef
 
   @Nullable
   public LuaComment getComment() {
-    return LuaPsiImplUtil.getComment(this);
+    return LuaPsiImplUtilKt.getComment(this);
   }
 
   @Override

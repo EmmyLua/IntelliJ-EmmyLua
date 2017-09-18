@@ -44,46 +44,46 @@ public class LuaLocalFuncDefImpl extends ASTWrapperPsiElement implements LuaLoca
 
   @Nullable
   public LuaComment getComment() {
-    return LuaPsiImplUtil.getComment(this);
+    return LuaPsiImplUtilKt.getComment(this);
   }
 
   @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
-    return LuaPsiImplUtil.getParamNameDefList(this);
+    return LuaPsiImplUtilKt.getParamNameDefList(this);
   }
 
   @Nullable
   public PsiElement getNameIdentifier() {
-    return LuaPsiImplUtil.getNameIdentifier(this);
+    return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @NotNull
   public PsiElement setName(String name) {
-    return LuaPsiImplUtil.setName(this, name);
+    return LuaPsiImplUtilKt.setName(this, name);
   }
 
   @Nullable
   public String getName() {
-    return LuaPsiImplUtil.getName(this);
+    return LuaPsiImplUtilKt.getName(this);
   }
 
   public int getTextOffset() {
-    return LuaPsiImplUtil.getTextOffset(this);
+    return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
   @NotNull
   public SearchScope getUseScope() {
-    return LuaPsiImplUtil.getUseScope(this);
+    return LuaPsiImplUtilKt.getUseScope(this);
   }
 
   @NotNull
   public ITy guessReturnTypeSet(SearchContext searchContext) {
-    return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
+    return LuaPsiImplUtilKt.guessReturnTypeSet(this, searchContext);
   }
 
   @NotNull
   public LuaParamInfo[] getParams() {
-    return LuaPsiImplUtil.getParams(this);
+    return LuaPsiImplUtilKt.getParams(this);
   }
 
 }

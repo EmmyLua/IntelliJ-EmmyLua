@@ -36,7 +36,7 @@ public class LuaExprListImpl extends ASTWrapperPsiElement implements LuaExprList
 
   @NotNull
   public ITy guessTypeAt(SearchContext context) {
-    return LuaPsiImplUtil.guessTypeAt(this, context);
+    return LuaPsiImplUtilKt.guessTypeAt(this, context);
   }
 
 }

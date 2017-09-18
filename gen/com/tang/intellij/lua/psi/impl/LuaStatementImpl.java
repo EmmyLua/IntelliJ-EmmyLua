@@ -29,7 +29,7 @@ public class LuaStatementImpl extends ASTWrapperPsiElement implements LuaStateme
 
   @Nullable
   public LuaComment getComment() {
-    return LuaPsiImplUtil.getComment(this);
+    return LuaPsiImplUtilKt.getComment(this);
   }
 
 }

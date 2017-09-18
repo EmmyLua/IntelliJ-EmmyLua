@@ -41,29 +41,29 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
 
   @NotNull
   public ITy guessPrefixType(SearchContext context) {
-    return LuaPsiImplUtil.guessPrefixType(this, context);
+    return LuaPsiImplUtilKt.guessPrefixType(this, context);
   }
 
   @Nullable
   public LuaFuncBodyOwner resolveFuncBodyOwner(SearchContext context) {
-    return LuaPsiImplUtil.resolveFuncBodyOwner(this, context);
+    return LuaPsiImplUtilKt.resolveFuncBodyOwner(this, context);
   }
 
   @Nullable
   public PsiElement getFirstStringArg() {
-    return LuaPsiImplUtil.getFirstStringArg(this);
+    return LuaPsiImplUtilKt.getFirstStringArg(this);
   }
 
   public boolean isStaticMethodCall() {
-    return LuaPsiImplUtil.isStaticMethodCall(this);
+    return LuaPsiImplUtilKt.isStaticMethodCall(this);
   }
 
   public boolean isMethodCall() {
-    return LuaPsiImplUtil.isMethodCall(this);
+    return LuaPsiImplUtilKt.isMethodCall(this);
   }
 
   public boolean isFunctionCall() {
-    return LuaPsiImplUtil.isFunctionCall(this);
+    return LuaPsiImplUtilKt.isFunctionCall(this);
   }
 
 }

@@ -35,17 +35,17 @@ public class LuaClosureExprImpl extends LuaExprImpl implements LuaClosureExpr {
 
   @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
-    return LuaPsiImplUtil.getParamNameDefList(this);
+    return LuaPsiImplUtilKt.getParamNameDefList(this);
   }
 
   @NotNull
   public ITy guessReturnTypeSet(SearchContext searchContext) {
-    return LuaPsiImplUtil.guessReturnTypeSet(this, searchContext);
+    return LuaPsiImplUtilKt.guessReturnTypeSet(this, searchContext);
   }
 
   @NotNull
   public LuaParamInfo[] getParams() {
-    return LuaPsiImplUtil.getParams(this);
+    return LuaPsiImplUtilKt.getParams(this);
   }
 
 }

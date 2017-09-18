@@ -60,6 +60,6 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
     }
 
     default String getParamSignature() {
-        return LuaPsiImplUtil.getParamSignature(this);
+        return LuaPsiImplUtilKt.getParamSignature(this);
     }
 }

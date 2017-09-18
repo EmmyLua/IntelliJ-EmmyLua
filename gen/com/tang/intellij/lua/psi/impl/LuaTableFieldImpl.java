@@ -55,51 +55,51 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
 
   @Nullable
   public PsiElement getNameIdentifier() {
-    return LuaPsiImplUtil.getNameIdentifier(this);
+    return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @NotNull
   public PsiElement setName(String name) {
-    return LuaPsiImplUtil.setName(this, name);
+    return LuaPsiImplUtilKt.setName(this, name);
   }
 
   @Nullable
   public String getName() {
-    return LuaPsiImplUtil.getName(this);
+    return LuaPsiImplUtilKt.getName(this);
   }
 
   public int getTextOffset() {
-    return LuaPsiImplUtil.getTextOffset(this);
+    return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
   @NotNull
   public String toString() {
-    return LuaPsiImplUtil.toString(this);
+    return LuaPsiImplUtilKt.toString(this);
   }
 
   @Nullable
   public String getFieldName() {
-    return LuaPsiImplUtil.getFieldName(this);
+    return LuaPsiImplUtilKt.getFieldName(this);
   }
 
   @NotNull
   public ItemPresentation getPresentation() {
-    return LuaPsiImplUtil.getPresentation(this);
+    return LuaPsiImplUtilKt.getPresentation(this);
   }
 
   @NotNull
   public ITy guessType(SearchContext context) {
-    return LuaPsiImplUtil.guessType(this, context);
+    return LuaPsiImplUtilKt.guessType(this, context);
   }
 
   @Nullable
   public LuaComment getComment() {
-    return LuaPsiImplUtil.getComment(this);
+    return LuaPsiImplUtilKt.getComment(this);
   }
 
   @Nullable
   public LuaLiteralExpr getIdExpr() {
-    return LuaPsiImplUtil.getIdExpr(this);
+    return LuaPsiImplUtilKt.getIdExpr(this);
   }
 
   @Override

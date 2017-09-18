@@ -63,7 +63,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
                         .map<PsiElement> { it.parent }
                         .map<String> { s ->
                             val assignStat = s as LuaAssignStat
-                            LuaPsiImplUtil.getTypeName(assignStat, 0)
+                            getTypeName(assignStat, 0)
                         }
                 _typeName = optional.orElse(if (table != null) getTableTypeName(table) else null)
             }

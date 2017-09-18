@@ -30,17 +30,17 @@ public class LuaNameDefImpl extends LuaNameImpl implements LuaNameDef {
 
   @NotNull
   public ITy guessType(SearchContext context) {
-    return LuaPsiImplUtil.guessType(this, context);
+    return LuaPsiImplUtilKt.guessType(this, context);
   }
 
   @NotNull
   public PsiElement getNameIdentifier() {
-    return LuaPsiImplUtil.getNameIdentifier(this);
+    return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
   @NotNull
   public SearchScope getUseScope() {
-    return LuaPsiImplUtil.getUseScope(this);
+    return LuaPsiImplUtilKt.getUseScope(this);
   }
 
 }
