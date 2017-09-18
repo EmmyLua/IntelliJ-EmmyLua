@@ -57,10 +57,9 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
         var element: PsiElement? = firstChild
         while (element != null) {
             if (element is LuaDocParamDef) {
-                val paramDef = element as LuaDocParamDef?
-                val nameRef = paramDef!!.paramNameRef
+                val nameRef = element.paramNameRef
                 if (nameRef != null && nameRef.text == name)
-                    return paramDef
+                    return element
             }
             element = element.nextSibling
         }

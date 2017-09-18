@@ -38,7 +38,7 @@ class LuaLanguageInjector : LanguageInjector {
                     if (lanDef != null) {
                         val lan = Language.findLanguageByID(lanDef.id?.text)
                         if (lan != null) {
-                            val le = injectionHost as LuaLiteralExpr
+                            val le:LuaLiteralExpr = injectionHost
                             val content = LuaString.getContent(le.text)
                             val range = TextRange(content.start, content.end)
                             languagePlaces.addPlace(lan, range, null, null)
