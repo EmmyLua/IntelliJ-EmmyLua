@@ -17,21 +17,19 @@
 package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.processOptional
 import com.tang.intellij.lua.search.SearchContext
 
 /**
  * suggest self.xxx
  * Created by TangZX on 2017/4/11.
  */
-class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
+class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
     override fun addCompletions(completionParameters: CompletionParameters,
                                 processingContext: ProcessingContext,
                                 completionResultSet: CompletionResultSet) {
@@ -42,23 +40,19 @@ class SuggestSelfMemberProvider : CompletionProvider<CompletionParameters>() {
             val type = methodDef.getClassType(searchContext)
             type?.processMembers(searchContext) { curType, member ->
                 if (member is LuaClassField) {
-                    val fieldName = member.name
-                    if (fieldName != null) {
-                        val elementBuilder = LuaFieldLookupElement("self." + fieldName, member, curType === type)
-                        elementBuilder.setTailText("  [" + curType.displayName + "]")
-                        completionResultSet.addElement(elementBuilder)
-                    }
-                } else if (member is LuaClassMethod) {
-                    val methodName = member.name
-                    if (methodName != null) {
-                        //todo no processOptional
-                        processOptional(member.params) { signature, mask ->
-                            val elementBuilder = LuaMethodLookupElement("self:" + methodName, signature, curType === type, member)
-                            elementBuilder.handler = FuncInsertHandler(member).withMask(mask)
-                            elementBuilder.setTailText("  [" + curType.displayName + "]")
-                            completionResultSet.addElement(elementBuilder)
+                    addField(completionResultSet, curType === type, curType.className, member, object : HandlerProcessor() {
+                        override fun process(element: LuaLookupElement) {
+                            element.lookupString = "self.${member.name}"
                         }
-                    }
+                    })
+                } else if (member is LuaClassMethod) {
+                    addMethod(completionResultSet, curType === type, curType.className, member,  object : HandlerProcessor() {
+                        override fun process(element: LuaLookupElement) { }
+
+                        override fun processLookupString(lookupString: String): String {
+                            return "self:${member.name}"
+                        }
+                    })
                 }
             }
         }

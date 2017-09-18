@@ -34,8 +34,9 @@ import com.tang.intellij.lua.ty.*
  * Created by tangzx on 2016/12/25.
  */
 open class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>() {
-    protected interface HandlerProcessor {
-        fun process(element: LuaLookupElement)
+    protected abstract class HandlerProcessor {
+        open fun processLookupString(lookupString: String): String = lookupString
+        abstract fun process(element: LuaLookupElement)
     }
 
     private class InsertHandlerWrapper(val deleteLen: Int, val name:String, val base: InsertHandler<LookupElement>?) : InsertHandler<LookupElement> {
@@ -69,7 +70,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                         if (!Ty.isInvalid(prefixTypeSet)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)
-                            complete(indexExpr, typeSet, resultSet, prefixMatcher, object : HandlerProcessor {
+                            complete(indexExpr, typeSet, resultSet, prefixMatcher, object : HandlerProcessor() {
                                 override fun process(element: LuaLookupElement) {
                                     element.itemText = txt + colon + element.itemText
                                     element.handler = InsertHandlerWrapper(nameExpr.textLength + 1, txt, element.handler)
@@ -95,18 +96,22 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         val context = SearchContext(project)
         luaType.lazyInit(context)
         luaType.processMembers(context) { curType, def ->
-            val className = curType.displayName
-            if (def is LuaClassField && !isColon) {
-                addField(completionResultSet, prefixMatcher, curType === luaType, className, def, handlerProcessor)
-            } else if (def is LuaClassMethod) {
-                addMethod(completionResultSet, prefixMatcher, curType === luaType, className, def, handlerProcessor)
+            def.name?.let {
+                if (prefixMatcher.prefixMatches(it)) {
+                    val className = curType.displayName
+                    if (def is LuaClassField && !isColon) {
+                        addField(completionResultSet, curType === luaType, className, def, handlerProcessor)
+                    } else if (def is LuaClassMethod) {
+                        addMethod(completionResultSet, curType === luaType, className, def, handlerProcessor)
+                    }
+                }
             }
         }
     }
 
-    private fun addField(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
+    protected fun addField(completionResultSet: CompletionResultSet, bold: Boolean, clazzName: String, field: LuaClassField, handlerProcessor: HandlerProcessor?) {
         val name = field.name
-        if (name != null && prefixMatcher.prefixMatches(name)) {
+        if (name != null) {
             val elementBuilder = LuaFieldLookupElement(name, field, bold)
             if (!LuaRefactoringUtil.isLuaIdentifier(name)) {
                 elementBuilder.lookupString = "['$name']"
@@ -123,12 +128,13 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         }
     }
 
-    private fun addMethod(completionResultSet: CompletionResultSet, prefixMatcher: PrefixMatcher, bold: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
+    protected fun addMethod(completionResultSet: CompletionResultSet, bold: Boolean, clazzName: String, def: LuaClassMethod, handlerProcessor: HandlerProcessor?) {
         val methodName = def.name
-        if (methodName != null && prefixMatcher.prefixMatches(methodName)) {
+        if (methodName != null) {
             val ty = def.asTy(SearchContext(def.project))
             ty.process(Processor {
-                val le = TyFunctionLookupElement(methodName, it, bold, ty, LuaIcons.CLASS_METHOD)
+                val lookupString = handlerProcessor?.processLookupString(methodName) ?: methodName
+                val le = TyFunctionLookupElement(lookupString, it, bold, ty, LuaIcons.CLASS_METHOD)
                 le.handler = SignatureInsertHandler(it)
                 if (!ty.isSelfCall) le.setItemTextUnderlined(true)
                 le.setTailText("  [$clazzName]")
