@@ -22,9 +22,10 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.IntStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
-import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaClassMethod
+import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
 
@@ -69,10 +70,26 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
 
         fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
             var perfect: LuaClassMember? = null
+            var docField: LuaDocFieldDef? = null
+            var tableField: LuaTableField? = null
             processAll(type, fieldName, context, Processor {
-                perfect = it
-                it !is LuaDocPsiElement
+                when (it) {
+                    is LuaDocFieldDef -> {
+                        docField = it
+                        false
+                    }
+                    is LuaTableField -> {
+                        tableField = it
+                        true
+                    }
+                    else -> {
+                        perfect = it
+                        true
+                    }
+                }
             })
+            if (docField != null) return docField
+            if (tableField != null) return tableField
             return perfect
         }
 
