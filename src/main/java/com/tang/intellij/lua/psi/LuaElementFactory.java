@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import org.jetbrains.annotations.NotNull;
 
@@ -64,5 +65,12 @@ public class LuaElementFactory {
     public static PsiElement createWith(Project project, String code) {
         LuaFile file = createFile(project, code);
         return file.getFirstChild();
+    }
+
+    public static PsiElement createDocIdentifier(Project project, String name) {
+        PsiElement element = createWith(project, "---@field " + name + " string");
+        LuaDocFieldDef fieldDef = PsiTreeUtil.findChildOfType(element, LuaDocFieldDef.class);
+        assert fieldDef != null;
+        return fieldDef.getId();
     }
 }

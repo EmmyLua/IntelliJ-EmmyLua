@@ -54,7 +54,7 @@ fun getName(identifierOwner: PsiNameIdentifierOwner): String? {
 fun setName(identifierOwner: PsiNameIdentifierOwner, newName: String): PsiElement {
     val oldId = identifierOwner.nameIdentifier
     if (oldId != null) {
-        val newId = LuaElementFactory.createIdentifier(identifierOwner.project, newName)
+        val newId = LuaElementFactory.createDocIdentifier(identifierOwner.project, newName)
         oldId.replace(newId)
         return newId
     }
@@ -160,13 +160,7 @@ fun getPresentation(classDef: LuaDocClassDef): ItemPresentation {
 
 fun getType(classDef: LuaDocClassDef): ITyClass {
     val stub = classDef.stub
-    val luaType: ITyClass
-    if (stub != null) {
-        luaType = stub.classType
-    } else {
-        luaType = TyPsiDocClass(classDef)
-    }
-    return luaType
+    return stub?.classType ?: TyPsiDocClass(classDef)
 }
 
 /**
