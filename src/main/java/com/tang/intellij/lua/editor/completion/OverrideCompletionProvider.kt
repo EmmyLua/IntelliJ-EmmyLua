@@ -48,12 +48,16 @@ class OverrideCompletionProvider : CompletionProvider<CompletionParameters>() {
             val classType = methodDef.getClassType(context)
             if (classType != null) {
                 val sup = classType.getSuperClass(context)
-                addOverrideMethod(completionParameters, completionResultSet, sup)
+                val memberNameSet = mutableSetOf<String>()
+                classType.processMembers(context, { _, m ->
+                    m.name?.let { memberNameSet.add(it) }
+                }, false)
+                addOverrideMethod(completionParameters, completionResultSet, memberNameSet, sup)
             }
         }
     }
 
-    private fun addOverrideMethod(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet, sup: ITyClass?) {
+    private fun addOverrideMethod(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet, memberNameSet:MutableSet<String>, sup: ITyClass?) {
         var superCls = sup
         if (superCls != null) {
             val project = completionParameters.originalFile.project
@@ -61,18 +65,22 @@ class OverrideCompletionProvider : CompletionProvider<CompletionParameters>() {
             val clazzName = superCls.className
             LuaClassMemberIndex.processAll(TyLazyClass(clazzName), context, Processor { def ->
                 if (def is LuaClassMethod) {
-                    val elementBuilder = LookupElementBuilder.create(def.name!!)
-                            .withIcon(LuaIcons.CLASS_METHOD_OVERRIDING)
-                            .withInsertHandler(OverrideInsertHandler(def))
-                            .withTailText(def.paramSignature)
+                    def.name?.let {
+                        if (memberNameSet.add(it)) {
+                            val elementBuilder = LookupElementBuilder.create(def.name!!)
+                                    .withIcon(LuaIcons.CLASS_METHOD_OVERRIDING)
+                                    .withInsertHandler(OverrideInsertHandler(def))
+                                    .withTailText(def.paramSignature)
 
-                    completionResultSet.addElement(elementBuilder)
+                            completionResultSet.addElement(elementBuilder)
+                        }
+                    }
                 }
                 true
             })
 
             superCls = superCls.getSuperClass(context)
-            addOverrideMethod(completionParameters, completionResultSet, superCls)
+            addOverrideMethod(completionParameters, completionResultSet, memberNameSet, superCls)
         }
     }
 

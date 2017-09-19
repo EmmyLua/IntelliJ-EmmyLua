@@ -29,7 +29,10 @@ interface ITyClass : ITy {
     var superClassName: String?
     var aliasName: String?
     fun lazyInit(searchContext: SearchContext)
-    fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit)
+    fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean = true)
+    fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
+        processMembers(context, processor, true)
+    }
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
     fun getSuperClass(context: SearchContext): ITyClass?
 }
@@ -48,7 +51,7 @@ abstract class TyClass(override val className: String, override var superClassNa
         return className.hashCode()
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
+    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         val clazzName = className
         val project = context.project
 
@@ -66,8 +69,10 @@ abstract class TyClass(override val className: String, override var superClassNa
         }
 
         // super
-        val superType = getSuperClass(context)
-        superType?.processMembers(context, processor)
+        if (deep) {
+            val superType = getSuperClass(context)
+            superType?.processMembers(context, processor, deep)
+        }
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
@@ -151,11 +156,11 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
         this.flags = TyFlags.ANONYMOUS
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
+    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         for (field in table.tableFieldList) {
             processor(this, field)
         }
-        super.processMembers(context, processor)
+        super.processMembers(context, processor, deep)
     }
 
     override val displayName: String
