@@ -39,12 +39,14 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JTextField constructorNames;
     private JCheckBox strictDoc;
     private JCheckBox smartCloseEnd;
+    private JCheckBox showWordsInFile;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
         constructorNames.setText(settings.getConstructorNamesString());
         strictDoc.setSelected(settings.isStrictDoc());
         smartCloseEnd.setSelected(settings.isSmartCloseEnd());
+        showWordsInFile.setSelected(settings.isShowWordsInFile());
     }
 
     @NotNull
@@ -69,7 +71,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     public boolean isModified() {
         return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
                 settings.isStrictDoc() != strictDoc.isSelected() ||
-                settings.isSmartCloseEnd() != smartCloseEnd.isSelected();
+                settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
+                settings.isShowWordsInFile() != showWordsInFile.isSelected();
     }
 
     @Override
@@ -78,6 +81,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         constructorNames.setText(settings.getConstructorNamesString());
         settings.setStrictDoc(strictDoc.isSelected());
         settings.setSmartCloseEnd(smartCloseEnd.isSelected());
+        settings.setShowWordsInFile(showWordsInFile.isSelected());
 
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             DaemonCodeAnalyzer.getInstance(project).restart();

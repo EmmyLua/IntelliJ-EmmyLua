@@ -25,6 +25,7 @@ import com.intellij.psi.tree.TokenSet
 import com.intellij.util.ProcessingContext
 import com.intellij.util.containers.HashSet
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 
 /**
@@ -67,7 +68,7 @@ class LuaCompletionContributor : CompletionContributor() {
         val session = CompletionSession(parameters, result)
         parameters.editor.putUserData(CompletionSession.KEY, session)
         super.fillCompletionVariants(parameters, result)
-        if (suggestWords && session.isSuggestWords && !result.isStopped) {
+        if (LuaSettings.instance.isShowWordsInFile && suggestWords && session.isSuggestWords && !result.isStopped) {
             suggestWordsInFile(parameters)
         }
     }
