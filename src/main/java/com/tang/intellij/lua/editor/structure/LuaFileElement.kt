@@ -183,66 +183,7 @@ class LuaFileElement(private val file: LuaFile) : StructureViewTreeElement {
             }
 
             override fun visitBlock(o: LuaBlock) {
-                o.children.forEach{
-                    if (it is LuaClassMethodDef) {
-                        val classMethodName = it.classMethodName
-
-                        var namePart = classMethodName.firstChild
-                        while (namePart.firstChild is LuaExpr) {
-                            namePart = namePart.firstChild
-                        }
-
-                        var curClassContext = classes
-
-                        while (namePart != classMethodName) {
-                            var name = namePart.lastChild.text
-
-                            if (name == null) {
-                                name = "<null>"
-                            }
-
-                            var curClassStruct = curClassContext[name]
-
-                            if (curClassStruct == null) {
-                                var curClassElem:ClassTreeElement? = null
-
-                                if (curClassContext.treeElement == null && name in locals) {
-                                    val idx = locals[name]
-
-                                    if (idx != null) {
-                                        locals.remove(name)
-                                        val nameDefEle:LuaNameDefElement = list[idx] as LuaNameDefElement
-
-                                        curClassElem = ClassTreeElement(nameDefEle.nameDef)
-
-                                        list.removeAt(idx)
-                                    }
-                                }
-
-                                if (curClassElem == null) {
-                                    curClassElem = ClassTreeElement(namePart as LuaPsiElement)
-                                }
-
-                                curClassStruct = ClassStructure(curClassElem)
-
-                                if (curClassContext.treeElement == null) {
-                                    list.add(curClassElem)
-                                }
-
-                                curClassContext[name] = curClassStruct
-                            }
-
-                            curClassContext = curClassStruct
-                            namePart = namePart.parent
-                        }
-
-                        curClassContext.addMethod(ShortMethodElement(it))
-
-//                        list.add(LuaClassMethodElement(it))
-                    } else {
-                        it.accept(this)
-                    }
-                }
+                o.children.forEach{it.accept(this)}
             }
 
             override fun visitClassMethod(o: LuaClassMethod) {
@@ -266,8 +207,70 @@ class LuaFileElement(private val file: LuaFile) : StructureViewTreeElement {
                 list.add(LuaLocalFuncElement(o))
             }
 
+            fun handleCompoundName(owner:LuaPsiElement):ClassStructure {
+                var namePart = owner.firstChild as LuaExpr
+                while (namePart.firstChild is LuaExpr) {
+                    namePart = namePart.firstChild as LuaExpr
+                }
+
+                var curClassContext = classes
+
+                var done = false
+                while (!done) {
+                    var name = namePart.lastChild.text
+
+                    if (name == null) {
+                        name = "<null>"
+                    }
+
+                    var curClassStruct = curClassContext[name]
+
+                    if (curClassStruct == null) {
+                        var curClassElem:ClassTreeElement? = null
+
+                        if (curClassContext.treeElement == null && name in locals) {
+                            val idx = locals[name]
+
+                            if (idx != null) {
+                                locals.remove(name)
+                                val nameDefEle:LuaNameDefElement = list[idx] as LuaNameDefElement
+
+                                curClassElem = ClassTreeElement(nameDefEle.nameDef)
+
+                                list.removeAt(idx)
+                            }
+                        }
+
+                        if (curClassElem == null) {
+                            curClassElem = ClassTreeElement(namePart as LuaPsiElement)
+                        }
+
+                        curClassStruct = ClassStructure(curClassElem)
+
+                        if (curClassContext.treeElement == null) {
+                            list.add(curClassElem)
+                        }
+
+                        curClassContext[name] = curClassStruct
+                    }
+
+                    curClassContext = curClassStruct
+                    done = namePart.parent == owner
+
+                    if (!done) {
+                        namePart = namePart.parent as LuaExpr
+                    }
+                }
+
+                return curClassContext
+            }
+
             override fun visitClassMethodDef(o: LuaClassMethodDef) {
-                list.add(LuaClassMethodElement(o))
+                val classStruct = handleCompoundName(o.classMethodName)
+
+                classStruct.addMethod(ShortMethodElement(o))
+
+//                        list.add(LuaClassMethodElement(it))
             }
         }
 
