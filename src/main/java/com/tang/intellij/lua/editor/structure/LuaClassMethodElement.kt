@@ -23,9 +23,9 @@ import com.tang.intellij.lua.psi.LuaClassMethodDef
 
  * Created by TangZX on 2016/12/13.
  */
-class LuaClassMethodElement internal constructor(methodDef: LuaClassMethodDef) : LuaTreeElement<LuaClassMethodDef>(methodDef, LuaIcons.CLASS_METHOD) {
+open class LuaClassMethodElement internal constructor(methodDef: LuaClassMethodDef) : LuaTreeElement<LuaClassMethodDef>(methodDef, LuaIcons.CLASS_METHOD) {
 
-    private val methodName: String
+    protected var methodName: String
 
     init {
         val methodName = methodDef.classMethodName
