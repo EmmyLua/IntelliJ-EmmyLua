@@ -28,7 +28,7 @@ class LuaLocalElement internal constructor(localDef: LuaLocalDef) : LuaTreeEleme
     override fun getPresentableText(): String? {
         val nameList = element.nameList
         if (nameList != null)
-            return "local " + nameList.text
+            return nameList.text
         return null
     }
 }
