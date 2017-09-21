@@ -16,8 +16,10 @@
 
 package com.tang.intellij.lua.psi;
 
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -191,5 +193,25 @@ public class LuaPsiTreeUtil {
             T e = (T) element;
             return e;
         }
+    }
+
+
+    private static final Class[] WS = {PsiWhiteSpace.class};
+    private static final Class[] WS_COMMENTS = {PsiWhiteSpace.class, PsiComment.class};
+
+    public static PsiElement skipWhitespacesBackward(@Nullable PsiElement element) {
+        return PsiTreeUtil.skipSiblingsBackward(element, WS);
+    }
+
+    public static PsiElement skipWhitespacesAndCommentsBackward(@Nullable PsiElement element) {
+        return PsiTreeUtil.skipSiblingsBackward(element, WS_COMMENTS);
+    }
+
+    public static PsiElement skipWhitespacesForward(@Nullable PsiElement element) {
+        return PsiTreeUtil.skipSiblingsForward(element, WS);
+    }
+
+    public static PsiElement skipWhitespacesAndCommentsForward(@Nullable PsiElement element) {
+        return PsiTreeUtil.skipSiblingsForward(element, WS_COMMENTS);
     }
 }
