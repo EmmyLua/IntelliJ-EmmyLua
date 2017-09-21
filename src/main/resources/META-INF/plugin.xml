@@ -150,6 +150,7 @@
         <!--navigate-->
         <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
         <gotoSymbolContributor implementation="com.tang.intellij.lua.editor.LuaSymbolNavigationContributor"/>
+        <breadcrumbsInfoProvider implementation="com.tang.intellij.lua.editor.LuaBreadcrumbsProvider"/>
 
         <!--completion-->
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCommentCompletionContributor"/>
