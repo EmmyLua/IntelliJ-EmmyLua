@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor.formatter
+package com.tang.intellij.lua.editor.formatter.blocks
 
 import com.intellij.formatting.Alignment
-import com.intellij.formatting.SpacingBuilder
-import com.intellij.psi.codeStyle.CodeStyleSettings
-import com.tang.intellij.lua.editor.formatter.blocks.LuaScriptBlock
+import com.intellij.formatting.Indent
+import com.intellij.formatting.Wrap
+import com.intellij.lang.ASTNode
+import com.tang.intellij.lua.editor.formatter.LuaFormatContext
 
-class LuaFormatContext(val settings: CodeStyleSettings, val luaSettings: LuaCodeStyleSettings, val spaceBuilder: SpacingBuilder) {
-    var eqAlignment: Alignment? = null
-    var lastBlock: LuaScriptBlock? = null
+class LuaAssignBlock(parent: LuaScriptBlock?, node: ASTNode, wrap: Wrap?, alignment: Alignment?, indent: Indent, ctx: LuaFormatContext)
+    : LuaScriptBlock(parent, node, wrap, alignment, indent, ctx) {
+    
 }

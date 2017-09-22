@@ -95,11 +95,11 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
     }
 
     private fun createBlock(node: ASTNode, childIndent: Indent, alignment: Alignment?): LuaScriptBlock {
-        if (node.elementType === UNARY_EXPR)
-            return LuaUnaryScriptBlock(this, node, null, alignment, childIndent, ctx)
-        if (node.elementType === BINARY_EXPR)
-            return LuaBinaryScriptBlock(this, node, null, alignment, childIndent, ctx)
-        return LuaScriptBlock(this, node, null, alignment, childIndent, ctx)
+        return when (node.elementType) {
+            UNARY_EXPR -> LuaUnaryScriptBlock(this, node, null, alignment, childIndent, ctx)
+            BINARY_EXPR -> LuaBinaryScriptBlock(this, node, null, alignment, childIndent, ctx)
+            else -> LuaScriptBlock(this, node, null, alignment, childIndent, ctx)
+        }
     }
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
