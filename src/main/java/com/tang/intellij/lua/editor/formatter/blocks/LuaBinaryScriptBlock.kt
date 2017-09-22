@@ -19,6 +19,7 @@ package com.tang.intellij.lua.editor.formatter.blocks
 import com.intellij.formatting.*
 import com.intellij.lang.ASTNode
 import com.intellij.psi.tree.TokenSet
+import com.tang.intellij.lua.editor.formatter.LuaFormatContext
 
 import com.tang.intellij.lua.psi.LuaTypes.*
 
@@ -26,7 +27,13 @@ import com.tang.intellij.lua.psi.LuaTypes.*
  * binary
  * Created by tangzx on 2017/4/23.
  */
-class LuaBinaryScriptBlock internal constructor(parent: LuaScriptBlock, node: ASTNode, wrap: Wrap?, alignment: Alignment?, indent: Indent, spacingBuilder: SpacingBuilder) : LuaScriptBlock(parent, node, wrap, alignment, indent, spacingBuilder) {
+class LuaBinaryScriptBlock internal constructor(parent: LuaScriptBlock,
+                                                node: ASTNode,
+                                                wrap: Wrap?,
+                                                alignment: Alignment?,
+                                                indent: Indent,
+                                                ctx: LuaFormatContext)
+    : LuaScriptBlock(parent, node, wrap, alignment, indent, ctx) {
 
     //这几个特殊一点，前后必须要有空格
     private val AND_NOT_OR = TokenSet.create(AND, NOT, OR)

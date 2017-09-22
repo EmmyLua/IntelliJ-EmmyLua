@@ -34,13 +34,14 @@ import com.tang.intellij.lua.psi.LuaTypes.*
  */
 class LuaFormattingModelBuilder : FormattingModelBuilder {
     override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
+        val ctx = LuaFormatContext(settings, settings.getCustomSettings(LuaCodeStyleSettings::class.java), createSpaceBuilder(settings))
         return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile,
                 LuaScriptBlock(null,
                         element.node,
                         Wrap.createWrap(WrapType.NONE, false),
                         Alignment.createAlignment(),
                         Indent.getNoneIndent(),
-                        createSpaceBuilder(settings)),
+                        ctx),
                 settings)
     }
 

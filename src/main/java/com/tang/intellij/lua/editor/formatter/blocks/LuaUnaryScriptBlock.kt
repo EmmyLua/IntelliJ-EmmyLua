@@ -18,6 +18,7 @@ package com.tang.intellij.lua.editor.formatter.blocks
 
 import com.intellij.formatting.*
 import com.intellij.lang.ASTNode
+import com.tang.intellij.lua.editor.formatter.LuaFormatContext
 
 import com.tang.intellij.lua.psi.LuaTypes.NOT
 
@@ -30,7 +31,8 @@ class LuaUnaryScriptBlock internal constructor(parent: LuaScriptBlock,
                                                wrap: Wrap?,
                                                alignment: Alignment?,
                                                indent: Indent,
-                                               spacingBuilder: SpacingBuilder) : LuaScriptBlock(parent, node, wrap, alignment, indent, spacingBuilder) {
+                                               ctx: LuaFormatContext)
+    : LuaScriptBlock(parent, node, wrap, alignment, indent, ctx) {
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
         val c1 = child1 as LuaScriptBlock
