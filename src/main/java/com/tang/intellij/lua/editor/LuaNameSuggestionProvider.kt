@@ -26,6 +26,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.isAnonymous
 import java.util.*
 
 /**

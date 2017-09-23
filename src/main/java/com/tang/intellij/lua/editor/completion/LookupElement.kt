@@ -74,7 +74,7 @@ class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boole
 
             icon = when {
                 _ty.isSelfCall -> LuaIcons.CLASS_METHOD
-                _ty.hasFlag(TyFlags.GLOBAL) -> LuaIcons.GLOBAL_FUNCTION
+                _ty.isGlobal -> LuaIcons.GLOBAL_FUNCTION
                 else -> LuaIcons.LOCAL_FUNCTION
             }
 

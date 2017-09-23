@@ -44,9 +44,6 @@ class TyFlags {
 }
 
 interface ITy {
-
-    val isAnonymous: Boolean
-
     val kind: TyKind
 
     val displayName: String
@@ -60,12 +57,15 @@ interface ITy {
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
 
+val ITy.isGlobal: Boolean
+    get() = hasFlag(TyFlags.GLOBAL)
+
+val ITy.isAnonymous: Boolean
+    get() = hasFlag(TyFlags.ANONYMOUS)
+
 abstract class Ty(override val kind: TyKind) : ITy {
 
     override final var flags: Int = 0
-
-    override val isAnonymous: Boolean
-        get() = hasFlag(TyFlags.ANONYMOUS)
 
     fun addFlag(flag: Int) {
         flags = flags or flag
@@ -83,12 +83,12 @@ abstract class Ty(override val kind: TyKind) : ITy {
     override fun toString(): String {
         val list = mutableListOf<String>()
         TyUnion.each(this) { //尽量不使用Global
-            if (!it.isAnonymous && !(it is ITyClass && it.hasFlag(TyFlags.GLOBAL)))
+            if (!it.isAnonymous && !(it is ITyClass && it.isGlobal))
                 list.add(it.displayName)
         }
         if (list.isEmpty()) { //使用Global
             TyUnion.each(this) {
-                if (!it.isAnonymous && (it is ITyClass && it.hasFlag(TyFlags.GLOBAL)))
+                if (!it.isAnonymous && (it is ITyClass && it.isGlobal))
                     list.add(it.displayName)
             }
         }

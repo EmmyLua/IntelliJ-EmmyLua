@@ -42,7 +42,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
     private fun addCompletion(name:String, session: CompletionSession, psi: LuaPsiElement) {
         val addTy = {ty: ITyFunction ->
-            val icon = if (ty.hasFlag(TyFlags.GLOBAL))
+            val icon = if (ty.isGlobal)
                 LuaIcons.GLOBAL_FUNCTION
             else
                 LuaIcons.LOCAL_FUNCTION
