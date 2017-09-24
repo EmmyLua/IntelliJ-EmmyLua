@@ -56,14 +56,15 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
             val nameExpr = this as LuaNameExpr
 
             val multiResolve = multiResolve(nameExpr, context)
-            if (multiResolve.isEmpty()) {
-                typeSet = typeSet.union(TyClass.createGlobalType(nameExpr))
-            } else {
-                multiResolve.forEach {
-                    val set = getTypeSet(context, it)
-                    typeSet = typeSet.union(set)
-                }
+            multiResolve.forEach {
+                val set = getTypeSet(context, it)
+                typeSet = typeSet.union(set)
             }
+
+            if (Ty.isInvalid(typeSet)) {
+                typeSet = typeSet.union(getTypeSet(context, nameExpr))
+            }
+
             typeSet
         }
         return set ?: Ty.UNKNOWN
@@ -89,7 +90,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
                     }
                 }
                 //Global
-                if (isGlobal(def)) {
+                if (Ty.isInvalid(typeSet) && isGlobal(def)) {
                     typeSet = typeSet.union(TyClass.createGlobalType(def))
                 }
                 return typeSet
