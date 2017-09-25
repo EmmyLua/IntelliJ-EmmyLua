@@ -28,6 +28,10 @@ import com.intellij.openapi.editor.colors.TextAttributesKey
 object LuaHighlightingData {
     val DOC_COMMENT_TAG = TextAttributesKey.createTextAttributesKey("LUA_DOC_TAG", DefaultLanguageHighlighterColors.DOC_COMMENT_TAG)
     val DOC_COMMENT_TAG_VALUE = TextAttributesKey.createTextAttributesKey("LUA_DOC_VALUE", DefaultLanguageHighlighterColors.DOC_COMMENT_TAG_VALUE)
+    val DOC_KEYWORD = TextAttributesKey.createTextAttributesKey("LUA_DOC_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
+    val CLASS_NAME = TextAttributesKey.createTextAttributesKey("LUA_CLASS_NAME", DefaultLanguageHighlighterColors.CLASS_NAME)
+    val CLASS_REFERENCE = TextAttributesKey.createTextAttributesKey("LUA_CLASS_REFERENCE", DefaultLanguageHighlighterColors.CLASS_REFERENCE)
+
     val LOCAL_VAR = TextAttributesKey.createTextAttributesKey("LUA_LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
     val PARAMETER = TextAttributesKey.createTextAttributesKey("LUA_PARAMETER", CustomHighlighterColors.CUSTOM_KEYWORD3_ATTRIBUTES)
     val FIELD = TextAttributesKey.createTextAttributesKey("LUA_FIELD")
@@ -51,6 +55,4 @@ object LuaHighlightingData {
     val STD_API = TextAttributesKey.createTextAttributesKey("LUA_STD_API")
     val INSTANCE_METHOD = TextAttributesKey.createTextAttributesKey("LUA_INSTANCE_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD)
     val STATIC_METHOD = TextAttributesKey.createTextAttributesKey("LUA_STATIC_METHOD", DefaultLanguageHighlighterColors.STATIC_METHOD)
-    val CLASS_NAME = TextAttributesKey.createTextAttributesKey("LUA_CLASS_NAME", DefaultLanguageHighlighterColors.CLASS_NAME)
-    val CLASS_REFERENCE = TextAttributesKey.createTextAttributesKey("LUA_CLASS_REFERENCE", DefaultLanguageHighlighterColors.CLASS_REFERENCE)
 }

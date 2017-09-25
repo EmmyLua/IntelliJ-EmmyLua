@@ -104,30 +104,30 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
             ourMap2 = HashMap()
 
             //key words
-            SyntaxHighlighterBase.fillMap(ourMap1, KEYWORD_TOKENS, LuaHighlightingData.KEYWORD)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.SEMICOLON, LuaTypes.SEMI)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.COMMA, LuaTypes.COMMA)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.OPERATORS, LuaTypes.BINARY_OP, LuaTypes.UNARY_OP)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaTypes.LBRACK, LuaTypes.RBRACK)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.BRACES, LuaTypes.LCURLY, LuaTypes.RCURLY)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaTypes.LPAREN, LuaTypes.RPAREN)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.DOT, LuaTypes.DOT)
+            fillMap(ourMap1, KEYWORD_TOKENS, LuaHighlightingData.KEYWORD)
+            fillMap(ourMap1, LuaHighlightingData.SEMICOLON, LuaTypes.SEMI)
+            fillMap(ourMap1, LuaHighlightingData.COMMA, LuaTypes.COMMA)
+            fillMap(ourMap1, LuaHighlightingData.OPERATORS, LuaTypes.BINARY_OP, LuaTypes.UNARY_OP)
+            fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaTypes.LBRACK, LuaTypes.RBRACK)
+            fillMap(ourMap1, LuaHighlightingData.BRACES, LuaTypes.LCURLY, LuaTypes.RCURLY)
+            fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaTypes.LPAREN, LuaTypes.RPAREN)
+            fillMap(ourMap1, LuaHighlightingData.DOT, LuaTypes.DOT)
             //comment
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHEBANG)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.SHEBANG_CONTENT)
+            fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHEBANG)
+            fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.SHEBANG_CONTENT)
 
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION)
-            SyntaxHighlighterBase.fillMap(ourMap1, DOC_TAG_TOKENS, LuaHighlightingData.DOC_COMMENT_TAG)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT_TAG, LuaDocTypes.TAG_NAME)
-            SyntaxHighlighterBase.fillMap(ourMap1, DOC_KEYWORD_TOKENS, LuaHighlightingData.KEYWORD)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaDocTypes.ARR)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaDocTypes.LPAREN, LuaDocTypes.RPAREN)
+            fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT)
+            fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION)
+            fillMap(ourMap1, DOC_TAG_TOKENS, LuaHighlightingData.DOC_COMMENT_TAG)
+            fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT_TAG, LuaDocTypes.TAG_NAME)
+            fillMap(ourMap1, DOC_KEYWORD_TOKENS, LuaHighlightingData.DOC_KEYWORD)
+            fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaDocTypes.ARR)
+            fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaDocTypes.LPAREN, LuaDocTypes.RPAREN)
 
             //primitive types
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.NUMBER, LuaTypes.NUMBER)
-            SyntaxHighlighterBase.fillMap(ourMap1, LuaHighlightingData.STRING, LuaTypes.STRING)
-            SyntaxHighlighterBase.fillMap(ourMap1, PRIMITIVE_TYPE_SET, LuaHighlightingData.PRIMITIVE_TYPE)
+            fillMap(ourMap1, LuaHighlightingData.NUMBER, LuaTypes.NUMBER)
+            fillMap(ourMap1, LuaHighlightingData.STRING, LuaTypes.STRING)
+            fillMap(ourMap1, PRIMITIVE_TYPE_SET, LuaHighlightingData.PRIMITIVE_TYPE)
         }
     }
 }

@@ -48,11 +48,12 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 "local <localVar>var</localVar> = {} -- a short comment\n" +
                 "local <localVar>a</localVar>, <localVar>b</localVar>, <localVar>c</localVar> = <primitive>true</primitive>, <primitive>false</primitive>, <primitive>nil</primitive>\n" +
                 "--- doc comment\n" +
-                "--- @param <docTagValue>par1</docTagValue> <docClassNameRef>Par1Type</docClassNameRef> @comments\n" +
+                "---@param <docTagValue>par1</docTagValue> <docClassNameRef>Par1Type</docClassNameRef> @comments\n" +
                 "function var:<method>fun</method>(<parameter>par1</parameter>, <parameter>par2</parameter>)\n" +
                 "   <std>print</std>('hello')\n" +
                 "   return <self>self</self>.<field>len</field> + 2\n" +
                 "end\n\n" +
+                "---@overload <docKeyword>fun</docKeyword>(name:<docClassNameRef>string</docClassNameRef>):<docClassNameRef>Emmy</docClassNameRef>\n" +
                 "function var.<staticMethod>staticFun</staticMethod>()\n" +
                 "end\n\n" +
                 "---@return <docClassNameRef>Emmy</docClassNameRef>\n" +
@@ -82,7 +83,8 @@ class LuaColorSettingsPage : ColorSettingsPage {
     }
 
     companion object {
-        private val ourAttributeDescriptors = arrayOf(AttributesDescriptor("Keyword", LuaHighlightingData.KEYWORD),
+        private val ourAttributeDescriptors = arrayOf(
+                AttributesDescriptor("Keyword", LuaHighlightingData.KEYWORD),
                 AttributesDescriptor("self", LuaHighlightingData.SELF),
                 AttributesDescriptor("String", LuaHighlightingData.STRING),
                 AttributesDescriptor("nil/true/false", LuaHighlightingData.PRIMITIVE_TYPE),
@@ -105,6 +107,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 AttributesDescriptor("Comments//EmmyDoc//Tag value", LuaHighlightingData.DOC_COMMENT_TAG_VALUE),
                 AttributesDescriptor("Comments//EmmyDoc//Class name", LuaHighlightingData.CLASS_NAME),
                 AttributesDescriptor("Comments//EmmyDoc//Class name reference", LuaHighlightingData.CLASS_REFERENCE),
+                AttributesDescriptor("Comments//EmmyDoc//Keyword", LuaHighlightingData.DOC_KEYWORD),
                 AttributesDescriptor("Class Members//Field", LuaHighlightingData.FIELD),
                 AttributesDescriptor("Class Members//Instance method", LuaHighlightingData.INSTANCE_METHOD),
                 AttributesDescriptor("Class Members//Static method", LuaHighlightingData.STATIC_METHOD),
@@ -119,6 +122,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
             ourTags.put("docTagValue", LuaHighlightingData.DOC_COMMENT_TAG_VALUE)
             ourTags.put("docClassName", LuaHighlightingData.CLASS_NAME)
             ourTags.put("docClassNameRef", LuaHighlightingData.CLASS_REFERENCE)
+            ourTags.put("docKeyword", LuaHighlightingData.DOC_KEYWORD)
             ourTags.put("localVar", LuaHighlightingData.LOCAL_VAR)
             ourTags.put("globalVar", LuaHighlightingData.GLOBAL_VAR)
             ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION)
