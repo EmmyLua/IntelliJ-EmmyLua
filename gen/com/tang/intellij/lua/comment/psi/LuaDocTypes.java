@@ -23,6 +23,7 @@ public interface LuaDocTypes {
   IElementType OVERLOAD_DEF = LuaParserDefinition.createDocType("OVERLOAD_DEF");
   IElementType PARAM_DEF = LuaParserDefinition.createDocType("PARAM_DEF");
   IElementType PARAM_NAME_REF = LuaParserDefinition.createDocType("PARAM_NAME_REF");
+  IElementType PAR_TY = LuaParserDefinition.createDocType("PAR_TY");
   IElementType RETURN_DEF = LuaParserDefinition.createDocType("RETURN_DEF");
   IElementType TAG_DEF = LuaParserDefinition.createDocType("TAG_DEF");
   IElementType TAG_VALUE = LuaParserDefinition.createDocType("TAG_VALUE");
@@ -104,6 +105,9 @@ public interface LuaDocTypes {
       }
       else if (type == PARAM_NAME_REF) {
         return new LuaDocParamNameRefImpl(node);
+      }
+      else if (type == PAR_TY) {
+        return new LuaDocParTyImpl(node);
       }
       else if (type == RETURN_DEF) {
         return new LuaDocReturnDefImpl(node);

@@ -67,7 +67,7 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaTypes.NIL,
             LuaTypes.TRUE
     );
-    public static final TokenSet DOC_KEYWORD_TOKENS = TokenSet.create(
+    public static final TokenSet DOC_TAG_TOKENS = TokenSet.create(
             LuaDocTypes.TAG_PARAM,
             LuaDocTypes.TAG_RETURN,
             LuaDocTypes.CLASS,
@@ -76,6 +76,9 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
             LuaDocTypes.FIELD,
             LuaDocTypes.LANGUAGE,
             LuaDocTypes.OVERLOAD
+    );
+    public static final TokenSet DOC_KEYWORD_TOKENS = TokenSet.create(
+            LuaDocTypes.FUN
     );
 
     private static final Map<IElementType, TextAttributesKey> ourMap1;
@@ -99,8 +102,12 @@ public class LuaSyntaxHighlighter extends SyntaxHighlighterBase {
 
         fillMap(ourMap1, LuaHighlightingData.LINE_COMMENT, LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT);
         fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION);
-        fillMap(ourMap1, DOC_KEYWORD_TOKENS, LuaHighlightingData.DOC_COMMENT_TAG);
+        fillMap(ourMap1, DOC_TAG_TOKENS, LuaHighlightingData.DOC_COMMENT_TAG);
         fillMap(ourMap1, LuaHighlightingData.DOC_COMMENT_TAG, LuaDocTypes.TAG_NAME);
+        fillMap(ourMap1, DOC_KEYWORD_TOKENS, LuaHighlightingData.KEYWORD);
+        fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaDocTypes.ARR);
+        fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaDocTypes.LPAREN, LuaDocTypes.RPAREN);
+
         //primitive types
         fillMap(ourMap1, LuaHighlightingData.NUMBER, LuaTypes.NUMBER);
         fillMap(ourMap1, LuaHighlightingData.STRING, LuaTypes.STRING);

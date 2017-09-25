@@ -86,7 +86,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ARR_TY, FUNCTION_TY, GENERAL_TY, GENERIC_TY,
-      TY),
+      PAR_TY, TY),
   };
 
   /* ********************************************************** */
@@ -376,7 +376,6 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // (ty ',')* ty
   static boolean generic_param_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_param_list")) return false;
-    if (!nextTokenIs(b, "", ID, FUN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = generic_param_list_0(b, l + 1);
@@ -567,7 +566,6 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // type_set(',' type_set)*
   public static boolean type_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_list")) return false;
-    if (!nextTokenIs(b, "<type list>", ID, FUN)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE_LIST, "<type list>");
     r = type_set(b, l + 1);
@@ -603,7 +601,6 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // ty ('|' ty)*
   public static boolean type_set(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_set")) return false;
-    if (!nextTokenIs(b, "<type set>", ID, FUN)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TYPE_SET, "<type set>");
     r = ty(b, l + 1, -1);
@@ -642,14 +639,15 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // 1: POSTFIX(generic_ty)
   // 2: POSTFIX(arr_ty)
   // 3: ATOM(general_ty)
+  // 4: ATOM(par_ty)
   public static boolean ty(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "ty")) return false;
     addVariant(b, "<ty>");
-    if (!nextTokenIs(b, "<ty>", ID, FUN)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, "<ty>");
     r = function_ty(b, l + 1);
     if (!r) r = general_ty(b, l + 1);
+    if (!r) r = par_ty(b, l + 1);
     p = r;
     r = r && ty_0(b, l + 1, g);
     exit_section_(b, l, m, null, r, p, null);
@@ -730,6 +728,20 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = class_name_ref(b, l + 1);
     exit_section_(b, m, GENERAL_TY, r);
     return r;
+  }
+
+  // '(' ty ')'
+  public static boolean par_ty(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "par_ty")) return false;
+    if (!nextTokenIsSmart(b, LPAREN)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, PAR_TY, null);
+    r = consumeTokenSmart(b, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, ty(b, l + 1, -1));
+    r = p && consumeToken(b, RPAREN) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   final static Parser after_dash_recover_parser_ = new Parser() {

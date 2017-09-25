@@ -229,3 +229,7 @@ fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
 fun getType(luaDocGenericTy: LuaDocGenericTy): ITy {
     return TyDocGeneric(luaDocGenericTy)
 }
+
+fun getType(luaDocParTy: LuaDocParTy): ITy {
+    return luaDocParTy.ty?.getType() ?: Ty.UNKNOWN
+}

@@ -41,7 +41,7 @@ class LuaCommentCompletionContributor : CompletionContributor() {
     init {
         extend(CompletionType.BASIC, SHOW_DOC_TAG, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
-                val set = LuaSyntaxHighlighter.DOC_KEYWORD_TOKENS
+                val set = LuaSyntaxHighlighter.DOC_TAG_TOKENS
                 for (type in set.types) {
                     completionResultSet.addElement(LookupElementBuilder.create(type).withIcon(LuaIcons.ANNOTATION))
                 }
