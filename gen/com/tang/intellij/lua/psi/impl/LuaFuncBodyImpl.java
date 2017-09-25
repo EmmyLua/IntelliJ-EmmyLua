@@ -38,4 +38,10 @@ public class LuaFuncBodyImpl extends ASTWrapperPsiElement implements LuaFuncBody
     return notNullChild(findChildByType(RPAREN));
   }
 
+  @Override
+  @Nullable
+  public PsiElement getEllipsis() {
+    return findChildByType(ELLIPSIS);
+  }
+
 }

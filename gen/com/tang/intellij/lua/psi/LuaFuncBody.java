@@ -13,4 +13,7 @@ public interface LuaFuncBody extends LuaIndentRange {
   @NotNull
   PsiElement getRparen();
 
+  @Nullable
+  PsiElement getEllipsis();
+
 }

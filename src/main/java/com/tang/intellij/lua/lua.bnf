@@ -426,6 +426,7 @@ funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
     ]
     methods = [
         RPAREN = 'RPAREN'
+        ELLIPSIS = 'ELLIPSIS'
     ]
 }
 
