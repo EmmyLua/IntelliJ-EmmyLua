@@ -55,7 +55,7 @@ public class LuaXPrimitive extends LuaXValue {
     public void computePresentation(@NotNull XValueNode xValueNode, @NotNull XValuePlace xValuePlace) {
         switch (type) {
             case "boolean":
-                xValueNode.setPresentation(null, new LuaXValuePresentation(type, data, LuaHighlightingData.PRIMITIVE_TYPE), false);
+                xValueNode.setPresentation(null, new LuaXValuePresentation(type, data, LuaHighlightingData.INSTANCE.getPRIMITIVE_TYPE()), false);
                 break;
             case "number":
                 xValueNode.setPresentation(null, new LuaXNumberPresentation(data), false);

@@ -1,0 +1,128 @@
+/*
+ * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.tang.intellij.lua.editor
+
+import com.intellij.codeHighlighting.RainbowHighlighter
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.fileTypes.SyntaxHighlighter
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
+import com.intellij.openapi.options.colors.AttributesDescriptor
+import com.intellij.openapi.options.colors.ColorDescriptor
+import com.intellij.openapi.options.colors.ColorSettingsPage
+import com.tang.intellij.lua.highlighting.LuaHighlightingData
+import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.lang.LuaLanguage
+import org.jetbrains.annotations.NonNls
+import javax.swing.Icon
+
+/**
+ * Color Settings Page
+ * Created by TangZX on 2017/1/9.
+ */
+class LuaColorSettingsPage : ColorSettingsPage {
+
+    override fun getIcon(): Icon? {
+        return LuaIcons.FILE
+    }
+
+    override fun getHighlighter(): SyntaxHighlighter {
+        return SyntaxHighlighterFactory.getSyntaxHighlighter(LuaLanguage.INSTANCE, null, null)
+    }
+
+    override fun getDemoText(): String {
+        return "local <localVar>var</localVar> = 1 -- a short comment\n" +
+                "local <localVar>a</localVar>, <localVar>b</localVar>, <localVar>c</localVar> = <primitive>true</primitive>, <primitive>false</primitive>, <primitive>nil</primitive>\n" +
+                "--- doc comment\n" +
+                "--- @param <docTagValue>par1</docTagValue> Par1Type @some strings\n" +
+                "function var:<method>fun</method>(<parameter>par1</parameter>, <parameter>par2</parameter>)\n" +
+                "   <std>print</std>('hello')" +
+                "   return <self>self</self>.<field>len</field> + 2\n" +
+                "end\n\n" +
+                "function var.<staticMethod>staticFun</staticMethod>()\n" +
+                "end\n\n" +
+                "function <globalFunction>globalFun</globalFunction>()\n" +
+                "   return \"string\" .. <upValue>var</upValue>\n" +
+                "end\n" +
+                "\n" +
+                "<globalVar>globalVar</globalVar> = {\n" +
+                "   <field>property</field> = value\n" +
+                "}\n"
+    }
+
+    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? {
+        return ourTags
+    }
+
+    override fun getAttributeDescriptors(): Array<AttributesDescriptor> {
+        return ourAttributeDescriptors
+    }
+
+    override fun getColorDescriptors(): Array<ColorDescriptor> {
+        return emptyArray()
+    }
+
+    override fun getDisplayName(): String {
+        return "Lua"
+    }
+
+    companion object {
+        private val ourAttributeDescriptors = arrayOf(AttributesDescriptor("Keyword", LuaHighlightingData.KEYWORD),
+                AttributesDescriptor("self", LuaHighlightingData.SELF),
+                AttributesDescriptor("String", LuaHighlightingData.STRING),
+                AttributesDescriptor("nil/true/false", LuaHighlightingData.PRIMITIVE_TYPE),
+                AttributesDescriptor("Number", LuaHighlightingData.NUMBER),
+                AttributesDescriptor("Braces and Operators//Operators", LuaHighlightingData.OPERATORS),
+                AttributesDescriptor("Braces and Operators//Brackets", LuaHighlightingData.BRACKETS),
+                AttributesDescriptor("Braces and Operators//Braces", LuaHighlightingData.BRACES),
+                AttributesDescriptor("Braces and Operators//Parentheses", LuaHighlightingData.PARENTHESES),
+                AttributesDescriptor("Braces and Operators//Semicolon", LuaHighlightingData.SEMICOLON),
+                AttributesDescriptor("Braces and Operators//Comma", LuaHighlightingData.COMMA),
+                AttributesDescriptor("Braces and Operators//Dot", LuaHighlightingData.DOT),
+                AttributesDescriptor("Variables//Parameter", LuaHighlightingData.PARAMETER),
+                AttributesDescriptor("Variables//Local Variable", LuaHighlightingData.LOCAL_VAR),
+                AttributesDescriptor("Variables//Global Variable", LuaHighlightingData.GLOBAL_VAR),
+                AttributesDescriptor("Variables//Global Function", LuaHighlightingData.GLOBAL_FUNCTION),
+                AttributesDescriptor("Variables//Up Value", LuaHighlightingData.UP_VALUE),
+                AttributesDescriptor("Comments//Line Comment", LuaHighlightingData.LINE_COMMENT),
+                AttributesDescriptor("Comments//Doc Comment", LuaHighlightingData.DOC_COMMENT),
+                AttributesDescriptor("Comments//EmmyDoc//Tag", LuaHighlightingData.DOC_COMMENT_TAG),
+                AttributesDescriptor("Comments//EmmyDoc//Tag Value", LuaHighlightingData.DOC_COMMENT_TAG_VALUE),
+                AttributesDescriptor("Class Members//Field", LuaHighlightingData.FIELD),
+                AttributesDescriptor("Class Members//Instance Method", LuaHighlightingData.INSTANCE_METHOD),
+                AttributesDescriptor("Class Members//Static Method", LuaHighlightingData.STATIC_METHOD),
+                AttributesDescriptor("Std api", LuaHighlightingData.STD_API))
+
+        @NonNls
+        private val ourTags: MutableMap<String, TextAttributesKey> = RainbowHighlighter.createRainbowHLM()
+
+        init {
+            ourTags.put("parameter", LuaHighlightingData.PARAMETER)
+            ourTags.put("docTag", LuaHighlightingData.DOC_COMMENT_TAG)
+            ourTags.put("docTagValue", LuaHighlightingData.DOC_COMMENT_TAG_VALUE)
+            ourTags.put("localVar", LuaHighlightingData.LOCAL_VAR)
+            ourTags.put("globalVar", LuaHighlightingData.GLOBAL_VAR)
+            ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION)
+            ourTags.put("field", LuaHighlightingData.FIELD)
+            ourTags.put("method", LuaHighlightingData.INSTANCE_METHOD)
+            ourTags.put("staticMethod", LuaHighlightingData.STATIC_METHOD)
+            ourTags.put("upValue", LuaHighlightingData.UP_VALUE)
+            ourTags.put("std", LuaHighlightingData.STD_API)
+            ourTags.put("self", LuaHighlightingData.SELF)
+            ourTags.put("primitive", LuaHighlightingData.PRIMITIVE_TYPE)
+        }
+    }
+}

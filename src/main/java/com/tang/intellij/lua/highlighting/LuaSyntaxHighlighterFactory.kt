@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.highlighting;
+package com.tang.intellij.lua.highlighting
 
-import com.intellij.openapi.fileTypes.SyntaxHighlighter;
-import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.fileTypes.SyntaxHighlighter
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 
 /**
  * Created by tangzx on 2015/11/15.
  */
-public class LuaSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
-    @NotNull
-    @Override
-    public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
-        return new LuaSyntaxHighlighter();
+class LuaSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
+    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter {
+        return LuaSyntaxHighlighter()
     }
 }

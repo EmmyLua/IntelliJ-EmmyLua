@@ -50,7 +50,7 @@ public class LuaRPrimitive extends LuaRValue {
             valuePresentation = new LuaXNumberPresentation(data);
         } else if (value instanceof LuaBoolean) {
             type = "boolean";
-            valuePresentation = new LuaXValuePresentation(type, data, LuaHighlightingData.PRIMITIVE_TYPE);
+            valuePresentation = new LuaXValuePresentation(type, data, LuaHighlightingData.INSTANCE.getPRIMITIVE_TYPE());
         } else if (value instanceof LuaFunction)
             type = "function";
     }
