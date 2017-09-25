@@ -39,7 +39,7 @@ class DuplicateClassDeclaration : LocalInspectionTool() {
                 val classDefs = LuaClassIndex.getInstance().get(identifier.text, o.project, LuaPredefinedScope(o.project))
                 if (classDefs.size > 1) {
                     classDefs.forEach {
-                        holder.registerProblem(identifier, LuaBundle.message("inspection.duplicate_class", it.containingFile.virtualFile.canonicalPath), ProblemHighlightType.ERROR)
+                        holder.registerProblem(identifier, LuaBundle.message("inspection.duplicate_class", it.containingFile.virtualFile.canonicalPath), ProblemHighlightType.GENERIC_ERROR)
                     }
                 }
             }

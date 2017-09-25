@@ -43,7 +43,7 @@ public class LuaStandardCompliance extends LocalInspectionTool implements LuaTyp
             @Override
             public void visitCallExpr(@NotNull LuaCallExpr o) {
                 // call(a, b, <<error>>)
-                Optional.ofNullable(o.getArgs())
+                Optional.of(o.getArgs())
                         .map(LuaArgs::getExprList)
                         .map(PsiElement::getLastChild)
                         .map(e -> {

@@ -48,7 +48,7 @@ public class RemoveUnusedLocal extends LocalInspectionTool {
                         if (search.findFirst() == null) {
                             int offset = name.getNode().getStartOffset() - o.getNode().getStartOffset();
                             TextRange textRange = new TextRange(offset, offset + name.getTextLength());
-                            holder.registerProblem(o, textRange,"Remove unused local assignment", new Fix());
+                            holder.registerProblem(o, "Remove unused local assignment", ProblemHighlightType.LIKE_UNUSED_SYMBOL, textRange, new Fix());
                         }
                     }
                 }
@@ -64,7 +64,7 @@ public class RemoveUnusedLocal extends LocalInspectionTool {
                         int offset = name.getNode().getStartOffset() - o.getNode().getStartOffset();
                         TextRange textRange = new TextRange(offset, offset + name.getTextLength());
 
-                        holder.registerProblem(o, textRange,"Remove unused local function", new Fix());
+                        holder.registerProblem(o, "Remove unused local function", ProblemHighlightType.LIKE_UNUSED_SYMBOL, textRange, new Fix());
                     }
                 }
             }
