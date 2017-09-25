@@ -44,17 +44,19 @@ class LuaColorSettingsPage : ColorSettingsPage {
     }
 
     override fun getDemoText(): String {
-        return "local <localVar>var</localVar> = 1 -- a short comment\n" +
+        return "---@class <docClassName>Emmy</docClassName>\n" +
+                "local <localVar>var</localVar> = {} -- a short comment\n" +
                 "local <localVar>a</localVar>, <localVar>b</localVar>, <localVar>c</localVar> = <primitive>true</primitive>, <primitive>false</primitive>, <primitive>nil</primitive>\n" +
                 "--- doc comment\n" +
-                "--- @param <docTagValue>par1</docTagValue> Par1Type @some strings\n" +
+                "--- @param <docTagValue>par1</docTagValue> <docClassNameRef>Par1Type</docClassNameRef> @comments\n" +
                 "function var:<method>fun</method>(<parameter>par1</parameter>, <parameter>par2</parameter>)\n" +
-                "   <std>print</std>('hello')" +
+                "   <std>print</std>('hello')\n" +
                 "   return <self>self</self>.<field>len</field> + 2\n" +
                 "end\n\n" +
                 "function var.<staticMethod>staticFun</staticMethod>()\n" +
                 "end\n\n" +
-                "function <globalFunction>globalFun</globalFunction>()\n" +
+                "---@return <docClassNameRef>Emmy</docClassNameRef>\n" +
+                "function <globalFunction>findEmmy</globalFunction>()\n" +
                 "   return \"string\" .. <upValue>var</upValue>\n" +
                 "end\n" +
                 "\n" +
@@ -93,17 +95,19 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 AttributesDescriptor("Braces and Operators//Comma", LuaHighlightingData.COMMA),
                 AttributesDescriptor("Braces and Operators//Dot", LuaHighlightingData.DOT),
                 AttributesDescriptor("Variables//Parameter", LuaHighlightingData.PARAMETER),
-                AttributesDescriptor("Variables//Local Variable", LuaHighlightingData.LOCAL_VAR),
-                AttributesDescriptor("Variables//Global Variable", LuaHighlightingData.GLOBAL_VAR),
-                AttributesDescriptor("Variables//Global Function", LuaHighlightingData.GLOBAL_FUNCTION),
-                AttributesDescriptor("Variables//Up Value", LuaHighlightingData.UP_VALUE),
-                AttributesDescriptor("Comments//Line Comment", LuaHighlightingData.LINE_COMMENT),
-                AttributesDescriptor("Comments//Doc Comment", LuaHighlightingData.DOC_COMMENT),
+                AttributesDescriptor("Variables//Local variable", LuaHighlightingData.LOCAL_VAR),
+                AttributesDescriptor("Variables//Global variable", LuaHighlightingData.GLOBAL_VAR),
+                AttributesDescriptor("Variables//Global function", LuaHighlightingData.GLOBAL_FUNCTION),
+                AttributesDescriptor("Variables//Up value", LuaHighlightingData.UP_VALUE),
+                AttributesDescriptor("Comments//Line comment", LuaHighlightingData.LINE_COMMENT),
+                AttributesDescriptor("Comments//Doc comment", LuaHighlightingData.DOC_COMMENT),
                 AttributesDescriptor("Comments//EmmyDoc//Tag", LuaHighlightingData.DOC_COMMENT_TAG),
-                AttributesDescriptor("Comments//EmmyDoc//Tag Value", LuaHighlightingData.DOC_COMMENT_TAG_VALUE),
+                AttributesDescriptor("Comments//EmmyDoc//Tag value", LuaHighlightingData.DOC_COMMENT_TAG_VALUE),
+                AttributesDescriptor("Comments//EmmyDoc//Class name", LuaHighlightingData.CLASS_NAME),
+                AttributesDescriptor("Comments//EmmyDoc//Class name reference", LuaHighlightingData.CLASS_REFERENCE),
                 AttributesDescriptor("Class Members//Field", LuaHighlightingData.FIELD),
-                AttributesDescriptor("Class Members//Instance Method", LuaHighlightingData.INSTANCE_METHOD),
-                AttributesDescriptor("Class Members//Static Method", LuaHighlightingData.STATIC_METHOD),
+                AttributesDescriptor("Class Members//Instance method", LuaHighlightingData.INSTANCE_METHOD),
+                AttributesDescriptor("Class Members//Static method", LuaHighlightingData.STATIC_METHOD),
                 AttributesDescriptor("Std api", LuaHighlightingData.STD_API))
 
         @NonNls
@@ -113,6 +117,8 @@ class LuaColorSettingsPage : ColorSettingsPage {
             ourTags.put("parameter", LuaHighlightingData.PARAMETER)
             ourTags.put("docTag", LuaHighlightingData.DOC_COMMENT_TAG)
             ourTags.put("docTagValue", LuaHighlightingData.DOC_COMMENT_TAG_VALUE)
+            ourTags.put("docClassName", LuaHighlightingData.CLASS_NAME)
+            ourTags.put("docClassNameRef", LuaHighlightingData.CLASS_REFERENCE)
             ourTags.put("localVar", LuaHighlightingData.LOCAL_VAR)
             ourTags.put("globalVar", LuaHighlightingData.GLOBAL_VAR)
             ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION)

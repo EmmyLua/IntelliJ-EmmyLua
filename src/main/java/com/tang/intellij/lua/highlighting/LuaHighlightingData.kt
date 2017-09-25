@@ -51,4 +51,6 @@ object LuaHighlightingData {
     val STD_API = TextAttributesKey.createTextAttributesKey("LUA_STD_API")
     val INSTANCE_METHOD = TextAttributesKey.createTextAttributesKey("LUA_INSTANCE_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD)
     val STATIC_METHOD = TextAttributesKey.createTextAttributesKey("LUA_STATIC_METHOD", DefaultLanguageHighlighterColors.STATIC_METHOD)
+    val CLASS_NAME = TextAttributesKey.createTextAttributesKey("LUA_CLASS_NAME", DefaultLanguageHighlighterColors.CLASS_NAME)
+    val CLASS_REFERENCE = TextAttributesKey.createTextAttributesKey("LUA_CLASS_REFERENCE", DefaultLanguageHighlighterColors.CLASS_REFERENCE)
 }
