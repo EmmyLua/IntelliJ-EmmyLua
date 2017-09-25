@@ -74,23 +74,25 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
         when (def) {
             is LuaNameExpr -> {
                 var typeSet: ITy = Ty.UNKNOWN
-                val luaAssignStat = PsiTreeUtil.getParentOfType(def, LuaAssignStat::class.java)
-                if (luaAssignStat != null) {
-                    val comment = luaAssignStat.comment
+                val p1 = def.parent // should be VAR_LIST
+                val p2 = p1.parent // should be ASSIGN_STAT
+                if (p2 is LuaAssignStat) {
+                    val comment = p2.comment
                     //优先从 Comment 猜
                     if (comment != null)
                         typeSet = comment.guessType(context)
                     //再从赋值猜
                     if (Ty.isInvalid(typeSet)) {
-                        val exprList = luaAssignStat.valueExprList
+                        val exprList = p2.valueExprList
                         if (exprList != null) {
-                            context.index = luaAssignStat.getIndexFor(def)
+                            context.index = p2.getIndexFor(def)
                             typeSet = exprList.guessTypeAt(context)
                         }
                     }
                 }
+
                 //Global
-                if (Ty.isInvalid(typeSet) && isGlobal(def)) {
+                if (isGlobal(def)) {
                     typeSet = typeSet.union(TyClass.createGlobalType(def))
                 }
                 return typeSet
