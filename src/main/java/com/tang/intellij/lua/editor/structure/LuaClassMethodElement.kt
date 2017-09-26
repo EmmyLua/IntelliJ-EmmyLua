@@ -20,19 +20,12 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 
 /**
-
  * Created by TangZX on 2016/12/13.
  */
-open class LuaClassMethodElement internal constructor(methodDef: LuaClassMethodDef) : LuaTreeElement<LuaClassMethodDef>(methodDef, LuaIcons.CLASS_METHOD) {
+open class LuaClassMethodElement internal constructor(methodDef:LuaClassMethodDef) : LuaTreeElement(methodDef, LuaIcons.CLASS_METHOD) {
+    protected var methodName:String = methodDef.classMethodName.text + methodDef.paramSignature
 
-    protected var methodName: String
-
-    init {
-        val methodName = methodDef.classMethodName
-        this.methodName = methodName.text + methodDef.paramSignature
-    }
-
-    override fun getPresentableText(): String {
+    override fun getPresentableText():String {
         return methodName
     }
 }

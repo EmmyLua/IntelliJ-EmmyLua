@@ -20,12 +20,10 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaFuncDef
 
 /**
-
  * Created by TangZX on 2016/12/13.
  */
-class LuaFuncElement internal constructor(funcDef: LuaFuncDef) : LuaTreeElement<LuaFuncDef>(funcDef, LuaIcons.GLOBAL_FUNCTION) {
-
-    private val globalFuncName: String? = funcDef.name
+class LuaFuncElement internal constructor(funcDef:LuaFuncDef) : LuaTreeElement(funcDef, LuaIcons.GLOBAL_FUNCTION) {
+    private val globalFuncName = funcDef.name
 
     override fun getPresentableText(): String? {
         return globalFuncName

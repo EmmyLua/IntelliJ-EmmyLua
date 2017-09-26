@@ -20,11 +20,10 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
 
 /**
-
  * Created by TangZX on 2016/12/13.
  */
-class LuaClassFieldElement internal constructor(fieldDef: LuaClassField) : LuaTreeElement<LuaClassField>(fieldDef, LuaIcons.CLASS_FIELD) {
-    private var fieldName: String = fieldDef.name ?: "unknown"
+class LuaClassFieldElement internal constructor(fieldDef:LuaClassField) : LuaTreeElement(fieldDef, LuaIcons.CLASS_FIELD) {
+    private val fieldName:String = fieldDef.name ?: "unknown"
 
     override fun getPresentableText(): String {
         return fieldName
