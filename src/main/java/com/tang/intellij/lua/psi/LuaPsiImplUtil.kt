@@ -493,7 +493,7 @@ private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo>
             list.add(paramInfo)
         }
         //check varArgs
-        funcBodyOwner.funcBody?.ellipsis.let {
+        funcBodyOwner.funcBody?.ellipsis?.let {
             val args = LuaParamInfo()
             args.name = "..."
             args.isVarArgs = true
