@@ -487,11 +487,17 @@ private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo>
             if (comment != null) {
                 val paramDef = comment.getParamDef(paramName)
                 if (paramDef != null) {
-                    paramInfo.isOptional = paramDef.optional != null
                     paramInfo.ty = resolveDocTypeSet(paramDef.typeSet)
                 }
             }
             list.add(paramInfo)
+        }
+        //check varArgs
+        funcBodyOwner.funcBody?.ellipsis.let {
+            val args = LuaParamInfo()
+            args.name = "..."
+            args.isVarArgs = true
+            list.add(args)
         }
         return list.toTypedArray()
     }
@@ -503,50 +509,9 @@ fun getParamSignature(funcBodyOwner: LuaFuncBodyOwner): String {
     val list = arrayOfNulls<String>(params.size)
     for (i in params.indices) {
         val lpi = params[i]
-        var s = lpi.name
-        if (lpi.isOptional)
-            s = "[$s]"
-        list[i] = s
+        list[i] = lpi.name
     }
     return "(" + list.joinToString(", ") + ")"
-}
-
-private val sets = HashSet<Int>()
-fun processOptional(params: Array<LuaParamInfo?>, processor: (signature: String, mask: Int) -> Unit) {
-    sets.clear()
-    processOptionalFunc(params, processor)
-}
-
-private fun processOptionalFunc(params: Array<LuaParamInfo?>, processor: (signature: String, mask: Int) -> Unit) {
-    var mask = 0
-    val signature = StringBuilder("(")
-
-    for (i in params.indices) {
-        val info = params[i]
-        if (info != null) {
-            if (mask > 0) {
-                signature.append(", ").append(info.name)
-            } else {
-                signature.append(info.name)
-            }
-            mask = mask or (1 shl i)
-        }
-    }
-
-    signature.append(")")
-    processor(signature.toString(), mask)
-    sets.add(mask)
-    for (i in params.indices) {
-        val info = params[i]
-        if (info != null && info.isOptional) {
-            val s = mask xor (1 shl i)
-            if (!sets.contains(s)) {
-                params[i] = null
-                processOptionalFunc(params, processor)
-                params[i] = info
-            }
-        }
-    }
 }
 
 fun getNameIdentifier(localFuncDef: LuaLocalFuncDef): PsiElement? {
