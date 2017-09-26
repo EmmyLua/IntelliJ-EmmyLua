@@ -16,12 +16,11 @@
 
 package com.tang.intellij.lua.comment.psi;
 
-import com.intellij.psi.NavigatablePsiElement;
-import com.intellij.psi.PsiElement;
+import com.tang.intellij.lua.psi.LuaPsiElement;
 
 /**
  * 注释接口
  * Created by TangZX on 2016/11/25.
  */
-public interface LuaDocPsiElement extends PsiElement, NavigatablePsiElement {
+public interface LuaDocPsiElement extends LuaPsiElement {
 }
