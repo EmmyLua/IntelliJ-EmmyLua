@@ -24,10 +24,9 @@ import com.tang.intellij.lua.psi.*
 import javax.swing.Icon
 
 /**
-
  * Created by TangZX on 2016/12/13.
  */
-class LuaFileElement(private val file: LuaFile) : StructureViewTreeElement {
+class LuaFileElement(private val file:LuaFile) : StructureViewTreeElement {
 
     override fun getValue(): Any {
         return file

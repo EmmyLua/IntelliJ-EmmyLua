@@ -20,12 +20,10 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaLocalFuncDef
 
 /**
-
  * Created by tangzx on 2017/3/14.
  */
-class LuaLocalFuncElement internal constructor(target: LuaLocalFuncDef) : LuaTreeElement<LuaLocalFuncDef>(target, LuaIcons.LOCAL_FUNCTION) {
-
-    private val name: String = element.name + element.paramSignature
+class LuaLocalFuncElement internal constructor(target:LuaLocalFuncDef) : LuaTreeElement(target, LuaIcons.LOCAL_FUNCTION) {
+    private val name:String = target.name + target.paramSignature
 
     override fun getPresentableText(): String {
         return name

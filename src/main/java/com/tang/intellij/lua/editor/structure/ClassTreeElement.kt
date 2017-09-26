@@ -21,7 +21,7 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaPsiElement
 import java.util.ArrayList
 
-class ClassTreeElement(indexExpr: LuaPsiElement) : LuaTreeElement<LuaPsiElement>(indexExpr, LuaIcons.CLASS) {
+class ClassTreeElement(indexExpr:LuaPsiElement) : LuaTreeElement(indexExpr, LuaIcons.CLASS) {
     val children = ArrayList<TreeElement>()
     var name = element.name
 

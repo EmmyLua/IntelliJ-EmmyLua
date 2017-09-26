@@ -159,7 +159,7 @@ class LuaStructureVisitor : LuaVisitor() {
                         locals.remove(name)
                         val nameDefEle:LuaNameDefElement = children[idx] as LuaNameDefElement
 
-                        curClassElem = ClassTreeElement(nameDefEle.nameDef)
+                        curClassElem = ClassTreeElement(nameDefEle.value as LuaNameDef)
 
                         children.removeAt(idx)
                     }

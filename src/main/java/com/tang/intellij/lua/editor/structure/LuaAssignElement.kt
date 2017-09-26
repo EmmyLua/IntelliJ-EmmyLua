@@ -20,13 +20,12 @@ import com.intellij.icons.AllIcons
 import com.tang.intellij.lua.psi.LuaAssignStat
 
 /**
-
  * Created by TangZX on 2016/12/28.
  */
-class LuaAssignElement internal constructor(target: LuaAssignStat) :
-        LuaTreeElement<LuaAssignStat>(target, AllIcons.Nodes.ClassInitializer) {
+class LuaAssignElement internal constructor(target:LuaAssignStat) : LuaTreeElement(target, AllIcons.Nodes.ClassInitializer) {
+    private val exprList = target.varExprList
 
     override fun getPresentableText(): String {
-        return element.varExprList.text + " = ..."
+        return exprList.text + " = ..."
     }
 }
