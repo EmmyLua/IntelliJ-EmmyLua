@@ -22,8 +22,7 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
-import com.tang.intellij.lua.psi.LuaClassMethod
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner
+import com.tang.intellij.lua.psi.LuaPsiElement
 import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
@@ -34,7 +33,7 @@ import javax.swing.Icon
  * Created by TangZX on 2017/5/22.
  */
 
-open class LuaTypeGuessableLookupElement(name: String, private val type: ITy, bold: Boolean, icon: Icon)
+open class LuaTypeGuessableLookupElement(name: String, val psi: LuaPsiElement, private val type: ITy, bold: Boolean, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
     private var typeString: String? = null
 
@@ -52,13 +51,28 @@ open class LuaTypeGuessableLookupElement(name: String, private val type: ITy, bo
         return typeString
     }
 
+    /**
+     * https://github.com/tangzx/IntelliJ-EmmyLua/issues/54
+     */
+    override fun getObject(): Any {
+        return psi
+    }
+
     override fun equals(other: Any?): Boolean {
         return other is LuaTypeGuessableLookupElement && super.equals(other)
     }
 }
 
-class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boolean)
+class LuaFieldLookupElement(fieldName: String, val field: LuaClassField, bold: Boolean)
     : LuaLookupElement(fieldName, bold, null) {
+
+    /**
+     * https://github.com/tangzx/IntelliJ-EmmyLua/issues/54
+     */
+    override fun getObject(): Any {
+        return field
+    }
+
     private val ty: ITy by lazy {
         field.guessTypeFromCache(SearchContext(field.project))
     }
@@ -93,35 +107,7 @@ class LuaFieldLookupElement(fieldName: String, field: LuaClassField, bold: Boole
     }
 }
 
-abstract class LuaFunctionLookupElement(name:String, signature: String, bold:Boolean, private val bodyOwner: LuaFuncBodyOwner, icon: Icon)
-    : LuaLookupElement(name, bold, icon) {
-    init {
-        itemText = lookupString + signature
-    }
-
-    private var typeDesc: String? = null
-
-    override fun equals(other: Any?): Boolean {
-        return other is LuaFunctionLookupElement && super.equals(other)
-    }
-
-    override fun getTypeText(): String? {
-        if (typeDesc == null) {
-            val set = bodyOwner.guessReturnTypeSet(SearchContext(bodyOwner.project))
-            typeDesc = set.createTypeString()
-        }
-        return typeDesc
-    }
-
-    override fun getObject(): Any {
-        return bodyOwner
-    }
-}
-
-class LuaMethodLookupElement(name:String, signature: String, bold:Boolean, method: LuaClassMethod)
-    : LuaFunctionLookupElement(name, signature, bold, method, LuaIcons.CLASS_METHOD)
-
-class TyFunctionLookupElement(name: String, signature: IFunSignature, bold: Boolean, val ty: ITyFunction, icon: Icon)
+class TyFunctionLookupElement(name: String, val psi: LuaPsiElement, signature: IFunSignature, bold: Boolean, val ty: ITyFunction, icon: Icon)
     : LuaLookupElement(name, bold, icon) {
     init {
         val list = mutableListOf<String>()
@@ -132,7 +118,10 @@ class TyFunctionLookupElement(name: String, signature: IFunSignature, bold: Bool
         typeText = signature.returnTy.createTypeString()
     }
 
+    /**
+     * https://github.com/tangzx/IntelliJ-EmmyLua/issues/54
+     */
     override fun getObject(): Any {
-        return ty
+        return psi
     }
 }

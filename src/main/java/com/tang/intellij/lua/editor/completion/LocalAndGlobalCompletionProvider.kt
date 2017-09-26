@@ -48,7 +48,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 LuaIcons.LOCAL_FUNCTION
 
             ty.process(Processor {
-                val le = TyFunctionLookupElement(name, it, false, ty, icon)
+                val le = TyFunctionLookupElement(name, psi, it, false, ty, icon)
                 le.handler = SignatureInsertHandler(it)
                 session.resultSet.addElement(le)
                 true
@@ -68,7 +68,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                         if (psi is LuaParamNameDef)
                             icon = LuaIcons.PARAMETER
 
-                        val elementBuilder = LuaTypeGuessableLookupElement(name, it, false, icon)
+                        val elementBuilder = LuaTypeGuessableLookupElement(name, psi, it, false, icon)
                         session.resultSet.addElement(elementBuilder)
                     }
                 }

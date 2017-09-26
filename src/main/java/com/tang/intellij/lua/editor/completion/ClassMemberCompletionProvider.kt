@@ -134,7 +134,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
             val ty = def.asTy(SearchContext(def.project))
             ty.process(Processor {
                 val lookupString = handlerProcessor?.processLookupString(methodName) ?: methodName
-                val le = TyFunctionLookupElement(lookupString, it, bold, ty, LuaIcons.CLASS_METHOD)
+                val le = TyFunctionLookupElement(lookupString, def, it, bold, ty, LuaIcons.CLASS_METHOD)
                 le.handler = SignatureInsertHandler(it)
                 if (!ty.isSelfCall) le.setItemTextUnderlined(true)
                 le.setTailText("  [$clazzName]")
