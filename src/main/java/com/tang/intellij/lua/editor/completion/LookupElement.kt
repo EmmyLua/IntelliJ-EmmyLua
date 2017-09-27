@@ -19,6 +19,7 @@
 package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.lookup.LookupElementPresentation
+import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
@@ -27,6 +28,10 @@ import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
+
+interface LuaDocumentationLookupElement {
+    fun getDocumentationElement(context: SearchContext): PsiElement?
+}
 
 /**
  * lookup elements
@@ -53,6 +58,7 @@ open class LuaTypeGuessableLookupElement(name: String, val psi: LuaPsiElement, p
 
     /**
      * https://github.com/tangzx/IntelliJ-EmmyLua/issues/54
+     * @see [com.tang.intellij.lua.documentation.LuaDocumentationProvider]
      */
     override fun getObject(): Any {
         return psi
@@ -63,17 +69,23 @@ open class LuaTypeGuessableLookupElement(name: String, val psi: LuaPsiElement, p
     }
 }
 
-class LuaFieldLookupElement(fieldName: String, val field: LuaClassField, bold: Boolean)
-    : LuaLookupElement(fieldName, bold, null) {
+class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bold: Boolean)
+    : LuaLookupElement(fieldName, bold, null), LuaDocumentationLookupElement {
 
-    /**
-     * https://github.com/tangzx/IntelliJ-EmmyLua/issues/54
-     */
-    override fun getObject(): Any {
-        return field
+    override fun getDocumentationElement(context: SearchContext): PsiElement? {
+        if (field.isValid)
+            return field
+        else {
+            val ty = this.ty
+            val clazz = TyUnion.getPrefectClass(ty)
+            if (clazz != null) {
+                return clazz.findMember(fieldName, context)
+            }
+        }
+        return null
     }
 
-    private val ty: ITy by lazy {
+    val ty: ITy by lazy {
         field.guessTypeFromCache(SearchContext(field.project))
     }
 

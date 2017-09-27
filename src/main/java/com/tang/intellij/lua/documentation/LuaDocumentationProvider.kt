@@ -26,6 +26,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.editor.completion.LuaDocumentationLookupElement
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
@@ -70,9 +71,15 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         return super.getQuickNavigateInfo(element, originalElement)
     }
 
+    override fun getDocumentationElementForLookupItem(psiManager: PsiManager, obj: Any, element: PsiElement): PsiElement? {
+        if (obj is LuaDocumentationLookupElement) {
+            return obj.getDocumentationElement(SearchContext(psiManager.project))
+        }
+        return super.getDocumentationElementForLookupItem(psiManager, obj, element)
+    }
+
     override fun getDocumentationElementForLink(psiManager: PsiManager, link: String, context: PsiElement?): PsiElement? {
         return LuaClassIndex.find(link, SearchContext(psiManager.project))
-        //return super.getDocumentationElementForLink(psiManager, link, context)
     }
 
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? {
@@ -80,7 +87,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
             is LuaCommentOwner -> return genDoc(element)
             is LuaParamNameDef -> return genDoc(element)
             is LuaDocClassDef -> return buildString { renderClassDef(this, element) }
-            is LuaDocFieldDef -> return buildString { renderFieldDef(this, element) }
+            is LuaClassField -> return genDoc(element)
             is LuaNameDef -> {
                 val owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner::class.java)
                 if (owner != null)
@@ -88,6 +95,15 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
             }
         }
         return super.generateDoc(element, originalElement)
+    }
+
+    private fun genDoc(field: LuaClassField): String? {
+        return if (field is LuaDocFieldDef)
+            buildString { renderFieldDef(this, field) }
+        else {
+            val iTy = field.guessTypeFromCache(SearchContext(field.project))
+            iTy.createTypeString()
+        }
     }
 
     private fun genDoc(paramNameDef: LuaParamNameDef): String? {
