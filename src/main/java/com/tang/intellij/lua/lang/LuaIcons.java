@@ -40,6 +40,7 @@ public class LuaIcons {
     public static final Icon PARAMETER = AllIcons.Nodes.Parameter;
     public static final Icon WORD = AllIcons.Actions.Edit;
     public static final Icon ANNOTATION = AllIcons.Css.Atrule;
+    public static final Icon META_METHOD = AllIcons.Javaee.PersistenceRelationship;
 
     public static final Icon MODULE = IconLoader.getIcon("/icons/module.png");
 }
