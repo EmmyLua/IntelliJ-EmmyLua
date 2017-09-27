@@ -16,16 +16,16 @@
 
 package com.tang.intellij.lua.editor.structure
 
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.psi.LuaPsiElement
 import com.tang.intellij.lua.lang.LuaIcons
 
 /**
  * Created by TangZX on 2016/12/13.
  */
-class LuaClassElement internal constructor(docClassDef:LuaDocClassDef) : LuaTreeElement(docClassDef, LuaIcons.CLASS) {
-    private val className:String? = docClassDef.name
+class LuaClassElement internal constructor(docClassDef:LuaPsiElement, className:String?=null) : LuaTreeElement(docClassDef, LuaIcons.CLASS) {
+    val className:String = className ?: element.name!!
 
-    override fun getPresentableText(): String? {
+    override fun getPresentableText(): String {
         return className
     }
 }
