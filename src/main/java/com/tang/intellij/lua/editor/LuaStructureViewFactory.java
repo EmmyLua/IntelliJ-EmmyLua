@@ -27,8 +27,8 @@ import com.intellij.lang.PsiStructureViewFactory;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiFile;
 import com.tang.intellij.lua.editor.structure.LuaClassFieldElement;
-import com.tang.intellij.lua.editor.structure.LuaClassMethodElement;
 import com.tang.intellij.lua.editor.structure.LuaFileElement;
+import com.tang.intellij.lua.editor.structure.LuaFuncElement;
 import com.tang.intellij.lua.psi.LuaFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -79,9 +79,9 @@ public class LuaStructureViewFactory implements PsiStructureViewFactory {
         @Override
         public Comparator getComparator() {
             return (o1, o2) -> {
-                if (o1 instanceof LuaClassFieldElement && o2 instanceof LuaClassMethodElement)
+                if (o1 instanceof LuaClassFieldElement && o2 instanceof LuaFuncElement)
                     return -1;
-                else if (o1 instanceof LuaClassMethodElement && o2 instanceof LuaClassFieldElement)
+                else if (o1 instanceof LuaFuncElement && o2 instanceof LuaClassFieldElement)
                     return 1;
 
                 String s1 = SorterUtil.getStringPresentation(o1);

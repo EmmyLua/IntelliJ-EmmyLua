@@ -18,14 +18,15 @@ package com.tang.intellij.lua.editor.structure
 
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
+import com.tang.intellij.lua.psi.LuaPsiElement
 
 /**
  * Created by TangZX on 2016/12/13.
  */
-class LuaClassFieldElement internal constructor(fieldDef:LuaClassField) : LuaTreeElement(fieldDef, LuaIcons.CLASS_FIELD) {
-    private val fieldName:String = fieldDef.name ?: "unknown"
+class LuaClassFieldElement internal constructor(fieldDef:LuaPsiElement, private val name:String) : LuaTreeElement(fieldDef, LuaIcons.CLASS_FIELD) {
+    internal constructor(fieldDef:LuaClassField) : this(fieldDef, fieldDef.name!!)
 
     override fun getPresentableText(): String {
-        return fieldName
+        return name
     }
 }

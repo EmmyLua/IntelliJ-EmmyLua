@@ -19,14 +19,16 @@ package com.tang.intellij.lua.editor.structure
 import com.intellij.ide.structureView.StructureViewTreeElement
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.navigation.ItemPresentation
-import com.tang.intellij.lua.psi.LuaPsiElement
+import com.intellij.navigation.NavigationItem
 import javax.swing.Icon
 
 /**
  * Created by TangZX on 2016/12/28.
  */
-abstract class LuaTreeElement internal constructor(protected val element:LuaPsiElement, private val icon: Icon) : StructureViewTreeElement {
-    abstract fun getPresentableText():String?
+abstract class LuaTreeElement internal constructor(protected var element: NavigationItem, private val icon: Icon) : StructureViewTreeElement {
+
+    abstract fun getPresentableText(): String?
+    private val children = ArrayList<LuaTreeElement>()
 
     override fun getValue(): Any {
         return element
@@ -49,7 +51,11 @@ abstract class LuaTreeElement internal constructor(protected val element:LuaPsiE
     }
 
     override fun getChildren(): Array<TreeElement> {
-        return emptyArray()
+        return children.toTypedArray()
+    }
+
+    fun addChild(child:LuaTreeElement) {
+        children.add(child)
     }
 
     override fun navigate(b: Boolean) {
