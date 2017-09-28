@@ -146,6 +146,7 @@
         <nameSuggestionProvider implementation="com.tang.intellij.lua.editor.LuaNameSuggestionProvider"/>
         <qualifiedNameProvider implementation="com.tang.intellij.lua.editor.LuaQualifiedNameProvider"/>
         <renamePsiElementProcessor implementation="com.tang.intellij.lua.refactoring.rename.RenameLuaMethodProcessor"/>
+        <inlineActionHandler implementation="com.tang.intellij.lua.refactoring.inline.LuaInlineActionHandler"/>
 
         <!--navigate-->
         <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
