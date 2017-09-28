@@ -32,10 +32,12 @@ import java.util.*
  */
 class LuaNameSuggestionProvider : NameSuggestionProvider {
 
-    private fun fixName(oriName: String): String {
-        return oriName.replace(".", "")
+    companion object {
+        fun fixName(oriName: String): String {
+            return oriName.replace(".", "")
+        }
     }
-
+    
     private fun collectNames(type: ITy, context: SearchContext, collector: (name: String, suffix: String, preferLonger: Boolean) -> Unit) {
         when (type) {
             is ITyClass -> {

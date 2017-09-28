@@ -62,6 +62,8 @@ class LuaCompletionContributor : CompletionContributor() {
                 resultSet.stopHere()
             }
         })
+
+        extend(CompletionType.BASIC, psiElement(LuaTypes.ID).withParent(LuaNameDef::class.java), SuggestLocalNameProvider())
     }
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
