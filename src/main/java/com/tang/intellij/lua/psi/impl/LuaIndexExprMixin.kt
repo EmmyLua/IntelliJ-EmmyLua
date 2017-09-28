@@ -50,11 +50,7 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
     }
 
     override fun getReference(): PsiReference? {
-        val references = references
-
-        if (references.isNotEmpty())
-            return references[0]
-        return null
+        return references.firstOrNull()
     }
 
     override fun guessType(context: SearchContext): ITy {

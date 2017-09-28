@@ -23,7 +23,6 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaNameStub
@@ -43,11 +42,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
     internal constructor(stub: LuaNameStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
     override fun getReference(): PsiReference? {
-        val references = references
-
-        if (references.isNotEmpty())
-            return references[0]
-        return null
+        return references.firstOrNull()
     }
 
     override fun guessType(context: SearchContext): ITy {
