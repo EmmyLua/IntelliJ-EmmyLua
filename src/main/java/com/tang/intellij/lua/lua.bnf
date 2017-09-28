@@ -29,9 +29,9 @@
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.psi.LuaTypes"
   elementTypeClass="com.tang.intellij.lua.psi.LuaElementType"
-  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createType"
+  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinitionKt.createType"
   tokenTypeClass="com.tang.intellij.lua.psi.LuaTokenType"
-  tokenTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createToken"
+  tokenTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinitionKt.createToken"
   parserImports = "static com.intellij.lang.WhitespacesBinders.*"
 
   tokens = [

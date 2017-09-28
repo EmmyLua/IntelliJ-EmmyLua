@@ -29,7 +29,7 @@
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.comment.psi.LuaDocTypes"
   elementTypeClass="com.tang.intellij.lua.comment.psi.LuaDocElementType"
-  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createDocType"
+  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinitionKt.createDocType"
   tokenTypeClass="com.tang.intellij.lua.comment.psi.LuaDocTokenType"
   extends(".*ty") = 'ty'
 
