@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface LuaDocFunctionParam extends LuaDocPsiElement {
 
-  @NotNull
+  @Nullable
   LuaDocTypeSet getTypeSet();
 
   @NotNull

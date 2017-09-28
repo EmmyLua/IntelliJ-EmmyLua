@@ -89,12 +89,16 @@ par_ty ::= '(' ty ')' {
 private generic_param_list ::= (ty ',')* ty
 generic_ty ::= ty '<' generic_param_list '>' {
     methods = [getType]
+    pin = 2
 }
 
-function_param ::= ID ':' type_set
+function_param ::= ID ':' type_set {
+    pin = 1
+}
 private function_param_list::= (function_param ',')* (function_param |& ')')
 function_ty ::= fun '(' function_param_list ')' (':' type_set)? {
     methods = [getType getReturnType]
+    pin = 1
 }
 
 type_set ::= ty ('|' ty)*
