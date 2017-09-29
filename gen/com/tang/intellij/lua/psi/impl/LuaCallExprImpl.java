@@ -40,8 +40,8 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
   }
 
   @NotNull
-  public ITy guessPrefixType(SearchContext context) {
-    return LuaPsiImplUtilKt.guessPrefixType(this, context);
+  public ITy guessParentType(SearchContext context) {
+    return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
   @Nullable

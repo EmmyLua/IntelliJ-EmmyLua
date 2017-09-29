@@ -37,7 +37,7 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
   LuaLiteralExpr getIdExpr();
 
   @NotNull
-  ITy guessPrefixType(SearchContext context);
+  ITy guessParentType(SearchContext context);
 
   @NotNull
   ITy guessValueType(SearchContext context);

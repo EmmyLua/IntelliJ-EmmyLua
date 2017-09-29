@@ -128,7 +128,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         if (expr is LuaIndexExpr) {
             val fnName = expr.name
             if (fnName != null && LuaSettings.isConstructorName(fnName)) {
-                ret = ret.union(expr.guessPrefixType(context))
+                ret = ret.union(expr.guessParentType(context))
             }
         }
 

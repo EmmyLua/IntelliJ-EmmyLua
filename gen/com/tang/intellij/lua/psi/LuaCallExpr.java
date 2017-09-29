@@ -16,7 +16,7 @@ public interface LuaCallExpr extends LuaExpr {
   LuaExpr getExpr();
 
   @NotNull
-  ITy guessPrefixType(SearchContext context);
+  ITy guessParentType(SearchContext context);
 
   @Nullable
   LuaFuncBodyOwner resolveFuncBodyOwner(SearchContext context);

@@ -378,7 +378,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         getIdExpr
         toString
 
-        guessPrefixType
+        guessParentType
         guessValueType
 
         dot = 'DOT'
@@ -396,7 +396,7 @@ arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = e
 args ::=  '(' (arg_expr_list)? ')' | tableExpr | STRING { pin(".*") = 1 }
 left callExpr ::= args {
     methods = [
-        guessPrefixType
+        guessParentType
         resolveFuncBodyOwner
         getFirstStringArg
 

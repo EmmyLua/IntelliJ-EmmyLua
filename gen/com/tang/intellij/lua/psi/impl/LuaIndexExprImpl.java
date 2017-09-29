@@ -86,8 +86,8 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
   }
 
   @NotNull
-  public ITy guessPrefixType(SearchContext context) {
-    return LuaPsiImplUtilKt.guessPrefixType(this, context);
+  public ITy guessParentType(SearchContext context) {
+    return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
   @NotNull

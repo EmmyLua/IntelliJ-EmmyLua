@@ -199,7 +199,7 @@ fun getClassType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass {
  * *
  * @return LuaTypeSet
  */
-fun guessPrefixType(callExpr: LuaCallExpr, context: SearchContext): ITy {
+fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
     val prefix = callExpr.firstChild as LuaExpr
     return prefix.guessTypeFromCache(context)
 }
@@ -290,7 +290,7 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
     return Ty.UNKNOWN
 }
 
-fun guessPrefixType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
+fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
     val prefix = indexExpr.firstChild as LuaExpr
     return prefix.guessTypeFromCache(context)
 }

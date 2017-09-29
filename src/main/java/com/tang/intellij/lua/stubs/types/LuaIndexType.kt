@@ -57,7 +57,7 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
     override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexStub {
         val context = SearchContext(indexExpr.project)
         context.setCurrentStubFile(indexExpr.containingFile)
-        val ty = indexExpr.guessPrefixType(context)
+        val ty = indexExpr.guessParentType(context)
         val type = TyUnion.getPrefectClass(ty)
         var typeName: String? = null
         if (type != null)

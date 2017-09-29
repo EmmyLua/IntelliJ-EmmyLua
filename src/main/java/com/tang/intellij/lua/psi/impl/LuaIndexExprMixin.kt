@@ -58,7 +58,7 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
             val indexExpr = this as LuaIndexExpr
             // xxx[yyy]
             if (indexExpr.lbrack != null) {
-                val tySet = indexExpr.guessPrefixType(context)
+                val tySet = indexExpr.guessParentType(context)
 
                 // Type[]
                 val array = TyUnion.find(tySet, ITyArray::class.java)
@@ -90,7 +90,7 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
             //from other class member
             val propName = indexExpr.name
             if (propName != null) {
-                val prefixType = indexExpr.guessPrefixType(context)
+                val prefixType = indexExpr.guessParentType(context)
                 TyUnion.each(prefixType) {
                     if (it is TyClass) {
                         result = result.union(guessFieldType(propName, it, context))

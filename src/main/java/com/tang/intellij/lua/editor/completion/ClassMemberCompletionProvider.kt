@@ -53,7 +53,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
 
         if (indexExpr is LuaIndexExpr) {
             val project = indexExpr.project
-            val prefixTypeSet = indexExpr.guessPrefixType(SearchContext(project))
+            val prefixTypeSet = indexExpr.guessParentType(SearchContext(project))
             if (!Ty.isInvalid(prefixTypeSet)) {
                 complete(indexExpr, prefixTypeSet, completionResultSet, completionResultSet.prefixMatcher, null)
             }

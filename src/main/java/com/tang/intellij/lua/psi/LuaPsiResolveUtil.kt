@@ -184,7 +184,7 @@ fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
 }
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
-    val typeSet = indexExpr.guessPrefixType(context)
+    val typeSet = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
     TyUnion.process(typeSet) { type ->
         if (type is TyClass) {
