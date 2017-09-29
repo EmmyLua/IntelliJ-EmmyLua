@@ -230,7 +230,6 @@ funcDef ::= 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaClassMethod"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
-        "com.tang.intellij.lua.psi.LuaGlobal"
     ]
     methods = [
         getComment
@@ -242,7 +241,7 @@ funcDef ::= 'function' ID funcBody {
         getTextOffset
         toString
         guessReturnTypeSet
-        getClassType
+        guessParentType
         getParams
         getReferences
     ]
@@ -269,7 +268,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
     methods = [
         getComment
-        getClassType
+        guessParentType
         getParamNameDefList
         getNameIdentifier
         setName
@@ -460,6 +459,7 @@ tableField ::= tableField1 | tableField2 | expr {
         getFieldName
         getPresentation
         guessType
+        guessParentType
         getComment
         getIdExpr
         nameDef = "tableFieldNameDef"

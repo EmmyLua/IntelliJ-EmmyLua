@@ -15,7 +15,6 @@ import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
-import com.tang.intellij.lua.ty.ITyClass;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
@@ -59,9 +58,9 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
     return LuaPsiImplUtilKt.getComment(this);
   }
 
-  @Nullable
-  public ITyClass getClassType(SearchContext context) {
-    return LuaPsiImplUtilKt.getClassType(this, context);
+  @NotNull
+  public ITy guessParentType(SearchContext context) {
+    return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
   @NotNull

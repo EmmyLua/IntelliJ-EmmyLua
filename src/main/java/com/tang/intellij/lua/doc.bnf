@@ -114,6 +114,7 @@ field_def ::= FIELD access_modifier? ID type_set comment_string? {
     stubClass = "com.tang.intellij.lua.stubs.LuaDocClassFieldStub"
     methods = [
         guessType
+        guessParentType
         getNameIdentifier
         setName
         getName

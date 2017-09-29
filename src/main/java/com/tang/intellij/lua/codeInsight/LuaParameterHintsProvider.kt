@@ -46,7 +46,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             val exprList = args.exprList?.exprList
             if (exprList != null) {
                 val context = SearchContext(callExpr.getProject())
-                val type = callExpr.guessPrefixType(context)
+                val type = callExpr.guessParentType(context)
                 val ty = TyUnion.find(type, ITyFunction::class.java) ?: return list
 
                 // 是否是 inst:method() 被用为 inst.method(self) 形式

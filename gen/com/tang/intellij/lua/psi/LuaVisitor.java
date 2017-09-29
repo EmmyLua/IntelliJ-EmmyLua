@@ -94,7 +94,6 @@ public class LuaVisitor extends PsiElementVisitor {
     visitClassMethod(o);
     // visitDeclaration(o);
     // visitStatement(o);
-    // visitGlobal(o);
   }
 
   public void visitGotoStat(@NotNull LuaGotoStat o) {

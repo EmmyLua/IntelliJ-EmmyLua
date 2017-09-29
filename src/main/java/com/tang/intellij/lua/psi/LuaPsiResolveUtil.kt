@@ -254,7 +254,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
 
         // 如果是个类方法，则有可能在父类里
         if (owner is LuaClassMethodDef) {
-            var classType = owner.getClassType(context)
+            var classType = owner.guessClassType(context)
             val methodName = owner.name
             while (classType != null) {
                 classType = classType.getSuperClass(context)
@@ -338,7 +338,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
             val closure = LuaPsiTreeUtil.getParentOfType(paramNameDef, LuaClosureExpr::class.java, LuaFuncBody::class.java)
             if (closure != null) {
                 val callExpr = owner.expr as LuaCallExpr
-                val type = callExpr.guessPrefixType(context)
+                val type = callExpr.guessParentType(context)
                 //todo mainSignature ?
                 if (type is ITyFunction) {
                     val closureIndex = callExpr.args.exprList!!.getIndexFor(closure)

@@ -119,7 +119,7 @@ fun isStatic(classMethodDef: LuaClassMethodDef): Boolean {
 fun getPresentation(classMethodDef: LuaClassMethodDef): ItemPresentation {
     return object : ItemPresentation {
         override fun getPresentableText(): String? {
-            val type = classMethodDef.getClassType(SearchContext(classMethodDef.project))
+            val type = classMethodDef.guessClassType(SearchContext(classMethodDef.project))
             if (type != null) {
                 val c = if (classMethodDef.isStatic) "." else ":"
                 return type.displayName + c + classMethodDef.name + classMethodDef.paramSignature
@@ -145,7 +145,7 @@ private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITyClass, Sea
  * *
  * @return LuaType
  */
-fun getClassType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITyClass? {
+fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITy {
     return CachedValuesManager.getManager(classMethodDef.project).getParameterizedCachedValue(classMethodDef, GET_CLASS_METHOD, { ctx ->
         val stub = classMethodDef.stub
         var type: ITyClass? = null
@@ -159,7 +159,7 @@ fun getClassType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITy
                 type = perfect
         }
         CachedValueProvider.Result.create(type, classMethodDef)
-    }, false, context)
+    }, false, context) ?: Ty.UNKNOWN
 }
 
 fun getNameIdentifier(funcDef: LuaFuncDef): PsiElement? {
@@ -189,7 +189,7 @@ fun getPresentation(funcDef: LuaFuncDef): ItemPresentation {
     }
 }
 
-fun getClassType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass {
+fun guessParentType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass {
     return TyClass.G
 }
 
@@ -538,6 +538,11 @@ fun getNameIdentifier(tableField: LuaTableField): PsiElement? {
     if (id != null)
         return id
     return tableField.idExpr
+}
+
+fun guessParentType(tableField: LuaTableField, context: SearchContext): ITy {
+    val tbl = PsiTreeUtil.getParentOfType(tableField, LuaTableExpr::class.java)!!
+    return tbl.guessType(context)
 }
 
 fun guessType(tableField: LuaTableField, context: SearchContext): ITy {

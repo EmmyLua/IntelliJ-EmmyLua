@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNUSED_PARAMETER")
+
 package com.tang.intellij.lua.comment.psi
 
 import com.intellij.icons.AllIcons
@@ -23,6 +25,7 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.psi.LuaElementFactory
@@ -74,12 +77,17 @@ fun getNameIdentifier(classDef: LuaDocClassDef): PsiElement {
     return classDef.id
 }
 
-@Suppress("UNUSED_PARAMETER")
 fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
     val stub = fieldDef.stub
     if (stub != null)
         return stub.type
     return resolveDocTypeSet(fieldDef.typeSet)
+}
+
+fun guessParentType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
+    val parent = fieldDef.parent
+    val classDef = PsiTreeUtil.findChildOfType(parent, LuaDocClassDef::class.java)
+    return classDef?.type ?: Ty.UNKNOWN
 }
 
 /**

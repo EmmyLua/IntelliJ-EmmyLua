@@ -26,10 +26,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.psi.LuaClassMethod
-import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner
-import com.tang.intellij.lua.psi.LuaParamInfo
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.ITyClass
@@ -45,7 +42,7 @@ class OverrideCompletionProvider : CompletionProvider<CompletionParameters>() {
         val methodDef = PsiTreeUtil.getParentOfType(id, LuaClassMethodDef::class.java)
         if (methodDef != null) {
             val context = SearchContext(methodDef.project)
-            val classType = methodDef.getClassType(context)
+            val classType = methodDef.guessClassType(context)
             if (classType != null) {
                 val sup = classType.getSuperClass(context)
                 val memberNameSet = mutableSetOf<String>()

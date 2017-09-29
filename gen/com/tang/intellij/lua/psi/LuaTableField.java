@@ -40,6 +40,9 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, Lu
   @NotNull
   ITy guessType(SearchContext context);
 
+  @NotNull
+  ITy guessParentType(SearchContext context);
+
   @Nullable
   LuaComment getComment();
 

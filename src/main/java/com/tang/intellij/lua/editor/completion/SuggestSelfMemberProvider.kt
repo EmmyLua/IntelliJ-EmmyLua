@@ -23,6 +23,7 @@ import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaClassMethodDef
+import com.tang.intellij.lua.psi.guessClassType
 import com.tang.intellij.lua.search.SearchContext
 
 /**
@@ -37,7 +38,7 @@ class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
         val methodDef = PsiTreeUtil.getParentOfType(position, LuaClassMethodDef::class.java)
         if (methodDef != null && !methodDef.isStatic) {
             val searchContext = SearchContext(position.project)
-            val type = methodDef.getClassType(searchContext)
+            val type = methodDef.guessClassType(searchContext)
             type?.processMembers(searchContext) { curType, member ->
                 if (member is LuaClassField) {
                     addField(completionResultSet, curType === type, curType.className, member, object : HandlerProcessor() {

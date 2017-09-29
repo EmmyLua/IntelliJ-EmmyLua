@@ -10,7 +10,6 @@ import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
-import com.tang.intellij.lua.ty.ITyClass;
 
 public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaStatement, StubBasedPsiElement<LuaClassMethodStub> {
 
@@ -23,8 +22,8 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   @Nullable
   LuaComment getComment();
 
-  @Nullable
-  ITyClass getClassType(SearchContext context);
+  @NotNull
+  ITy guessParentType(SearchContext context);
 
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();

@@ -29,6 +29,9 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   @NotNull
   ITy guessType(SearchContext context);
 
+  @NotNull
+  ITy guessParentType(SearchContext context);
+
   @Nullable
   PsiElement getNameIdentifier();
 

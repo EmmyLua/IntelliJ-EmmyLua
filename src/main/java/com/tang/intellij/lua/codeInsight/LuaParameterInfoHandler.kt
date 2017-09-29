@@ -52,7 +52,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
         val luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.offset, LuaArgs::class.java, false)
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
-            val type = callExpr.guessPrefixType(SearchContext(context.project))
+            val type = callExpr.guessParentType(SearchContext(context.project))
             if (type is ITyFunction) {
                 val list = mutableListOf<IFunSignature>()
                 type.process(Processor {

@@ -35,7 +35,6 @@ import com.intellij.util.FunctionUtil
 import com.intellij.util.Query
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
@@ -46,14 +45,14 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
  * line marker
  * Created by tangzx on 2016/12/11.
  */
-class LuaLineMarkerProvider(val daemonSettings: DaemonCodeAnalyzerSettings, val colorsManager:EditorColorsManager) : LineMarkerProvider {
+class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettings, private val colorsManager:EditorColorsManager) : LineMarkerProvider {
 
     private fun collectNavigationMarkers(element: PsiElement, result: MutableCollection<in LineMarkerInfo<*>>) {
         if (element is LuaClassMethodName) {
             val methodDef = PsiTreeUtil.getParentOfType(element, LuaClassMethod::class.java)!!
             val project = methodDef.project
             val context = SearchContext(project)
-            val type = methodDef.getClassType(context)
+            val type = methodDef.guessClassType(context)
 
             //OverridingMethod
             val classMethodNameId = element.id

@@ -69,6 +69,11 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocClassField
     return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 
+  @NotNull
+  public ITy guessParentType(SearchContext context) {
+    return LuaDocPsiImplUtilKt.guessParentType(this, context);
+  }
+
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaDocPsiImplUtilKt.getNameIdentifier(this);

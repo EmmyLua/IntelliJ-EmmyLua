@@ -17,9 +17,20 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.psi.PsiNamedElement
+import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyUnion
 
 /**
  * Class 成员
  * Created by tangzx on 2016/12/12.
  */
-interface LuaClassMember : LuaTypeGuessable, PsiNamedElement
+interface LuaClassMember : LuaTypeGuessable, PsiNamedElement {
+    fun guessParentType(context: SearchContext): ITy
+}
+
+fun LuaClassMember.guessClassType(context: SearchContext): ITyClass? {
+    val ty = guessParentType(context)
+    return TyUnion.getPrefectClass(ty)
+}

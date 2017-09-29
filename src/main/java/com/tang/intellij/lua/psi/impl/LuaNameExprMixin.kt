@@ -34,7 +34,7 @@ import com.tang.intellij.lua.ty.TyClass
 
  * Created by TangZX on 2017/4/12.
  */
-abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, LuaGlobalVar {
+abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, LuaClassField {
     internal constructor(stub: LuaNameStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     internal constructor(node: ASTNode) : super(node)
@@ -43,6 +43,10 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
 
     override fun getReference(): PsiReference? {
         return references.firstOrNull()
+    }
+
+    override fun guessParentType(context: SearchContext): ITy {
+        return Ty.UNKNOWN
     }
 
     override fun guessType(context: SearchContext): ITy {
