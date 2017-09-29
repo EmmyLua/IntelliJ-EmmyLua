@@ -170,8 +170,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
                     else -> {
                         val elementType = child.node.elementType
                         if (elementType === LuaDocTypes.STRING) {
-                            sb.append(child.text)
-                            sb.append("<br>")
+                            sb.append(markdownToHtml(child.text))
                         }
                     }
                 }
@@ -207,7 +206,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
     private fun renderCommentString(prefix: String?, postfix: String?, sb: StringBuilder, child: LuaDocCommentString?) {
         child?.string?.text?.let {
             if (prefix != null) sb.append(prefix)
-            sb.append(it)
+            sb.append(markdownToHtml(it))
             if (postfix != null) sb.append(postfix)
         }
     }
