@@ -13,7 +13,7 @@
             <option name="EFFECT_TYPE" value="2"/>
         </value>
     </option>
-    <option>
+    <option name="LUA_PRIMITIVE_TYPE">
         <value>
             <option name="FOREGROUND" value="D700FF"/>
         </value>
