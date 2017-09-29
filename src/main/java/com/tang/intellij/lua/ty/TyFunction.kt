@@ -33,6 +33,7 @@ interface IFunSignature {
     val returnTy: ITy
     val params: Array<LuaParamInfo>
     val displayName: String
+    val paramSignature: String
 }
 
 fun IFunSignature.getParamTy(index: Int): ITy {
@@ -99,6 +100,15 @@ class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, o
             paramSB.add(it.name + ":" + it.ty.displayName)
         }
         "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
+    }
+
+    override val paramSignature: String get() {
+        val list = arrayOfNulls<String>(params.size)
+        for (i in params.indices) {
+            val lpi = params[i]
+            list[i] = lpi.name
+        }
+        return "(" + list.joinToString(", ") + ")"
     }
 }
 

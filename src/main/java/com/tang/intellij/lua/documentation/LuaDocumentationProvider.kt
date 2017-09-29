@@ -16,22 +16,18 @@
 
 package com.tang.intellij.lua.documentation
 
-import com.intellij.codeInsight.documentation.DocumentationManagerUtil
 import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.*
-import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.editor.completion.LuaDocumentationLookupElement
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
-import com.tang.intellij.lua.ty.TyUnion
-import java.util.*
+import com.tang.intellij.lua.ty.TyFunction
+import com.tang.intellij.lua.ty.isSelfCall
 
 /**
  * Documentation support
@@ -39,31 +35,13 @@ import java.util.*
  */
 class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationProvider {
 
-    private inline fun StringBuilder.wrap(prefix: String, postfix: String, crossinline body: () -> Unit) {
-        this.append(prefix)
-        body()
-        this.append(postfix)
-    }
-
-    private inline fun StringBuilder.wrapTag(tag: String, crossinline body: () -> Unit) {
-        wrap("<$tag>", "</$tag>", body)
-    }
-
-    private fun StringBuilder.appendClassLink(clazz: String) {
-        DocumentationManagerUtil.createHyperlink(this, clazz, clazz, true)
-    }
-
     override fun getQuickNavigateInfo(element: PsiElement?, originalElement: PsiElement?): String? {
         if (element != null) {
             when (element) {
                 is LuaTypeGuessable -> {
                     val ty = element.guessTypeFromCache(SearchContext(element.project))
                     return buildString {
-                        var index = 0
-                        TyUnion.each(ty) {
-                            if (index++ == 0) append(it.toString())
-                            else wrapTag("br") { append(it.toString()) }
-                        }
+                        renderTy(this, ty)
                     }
                 }
             }
@@ -83,154 +61,74 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
     }
 
     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? {
+        val sb = StringBuilder()
         when (element) {
-            is LuaCommentOwner -> return genDoc(element)
-            is LuaParamNameDef -> return genDoc(element)
-            is LuaDocClassDef -> return buildString { renderClassDef(this, element) }
-            is LuaClassField -> return genDoc(element)
+            is LuaParamNameDef -> renderParamNameDef(sb, element)
+            is LuaDocClassDef -> renderClassDef(sb, element)
+            is LuaClassMember -> renderClassMember(sb, element)
             is LuaNameDef -> {
                 val owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner::class.java)
                 if (owner != null)
-                    return genDoc(owner)
+                    renderComment(sb, owner.comment)
             }
         }
+        if (sb.isNotEmpty()) return sb.toString()
         return super.generateDoc(element, originalElement)
     }
 
-    private fun genDoc(field: LuaClassField): String? {
-        return if (field is LuaDocFieldDef)
-            buildString { renderFieldDef(this, field) }
-        else {
-            val iTy = field.guessTypeFromCache(SearchContext(field.project))
-            iTy.createTypeString()
-        }
-    }
+    private fun renderClassMember(sb: StringBuilder, classMember: LuaClassMember) {
+        val context = SearchContext(classMember.project)
+        val parentType = classMember.guessClassType(context)
+        val ty = classMember.guessType(context)
 
-    private fun genDoc(paramNameDef: LuaParamNameDef): String? {
-        val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
-        val o = Optional.ofNullable(owner)
-                .map<LuaComment>({ it.comment })
-                .map<LuaDocParamDef> { t -> t.getParamDef(paramNameDef.name) }
-                .map<LuaDocCommentString>({ it.commentString })
-                .map<PsiElement>({ it.string })
-                .map<String>({ it.text })
-        return o.orElse(null)
-    }
-
-    private fun genDoc(owner: LuaCommentOwner): String? {
-        val sb = StringBuilder()
-        if (owner is LuaFuncBodyOwner && owner is PsiNameIdentifierOwner) {
-            val methodDef: PsiNameIdentifierOwner = owner
+        //base info
+        if (parentType != null) {
+            renderTy(sb, parentType)
             with(sb) {
-                append("<h1>")
-                append(methodDef.name)
-                append(owner.paramSignature)
-                append("</h1><br>")
-            }
-        }
-
-        val comment = LuaCommentUtil.findComment(owner)
-        sb.append(genComment(comment))
-
-        val doc = sb.toString()
-        return if (doc.isNotEmpty()) sb.toString() else null
-    }
-
-    private fun genComment(comment: LuaComment?): String {
-        val sb = StringBuilder()
-        if (comment != null) {
-            var child: PsiElement? = comment.firstChild
-            while (child != null) {
-                when (child) {
-                    is LuaDocParamDef -> {
-                        val paramNameRef = child.paramNameRef
-                        if (paramNameRef != null) {
-                            sb.append("<li><b>param</b> ")
-                            sb.append(paramNameRef.text)
-                            renderTypeSet(":", null, sb, child.typeSet)
-                            renderCommentString("  ", null, sb, child.commentString)
-                            sb.append("<br>")
-                        }
+                when (ty) {
+                    is TyFunction -> {
+                        append(if (ty.isSelfCall) ":" else ".")
+                        append(classMember.name)
+                        renderSignature(sb, ty.mainSignature)
                     }
-                    is LuaDocReturnDef -> {
-                        val typeList = child.typeList
-                        if (typeList != null) {
-                            sb.append("<li><b>return</b> ")
-                            val typeSetList = typeList.typeSetList
-                            for (typeSet in typeSetList) {
-                                renderTypeSet(":", null, sb, typeSet)
-                                sb.append(" ")
-                            }
-                            sb.append("<br>")
-                        }
-                    }
-                    is LuaDocClassDef -> renderClassDef(sb, child)
-                    is LuaDocOverloadDef -> renderOverload(sb, child)
-                    is LuaDocTypeDef -> renderTypeDef(sb, child)
                     else -> {
-                        val elementType = child.node.elementType
-                        if (elementType === LuaDocTypes.STRING) {
-                            sb.append(markdownToHtml(child.text))
+                        append(".${classMember.name}:")
+                        renderTy(sb, ty)
+                    }
+                }
+            }
+        } else {
+            //NameExpr
+            if (classMember is LuaNameExpr) {
+                val nameExpr: LuaNameExpr = classMember
+                with(sb) {
+                    append(nameExpr.name)
+                    when (ty) {
+                        is TyFunction -> renderSignature(sb, ty.mainSignature)
+                        else -> {
+                            append(":")
+                            renderTy(sb, ty)
                         }
                     }
                 }
-                child = child.nextSibling
+
+                val stat = nameExpr.parent.parent // VAR_LIST ASSIGN_STAT
+                if (stat is LuaAssignStat) renderComment(sb, stat.comment)
             }
         }
-        return sb.toString()
+
+        //comment content
+        if (classMember is LuaCommentOwner)
+            renderComment(sb, classMember.comment)
     }
 
-    private fun renderClassDef(sb: StringBuilder, def: LuaDocClassDef) {
-        val cls = def.type
-        sb.append("class ")
-        sb.wrapTag("b") { sb.append(cls.className) }
-        if (cls.superClassName != null) {
-            sb.append(" : ")
-            DocumentationManagerUtil.createHyperlink(sb, cls.superClassName, cls.superClassName, true)
+    private fun renderParamNameDef(sb: StringBuilder, paramNameDef: LuaParamNameDef) {
+        val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
+        val docParamDef = owner?.comment?.getParamDef(paramNameDef.name)
+        if (docParamDef != null) {
+            renderDocParam(sb, docParamDef)
+        } else {
+            sb.append("<li><b>param</b> ${paramNameDef.name}:any")
         }
-        renderCommentString("  ", null, sb, def.commentString)
-        sb.append("<br>")
-    }
-
-    private fun renderFieldDef(sb: StringBuilder, def: LuaDocFieldDef) {
-        val classDef = PsiTreeUtil.getChildOfType(def.parent, LuaDocClassDef::class.java)
-        val cls = classDef?.type
-        if (cls != null) {
-            DocumentationManagerUtil.createHyperlink(sb, cls.className, cls.className, true)
-            sb.append(".${def.name}")
-            renderTypeSet(":", null, sb, def.typeSet)
-            renderCommentString("  ", null, sb, def.commentString)
-        }
-    }
-
-    private fun renderCommentString(prefix: String?, postfix: String?, sb: StringBuilder, child: LuaDocCommentString?) {
-        child?.string?.text?.let {
-            if (prefix != null) sb.append(prefix)
-            sb.append(markdownToHtml(it))
-            if (postfix != null) sb.append(postfix)
-        }
-    }
-
-    private fun renderTypeSet(prefix: String?, postfix: String?, sb: StringBuilder, typeSet: LuaDocTypeSet?) {
-        if (typeSet != null) {
-            if (prefix != null) sb.append(prefix)
-            sb.append("(")
-            val nameRefList = typeSet.tyList
-            for (i in nameRefList.indices) {
-                if (i != 0) sb.append(", ")
-                sb.appendClassLink(nameRefList[i].text)
-            }
-            sb.append(")")
-            if (postfix != null) sb.append(postfix)
-        }
-    }
-
-    private fun renderOverload(sb: StringBuilder, overloadDef: LuaDocOverloadDef) {
-        sb.append("<li><b>overload</b> ")
-        sb.append(overloadDef.functionTy.toString())
-    }
-
-    private fun renderTypeDef(sb: StringBuilder, typeDef: LuaDocTypeDef) {
-        sb.append(typeDef.type.createTypeString())
     }
 }
