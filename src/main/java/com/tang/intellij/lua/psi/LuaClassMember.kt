@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi;
+package com.tang.intellij.lua.psi
 
-import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.PsiNamedElement
 
 /**
  * Class 成员
  * Created by tangzx on 2016/12/12.
  */
-public interface LuaClassMember extends LuaTypeGuessable, PsiNamedElement {
-}
+interface LuaClassMember : LuaTypeGuessable, PsiNamedElement

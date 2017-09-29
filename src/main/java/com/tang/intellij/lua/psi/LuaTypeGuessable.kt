@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi;
+package com.tang.intellij.lua.psi
 
-import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.ITy;
-import org.jetbrains.annotations.NotNull;
+import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
 
 /**
  *
  * Created by tangzx on 2016/12/1.
  */
-public interface LuaTypeGuessable extends LuaPsiElement {
-    @NotNull
-    ITy guessType(SearchContext context);
+interface LuaTypeGuessable : LuaPsiElement {
+    fun guessType(context: SearchContext): ITy
 }
