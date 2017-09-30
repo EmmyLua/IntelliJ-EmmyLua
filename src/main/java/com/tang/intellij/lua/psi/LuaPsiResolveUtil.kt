@@ -296,30 +296,34 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     if (paramIndex == 0)
                         return Ty.NUMBER
 
-                    val argExprList = callExpr.args.exprList
-                    val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
-                    if (argExpr != null) {
-                        val set = argExpr.guessTypeFromCache(context)
-                        val tyArray = TyUnion.find(set, ITyArray::class.java)
-                        if (tyArray != null)
-                            return tyArray.base
-                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
-                        if (tyGeneric != null)
-                            return tyGeneric.getParamTy(1)
+                    val args = callExpr.args
+                    if (args is LuaListArgs) {
+                        val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
+                        if (argExpr != null) {
+                            val set = argExpr.guessTypeFromCache(context)
+                            val tyArray = TyUnion.find(set, ITyArray::class.java)
+                            if (tyArray != null)
+                                return tyArray.base
+                            val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
+                            if (tyGeneric != null)
+                                return tyGeneric.getParamTy(1)
+                        }
                     }
                 }
                 // pairs
                 if (expr.text == Constants.WORD_PAIRS) {
-                    val argExprList = callExpr.args.exprList
-                    val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
-                    if (argExpr != null) {
-                        val set = argExpr.guessType(context)
-                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
-                        if (tyGeneric != null)
-                            return tyGeneric.getParamTy(paramIndex)
-                        val tyArray = TyUnion.find(set, ITyArray::class.java)
-                        if (tyArray != null)
-                            return if (paramIndex == 0) Ty.NUMBER else tyArray.base
+                    val args = callExpr.args
+                    if (args is LuaListArgs) {
+                        val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
+                        if (argExpr != null) {
+                            val set = argExpr.guessType(context)
+                            val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
+                            if (tyGeneric != null)
+                                return tyGeneric.getParamTy(paramIndex)
+                            val tyArray = TyUnion.find(set, ITyArray::class.java)
+                            if (tyArray != null)
+                                return if (paramIndex == 0) Ty.NUMBER else tyArray.base
+                        }
                     }
                 }
             }
@@ -341,11 +345,14 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 val type = callExpr.guessParentType(context)
                 //todo mainSignature ?
                 if (type is ITyFunction) {
-                    val closureIndex = callExpr.args.exprList!!.getIndexFor(closure)
-                    val paramTy = type.mainSignature.getParamTy(closureIndex)
-                    if (paramTy is ITyFunction) {
-                        val paramIndex = closure.getIndexFor(paramNameDef)
-                        return paramTy.mainSignature.getParamTy(paramIndex)
+                    val args = callExpr.args
+                    if (args is LuaListArgs) {
+                        val closureIndex = args.getIndexFor(closure)
+                        val paramTy = type.mainSignature.getParamTy(closureIndex)
+                        if (paramTy is ITyFunction) {
+                            val paramIndex = closure.getIndexFor(paramNameDef)
+                            return paramTy.mainSignature.getParamTy(paramIndex)
+                        }
                     }
                 }
             }

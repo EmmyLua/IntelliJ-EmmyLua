@@ -5,6 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaArgs extends LuaPsiElement {
+public interface LuaSingleArg extends LuaArgs {
+
+  @Nullable
+  LuaTableExpr getTableExpr();
+
+  @Nullable
+  PsiElement getString();
 
 }

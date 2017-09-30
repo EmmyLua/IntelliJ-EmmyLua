@@ -391,8 +391,11 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExprMixin"
 }
 
-arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }
-args ::=  '(' (arg_expr_list)? ')' | tableExpr | STRING { pin(".*") = 1 }
+args ::= listArgs | singleArg
+singleArg ::= tableExpr | STRING { extends = args methods = [ STRING = "STRING" ] }
+private arg_expr_list ::= (expr ',')* (expr |& ')')
+listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }
+
 left callExpr ::= args {
     methods = [
         guessParentType

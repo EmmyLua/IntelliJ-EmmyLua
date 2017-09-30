@@ -57,7 +57,7 @@ fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     return list[index]
 }
 
-fun LuaExprList.getIndexFor(psi: LuaExpr): Int {
+fun LuaListArgs.getIndexFor(psi: LuaExpr): Int {
     var idx = 0
     PsiTreeUtil.processElements(this, {
         if (it is LuaExpr) {

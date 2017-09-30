@@ -31,6 +31,7 @@ public interface LuaTypes {
   IElementType IF_STAT = LuaParserDefinitionKt.createType("IF_STAT");
   IElementType INDEX_EXPR = LuaParserDefinitionKt.createType("INDEX_EXPR");
   IElementType LABEL_STAT = LuaParserDefinitionKt.createType("LABEL_STAT");
+  IElementType LIST_ARGS = LuaParserDefinitionKt.createType("LIST_ARGS");
   IElementType LITERAL_EXPR = LuaParserDefinitionKt.createType("LITERAL_EXPR");
   IElementType LOCAL_DEF = LuaParserDefinitionKt.createType("LOCAL_DEF");
   IElementType LOCAL_FUNC_DEF = LuaParserDefinitionKt.createType("LOCAL_FUNC_DEF");
@@ -42,6 +43,7 @@ public interface LuaTypes {
   IElementType REPEAT_STAT = LuaParserDefinitionKt.createType("REPEAT_STAT");
   IElementType RETURN_STAT = LuaParserDefinitionKt.createType("RETURN_STAT");
   IElementType SHEBANG_LINE = LuaParserDefinitionKt.createType("SHEBANG_LINE");
+  IElementType SINGLE_ARG = LuaParserDefinitionKt.createType("SINGLE_ARG");
   IElementType TABLE_EXPR = LuaParserDefinitionKt.createType("TABLE_EXPR");
   IElementType TABLE_FIELD = LuaParserDefinitionKt.createType("TABLE_FIELD");
   IElementType TABLE_FIELD_SEP = LuaParserDefinitionKt.createType("TABLE_FIELD_SEP");
@@ -121,10 +123,7 @@ public interface LuaTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ARGS) {
-        return new LuaArgsImpl(node);
-      }
-      else if (type == ASSIGN_STAT) {
+       if (type == ASSIGN_STAT) {
         return new LuaAssignStatImpl(node);
       }
       else if (type == BINARY_EXPR) {
@@ -184,6 +183,9 @@ public interface LuaTypes {
       else if (type == LABEL_STAT) {
         return new LuaLabelStatImpl(node);
       }
+      else if (type == LIST_ARGS) {
+        return new LuaListArgsImpl(node);
+      }
       else if (type == LITERAL_EXPR) {
         return new LuaLiteralExprImpl(node);
       }
@@ -216,6 +218,9 @@ public interface LuaTypes {
       }
       else if (type == SHEBANG_LINE) {
         return new LuaShebangLineImpl(node);
+      }
+      else if (type == SINGLE_ARG) {
+        return new LuaSingleArgImpl(node);
       }
       else if (type == TABLE_EXPR) {
         return new LuaTableExprImpl(node);

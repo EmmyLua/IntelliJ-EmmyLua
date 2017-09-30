@@ -5,6 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaArgs extends LuaPsiElement {
+public interface LuaListArgs extends LuaArgs {
+
+  @NotNull
+  List<LuaExpr> getExprList();
 
 }

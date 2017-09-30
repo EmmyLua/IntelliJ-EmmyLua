@@ -235,20 +235,9 @@ fun getFirstStringArg(callExpr: LuaCallExpr): PsiElement? {
     val args = callExpr.args
     var path: PsiElement? = null
 
-    // require "xxx"
-    var child: PsiElement? = args.firstChild
-    while (child != null) {
-        if (child.node.elementType === LuaTypes.STRING) {
-            path = child
-            break
-        }
-        child = child.nextSibling
-    }
-    // require("")
-    if (path == null) {
-        val exprList = args.exprList
-        if (exprList != null) {
-            val list = exprList.exprList
+    when (args) {
+        is LuaSingleArg -> path = args.string
+        is LuaListArgs -> args.exprList.let { list ->
             if (list.isNotEmpty() && list[0] is LuaLiteralExpr) {
                 val valueExpr = list[0] as LuaLiteralExpr
                 val node = valueExpr.firstChild

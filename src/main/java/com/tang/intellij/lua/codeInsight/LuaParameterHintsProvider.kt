@@ -42,37 +42,35 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
                 return list
             @Suppress("UnnecessaryVariable")
             val callExpr = psi
-            val args = callExpr.args
-            val exprList = args.exprList?.exprList
-            if (exprList != null) {
-                val context = SearchContext(callExpr.getProject())
-                val type = callExpr.guessParentType(context)
-                val ty = TyUnion.find(type, ITyFunction::class.java) ?: return list
+            val args = callExpr.args as? LuaListArgs ?: return list
+            val exprList = args.exprList
+            val context = SearchContext(callExpr.getProject())
+            val type = callExpr.guessParentType(context)
+            val ty = TyUnion.find(type, ITyFunction::class.java) ?: return list
 
-                // 是否是 inst:method() 被用为 inst.method(self) 形式
-                val isInstanceMethodUsedAsStaticMethod = ty.isSelfCall && callExpr.isStaticMethodCall
-                val isStaticMethodUsedAsInstanceMethod = !ty.isSelfCall && !callExpr.isStaticMethodCall
-                var paramIndex = 0
-                var argIndex = 0
-                val sig = ty.findPrefectSignature(if (isInstanceMethodUsedAsStaticMethod) exprList.size - 1 else exprList.size)
-                val parameters: Array<LuaParamInfo> = sig.params
-                val paramCount = parameters.size
+            // 是否是 inst:method() 被用为 inst.method(self) 形式
+            val isInstanceMethodUsedAsStaticMethod = ty.isSelfCall && callExpr.isStaticMethodCall
+            val isStaticMethodUsedAsInstanceMethod = !ty.isSelfCall && !callExpr.isStaticMethodCall
+            var paramIndex = 0
+            var argIndex = 0
+            val sig = ty.findPrefectSignature(if (isInstanceMethodUsedAsStaticMethod) exprList.size - 1 else exprList.size)
+            val parameters: Array<LuaParamInfo> = sig.params
+            val paramCount = parameters.size
 
-                if (isStaticMethodUsedAsInstanceMethod)
-                    paramIndex = 1
-                else if (isInstanceMethodUsedAsStaticMethod && !exprList.isEmpty()) {
-                    val expr = exprList[argIndex++]
-                    list.add(InlayInfo(Constants.WORD_SELF, expr.textOffset))
-                }
+            if (isStaticMethodUsedAsInstanceMethod)
+                paramIndex = 1
+            else if (isInstanceMethodUsedAsStaticMethod && !exprList.isEmpty()) {
+                val expr = exprList[argIndex++]
+                list.add(InlayInfo(Constants.WORD_SELF, expr.textOffset))
+            }
 
-                while (argIndex < exprList.size && paramIndex < paramCount) {
-                    val expr = exprList[argIndex]
+            while (argIndex < exprList.size && paramIndex < paramCount) {
+                val expr = exprList[argIndex]
 
-                    if (PsiTreeUtil.instanceOf(expr, *EXPR_HINT))
-                        list.add(InlayInfo(parameters[paramIndex].name, expr.textOffset))
-                    paramIndex++
-                    argIndex++
-                }
+                if (PsiTreeUtil.instanceOf(expr, *EXPR_HINT))
+                    list.add(InlayInfo(parameters[paramIndex].name, expr.textOffset))
+                paramIndex++
+                argIndex++
             }
         }
         else if (psi is LuaParamNameDef) {
