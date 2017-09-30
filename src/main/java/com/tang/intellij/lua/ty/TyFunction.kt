@@ -166,7 +166,7 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        if (other.displayName == "function") return true // 'any' equivalent for functions
+        if (super.subTypeOf(other, context) || other.displayName == "function") return true // 'any' equivalent for functions
         if (other is ITyFunction) {
             if (mainSignature == other.mainSignature || other.signatures.any({ sig -> sig == mainSignature})) return true
             return signatures.any({ sig -> sig == other.mainSignature || other.signatures.any({ sig2 -> sig2 == sig})})
