@@ -87,7 +87,7 @@ par_ty ::= '(' ty ')' {
 }
 
 private generic_param_list ::= (ty ',')* ty
-generic_ty ::= ty '<' generic_param_list '>' {
+generic_ty ::= general_ty '<' generic_param_list '>' {
     methods = [getType]
     pin = 2
 }

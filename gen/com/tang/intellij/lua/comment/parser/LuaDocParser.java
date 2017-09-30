@@ -630,7 +630,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
         }
         exit_section_(b, l, m, UNION_TY, r, true, null);
       }
-      else if (g < 2 && generic_ty_0(b, l + 1)) {
+      else if (g < 2 && leftMarkerIs(b, GENERAL_TY) && generic_ty_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, GENERIC_TY, r, true, null);
       }
