@@ -24,8 +24,12 @@ import com.intellij.psi.search.searches.ReferencesSearch
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.highlighting.LuaHighlightingData
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.IFunSignature
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.TyPsiFunction
 
 /**
  * LuaAnnotator
@@ -193,6 +197,87 @@ class LuaAnnotator : Annotator {
                     }
                 }
             }
+        }
+
+        override fun visitCallExpr(o: LuaCallExpr) {
+            super.visitCallExpr(o)
+
+            // Check if type safety is enforced
+            if (!LuaSettings.instance.isEnforceTypeSafety) return
+
+            val searchContext = SearchContext(o.project)
+            val type = o.expr.guessType(searchContext)
+
+            if (type is TyPsiFunction) {
+                val givenParams = o.args.children.filterIsInstance<LuaExpr>()
+                val givenTypes = givenParams.map({ param -> param.guessType(searchContext) })
+
+                // Check if there are overloads?
+                if (type.signatures.isEmpty()) {
+                    // Check main signature
+                    if (!matchCallSignature(givenTypes, type.mainSignature, searchContext)) {
+                        annotateCall(o, givenParams, givenTypes, type.mainSignature.params, searchContext)
+                    }
+                } else {
+                    // Check if main signature matches
+                    if (matchCallSignature(givenTypes, type.mainSignature, searchContext)) return
+                    // Check if there are other matching signatures
+                    for (sig in type.signatures) {
+                        if (matchCallSignature(givenTypes, sig, searchContext)) return
+                    }
+
+                    // No matching overload found
+                    val signatureString = givenTypes.joinToString(", ", transform = { type -> type.displayName })
+                    val errorStr = "No matching overload of type: %s(%s)"
+                    myHolder!!.createErrorAnnotation(o, errorStr.format(o.firstChild.text, signatureString))
+                }
+            }
+        }
+
+        private fun annotateCall(call: LuaExpr, concreteParams: List<LuaExpr>, concreteTypes: List<ITy>, abstractParams: Array<LuaParamInfo>, searchContext: SearchContext) {
+            // Check if number of arguments match
+            if (concreteParams.size > abstractParams.size) {
+                val signatureString = abstractParams.joinToString(", ", transform = { param -> param.ty.displayName })
+                for (i in abstractParams.size until concreteParams.size) {
+                    myHolder!!.createErrorAnnotation(concreteParams[i], "Too many arguments for type %s(%s).".format(call.firstChild.text, signatureString))
+                }
+            }
+            else if (concreteParams.size < abstractParams.size) {
+                for (i in concreteParams.size until abstractParams.size) {
+                    myHolder!!.createErrorAnnotation(call.lastChild.lastChild, "Missing argument: %s: %s".format(abstractParams[i].name, abstractParams[i].ty.displayName))
+                }
+            }
+            else {
+                // Check individual arguments
+                for (i in 0 until concreteParams.size) {
+                    // Check if concrete param is subtype of abstract type.
+                    val concreteType = concreteTypes[i]
+                    val abstractType = abstractParams[i].ty
+
+                    if (!concreteType.subTypeOf(abstractType, searchContext)) {
+                        myHolder!!.createErrorAnnotation(concreteParams[i], "Type mismatch. Required: '%s' Found: '%s'".format(abstractType.displayName, concreteType.displayName))
+                    }
+                }
+            }
+        }
+
+        // Evaluate if concrete function parameters match abstract function parameters.
+        private fun matchCallSignature(concreteParams: List<ITy>, abstractParams: IFunSignature, searchContext: SearchContext): Boolean {
+            // Check if number of arguments matches
+            if (concreteParams.size != abstractParams.params.size) return false
+
+            // Check individual arguments
+            for (i in 0 until concreteParams.size) {
+                // Check if concrete param is subtype of abstract type.
+                val concreteType = concreteParams[i]
+                val abstractType = abstractParams.params[i].ty
+
+                if (!concreteType.subTypeOf(abstractType, searchContext)) {
+                    return false
+                }
+            }
+
+            return true
         }
     }
 

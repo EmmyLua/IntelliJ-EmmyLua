@@ -20,6 +20,7 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.search.SearchContext
 
 enum class TyKind {
     Unknown,
@@ -53,6 +54,8 @@ interface ITy {
     fun union(ty: ITy): ITy
 
     fun createTypeString(): String
+
+    fun subTypeOf(other: ITy, context: SearchContext): Boolean
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -93,6 +96,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
             }
         }
         return list.joinToString("|")
+    }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return this.displayName.equals(other.displayName);
     }
 
     companion object {
@@ -234,7 +241,7 @@ class TyUnion : Ty(TyKind.Union) {
     private val childSet = mutableSetOf<ITy>()
 
     override val displayName: String
-        get() = "Union"
+        get() = childSet.joinToString("|", transform = { type:ITy -> type.displayName })
 
     val size:Int
         get() = childSet.size
@@ -249,6 +256,10 @@ class TyUnion : Ty(TyKind.Union) {
 
     private fun addChild(ty: ITy): Boolean {
         return childSet.add(ty)
+    }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return false
     }
 
     companion object {
