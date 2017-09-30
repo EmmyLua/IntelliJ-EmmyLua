@@ -43,6 +43,10 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     override fun hashCode(): Int {
         return displayName.hashCode()
     }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return base.subTypeOf(other, context)
+    }
 }
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {

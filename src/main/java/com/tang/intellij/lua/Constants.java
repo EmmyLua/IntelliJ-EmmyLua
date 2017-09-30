@@ -28,4 +28,5 @@ public class Constants {
     public static final String WORD_IPAIRS = "ipairs";
     public static final String WORD_ANY = "any";
     public static final String WORD_MODULE = "module";
+    public static final String WORD_NIL = "nil";
 }
