@@ -71,11 +71,11 @@ internal fun renderTy(sb: StringBuilder, ty: ITy) {
 }
 
 internal fun renderSignature(sb: StringBuilder, sig: IFunSignature) {
-    sb.wrap("(", "):") {
+    sb.wrap("(", "): ") {
         var idx = 0
         sig.params.forEach {
             if (idx++ != 0) sb.append(", ")
-            sb.append("${it.name}:")
+            sb.append("${it.name}: ")
             renderTy(sb, it.ty)
         }
     }
@@ -94,10 +94,10 @@ internal fun renderComment(sb: StringBuilder, comment: LuaComment?) {
                 is LuaDocReturnDef -> {
                     val typeList = child.typeList
                     if (typeList != null) {
-                        sb.append("<li><b>return</b> ")
-                        val typeSetList = typeList.typeSetList
-                        for (typeSet in typeSetList) {
-                            renderTypeSet(":", null, sb, typeSet)
+                        sb.append("<li><b>return</b>: ")
+                        val list = typeList.tyList
+                        list.forEachIndexed { index, luaDocTy ->
+                            renderTypeUnion(if (index != 0) ", " else null, null, sb, luaDocTy)
                             sb.append(" ")
                         }
                         sb.append("<br>")
@@ -133,16 +133,16 @@ internal fun renderClassDef(sb: StringBuilder, def: LuaDocClassDef) {
 }
 
 internal fun renderFieldDef(sb: StringBuilder, def: LuaDocFieldDef) {
-    sb.append("<li><b>field</b> ${def.name}")
-    renderTypeSet(":", null, sb, def.typeSet)
+    sb.append("<li><b>field</b> ${def.name}: ")
+    renderTypeUnion(null, null, sb, def.ty)
     renderCommentString("  ", null, sb, def.commentString)
 }
 
 internal fun renderDocParam(sb: StringBuilder, child: LuaDocParamDef) {
     val paramNameRef = child.paramNameRef
     if (paramNameRef != null) {
-        sb.append("<li><b>param</b> ${paramNameRef.text}")
-        renderTypeSet(":", null, sb, child.typeSet)
+        sb.append("<li><b>param</b> ${paramNameRef.text}: ")
+        renderTypeUnion(null, null, sb, child.ty)
         renderCommentString("  ", null, sb, child.commentString)
     }
 }
@@ -155,16 +155,12 @@ internal fun renderCommentString(prefix: String?, postfix: String?, sb: StringBu
     }
 }
 
-internal fun renderTypeSet(prefix: String?, postfix: String?, sb: StringBuilder, typeSet: LuaDocTypeSet?) {
+internal fun renderTypeUnion(prefix: String?, postfix: String?, sb: StringBuilder, typeSet: LuaDocTy?) {
     if (typeSet != null) {
         if (prefix != null) sb.append(prefix)
 
-        val nameRefList = typeSet.tyList
-        for (i in nameRefList.indices) {
-            if (i != 0) sb.append(", ")
-            val docTy = nameRefList[i]
-            renderTy(sb, docTy.getType())
-        }
+        val ty = typeSet.getType()
+        renderTy(sb, ty)
 
         if (postfix != null) sb.append(postfix)
     }

@@ -67,10 +67,8 @@ class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: P
                 addOccurrence(returnDef)
 
             val overloads = PsiTreeUtil.findChildrenOfType(comment, LuaDocOverloadDef::class.java)
-            overloads.forEach {
-                val typeSet = it.functionTy?.typeSet
-                if (typeSet != null)
-                    addOccurrence(typeSet)
+            overloads.forEach { overload ->
+                overload.functionTy?.typeList?.let { addOccurrence(it) }
             }
         }
     }

@@ -94,8 +94,8 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitTypeSet(@NotNull LuaDocTypeSet o) {
-    visitPsiElement(o);
+  public void visitUnionTy(@NotNull LuaDocUnionTy o) {
+    visitTy(o);
   }
 
   public void visitLuaClassField(@NotNull LuaClassField o) {

@@ -15,7 +15,7 @@ public interface LuaDocParamDef extends LuaDocPsiElement {
   LuaDocParamNameRef getParamNameRef();
 
   @Nullable
-  LuaDocTypeSet getTypeSet();
+  LuaDocTy getTy();
 
   @NotNull
   ITy getType();

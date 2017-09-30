@@ -21,7 +21,7 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   LuaDocCommentString getCommentString();
 
   @Nullable
-  LuaDocTypeSet getTypeSet();
+  LuaDocTy getTy();
 
   @Nullable
   PsiElement getId();

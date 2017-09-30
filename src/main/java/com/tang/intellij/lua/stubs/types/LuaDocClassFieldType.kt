@@ -22,7 +22,6 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl
-import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStubImpl
@@ -54,9 +53,7 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
             className = classDef.name
         }
 
-        val typeSet = resolveDocTypeSet(luaDocFieldDef.typeSet)
-
-        return LuaDocClassFieldStubImpl(stubElement, name, className, typeSet)
+        return LuaDocClassFieldStubImpl(stubElement, name, className, luaDocFieldDef.ty?.getType() ?: Ty.UNKNOWN)
     }
 
     override fun getExternalId() = "lua.class.field"

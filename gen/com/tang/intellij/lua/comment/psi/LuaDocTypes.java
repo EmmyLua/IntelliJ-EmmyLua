@@ -30,7 +30,7 @@ public interface LuaDocTypes {
   IElementType TY = LuaParserDefinitionKt.createDocType("TY");
   IElementType TYPE_DEF = LuaParserDefinitionKt.createDocType("TYPE_DEF");
   IElementType TYPE_LIST = LuaParserDefinitionKt.createDocType("TYPE_LIST");
-  IElementType TYPE_SET = LuaParserDefinitionKt.createDocType("TYPE_SET");
+  IElementType UNION_TY = LuaParserDefinitionKt.createDocType("UNION_TY");
 
   IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
@@ -124,8 +124,8 @@ public interface LuaDocTypes {
       else if (type == TYPE_LIST) {
         return new LuaDocTypeListImpl(node);
       }
-      else if (type == TYPE_SET) {
-        return new LuaDocTypeSetImpl(node);
+      else if (type == UNION_TY) {
+        return new LuaDocUnionTyImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

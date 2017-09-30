@@ -35,7 +35,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
@@ -476,7 +475,7 @@ private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo>
             if (comment != null) {
                 val paramDef = comment.getParamDef(paramName)
                 if (paramDef != null) {
-                    paramInfo.ty = resolveDocTypeSet(paramDef.typeSet)
+                    paramInfo.ty = paramDef.type
                 }
             }
             list.add(paramInfo)

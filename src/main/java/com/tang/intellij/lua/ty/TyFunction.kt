@@ -22,7 +22,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
-import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
@@ -63,7 +62,7 @@ class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, o
             func.functionParamList.forEach {
                 val p = LuaParamInfo()
                 p.name = it.id.text
-                p.ty = resolveDocTypeSet(it.typeSet)
+                p.ty = it.ty?.getType() ?: Ty.UNKNOWN
                 list.add(p)
             }
             return list.toTypedArray()
