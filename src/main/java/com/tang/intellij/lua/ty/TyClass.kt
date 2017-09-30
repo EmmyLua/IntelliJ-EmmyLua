@@ -107,10 +107,14 @@ abstract class TyClass(override val className: String, override var superClassNa
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        // If other class is any, everything is subclass - TyKind.Unknown == any
+        // displayname is a hack because 'any' is read as class with name 'any'
+        if (other.kind == TyKind.Unknown || other.displayName == "any") return true
+
         // Check if other is also a class
         if (other !is ITyClass) return false
-        // If other class is any, everything is subclass - Maybe add TyKind.Any?
-        if (other.displayName.equals("any")) return true
+
+        if (this == other) return true
 
         // Lazy init for superclass
         this.doLazyInit(context)

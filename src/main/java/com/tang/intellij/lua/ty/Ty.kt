@@ -29,7 +29,8 @@ enum class TyKind {
     Function,
     Class,
     Union,
-    Generic
+    Generic,
+    Nil
 }
 enum class TyPrimitiveKind {
     String,
@@ -99,6 +100,9 @@ abstract class Ty(override val kind: TyKind) : ITy {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        // Everything is subset of any
+        if (other.kind == TyKind.Unknown) return true
+
         return this.displayName.equals(other.displayName);
     }
 
@@ -108,6 +112,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
         val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
         val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
+        val NIL = TyNil()
 
         private fun getPrimitive(mark: Byte): Ty {
             return when (mark.toInt()) {
@@ -235,6 +240,10 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override fun hashCode(): Int {
         return displayName.hashCode()
     }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return other == this || other.displayName == "table"
+    }
 }
 
 class TyUnion : Ty(TyKind.Union) {
@@ -337,5 +346,16 @@ class TyUnknown : Ty(TyKind.Unknown) {
 
     override fun hashCode(): Int {
         return Constants.WORD_ANY.hashCode()
+    }
+}
+
+class TyNil : Ty(TyKind.Nil) {
+    override val displayName: String
+        get() = Constants.WORD_NIL
+
+    // Nil only subtype of nil and any
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        // displayName workaround
+        return other.kind == TyKind.Nil || other.kind == TyKind.Unknown || other.displayName == "any"
     }
 }
