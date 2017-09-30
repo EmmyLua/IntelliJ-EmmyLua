@@ -22,6 +22,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.editor.completion.LuaDocumentationLookupElement
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -120,6 +121,8 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         //comment content
         if (classMember is LuaCommentOwner)
             renderComment(sb, classMember.comment)
+        else if (classMember is LuaDocFieldDef)
+            renderCommentString("  ", null, sb, classMember.commentString)
     }
 
     private fun renderParamNameDef(sb: StringBuilder, paramNameDef: LuaParamNameDef) {

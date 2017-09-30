@@ -18,7 +18,6 @@ package com.tang.intellij.lua.documentation
 
 import com.intellij.codeInsight.documentation.DocumentationManagerUtil
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.ty.*
@@ -105,6 +104,7 @@ internal fun renderComment(sb: StringBuilder, comment: LuaComment?) {
                     }
                 }
                 is LuaDocClassDef -> renderClassDef(sb, child)
+                is LuaDocFieldDef -> renderFieldDef(sb, child)
                 is LuaDocOverloadDef -> renderOverload(sb, child)
                 is LuaDocTypeDef -> renderTypeDef(sb, child)
                 else -> {
@@ -133,21 +133,15 @@ internal fun renderClassDef(sb: StringBuilder, def: LuaDocClassDef) {
 }
 
 internal fun renderFieldDef(sb: StringBuilder, def: LuaDocFieldDef) {
-    val classDef = PsiTreeUtil.getChildOfType(def.parent, LuaDocClassDef::class.java)
-    val cls = classDef?.type
-    if (cls != null) {
-        DocumentationManagerUtil.createHyperlink(sb, cls.className, cls.className, true)
-        sb.append(".${def.name}")
-        renderTypeSet(":", null, sb, def.typeSet)
-        renderCommentString("  ", null, sb, def.commentString)
-    }
+    sb.append("<li><b>field</b> ${def.name}")
+    renderTypeSet(":", null, sb, def.typeSet)
+    renderCommentString("  ", null, sb, def.commentString)
 }
 
 internal fun renderDocParam(sb: StringBuilder, child: LuaDocParamDef) {
     val paramNameRef = child.paramNameRef
     if (paramNameRef != null) {
-        sb.append("<li><b>param</b> ")
-        sb.append(paramNameRef.text)
+        sb.append("<li><b>param</b> ${paramNameRef.text}")
         renderTypeSet(":", null, sb, child.typeSet)
         renderCommentString("  ", null, sb, child.commentString)
     }
