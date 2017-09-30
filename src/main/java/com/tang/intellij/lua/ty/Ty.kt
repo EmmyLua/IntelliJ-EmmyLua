@@ -20,6 +20,7 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.search.SearchContext
 
 enum class TyKind {
@@ -101,9 +102,12 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         // Everything is subset of any
-        if (other.kind == TyKind.Unknown) return true
+        if (other.kind == TyKind.Unknown || other.displayName == "any") return true //TODO: Get rid of displayName any and parse any as TyUnknown
 
-        return this.displayName.equals(other.displayName);
+        // Handle unions, subtype if subtype of any of the union components.
+        if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context) })
+
+        return displayName == other.displayName
     }
 
     companion object {
@@ -242,12 +246,13 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return other == this || other.displayName == "table"
+        return super.subTypeOf(other, context) || (other is TyArray && base.subTypeOf(other.base, context)) || other.displayName == "table"
     }
 }
 
 class TyUnion : Ty(TyKind.Union) {
     private val childSet = mutableSetOf<ITy>()
+    fun getChildTypes() = childSet
 
     override val displayName: String
         get() = childSet.joinToString("|", transform = { type:ITy -> type.displayName })
@@ -267,8 +272,9 @@ class TyUnion : Ty(TyKind.Union) {
         return childSet.add(ty)
     }
 
+    // All members of union must be subset of other type
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return false
+        return super.subTypeOf(other, context) || childSet.all({ type -> type.subTypeOf(other, context) })
     }
 
     companion object {
@@ -353,9 +359,8 @@ class TyNil : Ty(TyKind.Nil) {
     override val displayName: String
         get() = Constants.WORD_NIL
 
-    // Nil only subtype of nil and any
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        // displayName workaround
-        return other.kind == TyKind.Nil || other.kind == TyKind.Unknown || other.displayName == "any"
+
+        return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
     }
 }

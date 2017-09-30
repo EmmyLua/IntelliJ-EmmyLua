@@ -45,7 +45,12 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return base.subTypeOf(other, context)
+        if (super.subTypeOf(other, context)) return true
+        return other is TyGeneric
+                && base.subTypeOf(other.base, context) // Base should be subtype of other base
+                && params.size == other.params.size // Equal amount of params
+                && params.indices.all({ i -> params[i].subTypeOf(other.params[i], context) }) // Params need to be subtypes
+
     }
 }
 
