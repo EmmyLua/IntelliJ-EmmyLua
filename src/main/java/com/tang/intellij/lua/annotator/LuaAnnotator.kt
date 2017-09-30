@@ -29,6 +29,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.TyNil
 import com.tang.intellij.lua.ty.TyPsiFunction
 
 /**
@@ -210,24 +211,25 @@ class LuaAnnotator : Annotator {
 
             if (type is TyPsiFunction) {
                 val givenParams = o.args.children.filterIsInstance<LuaExpr>()
-                val givenTypes = givenParams.map({ param -> param.guessType(searchContext) })
+                // TODO: Remove workaround because nil is parsed as TyUnknown
+                val givenTypes = givenParams.map({ param -> if (param.text == "nil") TyNil() else param.guessType(searchContext) })
 
                 // Check if there are overloads?
                 if (type.signatures.isEmpty()) {
                     // Check main signature
-                    if (!matchCallSignature(givenTypes, type.mainSignature, searchContext)) {
+                    if (!matchCallSignature(givenParams, givenTypes, type.mainSignature, searchContext)) {
                         annotateCall(o, givenParams, givenTypes, type.mainSignature.params, searchContext)
                     }
                 } else {
                     // Check if main signature matches
-                    if (matchCallSignature(givenTypes, type.mainSignature, searchContext)) return
+                    if (matchCallSignature(givenParams, givenTypes, type.mainSignature, searchContext)) return
                     // Check if there are other matching signatures
                     for (sig in type.signatures) {
-                        if (matchCallSignature(givenTypes, sig, searchContext)) return
+                        if (matchCallSignature(givenParams, givenTypes, sig, searchContext)) return
                     }
 
                     // No matching overload found
-                    val signatureString = givenTypes.joinToString(", ", transform = { type -> type.displayName })
+                    val signatureString = givenTypes.joinToString(", ", transform = { t -> t.displayName })
                     val errorStr = "No matching overload of type: %s(%s)"
                     myHolder!!.createErrorAnnotation(o, errorStr.format(o.firstChild.text, signatureString))
                 }
@@ -251,7 +253,7 @@ class LuaAnnotator : Annotator {
                 // Check individual arguments
                 for (i in 0 until concreteParams.size) {
                     // Check if concrete param is subtype of abstract type.
-                    val concreteType = concreteTypes[i]
+                    var concreteType = concreteTypes[i]
                     val abstractType = abstractParams[i].ty
 
                     if (!concreteType.subTypeOf(abstractType, searchContext)) {
@@ -262,15 +264,20 @@ class LuaAnnotator : Annotator {
         }
 
         // Evaluate if concrete function parameters match abstract function parameters.
-        private fun matchCallSignature(concreteParams: List<ITy>, abstractParams: IFunSignature, searchContext: SearchContext): Boolean {
+        private fun matchCallSignature(concreteParams: List<LuaExpr>, concreteTypes: List<ITy>, abstractParams: IFunSignature, searchContext: SearchContext): Boolean {
             // Check if number of arguments matches
             if (concreteParams.size != abstractParams.params.size) return false
 
             // Check individual arguments
             for (i in 0 until concreteParams.size) {
                 // Check if concrete param is subtype of abstract type.
-                val concreteType = concreteParams[i]
+                var concreteType = concreteTypes[i]
                 val abstractType = abstractParams.params[i].ty
+
+                // TODO: Remove hack because nil is parsed as TyUnknown
+                if (concreteParams[i].text == "nil") {
+                    concreteType = TyNil()
+                }
 
                 if (!concreteType.subTypeOf(abstractType, searchContext)) {
                     return false

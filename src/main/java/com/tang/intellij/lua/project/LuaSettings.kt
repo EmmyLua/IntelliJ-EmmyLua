@@ -44,6 +44,8 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     // Throw errors if specified and found types do not match
     var isEnforceTypeSafety: Boolean = false
 
+    var isNilStrict: Boolean = false
+
     override fun getState(): LuaSettings? {
         return this
     }

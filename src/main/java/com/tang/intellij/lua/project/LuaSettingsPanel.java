@@ -41,6 +41,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox smartCloseEnd;
     private JCheckBox showWordsInFile;
     private JCheckBox enforceTypeSafety;
+    private JCheckBox nilStrict;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -49,6 +50,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         smartCloseEnd.setSelected(settings.isSmartCloseEnd());
         showWordsInFile.setSelected(settings.isShowWordsInFile());
         enforceTypeSafety.setSelected(settings.isEnforceTypeSafety());
+        nilStrict.setSelected(settings.isNilStrict());
     }
 
     @NotNull
@@ -75,7 +77,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
                 settings.isStrictDoc() != strictDoc.isSelected() ||
                 settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
                 settings.isShowWordsInFile() != showWordsInFile.isSelected() ||
-                settings.isEnforceTypeSafety() != enforceTypeSafety.isSelected();
+                settings.isEnforceTypeSafety() != enforceTypeSafety.isSelected() ||
+                settings.isNilStrict() != nilStrict.isSelected();
     }
 
     @Override
@@ -86,6 +89,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setSmartCloseEnd(smartCloseEnd.isSelected());
         settings.setShowWordsInFile(showWordsInFile.isSelected());
         settings.setEnforceTypeSafety(enforceTypeSafety.isSelected());
+        settings.setNilStrict(nilStrict.isSelected());
 
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             DaemonCodeAnalyzer.getInstance(project).restart();
