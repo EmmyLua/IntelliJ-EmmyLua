@@ -149,6 +149,7 @@ private stat_recover ::= !(ID
     | nil | true | false | STRING | NUMBER | '::' | 'goto'
     | unaryOp)
 
+varList ::= varExpr (',' varExpr)* { extends = exprList }
 assignStat ::= varList '=' exprList {
     pin = 2
     implements = [
@@ -302,6 +303,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         getParams
     ]
 }
+nameList ::= nameDef (',' nameDef)*
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
     implements = [
@@ -314,10 +316,6 @@ localDef ::= 'local' nameList ('=' exprList)? {
 returnStat ::= return exprList?
 breakStat ::= break
 private lastStat ::= returnStat | breakStat
-
-varList ::= varExpr (',' varExpr)* { extends = exprList }
-
-nameList ::= nameDef (',' nameDef)*
 
 exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
