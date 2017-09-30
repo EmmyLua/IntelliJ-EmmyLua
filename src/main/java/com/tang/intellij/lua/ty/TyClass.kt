@@ -106,6 +106,24 @@ abstract class TyClass(override val className: String, override var superClassNa
         return null
     }
 
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        // Check if other is also a class
+        if (other !is ITyClass) return false
+        // If other class is any, everything is subclass - Maybe add TyKind.Any?
+        if (other.displayName.equals("any")) return true
+
+        // Lazy init for superclass
+        this.doLazyInit(context)
+        // Check if any of the superclasses are type
+        var superClass = getSuperClass(context)
+        while (superClass != null) {
+            if (other == superClass) return true
+            superClass = superClass.getSuperClass(context)
+        }
+
+        return false
+    }
+
     companion object {
         // for _G
         val G: TyClass = TySerializedClass(Constants.WORD_G)
