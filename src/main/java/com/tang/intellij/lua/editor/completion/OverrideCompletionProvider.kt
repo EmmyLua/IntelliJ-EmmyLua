@@ -29,7 +29,9 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyLazyClass
 
 /**
@@ -54,9 +56,9 @@ class OverrideCompletionProvider : CompletionProvider<CompletionParameters>() {
         }
     }
 
-    private fun addOverrideMethod(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet, memberNameSet:MutableSet<String>, sup: ITyClass?) {
+    private fun addOverrideMethod(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet, memberNameSet:MutableSet<String>, sup: ITy?) {
         var superCls = sup
-        if (superCls != null) {
+        if (superCls != null && superCls is TyClass) {
             val project = completionParameters.originalFile.project
             val context = SearchContext(project)
             val clazzName = superCls.className
