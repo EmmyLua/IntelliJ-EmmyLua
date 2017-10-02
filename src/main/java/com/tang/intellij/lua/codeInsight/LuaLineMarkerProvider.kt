@@ -40,6 +40,7 @@ import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.ty.TyClass
 
 /**
  * line marker
@@ -60,7 +61,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                 val methodName = methodDef.name!!
                 var superType = type.getSuperClass(context)
 
-                while (superType != null) {
+                while (superType != null && superType is TyClass) {
                     val superTypeName = superType.className
                     val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
                     if (superMethod != null) {

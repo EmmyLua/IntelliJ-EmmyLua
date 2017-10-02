@@ -26,6 +26,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.psi.LuaElementFactory
@@ -46,7 +47,16 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
-    return TyLazyClass(nameRef.text)
+    return when (nameRef.text){
+        Constants.WORD_NIL -> Ty.NIL
+        Constants.WORD_ANY -> Ty.UNKNOWN
+        Constants.WORD_BOOLEAN -> Ty.BOOLEAN
+        Constants.WORD_STRING -> Ty.STRING
+        Constants.WORD_NUMBER -> Ty.NUMBER
+        Constants.WORD_TABLE -> Ty.TABLE
+        Constants.WORD_FUNCTION -> Ty.FUNCTION
+        else -> TyLazyClass(nameRef.text)
+    }
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {

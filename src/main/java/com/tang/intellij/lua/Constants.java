@@ -29,4 +29,9 @@ public class Constants {
     public static final String WORD_ANY = "any";
     public static final String WORD_MODULE = "module";
     public static final String WORD_NIL = "nil";
+    public static final String WORD_STRING = "string";
+    public static final String WORD_BOOLEAN = "boolean";
+    public static final String WORD_NUMBER = "number";
+    public static final String WORD_TABLE = "table";
+    public static final String WORD_FUNCTION = "function";
 }

@@ -34,7 +34,6 @@ interface ITyClass : ITy {
         processMembers(context, processor, true)
     }
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
-    fun getSuperClass(context: SearchContext): ITyClass?
 }
 
 abstract class TyClass(override val className: String, override var superClassName: String? = null) : Ty(TyKind.Class), ITyClass {
@@ -71,7 +70,7 @@ abstract class TyClass(override val className: String, override var superClassNa
         // super
         if (deep) {
             val superType = getSuperClass(context)
-            superType?.processMembers(context, processor, deep)
+            if (superType is TyClass) superType?.processMembers(context, processor, deep)
         }
     }
 
@@ -97,11 +96,19 @@ abstract class TyClass(override val className: String, override var superClassNa
         }
     }
 
-    override fun getSuperClass(context: SearchContext): ITyClass? {
+    override fun getSuperClass(context: SearchContext): ITy? {
         val clsName = superClassName
         if (clsName != null) {
-            val def = LuaClassIndex.find(clsName, context)
-            return def?.type
+            return when (clsName){
+                Constants.WORD_NIL -> Ty.NIL
+                Constants.WORD_ANY -> Ty.UNKNOWN
+                Constants.WORD_BOOLEAN -> Ty.BOOLEAN
+                Constants.WORD_STRING -> Ty.STRING
+                Constants.WORD_NUMBER -> Ty.NUMBER
+                Constants.WORD_TABLE -> Ty.TABLE
+                Constants.WORD_FUNCTION -> Ty.FUNCTION
+                else -> LuaClassIndex.find(clsName, context)?.type
+            }
         }
         return null
     }
@@ -186,6 +193,6 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) = Unit
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return super.subTypeOf(other, context) || other.displayName == "table"
+        return super.subTypeOf(other, context) || other == Ty.TABLE
     }
 }

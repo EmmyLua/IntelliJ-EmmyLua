@@ -36,7 +36,9 @@ enum class TyKind {
 enum class TyPrimitiveKind {
     String,
     Number,
-    Boolean
+    Boolean,
+    Table,
+    Function
 }
 class TyFlags {
     companion object {
@@ -58,6 +60,8 @@ interface ITy {
     fun createTypeString(): String
 
     fun subTypeOf(other: ITy, context: SearchContext): Boolean
+
+    fun getSuperClass(context: SearchContext): ITy?
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -102,12 +106,17 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         // Everything is subset of any
-        if (other.kind == TyKind.Unknown || other.displayName == "any") return true //TODO: Get rid of displayName any and parse any as TyUnknown
+        if (other.kind == TyKind.Unknown) return true
 
         // Handle unions, subtype if subtype of any of the union components.
         if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context) })
 
-        return displayName == other.displayName
+        // Classes are equal
+        return this == other
+    }
+
+    override fun getSuperClass(context: SearchContext): ITy? {
+        return null
     }
 
     companion object {
@@ -116,6 +125,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
         val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
         val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
         val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
+        val TABLE = TyPrimitive(TyPrimitiveKind.Table, "table")
+        val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, "function")
         val NIL = TyNil()
 
         private fun getPrimitive(mark: Byte): Ty {

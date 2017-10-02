@@ -211,8 +211,7 @@ class LuaAnnotator : Annotator {
 
             if (type is TyPsiFunction) {
                 val givenParams = o.args.children.filterIsInstance<LuaExpr>()
-                // TODO: Remove workaround because nil is parsed as TyUnknown
-                val givenTypes = givenParams.map({ param -> if (param.text == "nil") TyNil() else param.guessType(searchContext) })
+                val givenTypes = givenParams.map { param -> param.guessType(searchContext) }
 
                 // Check if there are overloads?
                 if (type.signatures.isEmpty()) {
@@ -273,11 +272,6 @@ class LuaAnnotator : Annotator {
                 // Check if concrete param is subtype of abstract type.
                 var concreteType = concreteTypes[i]
                 val abstractType = abstractParams.params[i].ty
-
-                // TODO: Remove hack because nil is parsed as TyUnknown
-                if (concreteParams[i].text == "nil") {
-                    concreteType = TyNil()
-                }
 
                 if (!concreteType.subTypeOf(abstractType, searchContext)) {
                     return false

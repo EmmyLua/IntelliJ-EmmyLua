@@ -71,6 +71,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
             LuaTypes.TRUE ,LuaTypes.FALSE -> Ty.BOOLEAN
             LuaTypes.STRING -> Ty.STRING
             LuaTypes.NUMBER -> Ty.NUMBER
+            LuaTypes.NIL -> Ty.NIL
             else -> Ty.UNKNOWN
         }
     }
