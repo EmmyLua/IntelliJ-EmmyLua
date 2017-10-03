@@ -313,14 +313,10 @@ class LuaAnnotator : Annotator {
                         val parent = field.guessParentType(searchContext)
 
                         if (parent is TyClass) {
-                            val fieldType = parent.findMemberType(name, searchContext)
+                            val fieldType = parent.findMemberType(name, searchContext) ?: Ty.NIL
 
-                            if (fieldType == null) {
-                                myHolder!!.createErrorAnnotation(field, "No type specified for field %s of class %s.".format(name, parent.displayName))
-                            } else {
-                                if (!valueType.subTypeOf(fieldType, searchContext)) {
-                                    myHolder!!.createErrorAnnotation(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
-                                }
+                            if (!valueType.subTypeOf(fieldType, searchContext)) {
+                                myHolder!!.createErrorAnnotation(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                             }
                         }
                     } else {
