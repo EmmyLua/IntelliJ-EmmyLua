@@ -103,7 +103,7 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
   }
 
   @Nullable
-  public LuaLiteralExpr getIdExpr() {
+  public LuaExpr getIdExpr() {
     return LuaPsiImplUtilKt.getIdExpr(this);
   }
 

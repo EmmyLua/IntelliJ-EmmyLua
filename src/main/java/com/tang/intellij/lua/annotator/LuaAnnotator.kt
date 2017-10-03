@@ -28,10 +28,7 @@ import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.ty.IFunSignature
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TyPsiFunction
+import com.tang.intellij.lua.ty.*
 import org.luaj.vm2.Lua
 
 /**
@@ -338,6 +335,53 @@ class LuaAnnotator : Annotator {
                     }
                 }
             }
+        }
+
+        override fun visitReturnStat(o: LuaReturnStat) {
+            super.visitReturnStat(o)
+
+            // Only do this if type safety is enabled
+            if (!LuaSettings.instance.isEnforceTypeSafety) return
+
+            val function = o.parent.parent.parent
+            val context = SearchContext(o.project)
+
+            var abstractTypes: List<ITy> = listOf()
+            val concreteValues = o.exprList?.exprList ?: listOf()
+            val concreteTypes = concreteValues.map { expr -> expr.guessType(context) } ?: listOf()
+
+            if (function is LuaFuncDef) {
+                // Local function
+                val typeList = function.comment?.returnDef?.typeList?.tyList ?: listOf()
+                abstractTypes = typeList.map { ty -> ty.getType() }
+            } else if (function is LuaClassMethodDef) {
+                if (function.comment?.lastChild?.text == "override") {
+                    val funcClass = function.guessParentType(context)
+                    val overridden = if (funcClass !is ITyClass) null else funcClass?.findSuperMember(function.name ?: "", context)
+                    abstractTypes = if (overridden is LuaClassMethodDef) overridden.comment?.returnDef?.typeList?.tyList?.map { it.getType() } ?: listOf() else listOf()
+                } else {
+                    // Local function
+                    val typeList = function.comment?.returnDef?.typeList?.tyList ?: listOf()
+                    abstractTypes = typeList.map { ty -> ty.getType() }
+                }
+            }
+
+            // Extend expected types with nil until the same amount as given types
+            if (abstractTypes.size < concreteTypes.size) {
+                abstractTypes += List(concreteTypes.size - abstractTypes.size, { Ty.NIL })
+            }
+
+            // Check number
+            if (abstractTypes.size > concreteTypes.size) {
+                myHolder!!.createErrorAnnotation(o.lastChild, "Expected %s return values but only found %s.".format(abstractTypes.size, concreteTypes.size))
+            } else {
+                for (i in 0 until concreteValues.size) {
+                    if (!concreteTypes[i].subTypeOf(abstractTypes[i], context)) {
+                        myHolder!!.createErrorAnnotation(concreteValues[i], "Type mismatch. Expected: '%s' Found: '%s'".format(abstractTypes[i], concreteTypes[i]))
+                    }
+                }
+            }
+
         }
     }
 
