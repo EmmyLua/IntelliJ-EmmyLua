@@ -35,6 +35,7 @@ interface ITyClass : ITy {
     }
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
     fun findMemberType(name: String, searchContext: SearchContext): ITy?
+    fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember?
 }
 
 abstract class TyClass(override val className: String, override var superClassName: String? = null) : Ty(TyKind.Class), ITyClass {
@@ -81,6 +82,17 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     override fun findMemberType(name: String, searchContext: SearchContext): ITy? {
         return findMember(name, searchContext)?.guessType(searchContext)
+    }
+
+    override fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        // Travel up the hierarchy to find the lowest member of this type on a superclass (excluding this class)
+        var superClass = getSuperClass(searchContext)
+        while (superClass != null && superClass is TyClass) {
+            val member = superClass.findMember(name, searchContext)
+            if (member != null) return member
+            superClass = superClass.getSuperClass(searchContext)
+        }
+        return null
     }
 
     override val displayName: String get() = if(isAnonymous) "Anonymous" else className

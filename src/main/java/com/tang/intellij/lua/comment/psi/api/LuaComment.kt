@@ -33,5 +33,6 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     fun getFieldDef(name: String): LuaDocFieldDef?
     val classDef: LuaDocClassDef?
     val typeDef: LuaDocTypeDef?
+    val returnDef: LuaDocReturnDef?
     fun guessType(context: SearchContext): ITy
 }

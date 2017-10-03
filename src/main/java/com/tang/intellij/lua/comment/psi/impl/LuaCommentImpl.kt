@@ -21,10 +21,7 @@ import com.intellij.psi.impl.source.tree.LazyParseablePsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
-import com.tang.intellij.lua.comment.psi.LuaDocParamDef
-import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
+import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaTypes
@@ -91,6 +88,18 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
         }
         return null
     }
+
+    override val returnDef: LuaDocReturnDef?
+        get() {
+            var element: PsiElement? = firstChild
+            while (element != null) {
+                if (element is LuaDocReturnDef) {
+                    return element
+                }
+                element = element.nextSibling
+            }
+            return null
+        }
 
     override val typeDef: LuaDocTypeDef?
         get() {
