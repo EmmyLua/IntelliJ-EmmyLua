@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.RecursionManager
+import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.project.LuaSettings
@@ -39,7 +40,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 is LuaParenExpr -> guessType(this, context)
                 is LuaLiteralExpr -> guessType(this)
                 is LuaClosureExpr -> asTy(context)
-                is LuaBinaryExpr -> guessType(this)
+                is LuaBinaryExpr -> guessType(this, context)
                 is LuaUnaryExpr -> guessType(this, context)
                 else -> Ty.UNKNOWN
             }
@@ -47,11 +48,12 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         return iTy ?: Ty.UNKNOWN
     }
 
-    private fun guessType(binaryExpr: LuaBinaryExpr): ITy {
+    private fun guessType(binaryExpr: LuaBinaryExpr, context: SearchContext): ITy {
         val firstChild = binaryExpr.firstChild
         val nextVisibleLeaf = PsiTreeUtil.nextVisibleLeaf(firstChild)
+        val operator = nextVisibleLeaf?.node?.elementType
         var ty: ITy = Ty.UNKNOWN
-        nextVisibleLeaf?.node?.elementType.let {
+        operator.let {
             ty = when (it) {
                 //..
                 LuaTypes.CONCAT -> Ty.STRING
@@ -60,11 +62,19 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 //&, <<, |, >>, ~, ^
                 LuaTypes.BIT_AND, LuaTypes.BIT_LTLT, LuaTypes.BIT_OR, LuaTypes.BIT_RTRT, LuaTypes.BIT_TILDE, LuaTypes.EXP,
                 //+, -, *, /, //, %
-                LuaTypes.PLUS, LuaTypes.MINUS, LuaTypes.MULT, LuaTypes.DIV, LuaTypes.DOUBLE_DIV, LuaTypes.MOD -> Ty.NUMBER
+                LuaTypes.PLUS, LuaTypes.MINUS, LuaTypes.MULT, LuaTypes.DIV, LuaTypes.DOUBLE_DIV, LuaTypes.MOD -> guessBinaryOpType(binaryExpr, operator, context)
                 else -> Ty.UNKNOWN
             }
         }
         return ty
+    }
+
+    private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
+        val lhs = binaryExpr.firstChild as LuaExpr
+        val rhs = binaryExpr.lastChild
+
+        // TODO: Search for operator overrides
+        return lhs.guessType(context)
     }
 
     private fun guessType(unaryExpr: LuaUnaryExpr, context: SearchContext): ITy {
