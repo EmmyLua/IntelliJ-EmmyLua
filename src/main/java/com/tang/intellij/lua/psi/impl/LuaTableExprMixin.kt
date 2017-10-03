@@ -22,10 +22,10 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.LuaExpr
 import com.tang.intellij.lua.psi.LuaTableExpr
+import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaTableStub
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyTable
+import com.tang.intellij.lua.ty.*
 
 /**
 
@@ -39,6 +39,20 @@ open class LuaTableExprMixin : StubBasedPsiElementBase<LuaTableStub>, LuaExpr {
     constructor(stub: LuaTableStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
     override fun guessType(context: SearchContext): Ty {
-        return TyTable(this as LuaTableExpr)
+        val table = this as LuaTableExpr
+        // Check for list syntax {a,b,c}
+        val isList = table.tableFieldList.size > 0 && table.tableFieldList.all { field -> field.exprList.size == 1 }
+
+        // Resolve type
+        if (isList) {
+            var baseType : ITy = Ty.UNKNOWN
+            for (field in table.tableFieldList) {
+                baseType = TyUnion.union(baseType, field.guessType(context))
+            }
+            return TyArray(baseType)
+        }
+
+        // Otherwise return table
+        return TyTable(table)
     }
 }

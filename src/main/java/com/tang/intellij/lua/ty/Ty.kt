@@ -257,7 +257,7 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return super.subTypeOf(other, context) || (other is TyArray && base.subTypeOf(other.base, context)) || other.displayName == "table"
+        return super.subTypeOf(other, context) || (other is TyArray && base.subTypeOf(other.base, context)) || other == Ty.TABLE
     }
 }
 

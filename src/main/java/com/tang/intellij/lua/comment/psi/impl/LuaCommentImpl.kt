@@ -22,6 +22,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.LuaDocParamDef
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
@@ -59,6 +60,19 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
             if (element is LuaDocParamDef) {
                 val nameRef = element.paramNameRef
                 if (nameRef != null && nameRef.text == name)
+                    return element
+            }
+            element = element.nextSibling
+        }
+        return null
+    }
+
+    override fun getFieldDef(name: String): LuaDocFieldDef? {
+        var element: PsiElement? = firstChild
+        while (element != null) {
+            if (element is LuaDocFieldDef) {
+                val nameRef = element.fieldName
+                if (nameRef != null && nameRef == name)
                     return element
             }
             element = element.nextSibling

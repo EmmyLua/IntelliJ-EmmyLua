@@ -34,6 +34,7 @@ interface ITyClass : ITy {
         processMembers(context, processor, true)
     }
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
+    fun findMemberType(name: String, searchContext: SearchContext): ITy?
 }
 
 abstract class TyClass(override val className: String, override var superClassName: String? = null) : Ty(TyKind.Class), ITyClass {
@@ -76,6 +77,10 @@ abstract class TyClass(override val className: String, override var superClassNa
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
         return LuaClassMemberIndex.find(this, name, searchContext)
+    }
+
+    override fun findMemberType(name: String, searchContext: SearchContext): ITy? {
+        return findMember(name, searchContext)?.guessType(searchContext)
     }
 
     override val displayName: String get() = if(isAnonymous) "Anonymous" else className
@@ -193,6 +198,7 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) = Unit
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return super.subTypeOf(other, context) || other == Ty.TABLE
+        // Empty list is a table, but subtype of all lists
+        return super.subTypeOf(other, context) || other == Ty.TABLE || (other is TyArray && table.tableFieldList.size == 0)
     }
 }
