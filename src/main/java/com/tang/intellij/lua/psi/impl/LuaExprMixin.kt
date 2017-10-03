@@ -24,6 +24,7 @@ import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
+import org.jaxen.expr.UnaryExpr
 
 /**
  * 表达式基类
@@ -39,6 +40,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 is LuaLiteralExpr -> guessType(this)
                 is LuaClosureExpr -> asTy(context)
                 is LuaBinaryExpr -> guessType(this)
+                is LuaUnaryExpr -> guessType(this, context)
                 else -> Ty.UNKNOWN
             }
         }
@@ -63,6 +65,16 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
             }
         }
         return ty
+    }
+
+    private fun guessType(unaryExpr: LuaUnaryExpr, context: SearchContext): ITy {
+        val operator = unaryExpr.unaryOp.node.firstChildNode.elementType
+
+        return when (operator) {
+            LuaTypes.MINUS -> unaryExpr.expr?.guessType(context) ?: Ty.UNKNOWN // Negative something
+            LuaTypes.GETN -> Ty.NUMBER // Table length is a number
+            else -> Ty.UNKNOWN
+        }
     }
 
     private fun guessType(literalExpr: LuaLiteralExpr): ITy {
