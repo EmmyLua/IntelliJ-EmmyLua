@@ -21,6 +21,7 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.ReferencesSearch
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.highlighting.LuaHighlightingData
@@ -344,7 +345,7 @@ class LuaAnnotator : Annotator {
 
             var abstractTypes: List<ITy> = listOf()
             val concreteValues = o.exprList?.exprList ?: listOf()
-            val concreteTypes = concreteValues.map { expr -> expr.guessType(context) } ?: listOf()
+            var concreteTypes = concreteValues.map { expr -> expr.guessType(context) }
 
             if (function is LuaFuncDef) {
                 // Local function
@@ -369,7 +370,11 @@ class LuaAnnotator : Annotator {
 
             // Check number
             if (abstractTypes.size > concreteTypes.size) {
-                myHolder!!.createErrorAnnotation(o.lastChild, "Expected %s return values but only found %s.".format(abstractTypes.size, concreteTypes.size))
+                if (concreteTypes.isEmpty()) {
+                    myHolder!!.createErrorAnnotation(o.lastChild, "Type mismatch. Expected: '%s' Found: 'nil'".format(abstractTypes[0]))
+                } else {
+                    myHolder!!.createErrorAnnotation(o.lastChild, "Incorrect number of return values. Expected %s but found %s.".format(abstractTypes.size, concreteTypes.size))
+                }
             } else {
                 for (i in 0 until concreteValues.size) {
                     if (!concreteTypes[i].subTypeOf(abstractTypes[i], context)) {
@@ -377,7 +382,28 @@ class LuaAnnotator : Annotator {
                     }
                 }
             }
+        }
 
+        override fun visitFuncBody(o: LuaFuncBody) {
+            super.visitFuncBody(o)
+
+            // Only do this if type safety is enabled
+            if (!LuaSettings.instance.isEnforceTypeSafety) return
+
+            // Ignore empty functions -- Definitions
+            if (o.children.size < 2) return
+            if (o.children[1].children.isEmpty()) return
+
+            val searchContext = SearchContext(o.project)
+            val parent = o.parent as LuaFuncBodyOwner
+            val returnType = parent.guessType(searchContext)
+
+            // If some return type is defined, we require at least one return type
+            val returns = PsiTreeUtil.findChildOfType(o, LuaReturnStat::class.java)
+
+            if (returnType != Ty.NIL && returns == null) {
+                myHolder!!.createErrorAnnotation(o, "Return type specified but no return values found.")
+            }
         }
     }
 
