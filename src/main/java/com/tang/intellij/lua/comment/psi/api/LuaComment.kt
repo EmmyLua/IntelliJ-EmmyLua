@@ -17,10 +17,7 @@
 package com.tang.intellij.lua.comment.psi.api
 
 import com.intellij.psi.PsiComment
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.comment.psi.LuaDocParamDef
-import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
-import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
+import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
@@ -33,6 +30,7 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     val owner: LuaCommentOwner?
     val moduleName: String?
     fun getParamDef(name: String): LuaDocParamDef?
+    fun getFieldDef(name: String): LuaDocFieldDef?
     val classDef: LuaDocClassDef?
     val typeDef: LuaDocTypeDef?
     fun guessType(context: SearchContext): ITy

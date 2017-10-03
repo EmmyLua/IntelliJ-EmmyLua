@@ -27,10 +27,12 @@ import com.tang.intellij.lua.highlighting.LuaHighlightingData
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.TyNil
+import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyPsiFunction
+import org.luaj.vm2.Lua
 
 /**
  * LuaAnnotator
@@ -279,6 +281,63 @@ class LuaAnnotator : Annotator {
             }
 
             return true
+        }
+
+        override fun visitAssignStat(o: LuaAssignStat) {
+            super.visitAssignStat(o)
+
+            // Only do this if type safety is enabled
+            if (!LuaSettings.instance.isEnforceTypeSafety) return
+
+            val assignees = o.varExprList.exprList
+            val values = o.valueExprList?.exprList ?: listOf()
+            val searchContext = SearchContext(o.project)
+
+            // Check right number of fields/assignments
+            if (assignees.size > values.size) {
+                for (i in values.size until assignees.size) {
+                    myHolder!!.createErrorAnnotation(assignees[i], "Missing value assignment.")
+                }
+            } else if (assignees.size < values.size) {
+                for (i in assignees.size until values.size) {
+                    myHolder!!.createErrorAnnotation(values[i], "Nothing to assign to.")
+                }
+            } else {
+                // Try to match types for each assignment
+                for (i in 0 until assignees.size) {
+                    val field = assignees[i]
+                    val name = field.name ?: ""
+                    val value = values[i]
+                    val valueType = value.guessType(searchContext)
+
+                    // Field access
+                    if (field is LuaIndexExpr) {
+                        // Get owner class
+                        val parent = field.guessParentType(searchContext)
+
+                        if (parent is TyClass) {
+                            val fieldType = parent.findMemberType(name, searchContext)
+
+                            if (fieldType == null) {
+                                myHolder!!.createErrorAnnotation(field, "No type specified for field %s of class %s.".format(name, parent.displayName))
+                            } else {
+                                if (!valueType.subTypeOf(fieldType, searchContext)) {
+                                    myHolder!!.createErrorAnnotation(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
+                                }
+                            }
+                        }
+                    } else {
+                        // Local/global var assignments, only check type if there is no comment defining it
+                        if (o.comment == null) {
+                            val fieldType = field.guessType(searchContext)
+
+                            if (!valueType.subTypeOf(fieldType, searchContext)) {
+                                myHolder!!.createErrorAnnotation(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
