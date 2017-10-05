@@ -35,4 +35,5 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     val typeDef: LuaDocTypeDef?
     val returnDef: LuaDocReturnDef?
     fun guessType(context: SearchContext): ITy
+    fun isOverride(): Boolean
 }

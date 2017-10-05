@@ -121,6 +121,17 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
         return typeDef?.type ?: Ty.UNKNOWN
     }
 
+    override fun isOverride(): Boolean {
+        var elem = firstChild
+        while (elem != null) {
+            if (elem is LuaDocTagDef) {
+                if (elem.text == "override") return true
+            }
+            elem = elem.nextSibling
+        }
+        return false
+    }
+
     override fun toString(): String {
         return "DOC_COMMENT"
     }
