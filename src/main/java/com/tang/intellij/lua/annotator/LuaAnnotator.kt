@@ -394,15 +394,36 @@ class LuaAnnotator : Annotator {
             if (o.children.size < 2) return
             if (o.children[1].children.isEmpty()) return
 
+            // Find function definition
             val searchContext = SearchContext(o.project)
-            val parent = o.parent as LuaFuncBodyOwner
-            val returnType = parent.guessType(searchContext)
+            val funcDef = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
+            val funcName = funcDef!!.name ?: ""
+            val comment = funcDef.comment
+
+            var type : ITy = Ty.NIL
+
+            // Check for comment
+            if (comment != null) {
+                // Check if comment is override
+                if (comment.isOverride()) {
+                    // Find super type
+                    val superClass = funcDef.guessClassType(searchContext)
+                    val superMember = superClass?.findSuperMember(funcName, searchContext)
+                    if (superMember == null) {
+                        myHolder!!.createErrorAnnotation(comment, "No function '%s' to override.".format(funcName))
+                    } else {
+                        type = if (superMember is LuaClassMethodDef) superMember.guessReturnTypeSet(searchContext) else Ty.NIL
+                    }
+                } else {
+                    type = comment.guessType(searchContext)
+                }
+            }
 
             // If some return type is defined, we require at least one return type
             val returns = PsiTreeUtil.findChildOfType(o, LuaReturnStat::class.java)
 
-            if (returnType != Ty.NIL && returns == null) {
-                myHolder!!.createErrorAnnotation(o, "Return type specified but no return values found.")
+            if (type != Ty.NIL && returns == null) {
+                myHolder!!.createErrorAnnotation(o, "Return type '%s' specified but no return values found.".format(type))
             }
         }
     }
