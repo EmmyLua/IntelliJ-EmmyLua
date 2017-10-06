@@ -340,28 +340,17 @@ class LuaAnnotator : Annotator {
             // Only do this if type safety is enabled
             if (!LuaSettings.instance.isEnforceTypeSafety) return
 
-            val function = o.parent.parent.parent
+            val function = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
+            if (function == null) {
+                myHolder!!.createErrorAnnotation(o, "Return statement needs to be in function.")
+                return
+            }
+
             val context = SearchContext(o.project)
 
-            var abstractTypes: List<ITy> = listOf()
+            var abstractTypes= guessSuperReturnTypes(function, context)
             val concreteValues = o.exprList?.exprList ?: listOf()
-            var concreteTypes = concreteValues.map { expr -> expr.guessType(context) }
-
-            if (function is LuaFuncDef) {
-                // Local function
-                val typeList = function.comment?.returnDef?.typeList?.tyList ?: listOf()
-                abstractTypes = typeList.map { ty -> ty.getType() }
-            } else if (function is LuaClassMethodDef) {
-                if (function.comment?.lastChild?.text == "override") {
-                    val funcClass = function.guessParentType(context)
-                    val overridden = if (funcClass !is ITyClass) null else funcClass?.findSuperMember(function.name ?: "", context)
-                    abstractTypes = if (overridden is LuaClassMethodDef) overridden.comment?.returnDef?.typeList?.tyList?.map { it.getType() } ?: listOf() else listOf()
-                } else {
-                    // Local function
-                    val typeList = function.comment?.returnDef?.typeList?.tyList ?: listOf()
-                    abstractTypes = typeList.map { ty -> ty.getType() }
-                }
-            }
+            val concreteTypes = concreteValues.map { expr -> expr.guessType(context) }
 
             // Extend expected types with nil until the same amount as given types
             if (abstractTypes.size < concreteTypes.size) {
@@ -384,6 +373,26 @@ class LuaAnnotator : Annotator {
             }
         }
 
+        private fun guessSuperReturnTypes(function: LuaClassMethodDef, context: SearchContext): List<ITy> {
+            var types = listOf<ITy>()
+            val comment = function.comment
+            if (comment != null) {
+                if (comment.isOverride()) {
+                    // Find super type
+                    val superClass = function.guessClassType(context)
+                    val superMember = superClass?.findSuperMember(function.name ?: "", context)
+                    if (superMember is LuaClassMethodDef) {
+                        val typeDef = superMember.comment?.returnDef?.typeList?.tyList ?: listOf()
+                        types = typeDef.map { ty -> ty.getType() }
+                    }
+                } else {
+                    val funcTypes = comment.returnDef?.typeList?.tyList ?: listOf()
+                    types = funcTypes.map { ty -> ty.getType() }
+                }
+            }
+            return types
+        }
+
         override fun visitFuncBody(o: LuaFuncBody) {
             super.visitFuncBody(o)
 
@@ -395,35 +404,21 @@ class LuaAnnotator : Annotator {
             if (o.children[1].children.isEmpty()) return
 
             // Find function definition
-            val searchContext = SearchContext(o.project)
+            val context = SearchContext(o.project)
             val funcDef = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
-            val funcName = funcDef!!.name ?: ""
-            val comment = funcDef.comment
 
-            var type : ITy = Ty.NIL
-
-            // Check for comment
-            if (comment != null) {
-                // Check if comment is override
-                if (comment.isOverride()) {
-                    // Find super type
-                    val superClass = funcDef.guessClassType(searchContext)
-                    val superMember = superClass?.findSuperMember(funcName, searchContext)
-                    if (superMember == null) {
-                        myHolder!!.createErrorAnnotation(comment, "No function '%s' to override.".format(funcName))
-                    } else {
-                        type = if (superMember is LuaClassMethodDef) superMember.guessReturnTypeSet(searchContext) else Ty.NIL
-                    }
-                } else {
-                    type = comment.guessType(searchContext)
-                }
+            if (funcDef == null) {
+                myHolder!!.createErrorAnnotation(o, "Return statement needs to be in function.")
+                return
             }
+
+            val types = guessSuperReturnTypes(funcDef, context)
 
             // If some return type is defined, we require at least one return type
             val returns = PsiTreeUtil.findChildOfType(o, LuaReturnStat::class.java)
 
-            if (type != Ty.NIL && returns == null) {
-                myHolder!!.createErrorAnnotation(o, "Return type '%s' specified but no return values found.".format(type))
+            if (!types.isEmpty() && types[0] != Ty.NIL && returns == null) {
+                myHolder!!.createErrorAnnotation(o, "Return type '%s' specified but no return values found.".format(types.joinToString(",")))
             }
         }
     }
