@@ -244,7 +244,7 @@ class LuaAnnotator : Annotator {
                     myHolder!!.createErrorAnnotation(o, errorStr.format(o.firstChild.text, signatureString))
                 }
             } else {
-                myHolder!!.createErrorAnnotation(o, "Unknown function '%s'.".format(o.expr.lastChild.text))
+                //myHolder!!.createErrorAnnotation(o, "Unknown function '%s'.".format(o.expr.lastChild.text))
             }
         }
 
@@ -353,15 +353,20 @@ class LuaAnnotator : Annotator {
             // Only do this if type safety is enabled
             if (!LuaSettings.instance.isEnforceTypeSafety) return
 
-            val function = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
-            if (function == null) {
-                myHolder!!.createErrorAnnotation(o, "Return statement needs to be in function.")
-                return
-            }
-
             val context = SearchContext(o.project)
 
-            var abstractTypes= guessSuperReturnTypes(function, context)
+            val function = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
+            var abstractTypes = if (function != null) {
+                guessSuperReturnTypes(function, context)
+            } else {
+                val fdef = PsiTreeUtil.getParentOfType(o, LuaFuncDef::class.java)
+                if (fdef == null) {
+                    myHolder!!.createErrorAnnotation(o, "Return statement needs to be in function.")
+                }
+                val comment = fdef?.comment?.returnDef
+                comment?.typeList?.tyList?.map { it.getType() } ?: listOf()
+            }
+
             val concreteValues = o.exprList?.exprList ?: listOf()
             val concreteTypes = concreteValues.map { expr -> expr.guessType(context) }
 
@@ -424,6 +429,9 @@ class LuaAnnotator : Annotator {
                 guessSuperReturnTypes(funcDef, context)
             } else {
                 val fdef = PsiTreeUtil.getParentOfType(o, LuaFuncDef::class.java)
+                if (fdef == null) {
+                    myHolder!!.createErrorAnnotation(o, "Return statement needs to be in function.")
+                }
                 val comment = fdef?.comment?.returnDef
                 comment?.typeList?.tyList?.map { it.getType() } ?: listOf()
             }
