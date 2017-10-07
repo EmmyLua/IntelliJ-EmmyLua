@@ -185,6 +185,17 @@ class LuaAnnotator : Annotator {
                     val annotation = myHolder!!.createInfoAnnotation(id, null)
                     if (o.parent is LuaCallExpr) {
                         if (o.colon != null) {
+                            if (LuaSettings.instance.isEnforceTypeSafety) {
+                                // Guess parent types
+                                val context = SearchContext(o.project)
+                                o.exprList.forEach { expr ->
+                                    if (expr.guessType(context) == Ty.NIL) {
+                                        // If parent type is nil add error
+                                        myHolder!!.createErrorAnnotation(expr, "Trying to index a nil type.")
+                                    }
+                                }
+                            }
+
                             annotation.textAttributes = LuaHighlightingData.INSTANCE_METHOD
                         } else {
                             annotation.textAttributes = LuaHighlightingData.STATIC_METHOD
@@ -232,6 +243,8 @@ class LuaAnnotator : Annotator {
                     val errorStr = "No matching overload of type: %s(%s)"
                     myHolder!!.createErrorAnnotation(o, errorStr.format(o.firstChild.text, signatureString))
                 }
+            } else {
+                myHolder!!.createErrorAnnotation(o, "Unknown function '%s'.".format(o.expr.lastChild.text))
             }
         }
 
