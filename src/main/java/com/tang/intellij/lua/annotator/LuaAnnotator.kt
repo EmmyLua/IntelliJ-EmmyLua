@@ -283,7 +283,7 @@ class LuaAnnotator : Annotator {
             // Check individual arguments
             for (i in 0 until concreteParams.size) {
                 // Check if concrete param is subtype of abstract type.
-                var concreteType = concreteTypes[i]
+                val concreteType = concreteTypes[i]
                 val abstractType = abstractParams.params[i].ty
 
                 if (!concreteType.subTypeOf(abstractType, searchContext)) {
@@ -420,12 +420,13 @@ class LuaAnnotator : Annotator {
             val context = SearchContext(o.project)
             val funcDef = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
 
-            if (funcDef == null) {
-                myHolder!!.createErrorAnnotation(o, "Return statement needs to be in function.")
-                return
+            val types = if (funcDef != null) {
+                guessSuperReturnTypes(funcDef, context)
+            } else {
+                val fdef = PsiTreeUtil.getParentOfType(o, LuaFuncDef::class.java)
+                val comment = fdef?.comment?.returnDef
+                comment?.typeList?.tyList?.map { it.getType() } ?: listOf()
             }
-
-            val types = guessSuperReturnTypes(funcDef, context)
 
             // If some return type is defined, we require at least one return type
             val returns = PsiTreeUtil.findChildOfType(o, LuaReturnStat::class.java)
