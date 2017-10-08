@@ -57,9 +57,11 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
             ty = when (it) {
                 //..
                 LuaTypes.CONCAT -> Ty.STRING
-                //and, or, <=, ==, <, ~=, >=, >
-                LuaTypes.AND, LuaTypes.OR, LuaTypes.LE, LuaTypes.EQ, LuaTypes.LT, LuaTypes.NE, LuaTypes.GE, LuaTypes.GT -> Ty.BOOLEAN
-                //&, <<, |, >>, ~, ^
+                //<=, ==, <, ~=, >=, >
+                LuaTypes.LE, LuaTypes.EQ, LuaTypes.LT, LuaTypes.NE, LuaTypes.GE, LuaTypes.GT -> Ty.BOOLEAN
+                //and, or
+                LuaTypes.AND, LuaTypes.OR -> guessAndOrType(binaryExpr, operator, context)
+                    //&, <<, |, >>, ~, ^
                 LuaTypes.BIT_AND, LuaTypes.BIT_LTLT, LuaTypes.BIT_OR, LuaTypes.BIT_RTRT, LuaTypes.BIT_TILDE, LuaTypes.EXP,
                 //+, -, *, /, //, %
                 LuaTypes.PLUS, LuaTypes.MINUS, LuaTypes.MULT, LuaTypes.DIV, LuaTypes.DOUBLE_DIV, LuaTypes.MOD -> guessBinaryOpType(binaryExpr, operator, context)
@@ -67,6 +69,18 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
             }
         }
         return ty
+    }
+
+    private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
+        val lhs = binaryExpr.firstChild as LuaExpr
+        val rhs = binaryExpr.lastChild as LuaExpr
+
+        if (operator == LuaTypes.AND) {
+            return rhs.guessType(context)
+        } else {
+            // or
+            return TyUnion.union(lhs.guessType(context), rhs.guessType(context))
+        }
     }
 
     private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {

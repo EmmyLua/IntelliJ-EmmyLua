@@ -219,6 +219,7 @@ class LuaAnnotator : Annotator {
 
             val searchContext = SearchContext(o.project)
             val type = o.expr.guessType(searchContext)
+            val text = o.text
 
             if (type is TyPsiFunction) {
                 val givenParams = o.args.children.filterIsInstance<LuaExpr>()
@@ -243,8 +244,15 @@ class LuaAnnotator : Annotator {
                     val errorStr = "No matching overload of type: %s(%s)"
                     myHolder!!.createErrorAnnotation(o, errorStr.format(o.firstChild.text, signatureString))
                 }
-            } else {
-                //myHolder!!.createErrorAnnotation(o, "Unknown function '%s'.".format(o.expr.lastChild.text))
+            } else if (o.expr is LuaIndexExpr) {
+                // Get parent type
+                val parentType = (o.expr as LuaIndexExpr).guessParentType(searchContext)
+                if (parentType is TyClass) {
+                    val fType = parentType.findSuperMember(o.expr.name ?: "", searchContext)
+                    if (fType == null) myHolder!!.createErrorAnnotation(o, "Unknown function '%s'.".format(o.expr.lastChild.text))
+                }
+            } else if (type == Ty.NIL) {
+                myHolder!!.createErrorAnnotation(o, "Unknown function '%s'.".format(o.expr.lastChild.text))
             }
         }
 
