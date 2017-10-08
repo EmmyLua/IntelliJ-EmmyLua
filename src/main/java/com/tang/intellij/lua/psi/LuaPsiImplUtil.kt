@@ -585,12 +585,10 @@ fun getPresentation(tableField: LuaTableField): ItemPresentation {
 /**
  * xx['id']
  */
-fun getIdExpr(tableField: LuaTableField): LuaLiteralExpr? {
+fun getIdExpr(tableField: LuaTableField): LuaExpr? {
     val bracket = tableField.lbrack
     if (bracket != null) {
-        val nextLeaf = PsiTreeUtil.getNextSiblingOfType(bracket, LuaExpr::class.java)
-        if (nextLeaf is LuaLiteralExpr && nextLeaf.kind == LuaLiteralKind.String)
-            return nextLeaf
+        return PsiTreeUtil.getNextSiblingOfType(bracket, LuaExpr::class.java)
     }
     return null
 }

@@ -20,6 +20,8 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.project.LuaSettings
+import com.tang.intellij.lua.search.SearchContext
 
 enum class TyKind {
     Unknown,
@@ -28,12 +30,15 @@ enum class TyKind {
     Function,
     Class,
     Union,
-    Generic
+    Generic,
+    Nil
 }
 enum class TyPrimitiveKind {
     String,
     Number,
-    Boolean
+    Boolean,
+    Table,
+    Function
 }
 class TyFlags {
     companion object {
@@ -53,6 +58,10 @@ interface ITy {
     fun union(ty: ITy): ITy
 
     fun createTypeString(): String
+
+    fun subTypeOf(other: ITy, context: SearchContext): Boolean
+
+    fun getSuperClass(context: SearchContext): ITy?
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -95,12 +104,30 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return list.joinToString("|")
     }
 
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        // Everything is subset of any
+        if (other.kind == TyKind.Unknown) return true
+
+        // Handle unions, subtype if subtype of any of the union components.
+        if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context) })
+
+        // Classes are equal
+        return this == other
+    }
+
+    override fun getSuperClass(context: SearchContext): ITy? {
+        return null
+    }
+
     companion object {
 
         val UNKNOWN = TyUnknown()
         val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
         val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
         val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
+        val TABLE = TyPrimitive(TyPrimitiveKind.Table, "table")
+        val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, "function")
+        val NIL = TyNil()
 
         private fun getPrimitive(mark: Byte): Ty {
             return when (mark.toInt()) {
@@ -228,13 +255,18 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override fun hashCode(): Int {
         return displayName.hashCode()
     }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return super.subTypeOf(other, context) || (other is TyArray && base.subTypeOf(other.base, context)) || other == Ty.TABLE
+    }
 }
 
 class TyUnion : Ty(TyKind.Union) {
     private val childSet = mutableSetOf<ITy>()
+    fun getChildTypes() = childSet
 
     override val displayName: String
-        get() = "Union"
+        get() = childSet.joinToString("|", transform = { type:ITy -> type.displayName })
 
     val size:Int
         get() = childSet.size
@@ -249,6 +281,11 @@ class TyUnion : Ty(TyKind.Union) {
 
     private fun addChild(ty: ITy): Boolean {
         return childSet.add(ty)
+    }
+
+    // All members of union must be subset of other type
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return super.subTypeOf(other, context) || childSet.all({ type -> type.subTypeOf(other, context) })
     }
 
     companion object {
@@ -326,5 +363,15 @@ class TyUnknown : Ty(TyKind.Unknown) {
 
     override fun hashCode(): Int {
         return Constants.WORD_ANY.hashCode()
+    }
+}
+
+class TyNil : Ty(TyKind.Nil) {
+    override val displayName: String
+        get() = Constants.WORD_NIL
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+
+        return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
     }
 }

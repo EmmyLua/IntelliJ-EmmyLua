@@ -43,6 +43,16 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     override fun hashCode(): Int {
         return displayName.hashCode()
     }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        if (super.subTypeOf(other, context)) return true
+        if (other !is TyGeneric && base.subTypeOf(other, context)) return true
+        return other is TyGeneric
+                && base.subTypeOf(other.base, context) // Base should be subtype of other base
+                && params.size == other.params.size // Equal amount of params
+                && params.indices.all({ i -> params[i].subTypeOf(other.params[i], context) }) // Params need to be subtypes
+
+    }
 }
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {

@@ -254,11 +254,11 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
 
         // 如果是个类方法，则有可能在父类里
         if (owner is LuaClassMethodDef) {
-            var classType = owner.guessClassType(context)
+            var classType: ITy? = owner.guessClassType(context)
             val methodName = owner.name
             while (classType != null) {
                 classType = classType.getSuperClass(context)
-                if (classType != null && methodName != null) {
+                if (classType != null && methodName != null && classType is TyClass) {
                     val superMethod = classType.findMember(methodName, context)
                     if (superMethod is LuaClassMethod) {
                         val params = superMethod.params//todo : 优化

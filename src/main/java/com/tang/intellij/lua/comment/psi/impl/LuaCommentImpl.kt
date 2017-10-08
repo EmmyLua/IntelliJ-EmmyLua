@@ -21,9 +21,7 @@ import com.intellij.psi.impl.source.tree.LazyParseablePsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.comment.psi.LuaDocParamDef
-import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
+import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaTypes
@@ -66,6 +64,19 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
         return null
     }
 
+    override fun getFieldDef(name: String): LuaDocFieldDef? {
+        var element: PsiElement? = firstChild
+        while (element != null) {
+            if (element is LuaDocFieldDef) {
+                val nameRef = element.fieldName
+                if (nameRef != null && nameRef == name)
+                    return element
+            }
+            element = element.nextSibling
+        }
+        return null
+    }
+
     override val classDef: LuaDocClassDef?
         get() {
         var element: PsiElement? = firstChild
@@ -77,6 +88,18 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
         }
         return null
     }
+
+    override val returnDef: LuaDocReturnDef?
+        get() {
+            var element: PsiElement? = firstChild
+            while (element != null) {
+                if (element is LuaDocReturnDef) {
+                    return element
+                }
+                element = element.nextSibling
+            }
+            return null
+        }
 
     override val typeDef: LuaDocTypeDef?
         get() {
@@ -96,6 +119,17 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
             return classDef.type
         val typeDef = typeDef
         return typeDef?.type ?: Ty.UNKNOWN
+    }
+
+    override fun isOverride(): Boolean {
+        var elem = firstChild
+        while (elem != null) {
+            if (elem is LuaDocTagDef) {
+                if (elem.text == "override") return true
+            }
+            elem = elem.nextSibling
+        }
+        return false
     }
 
     override fun toString(): String {
