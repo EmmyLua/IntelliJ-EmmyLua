@@ -162,6 +162,10 @@ class LuaAnnotator : Annotator {
                     annotation.textAttributes = if (isModuleFile) LuaHighlightingData.FIELD else LuaHighlightingData.GLOBAL_VAR
                 }
             }
+
+            if (LuaSettings.instance.isEnforceTypeSafety && res == null) {
+                myHolder!!.createErrorAnnotation(o, "Undeclared variable '%s'.".format(o.text))
+            }
         }
 
         private fun checkUpValue(o: LuaNameExpr) {
