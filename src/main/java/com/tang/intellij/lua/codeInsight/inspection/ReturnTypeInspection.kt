@@ -33,15 +33,14 @@ class ReturnTypeInspection : StrictInspection() {
 
                     val context = SearchContext(o.project)
 
-                    val function = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
-                    var abstractTypes = if (function != null) {
-                        guessSuperReturnTypes(function, context)
+                    val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java)
+                    var abstractTypes = if (bodyOwner is LuaClassMethodDef) {
+                        guessSuperReturnTypes(bodyOwner, context)
                     } else {
-                        val fdef = PsiTreeUtil.getParentOfType(o, LuaFuncDef::class.java)
-                        if (fdef == null) {
+                        if (bodyOwner == null) {
                             myHolder.registerProblem(o, "Return statement needs to be in function.")
                         }
-                        val comment = fdef?.comment?.returnDef
+                        val comment = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
                         comment?.typeList?.tyList?.map { it.getType() } ?: listOf()
                     }
 
@@ -98,16 +97,15 @@ class ReturnTypeInspection : StrictInspection() {
 
                     // Find function definition
                     val context = SearchContext(o.project)
-                    val funcDef = PsiTreeUtil.getParentOfType(o, LuaClassMethodDef::class.java)
+                    val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java)
 
-                    val types = if (funcDef != null) {
-                        guessSuperReturnTypes(funcDef, context)
+                    val types = if (bodyOwner is LuaClassMethodDef) {
+                        guessSuperReturnTypes(bodyOwner, context)
                     } else {
-                        val fdef = PsiTreeUtil.getParentOfType(o, LuaFuncDef::class.java)
-                        if (fdef == null) {
+                        if (bodyOwner == null) {
                             myHolder.registerProblem(o, "Return statement needs to be in function.")
                         }
-                        val comment = fdef?.comment?.returnDef
+                        val comment = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
                         comment?.typeList?.tyList?.map { it.getType() } ?: listOf()
                     }
 
