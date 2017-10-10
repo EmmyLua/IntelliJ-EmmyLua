@@ -145,7 +145,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         }
 
         fun isInvalid(ty: ITy?): Boolean {
-            return ty == null || ty is TyUnknown
+            return ty == null || ty is TyUnknown || ty is TyNil
         }
 
         fun serialize(ty: ITy, stream: StubOutputStream) {
