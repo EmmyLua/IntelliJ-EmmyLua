@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.codeInsight.inspection
 
-import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
@@ -25,7 +24,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
-class TypeSafetyInspection : LocalInspectionTool() {
+class TypeSafetyInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
                 override fun visitIndexExpr(o: LuaIndexExpr) {
@@ -42,15 +41,6 @@ class TypeSafetyInspection : LocalInspectionTool() {
                                 }
                             }
                         }
-                    }
-                }
-
-                override fun visitNameExpr(o: LuaNameExpr) {
-                    super.visitNameExpr(o)
-                    val res = resolve(o, SearchContext(o.project))
-
-                    if (res == null) {
-                        myHolder.registerProblem(o, "Undeclared variable '%s'.".format(o.text))
                     }
                 }
 
