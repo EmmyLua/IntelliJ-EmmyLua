@@ -296,10 +296,10 @@
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyBody"/>
         <localInspection
-            displayName="Unreachable statement"
-            enabledByDefault="true"
-            groupName="Lua"
-            implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
+                displayName="Unreachable statement"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
         <localInspection
                 displayName="0 index"
                 enabledByDefault="true"
@@ -311,15 +311,25 @@
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious"/>
         <localInspection
-                displayName="Type safety"
+                displayName="Match function signature"
                 enabledByDefault="true"
-                groupName="Lua"
-                implementationClass="com.tang.intellij.lua.codeInsight.inspection.TypeSafetyInspection"/>
+                groupName="Lua > Lint > Type safety"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection"/>
         <localInspection
                 displayName="Undeclared variable"
                 enabledByDefault="true"
-                groupName="Lua"
+                groupName="Lua > Lint > Type safety"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection"/>
+        <localInspection
+                displayName="Return type"
+                enabledByDefault="true"
+                groupName="Lua > Lint > Type safety"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection"/>
+        <localInspection
+                displayName="Assign type"
+                enabledByDefault="true"
+                groupName="Lua > Lint > Type safety"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.AssignTypeInspection"/>
     </extensions>
 
     <application-components>
