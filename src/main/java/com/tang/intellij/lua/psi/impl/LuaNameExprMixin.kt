@@ -23,14 +23,12 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaNameStub
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TyFlags
 
 /**
 
@@ -48,6 +46,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
     }
 
     override fun guessParentType(context: SearchContext): ITy {
+        //todo: model type
         return Ty.UNKNOWN
     }
 
@@ -74,15 +73,15 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
     private fun getTypeSet(context: SearchContext, def: PsiElement): ITy {
         when (def) {
             is LuaNameExpr -> {
-                var typeSet: ITy = if (!LuaSettings.instance.isEnforceTypeSafety) Ty.UNKNOWN else Ty.NIL
+                var typeSet: ITy = Ty.UNKNOWN
                 val p1 = def.parent // should be VAR_LIST
                 val p2 = p1.parent // should be ASSIGN_STAT
                 if (p2 is LuaAssignStat) {
                     val comment = p2.comment
-                    //优先从 Comment 猜
+                    //guess from comment
                     if (comment != null)
                         typeSet = comment.guessType(context)
-                    //再从赋值猜
+                    //guess from value expr
                     if (Ty.isInvalid(typeSet)) {
                         val exprList = p2.valueExprList
                         if (exprList != null) {
@@ -94,8 +93,8 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
 
                 //Global
                 if (isGlobal(def)) {
-                    if (!LuaSettings.instance.isEnforceTypeSafety) typeSet = typeSet.union(TyClass.createGlobalType(def))
-                    if (typeSet is Ty) typeSet.addFlag(TyFlags.GLOBAL)
+                    //use globalClassTy to store class members, that's very important
+                    typeSet = typeSet.union(TyClass.createGlobalType(def))
                 }
                 return typeSet
             }
