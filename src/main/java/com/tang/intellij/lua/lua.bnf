@@ -322,6 +322,10 @@ exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 literalExpr ::= nil | false | true | NUMBER | STRING | "..." {
     mixin = 'com.tang.intellij.lua.psi.impl.LuaLiteralExprMixin'
 }
+stringExpr ::= STRING {
+    extends = literalExpr
+    elementType = literalExpr
+}
 
 valueExpr ::= varExpr | literalExpr | closureExpr | tableExpr | parenExpr
 
@@ -390,7 +394,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
 }
 
 args ::= listArgs | singleArg
-singleArg ::= tableExpr | literalExpr { extends = args methods = [ STRING = "STRING" ] }
+singleArg ::= tableExpr | stringExpr { extends = args }
 private arg_expr_list ::= (expr ',')* (expr |& ')')
 listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }
 
@@ -407,7 +411,7 @@ left callExpr ::= args {
 }
 
 private suffixExpr ::= indexExpr | callExpr
-private prefixExpr ::= parenExpr | nameExpr | literalExpr | tableExpr
+private prefixExpr ::= parenExpr | nameExpr | stringExpr | tableExpr
 // 最终产生 callExpr | indexExpr
 private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr

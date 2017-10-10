@@ -1227,14 +1227,14 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // parenExpr | nameExpr | literalExpr | tableExpr
+  // parenExpr | nameExpr | stringExpr | tableExpr
   static boolean prefixExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefixExpr")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = parenExpr(b, l + 1);
     if (!r) r = nameExpr(b, l + 1);
-    if (!r) r = literalExpr(b, l + 1);
+    if (!r) r = stringExpr(b, l + 1);
     if (!r) r = tableExpr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1291,13 +1291,14 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // tableExpr | literalExpr
+  // tableExpr | stringExpr
   public static boolean singleArg(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "singleArg")) return false;
+    if (!nextTokenIs(b, "<single arg>", LCURLY, STRING)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SINGLE_ARG, "<single arg>");
     r = tableExpr(b, l + 1);
-    if (!r) r = literalExpr(b, l + 1);
+    if (!r) r = stringExpr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -1402,6 +1403,18 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "stat_semi_1")) return false;
     consumeToken(b, SEMI);
     return true;
+  }
+
+  /* ********************************************************** */
+  // STRING
+  public static boolean stringExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "stringExpr")) return false;
+    if (!nextTokenIs(b, STRING)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, STRING);
+    exit_section_(b, m, LITERAL_EXPR, r);
+    return r;
   }
 
   /* ********************************************************** */
