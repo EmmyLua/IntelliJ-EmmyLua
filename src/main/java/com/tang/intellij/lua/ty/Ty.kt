@@ -134,6 +134,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 TyPrimitiveKind.Boolean.ordinal -> BOOLEAN
                 TyPrimitiveKind.String.ordinal -> STRING
                 TyPrimitiveKind.Number.ordinal -> NUMBER
+                TyPrimitiveKind.Table.ordinal -> TABLE
+                TyPrimitiveKind.Function.ordinal -> FUNCTION
                 else -> UNKNOWN
             }
         }
@@ -224,6 +226,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     }
                     TySerializedGeneric(params.toTypedArray(), base)
                 }
+                TyKind.Nil -> NIL
                 else -> TyUnknown()
             }
         }
