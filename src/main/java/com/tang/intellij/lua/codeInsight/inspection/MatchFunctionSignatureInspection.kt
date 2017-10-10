@@ -20,10 +20,7 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.util.Processor
-import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaExpr
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaVisitor
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
@@ -55,7 +52,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     val type = prefixExpr.guessType(searchContext)
 
                     if (type is TyPsiFunction) {
-                        val givenParams = o.args.children.filterIsInstance<LuaExpr>()
+                        val givenParams = o.argList
                         val givenTypes = givenParams.map { param -> param.guessType(searchContext) }
                         //find the perfect one.
                         var perfectSig: IFunSignature? = null
