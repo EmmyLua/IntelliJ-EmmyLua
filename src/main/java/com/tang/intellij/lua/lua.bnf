@@ -390,7 +390,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
 }
 
 args ::= listArgs | singleArg
-singleArg ::= tableExpr | STRING { extends = args methods = [ STRING = "STRING" ] }
+singleArg ::= tableExpr | literalExpr { extends = args methods = [ STRING = "STRING" ] }
 private arg_expr_list ::= (expr ',')* (expr |& ')')
 listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }
 

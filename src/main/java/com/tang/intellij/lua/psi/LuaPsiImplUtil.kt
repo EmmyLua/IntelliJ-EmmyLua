@@ -235,7 +235,10 @@ fun getFirstStringArg(callExpr: LuaCallExpr): PsiElement? {
     var path: PsiElement? = null
 
     when (args) {
-        is LuaSingleArg -> path = args.string
+        is LuaSingleArg -> {
+            val expr = args.expr
+            if (expr is LuaLiteralExpr) path = expr
+        }
         is LuaListArgs -> args.exprList.let { list ->
             if (list.isNotEmpty() && list[0] is LuaLiteralExpr) {
                 val valueExpr = list[0] as LuaLiteralExpr

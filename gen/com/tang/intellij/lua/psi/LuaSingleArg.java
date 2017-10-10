@@ -7,10 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface LuaSingleArg extends LuaArgs {
 
-  @Nullable
-  LuaTableExpr getTableExpr();
-
-  @Nullable
-  PsiElement getString();
+  @NotNull
+  LuaExpr getExpr();
 
 }

@@ -1291,14 +1291,13 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // tableExpr | STRING
+  // tableExpr | literalExpr
   public static boolean singleArg(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "singleArg")) return false;
-    if (!nextTokenIs(b, "<single arg>", LCURLY, STRING)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SINGLE_ARG, "<single arg>");
     r = tableExpr(b, l + 1);
-    if (!r) r = consumeToken(b, STRING);
+    if (!r) r = literalExpr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

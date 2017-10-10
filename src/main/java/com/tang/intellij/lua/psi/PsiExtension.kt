@@ -192,3 +192,12 @@ val LuaFuncDef.isGlobal: Boolean get() {
         return false
     return true
 }
+
+val LuaCallExpr.argList: List<LuaExpr> get() {
+    val args = this.args
+    return when (args) {
+        is LuaSingleArg -> listOf(args.expr)
+        is LuaListArgs -> args.exprList
+        else -> emptyList()
+    }
+}

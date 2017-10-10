@@ -26,15 +26,9 @@ public class LuaSingleArgImpl extends LuaArgsImpl implements LuaSingleArg {
   }
 
   @Override
-  @Nullable
-  public LuaTableExpr getTableExpr() {
-    return PsiTreeUtil.getChildOfType(this, LuaTableExpr.class);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getString() {
-    return findChildByType(STRING);
+  @NotNull
+  public LuaExpr getExpr() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaExpr.class));
   }
 
 }
