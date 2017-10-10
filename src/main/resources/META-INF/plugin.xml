@@ -312,22 +312,22 @@
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious"/>
         <localInspection
                 displayName="Match function signature"
-                enabledByDefault="true"
+                enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection"/>
         <localInspection
                 displayName="Undeclared variable"
-                enabledByDefault="true"
+                enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection"/>
         <localInspection
                 displayName="Return type"
-                enabledByDefault="true"
+                enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection"/>
         <localInspection
                 displayName="Assign type"
-                enabledByDefault="true"
+                enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.AssignTypeInspection"/>
     </extensions>
