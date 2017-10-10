@@ -21,12 +21,11 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.LuaExpr
-import com.tang.intellij.lua.psi.LuaLiteralExpr
 import com.tang.intellij.lua.psi.LuaTableExpr
-import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaTableStub
-import com.tang.intellij.lua.ty.*
+import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyTable
 
 /**
 
@@ -40,7 +39,10 @@ open class LuaTableExprMixin : StubBasedPsiElementBase<LuaTableStub>, LuaExpr {
     constructor(stub: LuaTableStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
     override fun guessType(context: SearchContext): Ty {
-        val table = this as LuaTableExpr
+        //todo detect generic table type
+        //cant pass completion test.
+
+        /*val table = this as LuaTableExpr
 
         // Resolve key types
         var keyType : ITy = Ty.UNKNOWN
@@ -60,6 +62,7 @@ open class LuaTableExprMixin : StubBasedPsiElementBase<LuaTableStub>, LuaExpr {
             return TyArray(valueType)
         }
 
-        return TySerializedGeneric(arrayOf(keyType, valueType), Ty.TABLE)
+        return TySerializedGeneric(arrayOf(keyType, valueType), Ty.TABLE)*/
+        return TyTable(this as LuaTableExpr)
     }
 }
