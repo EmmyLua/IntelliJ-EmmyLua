@@ -557,7 +557,7 @@ fun getName(tableField: LuaTableField): String? {
         return id.text
 
     val idExpr = tableField.idExpr
-    if (idExpr != null)
+    if (idExpr is LuaLiteralExpr && idExpr.kind == LuaLiteralKind.String)
         return LuaString.getContent(idExpr.text).value
     return null
 }

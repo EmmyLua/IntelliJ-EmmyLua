@@ -154,6 +154,8 @@ val LuaIndexExpr.prefixExpr: LuaExpr get() {
 val LuaTableField.shouldCreateStub: Boolean get() {
     if (id == null && idExpr == null)
         return false
+    if (name == null)
+        return false
 
     val tableExpr = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaTableExpr::class.java)
     tableExpr ?: return false
