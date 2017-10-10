@@ -40,6 +40,11 @@ fun IFunSignature.getParamTy(index: Int): ITy {
     return info?.ty ?: Ty.UNKNOWN
 }
 
+//eg. print(...)
+fun IFunSignature.hasVarArgs(): Boolean {
+    return params.lastOrNull()?.isVarArgs ?: false
+}
+
 class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, override val params: Array<LuaParamInfo>) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
