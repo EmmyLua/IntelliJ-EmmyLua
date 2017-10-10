@@ -72,7 +72,7 @@ abstract class TyClass(override val className: String, override var superClassNa
         // super
         if (deep) {
             val superType = getSuperClass(context)
-            if (superType is TyClass) superType?.processMembers(context, processor, deep)
+            if (superType is TyClass) superType.processMembers(context, processor, deep)
         }
     }
 
