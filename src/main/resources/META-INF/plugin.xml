@@ -310,6 +310,11 @@
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious"/>
+        <localInspection
+                displayName="Type safety"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.TypeSafetyInspection"/>
     </extensions>
 
     <application-components>
