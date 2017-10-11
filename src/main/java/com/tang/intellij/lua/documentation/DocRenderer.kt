@@ -61,7 +61,8 @@ internal fun renderTy(sb: StringBuilder, ty: ITy) {
             }
         }
         is TyPrimitive -> {
-            sb.append(ty.displayName)
+            sb.appendClassLink(ty.displayName)
+            //sb.append(ty.displayName)
         }
         else -> {
             sb.append("<<${ty.createTypeString()}>>")

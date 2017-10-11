@@ -69,12 +69,20 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
             is LuaClassMember -> renderClassMember(sb, element)
             is LuaNameDef -> { //local xx
                 sb.wrapTag("pre") {
-                    sb.append("local ${element.name}")
+                    sb.append("local ${element.name}:")
+                    val ty = element.guessType(SearchContext(element.project))
+                    renderTy(sb, ty)
                 }
 
                 val owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner::class.java)
-                if (owner != null)
-                    renderComment(sb, owner.comment)
+                owner?.let { renderComment(sb, owner.comment) }
+            }
+            is LuaLocalFuncDef -> {
+                sb.wrapTag("pre") {
+                    sb.append("local function ${element.name}")
+                    renderSignature(sb, element.asTy(SearchContext(element.project)).mainSignature)
+                }
+                renderComment(sb, element.comment)
             }
         }
         if (sb.isNotEmpty()) return sb.toString()
