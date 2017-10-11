@@ -64,6 +64,11 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
   }
 
   @NotNull
+  public Visibility getVisibility() {
+    return LuaPsiImplUtilKt.getVisibility(this);
+  }
+
+  @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtilKt.getParamNameDefList(this);
   }

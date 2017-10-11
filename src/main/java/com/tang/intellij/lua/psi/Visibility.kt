@@ -16,22 +16,10 @@
 
 package com.tang.intellij.lua.psi
 
-import com.intellij.psi.PsiNamedElement
-import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.TyUnion
+enum class Visibility(val text: String) {
+    PUBLIC("public"),
+    PRIVATE("private"),
+    PROTECTED("protected");
 
-/**
- * Class 成员
- * Created by tangzx on 2016/12/12.
- */
-interface LuaClassMember : LuaTypeGuessable, PsiNamedElement {
-    fun guessParentType(context: SearchContext): ITy
-    val visibility: Visibility
-}
-
-fun LuaClassMember.guessClassType(context: SearchContext): ITyClass? {
-    val ty = guessParentType(context)
-    return TyUnion.getPerfectClass(ty)
+    override fun toString() = text
 }

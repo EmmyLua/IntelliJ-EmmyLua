@@ -87,14 +87,14 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   };
 
   /* ********************************************************** */
-  // "protected" | "public"
+  // PRIVATE | PUBLIC | PROTECTED
   public static boolean access_modifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "access_modifier")) return false;
-    if (!nextTokenIs(b, "<access modifier>", PROTECTED, PUBLIC)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ACCESS_MODIFIER, "<access modifier>");
-    r = consumeToken(b, PROTECTED);
+    r = consumeToken(b, PRIVATE);
     if (!r) r = consumeToken(b, PUBLIC);
+    if (!r) r = consumeToken(b, PROTECTED);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -239,7 +239,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def)
+  // '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def | access_modifier)
   static boolean doc_item(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item")) return false;
     if (!nextTokenIs(b, AT)) return false;
@@ -251,7 +251,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def
+  // param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def | access_modifier
   private static boolean doc_item_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
@@ -264,6 +264,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = lan_def(b, l + 1);
     if (!r) r = overload_def(b, l + 1);
     if (!r) r = tag_def(b, l + 1);
+    if (!r) r = access_modifier(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }

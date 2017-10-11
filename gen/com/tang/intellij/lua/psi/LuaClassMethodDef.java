@@ -26,6 +26,9 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   ITy guessParentType(SearchContext context);
 
   @NotNull
+  Visibility getVisibility();
+
+  @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
   @NotNull

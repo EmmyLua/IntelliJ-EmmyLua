@@ -12,6 +12,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.tang.intellij.lua.comment.psi.*;
 import com.intellij.navigation.ItemPresentation;
+import com.tang.intellij.lua.psi.Visibility;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.intellij.psi.stubs.IStubElementType;
@@ -72,6 +73,11 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocClassField
   @NotNull
   public ITy guessParentType(SearchContext context) {
     return LuaDocPsiImplUtilKt.guessParentType(this, context);
+  }
+
+  @NotNull
+  public Visibility getVisibility() {
+    return LuaDocPsiImplUtilKt.getVisibility(this);
   }
 
   @Nullable

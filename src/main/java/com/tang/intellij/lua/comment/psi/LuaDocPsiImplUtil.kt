@@ -29,7 +29,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
+import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaElementFactory
+import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -98,6 +100,10 @@ fun guessParentType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
     val parent = fieldDef.parent
     val classDef = PsiTreeUtil.findChildOfType(parent, LuaDocClassDef::class.java)
     return classDef?.type ?: Ty.UNKNOWN
+}
+
+fun getVisibility(fieldDef: LuaDocFieldDef): Visibility {
+    return Visibility.PUBLIC
 }
 
 /**

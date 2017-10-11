@@ -668,3 +668,7 @@ fun guessReturnTypeSet(returnStat: LuaReturnStat?, index: Int, context: SearchCo
 fun getNameIdentifier(label: LuaLabelStat): PsiElement? {
     return label.id
 }
+
+fun getVisibility(member: LuaClassMember): Visibility {
+    return Visibility.PUBLIC
+}

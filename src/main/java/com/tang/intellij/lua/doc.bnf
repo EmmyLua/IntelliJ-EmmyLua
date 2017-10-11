@@ -51,6 +51,7 @@
         TAG_PARAM = 'param'
         OPTIONAL = 'optional'
         TAG_RETURN = 'return'
+        PRIVATE = 'private'
         PROTECTED = 'protected'
         PUBLIC = 'public'
         CLASS = 'class'
@@ -69,7 +70,7 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def)
+private doc_item ::= '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def | access_modifier)
 
 ty ::= union_ty | function_ty | generic_ty | arr_ty | general_ty | par_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
@@ -104,7 +105,7 @@ function_ty ::= fun '(' function_param_list ')' (':' type_list)? {
 union_ty ::= ty ('|' ty)+ {
     methods = [getType]
 }
-access_modifier ::= "protected" | "public"
+access_modifier ::= PRIVATE | PUBLIC | PROTECTED
 
 field_def ::= FIELD access_modifier? ID ty comment_string? {
     pin = 1
@@ -117,6 +118,7 @@ field_def ::= FIELD access_modifier? ID ty comment_string? {
     methods = [
         guessType
         guessParentType
+        getVisibility
         getNameIdentifier
         setName
         getName

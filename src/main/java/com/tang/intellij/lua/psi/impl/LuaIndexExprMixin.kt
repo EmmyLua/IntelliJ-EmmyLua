@@ -129,4 +129,7 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
         }
         return null
     }
+
+    override val visibility: Visibility
+        get() = Visibility.PUBLIC
 }

@@ -105,6 +105,11 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
   }
 
   @NotNull
+  public Visibility getVisibility() {
+    return LuaPsiImplUtilKt.getVisibility(this);
+  }
+
+  @NotNull
   public LuaParamInfo[] getParams() {
     return LuaPsiImplUtilKt.getParams(this);
   }

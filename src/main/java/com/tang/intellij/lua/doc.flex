@@ -71,6 +71,9 @@ DOC_DASHES = --+
     "language"                 { yybegin(xTAG); return LANGUAGE;}
     "overload"                 { yybegin(xTAG); return OVERLOAD; }
     "module"                   { yybegin(xTAG); return MODULE; }
+    "private"                  { yybegin(xTAG); return PRIVATE; }
+    "protected"                { yybegin(xTAG); return PROTECTED; }
+    "public"                   { yybegin(xTAG); return PUBLIC; }
     {ID}                       { yybegin(xTAG); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
@@ -88,6 +91,7 @@ DOC_DASHES = --+
     "[]"                       { return ARR; }
     "fun"                      { return FUN; }
     "optional"                 { return OPTIONAL; }
+    "private"                  { yybegin(xTAG); return PRIVATE; }
     "protected"                { yybegin(xTAG); return PROTECTED; }
     "public"                   { yybegin(xTAG); return PUBLIC; }
     {ID}                       { return ID; }

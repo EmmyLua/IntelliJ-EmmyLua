@@ -50,6 +50,7 @@ public interface LuaDocTypes {
   IElementType OPTIONAL = new LuaDocTokenType("optional");
   IElementType OR = new LuaDocTokenType("|");
   IElementType OVERLOAD = new LuaDocTokenType("overload");
+  IElementType PRIVATE = new LuaDocTokenType("private");
   IElementType PROTECTED = new LuaDocTokenType("protected");
   IElementType PUBLIC = new LuaDocTokenType("public");
   IElementType RPAREN = new LuaDocTokenType(")");

@@ -97,6 +97,11 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
+  @NotNull
+  public Visibility getVisibility() {
+    return LuaPsiImplUtilKt.getVisibility(this);
+  }
+
   @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtilKt.getComment(this);

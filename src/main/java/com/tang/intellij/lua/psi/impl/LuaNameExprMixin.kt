@@ -108,4 +108,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
         val gs = minx.greenStub
         return gs?.isGlobal ?: (resolveLocal(nameExpr, null) == null)
     }
+
+    override val visibility: Visibility
+        get() = Visibility.PUBLIC
 }

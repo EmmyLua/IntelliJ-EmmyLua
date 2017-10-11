@@ -243,6 +243,7 @@ funcDef ::= 'function' ID funcBody {
         toString
         guessReturnTypeSet
         guessParentType
+        getVisibility
         getParams
         getReferences
     ]
@@ -270,6 +271,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
     methods = [
         getComment
         guessParentType
+        getVisibility
         getParamNameDefList
         getNameIdentifier
         setName
@@ -465,6 +467,7 @@ tableField ::= tableField1 | tableField2 | expr {
         getPresentation
         guessType
         guessParentType
+        getVisibility
         getComment
         getIdExpr
         nameDef = "tableFieldNameDef"

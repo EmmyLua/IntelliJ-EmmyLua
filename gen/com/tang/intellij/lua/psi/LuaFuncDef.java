@@ -48,6 +48,9 @@ public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement
   ITyClass guessParentType(SearchContext searchContext);
 
   @NotNull
+  Visibility getVisibility();
+
+  @NotNull
   LuaParamInfo[] getParams();
 
   @NotNull
