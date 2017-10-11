@@ -32,5 +32,5 @@ interface LuaClassMember : LuaTypeGuessable, PsiNamedElement {
 
 fun LuaClassMember.guessClassType(context: SearchContext): ITyClass? {
     val ty = guessParentType(context)
-    return TyUnion.getPrefectClass(ty)
+    return TyUnion.getPerfectClass(ty)
 }

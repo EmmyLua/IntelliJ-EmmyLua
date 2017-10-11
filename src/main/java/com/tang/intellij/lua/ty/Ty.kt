@@ -362,7 +362,7 @@ class TyUnion : Ty(TyKind.Union) {
             }
         }
 
-        fun getPrefectClass(ty: ITy): ITyClass? {
+        fun getPerfectClass(ty: ITy): ITyClass? {
             var tc: ITyClass? = null
             var anonymous: ITyClass? = null
             process(ty) {

@@ -55,7 +55,7 @@ class CreateMethodIntention : BaseIntentionAction() {
                 val typeSet = expr.guessParentType(SearchContext(project))
                 if (Ty.isInvalid(typeSet)) return
 
-                val position = calcInsertPosition(TyUnion.getPrefectClass(typeSet), project)
+                val position = calcInsertPosition(TyUnion.getPerfectClass(typeSet), project)
                 if (position != null) {
                     editor.caretModel.moveToOffset(position.offset)
 

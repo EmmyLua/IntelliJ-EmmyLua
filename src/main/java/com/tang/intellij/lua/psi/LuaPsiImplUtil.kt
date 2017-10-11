@@ -153,7 +153,7 @@ fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): 
         } else {
             val expr = classMethodDef.classMethodName.expr
             val ty = expr.guessTypeFromCache(ctx)
-            val perfect = TyUnion.getPrefectClass(ty)
+            val perfect = TyUnion.getPerfectClass(ty)
             if (perfect is ITyClass)
                 type = perfect
         }

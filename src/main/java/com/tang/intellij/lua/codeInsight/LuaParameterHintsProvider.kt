@@ -53,7 +53,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             val isStaticMethodUsedAsInstanceMethod = !ty.isSelfCall && !callExpr.isStaticMethodCall
             var paramIndex = 0
             var argIndex = 0
-            val sig = ty.findPrefectSignature(if (isInstanceMethodUsedAsStaticMethod) exprList.size - 1 else exprList.size)
+            val sig = ty.findPerfectSignature(if (isInstanceMethodUsedAsStaticMethod) exprList.size - 1 else exprList.size)
             val parameters: Array<LuaParamInfo> = sig.params
             val paramCount = parameters.size
 

@@ -132,15 +132,15 @@ fun ITyFunction.process(processor: Processor<IFunSignature>) {
     }
 }
 
-fun ITyFunction.findPrefectSignature(nArgs: Int): IFunSignature {
+fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
     var sgi: IFunSignature? = null
-    var prefectN = Int.MAX_VALUE
+    var perfectN = Int.MAX_VALUE
     process(Processor {
         val offset = Math.abs(it.params.size - nArgs)
-        if (offset < prefectN) {
-            prefectN = offset
+        if (offset < perfectN) {
+            perfectN = offset
             sgi = it
-            if (prefectN == 0) return@Processor false
+            if (perfectN == 0) return@Processor false
         }
         true
     })
