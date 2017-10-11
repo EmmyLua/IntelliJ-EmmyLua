@@ -151,14 +151,14 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
     protected fun addMethod(completionResultSet: CompletionResultSet,
                             bold: Boolean,
                             clazzName: String,
-                            def: LuaClassMethod,
+                            classMethod: LuaClassMethod,
                             handlerProcessor: HandlerProcessor?) {
-        val methodName = def.name
+        val methodName = classMethod.name
         if (methodName != null) {
-            val ty = def.asTy(SearchContext(def.project))
+            val ty = classMethod.asTy(SearchContext(classMethod.project))
             ty.process(Processor {
                 val lookupString = handlerProcessor?.processLookupString(methodName) ?: methodName
-                val le = TyFunctionLookupElement(lookupString, def, it, bold, ty, LuaIcons.CLASS_METHOD)
+                val le = TyFunctionLookupElement(lookupString, classMethod, it, bold, ty, classMethod.visibility.warpIcon(LuaIcons.CLASS_METHOD))
                 le.handler = SignatureInsertHandler(it)
                 if (!ty.isSelfCall) le.setItemTextUnderlined(true)
                 le.setTailText("  [$clazzName]")

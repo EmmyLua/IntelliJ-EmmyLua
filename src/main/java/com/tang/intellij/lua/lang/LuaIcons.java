@@ -42,5 +42,9 @@ public class LuaIcons {
     public static final Icon ANNOTATION = AllIcons.Css.Atrule;
     public static final Icon META_METHOD = AllIcons.Javaee.PersistenceRelationship;
 
+    public static final Icon PUBLIC = AllIcons.Nodes.C_public;
+    public static final Icon PROTECTED = AllIcons.Nodes.C_protected;
+    public static final Icon PRIVATE = AllIcons.Nodes.C_private;
+
     public static final Icon MODULE = IconLoader.getIcon("/icons/module.png");
 }

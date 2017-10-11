@@ -16,12 +16,20 @@
 
 package com.tang.intellij.lua.psi
 
-enum class Visibility(val text: String) {
-    PUBLIC("public"),
-    PRIVATE("private"),
-    PROTECTED("protected");
+import com.intellij.ui.RowIcon
+import com.tang.intellij.lua.lang.LuaIcons
+import javax.swing.Icon
+
+enum class Visibility(val text: String, val icon: Icon) {
+    PUBLIC("public", LuaIcons.PUBLIC),
+    PRIVATE("private", LuaIcons.PRIVATE),
+    PROTECTED("protected", LuaIcons.PROTECTED);
 
     override fun toString() = text
+
+    fun warpIcon(oriIcon: Icon): Icon {
+        return RowIcon(oriIcon, icon)
+    }
 
     companion object {
         fun get(text: String): Visibility = when (text) {

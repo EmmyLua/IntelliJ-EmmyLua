@@ -90,26 +90,27 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bol
     }
 
     private fun lazyInit() {
-        val _ty = ty
-        if (_ty is ITyFunction) {
+        val ty = ty
+        if (ty is ITyFunction) {
             val list = mutableListOf<String>()
-            _ty.mainSignature.params.forEach {
+            ty.mainSignature.params.forEach {
                 list.add(it.name)
             }
             itemText = lookupString + "(${list.joinToString(", ")})"
 
             icon = when {
-                _ty.isSelfCall -> LuaIcons.CLASS_METHOD
-                _ty.isGlobal -> LuaIcons.GLOBAL_FUNCTION
+                ty.isSelfCall -> LuaIcons.CLASS_METHOD
+                ty.isGlobal -> LuaIcons.GLOBAL_FUNCTION
                 else -> LuaIcons.LOCAL_FUNCTION
             }
 
-            handler = SignatureInsertHandler(_ty.mainSignature)
+            handler = SignatureInsertHandler(ty.mainSignature)
         } else {
             icon = LuaIcons.CLASS_FIELD
         }
 
-        typeText = _ty.createTypeString()
+        icon = field.visibility.warpIcon(icon)
+        typeText = ty.createTypeString()
     }
 
     override fun renderElement(presentation: LookupElementPresentation?) {
