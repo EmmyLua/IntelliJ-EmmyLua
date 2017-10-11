@@ -29,6 +29,8 @@ import com.tang.intellij.lua.ty.ITy
 interface LuaComment : PsiComment, LuaDocPsiElement {
     val owner: LuaCommentOwner?
     val moduleName: String?
+    fun <T : LuaDocPsiElement> findTag(t:Class<T>): T?
+    fun <T : LuaDocPsiElement> findTags(t:Class<T>): Collection<T>
     fun getParamDef(name: String): LuaDocParamDef?
     fun getFieldDef(name: String): LuaDocFieldDef?
     val classDef: LuaDocClassDef?

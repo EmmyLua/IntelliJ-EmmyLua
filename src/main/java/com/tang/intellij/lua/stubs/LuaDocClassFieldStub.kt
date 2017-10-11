@@ -20,13 +20,14 @@ import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.psi.LuaElementType
+import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.ty.ITy
 
 /**
 
  * Created by tangzx on 2016/12/10.
  */
-interface LuaDocClassFieldStub : StubElement<LuaDocFieldDef> {
+interface LuaDocClassFieldStub : LuaClassMemberStub<LuaDocFieldDef> {
     val name: String
 
     val type: ITy
@@ -37,5 +38,6 @@ interface LuaDocClassFieldStub : StubElement<LuaDocFieldDef> {
 class LuaDocClassFieldStubImpl(parent: StubElement<*>,
                                override val name: String,
                                override val className: String?,
+                               override val visibility: Visibility,
                                override val type: ITy)
     : StubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocClassFieldStub

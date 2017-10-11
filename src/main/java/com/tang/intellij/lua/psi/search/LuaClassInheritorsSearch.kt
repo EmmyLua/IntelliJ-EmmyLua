@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi.search
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ExtensibleQueryFactory
+import com.intellij.util.Processor
 import com.intellij.util.Query
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 
@@ -38,6 +39,13 @@ class LuaClassInheritorsSearch private constructor() : ExtensibleQueryFactory<Lu
         fun search(searchScope: GlobalSearchScope, project: Project, typeName: String, deep: Boolean = true): Query<LuaDocClassDef> {
             val parameters = SearchParameters(searchScope, project, typeName, deep)
             return INSTANCE.createUniqueResultsQuery(parameters)
+        }
+
+        fun isClassInheritFrom(searchScope: GlobalSearchScope, project: Project, thiz: String, sup: String): Boolean {
+            val query = search(searchScope, project, thiz)
+            return !query.forEach(Processor {
+                it.name != sup
+            })
         }
     }
 }

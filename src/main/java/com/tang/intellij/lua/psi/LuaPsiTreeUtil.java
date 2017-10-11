@@ -21,6 +21,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.ITy;
+import com.tang.intellij.lua.ty.Ty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -213,5 +216,20 @@ public class LuaPsiTreeUtil {
 
     public static PsiElement skipWhitespacesAndCommentsForward(@Nullable PsiElement element) {
         return PsiTreeUtil.skipSiblingsForward(element, WS_COMMENTS);
+    }
+
+    @NotNull
+    public static ITy findContextClass(PsiElement current) {
+        //todo module ty
+        while (true) {
+            if (current instanceof PsiFile)
+                break;
+            if (current instanceof LuaClassMethod) {
+                LuaClassMethod method = (LuaClassMethod) current;
+                return method.guessParentType(new SearchContext(current.getProject()));
+            }
+            current = current.getParent();
+        }
+        return Ty.Companion.getUNKNOWN();
     }
 }

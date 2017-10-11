@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi
+package com.tang.intellij.lua.stubs
 
-enum class Visibility(val text: String) {
-    PUBLIC("public"),
-    PRIVATE("private"),
-    PROTECTED("protected");
+import com.intellij.psi.PsiElement
+import com.intellij.psi.stubs.StubElement
+import com.tang.intellij.lua.psi.Visibility
 
-    override fun toString() = text
-
-    companion object {
-        fun get(text: String): Visibility = when (text) {
-            "private" -> PRIVATE
-            "protected" -> PROTECTED
-            else -> PUBLIC
-        }
-        fun get(value: Int): Visibility = when (value) {
-            PRIVATE.ordinal -> PRIVATE
-            PROTECTED.ordinal -> PROTECTED
-            else -> PUBLIC
-        }
-    }
+interface LuaClassMemberStub<T : PsiElement> : StubElement<T> {
+    val visibility: Visibility
 }

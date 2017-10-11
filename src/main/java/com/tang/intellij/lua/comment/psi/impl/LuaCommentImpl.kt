@@ -34,6 +34,20 @@ import com.tang.intellij.lua.ty.Ty
  *
  */
 class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaTypes.DOC_COMMENT, charSequence), LuaComment {
+    override fun <T : LuaDocPsiElement> findTag(t:Class<T>): T? {
+        var element: PsiElement? = firstChild
+        while (element != null) {
+            if (t.isInstance(element)) {
+                return t.cast(element)
+            }
+            element = element.nextSibling
+        }
+        return null
+    }
+
+    override fun <T : LuaDocPsiElement> findTags(t:Class<T>): Collection<T> {
+        return PsiTreeUtil.findChildrenOfType(this, t)
+    }
 
     override fun getTokenType(): IElementType {
         return LuaTypes.DOC_COMMENT

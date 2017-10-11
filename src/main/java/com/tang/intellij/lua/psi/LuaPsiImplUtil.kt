@@ -33,6 +33,7 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
+import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaIcons
@@ -670,5 +671,19 @@ fun getNameIdentifier(label: LuaLabelStat): PsiElement? {
 }
 
 fun getVisibility(member: LuaClassMember): Visibility {
+    if (member is LuaCommentOwner) {
+        val comment = member.comment
+        comment?.findTag(LuaDocAccessModifier::class.java)?.let {
+            return Visibility.get(it.text)
+        }
+    }
     return Visibility.PUBLIC
+}
+
+fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
+    val stub = classMethodDef.stub
+    if (stub != null) {
+
+    }
+    return getVisibility(classMethodDef as LuaClassMember)
 }

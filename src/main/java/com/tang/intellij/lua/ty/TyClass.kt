@@ -16,9 +16,12 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
@@ -36,6 +39,23 @@ interface ITyClass : ITy {
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
     fun findMemberType(name: String, searchContext: SearchContext): ITy?
     fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember?
+}
+
+fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visibility): Boolean {
+    if (visibility == Visibility.PUBLIC)
+        return true
+    var isVisible = false
+    TyUnion.process(contextTy) {
+        if (it is ITyClass) {
+            if (it == this)
+                isVisible = true
+            else if (visibility == Visibility.PROTECTED) {
+                isVisible = LuaClassInheritorsSearch.isClassInheritFrom(GlobalSearchScope.projectScope(project), project, className, it.className)
+            }
+        }
+        !isVisible
+    }
+    return isVisible
 }
 
 abstract class TyClass(override val className: String, override var superClassName: String? = null) : Ty(TyKind.Class), ITyClass {

@@ -29,7 +29,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
-import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.search.SearchContext
@@ -103,7 +102,8 @@ fun guessParentType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
 }
 
 fun getVisibility(fieldDef: LuaDocFieldDef): Visibility {
-    return Visibility.PUBLIC
+    val v = fieldDef.accessModifier?.let { Visibility.get(it.text) }
+    return v ?: Visibility.PUBLIC
 }
 
 /**
