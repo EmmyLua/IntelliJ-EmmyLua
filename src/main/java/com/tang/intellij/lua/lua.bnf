@@ -390,6 +390,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     ]
     implements = [
         "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.psi.LuaClassMember"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaIndexStub"
     mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExprMixin"

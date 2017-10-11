@@ -108,6 +108,7 @@ public class LuaVisitor extends PsiElementVisitor {
   public void visitIndexExpr(@NotNull LuaIndexExpr o) {
     visitExpr(o);
     // visitPsiNameIdentifierOwner(o);
+    // visitClassMember(o);
   }
 
   public void visitLabelStat(@NotNull LuaLabelStat o) {

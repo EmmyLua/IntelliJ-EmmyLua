@@ -23,6 +23,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.LuaVarList
+import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexStub
@@ -63,17 +64,24 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
         if (type != null)
             typeName = type.className
         val valueType = indexExpr.guessValueType(context)
+        val visibility = indexExpr.visibility
 
-        return LuaIndexStubImpl(typeName, indexExpr.name, valueType, stubElement, this)
+        return LuaIndexStubImpl(typeName,
+                indexExpr.name,
+                valueType,
+                visibility,
+                stubElement,
+                this)
     }
 
     override fun getExternalId() = "lua.index_expr"
 
     @Throws(IOException::class)
     override fun serialize(indexStub: LuaIndexStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeName(indexStub.typeName)
+        stubOutputStream.writeName(indexStub.className)
         stubOutputStream.writeName(indexStub.name)
         Ty.serialize(indexStub.valueType, stubOutputStream)
+        stubOutputStream.writeByte(indexStub.visibility.ordinal)
     }
 
     @Throws(IOException::class)
@@ -81,12 +89,18 @@ class LuaIndexType : IStubElementType<LuaIndexStub, LuaIndexExpr>("LuaIndex", Lu
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
         val valueType = Ty.deserialize(stubInputStream)
-        return LuaIndexStubImpl(StringRef.toString(typeName), StringRef.toString(fieldName), valueType, stubElement, this)
+        val visibility = Visibility.get(stubInputStream.readByte().toInt())
+        return LuaIndexStubImpl(StringRef.toString(typeName),
+                StringRef.toString(fieldName),
+                valueType,
+                visibility,
+                stubElement,
+                this)
     }
 
     override fun indexStub(indexStub: LuaIndexStub, indexSink: IndexSink) {
         val fieldName = indexStub.name
-        val typeName = indexStub.typeName
+        val typeName = indexStub.className
         if (typeName != null && fieldName != null) {
             LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
 

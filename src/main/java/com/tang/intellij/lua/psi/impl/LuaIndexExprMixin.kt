@@ -25,6 +25,7 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.intellij.util.Processor
+import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -130,6 +131,12 @@ abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExp
         return null
     }
 
-    override val visibility: Visibility
-        get() = Visibility.PUBLIC
+    override val visibility: Visibility get() {
+        val stub = this.stub
+        if (stub != null)
+            return stub.visibility
+        return comment?.findTag(LuaDocAccessModifier::class.java)?.let {
+            Visibility.get(it.text)
+        } ?: Visibility.PUBLIC
+    }
 }
