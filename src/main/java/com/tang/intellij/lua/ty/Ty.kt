@@ -286,9 +286,8 @@ class TyUnion : Ty(TyKind.Union) {
         return childSet.add(ty)
     }
 
-    // All members of union must be subset of other type
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return super.subTypeOf(other, context) || childSet.all({ type -> type.subTypeOf(other, context) })
+        return super.subTypeOf(other, context) || childSet.any { type -> type.subTypeOf(other, context) }
     }
 
     companion object {
