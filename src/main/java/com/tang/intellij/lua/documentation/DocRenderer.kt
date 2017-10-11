@@ -54,11 +54,10 @@ internal fun renderTy(sb: StringBuilder, ty: ITy) {
         }
         is TyUnion -> {
             var idx = 0
-            TyUnion.each(ty) {
-                if (!it.isAnonymous) {
-                    if (idx++ != 0) sb.append("|")
-                    renderTy(sb, it)
-                }
+            TyUnion.eachPerfect(ty) {
+                if (idx++ != 0) sb.append("|")
+                renderTy(sb, it)
+                true
             }
         }
         is TyPrimitive -> {

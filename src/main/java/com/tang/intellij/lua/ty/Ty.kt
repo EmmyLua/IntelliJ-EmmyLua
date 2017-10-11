@@ -268,8 +268,14 @@ class TyUnion : Ty(TyKind.Union) {
     private val childSet = mutableSetOf<ITy>()
     fun getChildTypes() = childSet
 
-    override val displayName: String
-        get() = childSet.joinToString("|", transform = { type:ITy -> type.displayName })
+    override val displayName: String get() {
+        val list = mutableListOf<String>()
+        eachPerfect(this) {
+            list.add(it.displayName)
+            true
+        }
+        return list.joinToString("|")
+    }
 
     val size:Int
         get() = childSet.size
@@ -320,6 +326,26 @@ class TyUnion : Ty(TyKind.Union) {
             } else process(ty)
         }
 
+        fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
+            val anonymous = mutableListOf<ITy>()
+            val globals = mutableListOf<ITy>()
+            val others = mutableListOf<ITy>()
+            each(ty) {
+                when {
+                    it.isGlobal -> globals.add(it)
+                    it.isAnonymous -> anonymous.add(it)
+                    else -> others.add(it)
+                }
+            }
+            if (others.isNotEmpty()) {
+                for (cls in others)
+                    if (!process(cls)) break
+            } else {
+                for (cls in globals)
+                    if (!process(cls)) break
+            }
+        }
+
         fun union(t1: ITy, t2: ITy): ITy {
             return when {
                 t1 is TyUnknown -> t2
@@ -365,6 +391,10 @@ class TyUnknown : Ty(TyKind.Unknown) {
 
     override fun hashCode(): Int {
         return Constants.WORD_ANY.hashCode()
+    }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return true
     }
 }
 
