@@ -16,16 +16,7 @@
 
 package com.tang.intellij.lua.editor.structure
 
-import com.intellij.icons.AllIcons
-import com.tang.intellij.lua.psi.LuaAssignStat
+import com.tang.intellij.lua.psi.LuaPsiElement
+import javax.swing.Icon
 
-/**
- * Created by TangZX on 2016/12/28.
- */
-class LuaAssignElement internal constructor(target:LuaAssignStat) : LuaTreeElement(target, AllIcons.Nodes.ClassInitializer) {
-    private val exprList = target.varExprList
-
-    override fun getPresentableText(): String {
-        return exprList.text + " = ..."
-    }
-}
+abstract class LuaVarElement constructor(target: LuaPsiElement, name:String, icon: Icon) : LuaTreeElement(target, name, icon)

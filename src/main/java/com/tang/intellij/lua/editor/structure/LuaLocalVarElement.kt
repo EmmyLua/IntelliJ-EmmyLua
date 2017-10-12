@@ -17,12 +17,6 @@
 package com.tang.intellij.lua.editor.structure
 
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.psi.LuaNameDef
+import com.tang.intellij.lua.psi.LuaPsiElement
 
-class LuaNameDefElement internal constructor(val nameDef: LuaNameDef) : LuaTreeElement(nameDef, LuaIcons.LOCAL_VAR) {
-    val name = element.name
-
-    override fun getPresentableText(): String? {
-        return name
-    }
-}
+class LuaLocalVarElement constructor(target:LuaPsiElement, name:String?=null) : LuaVarElement(target, name ?: target.name!!, LuaIcons.LOCAL_VAR)

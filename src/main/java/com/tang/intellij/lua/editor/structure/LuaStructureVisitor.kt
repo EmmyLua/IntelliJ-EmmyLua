@@ -17,8 +17,6 @@
 package com.tang.intellij.lua.editor.structure
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
@@ -26,123 +24,55 @@ import com.tang.intellij.lua.psi.*
 import java.util.*
 
 
-private class ClassInfo(val treeElement:LuaClassElement, clsName:String? = null, varName:String? = null) {
-    val className:String = clsName ?: varName ?: treeElement.className
-    val variableName:String = varName ?: className
+private class LexicalContext(val element:LuaTreeElement?=null, val parent:LexicalContext?=null) {
+    val children = LinkedHashMap<String, LuaTreeElement>()
 
-    val nestedClasses = HashMap<String, ClassInfo>()
+    fun addChildContext(e:LuaTreeElement, addChild:Boolean=true):LexicalContext {
+        if (addChild) {
+            element?.addChild(e)
+            children[e.name] = e
+        }
 
-    operator fun get(name:String):ClassInfo? {
-        return nestedClasses[name]
+        return LexicalContext(e, this)
     }
 
-    operator fun set(name:String, elem:ClassInfo) {
-        nestedClasses[name] = elem
-
-        treeElement.addChild(elem.treeElement)
+    fun addChild(e:LuaTreeElement, name:String?=null) {
+        element?.addChild(e)
+        children[name ?: e.name] = e
     }
 
-    fun addMethod(mtd:LuaFuncElement) {
-        treeElement.addChild(mtd)
-    }
-
-    fun addField(fld:LuaClassFieldElement) {
-        treeElement.addChild(fld)
+    fun findElementNamed(name:String):LuaTreeElement? {
+        return children[name] ?: parent?.findElementNamed(name)
     }
 }
-
-
-private class Context(val element:LuaTreeElement?=null, val parent:Context?=null) {
-    val locals = HashMap<String, Int>()
-    val classes = HashMap<String, ClassInfo>()
-    private var children:ArrayList<TreeElement>? = null
-
-    init {
-        if (element == null) {
-            children = ArrayList()
-        }
-    }
-
-    fun getChildren():Array<TreeElement> {
-        return element?.children ?: children!!.toTypedArray()
-    }
-
-    fun addChild(l:LuaTreeElement) {
-        if (l is LuaNameDefElement) {
-            locals.put(l.nameDef.name, element?.children?.size ?: children!!.size)
-        }
-
-        element?.addChild(l) ?: children!!.add(l)
-    }
-
-    fun getChildAt(i:Int):LuaTreeElement {
-        return (element?.children?.get(i) ?: children!![i]) as LuaTreeElement
-    }
-
-    fun setChildAt(i:Int, e:LuaTreeElement) {
-        if (element != null) {
-            element.children[i] = e
-        } else {
-            children!![i] = e
-        }
-    }
-
-    fun addClass(classInfo:ClassInfo) {
-        classes.put(classInfo.variableName, classInfo)
-
-        element?.addChild(classInfo.treeElement) ?: children!!.add(classInfo.treeElement)
-    }
-
-    fun findClassNamed(name:String):ClassInfo? {
-        return classes[name] ?: parent?.findClassNamed(name)
-    }
-
-    fun findLocalNamed(name:String):Pair<Context, Int>? {
-        val local = locals[name]
-
-        return if (local != null) Pair(this, local) else parent?.findLocalNamed(name)
-    }
-
-    fun removeLocalNamed(name:String) {
-        if (name in locals) {
-            locals.remove(name)
-        } else {
-            parent?.removeLocalNamed(name)
-        }
-    }
-}
-
 
 class LuaStructureVisitor : LuaVisitor() {
-    private val contextStack = Stack<Context>()
+    private var current:LexicalContext? = LexicalContext()
 
-    init {
-        contextStack.push(Context())
-    }
-
-    fun getChildren():Array<TreeElement> {
-        return getCurContext().getChildren()
-    }
-
-    private fun getCurContext():Context {
-        return contextStack.peek()
-    }
-
-    private fun pushContext(element:LuaTreeElement, addElement:Boolean=true) {
-        val newContext = Context(element, getCurContext())
-
-        if (addElement) {
-            getCurContext().addChild(element)
-        }
-
-        contextStack.push(newContext)
+    private fun pushContext(e:LuaTreeElement, addChild:Boolean=true) {
+        current = current?.addChildContext(e, addChild)
     }
 
     private fun popContext() {
-        contextStack.pop()
+        current = current?.parent
     }
 
-    private fun getDocCommentDeclarations(commentOwner: LuaCommentOwner):ArrayList<LuaTreeElement>? {
+    private fun findElementNamed(name:String):LuaTreeElement? {
+        return current?.findElementNamed(name)
+    }
+
+    private fun addChild(child:LuaTreeElement, name:String?=null) {
+        current?.addChild(child, name)
+    }
+
+    fun getChildren():Array<TreeElement> {
+        return current?.children?.values?.toTypedArray<TreeElement>() ?: emptyArray()
+    }
+
+    /**
+     * Get the class/field declarations present in a document comment
+     */
+    private fun getDocCommentDeclarations(commentOwner:LuaCommentOwner):ArrayList<LuaTreeElement>? {
         val comment = commentOwner.comment
 
         if (commentOwner.comment == null) {
@@ -151,12 +81,12 @@ class LuaStructureVisitor : LuaVisitor() {
 
         val elements = ArrayList<LuaTreeElement>()
 
-        comment.acceptChildren(object : LuaDocVisitor() {
-            override fun visitClassDef(o: LuaDocClassDef) {
+        comment.acceptChildren(object:LuaDocVisitor() {
+            override fun visitClassDef(o:LuaDocClassDef) {
                 elements.add(LuaClassElement(o))
             }
 
-            override fun visitFieldDef(o: LuaDocFieldDef) {
+            override fun visitFieldDef(o:LuaDocFieldDef) {
                 elements.add(LuaClassFieldElement(o))
             }
         })
@@ -164,15 +94,7 @@ class LuaStructureVisitor : LuaVisitor() {
         return elements
     }
 
-    override fun visitFile(file: PsiFile?) {
-        pushContext(LuaFileElement(file as LuaFile))
-
-        file.acceptChildren(this)
-
-        popContext()
-    }
-
-    override fun visitAssignStat(o: LuaAssignStat) {
+    override fun visitAssignStat(o:LuaAssignStat) {
         val variableNames = o.varExprList
         val expressions = o.valueExprList
 
@@ -181,72 +103,113 @@ class LuaStructureVisitor : LuaVisitor() {
             val expr = expressions?.children?.get(i)
             val name  = variableNames.children[i] as LuaPsiElement
 
-            val classInfo:ClassInfo?
-            classInfo = when (name) {
-                is LuaIndexExpr -> handleCompoundName(name)
-                is LuaNameExpr -> getCurContext().findClassNamed(name.name)
-                else -> getCurContext().findClassNamed((name as LuaNameDef).name)
+            if (name is LuaNameExpr && findElementNamed(name.name) != null || name is LuaNameDef && findElementNamed(name.name) != null) {
+                // We're assigning to a previously declared entity -- ignore
+                return
             }
 
-            if (classInfo != null) {
-                if (expr is LuaClosureExpr) {
-                    classInfo.addMethod(LuaFuncElement.asClassMethod(name, name.name!!, expr.paramSignature))
-                } else {
-                    classInfo.addField(LuaClassFieldElement(o, name.name!!))
-                }
+            val owner:LuaTreeElement? = if (name is LuaIndexExpr) handleCompoundName(name) else null
+
+            val child = if (expr is LuaClosureExpr) {
+                            when (owner) {
+                                is LuaClassElement -> LuaClassMethodElement(name, name.name!!, expr.paramSignature)
+                                is LuaLocalVarElement -> LuaLocalFuncElement(name, name.name!!, expr.paramSignature)
+                                else -> LuaGlobalFuncElement(name, name.name!!, expr.paramSignature)
+                            }
+                        } else {
+                            when (owner) {
+                                is LuaClassElement -> LuaClassFieldElement(o, name.name!!)
+                                is LuaLocalVarElement -> LuaLocalVarElement(o, name.name!!)
+                                else -> {
+                                    val declarations = getDocCommentDeclarations(o)
+
+                                    val names = o.varExprList.exprList
+                                    val exprs = o.valueExprList?.exprList
+
+                                    for (idx in 0 until names.size) {
+                                        val declaration = if (declarations == null || idx >= declarations.size) null else declarations[idx]
+                                        val expr = if (exprs == null || idx >= exprs.size) null else exprs[idx]
+                                        val nameDef = names[idx] as LuaNameExpr
+
+                                        val exprOwner:LuaTreeElement
+                                        if (declaration is LuaClassElement) {
+                                            exprOwner = declaration
+
+                                            addChild(declaration, nameDef.name)
+                                        } else {
+                                            exprOwner = LuaLocalVarElement(nameDef)
+
+                                            addChild(exprOwner)
+                                        }
+
+                                        if (expr is LuaTableExpr) {
+                                            handleTableExpr(expr, exprOwner)
+                                        }
+                                    }
+
+                                    LuaGlobalVarElement(o, name.name!!)
+                                }
+                            }
+                        }
+
+            if (owner != null) {
+                owner.addChild(child)
             } else {
-                if (expr is LuaClosureExpr) {
-                    getCurContext().addChild(LuaFuncElement(name, name.name, expr.paramSignature))
-                } else {
-                    getCurContext().addChild(LuaAssignElement(o))
-                }
+                addChild(child)
+            }
+
+            if (expr is LuaClosureExpr) {
+                expr.accept(this)
+            } else if (expr is LuaTableExpr) {
+                handleTableExpr(expr, child)
             }
         }
     }
 
-    override fun visitFuncDef(o: LuaFuncDef) {
-        getCurContext().addChild(LuaFuncElement(o))
+    override fun visitFuncDef(o:LuaFuncDef) {
+        addChild(LuaGlobalFuncElement(o))
     }
 
-    override fun visitElement(element: PsiElement?) {
-        if (element is LuaCommentOwner) {
-            getDocCommentDeclarations(element)
-        }
-    }
-
-    override fun visitTableExpr(o: LuaTableExpr) {
-        super.visitTableExpr(o)
-    }
-
-    private fun handleTableExpr(o:LuaTableExpr, exprOwner:LuaTreeElement?=null) {
+    private fun handleTableExpr(o:LuaTableExpr, exprOwner:LuaTreeElement) {
         o.tableFieldList.forEach{tableField ->
             val name = tableField.name
 
             if (name != null) {
                 val expr = tableField.exprList[0]
 
-                if (expr is LuaClosureExpr) {
-                    exprOwner?.addChild(LuaFuncElement.asClassMethod(tableField, name, expr.paramSignature))
-                } else {
-                    exprOwner?.addChild(LuaClassFieldElement(tableField, name))
-                }
+                val child = if (expr is LuaClosureExpr) {
+                                if (exprOwner is LuaClassElement) {
+                                    LuaClassMethodElement(tableField, name, expr.paramSignature)
+                                } else {
+                                    LuaLocalFuncElement(tableField, name, expr.paramSignature)
+                                }
+                            } else {
+                                if (exprOwner is LuaClassElement) {
+                                    LuaClassFieldElement(tableField, name)
+                                } else {
+                                    LuaLocalVarElement(tableField, name)
+                                }
+                            }
+
+                exprOwner.addChild(child)
             }
         }
+
         super.visitTableExpr(o)
     }
 
-    override fun visitFuncBody(o: LuaFuncBody) {
-        // A func body has, as children, some number of param name defs followed by a block
+    override fun visitFuncBody(o:LuaFuncBody) {
+        // A func body has, as _children, some number of param name defs followed by a block
         val block = o.children[o.children.size - 1]
 
         block.accept(this)
     }
 
-    override fun visitBlock(o: LuaBlock) {
+    override fun visitBlock(o:LuaBlock) {
         o.statementList.forEach{s -> s.accept(this)}
     }
 
-    override fun visitLocalDef(o: LuaLocalDef) {
+    override fun visitLocalDef(o:LuaLocalDef) {
         val nameList = o.nameList ?: return
 
         val declarations:ArrayList<LuaTreeElement>? = getDocCommentDeclarations(o)
@@ -262,12 +225,12 @@ class LuaStructureVisitor : LuaVisitor() {
             val exprOwner:LuaTreeElement
             if (declaration is LuaClassElement) {
                 exprOwner = declaration
-                val classInfo = ClassInfo(declaration, declaration.className, nameDef.name)
 
-                getCurContext().addClass(classInfo)
+                addChild(declaration, nameDef.name)
             } else {
-                exprOwner = LuaNameDefElement(nameDef)
-                getCurContext().addChild(exprOwner)
+                exprOwner = LuaLocalVarElement(nameDef)
+
+                addChild(exprOwner)
             }
 
             if (expr is LuaTableExpr) {
@@ -276,80 +239,75 @@ class LuaStructureVisitor : LuaVisitor() {
         }
     }
 
-    override fun visitLocalFuncDef(o: LuaLocalFuncDef) {
-        pushContext(LuaFuncElement(o))
+    override fun visitLocalFuncDef(o:LuaLocalFuncDef) {
+        pushContext(LuaLocalFuncElement(o))
 
         o.funcBody?.accept(this)
 
         popContext()
     }
 
-    private fun handleCompoundName(owner: LuaPsiElement):ClassInfo {
-        var namePart:LuaExpr
-        namePart = (owner as? LuaClassMethodDef)?.classMethodName?.expr ?: owner.firstChild as LuaExpr
+    private fun getNamePartsFromCompoundName(compoundNameParent:LuaPsiElement):ArrayList<LuaExpr> {
+        val result = ArrayList<LuaExpr>()
+
+        val secondToLast = (compoundNameParent as? LuaClassMethodDef)?.classMethodName?.expr ?: compoundNameParent.firstChild as LuaExpr
+        var namePart:LuaExpr = secondToLast
 
         while (namePart.firstChild is LuaExpr) {
             namePart = namePart.firstChild as LuaExpr
         }
 
-        var curClassInfo:ClassInfo? = getCurContext().findClassNamed(namePart.lastChild.text)
+        result.add(namePart)
 
-        if (curClassInfo == null) {
-            val name = namePart.lastChild.text
-            val local = getCurContext().findLocalNamed(name)
-            var idx:Int? = null
-            var context:Context? = null
-
-            val curClassElem:LuaClassElement?
-
-            if (local != null) {
-                context = local.first
-                idx = local.second
-
-                context.removeLocalNamed(name)
-
-                val nameDefEle:LuaNameDefElement = context.getChildAt(idx) as LuaNameDefElement
-
-                curClassElem = LuaClassElement(nameDefEle.nameDef)
-            } else {
-                curClassElem = LuaClassElement(namePart as LuaPsiElement)
-            }
-
-            curClassInfo = ClassInfo(curClassElem)
-
-            if (idx != null) {
-                context?.setChildAt(idx, curClassElem)
-            } else {
-                getCurContext().addClass(curClassInfo)
-            }
-        }
-
-        while (namePart.parent != owner) {
+        while (namePart != secondToLast) {
             namePart = namePart.parent as LuaExpr
-            val name = namePart.lastChild.text
-
-            var childClassInfo = curClassInfo!![name]
-
-            if (childClassInfo == null) {
-                val curClassElem = LuaClassElement(namePart as LuaPsiElement)
-
-                childClassInfo = ClassInfo(curClassElem, curClassElem.className)
-
-                curClassInfo[curClassElem.className] = childClassInfo
-            }
-
-            curClassInfo = childClassInfo
+            result.add(namePart)
         }
 
-        return curClassInfo!!
+        return result
     }
 
-    override fun visitClassMethodDef(o: LuaClassMethodDef) {
-        val classStruct = handleCompoundName(o.classMethodName)
+    private fun handleCompoundName(owner:LuaPsiElement, parent:LuaTreeElement?=null):LuaTreeElement {
+        val nameParts = getNamePartsFromCompoundName(owner)
 
-        val elem = LuaFuncElement(o)
+        var element:LuaTreeElement? = null
 
-        classStruct.addMethod(elem)
+        nameParts.forEach{namePart ->
+            var child:LuaTreeElement?
+            if (element == null) {
+                child = findElementNamed(namePart.name!!)
+
+                if (child == null) {
+                    child = if (parent == null) {
+                                LuaGlobalVarElement(namePart)
+                            } else {
+                                LuaLocalVarElement(namePart)
+                            }
+
+                    addChild(child)
+                }
+            } else {
+                child = element!!.childNamed(namePart.name!!)
+
+                if (child == null) {
+                    child = LuaLocalVarElement(namePart)
+
+                    element!!.addChild(child)
+                }
+            }
+
+            element = child
+        }
+
+        return element!!
+    }
+
+    override fun visitClassMethodDef(o:LuaClassMethodDef) {
+        val treeElem = handleCompoundName(o.classMethodName/*, current?.element*/)
+
+        val elem = LuaClassMethodElement(o)
+
+        treeElem.addChild(elem)
 
         val funcBody = o.funcBody
         if (funcBody != null) {
@@ -360,30 +318,30 @@ class LuaStructureVisitor : LuaVisitor() {
             popContext()
         }
     }
-//
-//    private fun compressChild(element:TreeElement) {
-//        if (element !is ClassTreeElement) {
-//            return
-//        }
-//
-//        if (element.children.size == 1) {
-//            if (element.children[0] is ClassTreeElement) {
-//                val child = element.children[0] as ClassTreeElement
-//
-//                element.name += "." + child.name
-//
-//                element.getChildList().clear()
-//
-//                child.children.forEach{childElem -> element.addChild(childElem)}
-//
-//                compressChild(element)
-//            }
-//        } else {
-//            element.children.forEach{childElem -> compressChild(childElem)}
-//        }
-//    }
-//
-//    fun compressChildren() {
-//        children.forEach{elem -> compressChild(elem)}
-//    }
+
+    private fun compressChild(element:TreeElement) {
+        if (element !is LuaVarElement) {
+            return
+        }
+
+        if (element.children.size == 1) {
+            if (element.children[0] is LuaVarElement) {
+                val child = element.children[0] as LuaTreeElement
+
+                element.name += "." + child.name
+
+                element.clearChildren()
+
+                child.children.forEach{childElem -> element.addChild(childElem as LuaTreeElement)}
+
+                compressChild(element)
+            }
+        } else {
+            element.children.forEach{childElem -> compressChild(childElem)}
+        }
+    }
+
+    fun compressChildren() {
+        current?.children?.values?.forEach{element -> compressChild(element)}
+    }
 }

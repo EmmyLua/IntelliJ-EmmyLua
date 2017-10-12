@@ -1,4 +1,4 @@
----@class Emmy
+---@class Emmy2
 local e = { name = 'Emmy', age = 7, doit = function () end }
 
 -- This should create a local variable
@@ -43,7 +43,7 @@ local function localFunc2()
     })
 end
 
--- new class
+-- new local
 local d = {
     -- with new functions
     foo = function () end,
@@ -53,14 +53,26 @@ local d = {
 -- local var
 local g = {}
 
--- new class A.B.C w/ function doit()
+-- new non-class A.B.C w/ function doit()
 function A.B.C.doit() end
 
 -- add doitItAgain() to A.B.C
 A.B.C.doitAgain = function () end
 
--- look, mom.  Fields.
+-- look, mom.  non-fields (in non-classes).
 A.B.C.var = 3
 
 globalVar = 3
 globalFunc2 = function () end
+
+globalTable = {
+    a = function () end
+}
+
+---@class GlobalClass2
+globalC2 = {}
+
+-- Assignment test
+local xyz
+
+xyz = 3
