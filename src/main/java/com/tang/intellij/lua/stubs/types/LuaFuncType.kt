@@ -21,7 +21,9 @@ import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaFuncDef
+import com.tang.intellij.lua.psi.forwardDeclaration
 import com.tang.intellij.lua.psi.impl.LuaFuncDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncStub
@@ -29,6 +31,7 @@ import com.tang.intellij.lua.stubs.LuaFuncStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
@@ -45,13 +48,12 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
     override fun createStub(funcDef: LuaFuncDef, stubElement: StubElement<*>): LuaFuncStub {
         val nameRef = funcDef.nameIdentifier!!
         val searchContext = SearchContext(funcDef.project).setCurrentStubFile(funcDef.containingFile)
-        val returnTypeSet = funcDef.guessReturnTypeSet(searchContext)
-        val params = funcDef.params
+        val ty = funcDef.asTy(searchContext)
         var moduleName = Constants.WORD_G
         val file = funcDef.containingFile
         if (file is LuaFile) moduleName = file.moduleName ?: Constants.WORD_G
 
-        return LuaFuncStubImpl(nameRef.text, moduleName, params, returnTypeSet, stubElement)
+        return LuaFuncStubImpl(nameRef.text, moduleName, ty, stubElement)
     }
 
     override fun getExternalId() = "lua.global_func_def"
@@ -68,34 +70,17 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
     override fun serialize(luaGlobalFuncStub: LuaFuncStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaGlobalFuncStub.name)
         stubOutputStream.writeName(luaGlobalFuncStub.module)
-
-        // params
-        val params = luaGlobalFuncStub.params
-        stubOutputStream.writeByte(params.size)
-        for (param in params) {
-            LuaParamInfo.serialize(param, stubOutputStream)
-        }
-
-        Ty.serialize(luaGlobalFuncStub.returnTypeSet, stubOutputStream)
+        Ty.serialize(luaGlobalFuncStub.ty, stubOutputStream)
     }
 
     @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaFuncStub {
         val name = stubInputStream.readName()
         val module = stubInputStream.readName()
-
-        // params
-        val len = stubInputStream.readByte().toInt()
-        val params = mutableListOf<LuaParamInfo>()
-        for (i in 0 until len) {
-            params.add(LuaParamInfo.deserialize(stubInputStream))
-        }
-
-        val returnTypeSet = Ty.deserialize(stubInputStream)
+        val ty = Ty.deserialize(stubInputStream) as ITyFunction
         return LuaFuncStubImpl(StringRef.toString(name)!!,
                 StringRef.toString(module)!!,
-                params.toTypedArray(),
-                returnTypeSet,
+                ty,
                 stubElement)
     }
 

@@ -20,9 +20,8 @@ import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaElementType
-import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.Visibility
-import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyFunction
 
 /**
  * class method static/instance
@@ -39,8 +38,7 @@ interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClass
 
 class LuaClassMethodStubImpl(override val name: String,
                              override val className: String,
-                             override val params: Array<LuaParamInfo>,
-                             override val returnTypeSet: ITy,
+                             override val ty: ITyFunction,
                              override val isStatic: Boolean,
                              override val visibility: Visibility,
                              parent: StubElement<*>)

@@ -21,7 +21,6 @@ import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
@@ -30,6 +29,7 @@ import com.tang.intellij.lua.stubs.LuaClassMethodStub
 import com.tang.intellij.lua.stubs.LuaClassMethodStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnion
 import java.io.IOException
@@ -56,13 +56,12 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         if (type != null)
             clazzName = type.className
 
-        val returnTypeSet = methodDef.guessReturnTypeSet(searchContext)
-        val params = methodDef.params
+        val ty = methodDef.asTy(searchContext)
 
         val isStatic = methodName.dot != null
         val visibility = methodDef.visibility
 
-        return LuaClassMethodStubImpl(id.text, clazzName, params, returnTypeSet, isStatic, visibility, stubElement)
+        return LuaClassMethodStubImpl(id.text, clazzName, ty, isStatic, visibility, stubElement)
     }
 
     override fun getExternalId() = "lua.class_method"
@@ -78,16 +77,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         stubOutputStream.writeName(luaClassMethodStub.className)
         stubOutputStream.writeName(luaClassMethodStub.name)
 
-        // params
-        val params = luaClassMethodStub.params
-        stubOutputStream.writeByte(params.size)
-        for (param in params) {
-            LuaParamInfo.serialize(param, stubOutputStream)
-        }
-
-        //return type set
-        val returnTypeSet = luaClassMethodStub.returnTypeSet
-        Ty.serialize(returnTypeSet, stubOutputStream)
+        Ty.serialize(luaClassMethodStub.ty, stubOutputStream)
 
         // is static ?
         stubOutputStream.writeBoolean(luaClassMethodStub.isStatic)
@@ -99,21 +89,12 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaClassMethodStub {
         val className = stubInputStream.readName()
         val shortName = stubInputStream.readName()
-
-        // params
-        val len = stubInputStream.readByte().toInt()
-        val params = mutableListOf<LuaParamInfo>()
-        for (i in 0 until len) {
-            params.add(LuaParamInfo.deserialize(stubInputStream))
-        }
-
-        val returnTypeSet = Ty.deserialize(stubInputStream)
+        val ty = Ty.deserialize(stubInputStream) as ITyFunction
         val isStatic = stubInputStream.readBoolean()
         val visibility = stubInputStream.readByte()
         return LuaClassMethodStubImpl(StringRef.toString(shortName)!!,
                 StringRef.toString(className)!!,
-                params.toTypedArray(),
-                returnTypeSet,
+                ty,
                 isStatic,
                 Visibility.get(visibility.toInt()),
                 stubElement)
