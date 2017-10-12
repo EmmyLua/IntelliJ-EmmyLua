@@ -39,7 +39,7 @@ internal fun StringBuilder.appendClassLink(clazz: String) {
 internal fun renderTy(sb: StringBuilder, ty: ITy) {
     when (ty) {
         is ITyClass -> {
-            sb.appendClassLink(ty.className)
+            sb.appendClassLink(ty.displayName)
         }
         is ITyFunction -> {
             sb.append("fun")
@@ -122,7 +122,7 @@ internal fun renderComment(sb: StringBuilder, comment: LuaComment?) {
 internal fun renderClassDef(sb: StringBuilder, def: LuaDocClassDef) {
     val cls = def.type
     sb.append("class ")
-    sb.wrapTag("b") { sb.appendClassLink(cls.className) }
+    sb.wrapTag("b") { sb.appendClassLink(cls.displayName) }
     val superClassName = cls.superClassName
     if (superClassName != null) {
         sb.append(" : ")
