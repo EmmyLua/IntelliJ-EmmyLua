@@ -16,28 +16,7 @@
 
 package com.tang.intellij.lua.editor.structure
 
-import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaPsiElement
-import java.util.ArrayList
 
-class ClassTreeElement(indexExpr: LuaPsiElement) : LuaTreeElement<LuaPsiElement>(indexExpr, LuaIcons.CLASS) {
-    val children = ArrayList<TreeElement>()
-    var name = element.name
-
-    override fun getPresentableText(): String? {
-        return name
-    }
-
-    fun addChild(child: TreeElement) {
-        children.add(child)
-    }
-
-    override fun getChildren(): Array<TreeElement> {
-        return children.toTypedArray()
-    }
-
-    fun getChildList(): ArrayList<TreeElement> {
-        return children
-    }
-}
+class LuaLocalVarElement constructor(target:LuaPsiElement, name:String?=null) : LuaVarElement(target, name ?: target.name!!, LuaIcons.LOCAL_VAR)

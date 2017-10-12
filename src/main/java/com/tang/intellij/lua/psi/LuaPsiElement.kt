@@ -23,7 +23,7 @@ import com.intellij.psi.PsiElement
  * LuaPsiElement
  * Created by TangZX on 2016/11/22.
  */
-interface LuaPsiElement : PsiElement, NavigatablePsiElement
+interface LuaPsiElement : NavigatablePsiElement
 
 val LuaPsiElement.moduleName: String? get() {
     val file = containingFile

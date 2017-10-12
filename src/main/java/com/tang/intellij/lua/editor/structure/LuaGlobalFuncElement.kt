@@ -16,17 +16,10 @@
 
 package com.tang.intellij.lua.editor.structure
 
-import com.intellij.icons.AllIcons
-import com.tang.intellij.lua.psi.LuaAssignStat
+import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaFuncDef
+import com.tang.intellij.lua.psi.LuaPsiElement
 
-/**
-
- * Created by TangZX on 2016/12/28.
- */
-class LuaAssignElement internal constructor(target: LuaAssignStat) :
-        LuaTreeElement<LuaAssignStat>(target, AllIcons.Nodes.ClassInitializer) {
-
-    override fun getPresentableText(): String {
-        return element.varExprList.text + " = ..."
-    }
+class LuaGlobalFuncElement constructor(target: LuaPsiElement, name:String, paramSignature:String) : LuaFuncElement(target, name, paramSignature, LuaIcons.GLOBAL_FUNCTION) {
+    constructor(target:LuaFuncDef) : this(target, target.name!!, target.paramSignature)
 }

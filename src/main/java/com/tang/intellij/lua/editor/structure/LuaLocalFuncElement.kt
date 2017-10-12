@@ -18,16 +18,8 @@ package com.tang.intellij.lua.editor.structure
 
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaLocalFuncDef
+import com.tang.intellij.lua.psi.LuaPsiElement
 
-/**
-
- * Created by tangzx on 2017/3/14.
- */
-class LuaLocalFuncElement internal constructor(target: LuaLocalFuncDef) : LuaTreeElement<LuaLocalFuncDef>(target, LuaIcons.LOCAL_FUNCTION) {
-
-    private val name: String = element.name + element.paramSignature
-
-    override fun getPresentableText(): String {
-        return name
-    }
+class LuaLocalFuncElement constructor(target:LuaPsiElement, name:String, paramSignature:String) : LuaFuncElement(target, name, paramSignature, LuaIcons.LOCAL_FUNCTION) {
+    internal constructor(target:LuaLocalFuncDef) : this(target, target.name!!, target.paramSignature)
 }
