@@ -22,10 +22,4 @@ import com.tang.intellij.lua.lang.LuaIcons
 /**
  * Created by TangZX on 2016/12/13.
  */
-class LuaClassElement internal constructor(docClassDef:LuaPsiElement, className:String?=null) : LuaTreeElement(docClassDef, LuaIcons.CLASS) {
-    val className:String = className ?: element.name!!
-
-    override fun getPresentableText(): String {
-        return className
-    }
-}
+class LuaClassElement internal constructor(docClassDef:LuaPsiElement, className:String?=null) : LuaVarElement(docClassDef, className ?: docClassDef.name!!, LuaIcons.CLASS)

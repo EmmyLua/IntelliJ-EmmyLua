@@ -23,15 +23,13 @@ import com.tang.intellij.lua.psi.*
 /**
  * Created by TangZX on 2016/12/13.
  */
-class LuaFileElement(private val file:LuaFile) : LuaTreeElement(file, LuaIcons.FILE) {
-    override fun getPresentableText(): String? {
-        return file.name
-    }
-
+class LuaFileElement(private val file:LuaFile) : LuaTreeElement(file, file.name, LuaIcons.FILE) {
     override fun getChildren(): Array<TreeElement> {
         val visitor = LuaStructureVisitor()
 
         file.acceptChildren(visitor)
+
+        visitor.compressChildren()
 
         return visitor.getChildren()
     }

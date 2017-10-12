@@ -16,16 +16,11 @@
 
 package com.tang.intellij.lua.editor.structure
 
+import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaPsiElement
-import javax.swing.Icon
 
-/**
- * Created by TangZX on 2016/12/13.
- */
-abstract class LuaFuncElement constructor(target:LuaPsiElement, name:String, paramSignature:String, icon:Icon) : LuaTreeElement(target, name, icon) {
-    private var text:String = name + paramSignature
-
-    override fun getPresentableText(): String {
-        return text
-    }
+class LuaClassMethodElement constructor(target:LuaPsiElement, name:String, paramSignature:String) : LuaFuncElement(target, name, paramSignature, LuaIcons.CLASS_METHOD) {
+    internal constructor(target: LuaClassMethodDef) : this(target, target.name!!, target.paramSignature)
 }
+

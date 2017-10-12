@@ -25,10 +25,13 @@ import javax.swing.Icon
 /**
  * Created by TangZX on 2016/12/28.
  */
-abstract class LuaTreeElement internal constructor(protected var element: NavigationItem, private val icon: Icon) : StructureViewTreeElement {
+open class LuaTreeElement internal constructor(val element:NavigationItem, var name:String, val icon:Icon) : StructureViewTreeElement {
+    var parent:LuaTreeElement? = null
+    private val children = LinkedHashMap<String, LuaTreeElement>()
 
-    abstract fun getPresentableText(): String?
-    private val children = ArrayList<LuaTreeElement>()
+    open fun getPresentableText():String? {
+        return name
+    }
 
     override fun getValue(): Any {
         return element
@@ -36,37 +39,46 @@ abstract class LuaTreeElement internal constructor(protected var element: Naviga
 
     override fun getPresentation(): ItemPresentation {
         return object : ItemPresentation {
-            override fun getPresentableText(): String? {
+            override fun getPresentableText():String? {
                 return this@LuaTreeElement.getPresentableText()
             }
 
-            override fun getLocationString(): String? {
+            override fun getLocationString():String? {
                 return null
             }
 
-            override fun getIcon(b: Boolean): Icon? {
+            override fun getIcon(b: Boolean):Icon? {
                 return this@LuaTreeElement.icon
             }
         }
     }
 
-    override fun getChildren(): Array<TreeElement> {
-        return children.toTypedArray()
+    override fun getChildren():Array<TreeElement> {
+        return children.values.toTypedArray()
     }
 
-    fun addChild(child:LuaTreeElement) {
-        children.add(child)
+    fun addChild(child:LuaTreeElement, name:String?=null) {
+        children[name ?: child.name] = child
+        child.parent = this
     }
 
-    override fun navigate(b: Boolean) {
+    fun clearChildren() {
+        children.clear()
+    }
+
+    fun childNamed(name:String):LuaTreeElement? {
+        return children[name]
+    }
+
+    override fun navigate(b:Boolean) {
         element.navigate(b)
     }
 
-    override fun canNavigate(): Boolean {
+    override fun canNavigate():Boolean {
         return element.canNavigate()
     }
 
-    override fun canNavigateToSource(): Boolean {
+    override fun canNavigateToSource():Boolean {
         return element.canNavigateToSource()
     }
 }
