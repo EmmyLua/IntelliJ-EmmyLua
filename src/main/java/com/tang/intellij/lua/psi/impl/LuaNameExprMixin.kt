@@ -29,6 +29,7 @@ import com.tang.intellij.lua.stubs.LuaNameStub
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TySerializedClass
 
 /**
 
@@ -73,6 +74,12 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
     private fun getType(context: SearchContext, def: PsiElement): ITy {
         when (def) {
             is LuaNameExpr -> {
+                //todo stub.module -> ty
+                val stub = def.stub
+                stub?.module?.let {
+                    return TySerializedClass(it)
+                }
+
                 var type: ITy = Ty.UNKNOWN
                 val p1 = def.parent // should be VAR_LIST
                 val p2 = p1.parent // should be ASSIGN_STAT
