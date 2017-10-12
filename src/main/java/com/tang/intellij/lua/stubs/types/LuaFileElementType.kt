@@ -36,7 +36,7 @@ import java.io.IOException
 
  * Created by tangzx on 2016/11/27.
  */
-class LuaFileType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
+class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
 
     // debug performance
     /*override fun parseContents(chameleon: ASTNode): ASTNode? {

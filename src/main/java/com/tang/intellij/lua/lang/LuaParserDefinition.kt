@@ -36,7 +36,7 @@ import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.LuaFile
 import com.tang.intellij.lua.psi.LuaTokenType
 import com.tang.intellij.lua.psi.LuaTypes
-import com.tang.intellij.lua.stubs.types.LuaFileType
+import com.tang.intellij.lua.stubs.types.LuaFileElementType
 
 /**
  * Created by TangZhiXu on 2015/11/15.
@@ -91,7 +91,7 @@ class LuaParserDefinition : ParserDefinition {
         val COMMENTS = TokenSet.create(LuaTypes.SHORT_COMMENT, LuaTypes.BLOCK_COMMENT, LuaTypes.DOC_COMMENT, LuaTypes.REGION, LuaTypes.ENDREGION)
         val STRINGS = TokenSet.create(LuaTypes.STRING)
 
-        val FILE = LuaFileType()
+        val FILE = LuaFileElementType()
     }
 }
 
