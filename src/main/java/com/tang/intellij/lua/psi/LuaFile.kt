@@ -44,8 +44,8 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
 
     val moduleName: String?
         get() {
-            val greenStub = greenStub as? LuaFileStub
-            return greenStub?.module ?: findModuleName()
+            val stub = stub as? LuaFileStub
+            return if (stub != null) stub.module else findModuleName()
         }
 
     fun findModuleName():String? {
