@@ -40,10 +40,10 @@ class LuaFileStub : PsiFileStubImpl<LuaFile> {
         moduleName = file.findModuleName()
     }
 
-    constructor(file: LuaFile?, module:String?, typeSet: ITy) : super(file) {
+    constructor(file: LuaFile?, module:String?, type: ITy) : super(file) {
         this.file = file
         moduleName = module
-        retTypeRef = Ref.create(typeSet)
+        retTypeRef = Ref.create(type)
     }
 
     val module: String? get() {

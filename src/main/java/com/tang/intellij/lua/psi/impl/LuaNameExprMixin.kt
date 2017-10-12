@@ -52,41 +52,41 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
 
     override fun guessType(context: SearchContext): ITy {
         val set = RecursionManager.doPreventingRecursion(this, true) {
-            var typeSet:ITy = Ty.UNKNOWN
+            var type:ITy = Ty.UNKNOWN
             val nameExpr = this as LuaNameExpr
 
             val multiResolve = multiResolve(nameExpr, context)
             multiResolve.forEach {
-                val set = getTypeSet(context, it)
-                typeSet = typeSet.union(set)
+                val set = getType(context, it)
+                type = type.union(set)
             }
 
-            if (Ty.isInvalid(typeSet)) {
-                typeSet = typeSet.union(getTypeSet(context, nameExpr))
+            if (Ty.isInvalid(type)) {
+                type = type.union(getType(context, nameExpr))
             }
 
-            typeSet
+            type
         }
         return set ?: Ty.UNKNOWN
     }
 
-    private fun getTypeSet(context: SearchContext, def: PsiElement): ITy {
+    private fun getType(context: SearchContext, def: PsiElement): ITy {
         when (def) {
             is LuaNameExpr -> {
-                var typeSet: ITy = Ty.UNKNOWN
+                var type: ITy = Ty.UNKNOWN
                 val p1 = def.parent // should be VAR_LIST
                 val p2 = p1.parent // should be ASSIGN_STAT
                 if (p2 is LuaAssignStat) {
                     val comment = p2.comment
                     //guess from comment
                     if (comment != null)
-                        typeSet = comment.guessType(context)
+                        type = comment.guessType(context)
                     //guess from value expr
-                    if (Ty.isInvalid(typeSet)) {
+                    if (Ty.isInvalid(type)) {
                         val exprList = p2.valueExprList
                         if (exprList != null) {
                             context.index = p2.getIndexFor(def)
-                            typeSet = exprList.guessTypeAt(context)
+                            type = exprList.guessTypeAt(context)
                         }
                     }
                 }
@@ -94,9 +94,9 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
                 //Global
                 if (isGlobal(def)) {
                     //use globalClassTy to store class members, that's very important
-                    typeSet = typeSet.union(TyClass.createGlobalType(def))
+                    type = type.union(TyClass.createGlobalType(def))
                 }
-                return typeSet
+                return type
             }
             is LuaTypeGuessable -> return def.guessTypeFromCache(context)
             else -> return Ty.UNKNOWN

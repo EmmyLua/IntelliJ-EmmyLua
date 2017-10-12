@@ -71,8 +71,8 @@ class LuaFileType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
     @Throws(IOException::class)
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaFileStub {
         val moduleRef = dataStream.readName()
-        val typeSet = Ty.deserialize(dataStream)
-        return LuaFileStub(null, StringRef.toString(moduleRef), typeSet)
+        val type = Ty.deserialize(dataStream)
+        return LuaFileStub(null, StringRef.toString(moduleRef), type)
     }
 
     override fun getExternalId() = "lua.file"

@@ -51,8 +51,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         var clazzName = expr.text
         val searchContext = SearchContext(methodDef.project).setCurrentStubFile(methodDef.containingFile)
 
-        val typeSet = expr.guessTypeFromCache(searchContext)
-        val type = TyUnion.getPerfectClass(typeSet)
+        val type = TyUnion.getPerfectClass(expr.guessTypeFromCache(searchContext))
         if (type != null)
             clazzName = type.className
 

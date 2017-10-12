@@ -92,7 +92,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         else if (psi is LuaFuncBodyOwner) {
             val paren = psi.funcBody?.rparen
             if (FUNCTION_HINT.get() && paren != null) {
-                val type = psi.guessReturnTypeSet(SearchContext(psi.project))
+                val type = psi.guessReturnType(SearchContext(psi.project))
                 if (!Ty.isInvalid(type)) {
                     return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", paren.textOffset + paren.textLength))
                 }

@@ -184,11 +184,11 @@ fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
 }
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
-    val typeSet = indexExpr.guessParentType(context)
+    val type = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
-    TyUnion.process(typeSet) { type ->
-        if (type is TyClass) {
-            ret = type.findMember(idString, context)
+    TyUnion.process(type) { ty ->
+        if (ty is TyClass) {
+            ret = ty.findMember(idString, context)
             if (ret != null)
                 return@process false
         }
@@ -198,38 +198,38 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
 }
 
 internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
-    var typeSet: ITy? = null
+    var type: ITy? = null
     //作为函数参数，类型在函数注释里找
     if (nameDef is LuaParamNameDef) {
-        typeSet = resolveParamType(nameDef, context)
+        type = resolveParamType(nameDef, context)
     } else if (nameDef.parent is LuaTableField) {
         val field = nameDef.parent as LuaTableField
         val expr = PsiTreeUtil.findChildOfType(field, LuaExpr::class.java)
-        if (expr != null) typeSet = expr.guessTypeFromCache(context)
+        if (expr != null) type = expr.guessTypeFromCache(context)
     } else {
         val localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef::class.java)
         if (localDef != null) {
             val comment = localDef.comment
             if (comment != null) {
-                typeSet = comment.guessType(context)
+                type = comment.guessType(context)
             }
 
             //计算 expr 返回类型
-            if (Ty.isInvalid(typeSet)) {
+            if (Ty.isInvalid(type)) {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
                     context.index = localDef.getIndexFor(nameDef)
-                    typeSet = exprList.guessTypeAt(context)
+                    type = exprList.guessTypeAt(context)
                 }
             }
 
             //anonymous
-            if (Ty.isInvalid(typeSet))
-                typeSet = TyClass.createAnonymousType(nameDef)
+            if (Ty.isInvalid(type))
+                type = TyClass.createAnonymousType(nameDef)
         }
     }
-    return typeSet ?: Ty.UNKNOWN
+    return type ?: Ty.UNKNOWN
 }
 
 /**
@@ -238,7 +238,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
  * *
  * @param context SearchContext
  * *
- * @return LuaTypeSet
+ * @return LuaType
  */
 private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
     val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)

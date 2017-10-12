@@ -158,7 +158,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
         if (Ty.isInvalid(ret)) {
             val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
             if (bodyOwner != null)
-                ret = bodyOwner.guessReturnTypeSet(context)
+                ret = bodyOwner.guessReturnType(context)
         }
 
         // xxx.new()

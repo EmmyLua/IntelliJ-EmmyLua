@@ -155,11 +155,11 @@ internal fun renderCommentString(prefix: String?, postfix: String?, sb: StringBu
     }
 }
 
-internal fun renderTypeUnion(prefix: String?, postfix: String?, sb: StringBuilder, typeSet: LuaDocTy?) {
-    if (typeSet != null) {
+internal fun renderTypeUnion(prefix: String?, postfix: String?, sb: StringBuilder, type: LuaDocTy?) {
+    if (type != null) {
         if (prefix != null) sb.append(prefix)
 
-        val ty = typeSet.getType()
+        val ty = type.getType()
         renderTy(sb, ty)
 
         if (postfix != null) sb.append(postfix)

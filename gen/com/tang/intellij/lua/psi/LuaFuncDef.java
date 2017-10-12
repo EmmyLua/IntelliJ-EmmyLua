@@ -42,7 +42,7 @@ public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement
   int getTextOffset();
 
   @NotNull
-  ITy guessReturnTypeSet(SearchContext searchContext);
+  ITy guessReturnType(SearchContext searchContext);
 
   @NotNull
   ITyClass guessParentType(SearchContext searchContext);

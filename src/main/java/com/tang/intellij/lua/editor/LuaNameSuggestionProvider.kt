@@ -63,12 +63,12 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
     override fun getSuggestedNames(psiElement: PsiElement, nameSuggestionContext: PsiElement?, set: MutableSet<String>): SuggestedNameInfo? {
         if (psiElement is LuaTypeGuessable) {
             val context = SearchContext(psiElement.getProject())
-            val typeSet = psiElement.guessTypeFromCache(context)
-            if (!Ty.isInvalid(typeSet)) {
+            val type = psiElement.guessTypeFromCache(context)
+            if (!Ty.isInvalid(type)) {
                 val names = HashSet<String>()
 
-                TyUnion.each(typeSet) { type ->
-                    collectNames(type, context) { name, suffix, preferLonger ->
+                TyUnion.each(type) { ty ->
+                    collectNames(ty, context) { name, suffix, preferLonger ->
                         if (names.add(name)) {
                             val strings = NameUtil.getSuggestionsByName(name, "", suffix, false, preferLonger, false)
                             set.addAll(strings)

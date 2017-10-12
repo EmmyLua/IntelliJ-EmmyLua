@@ -197,7 +197,7 @@ fun guessParentType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass
  * 猜出前面的类型
  * @param callExpr call expr
  * *
- * @return LuaTypeSet
+ * @return LuaType
  */
 fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
     val prefix = callExpr.firstChild as LuaExpr
@@ -389,7 +389,7 @@ fun getParamNameDefList(forAStat: LuaForAStat): List<LuaParamNameDef> {
     return list
 }
 
-fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
+fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
@@ -397,12 +397,12 @@ fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): I
         }
     }
 
-    return guessReturnTypeSetInner(owner, searchContext)
+    return guessReturnTypeInner(owner, searchContext)
 }
 
 private val FUNCTION_RETURN_TYPESET = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.function.return_typeset")
 
-private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
+private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
     if (owner is LuaCommentOwner) {
         val comment = LuaCommentUtil.findComment(owner)
         if (comment != null) {
@@ -415,11 +415,11 @@ private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: Sear
 
     //infer from return stat
     return CachedValuesManager.getManager(owner.project).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, { ctx ->
-        var typeSet: ITy = Ty.UNKNOWN
+        var type: ITy = Ty.UNKNOWN
         owner.acceptChildren(object : LuaVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
-                val guessReturnTypeSet = guessReturnTypeSet(o, ctx.index, ctx)
-                TyUnion.each(guessReturnTypeSet) {
+                val guessReturnType = guessReturnType(o, ctx.index, ctx)
+                TyUnion.each(guessReturnType) {
                     /**
                      * 注意，不能排除anonymous
                      * local function test()
@@ -432,7 +432,7 @@ private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: Sear
                      *
                      * type of r is an anonymous ty
                      */
-                    typeSet = typeSet.union(it)
+                    type = type.union(it)
                 }
             }
 
@@ -448,7 +448,7 @@ private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: Sear
                 o.acceptChildren(this)
             }
         })
-        CachedValueProvider.Result.create(typeSet, owner)
+        CachedValueProvider.Result.create(type, owner)
     }, false, searchContext)
 }
 
@@ -655,7 +655,7 @@ fun getTypeName(stat: LuaAssignStat, index: Int): String? {
     return typeName
 }
 
-fun guessReturnTypeSet(returnStat: LuaReturnStat?, index: Int, context: SearchContext): ITy {
+fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchContext): ITy {
     if (returnStat != null) {
         val returnExpr = returnStat.exprList
         if (returnExpr != null) {

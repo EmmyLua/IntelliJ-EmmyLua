@@ -75,13 +75,13 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocClassFieldStub {
         val name = stubInputStream.readName()
         val className = stubInputStream.readName()
-        val typeSet = Ty.deserialize(stubInputStream)
+        val type = Ty.deserialize(stubInputStream)
         val visibility = stubInputStream.readByte()
         return LuaDocClassFieldStubImpl(stubElement,
                 StringRef.toString(name)!!,
                 StringRef.toString(className)!!,
                 Visibility.get(visibility.toInt()),
-                typeSet)
+                type)
     }
 
     override fun indexStub(luaFieldStub: LuaDocClassFieldStub, indexSink: IndexSink) {

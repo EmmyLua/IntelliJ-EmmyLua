@@ -189,7 +189,7 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
     }
 
     override val mainSignature: IFunSignature by lazy {
-        FunSignature(selfCall, psi.guessReturnTypeSet(searchContext), psi.params)
+        FunSignature(selfCall, psi.guessReturnType(searchContext), psi.params)
     }
 
     override val signatures: Array<IFunSignature> by lazy {

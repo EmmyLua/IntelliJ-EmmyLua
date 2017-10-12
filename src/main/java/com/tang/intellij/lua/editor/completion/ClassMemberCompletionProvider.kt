@@ -58,9 +58,9 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
             val project = indexExpr.project
             val searchContext = SearchContext(project)
             val contextTy = LuaPsiTreeUtil.findContextClass(indexExpr)
-            val prefixTypeSet = indexExpr.guessParentType(searchContext)
-            if (!Ty.isInvalid(prefixTypeSet)) {
-                complete(isColon, project, contextTy, prefixTypeSet, completionResultSet, completionResultSet.prefixMatcher, null)
+            val prefixType = indexExpr.guessParentType(searchContext)
+            if (!Ty.isInvalid(prefixType)) {
+                complete(isColon, project, contextTy, prefixType, completionResultSet, completionResultSet.prefixMatcher, null)
             }
             //smart
             val nameExpr = PsiTreeUtil.getChildOfType(indexExpr, LuaNameExpr::class.java)
@@ -71,11 +71,11 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                 LuaPsiTreeUtil.walkUpLocalNameDef(indexExpr, {
                     val txt = it.text
                     if (nameText != txt && matcher.prefixMatches(txt)) {
-                        val typeSet = it.guessTypeFromCache(searchContext)
-                        if (!Ty.isInvalid(prefixTypeSet)) {
+                        val type = it.guessTypeFromCache(searchContext)
+                        if (!Ty.isInvalid(prefixType)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)
-                            complete(isColon, project, contextTy, typeSet, resultSet, prefixMatcher, object : HandlerProcessor() {
+                            complete(isColon, project, contextTy, type, resultSet, prefixMatcher, object : HandlerProcessor() {
                                 override fun process(element: LuaLookupElement) {
                                     element.itemText = txt + colon + element.itemText
                                     element.handler = InsertHandlerWrapper(nameExpr.textLength + 1, txt, element.handler)
@@ -92,11 +92,11 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
     private fun complete(isColon: Boolean,
                          project: Project,
                          contextTy: ITy,
-                         prefixTypeSet: ITy,
+                         prefixType: ITy,
                          completionResultSet: CompletionResultSet,
                          prefixMatcher: PrefixMatcher,
                          handlerProcessor: HandlerProcessor?) {
-        TyUnion.each(prefixTypeSet) { luaType ->
+        TyUnion.each(prefixType) { luaType ->
             if (luaType is ITyClass)
                 addClass(contextTy, luaType, project, isColon, completionResultSet, prefixMatcher, handlerProcessor)
         }

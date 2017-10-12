@@ -43,7 +43,7 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   int getTextOffset();
 
   @NotNull
-  ITy guessReturnTypeSet(SearchContext searchContext);
+  ITy guessReturnType(SearchContext searchContext);
 
   @NotNull
   LuaParamInfo[] getParams();

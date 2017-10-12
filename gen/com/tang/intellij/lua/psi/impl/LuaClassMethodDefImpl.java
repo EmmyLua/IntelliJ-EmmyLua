@@ -98,8 +98,8 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
   }
 
   @NotNull
-  public ITy guessReturnTypeSet(SearchContext searchContext) {
-    return LuaPsiImplUtilKt.guessReturnTypeSet(this, searchContext);
+  public ITy guessReturnType(SearchContext searchContext) {
+    return LuaPsiImplUtilKt.guessReturnType(this, searchContext);
   }
 
   @NotNull

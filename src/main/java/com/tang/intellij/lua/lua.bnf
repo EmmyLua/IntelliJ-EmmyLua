@@ -241,7 +241,7 @@ funcDef ::= 'function' ID funcBody {
         getName
         getTextOffset
         toString
-        guessReturnTypeSet
+        guessReturnType
         guessParentType
         getVisibility
         getParams
@@ -278,7 +278,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         getName
         getTextOffset
         toString
-        guessReturnTypeSet
+        guessReturnType
         getParams
         isStatic
         getPresentation
@@ -301,7 +301,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         getName
         getTextOffset
         getUseScope
-        guessReturnTypeSet
+        guessReturnType
         getParams
     ]
 }
@@ -423,7 +423,7 @@ private funcCallExpr ::= callOrIndexExpr <<checkType 'CALL_EXPR'>>
 closureExpr ::= 'function' funcBody {
     pin = 2
     implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
-    methods = [getParamNameDefList guessReturnTypeSet getParams]
+    methods = [getParamNameDefList guessReturnType getParams]
 }
 
 funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
