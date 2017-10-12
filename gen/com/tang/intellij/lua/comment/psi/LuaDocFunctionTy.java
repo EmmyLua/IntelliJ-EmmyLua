@@ -12,7 +12,7 @@ public interface LuaDocFunctionTy extends LuaDocTy {
   List<LuaDocFunctionParam> getFunctionParamList();
 
   @Nullable
-  LuaDocTypeSet getTypeSet();
+  LuaDocTypeList getTypeList();
 
   @NotNull
   ITy getType();

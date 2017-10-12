@@ -28,8 +28,8 @@ public class LuaDocTypeListImpl extends ASTWrapperPsiElement implements LuaDocTy
 
   @Override
   @NotNull
-  public List<LuaDocTypeSet> getTypeSetList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTypeSet.class);
+  public List<LuaDocTy> getTyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTy.class);
   }
 
 }

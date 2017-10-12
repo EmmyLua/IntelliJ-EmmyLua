@@ -4,32 +4,33 @@ package com.tang.intellij.lua.comment.psi;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.PsiElement;
 import com.intellij.lang.ASTNode;
-import com.tang.intellij.lua.lang.LuaParserDefinition;
+import com.tang.intellij.lua.lang.LuaParserDefinitionKt;
 import com.tang.intellij.lua.comment.psi.impl.*;
 
 public interface LuaDocTypes {
 
-  IElementType ACCESS_MODIFIER = LuaParserDefinition.createDocType("ACCESS_MODIFIER");
-  IElementType ARR_TY = LuaParserDefinition.createDocType("ARR_TY");
-  IElementType CLASS_DEF = LuaParserDefinition.createDocType("CLASS_DEF");
-  IElementType CLASS_NAME_REF = LuaParserDefinition.createDocType("CLASS_NAME_REF");
-  IElementType COMMENT_STRING = LuaParserDefinition.createDocType("COMMENT_STRING");
-  IElementType FIELD_DEF = LuaParserDefinition.createDocType("FIELD_DEF");
-  IElementType FUNCTION_PARAM = LuaParserDefinition.createDocType("FUNCTION_PARAM");
-  IElementType FUNCTION_TY = LuaParserDefinition.createDocType("FUNCTION_TY");
-  IElementType GENERAL_TY = LuaParserDefinition.createDocType("GENERAL_TY");
-  IElementType GENERIC_TY = LuaParserDefinition.createDocType("GENERIC_TY");
-  IElementType LAN_DEF = LuaParserDefinition.createDocType("LAN_DEF");
-  IElementType OVERLOAD_DEF = LuaParserDefinition.createDocType("OVERLOAD_DEF");
-  IElementType PARAM_DEF = LuaParserDefinition.createDocType("PARAM_DEF");
-  IElementType PARAM_NAME_REF = LuaParserDefinition.createDocType("PARAM_NAME_REF");
-  IElementType RETURN_DEF = LuaParserDefinition.createDocType("RETURN_DEF");
-  IElementType TAG_DEF = LuaParserDefinition.createDocType("TAG_DEF");
-  IElementType TAG_VALUE = LuaParserDefinition.createDocType("TAG_VALUE");
-  IElementType TY = LuaParserDefinition.createDocType("TY");
-  IElementType TYPE_DEF = LuaParserDefinition.createDocType("TYPE_DEF");
-  IElementType TYPE_LIST = LuaParserDefinition.createDocType("TYPE_LIST");
-  IElementType TYPE_SET = LuaParserDefinition.createDocType("TYPE_SET");
+  IElementType ACCESS_MODIFIER = LuaParserDefinitionKt.createDocType("ACCESS_MODIFIER");
+  IElementType ARR_TY = LuaParserDefinitionKt.createDocType("ARR_TY");
+  IElementType CLASS_DEF = LuaParserDefinitionKt.createDocType("CLASS_DEF");
+  IElementType CLASS_NAME_REF = LuaParserDefinitionKt.createDocType("CLASS_NAME_REF");
+  IElementType COMMENT_STRING = LuaParserDefinitionKt.createDocType("COMMENT_STRING");
+  IElementType FIELD_DEF = LuaParserDefinitionKt.createDocType("FIELD_DEF");
+  IElementType FUNCTION_PARAM = LuaParserDefinitionKt.createDocType("FUNCTION_PARAM");
+  IElementType FUNCTION_TY = LuaParserDefinitionKt.createDocType("FUNCTION_TY");
+  IElementType GENERAL_TY = LuaParserDefinitionKt.createDocType("GENERAL_TY");
+  IElementType GENERIC_TY = LuaParserDefinitionKt.createDocType("GENERIC_TY");
+  IElementType LAN_DEF = LuaParserDefinitionKt.createDocType("LAN_DEF");
+  IElementType OVERLOAD_DEF = LuaParserDefinitionKt.createDocType("OVERLOAD_DEF");
+  IElementType PARAM_DEF = LuaParserDefinitionKt.createDocType("PARAM_DEF");
+  IElementType PARAM_NAME_REF = LuaParserDefinitionKt.createDocType("PARAM_NAME_REF");
+  IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
+  IElementType RETURN_DEF = LuaParserDefinitionKt.createDocType("RETURN_DEF");
+  IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
+  IElementType TAG_VALUE = LuaParserDefinitionKt.createDocType("TAG_VALUE");
+  IElementType TY = LuaParserDefinitionKt.createDocType("TY");
+  IElementType TYPE_DEF = LuaParserDefinitionKt.createDocType("TYPE_DEF");
+  IElementType TYPE_LIST = LuaParserDefinitionKt.createDocType("TYPE_LIST");
+  IElementType UNION_TY = LuaParserDefinitionKt.createDocType("UNION_TY");
 
   IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
@@ -49,6 +50,7 @@ public interface LuaDocTypes {
   IElementType OPTIONAL = new LuaDocTokenType("optional");
   IElementType OR = new LuaDocTokenType("|");
   IElementType OVERLOAD = new LuaDocTokenType("overload");
+  IElementType PRIVATE = new LuaDocTokenType("private");
   IElementType PROTECTED = new LuaDocTokenType("protected");
   IElementType PUBLIC = new LuaDocTokenType("public");
   IElementType RPAREN = new LuaDocTokenType(")");
@@ -105,6 +107,9 @@ public interface LuaDocTypes {
       else if (type == PARAM_NAME_REF) {
         return new LuaDocParamNameRefImpl(node);
       }
+      else if (type == PAR_TY) {
+        return new LuaDocParTyImpl(node);
+      }
       else if (type == RETURN_DEF) {
         return new LuaDocReturnDefImpl(node);
       }
@@ -120,8 +125,8 @@ public interface LuaDocTypes {
       else if (type == TYPE_LIST) {
         return new LuaDocTypeListImpl(node);
       }
-      else if (type == TYPE_SET) {
-        return new LuaDocTypeSetImpl(node);
+      else if (type == UNION_TY) {
+        return new LuaDocUnionTyImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

@@ -22,7 +22,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
-import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
@@ -33,11 +32,17 @@ interface IFunSignature {
     val returnTy: ITy
     val params: Array<LuaParamInfo>
     val displayName: String
+    val paramSignature: String
 }
 
 fun IFunSignature.getParamTy(index: Int): ITy {
     val info = params.getOrNull(index)
     return info?.ty ?: Ty.UNKNOWN
+}
+
+//eg. print(...)
+fun IFunSignature.hasVarArgs(): Boolean {
+    return params.lastOrNull()?.isVarArgs ?: false
 }
 
 class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, override val params: Array<LuaParamInfo>) : IFunSignature {
@@ -62,7 +67,7 @@ class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, o
             func.functionParamList.forEach {
                 val p = LuaParamInfo()
                 p.name = it.id.text
-                p.ty = resolveDocTypeSet(it.typeSet)
+                p.ty = it.ty?.getType() ?: Ty.UNKNOWN
                 list.add(p)
             }
             return list.toTypedArray()
@@ -100,6 +105,15 @@ class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, o
         }
         "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
     }
+
+    override val paramSignature: String get() {
+        val list = arrayOfNulls<String>(params.size)
+        for (i in params.indices) {
+            val lpi = params[i]
+            list[i] = lpi.name
+        }
+        return "(" + list.joinToString(", ") + ")"
+    }
 }
 
 interface ITyFunction : ITy {
@@ -118,15 +132,15 @@ fun ITyFunction.process(processor: Processor<IFunSignature>) {
     }
 }
 
-fun ITyFunction.findPrefectSignature(nArgs: Int): IFunSignature {
+fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
     var sgi: IFunSignature? = null
-    var prefectN = Int.MAX_VALUE
+    var perfectN = Int.MAX_VALUE
     process(Processor {
         val offset = Math.abs(it.params.size - nArgs)
-        if (offset < prefectN) {
-            prefectN = offset
+        if (offset < perfectN) {
+            perfectN = offset
             sgi = it
-            if (prefectN == 0) return@Processor false
+            if (perfectN == 0) return@Processor false
         }
         true
     })
@@ -155,6 +169,15 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
         }
         return code
     }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        if (super.subTypeOf(other, context) || other == Ty.FUNCTION) return true // Subtype of function primitive.
+        if (other is ITyFunction) {
+            if (mainSignature == other.mainSignature || other.signatures.any({ sig -> sig == mainSignature})) return true
+            return signatures.any({ sig -> sig == other.mainSignature || other.signatures.any({ sig2 -> sig2 == sig})})
+        }
+        return false
+    }
 }
 
 class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
@@ -166,7 +189,7 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
     }
 
     override val mainSignature: IFunSignature by lazy {
-        FunSignature(selfCall, psi.guessReturnTypeSet(searchContext), psi.params)
+        FunSignature(selfCall, psi.guessReturnType(searchContext), psi.params)
     }
 
     override val signatures: Array<IFunSignature> by lazy {

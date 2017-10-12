@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi;
+package inspections
 
-/**
- * _G.xxx
- * Created by tangzx on 2017/1/16.
- */
-public interface LuaGlobalVar extends LuaClassField, LuaGlobal {
+import com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection
+
+class UndeclaredVariableTest : LuaInspectionsTestBase(UndeclaredVariableInspection()) {
+
+    fun testUndeclaredVariable() = checkByText("""
+         print(<warning>MyUndeclaredVariable</warning>)
+    """)
 
 }

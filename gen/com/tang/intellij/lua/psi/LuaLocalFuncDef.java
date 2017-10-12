@@ -39,7 +39,7 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaSt
   SearchScope getUseScope();
 
   @NotNull
-  ITy guessReturnTypeSet(SearchContext searchContext);
+  ITy guessReturnType(SearchContext searchContext);
 
   @NotNull
   LuaParamInfo[] getParams();

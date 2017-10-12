@@ -20,6 +20,8 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.project.LuaSettings
+import com.tang.intellij.lua.search.SearchContext
 
 enum class TyKind {
     Unknown,
@@ -28,12 +30,15 @@ enum class TyKind {
     Function,
     Class,
     Union,
-    Generic
+    Generic,
+    Nil
 }
 enum class TyPrimitiveKind {
     String,
     Number,
-    Boolean
+    Boolean,
+    Table,
+    Function
 }
 class TyFlags {
     companion object {
@@ -44,9 +49,6 @@ class TyFlags {
 }
 
 interface ITy {
-
-    val isAnonymous: Boolean
-
     val kind: TyKind
 
     val displayName: String
@@ -56,16 +58,23 @@ interface ITy {
     fun union(ty: ITy): ITy
 
     fun createTypeString(): String
+
+    fun subTypeOf(other: ITy, context: SearchContext): Boolean
+
+    fun getSuperClass(context: SearchContext): ITy?
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
 
+val ITy.isGlobal: Boolean
+    get() = hasFlag(TyFlags.GLOBAL)
+
+val ITy.isAnonymous: Boolean
+    get() = hasFlag(TyFlags.ANONYMOUS)
+
 abstract class Ty(override val kind: TyKind) : ITy {
 
     override final var flags: Int = 0
-
-    override val isAnonymous: Boolean
-        get() = hasFlag(TyFlags.ANONYMOUS)
 
     fun addFlag(flag: Int) {
         flags = flags or flag
@@ -83,16 +92,31 @@ abstract class Ty(override val kind: TyKind) : ITy {
     override fun toString(): String {
         val list = mutableListOf<String>()
         TyUnion.each(this) { //尽量不使用Global
-            if (!it.isAnonymous && !(it is ITyClass && it.hasFlag(TyFlags.GLOBAL)))
+            if (!it.isAnonymous && !(it is ITyClass && it.isGlobal))
                 list.add(it.displayName)
         }
         if (list.isEmpty()) { //使用Global
             TyUnion.each(this) {
-                if (!it.isAnonymous && (it is ITyClass && it.hasFlag(TyFlags.GLOBAL)))
+                if (!it.isAnonymous && (it is ITyClass && it.isGlobal))
                     list.add(it.displayName)
             }
         }
         return list.joinToString("|")
+    }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        // Everything is subset of any
+        if (other.kind == TyKind.Unknown) return true
+
+        // Handle unions, subtype if subtype of any of the union components.
+        if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context) })
+
+        // Classes are equal
+        return this == other
+    }
+
+    override fun getSuperClass(context: SearchContext): ITy? {
+        return null
     }
 
     companion object {
@@ -101,12 +125,17 @@ abstract class Ty(override val kind: TyKind) : ITy {
         val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
         val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
         val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
+        val TABLE = TyPrimitive(TyPrimitiveKind.Table, "table")
+        val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, "function")
+        val NIL = TyNil()
 
         private fun getPrimitive(mark: Byte): Ty {
             return when (mark.toInt()) {
                 TyPrimitiveKind.Boolean.ordinal -> BOOLEAN
                 TyPrimitiveKind.String.ordinal -> STRING
                 TyPrimitiveKind.Number.ordinal -> NUMBER
+                TyPrimitiveKind.Table.ordinal -> TABLE
+                TyPrimitiveKind.Function.ordinal -> FUNCTION
                 else -> UNKNOWN
             }
         }
@@ -116,7 +145,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         }
 
         fun isInvalid(ty: ITy?): Boolean {
-            return ty == null || ty is TyUnknown
+            return ty == null || ty is TyUnknown || ty is TyNil
         }
 
         fun serialize(ty: ITy, stream: StubOutputStream) {
@@ -197,6 +226,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     }
                     TySerializedGeneric(params.toTypedArray(), base)
                 }
+                TyKind.Nil -> NIL
                 else -> TyUnknown()
             }
         }
@@ -228,13 +258,24 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override fun hashCode(): Int {
         return displayName.hashCode()
     }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return super.subTypeOf(other, context) || (other is TyArray && base.subTypeOf(other.base, context)) || other == Ty.TABLE
+    }
 }
 
 class TyUnion : Ty(TyKind.Union) {
     private val childSet = mutableSetOf<ITy>()
+    fun getChildTypes() = childSet
 
-    override val displayName: String
-        get() = "Union"
+    override val displayName: String get() {
+        val list = mutableListOf<String>()
+        eachPerfect(this) {
+            list.add(it.displayName)
+            true
+        }
+        return list.joinToString("|")
+    }
 
     val size:Int
         get() = childSet.size
@@ -249,6 +290,10 @@ class TyUnion : Ty(TyKind.Union) {
 
     private fun addChild(ty: ITy): Boolean {
         return childSet.add(ty)
+    }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return super.subTypeOf(other, context) || childSet.any { type -> type.subTypeOf(other, context) }
     }
 
     companion object {
@@ -281,6 +326,26 @@ class TyUnion : Ty(TyKind.Union) {
             } else process(ty)
         }
 
+        fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
+            val anonymous = mutableListOf<ITy>()
+            val globals = mutableListOf<ITy>()
+            val others = mutableListOf<ITy>()
+            each(ty) {
+                when {
+                    it.isGlobal -> globals.add(it)
+                    it.isAnonymous -> anonymous.add(it)
+                    else -> others.add(it)
+                }
+            }
+            if (others.isNotEmpty()) {
+                for (cls in others)
+                    if (!process(cls)) break
+            } else {
+                for (cls in globals)
+                    if (!process(cls)) break
+            }
+        }
+
         fun union(t1: ITy, t2: ITy): ITy {
             return when {
                 t1 is TyUnknown -> t2
@@ -297,7 +362,7 @@ class TyUnion : Ty(TyKind.Union) {
             }
         }
 
-        fun getPrefectClass(ty: ITy): ITyClass? {
+        fun getPerfectClass(ty: ITy): ITyClass? {
             var tc: ITyClass? = null
             var anonymous: ITyClass? = null
             process(ty) {
@@ -326,5 +391,19 @@ class TyUnknown : Ty(TyKind.Unknown) {
 
     override fun hashCode(): Int {
         return Constants.WORD_ANY.hashCode()
+    }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return true
+    }
+}
+
+class TyNil : Ty(TyKind.Nil) {
+    override val displayName: String
+        get() = Constants.WORD_NIL
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+
+        return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
     }
 }

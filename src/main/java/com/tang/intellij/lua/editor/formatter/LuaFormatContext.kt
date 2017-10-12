@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.highlighting;
+package com.tang.intellij.lua.editor.formatter
 
-import com.intellij.openapi.fileTypes.SyntaxHighlighter;
-import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.formatting.Alignment
+import com.intellij.formatting.SpacingBuilder
+import com.intellij.psi.codeStyle.CodeStyleSettings
+import com.tang.intellij.lua.editor.formatter.blocks.LuaScriptBlock
 
-/**
- * Created by tangzx on 2015/11/15.
- */
-public class LuaSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
-    @NotNull
-    @Override
-    public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
-        return new LuaSyntaxHighlighter();
-    }
+class LuaFormatContext(val settings: CodeStyleSettings, val luaSettings: LuaCodeStyleSettings, val spaceBuilder: SpacingBuilder) {
+    var eqAlignment: Alignment? = null
+    var lastBlock: LuaScriptBlock? = null
 }

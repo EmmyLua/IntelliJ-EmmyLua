@@ -14,7 +14,7 @@ public interface LuaDocTypeDef extends LuaDocPsiElement, StubBasedPsiElement<Lua
   LuaDocCommentString getCommentString();
 
   @Nullable
-  LuaDocTypeSet getTypeSet();
+  LuaDocTy getTy();
 
   @NotNull
   ITy getType();

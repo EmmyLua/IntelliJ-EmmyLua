@@ -29,9 +29,9 @@
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.psi.LuaTypes"
   elementTypeClass="com.tang.intellij.lua.psi.LuaElementType"
-  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createType"
+  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinitionKt.createType"
   tokenTypeClass="com.tang.intellij.lua.psi.LuaTokenType"
-  tokenTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createToken"
+  tokenTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinitionKt.createToken"
   parserImports = "static com.intellij.lang.WhitespacesBinders.*"
 
   tokens = [
@@ -149,6 +149,7 @@ private stat_recover ::= !(ID
     | nil | true | false | STRING | NUMBER | '::' | 'goto'
     | unaryOp)
 
+varList ::= varExpr (',' varExpr)* { extends = exprList }
 assignStat ::= varList '=' exprList {
     pin = 2
     implements = [
@@ -230,7 +231,6 @@ funcDef ::= 'function' ID funcBody {
         "com.tang.intellij.lua.psi.LuaClassMethod"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
-        "com.tang.intellij.lua.psi.LuaGlobal"
     ]
     methods = [
         getComment
@@ -241,8 +241,9 @@ funcDef ::= 'function' ID funcBody {
         getName
         getTextOffset
         toString
-        guessReturnTypeSet
-        getClassType
+        guessReturnType
+        guessParentType
+        getVisibility
         getParams
         getReferences
     ]
@@ -269,14 +270,15 @@ classMethodDef ::= 'function' classMethodName funcBody {
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
     methods = [
         getComment
-        getClassType
+        guessParentType
+        getVisibility
         getParamNameDefList
         getNameIdentifier
         setName
         getName
         getTextOffset
         toString
-        guessReturnTypeSet
+        guessReturnType
         getParams
         isStatic
         getPresentation
@@ -299,10 +301,11 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         getName
         getTextOffset
         getUseScope
-        guessReturnTypeSet
+        guessReturnType
         getParams
     ]
 }
+nameList ::= nameDef (',' nameDef)*
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
     implements = [
@@ -316,14 +319,14 @@ returnStat ::= return exprList?
 breakStat ::= break
 private lastStat ::= returnStat | breakStat
 
-varList ::= varExpr (',' varExpr)* { extends = exprList }
-
-nameList ::= nameDef (',' nameDef)*
-
 exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..." {
     mixin = 'com.tang.intellij.lua.psi.impl.LuaLiteralExprMixin'
+}
+stringExpr ::= STRING {
+    extends = literalExpr
+    elementType = literalExpr
 }
 
 valueExpr ::= varExpr | literalExpr | closureExpr | tableExpr | parenExpr
@@ -378,7 +381,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         getIdExpr
         toString
 
-        guessPrefixType
+        guessParentType
         guessValueType
 
         dot = 'DOT'
@@ -387,16 +390,20 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     ]
     implements = [
         "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.psi.LuaClassMember"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaIndexStub"
     mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExprMixin"
 }
 
-arg_expr_list ::= (expr ',')* (expr |& ')') { extends = exprList elementType = exprList }
-args ::=  '(' (arg_expr_list)? ')' | tableExpr | STRING { pin(".*") = 1 }
+args ::= listArgs | singleArg
+singleArg ::= tableExpr | stringExpr { extends = args }
+private arg_expr_list ::= (expr ',')* (expr |& ')')
+listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }
+
 left callExpr ::= args {
     methods = [
-        guessPrefixType
+        guessParentType
         resolveFuncBodyOwner
         getFirstStringArg
 
@@ -407,7 +414,7 @@ left callExpr ::= args {
 }
 
 private suffixExpr ::= indexExpr | callExpr
-private prefixExpr ::= parenExpr | nameExpr | literalExpr | tableExpr
+private prefixExpr ::= parenExpr | nameExpr | stringExpr | tableExpr
 // 最终产生 callExpr | indexExpr
 private callOrIndexExpr ::= prefixExpr suffixExpr+
 // callExpr
@@ -416,7 +423,7 @@ private funcCallExpr ::= callOrIndexExpr <<checkType 'CALL_EXPR'>>
 closureExpr ::= 'function' funcBody {
     pin = 2
     implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
-    methods = [getParamNameDefList guessReturnTypeSet getParams]
+    methods = [getParamNameDefList guessReturnType getParams]
 }
 
 funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
@@ -426,6 +433,7 @@ funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
     ]
     methods = [
         RPAREN = 'RPAREN'
+        ELLIPSIS = 'ELLIPSIS'
     ]
 }
 
@@ -459,6 +467,8 @@ tableField ::= tableField1 | tableField2 | expr {
         getFieldName
         getPresentation
         guessType
+        guessParentType
+        getVisibility
         getComment
         getIdExpr
         nameDef = "tableFieldNameDef"

@@ -11,7 +11,7 @@ import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBasedPsiElement<LuaIndexStub> {
+public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, LuaClassMember, StubBasedPsiElement<LuaIndexStub> {
 
   @NotNull
   List<LuaExpr> getExprList();
@@ -37,7 +37,7 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, StubBased
   LuaLiteralExpr getIdExpr();
 
   @NotNull
-  ITy guessPrefixType(SearchContext context);
+  ITy guessParentType(SearchContext context);
 
   @NotNull
   ITy guessValueType(SearchContext context);

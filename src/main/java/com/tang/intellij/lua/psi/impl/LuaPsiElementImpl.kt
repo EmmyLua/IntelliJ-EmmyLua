@@ -34,10 +34,6 @@ open class LuaPsiElementImpl internal constructor(node: ASTNode) : ASTWrapperPsi
     }
 
     override fun getReference(): PsiReference? {
-        val references = references
-
-        if (references.isNotEmpty())
-            return references[0]
-        return null
+        return references.firstOrNull()
     }
 }

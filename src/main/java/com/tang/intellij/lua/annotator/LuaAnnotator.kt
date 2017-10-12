@@ -18,7 +18,6 @@ package com.tang.intellij.lua.annotator
 
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
-import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.ReferencesSearch
@@ -201,12 +200,12 @@ class LuaAnnotator : Annotator {
         override fun visitClassDef(o: LuaDocClassDef) {
             super.visitClassDef(o)
             val annotation = myHolder!!.createInfoAnnotation(o.id, null)
-            annotation.textAttributes = DefaultLanguageHighlighterColors.CLASS_NAME
+            annotation.textAttributes = LuaHighlightingData.CLASS_NAME
         }
 
         override fun visitClassNameRef(o: LuaDocClassNameRef) {
             val annotation = myHolder!!.createInfoAnnotation(o, null)
-            annotation.textAttributes = DefaultLanguageHighlighterColors.CLASS_REFERENCE
+            annotation.textAttributes = LuaHighlightingData.CLASS_REFERENCE
         }
 
         override fun visitFieldDef(o: LuaDocFieldDef) {

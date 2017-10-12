@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("UNUSED_PARAMETER")
+
 package com.tang.intellij.lua.comment.psi
 
 import com.intellij.icons.AllIcons
@@ -23,9 +25,12 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.psi.LuaElementFactory
+import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -43,7 +48,16 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
-    return TyLazyClass(nameRef.text)
+    return when (nameRef.text){
+        Constants.WORD_NIL -> Ty.NIL
+        Constants.WORD_ANY -> Ty.UNKNOWN
+        Constants.WORD_BOOLEAN -> Ty.BOOLEAN
+        Constants.WORD_STRING -> Ty.STRING
+        Constants.WORD_NUMBER -> Ty.NUMBER
+        Constants.WORD_TABLE -> Ty.TABLE
+        Constants.WORD_FUNCTION -> Ty.FUNCTION
+        else -> TyLazyClass(nameRef.text)
+    }
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {
@@ -74,12 +88,22 @@ fun getNameIdentifier(classDef: LuaDocClassDef): PsiElement {
     return classDef.id
 }
 
-@Suppress("UNUSED_PARAMETER")
 fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
     val stub = fieldDef.stub
     if (stub != null)
         return stub.type
-    return resolveDocTypeSet(fieldDef.typeSet)
+    return fieldDef.ty?.getType() ?: Ty.UNKNOWN
+}
+
+fun guessParentType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
+    val parent = fieldDef.parent
+    val classDef = PsiTreeUtil.findChildOfType(parent, LuaDocClassDef::class.java)
+    return classDef?.type ?: Ty.UNKNOWN
+}
+
+fun getVisibility(fieldDef: LuaDocFieldDef): Visibility {
+    val v = fieldDef.accessModifier?.let { Visibility.get(it.text) }
+    return v ?: Visibility.PUBLIC
 }
 
 /**
@@ -89,8 +113,7 @@ fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
  * @return 类型集合
  */
 fun getType(paramDec: LuaDocParamDef): ITy {
-    val docTypeSet = paramDec.typeSet ?: return Ty.UNKNOWN
-    return resolveDocTypeSet(docTypeSet)
+    return paramDec.ty?.getType() ?: return Ty.UNKNOWN
 }
 
 /**
@@ -102,23 +125,10 @@ fun getType(paramDec: LuaDocParamDef): ITy {
 fun resolveTypeAt(returnDef: LuaDocReturnDef, index: Int): ITy {
     val typeList = returnDef.typeList
     if (typeList != null) {
-        val typeSetList = typeList.typeSetList
-        if (typeSetList.size > index) {
-            val docTypeSet = typeSetList[index]
-            return resolveDocTypeSet(docTypeSet)
+        val list = typeList.tyList
+        if (list.size > index) {
+            return list[index].getType()
         }
-    }
-    return Ty.UNKNOWN
-}
-
-fun resolveDocTypeSet(docTypeSet: LuaDocTypeSet?): ITy {
-    if (docTypeSet != null) {
-        val list = docTypeSet.tyList
-        var retTy: ITy = Ty.UNKNOWN
-        for (ty in list) {
-            retTy = retTy.union(ty.getType())
-        }
-        return retTy
     }
     return Ty.UNKNOWN
 }
@@ -170,7 +180,7 @@ fun getType(classDef: LuaDocClassDef): ITyClass {
  * @return 类型集合
  */
 fun getType(typeDef: LuaDocTypeDef): ITy {
-    return resolveDocTypeSet(typeDef.typeSet)
+    return typeDef.ty?.getType() ?: Ty.UNKNOWN
 }
 
 @Suppress("UNUSED_PARAMETER")
@@ -222,10 +232,23 @@ fun getType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
 }
 
 fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
-    val set = luaDocFunctionTy.typeSet
-    return resolveDocTypeSet(set)
+    val set = luaDocFunctionTy.typeList?.tyList?.firstOrNull()
+    return set?.getType() ?: Ty.UNKNOWN
 }
 
 fun getType(luaDocGenericTy: LuaDocGenericTy): ITy {
     return TyDocGeneric(luaDocGenericTy)
+}
+
+fun getType(luaDocParTy: LuaDocParTy): ITy {
+    return luaDocParTy.ty?.getType() ?: Ty.UNKNOWN
+}
+
+fun getType(unionTy: LuaDocUnionTy): ITy {
+    val list = unionTy.tyList
+    var retTy: ITy = Ty.UNKNOWN
+    for (ty in list) {
+        retTy = retTy.union(ty.getType())
+    }
+    return retTy
 }

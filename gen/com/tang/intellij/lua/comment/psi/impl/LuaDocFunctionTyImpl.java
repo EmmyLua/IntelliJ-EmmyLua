@@ -34,8 +34,8 @@ public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunction
 
   @Override
   @Nullable
-  public LuaDocTypeSet getTypeSet() {
-    return PsiTreeUtil.getChildOfType(this, LuaDocTypeSet.class);
+  public LuaDocTypeList getTypeList() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocTypeList.class);
   }
 
   @NotNull

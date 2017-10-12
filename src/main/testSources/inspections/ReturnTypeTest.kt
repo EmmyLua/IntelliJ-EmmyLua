@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi;
+package inspections
 
-import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.ITy;
-import org.jetbrains.annotations.NotNull;
+import com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection
 
-/**
- *
- * Created by tangzx on 2016/12/1.
- */
-public interface LuaTypeGuessable extends LuaPsiElement {
-    @NotNull
-    ITy guessType(SearchContext context);
+class ReturnTypeTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
+
+    fun testReturn() = checkByText("""
+        ---@return string
+        local function test()
+            return <warning>1</warning>
+        end
+    """)
+
 }

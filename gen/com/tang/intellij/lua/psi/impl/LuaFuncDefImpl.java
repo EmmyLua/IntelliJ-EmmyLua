@@ -95,13 +95,18 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
   }
 
   @NotNull
-  public ITy guessReturnTypeSet(SearchContext searchContext) {
-    return LuaPsiImplUtilKt.guessReturnTypeSet(this, searchContext);
+  public ITy guessReturnType(SearchContext searchContext) {
+    return LuaPsiImplUtilKt.guessReturnType(this, searchContext);
   }
 
   @NotNull
-  public ITyClass getClassType(SearchContext searchContext) {
-    return LuaPsiImplUtilKt.getClassType(this, searchContext);
+  public ITyClass guessParentType(SearchContext searchContext) {
+    return LuaPsiImplUtilKt.guessParentType(this, searchContext);
+  }
+
+  @NotNull
+  public Visibility getVisibility() {
+    return LuaPsiImplUtilKt.getVisibility(this);
   }
 
   @NotNull

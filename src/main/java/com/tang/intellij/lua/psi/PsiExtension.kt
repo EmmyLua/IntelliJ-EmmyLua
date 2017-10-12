@@ -57,7 +57,7 @@ fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     return list[index]
 }
 
-fun LuaExprList.getIndexFor(psi: LuaExpr): Int {
+fun LuaListArgs.getIndexFor(psi: LuaExpr): Int {
     var idx = 0
     PsiTreeUtil.processElements(this, {
         if (it is LuaExpr) {
@@ -154,6 +154,8 @@ val LuaIndexExpr.prefixExpr: LuaExpr get() {
 val LuaTableField.shouldCreateStub: Boolean get() {
     if (id == null && idExpr == null)
         return false
+    if (name == null)
+        return false
 
     val tableExpr = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaTableExpr::class.java)
     tableExpr ?: return false
@@ -189,4 +191,13 @@ val LuaFuncDef.isGlobal: Boolean get() {
     if (moduleName != null)
         return false
     return true
+}
+
+val LuaCallExpr.argList: List<LuaExpr> get() {
+    val args = this.args
+    return when (args) {
+        is LuaSingleArg -> listOf(args.expr)
+        is LuaListArgs -> args.exprList
+        else -> emptyList()
+    }
 }

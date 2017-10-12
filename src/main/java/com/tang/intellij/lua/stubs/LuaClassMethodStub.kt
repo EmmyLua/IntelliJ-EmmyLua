@@ -20,14 +20,14 @@ import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaElementType
-import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.ty.ITyFunction
 
 /**
  * class method static/instance
  * Created by tangzx on 2016/12/4.
  */
-interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef> {
+interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClassMemberStub<LuaClassMethodDef> {
 
     val className: String
 
@@ -38,8 +38,8 @@ interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef> {
 
 class LuaClassMethodStubImpl(override val name: String,
                              override val className: String,
-                             override val params: Array<LuaParamInfo>,
-                             override val returnTypeSet: ITy,
+                             override val ty: ITyFunction,
                              override val isStatic: Boolean,
+                             override val visibility: Visibility,
                              parent: StubElement<*>)
     : StubBase<LuaClassMethodDef>(parent, LuaElementType.CLASS_METHOD_DEF), LuaClassMethodStub

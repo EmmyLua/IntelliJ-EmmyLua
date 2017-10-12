@@ -29,7 +29,7 @@
   parserUtilClass="com.tang.intellij.lua.psi.LuaParserUtil"
   elementTypeHolderClass="com.tang.intellij.lua.comment.psi.LuaDocTypes"
   elementTypeClass="com.tang.intellij.lua.comment.psi.LuaDocElementType"
-  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinition.createDocType"
+  elementTypeFactory="com.tang.intellij.lua.lang.LuaParserDefinitionKt.createDocType"
   tokenTypeClass="com.tang.intellij.lua.comment.psi.LuaDocTokenType"
   extends(".*ty") = 'ty'
 
@@ -51,6 +51,7 @@
         TAG_PARAM = 'param'
         OPTIONAL = 'optional'
         TAG_RETURN = 'return'
+        PRIVATE = 'private'
         PROTECTED = 'protected'
         PUBLIC = 'public'
         CLASS = 'class'
@@ -69,9 +70,9 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def)
+private doc_item ::= '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def | access_modifier)
 
-ty ::= function_ty | generic_ty | arr_ty | general_ty {
+ty ::= union_ty | function_ty | generic_ty | arr_ty | general_ty | par_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
 }
 
@@ -81,22 +82,32 @@ arr_ty ::= ty '[]' {
 general_ty ::= class_name_ref {
     methods = [getType]
 }
-
-private generic_param_list ::= (ty ',')* ty
-generic_ty ::= ty '<' generic_param_list '>' {
+par_ty ::= '(' ty ')' {
+    pin = 1
     methods = [getType]
 }
 
-function_param ::= ID ':' type_set
-private function_param_list::= (function_param ',')* (function_param |& ')')
-function_ty ::= fun '(' function_param_list ')' (':' type_set)? {
-    methods = [getType getReturnType]
+private generic_param_list ::= (ty ',')* ty
+generic_ty ::= general_ty '<' generic_param_list '>' {
+    methods = [getType]
+    pin = 2
 }
 
-type_set ::= ty ('|' ty)*
-access_modifier ::= "protected" | "public"
+function_param ::= ID ':' ty {
+    pin = 1
+}
+private function_param_list::= (function_param ',')* (function_param |& ')')
+function_ty ::= fun '(' function_param_list ')' (':' type_list)? {
+    methods = [getType getReturnType]
+    pin = 1
+}
 
-field_def ::= FIELD access_modifier? ID type_set comment_string? {
+union_ty ::= ty ('|' ty)+ {
+    methods = [getType]
+}
+access_modifier ::= PRIVATE | PUBLIC | PROTECTED
+
+field_def ::= FIELD access_modifier? ID ty comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
@@ -106,6 +117,8 @@ field_def ::= FIELD access_modifier? ID type_set comment_string? {
     stubClass = "com.tang.intellij.lua.stubs.LuaDocClassFieldStub"
     methods = [
         guessType
+        guessParentType
+        getVisibility
         getNameIdentifier
         setName
         getName
@@ -130,13 +143,13 @@ lan_def ::= LANGUAGE ID { pin = 1 }
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_def ::= TAG_PARAM OPTIONAL? param_name_ref type_set comment_string? {
+param_def ::= TAG_PARAM OPTIONAL? param_name_ref ty comment_string? {
     pin = 1
     methods = [getType optional = 'OPTIONAL']
 }
 
 //--- return
-type_list ::= type_set(',' type_set)*
+type_list ::= ty(',' ty)*
 return_def ::= TAG_RETURN type_list comment_string? {
     pin = 1
     methods = [resolveTypeAt]
@@ -168,7 +181,7 @@ class_def ::= (CLASS|MODULE) ID (EXTENDS class_name_ref)? comment_string? {
 }
 
 // @type CLASS_REF
-type_def ::= TYPE type_set comment_string? {
+type_def ::= TYPE ty comment_string? {
     pin = 1
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTyStub"
     methods = [getType]

@@ -9,6 +9,7 @@ import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub;
 import com.intellij.navigation.ItemPresentation;
+import com.tang.intellij.lua.psi.Visibility;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
@@ -21,13 +22,19 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   LuaDocCommentString getCommentString();
 
   @Nullable
-  LuaDocTypeSet getTypeSet();
+  LuaDocTy getTy();
 
   @Nullable
   PsiElement getId();
 
   @NotNull
   ITy guessType(SearchContext context);
+
+  @NotNull
+  ITy guessParentType(SearchContext context);
+
+  @NotNull
+  Visibility getVisibility();
 
   @Nullable
   PsiElement getNameIdentifier();

@@ -20,41 +20,60 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.psi.codeStyle.SuggestedNameInfo
 import com.intellij.refactoring.rename.NameSuggestionProvider
-import com.tang.intellij.lua.psi.LuaNameDef
+import com.tang.intellij.lua.psi.LuaTypeGuessable
 import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.*
 import java.util.*
 
 /**
- * LuaNameDef implements PsiNameIdentifierOwner
-
+ *
  * Created by TangZX on 2016/12/20.
  */
 class LuaNameSuggestionProvider : NameSuggestionProvider {
-    override fun getSuggestedNames(psiElement: PsiElement, psiElement1: PsiElement?, set: MutableSet<String>): SuggestedNameInfo? {
-        if (psiElement is LuaNameDef) {
-            val context = SearchContext(psiElement.getProject())
-            val typeSet = psiElement.guessTypeFromCache(context)
-            if (!Ty.isInvalid(typeSet)) {
-                val classNames = HashSet<String>()
 
-                TyUnion.each(typeSet) { type ->
-                    if (type is ITyClass) {
-                        var cur: ITyClass? = type
-                        while (cur != null) {
-                            val className = cur.className
-                            if (!cur.isAnonymous)
-                                classNames.add(className)
-                            cur = cur.getSuperClass(context)
+    companion object {
+        fun fixName(oriName: String): String {
+            return oriName.replace(".", "")
+        }
+    }
+    
+    private fun collectNames(type: ITy, context: SearchContext, collector: (name: String, suffix: String, preferLonger: Boolean) -> Unit) {
+        when (type) {
+            is ITyClass -> {
+                var cur: ITy? = type
+                while (cur != null) {
+                    if (!cur.isAnonymous)
+                        collector(fixName(type.className), "", false)
+                    cur = cur.getSuperClass(context)
+                }
+            }
+            is ITyArray -> collectNames(type.base, context) { name, _, _ ->
+                collector(name, "List", false)
+            }
+            is ITyGeneric -> {
+                val paramTy = type.getParamTy(1)
+                collectNames(paramTy, context) { name, _, _ ->
+                    collector(name, "Map", false)
+                }
+            }
+        }
+    }
+
+    override fun getSuggestedNames(psiElement: PsiElement, nameSuggestionContext: PsiElement?, set: MutableSet<String>): SuggestedNameInfo? {
+        if (psiElement is LuaTypeGuessable) {
+            val context = SearchContext(psiElement.getProject())
+            val type = psiElement.guessTypeFromCache(context)
+            if (!Ty.isInvalid(type)) {
+                val names = HashSet<String>()
+
+                TyUnion.each(type) { ty ->
+                    collectNames(ty, context) { name, suffix, preferLonger ->
+                        if (names.add(name)) {
+                            val strings = NameUtil.getSuggestionsByName(name, "", suffix, false, preferLonger, false)
+                            set.addAll(strings)
                         }
                     }
-                }
-                for (className in classNames) {
-                    val strings = NameUtil.getSuggestionsByName(className, "", "", false, false, false)
-                    set.addAll(strings)
                 }
             }
         }

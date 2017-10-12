@@ -94,7 +94,6 @@ public class LuaVisitor extends PsiElementVisitor {
     visitClassMethod(o);
     // visitDeclaration(o);
     // visitStatement(o);
-    // visitGlobal(o);
   }
 
   public void visitGotoStat(@NotNull LuaGotoStat o) {
@@ -109,11 +108,16 @@ public class LuaVisitor extends PsiElementVisitor {
   public void visitIndexExpr(@NotNull LuaIndexExpr o) {
     visitExpr(o);
     // visitPsiNameIdentifierOwner(o);
+    // visitClassMember(o);
   }
 
   public void visitLabelStat(@NotNull LuaLabelStat o) {
     visitStatement(o);
     // visitPsiNameIdentifierOwner(o);
+  }
+
+  public void visitListArgs(@NotNull LuaListArgs o) {
+    visitArgs(o);
   }
 
   public void visitLiteralExpr(@NotNull LuaLiteralExpr o) {
@@ -171,6 +175,10 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitShebangLine(@NotNull LuaShebangLine o) {
     visitPsiElement(o);
+  }
+
+  public void visitSingleArg(@NotNull LuaSingleArg o) {
+    visitArgs(o);
   }
 
   public void visitStatement(@NotNull LuaStatement o) {

@@ -42,13 +42,13 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
     private fun addCompletion(name:String, session: CompletionSession, psi: LuaPsiElement) {
         val addTy = {ty: ITyFunction ->
-            val icon = if (ty.hasFlag(TyFlags.GLOBAL))
+            val icon = if (ty.isGlobal)
                 LuaIcons.GLOBAL_FUNCTION
             else
                 LuaIcons.LOCAL_FUNCTION
 
             ty.process(Processor {
-                val le = TyFunctionLookupElement(name, it, false, ty, icon)
+                val le = TyFunctionLookupElement(name, psi, it, false, ty, icon)
                 le.handler = SignatureInsertHandler(it)
                 session.resultSet.addElement(le)
                 true
@@ -68,7 +68,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                         if (psi is LuaParamNameDef)
                             icon = LuaIcons.PARAMETER
 
-                        val elementBuilder = LuaTypeGuessableLookupElement(name, it, false, icon)
+                        val elementBuilder = LuaTypeGuessableLookupElement(name, psi, it, false, icon)
                         session.resultSet.addElement(elementBuilder)
                     }
                 }
@@ -86,7 +86,8 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
             val moduleName = nameExpr.moduleName
             if (moduleName != null) {
                 val ty = TyLazyClass(moduleName)
-                addClass(ty, cur.project, true, completionResultSet, completionResultSet.prefixMatcher, null)
+                val contextTy = LuaPsiTreeUtil.findContextClass(nameExpr)
+                addClass(contextTy, ty, cur.project, true, completionResultSet, completionResultSet.prefixMatcher, null)
             }
         }
 

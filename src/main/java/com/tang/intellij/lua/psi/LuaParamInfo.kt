@@ -31,7 +31,7 @@ import java.io.IOException
  */
 class LuaParamInfo {
 
-    var isOptional: Boolean = false
+    var isVarArgs: Boolean = false
     var name: String = ""
     var ty: ITy = Ty.UNKNOWN
 
@@ -49,16 +49,16 @@ class LuaParamInfo {
         @Throws(IOException::class)
         fun deserialize(stubInputStream: StubInputStream): LuaParamInfo {
             val paramInfo = LuaParamInfo()
+            paramInfo.isVarArgs = stubInputStream.readBoolean()
             paramInfo.name = StringRef.toString(stubInputStream.readName())
-            paramInfo.isOptional = stubInputStream.readBoolean()
             paramInfo.ty = Ty.deserialize(stubInputStream)
             return paramInfo
         }
 
         @Throws(IOException::class)
         fun serialize(param: LuaParamInfo, stubOutputStream: StubOutputStream) {
+            stubOutputStream.writeBoolean(param.isVarArgs)
             stubOutputStream.writeName(param.name)
-            stubOutputStream.writeBoolean(param.isOptional)
             Ty.serialize(param.ty, stubOutputStream)
         }
     }

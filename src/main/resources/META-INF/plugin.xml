@@ -22,7 +22,7 @@
     <category>Custom Languages</category>
     <description><![CDATA[
     Support for Lua programming language.<br>
-    <p><a href="https://github.com/tangzx/IntelliJ-EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://www.paypal.me/tangzx">Donate</a></p>
+    <p><a href="https://github.com/tangzx/IntelliJ-EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://tangzx.github.io/emmydoc/donate.html">Donate</a></p> | <a href="https://tangzx.github.io/emmydoc">Doc</a></p>
     Features:
     <ul>
         <li>Syntax highlighting</li>
@@ -146,6 +146,7 @@
         <nameSuggestionProvider implementation="com.tang.intellij.lua.editor.LuaNameSuggestionProvider"/>
         <qualifiedNameProvider implementation="com.tang.intellij.lua.editor.LuaQualifiedNameProvider"/>
         <renamePsiElementProcessor implementation="com.tang.intellij.lua.refactoring.rename.RenameLuaMethodProcessor"/>
+        <inlineActionHandler implementation="com.tang.intellij.lua.refactoring.inline.LuaInlineActionHandler"/>
 
         <!--navigate-->
         <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
@@ -295,10 +296,10 @@
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyBody"/>
         <localInspection
-            displayName="Unreachable statement"
-            enabledByDefault="true"
-            groupName="Lua"
-            implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
+                displayName="Unreachable statement"
+                enabledByDefault="true"
+                groupName="Lua"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
         <localInspection
                 displayName="0 index"
                 enabledByDefault="true"
@@ -309,6 +310,26 @@
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious"/>
+        <localInspection
+                displayName="Match function signature"
+                enabledByDefault="false"
+                groupName="Lua > Lint > Type safety"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection"/>
+        <localInspection
+                displayName="Undeclared variable"
+                enabledByDefault="false"
+                groupName="Lua > Lint > Type safety"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection"/>
+        <localInspection
+                displayName="Return type"
+                enabledByDefault="false"
+                groupName="Lua > Lint > Type safety"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection"/>
+        <localInspection
+                displayName="Assign type"
+                enabledByDefault="false"
+                groupName="Lua > Lint > Type safety"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.AssignTypeInspection"/>
     </extensions>
 
     <application-components>

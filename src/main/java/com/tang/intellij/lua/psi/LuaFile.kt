@@ -44,8 +44,8 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
 
     val moduleName: String?
         get() {
-            val greenStub = greenStub as? LuaFileStub
-            return greenStub?.module ?: findModuleName()
+            val stub = stub as? LuaFileStub
+            return if (stub != null) stub.module else findModuleName()
         }
 
     fun findModuleName():String? {
@@ -77,7 +77,7 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
 
     /**
      * 获取最后返回的类型
-     * @return LuaTypeSet
+     * @return LuaType
      */
     fun getReturnedType(context: SearchContext): ITy {
         val greenStub = greenStub
@@ -96,7 +96,7 @@ class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider
                     returnStatRef.set(luaReturnStat)
                     false
                 }
-                guessReturnTypeSet(returnStatRef.get(), 0, context)
+                guessReturnType(returnStatRef.get(), 0, context)
             }
             ty
         } ?: Ty.UNKNOWN

@@ -18,11 +18,10 @@ package com.tang.intellij.lua.stubs
 
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.stubs.PsiFileStubImpl
-import com.intellij.psi.tree.IStubFileElementType
 import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.LuaFile
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.types.LuaFileType
+import com.tang.intellij.lua.stubs.types.LuaFileElementType
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 
@@ -40,17 +39,17 @@ class LuaFileStub : PsiFileStubImpl<LuaFile> {
         moduleName = file.findModuleName()
     }
 
-    constructor(file: LuaFile?, module:String?, typeSet: ITy) : super(file) {
+    constructor(file: LuaFile?, module:String?, type: ITy) : super(file) {
         this.file = file
         moduleName = module
-        retTypeRef = Ref.create(typeSet)
+        retTypeRef = Ref.create(type)
     }
 
     val module: String? get() {
         return moduleName
     }
 
-    override fun getType(): LuaFileType = LuaParserDefinition.FILE
+    override fun getType(): LuaFileElementType = LuaParserDefinition.FILE
 
     fun getReturnedType(context: SearchContext): ITy {
         if (retTypeRef == null && file != null) {

@@ -13,7 +13,7 @@ import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.tang.intellij.lua.ty.ITyClass;
 
-public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement, LuaGlobal, StubBasedPsiElement<LuaFuncStub> {
+public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement, StubBasedPsiElement<LuaFuncStub> {
 
   @Nullable
   LuaFuncBody getFuncBody();
@@ -42,10 +42,13 @@ public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement
   int getTextOffset();
 
   @NotNull
-  ITy guessReturnTypeSet(SearchContext searchContext);
+  ITy guessReturnType(SearchContext searchContext);
 
   @NotNull
-  ITyClass getClassType(SearchContext searchContext);
+  ITyClass guessParentType(SearchContext searchContext);
+
+  @NotNull
+  Visibility getVisibility();
 
   @NotNull
   LuaParamInfo[] getParams();

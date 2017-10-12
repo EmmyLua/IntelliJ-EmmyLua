@@ -41,6 +41,11 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
 
     var isShowWordsInFile: Boolean = true
 
+    // Throw errors if specified and found types do not match
+    var isEnforceTypeSafety: Boolean = false
+
+    var isNilStrict: Boolean = false
+
     override fun getState(): LuaSettings? {
         return this
     }

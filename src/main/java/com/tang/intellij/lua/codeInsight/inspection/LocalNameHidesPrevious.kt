@@ -19,7 +19,10 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.codeInspection.RefactoringQuickFix
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.refactoring.RefactoringActionHandler
+import com.intellij.refactoring.RefactoringActionHandlerFactory
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaLocalDef
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
@@ -34,7 +37,15 @@ class LocalNameHidesPrevious : LocalInspectionTool() {
                     if (name != Constants.WORD_UNDERLINE) {
                         LuaPsiTreeUtil.walkUpLocalNameDef(it) { nameDef ->
                             if (it.name == nameDef.name) {
-                                holder.registerProblem(it, "Local name hides previous")
+                                holder.registerProblem(it, "Local name hides previous", object : RefactoringQuickFix {
+                                    override fun getHandler(): RefactoringActionHandler {
+                                        return RefactoringActionHandlerFactory.getInstance().createRenameHandler()
+                                    }
+
+                                    override fun getFamilyName(): String {
+                                        return "Rename"
+                                    }
+                                })
                                 return@walkUpLocalNameDef false
                             }
                             return@walkUpLocalNameDef true

@@ -123,17 +123,14 @@ class RemoveCallParenIntention : BaseIntentionAction() {
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
         val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null) {
-            callExpr.args.node.findChildByType(LuaTypes.LPAREN) ?: return false
-
-            val exprList = callExpr.args.exprList
-            if (exprList != null) {
-                val list = exprList.exprList
-                if (list.size != 1) return false
-                val expr = list[0]
-                when (expr) {
-                    is LuaTableExpr -> return true
-                    is LuaLiteralExpr -> return expr.kind == LuaLiteralKind.String
-                }
+            val args = callExpr.args as? LuaListArgs ?: return false
+            val list = args.exprList
+            if (list.isEmpty())
+                return false
+            val expr = list.first()
+            when (expr) {
+                is LuaTableExpr -> return true
+                is LuaLiteralExpr -> return expr.kind == LuaLiteralKind.String
             }
         }
         return false

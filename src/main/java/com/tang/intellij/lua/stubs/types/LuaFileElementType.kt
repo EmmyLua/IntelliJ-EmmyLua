@@ -16,6 +16,8 @@
 
 package com.tang.intellij.lua.stubs.types
 
+import com.intellij.lang.ASTNode
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBuilder
 import com.intellij.psi.stubs.DefaultStubBuilder
@@ -35,7 +37,27 @@ import java.io.IOException
 
  * Created by tangzx on 2016/11/27.
  */
-class LuaFileType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
+class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
+
+    companion object {
+        val LOG = Logger.getInstance(LuaFileElementType::class.java)
+    }
+
+    // debug performance
+    override fun parseContents(chameleon: ASTNode): ASTNode? {
+        val t = System.currentTimeMillis()
+        val contents = super.parseContents(chameleon)
+        if (LOG.isDebugEnabled) {
+            val dt = System.currentTimeMillis() - t
+            val psi = chameleon.psi
+            if (psi is LuaFile) {
+                val fileName = psi.name
+                println("$fileName : $dt")
+                LOG.debug("$fileName : $dt")
+            }
+        }
+        return contents
+    }
 
     override fun getBuilder(): StubBuilder {
         return object : DefaultStubBuilder() {
@@ -57,8 +79,8 @@ class LuaFileType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
     @Throws(IOException::class)
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaFileStub {
         val moduleRef = dataStream.readName()
-        val typeSet = Ty.deserialize(dataStream)
-        return LuaFileStub(null, StringRef.toString(moduleRef), typeSet)
+        val type = Ty.deserialize(dataStream)
+        return LuaFileStub(null, StringRef.toString(moduleRef), type)
     }
 
     override fun getExternalId() = "lua.file"

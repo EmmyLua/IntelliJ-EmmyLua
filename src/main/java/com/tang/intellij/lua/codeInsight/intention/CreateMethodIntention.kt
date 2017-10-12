@@ -52,10 +52,10 @@ class CreateMethodIntention : BaseIntentionAction() {
         if (callExpr != null && !callExpr.isFunctionCall) {
             val expr = callExpr.expr
             if (expr is LuaIndexExpr) {
-                val typeSet = expr.guessPrefixType(SearchContext(project))
-                if (Ty.isInvalid(typeSet)) return
+                val type = expr.guessParentType(SearchContext(project))
+                if (Ty.isInvalid(type)) return
 
-                val position = calcInsertPosition(TyUnion.getPrefectClass(typeSet), project)
+                val position = calcInsertPosition(TyUnion.getPerfectClass(type), project)
                 if (position != null) {
                     editor.caretModel.moveToOffset(position.offset)
 

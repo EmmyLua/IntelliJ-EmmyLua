@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface LuaDocTypeList extends LuaDocPsiElement {
 
   @NotNull
-  List<LuaDocTypeSet> getTypeSetList();
+  List<LuaDocTy> getTyList();
 
 }

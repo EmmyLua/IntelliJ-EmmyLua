@@ -11,7 +11,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.psi.*;
 
-public class LuaArgsImpl extends ASTWrapperPsiElement implements LuaArgs {
+public abstract class LuaArgsImpl extends ASTWrapperPsiElement implements LuaArgs {
 
   public LuaArgsImpl(ASTNode node) {
     super(node);
@@ -24,18 +24,6 @@ public class LuaArgsImpl extends ASTWrapperPsiElement implements LuaArgs {
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public LuaExprList getExprList() {
-    return PsiTreeUtil.getChildOfType(this, LuaExprList.class);
-  }
-
-  @Override
-  @Nullable
-  public LuaTableExpr getTableExpr() {
-    return PsiTreeUtil.getChildOfType(this, LuaTableExpr.class);
   }
 
 }

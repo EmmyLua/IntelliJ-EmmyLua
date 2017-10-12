@@ -46,8 +46,8 @@ public class LuaDocTypeDefImpl extends StubBasedPsiElementBase<LuaDocTyStub> imp
 
   @Override
   @Nullable
-  public LuaDocTypeSet getTypeSet() {
-    return PsiTreeUtil.getChildOfType(this, LuaDocTypeSet.class);
+  public LuaDocTy getTy() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
   }
 
   @NotNull

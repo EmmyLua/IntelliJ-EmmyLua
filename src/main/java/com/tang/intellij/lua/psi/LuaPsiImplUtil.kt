@@ -33,9 +33,9 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
+import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.comment.psi.resolveDocTypeSet
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
@@ -119,7 +119,7 @@ fun isStatic(classMethodDef: LuaClassMethodDef): Boolean {
 fun getPresentation(classMethodDef: LuaClassMethodDef): ItemPresentation {
     return object : ItemPresentation {
         override fun getPresentableText(): String? {
-            val type = classMethodDef.getClassType(SearchContext(classMethodDef.project))
+            val type = classMethodDef.guessClassType(SearchContext(classMethodDef.project))
             if (type != null) {
                 val c = if (classMethodDef.isStatic) "." else ":"
                 return type.displayName + c + classMethodDef.name + classMethodDef.paramSignature
@@ -145,7 +145,7 @@ private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITyClass, Sea
  * *
  * @return LuaType
  */
-fun getClassType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITyClass? {
+fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITy {
     return CachedValuesManager.getManager(classMethodDef.project).getParameterizedCachedValue(classMethodDef, GET_CLASS_METHOD, { ctx ->
         val stub = classMethodDef.stub
         var type: ITyClass? = null
@@ -154,12 +154,12 @@ fun getClassType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITy
         } else {
             val expr = classMethodDef.classMethodName.expr
             val ty = expr.guessTypeFromCache(ctx)
-            val perfect = TyUnion.getPrefectClass(ty)
+            val perfect = TyUnion.getPerfectClass(ty)
             if (perfect is ITyClass)
                 type = perfect
         }
         CachedValueProvider.Result.create(type, classMethodDef)
-    }, false, context)
+    }, false, context) ?: Ty.UNKNOWN
 }
 
 fun getNameIdentifier(funcDef: LuaFuncDef): PsiElement? {
@@ -189,7 +189,7 @@ fun getPresentation(funcDef: LuaFuncDef): ItemPresentation {
     }
 }
 
-fun getClassType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass {
+fun guessParentType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass {
     return TyClass.G
 }
 
@@ -197,9 +197,9 @@ fun getClassType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass {
  * 猜出前面的类型
  * @param callExpr call expr
  * *
- * @return LuaTypeSet
+ * @return LuaType
  */
-fun guessPrefixType(callExpr: LuaCallExpr, context: SearchContext): ITy {
+fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
     val prefix = callExpr.firstChild as LuaExpr
     return prefix.guessTypeFromCache(context)
 }
@@ -235,20 +235,12 @@ fun getFirstStringArg(callExpr: LuaCallExpr): PsiElement? {
     val args = callExpr.args
     var path: PsiElement? = null
 
-    // require "xxx"
-    var child: PsiElement? = args.firstChild
-    while (child != null) {
-        if (child.node.elementType === LuaTypes.STRING) {
-            path = child
-            break
+    when (args) {
+        is LuaSingleArg -> {
+            val expr = args.expr
+            if (expr is LuaLiteralExpr) path = expr
         }
-        child = child.nextSibling
-    }
-    // require("")
-    if (path == null) {
-        val exprList = args.exprList
-        if (exprList != null) {
-            val list = exprList.exprList
+        is LuaListArgs -> args.exprList.let { list ->
             if (list.isNotEmpty() && list[0] is LuaLiteralExpr) {
                 val valueExpr = list[0] as LuaLiteralExpr
                 val node = valueExpr.firstChild
@@ -290,7 +282,7 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
     return Ty.UNKNOWN
 }
 
-fun guessPrefixType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
+fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
     val prefix = indexExpr.firstChild as LuaExpr
     return prefix.guessTypeFromCache(context)
 }
@@ -397,20 +389,20 @@ fun getParamNameDefList(forAStat: LuaForAStat): List<LuaParamNameDef> {
     return list
 }
 
-fun guessReturnTypeSet(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
+fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
-            return stub.returnTypeSet
+            return stub.ty.mainSignature.returnTy
         }
     }
 
-    return guessReturnTypeSetInner(owner, searchContext)
+    return guessReturnTypeInner(owner, searchContext)
 }
 
 private val FUNCTION_RETURN_TYPESET = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.function.return_typeset")
 
-private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
+private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
     if (owner is LuaCommentOwner) {
         val comment = LuaCommentUtil.findComment(owner)
         if (comment != null) {
@@ -423,11 +415,11 @@ private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: Sear
 
     //infer from return stat
     return CachedValuesManager.getManager(owner.project).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, { ctx ->
-        var typeSet: ITy = Ty.UNKNOWN
+        var type: ITy = Ty.UNKNOWN
         owner.acceptChildren(object : LuaVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
-                val guessReturnTypeSet = guessReturnTypeSet(o, ctx.index, ctx)
-                TyUnion.each(guessReturnTypeSet) {
+                val guessReturnType = guessReturnType(o, ctx.index, ctx)
+                TyUnion.each(guessReturnType) {
                     /**
                      * 注意，不能排除anonymous
                      * local function test()
@@ -440,7 +432,7 @@ private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: Sear
                      *
                      * type of r is an anonymous ty
                      */
-                    typeSet = typeSet.union(it)
+                    type = type.union(it)
                 }
             }
 
@@ -456,7 +448,7 @@ private fun guessReturnTypeSetInner(owner: LuaFuncBodyOwner, searchContext: Sear
                 o.acceptChildren(this)
             }
         })
-        CachedValueProvider.Result.create(typeSet, owner)
+        CachedValueProvider.Result.create(type, owner)
     }, false, searchContext)
 }
 
@@ -464,7 +456,7 @@ fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
-            return stub.params
+            return stub.ty.mainSignature.params
         }
     }
     return getParamsInner(owner)
@@ -487,11 +479,17 @@ private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo>
             if (comment != null) {
                 val paramDef = comment.getParamDef(paramName)
                 if (paramDef != null) {
-                    paramInfo.isOptional = paramDef.optional != null
-                    paramInfo.ty = resolveDocTypeSet(paramDef.typeSet)
+                    paramInfo.ty = paramDef.type
                 }
             }
             list.add(paramInfo)
+        }
+        //check varArgs
+        funcBodyOwner.funcBody?.ellipsis?.let {
+            val args = LuaParamInfo()
+            args.name = "..."
+            args.isVarArgs = true
+            list.add(args)
         }
         return list.toTypedArray()
     }
@@ -503,50 +501,9 @@ fun getParamSignature(funcBodyOwner: LuaFuncBodyOwner): String {
     val list = arrayOfNulls<String>(params.size)
     for (i in params.indices) {
         val lpi = params[i]
-        var s = lpi.name
-        if (lpi.isOptional)
-            s = "[$s]"
-        list[i] = s
+        list[i] = lpi.name
     }
     return "(" + list.joinToString(", ") + ")"
-}
-
-private val sets = HashSet<Int>()
-fun processOptional(params: Array<LuaParamInfo?>, processor: (signature: String, mask: Int) -> Unit) {
-    sets.clear()
-    processOptionalFunc(params, processor)
-}
-
-private fun processOptionalFunc(params: Array<LuaParamInfo?>, processor: (signature: String, mask: Int) -> Unit) {
-    var mask = 0
-    val signature = StringBuilder("(")
-
-    for (i in params.indices) {
-        val info = params[i]
-        if (info != null) {
-            if (mask > 0) {
-                signature.append(", ").append(info.name)
-            } else {
-                signature.append(info.name)
-            }
-            mask = mask or (1 shl i)
-        }
-    }
-
-    signature.append(")")
-    processor(signature.toString(), mask)
-    sets.add(mask)
-    for (i in params.indices) {
-        val info = params[i]
-        if (info != null && info.isOptional) {
-            val s = mask xor (1 shl i)
-            if (!sets.contains(s)) {
-                params[i] = null
-                processOptionalFunc(params, processor)
-                params[i] = info
-            }
-        }
-    }
 }
 
 fun getNameIdentifier(localFuncDef: LuaLocalFuncDef): PsiElement? {
@@ -575,6 +532,11 @@ fun getNameIdentifier(tableField: LuaTableField): PsiElement? {
     return tableField.idExpr
 }
 
+fun guessParentType(tableField: LuaTableField, context: SearchContext): ITy {
+    val tbl = PsiTreeUtil.getParentOfType(tableField, LuaTableExpr::class.java)!!
+    return tbl.guessType(context)
+}
+
 fun guessType(tableField: LuaTableField, context: SearchContext): ITy {
     //from comment
     val comment = tableField.comment
@@ -599,7 +561,7 @@ fun getName(tableField: LuaTableField): String? {
         return id.text
 
     val idExpr = tableField.idExpr
-    if (idExpr != null)
+    if (idExpr is LuaLiteralExpr && idExpr.kind == LuaLiteralKind.String)
         return LuaString.getContent(idExpr.text).value
     return null
 }
@@ -627,12 +589,10 @@ fun getPresentation(tableField: LuaTableField): ItemPresentation {
 /**
  * xx['id']
  */
-fun getIdExpr(tableField: LuaTableField): LuaLiteralExpr? {
+fun getIdExpr(tableField: LuaTableField): LuaExpr? {
     val bracket = tableField.lbrack
     if (bracket != null) {
-        val nextLeaf = PsiTreeUtil.getNextSiblingOfType(bracket, LuaExpr::class.java)
-        if (nextLeaf is LuaLiteralExpr && nextLeaf.kind == LuaLiteralKind.String)
-            return nextLeaf
+        return PsiTreeUtil.getNextSiblingOfType(bracket, LuaExpr::class.java)
     }
     return null
 }
@@ -695,7 +655,7 @@ fun getTypeName(stat: LuaAssignStat, index: Int): String? {
     return typeName
 }
 
-fun guessReturnTypeSet(returnStat: LuaReturnStat?, index: Int, context: SearchContext): ITy {
+fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchContext): ITy {
     if (returnStat != null) {
         val returnExpr = returnStat.exprList
         if (returnExpr != null) {
@@ -708,4 +668,22 @@ fun guessReturnTypeSet(returnStat: LuaReturnStat?, index: Int, context: SearchCo
 
 fun getNameIdentifier(label: LuaLabelStat): PsiElement? {
     return label.id
+}
+
+fun getVisibility(member: LuaClassMember): Visibility {
+    if (member is LuaCommentOwner) {
+        val comment = member.comment
+        comment?.findTag(LuaDocAccessModifier::class.java)?.let {
+            return Visibility.get(it.text)
+        }
+    }
+    return Visibility.PUBLIC
+}
+
+fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
+    val stub = classMethodDef.stub
+    if (stub != null) {
+
+    }
+    return getVisibility(classMethodDef as LuaClassMember)
 }

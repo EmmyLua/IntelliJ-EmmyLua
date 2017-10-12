@@ -19,12 +19,12 @@ package com.tang.intellij.lua.editor.completion
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
+import com.intellij.lang.findUsages.LanguageFindUsages
 import com.intellij.patterns.PlatformPatterns.psiElement
-import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
 import com.intellij.util.ProcessingContext
-import com.intellij.util.containers.HashSet
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 
@@ -62,6 +62,8 @@ class LuaCompletionContributor : CompletionContributor() {
                 resultSet.stopHere()
             }
         })
+
+        extend(CompletionType.BASIC, psiElement(LuaTypes.ID).withParent(LuaNameDef::class.java), SuggestLocalNameProvider())
     }
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
@@ -126,29 +128,17 @@ class LuaCompletionContributor : CompletionContributor() {
             val originalPosition = parameters.originalPosition
             if (originalPosition != null)
                 session.addWord(originalPosition.text)
-
-            val wordsInFileSet = HashSet<String>()
-            val file = session.parameters.originalFile
-            file.acceptChildren(object : LuaVisitor() {
-                override fun visitPsiElement(o: LuaPsiElement) {
-                    o.acceptChildren(this)
+            
+            val wordsScanner = LanguageFindUsages.INSTANCE.forLanguage(LuaLanguage.INSTANCE).wordsScanner
+            wordsScanner?.processWords(parameters.editor.document.charsSequence) {
+                val word = it.baseText.subSequence(it.start, it.end).toString()
+                if (session.addWord(word)) {
+                    session.resultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
+                            .create(word)
+                            .withIcon(LuaIcons.WORD), -1.0)
+                    )
                 }
-
-                override fun visitElement(element: PsiElement) {
-                    if (element.node.elementType === LuaTypes.ID && element.textLength > 2) {
-                        val text = element.text
-                        if (session.resultSet.prefixMatcher.prefixMatches(text) && session.addWord(text))
-                            wordsInFileSet.add(text)
-                    }
-                    super.visitElement(element)
-                }
-            })
-
-            for (s in wordsInFileSet) {
-                session.resultSet.addElement(PrioritizedLookupElement.withPriority(LookupElementBuilder
-                        .create(s)
-                        .withIcon(LuaIcons.WORD), -1.0)//.withTypeText("Word In File")
-                )
+                true
             }
         }
     }

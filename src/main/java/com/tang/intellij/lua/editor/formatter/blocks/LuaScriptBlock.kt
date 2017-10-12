@@ -22,11 +22,10 @@ import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
+import com.tang.intellij.lua.editor.formatter.LuaFormatContext
 import com.tang.intellij.lua.psi.LuaTypes
-
-import java.util.ArrayList
-
 import com.tang.intellij.lua.psi.LuaTypes.*
+import java.util.*
 
 /**
 
@@ -37,7 +36,7 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
                           wrap: Wrap?,
                           private val alignment: Alignment?,
                           private val indent: Indent,
-                          private val spacingBuilder: SpacingBuilder) : AbstractBlock(node, wrap, alignment) {
+                          private val ctx: LuaFormatContext) : AbstractBlock(node, wrap, alignment) {
 
     //不创建 ASTBlock
     private val fakeBlockSet = TokenSet.create(
@@ -96,11 +95,11 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
     }
 
     private fun createBlock(node: ASTNode, childIndent: Indent, alignment: Alignment?): LuaScriptBlock {
-        if (node.elementType === UNARY_EXPR)
-            return LuaUnaryScriptBlock(this, node, null, alignment, childIndent, spacingBuilder)
-        if (node.elementType === BINARY_EXPR)
-            return LuaBinaryScriptBlock(this, node, null, alignment, childIndent, spacingBuilder)
-        return LuaScriptBlock(this, node, null, alignment, childIndent, spacingBuilder)
+        return when (node.elementType) {
+            UNARY_EXPR -> LuaUnaryScriptBlock(this, node, null, alignment, childIndent, ctx)
+            BINARY_EXPR -> LuaBinaryScriptBlock(this, node, null, alignment, childIndent, ctx)
+            else -> LuaScriptBlock(this, node, null, alignment, childIndent, ctx)
+        }
     }
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
@@ -115,7 +114,7 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
             }
         }
 
-        return spacingBuilder.getSpacing(this, child1, child2)
+        return ctx.spaceBuilder.getSpacing(this, child1, child2)
     }
 
     override fun getAlignment(): Alignment? {

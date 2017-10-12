@@ -62,12 +62,33 @@ fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? = resol
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
 
+    //local/param
+    LuaPsiTreeUtil.walkUpLocalNameDef(ref) { nameDef ->
+        if (refName == nameDef.name) {
+            ret = nameDef
+            return@walkUpLocalNameDef false
+        }
+        true
+    }
+
     if (refName == Constants.WORD_SELF) {
         val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
         if (block != null) {
-            val classMethodFuncDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)
-            if (classMethodFuncDef != null && !classMethodFuncDef.isStatic) {
-                val expr = classMethodFuncDef.classMethodName.expr
+            val methodDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)
+            if (methodDef != null && !methodDef.isStatic) {
+                /**
+                 * eg.
+                 * function xx:aa()
+                 *     local self = {}
+                 *     return self
+                 * end
+                 */
+                ret?.textRange?.let {
+                    if (block.textRange.contains(it))
+                        return ret
+                }
+
+                val expr = methodDef.classMethodName.expr
                 val reference = expr.reference
                 if (reference is LuaReference && context != null) {
                     val resolve = reference.resolve(context)
@@ -76,17 +97,6 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
                 if (ret == null && expr is LuaNameExpr)
                     ret = expr
             }
-        }
-    }
-
-    //local 变量, 参数
-    if (ret == null) {
-        LuaPsiTreeUtil.walkUpLocalNameDef(ref) { nameDef ->
-            if (refName == nameDef.name) {
-                ret = nameDef
-                return@walkUpLocalNameDef false
-            }
-            true
         }
     }
 
@@ -184,11 +194,11 @@ fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
 }
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
-    val typeSet = indexExpr.guessPrefixType(context)
+    val type = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
-    TyUnion.process(typeSet) { type ->
-        if (type is TyClass) {
-            ret = type.findMember(idString, context)
+    TyUnion.process(type) { ty ->
+        if (ty is TyClass) {
+            ret = ty.findMember(idString, context)
             if (ret != null)
                 return@process false
         }
@@ -198,38 +208,38 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
 }
 
 internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
-    var typeSet: ITy? = null
+    var type: ITy? = null
     //作为函数参数，类型在函数注释里找
     if (nameDef is LuaParamNameDef) {
-        typeSet = resolveParamType(nameDef, context)
+        type = resolveParamType(nameDef, context)
     } else if (nameDef.parent is LuaTableField) {
         val field = nameDef.parent as LuaTableField
         val expr = PsiTreeUtil.findChildOfType(field, LuaExpr::class.java)
-        if (expr != null) typeSet = expr.guessTypeFromCache(context)
+        if (expr != null) type = expr.guessTypeFromCache(context)
     } else {
         val localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef::class.java)
         if (localDef != null) {
             val comment = localDef.comment
             if (comment != null) {
-                typeSet = comment.guessType(context)
+                type = comment.guessType(context)
             }
 
             //计算 expr 返回类型
-            if (Ty.isInvalid(typeSet)) {
+            if (Ty.isInvalid(type)) {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
                     context.index = localDef.getIndexFor(nameDef)
-                    typeSet = exprList.guessTypeAt(context)
+                    type = exprList.guessTypeAt(context)
                 }
             }
 
             //anonymous
-            if (Ty.isInvalid(typeSet))
-                typeSet = TyClass.createAnonymousType(nameDef)
+            if (Ty.isInvalid(type))
+                type = TyClass.createAnonymousType(nameDef)
         }
     }
-    return typeSet ?: Ty.UNKNOWN
+    return type ?: Ty.UNKNOWN
 }
 
 /**
@@ -238,7 +248,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
  * *
  * @param context SearchContext
  * *
- * @return LuaTypeSet
+ * @return LuaType
  */
 private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
     val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
@@ -254,11 +264,11 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
 
         // 如果是个类方法，则有可能在父类里
         if (owner is LuaClassMethodDef) {
-            var classType = owner.getClassType(context)
+            var classType: ITy? = owner.guessClassType(context)
             val methodName = owner.name
             while (classType != null) {
                 classType = classType.getSuperClass(context)
-                if (classType != null && methodName != null) {
+                if (classType != null && methodName != null && classType is TyClass) {
                     val superMethod = classType.findMember(methodName, context)
                     if (superMethod is LuaClassMethod) {
                         val params = superMethod.params//todo : 优化
@@ -296,30 +306,34 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     if (paramIndex == 0)
                         return Ty.NUMBER
 
-                    val argExprList = callExpr.args.exprList
-                    val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
-                    if (argExpr != null) {
-                        val set = argExpr.guessTypeFromCache(context)
-                        val tyArray = TyUnion.find(set, ITyArray::class.java)
-                        if (tyArray != null)
-                            return tyArray.base
-                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
-                        if (tyGeneric != null)
-                            return tyGeneric.getParamTy(1)
+                    val args = callExpr.args
+                    if (args is LuaListArgs) {
+                        val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
+                        if (argExpr != null) {
+                            val set = argExpr.guessTypeFromCache(context)
+                            val tyArray = TyUnion.find(set, ITyArray::class.java)
+                            if (tyArray != null)
+                                return tyArray.base
+                            val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
+                            if (tyGeneric != null)
+                                return tyGeneric.getParamTy(1)
+                        }
                     }
                 }
                 // pairs
                 if (expr.text == Constants.WORD_PAIRS) {
-                    val argExprList = callExpr.args.exprList
-                    val argExpr = PsiTreeUtil.findChildOfType(argExprList, LuaExpr::class.java)
-                    if (argExpr != null) {
-                        val set = argExpr.guessType(context)
-                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
-                        if (tyGeneric != null)
-                            return tyGeneric.getParamTy(paramIndex)
-                        val tyArray = TyUnion.find(set, ITyArray::class.java)
-                        if (tyArray != null)
-                            return if (paramIndex == 0) Ty.NUMBER else tyArray.base
+                    val args = callExpr.args
+                    if (args is LuaListArgs) {
+                        val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
+                        if (argExpr != null) {
+                            val set = argExpr.guessType(context)
+                            val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
+                            if (tyGeneric != null)
+                                return tyGeneric.getParamTy(paramIndex)
+                            val tyArray = TyUnion.find(set, ITyArray::class.java)
+                            if (tyArray != null)
+                                return if (paramIndex == 0) Ty.NUMBER else tyArray.base
+                        }
                     }
                 }
             }
@@ -338,14 +352,17 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
             val closure = LuaPsiTreeUtil.getParentOfType(paramNameDef, LuaClosureExpr::class.java, LuaFuncBody::class.java)
             if (closure != null) {
                 val callExpr = owner.expr as LuaCallExpr
-                val type = callExpr.guessPrefixType(context)
+                val type = callExpr.guessParentType(context)
                 //todo mainSignature ?
                 if (type is ITyFunction) {
-                    val closureIndex = callExpr.args.exprList!!.getIndexFor(closure)
-                    val paramTy = type.mainSignature.getParamTy(closureIndex)
-                    if (paramTy is ITyFunction) {
-                        val paramIndex = closure.getIndexFor(paramNameDef)
-                        return paramTy.mainSignature.getParamTy(paramIndex)
+                    val args = callExpr.args
+                    if (args is LuaListArgs) {
+                        val closureIndex = args.getIndexFor(closure)
+                        val paramTy = type.mainSignature.getParamTy(closureIndex)
+                        if (paramTy is ITyFunction) {
+                            val paramIndex = closure.getIndexFor(paramNameDef)
+                            return paramTy.mainSignature.getParamTy(paramIndex)
+                        }
                     }
                 }
             }

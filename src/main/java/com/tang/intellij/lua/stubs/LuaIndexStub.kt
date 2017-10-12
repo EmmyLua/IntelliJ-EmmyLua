@@ -24,8 +24,8 @@ import com.tang.intellij.lua.ty.ITy
 
  * Created by TangZX on 2017/4/12.
  */
-interface LuaIndexStub : StubElement<LuaIndexExpr> {
-    val typeName: String?
+interface LuaIndexStub : StubElement<LuaIndexExpr>, LuaClassMemberStub<LuaIndexExpr> {
+    val className: String?
     val name: String?
     val valueType: ITy
 }

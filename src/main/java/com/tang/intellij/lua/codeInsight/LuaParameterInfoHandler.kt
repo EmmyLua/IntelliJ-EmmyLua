@@ -22,6 +22,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaArgs
 import com.tang.intellij.lua.psi.LuaCallExpr
+import com.tang.intellij.lua.psi.LuaListArgs
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.IFunSignature
@@ -52,7 +53,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
         val luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.offset, LuaArgs::class.java, false)
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
-            val type = callExpr.guessPrefixType(SearchContext(context.project))
+            val type = callExpr.guessParentType(SearchContext(context.project))
             if (type is ITyFunction) {
                 val list = mutableListOf<IFunSignature>()
                 type.process(Processor {
@@ -77,9 +78,8 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
     }
 
     override fun updateParameterInfo(args: LuaArgs, context: UpdateParameterInfoContext) {
-        val exprList = args.exprList
-        if (exprList != null) {
-            val index = ParameterInfoUtils.getCurrentParameterIndex(exprList.node, context.offset, LuaTypes.COMMA)
+        if (args is LuaListArgs) {
+            val index = ParameterInfoUtils.getCurrentParameterIndex(args.node, context.offset, LuaTypes.COMMA)
             context.setCurrentParameter(index)
         }
     }

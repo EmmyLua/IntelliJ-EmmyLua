@@ -16,9 +16,12 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.openapi.project.Project
+import com.intellij.psi.search.GlobalSearchScope
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
@@ -34,7 +37,25 @@ interface ITyClass : ITy {
         processMembers(context, processor, true)
     }
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
-    fun getSuperClass(context: SearchContext): ITyClass?
+    fun findMemberType(name: String, searchContext: SearchContext): ITy?
+    fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember?
+}
+
+fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visibility): Boolean {
+    if (visibility == Visibility.PUBLIC)
+        return true
+    var isVisible = false
+    TyUnion.process(contextTy) {
+        if (it is ITyClass) {
+            if (it == this)
+                isVisible = true
+            else if (visibility == Visibility.PROTECTED) {
+                isVisible = LuaClassInheritorsSearch.isClassInheritFrom(GlobalSearchScope.projectScope(project), project, className, it.className)
+            }
+        }
+        !isVisible
+    }
+    return isVisible
 }
 
 abstract class TyClass(override val className: String, override var superClassName: String? = null) : Ty(TyKind.Class), ITyClass {
@@ -71,12 +92,27 @@ abstract class TyClass(override val className: String, override var superClassNa
         // super
         if (deep) {
             val superType = getSuperClass(context)
-            superType?.processMembers(context, processor, deep)
+            if (superType is TyClass) superType.processMembers(context, processor, deep)
         }
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
         return LuaClassMemberIndex.find(this, name, searchContext)
+    }
+
+    override fun findMemberType(name: String, searchContext: SearchContext): ITy? {
+        return findMember(name, searchContext)?.guessType(searchContext)
+    }
+
+    override fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        // Travel up the hierarchy to find the lowest member of this type on a superclass (excluding this class)
+        var superClass = getSuperClass(searchContext)
+        while (superClass != null && superClass is TyClass) {
+            val member = superClass.findMember(name, searchContext)
+            if (member != null) return member
+            superClass = superClass.getSuperClass(searchContext)
+        }
+        return null
     }
 
     override val displayName: String get() = if(isAnonymous) "Anonymous" else className
@@ -97,13 +133,36 @@ abstract class TyClass(override val className: String, override var superClassNa
         }
     }
 
-    override fun getSuperClass(context: SearchContext): ITyClass? {
+    override fun getSuperClass(context: SearchContext): ITy? {
         val clsName = superClassName
         if (clsName != null) {
-            val def = LuaClassIndex.find(clsName, context)
-            return def?.type
+            return when (clsName){
+                Constants.WORD_NIL -> Ty.NIL
+                Constants.WORD_ANY -> Ty.UNKNOWN
+                Constants.WORD_BOOLEAN -> Ty.BOOLEAN
+                Constants.WORD_STRING -> Ty.STRING
+                Constants.WORD_NUMBER -> Ty.NUMBER
+                Constants.WORD_TABLE -> Ty.TABLE
+                Constants.WORD_FUNCTION -> Ty.FUNCTION
+                else -> LuaClassIndex.find(clsName, context)?.type
+            }
         }
         return null
+    }
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        if (super.subTypeOf(other, context)) return true
+
+        // Lazy init for superclass
+        this.doLazyInit(context)
+        // Check if any of the superclasses are type
+        var superClass = getSuperClass(context)
+        while (superClass != null) {
+            if (other == superClass) return true
+            superClass = superClass.getSuperClass(context)
+        }
+
+        return false
     }
 
     companion object {
@@ -169,4 +228,9 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun toString(): String = displayName
 
     override fun doLazyInit(searchContext: SearchContext) = Unit
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        // Empty list is a table, but subtype of all lists
+        return super.subTypeOf(other, context) || other == Ty.TABLE || (other is TyArray && table.tableFieldList.size == 0)
+    }
 }

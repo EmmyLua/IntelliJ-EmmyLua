@@ -20,9 +20,8 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaFuncDef
-import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaTypes
-import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyFunction
 
 /**
 
@@ -35,7 +34,6 @@ interface LuaFuncStub : LuaFuncBodyOwnerStub<LuaFuncDef> {
 
 class LuaFuncStubImpl(override val name: String,
                       override val module: String,
-                      override val params: Array<LuaParamInfo>,
-                      override val returnTypeSet: ITy,
+                      override val ty: ITyFunction,
                       parent: StubElement<*>)
     : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub

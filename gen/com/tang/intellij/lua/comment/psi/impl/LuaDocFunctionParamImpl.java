@@ -27,9 +27,9 @@ public class LuaDocFunctionParamImpl extends ASTWrapperPsiElement implements Lua
   }
 
   @Override
-  @NotNull
-  public LuaDocTypeSet getTypeSet() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaDocTypeSet.class));
+  @Nullable
+  public LuaDocTy getTy() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
   }
 
   @Override

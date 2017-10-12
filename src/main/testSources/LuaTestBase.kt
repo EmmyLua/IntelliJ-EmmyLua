@@ -1,3 +1,5 @@
+import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+
 /*
  * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
  *
@@ -14,12 +16,6 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi;
+abstract class LuaTestBase : LightPlatformCodeInsightFixtureTestCase() {
 
-import com.intellij.navigation.NavigationItem;
-
-/**
- * 全局的对象
- */
-public interface LuaGlobal extends LuaPsiElement, NavigationItem {
 }
