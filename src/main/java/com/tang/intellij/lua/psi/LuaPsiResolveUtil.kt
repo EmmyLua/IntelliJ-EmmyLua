@@ -62,12 +62,33 @@ fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? = resol
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
 
+    //local/param
+    LuaPsiTreeUtil.walkUpLocalNameDef(ref) { nameDef ->
+        if (refName == nameDef.name) {
+            ret = nameDef
+            return@walkUpLocalNameDef false
+        }
+        true
+    }
+
     if (refName == Constants.WORD_SELF) {
         val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
         if (block != null) {
-            val classMethodFuncDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)
-            if (classMethodFuncDef != null && !classMethodFuncDef.isStatic) {
-                val expr = classMethodFuncDef.classMethodName.expr
+            val methodDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)
+            if (methodDef != null && !methodDef.isStatic) {
+                /**
+                 * eg.
+                 * function xx:aa()
+                 *     local self = {}
+                 *     return self
+                 * end
+                 */
+                ret?.textRange?.let {
+                    if (block.textRange.contains(it))
+                        return ret
+                }
+
+                val expr = methodDef.classMethodName.expr
                 val reference = expr.reference
                 if (reference is LuaReference && context != null) {
                     val resolve = reference.resolve(context)
@@ -76,17 +97,6 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
                 if (ret == null && expr is LuaNameExpr)
                     ret = expr
             }
-        }
-    }
-
-    //local 变量, 参数
-    if (ret == null) {
-        LuaPsiTreeUtil.walkUpLocalNameDef(ref) { nameDef ->
-            if (refName == nameDef.name) {
-                ret = nameDef
-                return@walkUpLocalNameDef false
-            }
-            true
         }
     }
 
