@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.lang.ASTNode
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBuilder
 import com.intellij.psi.stubs.DefaultStubBuilder
@@ -38,18 +39,25 @@ import java.io.IOException
  */
 class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
 
+    companion object {
+        val LOG = Logger.getInstance(LuaFileElementType::class.java)
+    }
+
     // debug performance
-    /*override fun parseContents(chameleon: ASTNode): ASTNode? {
+    override fun parseContents(chameleon: ASTNode): ASTNode? {
         val t = System.currentTimeMillis()
         val contents = super.parseContents(chameleon)
-        val dt = System.currentTimeMillis() - t
-        val psi = chameleon.psi
-        if (psi is LuaFile) {
-            val fileName = psi.name
-            println("$fileName : $dt")
+        if (LOG.isDebugEnabled) {
+            val dt = System.currentTimeMillis() - t
+            val psi = chameleon.psi
+            if (psi is LuaFile) {
+                val fileName = psi.name
+                println("$fileName : $dt")
+                LOG.debug("$fileName : $dt")
+            }
         }
         return contents
-    }*/
+    }
 
     override fun getBuilder(): StubBuilder {
         return object : DefaultStubBuilder() {
