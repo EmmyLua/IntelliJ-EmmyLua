@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.stubs.types
 
+import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBuilder
 import com.intellij.psi.stubs.DefaultStubBuilder
@@ -36,6 +37,19 @@ import java.io.IOException
  * Created by tangzx on 2016/11/27.
  */
 class LuaFileType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANCE) {
+
+    // debug performance
+    /*override fun parseContents(chameleon: ASTNode): ASTNode? {
+        val t = System.currentTimeMillis()
+        val contents = super.parseContents(chameleon)
+        val dt = System.currentTimeMillis() - t
+        val psi = chameleon.psi
+        if (psi is LuaFile) {
+            val fileName = psi.name
+            println("$fileName : $dt")
+        }
+        return contents
+    }*/
 
     override fun getBuilder(): StubBuilder {
         return object : DefaultStubBuilder() {
