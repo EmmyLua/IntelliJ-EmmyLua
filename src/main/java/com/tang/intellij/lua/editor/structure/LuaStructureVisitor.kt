@@ -110,7 +110,7 @@ class LuaStructureVisitor : LuaVisitor() {
                 return
             }
 
-            val owner: LuaTreeElement? = if (name is LuaIndexExpr) handleCompoundName(name) else null
+            val owner: LuaTreeElement? = if (name is LuaIndexExpr) handleCompoundName(name.prefixExpr) else null
 
             val child = if (expr is LuaClosureExpr) {
                 when (owner) {
@@ -249,28 +249,21 @@ class LuaStructureVisitor : LuaVisitor() {
         popContext()
     }
 
-    private fun getNamePartsFromCompoundName(compoundNameParent: LuaPsiElement): ArrayList<LuaExpr> {
+    private fun getNamePartsFromCompoundName(namePartExpr: LuaExpr): ArrayList<LuaExpr> {
         val result = ArrayList<LuaExpr>()
 
-        val secondToLast = (compoundNameParent as? LuaClassMethodDef)?.classMethodName?.expr ?: compoundNameParent.firstChild as LuaExpr
-        var namePart: LuaExpr = secondToLast
-
-        while (namePart.firstChild is LuaExpr) {
-            namePart = namePart.firstChild as LuaExpr
-        }
-
-        result.add(namePart)
-
-        while (namePart != secondToLast) {
-            namePart = namePart.parent as LuaExpr
+        var namePart = namePartExpr
+        while (true) {
             result.add(namePart)
+            namePart = namePart.firstChild as? LuaExpr ?: break
         }
+        result.reverse()
 
         return result
     }
 
-    private fun handleCompoundName(owner: LuaPsiElement, parent: LuaTreeElement? = null): LuaTreeElement {
-        val nameParts = getNamePartsFromCompoundName(owner)
+    private fun handleCompoundName(namePartExpr: LuaExpr, parent: LuaTreeElement? = null): LuaTreeElement {
+        val nameParts = getNamePartsFromCompoundName(namePartExpr)
 
         var element: LuaTreeElement? = null
 
@@ -305,7 +298,7 @@ class LuaStructureVisitor : LuaVisitor() {
     }
 
     override fun visitClassMethodDef(o: LuaClassMethodDef) {
-        val treeElem = handleCompoundName(o.classMethodName/*, current?.element*/)
+        val treeElem = handleCompoundName(o.classMethodName.expr)
 
         val elem = LuaClassMethodElement(o)
 
