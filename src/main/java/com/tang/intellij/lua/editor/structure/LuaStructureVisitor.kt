@@ -18,6 +18,7 @@ package com.tang.intellij.lua.editor.structure
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
@@ -205,15 +206,9 @@ class LuaStructureVisitor : LuaVisitor() {
 
     override fun visitFuncBody(o: LuaFuncBody) {
         // A func body has, as _children, some number of param name defs followed by a block
-        val block = o.children[o.children.size - 1]
-
-        block.accept(this)
+        PsiTreeUtil.getChildOfType(o, LuaBlock::class.java)?.acceptChildren(this)
     }
-
-    override fun visitBlock(o: LuaBlock) {
-        o.statementList.forEach { s -> s.accept(this) }
-    }
-
+    
     override fun visitLocalDef(o: LuaLocalDef) {
         val nameList = o.nameList ?: return
 
