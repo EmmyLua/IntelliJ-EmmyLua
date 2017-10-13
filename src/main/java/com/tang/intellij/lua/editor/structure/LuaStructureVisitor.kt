@@ -110,7 +110,10 @@ class LuaStructureVisitor : LuaVisitor() {
                 return
             }
 
-            val owner: LuaTreeElement? = if (name is LuaIndexExpr) handleCompoundName(name.prefixExpr) else null
+            var owner: LuaTreeElement? = null
+            if (name is LuaIndexExpr) {
+                owner = handleCompoundName(name.prefixExpr) ?: return
+            }
 
             val child = if (expr is LuaClosureExpr) {
                 when (owner) {
@@ -262,15 +265,19 @@ class LuaStructureVisitor : LuaVisitor() {
         return result
     }
 
-    private fun handleCompoundName(namePartExpr: LuaExpr, parent: LuaTreeElement? = null): LuaTreeElement {
+    // return null if namePartExpr contains indexExpr such as `b[1]`
+    private fun handleCompoundName(namePartExpr: LuaExpr, parent: LuaTreeElement? = null): LuaTreeElement? {
         val nameParts = getNamePartsFromCompoundName(namePartExpr)
 
         var element: LuaTreeElement? = null
 
-        nameParts.forEach { namePart ->
+        for (namePart in nameParts) {
             var child: LuaTreeElement?
+            // fix crash : a.b[1].c = 2
+            val name = namePart.name ?: return null
+
             if (element == null) {
-                child = findElementNamed(namePart.name)
+                child = findElementNamed(name)
 
                 if (child == null) {
                     child = if (parent == null) {
@@ -282,35 +289,35 @@ class LuaStructureVisitor : LuaVisitor() {
                     addChild(child)
                 }
             } else {
-                child = element!!.childNamed(namePart.name!!)
+                child = element.childNamed(name)
 
                 if (child == null) {
                     child = LuaLocalVarElement(namePart)
 
-                    element!!.addChild(child)
+                    element.addChild(child)
                 }
             }
 
             element = child
         }
 
-        return element!!
+        return element
     }
 
     override fun visitClassMethodDef(o: LuaClassMethodDef) {
-        val treeElem = handleCompoundName(o.classMethodName.expr)
+        handleCompoundName(o.classMethodName.expr)?.let { treeElem->
+            val elem = LuaClassMethodElement(o)
 
-        val elem = LuaClassMethodElement(o)
+            treeElem.addChild(elem)
 
-        treeElem.addChild(elem)
+            val funcBody = o.funcBody
+            if (funcBody != null) {
+                pushContext(elem, false)
 
-        val funcBody = o.funcBody
-        if (funcBody != null) {
-            pushContext(elem, false)
+                funcBody.accept(this)
 
-            funcBody.accept(this)
-
-            popContext()
+                popContext()
+            }
         }
     }
 
