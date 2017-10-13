@@ -54,15 +54,18 @@
         PRIVATE = 'private'
         PROTECTED = 'protected'
         PUBLIC = 'public'
-        CLASS = 'class'
-        FIELD = 'field'
+        TAG_PRIVATE = 'private'
+        TAG_PROTECTED = 'protected'
+        TAG_PUBLIC = 'public'
+        TAG_CLASS = 'class'
+        TAG_FIELD = 'field'
         DASHES = 'DASHES'
         STRING_BEGIN = 'STRING_BEGIN'
         STRING = 'STRING'
-        TYPE = 'type'
-        LANGUAGE = 'language'
-        OVERLOAD = 'overload'
-        MODULE = 'module'
+        TAG_TYPE = 'type'
+        TAG_LANGUAGE = 'language'
+        TAG_OVERLOAD = 'overload'
+        TAG_MODULE = 'module'
   ]
 }
 
@@ -105,9 +108,9 @@ function_ty ::= fun '(' function_param_list ')' (':' type_list)? {
 union_ty ::= ty ('|' ty)+ {
     methods = [getType]
 }
-access_modifier ::= PRIVATE | PUBLIC | PROTECTED
+access_modifier ::= PRIVATE | PUBLIC | PROTECTED | TAG_PRIVATE | TAG_PUBLIC | TAG_PROTECTED
 
-field_def ::= FIELD access_modifier? ID ty comment_string? {
+field_def ::= TAG_FIELD access_modifier? ID ty comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
@@ -134,10 +137,10 @@ tag_value ::= ID
 tag_def ::= TAG_NAME tag_value? comment_string? { pin = 1 }
 
 //@overload
-overload_def ::= OVERLOAD function_ty { pin = 1 }
+overload_def ::= TAG_OVERLOAD function_ty { pin = 1 }
 
 //@language json
-lan_def ::= LANGUAGE ID { pin = 1 }
+lan_def ::= TAG_LANGUAGE ID { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
@@ -158,7 +161,7 @@ return_def ::= TAG_RETURN type_list comment_string? {
 class_name_ref ::= ID {
     methods = [getReference resolveType]
 }
-class_def ::= (CLASS|MODULE) ID (EXTENDS class_name_ref)? comment_string? {
+class_def ::= (TAG_CLASS|TAG_MODULE) ID (EXTENDS class_name_ref)? comment_string? {
     pin = 2
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
@@ -176,19 +179,19 @@ class_def ::= (CLASS|MODULE) ID (EXTENDS class_name_ref)? comment_string? {
         toString
 
         superClassNameRef = 'class_name_ref'
-        module = 'MODULE'
+        module = 'TAG_MODULE'
     ]
 }
 
 // @type CLASS_REF
-type_def ::= TYPE ty comment_string? {
+type_def ::= TAG_TYPE ty comment_string? {
     pin = 1
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTyStub"
     methods = [getType]
 }
 
-comment_string ::= STRING_BEGIN STRING? {
-    pin = 1
+comment_string ::= STRING_BEGIN? STRING? {
+    //pin = 1
     methods = [
         string = "STRING"
     ]

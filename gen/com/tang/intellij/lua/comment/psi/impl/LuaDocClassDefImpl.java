@@ -94,7 +94,7 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
   @Override
   @Nullable
   public PsiElement getModule() {
-    return findChildByType(MODULE);
+    return findChildByType(TAG_MODULE);
   }
 
 }

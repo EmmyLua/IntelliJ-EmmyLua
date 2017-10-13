@@ -85,12 +85,15 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
         val DOC_TAG_TOKENS = TokenSet.create(
                 LuaDocTypes.TAG_PARAM,
                 LuaDocTypes.TAG_RETURN,
-                LuaDocTypes.CLASS,
-                LuaDocTypes.MODULE,
-                LuaDocTypes.TYPE,
-                LuaDocTypes.FIELD,
-                LuaDocTypes.LANGUAGE,
-                LuaDocTypes.OVERLOAD
+                LuaDocTypes.TAG_CLASS,
+                LuaDocTypes.TAG_MODULE,
+                LuaDocTypes.TAG_TYPE,
+                LuaDocTypes.TAG_FIELD,
+                LuaDocTypes.TAG_LANGUAGE,
+                LuaDocTypes.TAG_OVERLOAD,
+                LuaDocTypes.TAG_PRIVATE,
+                LuaDocTypes.TAG_PROTECTED,
+                LuaDocTypes.TAG_PUBLIC
         )
         private val DOC_KEYWORD_TOKENS = TokenSet.create(
                 LuaDocTypes.FUN

@@ -34,33 +34,36 @@ public interface LuaDocTypes {
 
   IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
-  IElementType CLASS = new LuaDocTokenType("class");
   IElementType COMMA = new LuaDocTokenType(",");
   IElementType DASHES = new LuaDocTokenType("DASHES");
   IElementType EQ = new LuaDocTokenType("=");
   IElementType EXTENDS = new LuaDocTokenType(":");
-  IElementType FIELD = new LuaDocTokenType("field");
   IElementType FUN = new LuaDocTokenType("fun");
   IElementType GT = new LuaDocTokenType(">");
   IElementType ID = new LuaDocTokenType("ID");
-  IElementType LANGUAGE = new LuaDocTokenType("language");
   IElementType LPAREN = new LuaDocTokenType("(");
   IElementType LT = new LuaDocTokenType("<");
-  IElementType MODULE = new LuaDocTokenType("module");
   IElementType OPTIONAL = new LuaDocTokenType("optional");
   IElementType OR = new LuaDocTokenType("|");
-  IElementType OVERLOAD = new LuaDocTokenType("overload");
-  IElementType PRIVATE = new LuaDocTokenType("private");
-  IElementType PROTECTED = new LuaDocTokenType("protected");
-  IElementType PUBLIC = new LuaDocTokenType("public");
+  IElementType PRIVATE = new LuaDocTokenType("PRIVATE");
+  IElementType PROTECTED = new LuaDocTokenType("PROTECTED");
+  IElementType PUBLIC = new LuaDocTokenType("PUBLIC");
   IElementType RPAREN = new LuaDocTokenType(")");
   IElementType SHARP = new LuaDocTokenType("#");
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
+  IElementType TAG_CLASS = new LuaDocTokenType("class");
+  IElementType TAG_FIELD = new LuaDocTokenType("field");
+  IElementType TAG_LANGUAGE = new LuaDocTokenType("language");
+  IElementType TAG_MODULE = new LuaDocTokenType("module");
   IElementType TAG_NAME = new LuaDocTokenType("TAG_NAME");
+  IElementType TAG_OVERLOAD = new LuaDocTokenType("overload");
   IElementType TAG_PARAM = new LuaDocTokenType("param");
+  IElementType TAG_PRIVATE = new LuaDocTokenType("private");
+  IElementType TAG_PROTECTED = new LuaDocTokenType("protected");
+  IElementType TAG_PUBLIC = new LuaDocTokenType("public");
   IElementType TAG_RETURN = new LuaDocTokenType("return");
-  IElementType TYPE = new LuaDocTokenType("type");
+  IElementType TAG_TYPE = new LuaDocTokenType("type");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

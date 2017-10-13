@@ -71,9 +71,9 @@ public class _LuaDocLexer implements FlexLexer, LuaDocTypes {
     "\1\16\1\17\1\20\1\21\1\6\11\22\1\23\4\10"+
     "\1\24\12\22\1\25\4\10\13\22\4\10\3\22\1\26"+
     "\7\22\4\10\1\27\5\22\1\30\1\22\1\31\1\22"+
-    "\2\10\1\32\1\10\1\22\1\33\2\22\1\32\1\34"+
-    "\1\22\1\35\2\10\1\22\1\35\2\22\1\10\1\36"+
-    "\1\37\1\22\1\40\2\41";
+    "\2\10\1\32\1\10\1\22\1\33\2\22\1\34\1\35"+
+    "\1\22\1\36\2\10\1\22\1\37\2\22\1\10\1\40"+
+    "\1\41\1\22\1\42\1\43\1\44";
 
   private static int [] zzUnpackAction() {
     int [] result = new int[122];
@@ -579,135 +579,147 @@ public class _LuaDocLexer implements FlexLexer, LuaDocTypes {
           case 1: 
             { yybegin(YYINITIAL); return STRING;
             }
-          case 34: break;
+          case 37: break;
           case 2: 
             { yybegin(xCOMMENT_STRING); yypushback(yylength());
             }
-          case 35: break;
+          case 38: break;
           case 3: 
             { yybegin(YYINITIAL); return com.intellij.psi.TokenType.WHITE_SPACE;
             }
-          case 36: break;
+          case 39: break;
           case 4: 
             { return com.intellij.psi.TokenType.WHITE_SPACE;
             }
-          case 37: break;
+          case 40: break;
           case 5: 
             { yybegin(xTAG_NAME); return AT;
             }
-          case 38: break;
+          case 41: break;
           case 6: 
             { return com.intellij.psi.TokenType.BAD_CHARACTER;
             }
-          case 39: break;
+          case 42: break;
           case 7: 
             { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;
             }
-          case 40: break;
+          case 43: break;
           case 8: 
             { return ID;
             }
-          case 41: break;
+          case 44: break;
           case 9: 
             { yybegin(xCOMMENT_STRING); return STRING_BEGIN;
             }
-          case 42: break;
+          case 45: break;
           case 10: 
             { return COMMA;
             }
-          case 43: break;
+          case 46: break;
           case 11: 
             { return SHARP;
             }
-          case 44: break;
+          case 47: break;
           case 12: 
             { return EXTENDS;
             }
-          case 45: break;
+          case 48: break;
           case 13: 
             { return OR;
             }
-          case 46: break;
+          case 49: break;
           case 14: 
             { return GT;
             }
-          case 47: break;
+          case 50: break;
           case 15: 
             { return LT;
             }
-          case 48: break;
+          case 51: break;
           case 16: 
             { return LPAREN;
             }
-          case 49: break;
+          case 52: break;
           case 17: 
             { return RPAREN;
             }
-          case 50: break;
+          case 53: break;
           case 18: 
             { yybegin(xTAG); return TAG_NAME;
             }
-          case 51: break;
+          case 54: break;
           case 19: 
             { return DASHES;
             }
-          case 52: break;
+          case 55: break;
           case 20: 
             { return ARR;
             }
-          case 53: break;
+          case 56: break;
           case 21: 
             { return FUN;
             }
-          case 54: break;
+          case 57: break;
           case 22: 
-            { yybegin(xTAG); return TYPE;
+            { yybegin(xTAG); return TAG_TYPE;
             }
-          case 55: break;
+          case 58: break;
           case 23: 
-            { yybegin(xTAG); return FIELD;
+            { yybegin(xTAG); return TAG_FIELD;
             }
-          case 56: break;
+          case 59: break;
           case 24: 
             { yybegin(xTAG); return TAG_PARAM;
             }
-          case 57: break;
+          case 60: break;
           case 25: 
-            { yybegin(xTAG); return CLASS;
+            { yybegin(xTAG); return TAG_CLASS;
             }
-          case 58: break;
+          case 61: break;
           case 26: 
             { yybegin(xTAG); return PUBLIC;
             }
-          case 59: break;
+          case 62: break;
           case 27: 
             { yybegin(xTAG); return TAG_RETURN;
             }
-          case 60: break;
-          case 28: 
-            { yybegin(xTAG); return MODULE;
-            }
-          case 61: break;
-          case 29: 
-            { yybegin(xTAG); return PRIVATE;
-            }
-          case 62: break;
-          case 30: 
-            { return OPTIONAL;
-            }
           case 63: break;
-          case 31: 
-            { yybegin(xTAG); return LANGUAGE;
+          case 28: 
+            { yybegin(xTAG); return TAG_PUBLIC;
             }
           case 64: break;
-          case 32: 
-            { yybegin(xTAG); return OVERLOAD;
+          case 29: 
+            { yybegin(xTAG); return TAG_MODULE;
             }
           case 65: break;
-          case 33: 
-            { yybegin(xTAG); return PROTECTED;
+          case 30: 
+            { yybegin(xTAG); return PRIVATE;
             }
           case 66: break;
+          case 31: 
+            { yybegin(xTAG); return TAG_PRIVATE;
+            }
+          case 67: break;
+          case 32: 
+            { return OPTIONAL;
+            }
+          case 68: break;
+          case 33: 
+            { yybegin(xTAG); return TAG_LANGUAGE;
+            }
+          case 69: break;
+          case 34: 
+            { yybegin(xTAG); return TAG_OVERLOAD;
+            }
+          case 70: break;
+          case 35: 
+            { yybegin(xTAG); return PROTECTED;
+            }
+          case 71: break;
+          case 36: 
+            { yybegin(xTAG); return TAG_PROTECTED;
+            }
+          case 72: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

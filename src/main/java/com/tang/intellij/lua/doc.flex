@@ -63,17 +63,17 @@ DOC_DASHES = --+
 }
 
 <xTAG_NAME> {
-    "field"                    { yybegin(xTAG); return FIELD; }
+    "field"                    { yybegin(xTAG); return TAG_FIELD; }
     "return"                   { yybegin(xTAG); return TAG_RETURN; }
     "param"                    { yybegin(xTAG); return TAG_PARAM; }
-    "class"                    { yybegin(xTAG); return CLASS; }
-    "type"                     { yybegin(xTAG); return TYPE;}
-    "language"                 { yybegin(xTAG); return LANGUAGE;}
-    "overload"                 { yybegin(xTAG); return OVERLOAD; }
-    "module"                   { yybegin(xTAG); return MODULE; }
-    "private"                  { yybegin(xTAG); return PRIVATE; }
-    "protected"                { yybegin(xTAG); return PROTECTED; }
-    "public"                   { yybegin(xTAG); return PUBLIC; }
+    "class"                    { yybegin(xTAG); return TAG_CLASS; }
+    "type"                     { yybegin(xTAG); return TAG_TYPE;}
+    "language"                 { yybegin(xTAG); return TAG_LANGUAGE;}
+    "overload"                 { yybegin(xTAG); return TAG_OVERLOAD; }
+    "module"                   { yybegin(xTAG); return TAG_MODULE; }
+    "private"                  { yybegin(xTAG); return TAG_PRIVATE; }
+    "protected"                { yybegin(xTAG); return TAG_PROTECTED; }
+    "public"                   { yybegin(xTAG); return TAG_PUBLIC; }
     {ID}                       { yybegin(xTAG); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

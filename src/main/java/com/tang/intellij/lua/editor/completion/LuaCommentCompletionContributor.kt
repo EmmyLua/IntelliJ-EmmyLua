@@ -188,7 +188,7 @@ class LuaCommentCompletionContributor : CompletionContributor() {
 
         // 在 @field 之后提示 public / protected
         private val SHOW_ACCESS_MODIFIER = psiElement().afterLeaf(
-                psiElement().withElementType(LuaDocTypes.FIELD)
+                psiElement().withElementType(LuaDocTypes.TAG_FIELD)
         )
 
         private val SHOW_FIELD = psiElement(LuaDocTypes.ID).inside(LuaDocFieldDef::class.java)
