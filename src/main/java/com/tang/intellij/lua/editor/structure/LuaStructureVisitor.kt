@@ -104,28 +104,29 @@ class LuaStructureVisitor : LuaVisitor() {
         // We're only interested in named entities
         repeat(variableNames.size) { i ->
             val expr = expressions?.get(i)
-            val name = variableNames[i]
+            val nameExpr = variableNames[i]
+            val name = nameExpr.name ?: return
 
-            if (name is PsiNamedElement && findElementNamed((name as PsiNamedElement).name) != null) {
+            if (nameExpr is PsiNamedElement && findElementNamed(name) != null) {
                 // We're assigning to a previously declared entity -- ignore
                 return
             }
 
             var owner: LuaTreeElement? = null
-            if (name is LuaIndexExpr) {
-                owner = handleCompoundName(name.prefixExpr) ?: return
+            if (nameExpr is LuaIndexExpr) {
+                owner = handleCompoundName(nameExpr.prefixExpr) ?: return
             }
 
             val child = if (expr is LuaClosureExpr) {
                 when (owner) {
-                    is LuaClassElement -> LuaClassMethodElement(name, name.name!!, expr.paramSignature)
-                    is LuaLocalVarElement -> LuaLocalFuncElement(name, name.name!!, expr.paramSignature)
-                    else -> LuaGlobalFuncElement(name, name.name!!, expr.paramSignature)
+                    is LuaClassElement -> LuaClassMethodElement(nameExpr, name, expr.paramSignature)
+                    is LuaLocalVarElement -> LuaLocalFuncElement(nameExpr, name, expr.paramSignature)
+                    else -> LuaGlobalFuncElement(nameExpr, name, expr.paramSignature)
                 }
             } else {
                 when (owner) {
-                    is LuaClassElement -> LuaClassFieldElement(o, name.name!!)
-                    is LuaLocalVarElement -> LuaLocalVarElement(o, name.name!!)
+                    is LuaClassElement -> LuaClassFieldElement(o, name)
+                    is LuaLocalVarElement -> LuaLocalVarElement(o, name)
                     else -> {
                         val declarations = getDocCommentDeclarations(o)
 
@@ -135,15 +136,15 @@ class LuaStructureVisitor : LuaVisitor() {
                         for (idx in 0 until names.size) {
                             val declaration = declarations?.getOrNull(idx)
                             val valueExpr = exprs?.getOrNull(idx)
-                            val nameExpr = names[idx]
+                            val nameExpr2 = names[idx]
 
                             var exprOwner: LuaTreeElement? = null
                             if (declaration is LuaClassElement) {
                                 exprOwner = declaration
 
-                                addChild(declaration, nameExpr.name)
-                            } else if (nameExpr is LuaNameExpr) {
-                                exprOwner = LuaLocalVarElement(nameExpr)
+                                addChild(declaration, nameExpr2.name)
+                            } else if (nameExpr2 is LuaNameExpr) {
+                                exprOwner = LuaLocalVarElement(nameExpr2)
 
                                 addChild(exprOwner)
                             }
@@ -153,7 +154,7 @@ class LuaStructureVisitor : LuaVisitor() {
                             }
                         }
 
-                        LuaGlobalVarElement(o, name.name!!)
+                        LuaGlobalVarElement(o, name)
                     }
                 }
             }
