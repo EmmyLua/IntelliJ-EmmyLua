@@ -186,7 +186,7 @@ class LuaStructureVisitor : LuaVisitor() {
 
                 val child = if (expr is LuaClosureExpr) {
                     if (exprOwner is LuaClassElement) {
-                        LuaClassMethodElement(tableField, name, expr.paramSignature)
+                        LuaClassMethodElement(tableField, name, expr.paramSignature, tableField.visibility)
                     } else {
                         LuaLocalFuncElement(tableField, name, expr.paramSignature)
                     }
@@ -302,7 +302,7 @@ class LuaStructureVisitor : LuaVisitor() {
 
     override fun visitClassMethodDef(o: LuaClassMethodDef) {
         handleCompoundName(o.classMethodName.expr)?.let { treeElem->
-            val elem = LuaClassMethodElement(o)
+            val elem = LuaClassMethodElement(o, o.visibility)
 
             treeElem.addChild(elem)
 
