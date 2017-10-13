@@ -133,8 +133,8 @@ class LuaStructureVisitor : LuaVisitor() {
                         val exprs = o.valueExprList?.exprList
 
                         for (idx in 0 until names.size) {
-                            val declaration = if (declarations == null || idx >= declarations.size) null else declarations[idx]
-                            val valueExpr = exprs?.getOrNull(idx)//if (exprs == null || idx >= exprs.size) null else exprs[idx]
+                            val declaration = declarations?.getOrNull(idx)
+                            val valueExpr = exprs?.getOrNull(idx)
                             val nameExpr = names[idx]
 
                             var exprOwner: LuaTreeElement? = null
@@ -208,7 +208,7 @@ class LuaStructureVisitor : LuaVisitor() {
         // A func body has, as _children, some number of param name defs followed by a block
         PsiTreeUtil.getChildOfType(o, LuaBlock::class.java)?.acceptChildren(this)
     }
-    
+
     override fun visitLocalDef(o: LuaLocalDef) {
         val nameList = o.nameList ?: return
 
@@ -218,8 +218,8 @@ class LuaStructureVisitor : LuaVisitor() {
         val exprs = o.exprList?.exprList
 
         for (idx in 0 until names.size) {
-            val declaration = if (declarations == null || idx >= declarations.size) null else declarations[idx]
-            val expr = if (exprs == null || idx >= exprs.size) null else exprs[idx]
+            val declaration = declarations?.getOrNull(idx)
+            val valueExpr = exprs?.getOrNull(idx)
             val nameDef = names[idx] as LuaNameDef
 
             val exprOwner: LuaTreeElement
@@ -233,8 +233,8 @@ class LuaStructureVisitor : LuaVisitor() {
                 addChild(exprOwner)
             }
 
-            if (expr is LuaTableExpr) {
-                handleTableExpr(expr, exprOwner)
+            if (valueExpr is LuaTableExpr) {
+                handleTableExpr(valueExpr, exprOwner)
             }
         }
     }
@@ -321,9 +321,10 @@ class LuaStructureVisitor : LuaVisitor() {
             return
         }
 
-        if (element.children.size == 1) {
-            if (element.children[0] is LuaVarElement) {
-                val child = element.children[0] as LuaTreeElement
+        val children = element.children
+        if (children.size == 1) {
+            if (children.first() is LuaVarElement) {
+                val child = children.first() as LuaTreeElement
 
                 element.name += "." + child.name
 
@@ -334,7 +335,7 @@ class LuaStructureVisitor : LuaVisitor() {
                 compressChild(element)
             }
         } else {
-            element.children.forEach { childElem -> compressChild(childElem) }
+            children.forEach { childElem -> compressChild(childElem) }
         }
     }
 
