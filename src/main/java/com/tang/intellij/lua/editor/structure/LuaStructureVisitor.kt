@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.editor.structure
 
 import com.intellij.ide.util.treeView.smartTree.TreeElement
+import com.intellij.psi.PsiNamedElement
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
@@ -57,7 +58,8 @@ class LuaStructureVisitor : LuaVisitor() {
         current = current?.parent
     }
 
-    private fun findElementNamed(name: String): LuaTreeElement? {
+    private fun findElementNamed(name: String?): LuaTreeElement? {
+        if (name == null) return null
         return current?.findElementNamed(name)
     }
 
@@ -95,15 +97,15 @@ class LuaStructureVisitor : LuaVisitor() {
     }
 
     override fun visitAssignStat(o: LuaAssignStat) {
-        val variableNames = o.varExprList
-        val expressions = o.valueExprList
+        val variableNames = o.varExprList.exprList
+        val expressions = o.valueExprList?.exprList
 
         // We're only interested in named entities
-        repeat(variableNames.children.size) { i ->
-            val expr = expressions?.children?.get(i)
-            val name = variableNames.children[i] as LuaPsiElement
+        repeat(variableNames.size) { i ->
+            val expr = expressions?.get(i)
+            val name = variableNames[i]
 
-            if (name is LuaNameExpr && findElementNamed(name.name) != null || name is LuaNameDef && findElementNamed(name.name) != null) {
+            if (name is PsiNamedElement && findElementNamed((name as PsiNamedElement).name) != null) {
                 // We're assigning to a previously declared entity -- ignore
                 return
             }
@@ -128,22 +130,22 @@ class LuaStructureVisitor : LuaVisitor() {
 
                         for (idx in 0 until names.size) {
                             val declaration = if (declarations == null || idx >= declarations.size) null else declarations[idx]
-                            val expr = if (exprs == null || idx >= exprs.size) null else exprs[idx]
-                            val nameDef = names[idx] as LuaNameExpr
+                            val valueExpr = exprs?.getOrNull(idx)//if (exprs == null || idx >= exprs.size) null else exprs[idx]
+                            val nameExpr = names[idx]
 
-                            val exprOwner: LuaTreeElement
+                            var exprOwner: LuaTreeElement? = null
                             if (declaration is LuaClassElement) {
                                 exprOwner = declaration
 
-                                addChild(declaration, nameDef.name)
-                            } else {
-                                exprOwner = LuaLocalVarElement(nameDef)
+                                addChild(declaration, nameExpr.name)
+                            } else if (nameExpr is LuaNameExpr) {
+                                exprOwner = LuaLocalVarElement(nameExpr)
 
                                 addChild(exprOwner)
                             }
 
-                            if (expr is LuaTableExpr) {
-                                handleTableExpr(expr, exprOwner)
+                            if (exprOwner != null && valueExpr is LuaTableExpr) {
+                                handleTableExpr(valueExpr, exprOwner)
                             }
                         }
 
@@ -275,7 +277,7 @@ class LuaStructureVisitor : LuaVisitor() {
         nameParts.forEach { namePart ->
             var child: LuaTreeElement?
             if (element == null) {
-                child = findElementNamed(namePart.name!!)
+                child = findElementNamed(namePart.name)
 
                 if (child == null) {
                     child = if (parent == null) {
