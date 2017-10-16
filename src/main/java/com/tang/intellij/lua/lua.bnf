@@ -128,8 +128,6 @@ fake statement ::= () {
 }
 fake exprStat ::= expr
 private stat_impl ::=
-    callStat |
-    assignStat |
     doStat |
     whileStat |
     repeatStat |
@@ -140,6 +138,8 @@ private stat_impl ::=
     lastStat |
     labelStat |
     gotoStat |
+    assignStat |
+    callStat |
     uncompletedStat {
         recoverWhile = stat_recover
     }
@@ -329,10 +329,10 @@ stringExpr ::= STRING {
     elementType = literalExpr
 }
 
-valueExpr ::= varExpr | literalExpr | closureExpr | tableExpr | parenExpr
+valueExpr ::= primaryExpr | closureExpr
 
 // 最终产生 callExpr | indexExpr | nameExpr
-private varExpr ::= callOrIndexExpr | nameExpr
+private varExpr ::= primaryExpr | nameExpr
 
 expr ::=
     orExpr |
@@ -414,11 +414,11 @@ left callExpr ::= args {
 }
 
 private suffixExpr ::= indexExpr | callExpr
-private prefixExpr ::= parenExpr | nameExpr | stringExpr | tableExpr
-// 最终产生 callExpr | indexExpr
-private callOrIndexExpr ::= prefixExpr suffixExpr+
+private prefixExpr ::= parenExpr | nameExpr | literalExpr | tableExpr
+// parenExpr | nameExpr | literalExpr | tableExpr | callExpr | indexExpr
+private primaryExpr ::= prefixExpr (suffixExpr*)
 // callExpr
-private funcCallExpr ::= callOrIndexExpr <<checkType 'CALL_EXPR'>>
+private funcCallExpr ::= primaryExpr <<checkType 'CALL_EXPR'>>
 
 closureExpr ::= 'function' funcBody {
     pin = 2

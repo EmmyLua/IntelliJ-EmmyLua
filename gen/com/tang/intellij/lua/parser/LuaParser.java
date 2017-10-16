@@ -363,34 +363,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // prefixExpr suffixExpr+
-  static boolean callOrIndexExpr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "callOrIndexExpr")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = prefixExpr(b, l + 1);
-    r = r && callOrIndexExpr_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // suffixExpr+
-  private static boolean callOrIndexExpr_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "callOrIndexExpr_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = suffixExpr(b, l + 1);
-    int c = current_position_(b);
-    while (r) {
-      if (!suffixExpr(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "callOrIndexExpr_1", c)) break;
-      c = current_position_(b);
-    }
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // funcCallExpr
   public static boolean callStat(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "callStat")) return false;
@@ -753,12 +725,12 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // callOrIndexExpr <<checkType 'CALL_EXPR'>>
+  // primaryExpr <<checkType 'CALL_EXPR'>>
   static boolean funcCallExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "funcCallExpr")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = callOrIndexExpr(b, l + 1);
+    r = primaryExpr(b, l + 1);
     r = r && checkType(b, l + 1, CALL_EXPR);
     exit_section_(b, m, null, r);
     return r;
@@ -1227,17 +1199,41 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // parenExpr | nameExpr | stringExpr | tableExpr
+  // parenExpr | nameExpr | literalExpr | tableExpr
   static boolean prefixExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefixExpr")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = parenExpr(b, l + 1);
     if (!r) r = nameExpr(b, l + 1);
-    if (!r) r = stringExpr(b, l + 1);
+    if (!r) r = literalExpr(b, l + 1);
     if (!r) r = tableExpr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // prefixExpr (suffixExpr*)
+  static boolean primaryExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "primaryExpr")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = prefixExpr(b, l + 1);
+    r = r && primaryExpr_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // suffixExpr*
+  private static boolean primaryExpr_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "primaryExpr_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!suffixExpr(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "primaryExpr_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */
@@ -1304,9 +1300,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // callStat |
-  //     assignStat |
-  //     doStat |
+  // doStat |
   //     whileStat |
   //     repeatStat |
   //     ifStat |
@@ -1316,14 +1310,14 @@ public class LuaParser implements PsiParser, LightPsiParser {
   //     lastStat |
   //     labelStat |
   //     gotoStat |
+  //     assignStat |
+  //     callStat |
   //     uncompletedStat
   static boolean stat_impl(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stat_impl")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_);
-    r = callStat(b, l + 1);
-    if (!r) r = assignStat(b, l + 1);
-    if (!r) r = doStat(b, l + 1);
+    r = doStat(b, l + 1);
     if (!r) r = whileStat(b, l + 1);
     if (!r) r = repeatStat(b, l + 1);
     if (!r) r = ifStat(b, l + 1);
@@ -1333,6 +1327,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = lastStat(b, l + 1);
     if (!r) r = labelStat(b, l + 1);
     if (!r) r = gotoStat(b, l + 1);
+    if (!r) r = assignStat(b, l + 1);
+    if (!r) r = callStat(b, l + 1);
     if (!r) r = uncompletedStat(b, l + 1);
     exit_section_(b, l, m, r, false, stat_recover_parser_);
     return r;
@@ -1554,12 +1550,12 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // callOrIndexExpr | nameExpr
+  // primaryExpr | nameExpr
   static boolean varExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "varExpr")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = callOrIndexExpr(b, l + 1);
+    r = primaryExpr(b, l + 1);
     if (!r) r = nameExpr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
@@ -1766,16 +1762,13 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // varExpr | literalExpr | closureExpr | tableExpr | parenExpr
+  // primaryExpr | closureExpr
   public static boolean valueExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "valueExpr")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, VALUE_EXPR, "<value expr>");
-    r = varExpr(b, l + 1);
-    if (!r) r = literalExpr(b, l + 1);
+    r = primaryExpr(b, l + 1);
     if (!r) r = closureExpr(b, l + 1);
-    if (!r) r = tableExpr(b, l + 1);
-    if (!r) r = parenExpr(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
