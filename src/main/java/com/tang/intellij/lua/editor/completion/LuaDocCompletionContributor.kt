@@ -34,6 +34,7 @@ import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.ty.ITyClass
 
 /**
  * doc 相关代码完成
@@ -116,6 +117,22 @@ class LuaDocCompletionContributor : CompletionContributor() {
             }
         })
 
+        // @see member completion
+        extend(CompletionType.BASIC, SHOW_SEE_MEMBER, object : CompletionProvider<CompletionParameters>() {
+            override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
+                val position = completionParameters.position
+                val seeRefTag = PsiTreeUtil.getParentOfType(position, LuaDocSeeRefTag::class.java)
+                if (seeRefTag != null) {
+                    val classType = seeRefTag.classNameRef?.resolveType() as? ITyClass
+                    classType?.processMembers(SearchContext(seeRefTag.project)) { _, member ->
+                        completionResultSet.addElement(LookupElementBuilder.create(member.name!!).withIcon(LuaIcons.CLASS_FIELD))
+                        Unit
+                    }
+                }
+                completionResultSet.stopHere()
+            }
+        })
+
         extend(CompletionType.BASIC, SHOW_LAN, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 Language.getRegisteredLanguages().forEach {
@@ -192,6 +209,9 @@ class LuaDocCompletionContributor : CompletionContributor() {
         )
 
         private val SHOW_FIELD = psiElement(LuaDocTypes.ID).inside(LuaDocFieldDef::class.java)
+
+        //@see type#MEMBER
+        private val SHOW_SEE_MEMBER = psiElement(LuaDocTypes.ID).inside(LuaDocSeeRefTag::class.java)
 
         private val SHOW_LAN = psiElement(LuaDocTypes.ID).inside(LuaDocLanDef::class.java)
     }
