@@ -107,6 +107,7 @@ internal fun renderComment(sb: StringBuilder, comment: LuaComment?) {
                 is LuaDocFieldDef -> renderFieldDef(sb, child)
                 is LuaDocOverloadDef -> renderOverload(sb, child)
                 is LuaDocTypeDef -> renderTypeDef(sb, child)
+                is LuaDocSeeRefTag -> renderSee(sb, child)
                 else -> {
                     val elementType = child.node.elementType
                     if (elementType === LuaDocTypes.STRING) {
@@ -175,4 +176,14 @@ internal fun renderOverload(sb: StringBuilder, overloadDef: LuaDocOverloadDef) {
 
 internal fun renderTypeDef(sb: StringBuilder, typeDef: LuaDocTypeDef) {
     renderTy(sb, typeDef.type)
+}
+
+internal fun renderSee(sb: StringBuilder, see: LuaDocSeeRefTag) {
+    sb.append("<li><b>see</b> ")
+    see.classNameRef?.resolveType()?.let {
+        renderTy(sb, it)
+        see.id?.let {
+            sb.append("#${it.text}")
+        }
+    }
 }
