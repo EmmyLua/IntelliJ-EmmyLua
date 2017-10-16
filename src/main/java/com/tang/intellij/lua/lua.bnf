@@ -335,19 +335,20 @@ valueExpr ::= primaryExpr | closureExpr
 private varExpr ::= primaryExpr | nameExpr
 
 expr ::=
-    orExpr |
-    andExpr |
-    conditionalExpr |
-    bitOrExpr |
-    bitTildeExpr |
-    bitAndExpr |
-    bitMoveExpr |
-    concatExpr |
-    addExpr |
-    mulExpr |
-    unaryExpr |
-    expExpr |
-    valueExpr {
+//    orExpr |
+//    andExpr |
+//    conditionalExpr |
+//    bitOrExpr |
+//    bitTildeExpr |
+//    bitAndExpr |
+//    bitMoveExpr |
+//    concatExpr |
+//    addExpr |
+//    mulExpr |
+//    expExpr |
+    //<<parserExpr>>
+    (unaryExpr | valueExpr) binaryExpr?
+{
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
     implements = [
         "com.tang.intellij.lua.psi.LuaTypeGuessable"
@@ -355,20 +356,20 @@ expr ::=
 }
 
 parenExpr ::= '(' expr ')' { pin = 1 }
-unaryExpr ::= unaryOp expr { pin = 1 }
+unaryExpr ::= unaryOp (parenExpr | primaryExpr) { pin = 1 }
 
-fake binaryExpr ::= ()
-orExpr ::= expr 'or' expr { elementType = binaryExpr }
-andExpr ::= expr 'and' expr { elementType = binaryExpr }
-conditionalExpr ::= expr ('<'|'>'|'<='|'>='|'~='|'==') expr { elementType = binaryExpr }
-bitOrExpr ::= expr '|' expr { elementType = binaryExpr }
-bitTildeExpr ::= expr '~' expr { elementType = binaryExpr }
-bitAndExpr ::= expr '&' expr { elementType = binaryExpr }
-bitMoveExpr ::= expr ('<<'|'>>') expr { elementType = binaryExpr }
-concatExpr ::= expr '..' expr { elementType = binaryExpr }
-addExpr ::= expr ('+'|'-') expr { elementType = binaryExpr }
-mulExpr ::= expr ('*'|'/'|'//'|'%') expr { elementType = binaryExpr }
-expExpr ::= expr '^' expr { elementType = binaryExpr }
+left binaryExpr ::= binaryOp expr { pin = 1 }
+//orExpr ::= expr 'or' expr { elementType = binaryExpr }
+//andExpr ::= expr 'and' expr { elementType = binaryExpr }
+//conditionalExpr ::= expr ('<'|'>'|'<='|'>='|'~='|'==') expr { elementType = binaryExpr }
+//bitOrExpr ::= expr '|' expr { elementType = binaryExpr }
+//bitTildeExpr ::= expr '~' expr { elementType = binaryExpr }
+//bitAndExpr ::= expr '&' expr { elementType = binaryExpr }
+//bitMoveExpr ::= expr ('<<'|'>>') expr { elementType = binaryExpr }
+//concatExpr ::= expr '..' expr { elementType = binaryExpr }
+//addExpr ::= expr ('+'|'-') expr { elementType = binaryExpr }
+//mulExpr ::= expr ('*'|'/'|'//'|'%') expr { elementType = binaryExpr }
+//expExpr ::= expr '^' expr { elementType = binaryExpr }
 
 left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1

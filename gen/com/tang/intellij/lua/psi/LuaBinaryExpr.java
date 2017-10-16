@@ -7,4 +7,10 @@ import com.intellij.psi.PsiElement;
 
 public interface LuaBinaryExpr extends LuaExpr {
 
+  @NotNull
+  LuaBinaryOp getBinaryOp();
+
+  @NotNull
+  List<LuaExpr> getExprList();
+
 }

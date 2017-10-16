@@ -25,4 +25,16 @@ public class LuaBinaryExprImpl extends LuaExprImpl implements LuaBinaryExpr {
     else super.accept(visitor);
   }
 
+  @Override
+  @NotNull
+  public LuaBinaryOp getBinaryOp() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaBinaryOp.class));
+  }
+
+  @Override
+  @NotNull
+  public List<LuaExpr> getExprList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaExpr.class);
+  }
+
 }
