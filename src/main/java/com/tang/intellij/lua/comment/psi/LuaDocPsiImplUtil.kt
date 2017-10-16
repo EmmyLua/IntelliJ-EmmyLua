@@ -29,6 +29,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
+import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.search.SearchContext
@@ -251,4 +252,9 @@ fun getType(unionTy: LuaDocUnionTy): ITy {
         retTy = retTy.union(ty.getType())
     }
     return retTy
+}
+
+fun getReference(see: LuaDocSeeRefTag): PsiReference? {
+    if (see.id == null) return null
+    return LuaDocSeeReference(see)
 }

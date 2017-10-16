@@ -25,6 +25,7 @@ public interface LuaDocTypes {
   IElementType PARAM_NAME_REF = LuaParserDefinitionKt.createDocType("PARAM_NAME_REF");
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
   IElementType RETURN_DEF = LuaParserDefinitionKt.createDocType("RETURN_DEF");
+  IElementType SEE_REF_TAG = LuaParserDefinitionKt.createDocType("SEE_REF_TAG");
   IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
   IElementType TAG_VALUE = LuaParserDefinitionKt.createDocType("TAG_VALUE");
   IElementType TY = LuaParserDefinitionKt.createDocType("TY");
@@ -63,6 +64,7 @@ public interface LuaDocTypes {
   IElementType TAG_PROTECTED = new LuaDocTokenType("protected");
   IElementType TAG_PUBLIC = new LuaDocTokenType("public");
   IElementType TAG_RETURN = new LuaDocTokenType("return");
+  IElementType TAG_SEE = new LuaDocTokenType("see");
   IElementType TAG_TYPE = new LuaDocTokenType("type");
 
   class Factory {
@@ -115,6 +117,9 @@ public interface LuaDocTypes {
       }
       else if (type == RETURN_DEF) {
         return new LuaDocReturnDefImpl(node);
+      }
+      else if (type == SEE_REF_TAG) {
+        return new LuaDocSeeRefTagImpl(node);
       }
       else if (type == TAG_DEF) {
         return new LuaDocTagDefImpl(node);

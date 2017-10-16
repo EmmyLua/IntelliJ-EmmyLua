@@ -56,6 +56,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == RETURN_DEF) {
       r = return_def(b, 0);
     }
+    else if (t == SEE_REF_TAG) {
+      r = see_ref_tag(b, 0);
+    }
     else if (t == TAG_DEF) {
       r = tag_def(b, 0);
     }
@@ -193,12 +196,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // STRING_BEGIN? STRING?
   public static boolean comment_string(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "comment_string")) return false;
-    boolean r;
+    boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, COMMENT_STRING, "<comment string>");
     r = comment_string_0(b, l + 1);
+    p = r; // pin = 1
     r = r && comment_string_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   // STRING_BEGIN?
@@ -247,7 +251,16 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def | access_modifier)
+  // '@' (param_def
+  //     | return_def
+  //     | class_def
+  //     | field_def
+  //     | type_def
+  //     | lan_def
+  //     | overload_def
+  //     | see_ref_tag
+  //     | tag_def
+  //     | access_modifier)
   static boolean doc_item(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item")) return false;
     if (!nextTokenIs(b, AT)) return false;
@@ -259,7 +272,16 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def | access_modifier
+  // param_def
+  //     | return_def
+  //     | class_def
+  //     | field_def
+  //     | type_def
+  //     | lan_def
+  //     | overload_def
+  //     | see_ref_tag
+  //     | tag_def
+  //     | access_modifier
   private static boolean doc_item_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
@@ -271,6 +293,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = type_def(b, l + 1);
     if (!r) r = lan_def(b, l + 1);
     if (!r) r = overload_def(b, l + 1);
+    if (!r) r = see_ref_tag(b, l + 1);
     if (!r) r = tag_def(b, l + 1);
     if (!r) r = access_modifier(b, l + 1);
     exit_section_(b, m, null, r);
@@ -504,6 +527,38 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "return_def_2")) return false;
     comment_string(b, l + 1);
     return true;
+  }
+
+  /* ********************************************************** */
+  // TAG_SEE class_name_ref (SHARP ID)?
+  public static boolean see_ref_tag(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "see_ref_tag")) return false;
+    if (!nextTokenIs(b, TAG_SEE)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, SEE_REF_TAG, null);
+    r = consumeToken(b, TAG_SEE);
+    p = r; // pin = 1
+    r = r && report_error_(b, class_name_ref(b, l + 1));
+    r = p && see_ref_tag_2(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (SHARP ID)?
+  private static boolean see_ref_tag_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "see_ref_tag_2")) return false;
+    see_ref_tag_2_0(b, l + 1);
+    return true;
+  }
+
+  // SHARP ID
+  private static boolean see_ref_tag_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "see_ref_tag_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, SHARP, ID);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

@@ -74,6 +74,7 @@ DOC_DASHES = --+
     "private"                  { yybegin(xTAG); return TAG_PRIVATE; }
     "protected"                { yybegin(xTAG); return TAG_PROTECTED; }
     "public"                   { yybegin(xTAG); return TAG_PUBLIC; }
+    "see"                      { yybegin(xTAG); return TAG_SEE; }
     {ID}                       { yybegin(xTAG); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

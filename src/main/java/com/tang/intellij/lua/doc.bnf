@@ -66,6 +66,7 @@
         TAG_LANGUAGE = 'language'
         TAG_OVERLOAD = 'overload'
         TAG_MODULE = 'module'
+        TAG_SEE = 'see'
   ]
 }
 
@@ -73,7 +74,16 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def | return_def | class_def | field_def | type_def | lan_def | overload_def | tag_def | access_modifier)
+private doc_item ::= '@' (param_def
+    | return_def
+    | class_def
+    | field_def
+    | type_def
+    | lan_def
+    | overload_def
+    | see_ref_tag
+    | tag_def
+    | access_modifier)
 
 ty ::= union_ty | function_ty | generic_ty | arr_ty | general_ty | par_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
@@ -191,8 +201,15 @@ type_def ::= TAG_TYPE ty comment_string? {
 }
 
 comment_string ::= STRING_BEGIN? STRING? {
-    //pin = 1
+    pin = 1
     methods = [
         string = "STRING"
+    ]
+}
+
+see_ref_tag ::= TAG_SEE class_name_ref (SHARP ID)? {
+    pin = 1
+    methods = [
+        getReference
     ]
 }
