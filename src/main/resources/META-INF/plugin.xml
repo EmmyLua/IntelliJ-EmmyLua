@@ -154,7 +154,7 @@
         <breadcrumbsInfoProvider implementation="com.tang.intellij.lua.editor.LuaBreadcrumbsProvider"/>
 
         <!--completion-->
-        <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCommentCompletionContributor"/>
+        <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaDocCompletionContributor"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>
 
         <!--codeInsight-->

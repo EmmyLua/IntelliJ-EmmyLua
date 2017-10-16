@@ -39,7 +39,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassIndex
  * doc 相关代码完成
  * Created by tangzx on 2016/12/2.
  */
-class LuaCommentCompletionContributor : CompletionContributor() {
+class LuaDocCompletionContributor : CompletionContributor() {
     init {
         extend(CompletionType.BASIC, SHOW_DOC_TAG, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
