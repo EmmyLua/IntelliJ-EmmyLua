@@ -1574,27 +1574,16 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // unaryOp (parenExpr | primaryExpr)
+  // unaryOp primaryExpr
   public static boolean unaryExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryExpr")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, UNARY_EXPR, "<unary expr>");
     r = unaryOp(b, l + 1);
     p = r; // pin = 1
-    r = r && unaryExpr_1(b, l + 1);
+    r = r && primaryExpr(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  // parenExpr | primaryExpr
-  private static boolean unaryExpr_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unaryExpr_1")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = parenExpr(b, l + 1);
-    if (!r) r = primaryExpr(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
   }
 
   /* ********************************************************** */
@@ -1638,15 +1627,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // primaryExpr | nameExpr
+  // primaryExpr
   static boolean varExpr(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "varExpr")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = primaryExpr(b, l + 1);
-    if (!r) r = nameExpr(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    return primaryExpr(b, l + 1);
   }
 
   /* ********************************************************** */
