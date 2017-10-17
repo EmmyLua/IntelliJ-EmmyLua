@@ -1,4 +1,6 @@
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import org.intellij.lang.annotations.Language
 
 /*
  * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
@@ -17,5 +19,13 @@ import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCa
  */
 
 abstract class LuaTestBase : LightPlatformCodeInsightFixtureTestCase() {
+    protected fun checkByDirectory(@Language("Lua") before: String, @Language("Lua") after: String, action: () -> Unit) {
+        fileTreeFromText(before).create()
+        action()
+        FileDocumentManager.getInstance().saveAllDocuments()
+        fileTreeFromText(after).assertEquals(myFixture.findFileInTempDir("."))
+    }
 
+    protected fun FileTree.create(): TestProject =
+            create(myFixture.project, myFixture.findFileInTempDir("."))
 }
