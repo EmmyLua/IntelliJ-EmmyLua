@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -33,6 +34,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -203,6 +206,26 @@ public class LuaFileUtil {
                 return fullPath;
         }
         return null;
+    }
+
+    @Nullable
+    public static String asRequirePath(@NotNull Project project, @NotNull VirtualFile file) {
+        VirtualFile root = getSourceRoot(project, file);
+        if (root == null)
+            return null;
+        ArrayList<String> list = new ArrayList<>();
+        VirtualFile item = file;
+        while (!item.equals(root)) {
+            if (item.isDirectory())
+                list.add(item.getName());
+            else
+                list.add(FileUtil.getNameWithoutExtension(item.getName()));
+            item = item.getParent();
+        }
+        if (list.isEmpty())
+            return null;
+        Collections.reverse(list);
+        return String.join(".", list);
     }
 
     public static Key<Boolean> PREDEFINED_KEY = Key.create("lua.lib.predefined");

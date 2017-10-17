@@ -17,11 +17,13 @@
 package com.tang.intellij.lua.reference
 
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
-import com.intellij.util.IncorrectOperationException
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.psi.LuaCallExpr
+import com.tang.intellij.lua.psi.LuaCallStat
+import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.resolveRequireFile
 
 /**
@@ -32,11 +34,9 @@ class LuaRequireReference internal constructor(callExpr: LuaCallExpr) : PsiRefer
 
     private var pathString: String? = null
     private var range = TextRange.EMPTY_RANGE
+    private val path: PsiElement? = callExpr.firstStringArg
 
     init {
-
-        val path = callExpr.firstStringArg
-
         if (path != null && path.textLength > 2) {
             val luaString = LuaString.getContent(path.text)
             pathString = luaString.value
@@ -61,14 +61,26 @@ class LuaRequireReference internal constructor(callExpr: LuaCallExpr) : PsiRefer
         return if (pathString == null) null else resolveRequireFile(pathString, myElement.project)
     }
 
-    @Throws(IncorrectOperationException::class)
     override fun handleElementRename(newElementName: String): PsiElement {
-        /*val newPathString = pathString!! + FileUtil.getNameWithoutExtension(newElementName)
-        var myText = myElement.text
-        myText = myText.replace(pathString!!, newPathString)
-        val element = LuaElementFactory.createWith(myElement.project, myText) as LuaCallStat
-        return myElement.replace(element.expr)*/
+        pathString?.let {
+            val name = FileUtil.getNameWithoutExtension(newElementName)
+            val last = it.lastIndexOf('.')
+            val path = if (last == -1) name else it.substring(0, last) + "." + name
+            setPath(path)
+        }
         return myElement
+    }
+
+    fun setPath(luaPath: String) {
+        if (path != null) {
+            val stat = LuaElementFactory.createWith(myElement.project, "require '$luaPath'") as LuaCallStat
+            val stringArg = (stat.expr as LuaCallExpr).firstStringArg
+            path.replace(stringArg!!)
+        }
+    }
+
+    override fun bindToElement(element: PsiElement): PsiElement? {
+        return null
     }
 
     override fun getVariants(): Array<Any> = emptyArray()

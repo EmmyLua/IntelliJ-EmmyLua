@@ -245,7 +245,7 @@ fun getFirstStringArg(callExpr: LuaCallExpr): PsiElement? {
                 val valueExpr = list[0] as LuaLiteralExpr
                 val node = valueExpr.firstChild
                 if (node.node.elementType === LuaTypes.STRING) {
-                    path = node
+                    path = valueExpr
                 }
             }
         }
