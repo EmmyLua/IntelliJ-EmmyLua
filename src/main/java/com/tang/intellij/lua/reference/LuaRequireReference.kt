@@ -35,11 +35,14 @@ class LuaRequireReference internal constructor(callExpr: LuaCallExpr) : PsiRefer
     private var pathString: String? = null
     private var range = TextRange.EMPTY_RANGE
     private val path: PsiElement? = callExpr.firstStringArg
+    private var quot: String = "\""
 
     init {
         if (path != null && path.textLength > 2) {
-            val luaString = LuaString.getContent(path.text)
+            val text = path.text
+            val luaString = LuaString.getContent(text)
             pathString = luaString.value
+            quot = text.substring(0, luaString.start)
 
             if (pathString != null) {
                 val start = path.textOffset - callExpr.textOffset + luaString.start
@@ -73,7 +76,7 @@ class LuaRequireReference internal constructor(callExpr: LuaCallExpr) : PsiRefer
 
     fun setPath(luaPath: String) {
         if (path != null) {
-            val stat = LuaElementFactory.createWith(myElement.project, "require '$luaPath'") as LuaCallStat
+            val stat = LuaElementFactory.createWith(myElement.project, "require $quot$luaPath$quot") as LuaCallStat
             val stringArg = (stat.expr as LuaCallExpr).firstStringArg
             path.replace(stringArg!!)
         }

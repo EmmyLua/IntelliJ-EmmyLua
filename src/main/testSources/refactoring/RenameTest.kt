@@ -23,7 +23,7 @@ class RenameTest : LuaTestBase() {
          --- A.lua
          print("a")
          --- B.lua
-         require("A")
+         require('A')
     """, """
          --- C.lua
          print("a")
