@@ -17,6 +17,7 @@ coroutine = {}
 ---
 --- Creates a new coroutine, with body `f`. `f` must be a Lua
 --- function. Returns this new coroutine, an object with type `"thread"`.
+---@return thread
 function coroutine.create(f) end
 
 ---
@@ -29,10 +30,12 @@ function coroutine.create(f) end
 --- values passed to `yield` (if the coroutine yields) or any values returned
 --- by the body function (if the coroutine terminates). If there is any error,
 --- `resume` returns false plus the error message.
+---@param co thread
 function coroutine.resume(co, ...) end
 
 ---
 --- Returns the running coroutine. Or nil when called by the main thread.
+---@return thread
 function coroutine.running() end
 
 ---
@@ -42,6 +45,7 @@ function coroutine.running() end
 --- running yet; `"normal"` if the coroutine is active but not running (that
 --- is, it has resumed another coroutine); and `"dead"` if the coroutine has
 --- finished its body function, or if it has stopped with an error.
+---@param co thread
 function coroutine.status(co) end
 
 ---

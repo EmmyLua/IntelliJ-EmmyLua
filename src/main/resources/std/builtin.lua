@@ -9,3 +9,5 @@ _G = nil
 ---@class void
 
 ---@class table
+
+---@class thread
