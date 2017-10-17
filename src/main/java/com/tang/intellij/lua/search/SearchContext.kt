@@ -28,28 +28,15 @@ import com.tang.intellij.lua.project.LuaPredefinedLibraryProvider
 
  * Created by tangzx on 2017/1/14.
  */
-class SearchContext(val project: Project) {
+class SearchContext(val project: Project, val currentFile: PsiFile? = null) {
+    constructor(project: Project) : this(project, null)
+
     /**
      * 用于有多返回值的索引设定
      */
     var index: Int = 0
 
-    private var currentStubFile: PsiFile? = null
     private var scope: GlobalSearchScope? = null
-    /*private var guessTypeKind = GuessTypeKind.Standard
-
-    fun setGuessTypeKind(value: Int) {
-        guessTypeKind = value
-    }
-
-    fun isGuessTypeKind(kind: Int): Boolean {
-        return guessTypeKind and kind == kind
-    }*/
-
-    fun setCurrentStubFile(currentStubFile: PsiFile): SearchContext {
-        this.currentStubFile = currentStubFile
-        return this
-    }
 
     fun getScope(): GlobalSearchScope {
         if (scope == null) {
@@ -63,7 +50,7 @@ class SearchContext(val project: Project) {
     }
 
     val isDumb: Boolean
-        get() = DumbService.isDumb(project) || currentStubFile != null
+        get() = DumbService.isDumb(project) || currentFile != null
 }
 
 class LuaPredefinedScope : AdditionalIndexedRootsScope {
