@@ -17,6 +17,8 @@
 package com.tang.intellij.lua.debugger
 
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.xdebugger.XDebugProcess
@@ -26,6 +28,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.frame.XSuspendContext
+import com.intellij.xdebugger.impl.actions.XDebuggerActions
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -38,6 +41,12 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
     override fun sessionInitialized() {
         super.sessionInitialized()
         session.consoleView.addMessageFilter(LuaTracebackFilter(session.project))
+    }
+
+    override fun registerAdditionalActions(leftToolbar: DefaultActionGroup, topToolbar: DefaultActionGroup, settings: DefaultActionGroup) {
+        val actionManager = ActionManager.getInstance()
+        topToolbar.remove(actionManager.getAction(XDebuggerActions.RUN_TO_CURSOR))
+        topToolbar.remove(actionManager.getAction(XDebuggerActions.FORCE_STEP_INTO))
     }
 
     override fun print(text: String, type: ConsoleViewContentType) {
@@ -90,7 +99,7 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
         registeredBreakpoints.put(sourcePosition, breakpoint)
     }
 
-    protected open fun unregisterBreakpoint(sourcePosition: XSourcePosition, position: XLineBreakpoint<*>) {
+    protected open fun unregisterBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
         registeredBreakpoints.remove(sourcePosition)
     }
 
