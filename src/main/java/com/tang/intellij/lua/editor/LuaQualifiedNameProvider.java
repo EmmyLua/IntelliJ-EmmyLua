@@ -19,10 +19,8 @@ package com.tang.intellij.lua.editor;
 import com.intellij.ide.actions.QualifiedNameProvider;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.util.ObjectUtils;
 import com.tang.intellij.lua.psi.LuaFile;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.Nullable;
@@ -45,15 +43,7 @@ public class LuaQualifiedNameProvider implements QualifiedNameProvider {
             LuaFile file = (LuaFile) psiElement;
             VirtualFile virtualFile = file.getVirtualFile();
             Project project = file.getProject();
-
-            VirtualFile logicalRootFile = LuaFileUtil.getSourceRoot(project, virtualFile);
-            if (logicalRootFile != null && !virtualFile.equals(logicalRootFile)) {
-                String value = ObjectUtils.assertNotNull(VfsUtilCore.getRelativePath(virtualFile, logicalRootFile, '.'));
-                int lastDot = value.lastIndexOf('.');
-                if (lastDot != -1)
-                    value = value.substring(0, lastDot);
-                return value;
-            }
+            return LuaFileUtil.asRequirePath(project, virtualFile);
         }
         return null;
     }
