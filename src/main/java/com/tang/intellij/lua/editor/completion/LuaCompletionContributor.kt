@@ -23,6 +23,7 @@ import com.intellij.lang.findUsages.LanguageFindUsages
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.tree.TokenSet
 import com.intellij.util.ProcessingContext
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.project.LuaSettings
@@ -43,7 +44,7 @@ class LuaCompletionContributor : CompletionContributor() {
         //提示属性, 提示方法
         extend(CompletionType.BASIC, SHOW_CLASS_FIELD, ClassMemberCompletionProvider())
 
-        extend(CompletionType.BASIC, SHOW_PATH, RequirePathCompletionProvider())
+        extend(CompletionType.BASIC, SHOW_REQUIRE_PATH, RequirePathCompletionProvider())
 
         //提示全局函数,local变量,local函数
         extend(CompletionType.BASIC, IN_NAME_EXPR, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL))
@@ -118,8 +119,14 @@ class LuaCompletionContributor : CompletionContributor() {
         private val IN_CLASS_METHOD = psiElement(LuaTypes.ID)
                 .withParent(LuaNameExpr::class.java)
                 .inside(LuaClassMethodDef::class.java)
-        private val SHOW_PATH = psiElement(LuaTypes.STRING)
-                .inside(psiElement(LuaTypes.ARGS).afterLeaf("require"))
+        private val SHOW_REQUIRE_PATH = psiElement(LuaTypes.STRING)
+                .withParent(
+                        psiElement(LuaTypes.LITERAL_EXPR).withParent(
+                                psiElement(LuaArgs::class.java).afterSibling(
+                                        psiElement().withName(Constants.WORD_REQUIRE)
+                                )
+                        )
+                )
 
         private val GOTO = psiElement(LuaTypes.ID).withParent(LuaGotoStat::class.java)
 
