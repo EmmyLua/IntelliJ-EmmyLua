@@ -20,6 +20,7 @@ import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.util.RecursionManager
 import com.intellij.openapi.util.Ref
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.Constants
@@ -40,6 +41,12 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
 
     override fun getFileType(): FileType {
         return LuaFileType.INSTANCE
+    }
+
+    override fun setName(name: String): PsiElement {
+        return if (FileUtil.getNameWithoutExtension(name) == name) {
+            super.setName("$name.${LuaFileType.INSTANCE.defaultExtension}")
+        } else super.setName(name)
     }
 
     val moduleName: String?
