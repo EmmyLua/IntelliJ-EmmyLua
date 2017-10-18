@@ -136,6 +136,8 @@
         <psi.referenceContributor language="Lua" implementation="com.tang.intellij.lua.reference.LuaReferenceContributor"/>
         <languageInjector implementation="com.tang.intellij.lua.lang.LuaLanguageInjector"/>
 
+        <spellchecker.support implementationClass="com.tang.intellij.lua.editor.LuaSpellcheckingStrategy" language="Lua"/>
+
         <!--usage-->
         <lang.findUsagesProvider language="Lua" implementationClass="com.tang.intellij.lua.usages.LuaFindUsagesProvider"/>
         <findUsagesHandlerFactory implementation="com.tang.intellij.lua.usages.LuaFindUsagesHandlerFactory"/>
