@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package inspections
+package com.tang.intellij.test.inspections
 
 import com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection
 

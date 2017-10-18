@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package refactoring
+package com.tang.intellij.test.refactoring
 
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiElement
@@ -24,7 +24,7 @@ import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFilesOrDirectori
 class MoveFileTest : MultiFileTestCase() {
     override fun getTestRoot() = "/refactoring/"
 
-    override fun getTestDataPath() = "src/main/testData/"
+    override fun getTestDataPath() = "src/test/resources/"
 
     fun testMoveFile() {
         val fileToMove = "A.lua"

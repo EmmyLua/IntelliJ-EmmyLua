@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package completion
+package com.tang.intellij.test.completion
 
-import LuaTestBase
+import com.tang.intellij.test.LuaTestBase
 import com.intellij.codeInsight.completion.CompletionType
 import java.util.*
 
@@ -26,7 +26,7 @@ import java.util.*
  */
 class TestCompletion : LuaTestBase() {
     override fun getTestDataPath(): String {
-        return "src/main/testData/completion"
+        return "src/test/resources/completion"
     }
 
     fun testLocalCompletion() {

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package inspections
+package com.tang.intellij.test.inspections
 
-import LuaTestBase
+import com.tang.intellij.test.LuaTestBase
 import com.intellij.codeInspection.LocalInspectionTool
 import org.intellij.lang.annotations.Language
 

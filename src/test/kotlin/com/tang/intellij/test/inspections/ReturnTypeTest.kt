@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package refactoring
+package com.tang.intellij.test.inspections
 
-import LuaTestBase
+import com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection
 
-class RenameTest : LuaTestBase() {
-    fun `test rename file`() = checkByDirectory("""
-         --- A.lua
-         print("a")
-         --- B.lua
-         require('A')
-    """, """
-         --- C.lua
-         print("a")
-         --- B.lua
-         require('C')
-    """) {
-        val file = myFixture.configureFromTempProjectFile("A.lua")
-        myFixture.renameElement(file, "C.lua")
-    }
+class ReturnTypeTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
+
+    fun testReturn() = checkByText("""
+        ---@return string
+        local function test()
+            return <warning>1</warning>
+        end
+    """)
+
 }

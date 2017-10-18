@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package inspections
+package com.tang.intellij.test.inspections
 
-import com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection
+import com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious
 
-class ReturnTypeTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
+class LocalNameHidesPreviousTest : LuaInspectionsTestBase(LocalNameHidesPrevious()) {
 
-    fun testReturn() = checkByText("""
-        ---@return string
-        local function test()
-            return <warning>1</warning>
-        end
+    fun testLocalNameHidesPrevious() = checkByText("""
+        local var1 = 1
+        print(var1)
+        local <warning>var1</warning> = "123"
     """)
 
 }

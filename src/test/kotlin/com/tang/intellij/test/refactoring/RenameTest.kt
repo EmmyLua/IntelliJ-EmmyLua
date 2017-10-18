@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package inspections
+package com.tang.intellij.test.refactoring
 
-import com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious
+import com.tang.intellij.test.LuaTestBase
 
-class LocalNameHidesPreviousTest : LuaInspectionsTestBase(LocalNameHidesPrevious()) {
-
-    fun testLocalNameHidesPrevious() = checkByText("""
-        local var1 = 1
-        print(var1)
-        local <warning>var1</warning> = "123"
-    """)
-
+class RenameTest : LuaTestBase() {
+    fun `test rename file`() = checkByDirectory("""
+         --- A.lua
+         print("a")
+         --- B.lua
+         require('A')
+    """, """
+         --- C.lua
+         print("a")
+         --- B.lua
+         require('C')
+    """) {
+        val file = myFixture.configureFromTempProjectFile("A.lua")
+        myFixture.renameElement(file, "C.lua")
+    }
 }
