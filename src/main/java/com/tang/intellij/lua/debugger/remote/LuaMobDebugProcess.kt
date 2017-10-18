@@ -93,8 +93,8 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         if (mobClient != null) sendBreakpoint(mobClient!!, sourcePosition)
     }
 
-    override fun unregisterBreakpoint(sourcePosition: XSourcePosition, position: XLineBreakpoint<*>) {
-        super.unregisterBreakpoint(sourcePosition, position)
+    override fun unregisterBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
+        super.unregisterBreakpoint(sourcePosition, breakpoint)
         if (mobClient != null) {
             val file = sourcePosition.file
             val fileShortUrl = LuaFileUtil.getShortPath(session.project, file)
