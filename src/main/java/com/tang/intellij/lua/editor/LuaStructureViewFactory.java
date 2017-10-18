@@ -29,7 +29,7 @@ import com.intellij.psi.PsiFile;
 import com.tang.intellij.lua.editor.structure.LuaClassFieldElement;
 import com.tang.intellij.lua.editor.structure.LuaFileElement;
 import com.tang.intellij.lua.editor.structure.LuaFuncElement;
-import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.psi.LuaPsiFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,7 +56,7 @@ public class LuaStructureViewFactory implements PsiStructureViewFactory {
     class LuaStructureViewModel extends StructureViewModelBase implements StructureViewModel.ElementInfoProvider {
 
         LuaStructureViewModel(@NotNull PsiFile psiFile) {
-            super(psiFile, new LuaFileElement((LuaFile) psiFile));
+            super(psiFile, new LuaFileElement((LuaPsiFile) psiFile));
             withSorters(new LuaAlphaSorter());
         }
 

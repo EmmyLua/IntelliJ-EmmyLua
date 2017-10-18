@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.psi.NavigatablePsiElement
-import com.intellij.psi.PsiElement
 
 /**
  * LuaPsiElement
@@ -27,7 +26,7 @@ interface LuaPsiElement : NavigatablePsiElement
 
 val LuaPsiElement.moduleName: String? get() {
     val file = containingFile
-    if (file is LuaFile)
+    if (file is LuaPsiFile)
         return file.moduleName
     return null
 }

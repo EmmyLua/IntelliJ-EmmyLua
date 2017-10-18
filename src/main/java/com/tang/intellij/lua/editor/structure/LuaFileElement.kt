@@ -23,7 +23,7 @@ import com.tang.intellij.lua.psi.*
 /**
  * Created by TangZX on 2016/12/13.
  */
-class LuaFileElement(private val file:LuaFile) : LuaTreeElement(file, file.name, LuaIcons.FILE) {
+class LuaFileElement(private val file: LuaPsiFile) : LuaTreeElement(file, file.name, LuaIcons.FILE) {
     override fun getChildren(): Array<TreeElement> {
         val visitor = LuaStructureVisitor()
 

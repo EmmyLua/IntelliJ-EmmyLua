@@ -25,7 +25,6 @@ import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
-import org.jaxen.expr.UnaryExpr
 
 /**
  * 表达式基类
@@ -130,7 +129,7 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
                 filePath = string.text
                 filePath = filePath!!.substring(1, filePath.length - 1)
             }
-            var file: LuaFile? = null
+            var file: LuaPsiFile? = null
             if (filePath != null)
                 file = resolveRequireFile(filePath, luaCallExpr.project)
             if (file != null)

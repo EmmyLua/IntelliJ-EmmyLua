@@ -21,7 +21,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.psi.LuaPsiFile;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,8 +39,8 @@ public class LuaQualifiedNameProvider implements QualifiedNameProvider {
     @Nullable
     @Override
     public String getQualifiedName(PsiElement psiElement) {
-        if (psiElement instanceof LuaFile) {
-            LuaFile file = (LuaFile) psiElement;
+        if (psiElement instanceof LuaPsiFile) {
+            LuaPsiFile file = (LuaPsiFile) psiElement;
             VirtualFile virtualFile = file.getVirtualFile();
             Project project = file.getProject();
             return LuaFileUtil.asRequirePath(project, virtualFile);

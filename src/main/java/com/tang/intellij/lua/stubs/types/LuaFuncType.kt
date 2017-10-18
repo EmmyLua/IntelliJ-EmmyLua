@@ -21,7 +21,7 @@ import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaFuncDef
 import com.tang.intellij.lua.psi.forwardDeclaration
 import com.tang.intellij.lua.psi.impl.LuaFuncDefImpl
@@ -51,7 +51,7 @@ class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function",
         val ty = funcDef.asTy(searchContext)
         var moduleName = Constants.WORD_G
         val file = funcDef.containingFile
-        if (file is LuaFile) moduleName = file.moduleName ?: Constants.WORD_G
+        if (file is LuaPsiFile) moduleName = file.moduleName ?: Constants.WORD_G
 
         return LuaFuncStubImpl(nameRef.text, moduleName, ty, stubElement)
     }

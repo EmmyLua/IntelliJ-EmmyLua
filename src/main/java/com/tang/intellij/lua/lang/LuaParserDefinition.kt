@@ -33,7 +33,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaElementType
-import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaTokenType
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.stubs.types.LuaFileElementType
@@ -69,7 +69,7 @@ class LuaParserDefinition : ParserDefinition {
     }
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile {
-        return LuaFile(viewProvider)
+        return LuaPsiFile(viewProvider)
     }
 
     override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements {

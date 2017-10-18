@@ -21,7 +21,7 @@ import com.intellij.psi.stubs.*
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
@@ -47,7 +47,7 @@ class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLa
 
     override fun createStub(luaNameExpr: LuaNameExpr, stubElement: StubElement<*>): LuaNameStub {
         val psiFile = luaNameExpr.containingFile
-        val module = if (psiFile is LuaFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
+        val module = if (psiFile is LuaPsiFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
         return LuaNameStubImpl(luaNameExpr, module, stubElement, this)
     }
 

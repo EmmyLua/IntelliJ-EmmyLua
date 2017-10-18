@@ -28,9 +28,9 @@ import com.tang.intellij.lua.lang.LuaLanguage
  * Created by TangZX on 2016/11/24.
  */
 object LuaElementFactory {
-    fun createFile(project: Project, content: String): LuaFile {
+    fun createFile(project: Project, content: String): LuaPsiFile {
         val name = "dummy.lua"
-        return PsiFileFactory.getInstance(project).createFileFromText(name, LuaLanguage.INSTANCE, content) as LuaFile
+        return PsiFileFactory.getInstance(project).createFileFromText(name, LuaLanguage.INSTANCE, content) as LuaPsiFile
     }
 
     fun createIdentifier(project: Project, name: String): PsiElement {

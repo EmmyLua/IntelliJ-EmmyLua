@@ -44,7 +44,7 @@ class LuaAnnotator : Annotator {
             psiElement.accept(docVisitor)
         } else if (psiElement is LuaPsiElement) {
             val psiFile = psiElement.containingFile
-            isModuleFile = if (psiFile is LuaFile) { psiFile.moduleName != null } else false
+            isModuleFile = if (psiFile is LuaPsiFile) { psiFile.moduleName != null } else false
             psiElement.accept(luaVisitor)
         }
         myHolder = null
@@ -141,7 +141,7 @@ class LuaAnnotator : Annotator {
             } else if (res is LuaFuncDef) {
                 val annotation = myHolder!!.createInfoAnnotation(o, null)
                 val resolvedFile = res.containingFile
-                if (resolvedFile !is LuaFile || resolvedFile.moduleName == null)
+                if (resolvedFile !is LuaPsiFile || resolvedFile.moduleName == null)
                     annotation.textAttributes = LuaHighlightingData.GLOBAL_FUNCTION
             } else {
                 if (id.textMatches(Constants.WORD_SELF)) {

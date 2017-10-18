@@ -379,14 +379,14 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
  * *
  * @return PsiFile
  */
-fun resolveRequireFile(pathString: String?, project: Project): LuaFile? {
+fun resolveRequireFile(pathString: String?, project: Project): LuaPsiFile? {
     if (pathString == null)
         return null
     val fileName = pathString.replace('.', '/')
     val f = LuaFileUtil.findFile(project, fileName)
     if (f != null) {
         val psiFile = PsiManager.getInstance(project).findFile(f)
-        if (psiFile is LuaFile)
+        if (psiFile is LuaPsiFile)
             return psiFile
     }
     return null

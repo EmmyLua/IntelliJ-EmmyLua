@@ -24,7 +24,7 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNamedElement
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFileHandler
 import com.intellij.usageView.UsageInfo
-import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaFileUtil
 import com.tang.intellij.lua.reference.LuaRequireReference
 import java.util.*
@@ -77,6 +77,6 @@ class LuaMoveFileHandler : MoveFileHandler() {
     }
 
     override fun canProcessElement(file: PsiFile): Boolean {
-        return file is LuaFile
+        return file is LuaPsiFile
     }
 }

@@ -22,7 +22,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.codeStyle.PreFormatProcessor
 import com.intellij.util.DocumentUtil
-import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.psi.LuaVisitor
 
@@ -34,7 +34,7 @@ class LuaPreFormatProcessor : PreFormatProcessor {
     override fun process(astNode: ASTNode, sourceRange: TextRange): TextRange {
         var range = sourceRange
         val psi = astNode.psi
-        if (psi.containingFile is LuaFile) {
+        if (psi.containingFile is LuaPsiFile) {
             val list = mutableListOf<Pair<Int, Boolean>>()
             psi.accept(object : LuaVisitor() {
                 override fun visitElement(o: PsiElement) {

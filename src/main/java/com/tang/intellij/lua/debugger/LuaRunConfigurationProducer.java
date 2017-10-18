@@ -25,7 +25,7 @@ import com.intellij.psi.PsiFile;
 import com.tang.intellij.lua.debugger.app.LuaAppConfigurationType;
 import com.tang.intellij.lua.debugger.app.LuaAppRunConfiguration;
 import com.tang.intellij.lua.lang.LuaFileType;
-import com.tang.intellij.lua.psi.LuaFile;
+import com.tang.intellij.lua.psi.LuaPsiFile;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 
 /**
@@ -41,7 +41,7 @@ public class LuaRunConfigurationProducer extends RunConfigurationProducer<LuaApp
     protected boolean setupConfigurationFromContext(LuaAppRunConfiguration luaAppRunConfiguration, ConfigurationContext configurationContext, Ref<PsiElement> ref) {
         PsiElement element = ref.get();
         PsiFile containingFile = element.getContainingFile();
-        if (!(containingFile instanceof LuaFile))
+        if (!(containingFile instanceof LuaPsiFile))
             return false;
 
         luaAppRunConfiguration.setFile(LuaFileUtil.getShortPath(element.getProject(), containingFile.getVirtualFile()));

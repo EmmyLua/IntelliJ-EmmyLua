@@ -27,7 +27,7 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.psi.tree.IStubFileElementType
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFileStub
 import com.tang.intellij.lua.ty.Ty
@@ -50,7 +50,7 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
         if (LOG.isDebugEnabled) {
             val dt = System.currentTimeMillis() - t
             val psi = chameleon.psi
-            if (psi is LuaFile) {
+            if (psi is LuaPsiFile) {
                 val fileName = psi.name
                 println("$fileName : $dt")
                 LOG.debug("$fileName : $dt")
@@ -62,7 +62,7 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
     override fun getBuilder(): StubBuilder {
         return object : DefaultStubBuilder() {
             override fun createStubForFile(file: PsiFile): StubElement<*> {
-                if (file is LuaFile)
+                if (file is LuaPsiFile)
                     return LuaFileStub(file)
                 return super.createStubForFile(file)
             }

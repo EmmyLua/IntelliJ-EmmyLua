@@ -61,5 +61,5 @@ class LuaRainbowVisitor : RainbowVisitor() {
         }
     }
 
-    override fun suitableForFile(p0: PsiFile): Boolean = p0 is LuaFile
+    override fun suitableForFile(p0: PsiFile): Boolean = p0 is LuaPsiFile
 }

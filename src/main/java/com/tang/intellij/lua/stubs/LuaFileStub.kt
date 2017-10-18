@@ -19,7 +19,7 @@ package com.tang.intellij.lua.stubs
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.stubs.PsiFileStubImpl
 import com.tang.intellij.lua.lang.LuaParserDefinition
-import com.tang.intellij.lua.psi.LuaFile
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.types.LuaFileElementType
 import com.tang.intellij.lua.ty.ITy
@@ -29,17 +29,17 @@ import com.tang.intellij.lua.ty.Ty
 
  * Created by tangzx on 2016/11/27.
  */
-class LuaFileStub : PsiFileStubImpl<LuaFile> {
+class LuaFileStub : PsiFileStubImpl<LuaPsiFile> {
     private var retTypeRef: Ref<ITy>? = null
-    private var file: LuaFile? = null
+    private var file: LuaPsiFile? = null
     private var moduleName:String? = null
 
-    constructor(file: LuaFile) : super(file) {
+    constructor(file: LuaPsiFile) : super(file) {
         this.file = file
         moduleName = file.findModuleName()
     }
 
-    constructor(file: LuaFile?, module:String?, type: ITy) : super(file) {
+    constructor(file: LuaPsiFile?, module:String?, type: ITy) : super(file) {
         this.file = file
         moduleName = module
         retTypeRef = Ref.create(type)

@@ -36,7 +36,7 @@ import com.tang.intellij.lua.ty.TyLazyClass
  * Created by TangZhiXu on 2015/11/15.
  * Email:272669294@qq.com
  */
-class LuaFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider, LuaLanguage.INSTANCE) {
+class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider, LuaLanguage.INSTANCE) {
 
     override fun getFileType(): FileType {
         return LuaFileType.INSTANCE
