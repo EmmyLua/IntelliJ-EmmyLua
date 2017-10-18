@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.highlighting;
+package com.tang.intellij.lua.editor
 
-import com.intellij.openapi.util.Condition;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.tang.intellij.lua.lang.LuaFileType;
+import com.intellij.lang.refactoring.RefactoringSupportProvider
+import com.intellij.psi.PsiElement
 
 /**
  *
- * Created by tangzx on 2017/1/11.
+ * Created by TangZX on 2016/12/20.
  */
-public class LuaProblemFileHighlightFilter implements Condition<VirtualFile> {
-    @Override
-    public boolean value(VirtualFile file) {
-        return file.getFileType() == LuaFileType.INSTANCE;
+class LuaRefactoringSupportProvider : RefactoringSupportProvider() {
+    override fun isMemberInplaceRenameAvailable(element: PsiElement, context: PsiElement?): Boolean {
+        return true
     }
 }

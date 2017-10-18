@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.lang;
+package com.tang.intellij.lua.lang
 
-import com.intellij.openapi.fileTypes.FileTypeConsumer;
-import com.intellij.openapi.fileTypes.FileTypeFactory;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.fileTypes.FileTypeConsumer
+import com.intellij.openapi.fileTypes.FileTypeFactory
 
 /**
  * Created by TangZhiXu on 2015/11/15.
  * Email:272669294@qq.com
  */
-public class LuaFileTypeFactory extends FileTypeFactory {
-    @Override
-    public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-        fileTypeConsumer.consume(LuaFileType.INSTANCE, "lua");
+class LuaFileTypeFactory : FileTypeFactory() {
+    override fun createFileTypes(fileTypeConsumer: FileTypeConsumer) {
+        fileTypeConsumer.consume(LuaFileType.INSTANCE, "lua")
     }
 }

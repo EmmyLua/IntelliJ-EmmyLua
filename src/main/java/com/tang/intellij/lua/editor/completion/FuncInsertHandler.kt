@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.reference;
+package com.tang.intellij.lua.editor.completion
 
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
-import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner
+import com.tang.intellij.lua.psi.LuaParamInfo
 
 /**
  *
- * Created by tangzx on 2017/4/9.
+ * Created by TangZX on 2016/12/20.
  */
-public interface LuaReference extends PsiReference {
-    PsiElement resolve(SearchContext context);
+open class FuncInsertHandler(private val funcBodyOwner: LuaFuncBodyOwner) : ArgsInsertHandler() {
+
+    override fun getParams(): Array<LuaParamInfo> {
+        return funcBodyOwner.params
+    }
 }

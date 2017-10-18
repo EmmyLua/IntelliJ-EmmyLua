@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.lang;
+package com.tang.intellij.lua.highlighting
+
+import com.intellij.openapi.util.Condition
+import com.intellij.openapi.vfs.VirtualFile
+import com.tang.intellij.lua.lang.LuaFileType
 
 /**
- * 判断类型的方式
- * Created by TangZX on 2017/3/22.
+ *
+ * Created by tangzx on 2017/1/11.
  */
-public class GuessTypeKind {
-    public static int Standard = 1;
-    public static int FromName = 2;
+class LuaProblemFileHighlightFilter : Condition<VirtualFile> {
+    override fun value(file: VirtualFile): Boolean {
+        return file.fileType === LuaFileType.INSTANCE
+    }
 }

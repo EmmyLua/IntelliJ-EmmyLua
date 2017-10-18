@@ -65,7 +65,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
                     element = element.parent
 
                 if (element is LuaDocPsiElement) {
-                    val owner = LuaCommentUtil.findOwner(element as LuaDocPsiElement?)
+                    val owner = LuaCommentUtil.findOwner(element)
                     if (owner is LuaFuncBodyOwner) {
                         val body = owner.funcBody
                         if (body != null) {

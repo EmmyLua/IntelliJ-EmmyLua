@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua;
+package com.tang.intellij.lua.lexer
+
+import com.intellij.lexer.FlexAdapter
 
 /**
- * 功能等级控制，等级越高功能越高，但在有些电脑上可能会卡，所以用户可设置
- * Created by tangzx on 2017/4/23.
+ * Created by TangZhiXu on 2015/11/15.
+ * Email:272669294@qq.com
  */
-public class PowerLevel {
-
-    public static boolean isFullPower() {
-        return false;
-    }
-
-}
+class LuaLexerAdapter : FlexAdapter(_LuaLexer(null))

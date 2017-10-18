@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.lexer;
+package com.tang.intellij.lua.reference
 
-import com.intellij.lexer.FlexAdapter;
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReference
+import com.tang.intellij.lua.search.SearchContext
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ *
+ * Created by tangzx on 2017/4/9.
  */
-public class LuaLexerAdapter extends FlexAdapter {
-    public LuaLexerAdapter() {
-        super(new _LuaLexer(null));
-    }
+interface LuaReference : PsiReference {
+    fun resolve(context: SearchContext): PsiElement?
 }
