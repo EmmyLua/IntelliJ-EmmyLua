@@ -132,6 +132,8 @@ class TestProject(
     val root: VirtualFile,
     val filesWithCaret: List<String>
 ) {
+    val fileWithCaret: String get() = filesWithCaret.singleOrNull()!!
+
     fun doFindElementInFile(path: String): PsiElement {
         val vFile = root.findFileByRelativePath(path)
             ?: error("No `$path` file in test project")
@@ -180,5 +182,5 @@ private fun findElementInFile(file: PsiFile, marker: String): PsiElement {
         error { "No element found, offset = $elementOffset" }
 }
 
-fun replaceCaretMarker(text: String): String = text.replace("/*caret*/", "<caret>")
-fun hasCaretMarker(text: String): Boolean = text.contains("/*caret*/")
+fun replaceCaretMarker(text: String): String = text.replace("--[[caret]]", "<caret>")
+fun hasCaretMarker(text: String): Boolean = text.contains("--[[caret]]")

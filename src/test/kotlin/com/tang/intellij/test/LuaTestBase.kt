@@ -46,4 +46,10 @@ abstract class LuaTestBase : LightPlatformCodeInsightFixtureTestCase() {
 
     protected fun FileTree.create(): TestProject =
             create(myFixture.project, myFixture.findFileInTempDir(""))
+
+    protected fun FileTree.createAndOpenFileWithCaretMarker(): TestProject {
+        val testProject = create()
+        myFixture.configureFromTempProjectFile(testProject.fileWithCaret)
+        return testProject
+    }
 }
