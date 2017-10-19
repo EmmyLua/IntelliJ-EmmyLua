@@ -322,7 +322,8 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun each(ty: ITy, process: (ITy) -> Unit) {
             if (ty is TyUnion) {
-                ty.childSet.forEach(process)
+                //ConcurrentModificationException
+                ty.childSet.toTypedArray().forEach(process)
             } else process(ty)
         }
 
