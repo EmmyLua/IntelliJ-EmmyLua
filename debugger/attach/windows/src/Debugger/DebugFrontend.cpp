@@ -770,10 +770,8 @@ DebugFrontend::Script* DebugFrontend::GetScript(unsigned int scriptIndex)
     {
         return nullptr;
     }
-    else
-    {
-        return m_scripts[scriptIndex];
-    }
+	assert(m_scripts.size() > scriptIndex, "Out of scripts range!");
+	return m_scripts[scriptIndex];
 }
 
 unsigned int DebugFrontend::GetScriptIndex(const char* name) const
