@@ -16,12 +16,12 @@
 
 package com.tang.intellij.lua.codeInsight.intention
 
-import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.MacroCallNode
 import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.openapi.editor.Editor
-import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.codeInsight.template.macro.SuggestTypeMacro
+import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
@@ -44,24 +44,11 @@ class CreateFunctionReturnAnnotationIntention : FunctionIntention() {
 
     override fun invoke(bodyOwner: LuaFuncBodyOwner, editor: Editor) {
         if (bodyOwner is LuaCommentOwner) {
-            val comment = bodyOwner.comment
-            val funcBody = bodyOwner.funcBody
-            if (funcBody != null) {
-                val templateManager = TemplateManager.getInstance(editor.project)
-                val template = templateManager.createTemplate("", "")
-                if (comment != null) template.addTextSegment("\n")
+            LuaCommentUtil.insertTemplate(bodyOwner, editor) { _, template ->
                 template.addTextSegment("---@return ")
                 val typeSuggest = MacroCallNode(SuggestTypeMacro())
                 template.addVariable("returnType", typeSuggest, TextExpression("table"), false)
                 template.addEndVariable()
-                if (comment != null) {
-                    editor.caretModel.moveToOffset(comment.textOffset + comment.textLength)
-                } else {
-                    template.addTextSegment("\n")
-                    val e: PsiElement = bodyOwner
-                    editor.caretModel.moveToOffset(e.node.startOffset)
-                }
-                templateManager.startTemplate(editor, template)
             }
         }
     }

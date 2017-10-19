@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.codeInsight.intention
+package com.tang.intellij.lua.codeInsight.template.macro
 
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -22,20 +22,30 @@ import com.intellij.codeInsight.template.Expression
 import com.intellij.codeInsight.template.ExpressionContext
 import com.intellij.codeInsight.template.Macro
 import com.intellij.codeInsight.template.Result
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 
-class NamesMacro(vararg val args: String) : Macro() {
-    override fun getPresentableName() = "LuaNamesMacro"
+/**
+ *
+ * Created by TangZX on 2017/4/8.
+ */
+class SuggestFirstLuaVarNameMacro : Macro() {
+    override fun getName(): String {
+        return "SuggestFirstLuaVarName"
+    }
 
-    override fun getName() = "LuaNamesMacro"
+    override fun getPresentableName(): String {
+        return "SuggestFirstLuaVarName()"
+    }
 
-    override fun calculateResult(p0: Array<out Expression>, p1: ExpressionContext?): Result? {
+    override fun calculateResult(expressions: Array<Expression>, expressionContext: ExpressionContext): Result? {
         return null
     }
 
-    override fun calculateLookupItems(params: Array<out Expression>, context: ExpressionContext?): Array<LookupElement>? {
+    override fun calculateLookupItems(params: Array<out Expression>, context: ExpressionContext): Array<LookupElement>? {
         val list = mutableListOf<LookupElement>()
-        for (name in args) {
-            list.add(LookupElementBuilder.create(name))
+        LuaPsiTreeUtil.walkUpLocalNameDef(context.psiElementAtStartOffset) { nameDef ->
+            list.add(LookupElementBuilder.create(nameDef.name))
+            true
         }
         return list.toTypedArray()
     }
