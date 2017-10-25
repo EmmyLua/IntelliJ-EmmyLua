@@ -83,7 +83,8 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                         true
                     }
                     else -> {
-                        perfect = it
+                        if (perfect == null)
+                            perfect = it
                         true
                     }
                 }
