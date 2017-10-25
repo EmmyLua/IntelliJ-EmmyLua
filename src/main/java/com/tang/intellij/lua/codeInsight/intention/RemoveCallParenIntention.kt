@@ -33,7 +33,7 @@ class RemoveCallParenIntention : BaseIntentionAction() {
         if (callExpr != null) {
             val args = callExpr.args as? LuaListArgs ?: return false
             val list = args.exprList
-            if (list.isEmpty())
+            if (list.isEmpty() || list.size > 1)
                 return false
             val expr = list.first()
             when (expr) {
