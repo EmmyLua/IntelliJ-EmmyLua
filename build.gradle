@@ -26,7 +26,7 @@ sourceSets {
     main {
         java.srcDirs 'gen'
         resources {
-            exclude "debugger/**", "std/**"
+            exclude "debugger/**"
         }
     }
 }
@@ -45,6 +45,6 @@ task copyAttachDebugger(dependsOn:["debugger:attach:windows:buildProduct"], type
 }
 
 //buildPlugin.dependsOn(copyAttachDebugger)
-buildPlugin.from(fileTree(dir:"${RES_DIR}", includes:['std/**', 'debugger/**'])) {
+buildPlugin.from(fileTree(dir:"${RES_DIR}", includes:['debugger/**'])) {
     into "/${project.name}/classes/"
 }

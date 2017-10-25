@@ -18,7 +18,9 @@ package com.tang.intellij.lua.project
 
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.PathUtil
 import com.intellij.util.indexing.IndexableSetContributor
+import com.intellij.util.io.URLUtil
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.File
 
@@ -28,21 +30,19 @@ import java.io.File
  */
 class LuaPredefinedLibraryProvider : IndexableSetContributor() {
 
-    /*override fun getAdditionalProjectRootsToIndex(project: Project): MutableSet<VirtualFile> {
-        val dir = LuaFileUtil.getPluginVirtualFile("std")
-        val file = VfsUtil.findFileByIoFile(File(dir), false)
-        val list = mutableSetOf<VirtualFile>()
-        list.add(file!!)
-        return list
-    }*/
-
     private val predefined: Set<VirtualFile> by lazy {
-        val dir = LuaFileUtil.getPluginVirtualFile("std")
-        val file = VfsUtil.findFileByIoFile(File(dir), false)
+        val jarPath = PathUtil.getJarPathForClass(LuaPredefinedLibraryProvider::class.java)
+        val dir = if (jarPath.endsWith(".jar")) {
+            VfsUtil.findFileByURL(URLUtil.getJarEntryURL(File(jarPath), "std"))
+        } else
+            VfsUtil.findFileByIoFile(File("$jarPath/std"), true)
+
         val set = mutableSetOf<VirtualFile>()
-        if (file != null) {
-            file.children.forEach { it.putUserData(LuaFileUtil.PREDEFINED_KEY, true) }
-            set.add(file)
+        if (dir != null) {
+            dir.children.forEach {
+                it.putUserData(LuaFileUtil.PREDEFINED_KEY, true)
+            }
+            set.add(dir)
         }
         set
     }
