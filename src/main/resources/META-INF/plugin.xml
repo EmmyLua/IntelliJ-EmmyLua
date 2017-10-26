@@ -17,12 +17,12 @@
 <idea-plugin>
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.1.9</version>
+    <version>1.2.0</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
     Support for Lua programming language.<br>
-    <p><a href="https://github.com/tangzx/IntelliJ-EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://tangzx.github.io/emmydoc/donate.html">Donate</a></p> | <a href="https://tangzx.github.io/emmydoc">Doc</a></p>
+    <p><a href="https://github.com/EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://emmylua.github.io/donate.html">Donate</a> | <a href="https://emmylua.github.io/?plugin">Doc</a></p>
     Features:
     <ul>
         <li>Syntax highlighting</li>
