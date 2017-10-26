@@ -103,7 +103,7 @@ class LuaStructureVisitor : LuaVisitor() {
 
         // We're only interested in named entities
         repeat(variableNames.size) { i ->
-            val expr = expressions?.get(i)
+            val expr = expressions?.getOrNull(i)
             val nameExpr = variableNames[i]
             val name = nameExpr.name ?: return
 
