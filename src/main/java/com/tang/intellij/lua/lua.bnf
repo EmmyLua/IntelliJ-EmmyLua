@@ -342,7 +342,7 @@ expr ::= (unaryExpr | valueExpr) binaryExpr?
 }
 
 parenExpr ::= '(' expr ')' { pin = 1 }
-unaryExpr ::= unaryOp primaryExpr { pin = 1 }
+unaryExpr ::= unaryOp (unaryExpr | primaryExpr) { pin = 1 }
 
 left binaryExpr ::= binaryOp expr { pin = 1 }
 
