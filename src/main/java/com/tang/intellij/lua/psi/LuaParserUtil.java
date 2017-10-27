@@ -25,7 +25,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.parser.LuaParser;
 
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
@@ -73,34 +72,6 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         }
         return 0;
     };
-
-    private static TokenSet binOpSet = TokenSet.create(
-            PLUS, MINUS, MULT, DIV, EXP, MOD, CONCAT, LT, LE, GT, GE, EQ, NE, AND, OR, BIT_OR, BIT_AND, BIT_RTRT, BIT_LTLT, BIT_TILDE, DOUBLE_DIV
-    );
-    private static TokenSet unaryOpSet = TokenSet.create(
-            MINUS, NOT, GETN, BIT_TILDE
-    );
-
-    public static boolean parserExpr(PsiBuilder b, int l) {
-        boolean r;
-        PsiBuilder.Marker m = enter_section_(b, l, _COLLAPSE_, EXPR, "<expr>");
-        if (unaryOpSet.contains(b.getTokenType())) {
-            r = LuaParser.unaryExpr(b, l + 1);
-        } else {
-            r = LuaParser.valueExpr(b, l + 1);
-        }
-
-        if (r) {
-            PsiBuilder.Marker marker = enter_section_(b, l, _LEFT_, BINARY_EXPR, "<binary expr>");
-            boolean s = false;
-            if (LuaParser.binaryOp(b, l + 1)) {
-                s = LuaParser.expr(b, l + 1);
-            }
-            exit_section_(b, l, marker, s, false, null);
-        }
-        exit_section_(b, l, m, r, false, null);
-        return r;
-    }
 
     public static boolean repeat(PsiBuilder builder_, int level_, Parser parser, int times) {
         PsiBuilder.Marker marker = builder_.mark();
