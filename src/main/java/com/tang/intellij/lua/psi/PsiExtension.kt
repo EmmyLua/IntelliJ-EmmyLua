@@ -201,3 +201,11 @@ val LuaCallExpr.argList: List<LuaExpr> get() {
         else -> emptyList()
     }
 }
+
+val LuaBinaryExpr.left: LuaExpr get() {
+    return this.firstChild as LuaExpr
+}
+
+val LuaBinaryExpr.right: LuaExpr? get() {
+    return PsiTreeUtil.nextVisibleLeaf(this.binaryOp) as? LuaExpr?
+}

@@ -71,14 +71,13 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
     }
 
     private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
-        val lhs = binaryExpr.firstChild as LuaExpr
-        val rhs = binaryExpr.lastChild as LuaExpr
-
-        if (operator == LuaTypes.AND) {
-            return rhs.guessType(context)
+        val lhs = binaryExpr.left
+        val lty = lhs.guessType(context)
+        return if (operator == LuaTypes.OR) {
+            val rhs = binaryExpr.right
+            if (rhs != null) lty.union(rhs.guessType(context)) else lty
         } else {
-            // or
-            return TyUnion.union(lhs.guessType(context), rhs.guessType(context))
+            lty
         }
     }
 
