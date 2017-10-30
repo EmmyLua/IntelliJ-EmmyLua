@@ -199,6 +199,15 @@ bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
         return false;
     }
 
+	// Handshake channel
+	char handshakeChannelName[256];
+	_snprintf(handshakeChannelName, 256, "Decoda.Handshake.%x", m_processId);
+	Channel handshakeChannel;
+	if (!handshakeChannel.Create(handshakeChannelName))
+	{
+		return false;
+	}
+
     // Inject our debugger DLL into the process so that we can monitor from
     // inside the process's memory space.
     if (!InjectDll(m_processId, "LuaInject.dll"))
@@ -208,11 +217,10 @@ bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
     }
 
     // Wait for the client to connect.
-    m_eventChannel.WaitForConnection();
+	handshakeChannel.WaitForConnection();
 
     // Read the initialization function from the event channel.
-
-    if (!ProcessInitialization(symbolsDirectory))
+    if (!ProcessInitialization(handshakeChannel, symbolsDirectory))
     {
         MessageEvent("Error: Backend couldn't be initialized", MessageType_Error);
         return false;
@@ -822,11 +830,10 @@ void DebugFrontend::MessageEvent(const std::string& message, MessageType type) c
 
 }
 
-bool DebugFrontend::ProcessInitialization(const char* symbolsDirectory)
+bool DebugFrontend::ProcessInitialization(Channel& handshakeChannel, const char* symbolsDirectory)
 {
-
     unsigned int command;
-    m_eventChannel.ReadUInt32(command);
+	handshakeChannel.ReadUInt32(command);
 
     if (command != EventId_Initialize)
     {
@@ -834,7 +841,7 @@ bool DebugFrontend::ProcessInitialization(const char* symbolsDirectory)
     }
 
 	size_t function;
-    m_eventChannel.ReadSize(function);
+	handshakeChannel.ReadSize(function);
 
     // Call the initializtion function.
 

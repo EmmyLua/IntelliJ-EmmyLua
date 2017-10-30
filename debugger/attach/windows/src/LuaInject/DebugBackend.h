@@ -74,6 +74,8 @@ public:
      */
     bool Initialize(HINSTANCE hInstance);
 
+	bool InitializePipeline();
+
     /**
      * Attaches the debugger to the state.
      */

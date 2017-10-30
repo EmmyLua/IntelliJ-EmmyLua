@@ -248,7 +248,7 @@ private:
      * This includes calling the DLLs post-load initialization function. If there
      * was an error the method returns false.
      */
-    bool ProcessInitialization(const char* symbolsDirectory);
+    bool ProcessInitialization(Channel& handshakeChannel, const char* symbolsDirectory);
 
     /**
      * Removes characters from the file name that would make it invalid (colons)
