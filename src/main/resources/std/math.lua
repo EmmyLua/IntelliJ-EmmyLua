@@ -212,7 +212,7 @@ function math.tan(x) return 0 end
 ---@return number
 function math.tanh(x) return 0 end
 
-math.PI = 3.1415
+math.pi = 3.1415
 
 return math
 
