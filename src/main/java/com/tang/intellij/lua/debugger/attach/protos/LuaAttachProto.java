@@ -26,6 +26,24 @@ import org.w3c.dom.NodeList;
  * Created by tangzx on 2017/4/2.
  */
 public class LuaAttachProto {
+    public static final int CommandId_Initialize		= 0;    // Initialize
+    public static final int CommandId_Continue          = 1;    // Continues execution until the next break point.
+    public static final int CommandId_StepOver          = 2;    // Steps to the next line, not entering any functions.
+    public static final int CommandId_StepInto			= 3;    // Steps to the next line, entering any functions.
+    public static final int CommandId_StepOut			= 16;   // Steps out functions
+    public static final int CommandId_AddBreakpoint     = 4;    // Toggles a breakpoint on a line on.
+    public static final int CommandId_DelBreakpoint     = 15;   // Toggles a breakpoint on a line off.
+    public static final int CommandId_Break             = 5;    // Instructs the debugger to break on the next line of script code.
+    public static final int CommandId_Evaluate          = 6;    // Evaluates the value of an expression in the current context.
+    public static final int CommandId_Detach            = 8;    // Detaches the debugger from the process.
+    public static final int CommandId_PatchReplaceLine  = 9;    // Replaces a line of code with a new line.
+    public static final int CommandId_PatchInsertLine   = 10;   // Adds a new line of code.
+    public static final int CommandId_PatchDeleteLine   = 11;   // Deletes a line of code.
+    public static final int CommandId_LoadDone          = 12;   // Signals to the backend that the frontend has finished processing a load.
+    public static final int CommandId_IgnoreException   = 13;   // Instructs the backend to ignore the specified exception message in the future.
+    public static final int CommandId_DeleteAllBreakpoints = 14;// Instructs the backend to clear all breakpoints set
+    public static final int CommandId_InitEmmy          = 17;   // set emmy env
+
     public static final int Initialize          = 11;   // Sent when the backend is ready to have its initialize function called
     public static final int CreateVM            = 1;    // Sent when a script VM is created.
     public static final int DestroyVM           = 2;    // Sent when a script VM is destroyed.

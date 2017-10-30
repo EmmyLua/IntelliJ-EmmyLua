@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include "Channel.h"
+#include "TCPServer.h"
 
 class DebugPipeline
 {
@@ -43,7 +44,9 @@ public:
 	bool ReadBool(bool& value) override { return m_commandChannel.ReadBool(value); }
 };
 
-class SocketPipeline : public DebugPipeline
+class SocketPipeline : public DebugPipeline, public DebugServerListener
 {
-	
+	DebugServer server;
+public:
+	bool Initialize() override;
 };

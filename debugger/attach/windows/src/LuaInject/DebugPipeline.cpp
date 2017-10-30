@@ -1,4 +1,5 @@
 ﻿#include "DebugPipeline.h"
+#include "TCPServer.h"
 
 bool ChannelPipeline::Initialize()
 {
@@ -30,4 +31,10 @@ void ChannelPipeline::Destroy()
 {
 	m_eventChannel.Destroy();
 	m_commandChannel.Destroy();
+}
+
+bool SocketPipeline::Initialize()
+{
+	DWORD processId = GetCurrentProcessId();
+	return server.startup(processId, this);
 }
