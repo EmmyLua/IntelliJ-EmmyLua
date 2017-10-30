@@ -80,14 +80,12 @@ void mainLoop() {
 			string depath = list[3];
 			string script = list[4];
 
-			string result;
 			inst.Evaluate(
 				handler->vm,
 				atoi(idString.c_str()),
 				script.c_str(),
 				atoi(stack.c_str()),
-				atoi(depath.c_str()),
-				result);
+				atoi(depath.c_str()));
 		}
 		else if (cmd == "done") {
 			inst.DoneLoadingScript(handler->vm);

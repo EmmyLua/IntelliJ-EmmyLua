@@ -147,7 +147,7 @@ public:
     /**
      * Evaluates the expression in the current context.
      */
-	bool Evaluate(size_t vm, int evalId, const char * expression, unsigned int stackLevel, unsigned int depath, std::string & result);
+	bool Evaluate(size_t vm, int evalId, const char * expression, unsigned int stackLevel, unsigned int depath);
 
     /**
      * Toggles a breakpoint on the specified line.

@@ -617,6 +617,19 @@ void DebugFrontend::EventThreadProc()
             event.SetMessageString(message);            
 
         }
+		else if (eventId == EventId_EvalResult)
+		{
+			std::string result;
+			unsigned int evalId;
+			bool success;
+			m_eventChannel.ReadBool(success);
+			m_eventChannel.ReadUInt32(evalId);
+			m_eventChannel.ReadString(result);
+
+			event.SetMessageString(result);
+			event.SetEvalResult(success);
+			event.SetEvalId(evalId);
+		}
 
         // Dispatch the message to the UI.
         if (m_eventHandler != nullptr)
@@ -704,7 +717,7 @@ void DebugFrontend::DoneLoadingScript(size_t vm)
     m_commandChannel.Flush();
 }
 
-bool DebugFrontend::Evaluate(size_t vm, int evalId, const char* expression, unsigned int stackLevel, unsigned int depath, std::string& result)
+bool DebugFrontend::Evaluate(size_t vm, int evalId, const char* expression, unsigned int stackLevel, unsigned int depath)
 {
 
     if (vm == 0)
@@ -714,22 +727,12 @@ bool DebugFrontend::Evaluate(size_t vm, int evalId, const char* expression, unsi
 
     m_commandChannel.WriteUInt32(CommandId_Evaluate);
     m_commandChannel.WriteSize(vm);
+	m_commandChannel.WriteUInt32(evalId);
 	m_commandChannel.WriteString(expression);
 	m_commandChannel.WriteUInt32(stackLevel);
 	m_commandChannel.WriteUInt32(depath);
     m_commandChannel.Flush();
-
-    unsigned int success;
-    m_commandChannel.ReadUInt32(success);
-    m_commandChannel.ReadString(result);
-
-	wxDebugEvent event(EventId_EvalResult, vm);
-	event.SetMessageString(result);
-	event.SetEvalResult(success == 1);
-	event.SetEvalId(evalId);
-	m_eventHandler->AddPendingEvent(event);
-
-    return success != 0;
+	return true;
 
 }
 

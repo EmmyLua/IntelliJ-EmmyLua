@@ -39,6 +39,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 //
 
 class TiXmlNode;
+class DebugPipeline;
 
 /**
  * This class encapsulates the part of the debugger that runs inside the
@@ -606,10 +607,10 @@ private:
     std::vector<Script*>            m_scripts;
     NameToScriptMap                 m_nameToScript;
 
-    Channel                         m_eventChannel;
+    //Channel                         m_eventChannel;
 
     HANDLE                          m_commandThread;
-    Channel                         m_commandChannel;
+    //Channel                         m_commandChannel;
 
     std::list<ClassInfo>            m_classInfos;
     std::vector<VirtualMachine*>    m_vms;
@@ -623,6 +624,7 @@ private:
     mutable bool                    m_warnedAboutUserData;
 
 	std::string						m_emmyLua;
+	DebugPipeline*					m_debugPipeline;
 
 };
 

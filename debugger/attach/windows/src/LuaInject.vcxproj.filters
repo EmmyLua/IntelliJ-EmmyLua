@@ -33,6 +33,9 @@
     <ClCompile Include="LuaInject\DllMain.cpp">
       <Filter>头文件\LuaInject</Filter>
     </ClCompile>
+    <ClCompile Include="LuaInject\DebugPipeline.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaInject\DebugBackend.h">
@@ -48,6 +51,9 @@
       <Filter>头文件\LuaInject</Filter>
     </ClInclude>
     <ClInclude Include="LuaInject\LuaTypes.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\DebugPipeline.h">
       <Filter>头文件\LuaInject</Filter>
     </ClInclude>
   </ItemGroup>
