@@ -84,6 +84,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == IF_STAT) {
       r = ifStat(b, 0);
     }
+    else if (t == INCOMPLETE_STAT) {
+      r = incompleteStat(b, 0);
+    }
     else if (t == INDEX_EXPR) {
       r = indexExpr(b, 0);
     }
@@ -144,9 +147,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == UNARY_OP) {
       r = unaryOp(b, 0);
     }
-    else if (t == UNCOMPLETED_STAT) {
-      r = uncompletedStat(b, 0);
-    }
     else if (t == VALUE_EXPR) {
       r = valueExpr(b, 0);
     }
@@ -175,7 +175,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
       TABLE_EXPR, UNARY_EXPR, VALUE_EXPR),
     create_token_set_(ASSIGN_STAT, BREAK_STAT, CALL_STAT, DO_STAT,
       FOR_A_STAT, FOR_B_STAT, GOTO_STAT, IF_STAT,
-      LABEL_STAT, REPEAT_STAT, RETURN_STAT, UNCOMPLETED_STAT,
+      INCOMPLETE_STAT, LABEL_STAT, REPEAT_STAT, RETURN_STAT,
       WHILE_STAT),
   };
 
@@ -895,6 +895,18 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // expr
+  public static boolean incompleteStat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "incompleteStat")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, INCOMPLETE_STAT, "<incomplete stat>");
+    r = expr(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // '[' expr ']' | '.' ID | ':' ID
   public static boolean indexExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "indexExpr")) return false;
@@ -1364,7 +1376,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   //     gotoStat |
   //     assignStat |
   //     callStat |
-  //     uncompletedStat
+  //     incompleteStat
   static boolean stat_impl(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stat_impl")) return false;
     boolean r;
@@ -1381,7 +1393,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = gotoStat(b, l + 1);
     if (!r) r = assignStat(b, l + 1);
     if (!r) r = callStat(b, l + 1);
-    if (!r) r = uncompletedStat(b, l + 1);
+    if (!r) r = incompleteStat(b, l + 1);
     exit_section_(b, l, m, r, false, stat_recover_parser_);
     return r;
   }
@@ -1609,18 +1621,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, NOT);
     if (!r) r = consumeToken(b, GETN);
     if (!r) r = consumeToken(b, BIT_TILDE);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // expr
-  public static boolean uncompletedStat(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "uncompletedStat")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, UNCOMPLETED_STAT, "<uncompleted stat>");
-    r = expr(b, l + 1);
-    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

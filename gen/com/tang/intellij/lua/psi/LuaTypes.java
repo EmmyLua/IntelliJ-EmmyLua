@@ -29,6 +29,7 @@ public interface LuaTypes {
   IElementType FUNC_DEF = LuaParserDefinitionKt.createType("FUNC_DEF");
   IElementType GOTO_STAT = LuaParserDefinitionKt.createType("GOTO_STAT");
   IElementType IF_STAT = LuaParserDefinitionKt.createType("IF_STAT");
+  IElementType INCOMPLETE_STAT = LuaParserDefinitionKt.createType("INCOMPLETE_STAT");
   IElementType INDEX_EXPR = LuaParserDefinitionKt.createType("INDEX_EXPR");
   IElementType LABEL_STAT = LuaParserDefinitionKt.createType("LABEL_STAT");
   IElementType LIST_ARGS = LuaParserDefinitionKt.createType("LIST_ARGS");
@@ -49,7 +50,6 @@ public interface LuaTypes {
   IElementType TABLE_FIELD_SEP = LuaParserDefinitionKt.createType("TABLE_FIELD_SEP");
   IElementType UNARY_EXPR = LuaParserDefinitionKt.createType("UNARY_EXPR");
   IElementType UNARY_OP = LuaParserDefinitionKt.createType("UNARY_OP");
-  IElementType UNCOMPLETED_STAT = LuaParserDefinitionKt.createType("UNCOMPLETED_STAT");
   IElementType VALUE_EXPR = LuaParserDefinitionKt.createType("VALUE_EXPR");
   IElementType VAR_LIST = LuaParserDefinitionKt.createType("VAR_LIST");
   IElementType WHILE_STAT = LuaParserDefinitionKt.createType("WHILE_STAT");
@@ -177,6 +177,9 @@ public interface LuaTypes {
       else if (type == IF_STAT) {
         return new LuaIfStatImpl(node);
       }
+      else if (type == INCOMPLETE_STAT) {
+        return new LuaIncompleteStatImpl(node);
+      }
       else if (type == INDEX_EXPR) {
         return new LuaIndexExprImpl(node);
       }
@@ -236,9 +239,6 @@ public interface LuaTypes {
       }
       else if (type == UNARY_OP) {
         return new LuaUnaryOpImpl(node);
-      }
-      else if (type == UNCOMPLETED_STAT) {
-        return new LuaUncompletedStatImpl(node);
       }
       else if (type == VAR_LIST) {
         return new LuaVarListImpl(node);

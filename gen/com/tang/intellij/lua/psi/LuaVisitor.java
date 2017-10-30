@@ -105,6 +105,10 @@ public class LuaVisitor extends PsiElementVisitor {
     // visitIndentRange(o);
   }
 
+  public void visitIncompleteStat(@NotNull LuaIncompleteStat o) {
+    visitExprStat(o);
+  }
+
   public void visitIndexExpr(@NotNull LuaIndexExpr o) {
     visitExpr(o);
     // visitPsiNameIdentifierOwner(o);
@@ -206,10 +210,6 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitUnaryOp(@NotNull LuaUnaryOp o) {
     visitPsiElement(o);
-  }
-
-  public void visitUncompletedStat(@NotNull LuaUncompletedStat o) {
-    visitExprStat(o);
   }
 
   public void visitValueExpr(@NotNull LuaValueExpr o) {

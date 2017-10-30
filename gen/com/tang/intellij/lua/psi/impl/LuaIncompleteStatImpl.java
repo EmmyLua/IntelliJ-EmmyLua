@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 
-public class LuaUncompletedStatImpl extends LuaExprStatImpl implements LuaUncompletedStat {
+public class LuaIncompleteStatImpl extends LuaExprStatImpl implements LuaIncompleteStat {
 
-  public LuaUncompletedStatImpl(ASTNode node) {
+  public LuaIncompleteStatImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
-    visitor.visitUncompletedStat(this);
+    visitor.visitIncompleteStat(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

@@ -140,7 +140,7 @@ private stat_impl ::=
     gotoStat |
     assignStat |
     callStat |
-    uncompletedStat {
+    incompleteStat {
         recoverWhile = stat_recover
     }
 private stat_recover ::= !(ID
@@ -223,7 +223,7 @@ gotoStat ::= 'goto' ID {
 }
 private defStat ::= classMethodDef | funcDef | localFuncDef | localDef
 callStat ::= funcCallExpr { extends = exprStat }
-uncompletedStat ::= expr { extends = exprStat }
+incompleteStat ::= expr { extends = exprStat }
 
 funcDef ::= 'function' ID funcBody {
     pin = 1

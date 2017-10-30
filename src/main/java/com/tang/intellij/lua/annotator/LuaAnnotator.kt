@@ -52,8 +52,8 @@ class LuaAnnotator : Annotator {
 
     internal inner class LuaElementVisitor : LuaVisitor() {
 
-        override fun visitUncompletedStat(o: LuaUncompletedStat) {
-            myHolder!!.createErrorAnnotation(o, "Uncompleted")
+        override fun visitIncompleteStat(o: LuaIncompleteStat) {
+            myHolder!!.createErrorAnnotation(o, "syntax error")
         }
 
         override fun visitLocalFuncDef(o: LuaLocalFuncDef) {
