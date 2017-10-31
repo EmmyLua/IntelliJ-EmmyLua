@@ -3,6 +3,8 @@
 #include "Channel.h"
 #include "TCPServer.h"
 
+class DebugMessage;
+
 class DebugPipeline
 {
 public:
@@ -18,6 +20,8 @@ public:
 	virtual bool ReadSize(size_t& size) = 0;
 	virtual bool ReadString(std::string& value) = 0;
 	virtual bool ReadBool(bool& value) = 0;
+
+	virtual void Send(DebugMessage* message);
 
 	virtual bool Initialize() = 0;
 	virtual void Destroy() = 0;
@@ -49,4 +53,20 @@ class SocketPipeline : public DebugPipeline, public DebugServerListener
 	DebugServer server;
 public:
 	bool Initialize() override;
+	void Destroy() override {}
+
+	void WriteUInt32(unsigned value) override {  }
+	void WriteSize(size_t value) override { }
+	void WriteString(const char* value) override {  }
+	void WriteString(const std::string& value) override { }
+	void WriteBool(bool value) override { }
+	void Flush() override { }
+
+	bool ReadUInt32(unsigned& value) override { return false; }
+	bool ReadSize(size_t& value) override { return false; }
+	bool ReadString(std::string& value) override { return false; }
+	bool ReadBool(bool& value) override { return false; }
+
+	void handleStream(ByteInputStream* stream) override;
+	void Send(DebugMessage* message) override;
 };

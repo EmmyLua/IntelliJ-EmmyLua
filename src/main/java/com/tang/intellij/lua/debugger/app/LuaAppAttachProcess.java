@@ -31,6 +31,7 @@ public class LuaAppAttachProcess extends LuaAttachDebugProcess {
         super(session);
     }
 
+    @NotNull
     @Override
     protected LuaAttachBridge startBridge() {
         LuaAppRunConfiguration configuration = (LuaAppRunConfiguration) getSession().getRunProfile();

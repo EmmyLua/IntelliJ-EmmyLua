@@ -4,6 +4,7 @@
 #include "Stream.h"
 #include "DebugBackend.h"
 #include "TCPServer.h"
+#include "endian.h"
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
 
@@ -15,7 +16,7 @@ DWORD WINAPI connectionThread(LPVOID param)
 
 DebugServer::DebugServer() : m_listenSocket(0) , m_client(nullptr) , m_listener(nullptr), m_connectionThread(nullptr), m_port(0)
 {
-	m_stream = new ByteInStream();
+	m_stream = new ByteOutputStream();
 }
 
 DebugServer::~DebugServer()
@@ -73,9 +74,10 @@ bool DebugServer::startup(int port, DebugServerListener* listener)
 		return false;
 	}
 
+	printf("begin tcp server on port:%d\n", port);
+
 	DWORD threadId;
 	m_connectionThread = CreateThread(nullptr, 0, connectionThread, this, 0, &threadId);
-	connectionThread(this);
 	return true;
 }
 
@@ -126,41 +128,9 @@ void DebugServer::sendMsg(const char * data, size_t size)
 	}
 }
 
-void DebugServer::WriteUInt32(unsigned int value) const
-{
-	m_stream->WriteUInt32(value);
-}
-
-void DebugServer::WriteSize(size_t size) const
-{
-	m_stream->WriteSize(size);
-}
-
-void DebugServer::WriteString(const char * value) const
-{
-	m_stream->WriteString(value);
-}
-
-void DebugServer::WriteString(const std::string & value) const
-{
-	m_stream->WriteString(value);
-}
-
-void DebugServer::WriteBool(bool value) const
-{
-	WriteUInt32(value ? 1 : 0);
-}
-
-void DebugServer::Flush()
-{
-	char* buff = (char*)malloc(m_stream->GetSize());
-	m_stream->Reset();
-	sendMsg(buff, m_stream->GetSize());
-	free(buff);
-}
-
 void DebugServer::onDisconnection(DebugClient * client)
 {
+	m_listener->onDisconnect(client);
 	m_client = nullptr;
 }
 
@@ -210,44 +180,49 @@ void DebugClient::handleMsg(const char * data, size_t size)
 {
 	char* temp = (char*)malloc(size);
 	memcpy(temp, data, size);
-	ByteOutStream os(temp, size);
+	ByteInputStream os(temp, size);
 	this->m_server->m_listener->handleStream(&os);
 }
 
 DWORD DebugClient::receive()
 {
-	ByteInStream is;
+	ByteOutputStream is;
 
 	const int BUFF_SIZE = 1024 * 1024;
 	char* buff = (char*)malloc(BUFF_SIZE);
-	int buffLen = 0;
+	int bufLen = 0;
 
 	int msgLen = 0;
 
 	while (true)
 	{
 		int count = recv(m_socket, buff, BUFF_SIZE, 0);
+		printf("receive msg pack size : %d\n", count);
+
 		if (count == 0 || count == SOCKET_ERROR) //disconnected
 		{
 			m_server->onDisconnection(this);
 			break;
 		}
 
-		buffLen += count;
+		bufLen += count;
 		//split packs
 		int bufPos = 0;
-		while (bufPos < buffLen)
+		while (bufPos < bufLen)
 		{
-			int remain = buffLen - bufPos;
+			int remain = bufLen - bufPos;
 			//get size of message pack
 			if (msgLen == 0)
 			{
-				if (remain < 4)
+				if (remain < 4) {
 					break;
-				msgLen = *(int*)(buff + bufPos);
+				}
+				msgLen = readInt32InBigEndian(buff + bufPos);
+
+				printf("\t>msg len: %d\n", msgLen);
 				bufPos += sizeof(int);
 			}
-			remain = buffLen - bufPos;
+			remain = bufLen - bufPos;
 			//read bytes
 			int rc = min(remain, msgLen);
 			is.Write(buff + bufPos, rc);
@@ -257,10 +232,12 @@ DWORD DebugClient::receive()
 			//check full
 			if (msgLen == 0)
 			{
-				handleMsg(is.GetBuf(), msgLen);
+				printf("\t>handle msg.\n");
+				handleMsg(is.GetBuf(), is.GetPositon());
 				is.Reset();
 			}
 		}
+		bufLen -= bufPos;
 	}
 
 	free(buff);

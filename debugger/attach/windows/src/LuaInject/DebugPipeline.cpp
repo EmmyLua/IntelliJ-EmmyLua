@@ -1,5 +1,8 @@
 ﻿#include "DebugPipeline.h"
 #include "TCPServer.h"
+#include "Stream.h"
+#include "DebugMessage.h"
+#include "DebugBackend.h"
 
 bool ChannelPipeline::Initialize()
 {
@@ -37,4 +40,55 @@ bool SocketPipeline::Initialize()
 {
 	DWORD processId = GetCurrentProcessId();
 	return server.startup(processId, this);
+}
+
+void SocketPipeline::handleStream(ByteInputStream * stream)
+{
+	unsigned id = stream->ReadUInt32();
+	DebugMessage* msg = nullptr;
+	DebugMessageId msgId = (DebugMessageId)id;
+	switch (msgId)
+	{
+	case DebugMessageId::AddBreakpoint:
+		msg = new DMAddBreakpoint();
+		break;
+	case DebugMessageId::DelBreakpoint:
+		msg = new DMDelBreakpoint();
+		break;
+	case DebugMessageId::Evaluate:
+		msg = new DMEvaluate();
+		break;
+	case DebugMessageId::Detach:
+	case DebugMessageId::Break:
+	case DebugMessageId::LoadDone:
+	case DebugMessageId::Continue:
+	case DebugMessageId::StepOver:
+	case DebugMessageId::StepInto:
+	case DebugMessageId::StepOut:
+	case DebugMessageId::DeleteAllBreakpoints:
+	default:
+		msg = new DebugMessage(msgId);
+		break;
+	}
+	if (msg != nullptr)
+	{
+		msg->Read(stream);
+		DebugBackend::Get().HandleMessage(msg);
+		delete msg;
+	}
+}
+
+void SocketPipeline::Send(DebugMessage* message)
+{
+	ByteOutputStream body;
+	message->Write(&body);
+	ByteOutputStream stream;
+	stream.WriteUInt32(body.GetPositon());
+	stream.Write((void*) body.GetBuf(), body.GetPositon());
+	server.sendMsg(stream.GetBuf(), stream.GetPositon());
+}
+
+void DebugPipeline::Send(DebugMessage * message)
+{
+
 }

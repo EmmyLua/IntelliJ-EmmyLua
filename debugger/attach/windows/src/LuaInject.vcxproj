@@ -23,6 +23,7 @@
     <ClCompile Include="LuaInject\DebugHelp.cpp" />
     <ClCompile Include="LuaInject\DebugMessage.cpp" />
     <ClCompile Include="LuaInject\DebugPipeline.cpp" />
+    <ClCompile Include="LuaInject\endian.cpp" />
     <ClCompile Include="LuaInject\LuaCheckStack.cpp" />
     <ClCompile Include="LuaInject\LuaDll.cpp" />
     <ClCompile Include="LuaInject\DllMain.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="LuaInject\DebugHelp.h" />
     <ClInclude Include="LuaInject\DebugMessage.h" />
     <ClInclude Include="LuaInject\DebugPipeline.h" />
+    <ClInclude Include="LuaInject\endian.h" />
     <ClInclude Include="LuaInject\LuaCheckStack.h" />
     <ClInclude Include="LuaInject\LuaDll.h" />
     <ClInclude Include="LuaInject\LuaTypes.h" />

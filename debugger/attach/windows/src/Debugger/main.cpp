@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 			if (options.count("p")) {
 				int pid = options["p"].as<int>();
 				if (inst.Attach(pid, "")) {
-					mainLoop();
+					//mainLoop();
 				}
 			}
 		}

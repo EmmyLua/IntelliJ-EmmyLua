@@ -4,8 +4,8 @@
 
 #include <string>
 
-class ByteInStream;
-class ByteOutStream;
+class ByteOutputStream;
+class ByteInputStream;
 class DebugClient;
 
 class DebugServerListener
@@ -14,14 +14,15 @@ public:
 	virtual ~DebugServerListener() = default;
 
 	virtual void onConnection(DebugClient* client) {}
-	virtual void handleStream(ByteOutStream* stream) {}
+	virtual void onDisconnect(DebugClient* client) {}
+	virtual void handleStream(ByteInputStream* stream) {}
 };
 
 class DebugServer
 {
 	SOCKET m_listenSocket;
 	DebugClient* m_client;
-	ByteInStream* m_stream;
+	ByteOutputStream* m_stream;
 	DebugServerListener* m_listener;
 	HANDLE m_connectionThread;
 	int m_port;
@@ -35,28 +36,6 @@ public:
 	void disConnectAll();
 	DWORD connectionProc();
 	void sendMsg(const char* data, size_t size);
-
-	void WriteUInt32(unsigned int value) const;
-
-	void WriteSize(size_t size) const;
-
-	/**
-	* Writes a string to the channel and returns immediately.
-	*/
-	void WriteString(const char* value) const;
-
-	/**
-	* Writes a string to the channel and returns immediately.
-	*/
-	void WriteString(const std::string& value) const;
-
-	/**
-	* Writes a boolean to the channel and returns immediately.
-	*/
-	void WriteBool(bool value) const;
-
-	void Flush();
-
 	void onDisconnection(DebugClient* client);
 private:
 	void onConnection(SOCKET newSocket);

@@ -45,6 +45,9 @@
     <ClCompile Include="LuaInject\DebugMessage.cpp">
       <Filter>头文件\LuaInject</Filter>
     </ClCompile>
+    <ClCompile Include="LuaInject\endian.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaInject\DebugBackend.h">
@@ -72,6 +75,9 @@
       <Filter>头文件\LuaInject</Filter>
     </ClInclude>
     <ClInclude Include="LuaInject\DebugMessage.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\endian.h">
       <Filter>头文件\LuaInject</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,12 +16,85 @@
 
 package com.tang.intellij.lua.debugger.attach
 
-import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto
+import com.intellij.xdebugger.XSourcePosition
+import com.intellij.xdebugger.frame.XStackFrame
+import com.intellij.xdebugger.frame.XValueChildrenList
+import com.intellij.xdebugger.impl.XSourcePositionImpl
+import com.tang.intellij.lua.debugger.LuaExecutionStack
+import com.tang.intellij.lua.debugger.attach.value.LuaXValue
+import com.tang.intellij.lua.psi.LuaFileUtil
+import org.w3c.dom.Node
+import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.util.*
+import javax.xml.parsers.DocumentBuilderFactory
 
-open class LuaAttachMessage {
+enum class DebugMessageId
+{
+    //resp
+    Continue,
+    StepOver,
+    StepInto,
+    StepOut,
+    AddBreakpoint,
+    DelBreakpoint,
+    Break,
+    Evaluate,
+    Detach,
+    PatchReplaceLine,
+    PatchInsertLine,
+    PatchDeleteLine,
+    LoadDone,
+    IgnoreException,
+    DeleteAllBreakpoints,
+    InitEmmy,
+
+    //req
+    Initialize,
+    CreateVM,
+    DestroyVM,
+    LoadScript,
+    SetBreakpoint,
+    Exception,
+    LoadError,
+    Message,
+    SessionEnd,
+    NameVM,
+    EvalResult,
+}
+
+open class LuaAttachMessage(val id: DebugMessageId) {
+
+    var L:Long = 0
+
+    var process: LuaAttachDebugProcess? = null
+
     open fun write(stream: DataOutputStream) {
+        stream.writeInt(id.ordinal)
+        stream.writeLong(L)
+    }
 
+    open fun read(stream: DataInputStream) {
+        L = stream.readLong()
+    }
+
+    companion object {
+        fun parseMessage(stream: DataInputStream): LuaAttachMessage {
+            val id = stream.readInt()
+            val idType = DebugMessageId.values().find { it.ordinal == id }
+            val m:LuaAttachMessage = when (idType) {
+                DebugMessageId.LoadScript -> DMLoadScript()
+                DebugMessageId.Message -> DMMessage()
+                DebugMessageId.Exception -> DMException()
+                DebugMessageId.Break -> DMBreak()
+                DebugMessageId.CreateVM -> LuaAttachMessage(idType)
+                else -> {
+                    throw Exception("unknown message id:$idType")
+                }
+            }
+            m.read(stream)
+            return m
+        }
     }
 }
 
@@ -30,13 +103,184 @@ fun DataOutputStream.writeString(s: String) {
     write(s.toByteArray())
 }
 
-class InitMessage : LuaAttachMessage() {
-    override fun write(stream: DataOutputStream) {
-        stream.writeInt(LuaAttachProto.CommandId_Initialize)
-        stream.writeString("123")
+fun DataInputStream.readString(): String {
+    val len = this.readInt()
+    val bytes = ByteArray(len)
+    this.read(bytes)
+    return String(bytes)
+}
+
+class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
+
+    lateinit var message: String
+    var type: Int = 0
+
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        type = stream.readInt()
+        message = stream.readString()
     }
 }
 
-class LuaAddBPMessage : LuaAttachMessage() {
+class DMException : LuaAttachMessage(DebugMessageId.Exception) {
+    lateinit var message: String
 
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        message = stream.readString()
+    }
+}
+
+class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
+    lateinit var fileName: String
+    lateinit var source: String
+    var index: Int = 0
+    var state: Int = 0
+
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        fileName = stream.readString()
+        source = stream.readString()
+        index = stream.readInt()
+        state = stream.readInt()
+    }
+}
+
+class DMSetBreakpoint : LuaAttachMessage(DebugMessageId.SetBreakpoint) {
+    var scriptIndex: Int = 0
+    var line: Int = 0
+    var success: Boolean = false
+
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        scriptIndex = stream.readInt()
+        line = stream.readInt()
+        success = stream.readInt() == 1
+    }
+}
+
+class DMAddBreakpoint(private val scriptIndex: Int,
+                      private val line: Int,
+                      private val expr: String) : LuaAttachMessage(DebugMessageId.AddBreakpoint) {
+    override fun write(stream: DataOutputStream) {
+        super.write(stream)
+        stream.writeInt(scriptIndex)
+        stream.writeInt(line)
+        stream.writeString(expr)
+    }
+}
+
+class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
+    lateinit var stackXML: String
+    lateinit var stack: LuaExecutionStack
+
+    var name: String? = null
+    var line: Int = 0
+
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        stackXML = stream.readString()
+        try {
+            val builderFactory = DocumentBuilderFactory.newInstance()
+            val documentBuilder = builderFactory.newDocumentBuilder()
+
+            val document = documentBuilder.parse(stackXML)
+            val root = document.documentElement
+            parseStack(root)
+        } catch (e: Exception) {
+            println("Parse exception:")
+            println(stackXML)
+        }
+    }
+
+    private fun parseStack(item: Node) {
+        val frames = ArrayList<XStackFrame>()
+        var stackNode: Node? = item.firstChild
+        var stackIndex = 0
+        while (stackNode != null) {
+            val attributes = stackNode.attributes
+            val functionNode = attributes.getNamedItem("function")
+            val scriptIndexNode = attributes.getNamedItem("script_index")
+            val lineNode = attributes.getNamedItem("line")
+
+            val script = process?.getScript(Integer.parseInt(scriptIndexNode.textContent))
+            var scriptName: String? = null
+            val line = Integer.parseInt(lineNode.textContent)
+            var position: XSourcePosition? = null
+            if (script != null) {
+                scriptName = script.name
+                // find source position
+                val file = LuaFileUtil.findFile(process?.session?.project!!, scriptName)
+                if (file != null) {
+                    position = XSourcePositionImpl.create(file, line)
+
+                    if (name == null) {
+                        this.line = line
+                        this.name = scriptName
+                    }
+                }
+            }
+            val childrenList = parseValue(stackNode)
+            val frame = LuaAttachStackFrame(this, childrenList, position, functionNode.textContent, scriptName, stackIndex)
+            frames.add(frame)
+
+            stackIndex++
+            stackNode = stackNode.nextSibling
+        }
+        stack = LuaExecutionStack(frames)
+    }
+
+    private fun parseValue(stackNode: Node): XValueChildrenList {
+        val list = XValueChildrenList()
+        var valueNode: Node? = stackNode.firstChild
+        while (valueNode != null) {
+            val value = LuaXValue.parse(valueNode, process)
+            if (value != null) {
+                var name = "unknown"
+                val valueNodeChildNodes = valueNode.childNodes
+                for (i in 0 until valueNodeChildNodes.length) {
+                    val item = valueNodeChildNodes.item(i)
+                    if (item.nodeName == "name") {
+                        name = item.textContent
+                        break
+                    }
+                }
+                value.name = name
+                list.add(name, value)
+            }
+            valueNode = valueNode.nextSibling
+        }
+        return list
+    }
+}
+
+class DMDelBreakpoint(private val scriptIndex: Int,
+                      private val line: Int) : LuaAttachMessage(DebugMessageId.DelBreakpoint) {
+    override fun write(stream: DataOutputStream) {
+        super.write(stream)
+        stream.writeInt(scriptIndex)
+        stream.writeInt(line)
+    }
+}
+
+class DMEvaluate(private val evalId: Int,
+                 private val stackLevel: Int,
+                 private val depth: Int,
+                 private val expr: String) : LuaAttachMessage(DebugMessageId.Evaluate) {
+    override fun write(stream: DataOutputStream) {
+        super.write(stream)
+        stream.writeInt(evalId)
+        stream.writeInt(stackLevel)
+        stream.writeInt(depth)
+        stream.writeString(expr)
+    }
+}
+
+class DMEvalResult : LuaAttachMessage(DebugMessageId.EvalResult) {
+    var evalId: Int = 0
+
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+
+    }
 }

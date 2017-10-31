@@ -1,8 +1,10 @@
 ﻿#pragma once
 #include <string>
+#include "Protocol.h"
 
-class ByteOutStream;
-class ByteInStream;
+class ByteInputStream;
+class ByteOutputStream;
+struct lua_State;
 
 enum class DebugMessageId
 {
@@ -47,40 +49,132 @@ public:
 
 	DebugMessageId getId() const { return id; }
 
-	virtual void Read(ByteOutStream* stream);
-	virtual void Write(ByteInStream* stream);
+	virtual void Read(ByteInputStream* stream);
+	virtual void Write(ByteOutputStream* stream);
 
-	size_t  vm;
+	lua_State* L;
 };
 
-class DebugMessageAddBreakpoint : public DebugMessage
+class DMException : public DebugMessage
 {
 public:
-	DebugMessageAddBreakpoint();
+	DMException();
 
-	void Read(ByteOutStream* stream) override;
+	void Write(ByteOutputStream* stream) override;
+
+	std::string message;
+};
+
+class DMLoadError : public DebugMessage
+{
+public:
+	DMLoadError();
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string message;
+};
+
+class DMMessage : public DebugMessage
+{
+public:
+	DMMessage(MessageType type, const char* message);
+
+	void Write(ByteOutputStream* stream) override;
+
+	MessageType type;
+	std::string message;
+};
+
+class DMLoadScript : public DebugMessage
+{
+public:
+	DMLoadScript();
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string fileName;
+	std::string source;
+	unsigned int index;
+	unsigned int state;
+};
+
+class DMAddBreakpoint : public DebugMessage
+{
+public:
+	DMAddBreakpoint();
+
+	void Read(ByteInputStream* stream) override;
 
 	unsigned int scriptIndex;
 	unsigned int line;
 	std::string expr;
 };
 
-class DebugMessageDelBreakpoint : public DebugMessage
+class DMSetBreakpoint : public DebugMessage
 {
 public:
-	DebugMessageDelBreakpoint();
+	DMSetBreakpoint();
+
+	void Write(ByteOutputStream* stream) override;
+
+	unsigned int scriptIndex;
+	unsigned int line;
+	bool success;
+};
+
+class DMBreak : public DebugMessage
+{
+public:
+	DMBreak();
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string stackXML;
+};
+
+class DMDelBreakpoint : public DebugMessage
+{
+public:
+	DMDelBreakpoint();
+
+	void Read(ByteInputStream* stream) override;
 
 	unsigned int scriptIndex;
 	unsigned int line;
 };
 
-class DebugMessageEvaluate : public DebugMessage
+class DMEvaluate : public DebugMessage
 {
 public:
-	DebugMessageEvaluate();
+	DMEvaluate();
+
+	void Read(ByteInputStream* stream) override;
 
 	unsigned int evalId;
 	unsigned int stackLevel;
 	unsigned int depth;
 	std::string expression;
+};
+
+class DMEvalResult : public DebugMessage
+{
+public:
+	DMEvalResult();
+
+	void Write(ByteOutputStream* stream) override;
+
+	bool success;
+	unsigned int evalId;
+	std::string result;
+};
+
+class DMNameVM : public DebugMessage
+{
+public:
+	DMNameVM();
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string name;
 };

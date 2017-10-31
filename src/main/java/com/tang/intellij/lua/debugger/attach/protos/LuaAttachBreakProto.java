@@ -95,8 +95,8 @@ public class LuaAttachBreakProto extends LuaAttachProto {
                 }
             }
             XValueChildrenList childrenList = parseValue(stackNode);
-            LuaAttachStackFrame frame = new LuaAttachStackFrame(this, childrenList, position, functionNode.getTextContent(), scriptName, stackIndex);
-            frames.add(frame);
+            //LuaAttachStackFrame frame = new LuaAttachStackFrame(this, childrenList, position, functionNode.getTextContent(), scriptName, stackIndex);
+            //frames.add(frame);
 
             stackIndex++;
             stackNode = stackNode.getNextSibling();

@@ -54,15 +54,15 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     override fun startStepOver(context: XSuspendContext?) {
-        bridge.send("stepover")
+        bridge.send(LuaAttachMessage(DebugMessageId.StepOver))//"stepover"
     }
 
     override fun startStepInto(context: XSuspendContext?) {
-        bridge.send("stepinto")
+        bridge.send(LuaAttachMessage(DebugMessageId.StepInto))//bridge.send("stepinto")
     }
 
     override fun startStepOut(context: XSuspendContext?) {
-        bridge.send("stepout")
+        bridge.send(LuaAttachMessage(DebugMessageId.StepOut))//bridge.send("stepout")
     }
 
     override fun stop() {
@@ -73,8 +73,19 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         bridge.sendRun()
     }
 
-    override fun handle(proto: LuaAttachProto) {
-        val type = proto.type
+    override fun handle(proto: LuaAttachMessage) {
+        when (proto) {
+            is DMLoadScript -> {
+                onLoadScript(proto)
+            }
+            is DMBreak -> {
+
+            }
+            is DMMessage -> {
+
+            }
+        }
+        /*val type = proto.type
         when (type) {
             LuaAttachProto.Exception, LuaAttachProto.Message -> {
                 val messageProto = proto as LuaAttachMessageProto
@@ -89,7 +100,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                 bridge.stop(false)
                 session.stop()
             }
-        }
+        }*/
     }
 
     private fun onBreak(proto: LuaAttachBreakProto) {
@@ -102,18 +113,18 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         setStack(proto.stack)
     }
 
-    private fun onLoadScript(proto: LuaAttachLoadScriptProto) {
-        val file = LuaFileUtil.findFile(session.project, proto.name)
+    private fun onLoadScript(proto: DMLoadScript) {
+        val file = LuaFileUtil.findFile(session.project, proto.fileName)
         if (file == null) {
-            print(String.format("[✘] File not found : %s\n", proto.name), ConsoleViewContentType.SYSTEM_OUTPUT)
+            print(String.format("[✘] File not found : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
         } else {
-            val script = LoadedScript(file, proto.index, proto.name)
+            val script = LoadedScript(file, proto.index, proto.fileName)
             loadedScriptMap.put(proto.index, script)
-            print(String.format("[✔] File was loaded : %s\n", proto.name), ConsoleViewContentType.SYSTEM_OUTPUT)
+            print(String.format("[✔] File was loaded : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
 
             for (pos in registeredBreakpoints.keys) {
                 if (LuaFileUtil.fileEquals(file, pos.file)) {
-                    val breakpoint = registeredBreakpoints[pos]
+                    val breakpoint = registeredBreakpoints[pos]!!
                     bridge.addBreakpoint(proto.index, breakpoint)
                 }
             }

@@ -237,7 +237,7 @@ bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 
     // Start a new thread to handle the incoming event channel.
     DWORD threadId;
-    m_eventThread = CreateThread(nullptr, 0, StaticEventThreadProc, this, 0, &threadId);
+    //m_eventThread = CreateThread(nullptr, 0, StaticEventThreadProc, this, 0, &threadId);
 
     return true;
 

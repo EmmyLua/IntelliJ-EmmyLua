@@ -40,6 +40,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 class TiXmlNode;
 class DebugPipeline;
+class DebugMessage;
 
 /**
  * This class encapsulates the part of the debugger that runs inside the
@@ -47,9 +48,6 @@ class DebugPipeline;
  */
 class DebugBackend
 {
-
-private:
-
     struct VirtualMachine;
 
 public:
@@ -235,6 +233,8 @@ public:
 	* Returns the index of the API that the VM was created in.
 	*/
 	LAPI GetApiForVm(lua_State* L) const;
+
+	void HandleMessage(DebugMessage* message);
 private:
 	class Breakpoint
 	{

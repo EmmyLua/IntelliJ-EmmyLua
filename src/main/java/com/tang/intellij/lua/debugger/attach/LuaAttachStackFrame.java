@@ -24,7 +24,6 @@ import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XCompositeNode;
 import com.intellij.xdebugger.frame.XStackFrame;
 import com.intellij.xdebugger.frame.XValueChildrenList;
-import com.tang.intellij.lua.debugger.attach.protos.LuaAttachBreakProto;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,7 +40,7 @@ public class LuaAttachStackFrame extends XStackFrame {
     private int stack;
     private LuaAttachDebuggerEvaluator evaluator;
 
-    public LuaAttachStackFrame(LuaAttachBreakProto proto, XValueChildrenList childrenList, XSourcePosition position, String function, String scriptName, int stack) {
+    public LuaAttachStackFrame(DMBreak proto, XValueChildrenList childrenList, XSourcePosition position, String function, String scriptName, int stack) {
         this.process = proto.getProcess();
         this.childrenList = childrenList;
         this.position = position;

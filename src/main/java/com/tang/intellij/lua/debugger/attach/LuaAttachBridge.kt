@@ -17,7 +17,10 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.execution.process.*
+import com.intellij.execution.process.OSProcessHandler
+import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessInfo
+import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Key
@@ -25,7 +28,6 @@ import com.intellij.util.io.BinaryOutputReader
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.tang.intellij.lua.LuaBundle
-import com.tang.intellij.lua.debugger.DebugLogger
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachEvalResultProto
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto
 import com.tang.intellij.lua.psi.LuaFileUtil
@@ -42,12 +44,13 @@ import javax.xml.parsers.DocumentBuilderFactory
  * debug bridge
  * Created by tangzx on 2017/3/26.
  */
-class LuaAttachBridge(private val logger: DebugLogger, private val session: XDebugSession) {
+class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val session: XDebugSession) {
     private var handler: OSProcessHandler? = null
     private var writer: DataOutputStream? = null
     private var protoHandler: ProtoHandler? = null
     private var protoFactory: ProtoFactory? = null
     private var evalIdCounter = 0
+    private var pid: Int = 0
     private val callbackMap = HashMap<Int, EvalInfo>()
     private lateinit var socket: Socket
     private lateinit var reader: ProtoReader
@@ -75,7 +78,8 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
         }
 
         override fun processTerminated(processEvent: ProcessEvent) {
-            stop(false)
+            //stop(false)
+            connect()
         }
 
         override fun processWillTerminate(processEvent: ProcessEvent, b: Boolean) {
@@ -83,7 +87,7 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
         }
 
         override fun onTextAvailable(processEvent: ProcessEvent, key: Key<*>) {
-            if (key === ProcessOutputTypes.STDOUT) {
+            /*if (key === ProcessOutputTypes.STDOUT) {
                 val line = processEvent.text
                 if (readProto) {
                     if (line.startsWith("[end]")) {
@@ -101,7 +105,7 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
                         sb = StringBuilder()
                     }
                 }
-            }
+            }*/
         }
     }
 
@@ -117,7 +121,7 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
     }
 
     interface ProtoHandler {
-        fun handle(proto: LuaAttachProto)
+        fun handle(proto: LuaAttachMessage)
     }
 
     interface ProtoFactory {
@@ -133,24 +137,24 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
         var expr: String? = null
     }
 
-    private fun handleProto(proto: LuaAttachProto?) {
-        if (proto!!.type == LuaAttachProto.EvalResult) {
-            handleEvalCallback(proto as LuaAttachEvalResultProto)
-        } else if (protoHandler != null)
-            protoHandler!!.handle(proto)
+    private fun handleProto(proto: LuaAttachMessage) {
+        if (proto.id == DebugMessageId.EvalResult) {
+            handleEvalCallback(proto as DMEvalResult)
+        } else protoHandler?.handle(proto)
     }
 
-    private fun handleEvalCallback(proto: LuaAttachEvalResultProto) {
+    private fun handleEvalCallback(proto: DMEvalResult) {
         val info = callbackMap.remove(proto.evalId)
-        if (info != null) {
+        /*if (info != null) {
             val xValue = proto.xValue
             if (xValue != null)
                 xValue.name = info.expr
             info.callback!!.onResult(proto)
-        }
+        }*/
     }
 
     fun attach(processInfo: ProcessInfo) {
+        this.pid = processInfo.pid
         val pid = processInfo.pid.toString()
         val pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory()
         try {
@@ -165,7 +169,7 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
                 isX86 = exitValue == 1
 
                 val archType = if (isX86) "x86" else "x64"
-                logger.println(LuaBundle.message("run.attach.start_info", processInfo.executableName, pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
+                process.println(LuaBundle.message("run.attach.start_info", processInfo.executableName, pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
                 // attach debugger
                 val exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType))
 
@@ -173,25 +177,26 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
                 commandLine.addParameters("-m", "attach", "-p", pid, "-e", emmyLua)
                 commandLine.charset = Charset.forName("UTF-8")
                 handler = OSProcessHandler(commandLine)
-                handler!!.addProcessListener(processListener)
-                handler!!.startNotify()
-
-                socket = Socket()
-                socket.tcpNoDelay = true
-                socket.connect(InetSocketAddress("localhost", processInfo.pid))
-                writer = DataOutputStream(socket.getOutputStream())
-                receiveBuffer = ByteArrayOutputStream()
-                //reader = ProtoReader(socket.getInputStream())
-                ApplicationManager.getApplication().executeOnPooledThread {
-                    procPack()
-                }
-                send(InitMessage())
+                handler?.addProcessListener(processListener)
+                handler?.startNotify()
             }
         } catch (e: Exception) {
-            logger.error(e.message!!)
+            process.error(e.message!!)
             session.stop()
         }
+    }
 
+    fun connect() {
+        socket = Socket()
+        socket.tcpNoDelay = true
+        socket.connect(InetSocketAddress("localhost", pid))
+        writer = DataOutputStream(socket.getOutputStream())
+        receiveBuffer = ByteArrayOutputStream()
+        reader = ProtoReader(socket.getInputStream())
+        //test: send(LuaAttachMessage(DebugMessageId.LoadDone))
+        ApplicationManager.getApplication().executeOnPooledThread {
+            //processPack()
+        }
     }
 
     fun launch(program: String, workingDir: String?, args: Array<String>?) {
@@ -215,7 +220,7 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
                 isX86 = exitValue == 1
 
                 val archType = if (isX86) "x86" else "x64"
-                logger.println(LuaBundle.message("run.attach.launch_info", program, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
+                process.println(LuaBundle.message("run.attach.launch_info", program, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
                 // attach debugger
                 val exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType))
 
@@ -236,15 +241,16 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
                 //writer = BufferedWriter(OutputStreamWriter(handler!!.process.outputStream))
             }
         } catch (e: Exception) {
-            logger.error(e.message!!)
+            process.error(e.message!!)
             session.stop()
         }
 
     }
 
-    private fun procPack() {
+    private fun processPack() {
         try {
-            val reader = DataInputStream(socket.getInputStream())
+            val inputStream = socket.getInputStream()
+            val reader = DataInputStream(inputStream)
             while (true) {
                 val len = reader.readInt()
                 val bytes = reader.readBytes(len)
@@ -256,22 +262,30 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
     }
 
     private fun handleMsg(byteArray: ByteArray) {
-        println(byteArray)
+        protoHandler?.let {
+            val reader = DataInputStream(ByteArrayInputStream(byteArray))
+            val message = LuaAttachMessage.parseMessage(reader)
+            message.process = process
+            it.handle(message)
+        }
     }
 
     private fun receive(data: ByteArray, size: Int) {
-        receiveBuffer.write(data)
-
+        //receiveBuffer.write(data)
+        val reader = DataInputStream(ByteArrayInputStream(data))
+        val len = reader.readInt()
+        val bytes = reader.readBytes(len)
+        handleMsg(bytes)
     }
 
-    internal fun stop(detach: Boolean = true) {
+    fun stop(detach: Boolean = true) {
         if (detach)
-            send("detach")
+            send(LuaAttachMessage(DebugMessageId.Detach))
         writer = null
-        if (handler != null) {
-            handler!!.destroyProcess()
-            handler = null
-        }
+        handler?.destroyProcess()
+        handler = null
+
+        socket.close()
     }
 
     fun send(message: LuaAttachMessage) {
@@ -287,26 +301,6 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
 
         socket.getOutputStream().write(byte2.toByteArray())
         socket.getOutputStream().flush()
-
-        /*with(writer!!) {
-            writeInt(byteArray.size)
-            write(byteArray)
-            flush()
-        }*/
-    }
-
-    internal fun send(data: String) {
-        if (writer != null) {
-            /*try {
-                writer!!.write(data)
-                writer!!.write("\n")
-                writer!!.flush()
-            } catch (e: IOException) {
-                writer = null
-                session.stop()
-            }*/
-
-        }
     }
 
     private fun parse(dataMsg: String): LuaAttachProto? {
@@ -333,7 +327,6 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
         return null
     }
 
-    @Throws(Exception::class)
     private fun createProto(type: Int, root: Element): LuaAttachProto {
         val proto = protoFactory!!.createProto(type)
         proto.doParse(root)
@@ -346,24 +339,29 @@ class LuaAttachBridge(private val logger: DebugLogger, private val session: XDeb
         info.callback = callback
         info.expr = expr
         callbackMap.put(id, info)
-        send(String.format("eval %d %d %d %s", id, stack, depth, expr))
+        //send(String.format("eval %d %d %d %s", id, stack, depth, expr))
+        send(DMEvaluate(id, stack, depth, expr))
     }
 
-    internal fun addBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {
+    fun addBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {
         val expression = breakpoint.conditionExpression
         val exp = expression?.expression ?: ""
-        send(String.format("setb %d %d %s", index, breakpoint.line, exp))
+        //send(String.format("setb %d %d %s", index, breakpoint.line, exp))
+        send(DMAddBreakpoint(index, breakpoint.line, exp))
     }
 
-    internal fun removeBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {
-        send(String.format("delb %d %d", index, breakpoint.line))
+    fun removeBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {
+        //send(String.format("delb %d %d", index, breakpoint.line))
+        send(DMDelBreakpoint(index, breakpoint.line))
     }
 
-    internal fun sendDone() {
-        send("done")
+    fun sendDone() {
+        //send("done")
+        send(LuaAttachMessage(DebugMessageId.LoadDone))
     }
 
-    internal fun sendRun() {
-        send("run")
+    fun sendRun() {
+        //send("run")
+        send(LuaAttachMessage(DebugMessageId.Continue))
     }
 }

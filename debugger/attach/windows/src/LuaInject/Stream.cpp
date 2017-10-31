@@ -1,72 +1,82 @@
 ﻿#include "Stream.h"
 #include <cstdlib>
 #include <cassert>
+#include "endian.h"
 
-ByteOutStream::ByteOutStream(char * buff, int size) : m_size(size), m_position(0)
+ByteInputStream::ByteInputStream(char * buff, int size) : m_size(size), m_position(0)
 {
 	m_buff = (char*)malloc(size);
 	memcpy(m_buff, buff, size);
 }
 
-ByteOutStream::~ByteOutStream()
+ByteInputStream::~ByteInputStream()
 {
 	free(m_buff);
 }
 
-void ByteOutStream::ReadUInt32(unsigned int & value)
+unsigned int ByteInputStream::ReadUInt32()
 {
 	int size = sizeof(unsigned int);
 	assert(m_position + size <= m_size, "overflow");
-	value = *(unsigned int*)m_buff[m_position];
+	auto value = readInt32InBigEndian(m_buff + m_position);
 	m_position = m_position + size;
+	return value;
 }
 
-void ByteOutStream::ReadSize(size_t & value)
+size_t ByteInputStream::ReadSize()
 {
 	int size = sizeof(size_t);
 	assert(m_position + size <= m_size, "overflow");
-	value = *(size_t*)m_buff[m_position];
+	auto value = readInt64InBigEndian(m_buff + m_position);
 	m_position = m_position + size;
+	return value;
 }
 
-void ByteOutStream::ReadString(std::string & value)
+void ByteInputStream::ReadString(std::string & value)
 {
-	unsigned int size;
-	ReadUInt32(size);
+	unsigned int size = ReadUInt32();
 	assert(m_position + size <= m_size, "overflow");
 	value.copy((char*)m_buff[m_position], size);
 	m_position = m_position + size;
 }
 
-ByteInStream::ByteInStream() : m_position(0)
+ByteOutputStream::ByteOutputStream() : m_position(0)
 {
 	m_size = 1024 * 1024;
 	m_buff = (char*)malloc(m_size);
 }
 
-ByteInStream::~ByteInStream()
+ByteOutputStream::~ByteOutputStream()
 {
 	free(m_buff);
 }
 
-void ByteInStream::Write(void * data, int size)
+void ByteOutputStream::Write(void * data, int size)
 {
 	assert(m_position + size <= m_size);
-	memcpy(m_buff, data, size);
+	memcpy(m_buff + m_position, data, size);
 	m_position += size;
 }
 
-void ByteInStream::WriteUInt32(unsigned int value)
+void ByteOutputStream::WriteUInt32(unsigned int value)
 {
-	Write(&value, 4);
+	int size = sizeof(unsigned int);
+	assert(m_position + size <= m_size);
+	//writeInt32InLittleEndian(m_buff, value);
+	writeInt32InBigEndian(m_buff + m_position, value);
+	m_position += size;
 }
 
-void ByteInStream::WriteSize(size_t value)
+void ByteOutputStream::WriteSize(size_t value)
 {
-	Write(&value, 8);
+	int size = 8;
+	assert(m_position + size <= m_size);
+	//writeInt64InLittleEndian(m_buff, value);
+	writeInt64InBigEndian(m_buff + m_position, value);
+	m_position += size;
 }
 
-void ByteInStream::WriteString(const std::string& value)
+void ByteOutputStream::WriteString(const std::string& value)
 {
 	int len = value.length();
 	WriteUInt32(len);

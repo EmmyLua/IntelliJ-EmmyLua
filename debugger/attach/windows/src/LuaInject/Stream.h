@@ -1,21 +1,21 @@
 ﻿#pragma once
 #include <string>
 
-class ByteOutStream
+class ByteInputStream
 {
 	char* m_buff;
 	int m_size;
 	int m_position;
 public:
-	ByteOutStream(char* buff, int size);
-	~ByteOutStream();
+	ByteInputStream(char* buff, int size);
+	~ByteInputStream();
 	/**
 	* Reads a 32-bit unsigned integer from the channel. This operation blocks
 	* until the data is available.
 	*/
-	void ReadUInt32(unsigned int& value);
+	unsigned int ReadUInt32();
 
-	void ReadSize(size_t& size);
+	size_t ReadSize();
 
 	/**
 	* Reads a string from the channel. This operation blocks until the
@@ -24,14 +24,14 @@ public:
 	void ReadString(std::string& value);
 };
 
-class ByteInStream
+class ByteOutputStream
 {
 	char* m_buff;
 	size_t m_size;
 	int m_position;
 public:
-	ByteInStream();
-	~ByteInStream();
+	ByteOutputStream();
+	~ByteOutputStream();
 
 	void Write(void* data, int size);
 
@@ -44,6 +44,8 @@ public:
 	const char* GetBuf() const { return m_buff; }
 
 	size_t GetSize() const { return m_size; }
+
+	int GetPositon() { return m_position; }
 
 	void Reset() { m_position = 0; }
 };
