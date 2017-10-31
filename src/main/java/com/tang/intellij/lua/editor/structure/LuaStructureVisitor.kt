@@ -166,7 +166,9 @@ class LuaStructureVisitor : LuaVisitor() {
             }
 
             if (expr is LuaClosureExpr) {
-                expr.accept(this)
+                pushContext(child, false)
+                expr.funcBody.accept(this)
+                popContext()
             } else if (expr is LuaTableExpr) {
                 handleTableExpr(expr, child)
             }
@@ -175,6 +177,24 @@ class LuaStructureVisitor : LuaVisitor() {
 
     override fun visitFuncDef(o: LuaFuncDef) {
         addChild(LuaGlobalFuncElement(o))
+    }
+
+    override fun visitCallStat(o: LuaCallStat) {
+        val callExpr = o.firstChild as LuaCallExpr
+
+        val args = callExpr.args as LuaListArgs
+
+        args.exprList.forEach{ arg ->
+            if (arg is LuaClosureExpr) {
+                val elem = LuaLocalFuncElement(arg, "<anonymous>", arg.paramSignature)
+
+                pushContext(elem)
+
+                arg.funcBody.accept(this)
+
+                popContext()
+            }
+        }
     }
 
     private fun handleTableExpr(o: LuaTableExpr, exprOwner: LuaTreeElement) {
