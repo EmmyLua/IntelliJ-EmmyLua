@@ -607,23 +607,6 @@ void* DebugFrontend::RemoteDup(HANDLE process, const void* source, size_t length
     return remote;
 }
 
-unsigned int DebugFrontend::GetNumLines(const std::string& source) const
-{
-
-    unsigned int numLines = 1;
-
-    for (unsigned int i = 0; i < source.length(); ++i)
-    {
-        if (source[i] == '\n')
-        {
-            ++numLines;
-        }
-    }
-
-    return numLines;
-
-}
-
 void DebugFrontend::SetBreakpoint(HANDLE hProcess, LPVOID entryPoint, bool set, BYTE* data) const
 {
 

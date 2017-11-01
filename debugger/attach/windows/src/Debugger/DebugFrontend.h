@@ -143,11 +143,6 @@ private:
     void* RemoteDup(HANDLE process, const void* string, size_t len) const;
 
     /**
-     * Counts the number of lines in a piece of text.
-     */
-    unsigned int GetNumLines(const std::string& source) const;
-
-    /**
      * Returns true if the specified process is currently being debugged by Decoda (or
      * was debugged at some point).
      */

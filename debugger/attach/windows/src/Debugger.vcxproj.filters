@@ -18,13 +18,7 @@
     <ClCompile Include="Debugger\DebugFrontend.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
-    <ClCompile Include="Debugger\LineMapper.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
     <ClCompile Include="Debugger\DebugEvent.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
-    <ClCompile Include="Debugger\wxEvtHandler.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
     <ClCompile Include="Debugger\main.cpp">
@@ -35,13 +29,7 @@
     <ClInclude Include="Debugger\DebugFrontend.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Debugger\LineMapper.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="Debugger\DebugEvent.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Debugger\wxEvtHandler.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Debugger\cxxopts.hpp">
