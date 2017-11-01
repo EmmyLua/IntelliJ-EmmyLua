@@ -53,15 +53,15 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     override fun startStepOver(context: XSuspendContext?) {
-        bridge.send(LuaAttachMessage(DebugMessageId.StepOver))//"stepover"
+        bridge.send(LuaAttachMessage(DebugMessageId.StepOver))
     }
 
     override fun startStepInto(context: XSuspendContext?) {
-        bridge.send(LuaAttachMessage(DebugMessageId.StepInto))//bridge.send("stepinto")
+        bridge.send(LuaAttachMessage(DebugMessageId.StepInto))
     }
 
     override fun startStepOut(context: XSuspendContext?) {
-        bridge.send(LuaAttachMessage(DebugMessageId.StepOut))//bridge.send("stepout")
+        bridge.send(LuaAttachMessage(DebugMessageId.StepOut))
     }
 
     override fun stop() {
@@ -72,34 +72,24 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         bridge.sendRun()
     }
 
-    override fun handle(proto: LuaAttachMessage) {
-        when (proto) {
-            is DMLoadScript -> {
-                onLoadScript(proto)
-            }
-            is DMBreak -> {
-                onBreak(proto)
-            }
-            is DMMessage -> {
-
+    override fun handle(message: LuaAttachMessage) {
+        when (message) {
+            is DMLoadScript -> onLoadScript(message)
+            is DMBreak -> onBreak(message)
+            is DMException -> message.print()
+            is DMMessage -> message.print()
+            else -> {
+                when (message.id) {
+                    DebugMessageId.SessionEnd -> {
+                        bridge.stop(false)
+                        session.stop()
+                    }
+                    else -> {
+                        println("unknown message : ${message.id}")
+                    }
+                }
             }
         }
-        /*val type = proto.type
-        when (type) {
-            LuaAttachProto.Exception, LuaAttachProto.Message -> {
-                val messageProto = proto as LuaAttachMessageProto
-                messageProto.outputToConsole()
-            }
-            LuaAttachProto.LoadScript -> {
-                val loadScriptProto = proto as LuaAttachLoadScriptProto
-                onLoadScript(loadScriptProto)
-            }
-            LuaAttachProto.Break -> onBreak(proto as LuaAttachBreakProto)
-            LuaAttachProto.SessionEnd, LuaAttachProto.DestroyVM -> {
-                bridge.stop(false)
-                session.stop()
-            }
-        }*/
     }
 
     private fun onBreak(proto: DMBreak) {

@@ -76,7 +76,7 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
     }
 
     interface ProtoHandler {
-        fun handle(proto: LuaAttachMessage)
+        fun handle(message: LuaAttachMessage)
     }
 
     interface EvalCallback {
@@ -185,8 +185,6 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
                 handler = OSProcessHandler(commandLine)
                 handler!!.addProcessListener(processListener)
                 handler!!.startNotify()
-
-                //writer = BufferedWriter(OutputStreamWriter(handler!!.process.outputStream))
             }
         } catch (e: Exception) {
             process.error(e.message!!)
@@ -252,29 +250,24 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         info.callback = callback
         info.expr = expr
         callbackMap.put(id, info)
-        //send(String.format("eval %d %d %d %s", id, stack, depth, expr))
         send(DMEvaluate(L, id, stack, depth, expr))
     }
 
     fun addBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {
         val expression = breakpoint.conditionExpression
         val exp = expression?.expression ?: ""
-        //send(String.format("setb %d %d %s", index, breakpoint.line, exp))
         send(DMAddBreakpoint(index, breakpoint.line, exp))
     }
 
     fun removeBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {
-        //send(String.format("delb %d %d", index, breakpoint.line))
         send(DMDelBreakpoint(index, breakpoint.line))
     }
 
     fun sendDone() {
-        //send("done")
         send(LuaAttachMessage(DebugMessageId.LoadDone))
     }
 
     fun sendRun() {
-        //send("run")
         send(LuaAttachMessage(DebugMessageId.Continue))
     }
 }

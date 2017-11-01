@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.attach
 
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValueChildrenList
@@ -118,6 +119,12 @@ fun DataInputStream.readString(): String {
 
 class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
 
+    companion object {
+        val Normal = 0
+        val Warning = 1
+        val Error = 2
+    }
+
     lateinit var message: String
         private set
     var type: Int = 0
@@ -128,6 +135,15 @@ class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
         type = stream.readInt()
         message = stream.readString()
     }
+
+    fun print() {
+        val contentType =  when (type) {
+            Error -> ConsoleViewContentType.ERROR_OUTPUT
+            Warning -> ConsoleViewContentType.LOG_WARNING_OUTPUT
+            else -> ConsoleViewContentType.NORMAL_OUTPUT
+        }
+        process.println(message, contentType)
+    }
 }
 
 class DMException : LuaAttachMessage(DebugMessageId.Exception) {
@@ -137,6 +153,10 @@ class DMException : LuaAttachMessage(DebugMessageId.Exception) {
     override fun read(stream: DataInputStream) {
         super.read(stream)
         message = stream.readString()
+    }
+
+    fun print() {
+        process.println(message, ConsoleViewContentType.ERROR_OUTPUT)
     }
 }
 
