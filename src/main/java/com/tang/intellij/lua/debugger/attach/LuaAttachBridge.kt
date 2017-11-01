@@ -24,17 +24,18 @@ import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Key
-import com.intellij.util.io.BinaryOutputReader
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.tang.intellij.lua.LuaBundle
 import com.tang.intellij.lua.psi.LuaFileUtil
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.nio.charset.Charset
 import java.util.*
-import java.util.concurrent.Future
 
 /**
  * debug bridge
@@ -48,32 +49,14 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
     private var pid: Int = 0
     private val callbackMap = HashMap<Int, EvalInfo>()
     private lateinit var socket: Socket
-    private lateinit var reader: ProtoReader
-    private lateinit var receiveBuffer: ByteArrayOutputStream
-
-    inner class ProtoReader(stream: InputStream) : BinaryOutputReader(stream, SleepingPolicy.BLOCKING) {
-        init {
-            start("Lua attach debugger proto reader")
-        }
-        override fun executeOnPooledThread(runnable: Runnable): Future<*> {
-            return ApplicationManager.getApplication().executeOnPooledThread(runnable)
-        }
-
-        override fun onBinaryAvailable(data: ByteArray, size: Int) {
-            receive(data, size)
-        }
-    }
 
     private val processListener = object : ProcessListener {
-        private var readProto = false
-        private var sb: StringBuilder? = null
 
         override fun startNotified(processEvent: ProcessEvent) {
 
         }
 
         override fun processTerminated(processEvent: ProcessEvent) {
-            //stop(false)
             connect()
         }
 
@@ -82,25 +65,6 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         }
 
         override fun onTextAvailable(processEvent: ProcessEvent, key: Key<*>) {
-            /*if (key === ProcessOutputTypes.STDOUT) {
-                val line = processEvent.text
-                if (readProto) {
-                    if (line.startsWith("[end]")) {
-                        readProto = false
-                        val data = sb!!.toString()
-                        val proto = parse(data)
-                        if (proto != null)
-                            handleMessage(proto)
-                    } else {
-                        sb!!.append(line)
-                    }
-                } else {
-                    readProto = line.startsWith("[start]")
-                    if (readProto) {
-                        sb = StringBuilder()
-                    }
-                }
-            }*/
         }
     }
 
@@ -177,11 +141,9 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         socket.tcpNoDelay = true
         socket.connect(InetSocketAddress("localhost", pid))
         writer = DataOutputStream(socket.getOutputStream())
-        receiveBuffer = ByteArrayOutputStream()
-        reader = ProtoReader(socket.getInputStream())
-        //test: send(LuaAttachMessage(DebugMessageId.LoadDone))
+
         ApplicationManager.getApplication().executeOnPooledThread {
-            //processPack()
+            processPack()
         }
     }
 
@@ -236,10 +198,16 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
     private fun processPack() {
         try {
             val inputStream = socket.getInputStream()
-            val reader = DataInputStream(inputStream)
             while (true) {
-                val len = reader.readInt()
-                val bytes = reader.readBytes(len)
+                val lenBytes = ByteArray(4)
+                inputStream.read(lenBytes)
+                val len = DataInputStream(ByteArrayInputStream(lenBytes)).readInt()
+                val bytes = ByteArray(len)
+                var read = 0
+                while (read < len) {
+                    val r = inputStream.read(bytes, read, len - read)
+                    read += r
+                }
                 handleMsg(bytes)
             }
         } catch (e: Exception) {
@@ -251,14 +219,6 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         val reader = DataInputStream(ByteArrayInputStream(byteArray))
         val message = LuaAttachMessage.parseMessage(reader, process)
         handleMessage(message)
-    }
-
-    private fun receive(data: ByteArray, size: Int) {
-        //receiveBuffer.write(data)
-        val reader = DataInputStream(ByteArrayInputStream(data))
-        val len = reader.readInt()
-        val bytes = reader.readBytes(len)
-        handleMsg(bytes)
     }
 
     fun stop(detach: Boolean = true) {
