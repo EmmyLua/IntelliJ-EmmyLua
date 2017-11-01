@@ -104,8 +104,9 @@ class LuaFoldingBuilder : CustomFoldingBuilder(), FoldingBuilder {
         if (validCount == 1) {
             if (first!!.textContains('\n')) return false
 
-            val lRange = TextRange(range.startOffset, first.textOffset)
-            val rRange = TextRange(first.textOffset + first.textLength, range.endOffset)
+            val firstRange = first.node.textRange
+            val lRange = TextRange(range.startOffset, firstRange.startOffset)
+            val rRange = TextRange(firstRange.endOffset, range.endOffset)
             if (lRange.isEmpty || rRange.isEmpty)
                 return false
 
