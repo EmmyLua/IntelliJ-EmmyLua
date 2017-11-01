@@ -278,18 +278,20 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
         val list = XValueChildrenList()
         var valueNode: Node? = stackNode.firstChild
         while (valueNode != null) {
-            val value = LuaXValue.parse(valueNode, L, process)
-            var name = "unknown"
-            val valueNodeChildNodes = valueNode.childNodes
-            for (i in 0 until valueNodeChildNodes.length) {
-                val item = valueNodeChildNodes.item(i)
-                if (item.nodeName == "name") {
-                    name = item.textContent
-                    break
+            if (valueNode is Element) {
+                val value = LuaXValue.parse(valueNode, L, process)
+                var name = "unknown"
+                val valueNodeChildNodes = valueNode.childNodes
+                for (i in 0 until valueNodeChildNodes.length) {
+                    val item = valueNodeChildNodes.item(i)
+                    if (item.nodeName == "name") {
+                        name = item.textContent
+                        break
+                    }
                 }
+                value.name = name
+                list.add(name, value)
             }
-            value.name = name
-            list.add(name, value)
             valueNode = valueNode.nextSibling
         }
         return list
