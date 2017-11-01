@@ -108,7 +108,7 @@ public class LuaAttachBreakProto extends LuaAttachProto {
         XValueChildrenList list = new XValueChildrenList();
         Node valueNode = stackNode.getFirstChild();
         while (valueNode != null) {
-            LuaXValue value = LuaXValue.parse(valueNode, getProcess());
+            LuaXValue value = LuaXValue.Companion.parse(valueNode, getProcess());
             if (value != null) {
                 String name = "unknown";
                 NodeList valueNodeChildNodes = valueNode.getChildNodes();

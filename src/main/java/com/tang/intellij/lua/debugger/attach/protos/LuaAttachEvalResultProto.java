@@ -41,7 +41,7 @@ public class LuaAttachEvalResultProto extends LuaAttachProto {
                 success = Integer.parseInt(item.getTextContent()) == 1;
                 break;
             case "value":
-                value = LuaXValue.parse(item.getFirstChild(), getProcess());
+                value = LuaXValue.Companion.parse(item.getFirstChild(), getProcess());
                 break;
             case "id":
                 evalId = Integer.parseInt(item.getTextContent());

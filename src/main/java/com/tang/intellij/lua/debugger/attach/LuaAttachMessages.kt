@@ -68,8 +68,9 @@ enum class DebugMessageId
 open class LuaAttachMessage(val id: DebugMessageId) {
 
     var L:Long = 0
+        private set
 
-    var process: LuaAttachDebugProcess? = null
+    lateinit var process: LuaAttachDebugProcess
 
     open fun write(stream: DataOutputStream) {
         stream.writeInt(id.ordinal)
@@ -117,7 +118,9 @@ fun DataInputStream.readString(): String {
 class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
 
     lateinit var message: String
+        private set
     var type: Int = 0
+        private set
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
@@ -128,6 +131,7 @@ class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
 
 class DMException : LuaAttachMessage(DebugMessageId.Exception) {
     lateinit var message: String
+        private set
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
@@ -137,9 +141,13 @@ class DMException : LuaAttachMessage(DebugMessageId.Exception) {
 
 class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
     lateinit var fileName: String
+        private set
     lateinit var source: String
+        private set
     var index: Int = 0
+        private set
     var state: Int = 0
+        private set
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
@@ -152,8 +160,11 @@ class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
 
 class DMSetBreakpoint : LuaAttachMessage(DebugMessageId.SetBreakpoint) {
     var scriptIndex: Int = 0
+        private set
     var line: Int = 0
+        private set
     var success: Boolean = false
+        private set
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
@@ -175,11 +186,13 @@ class DMAddBreakpoint(private val scriptIndex: Int,
 }
 
 class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
-    lateinit var stackXML: String
+    private lateinit var stackXML: String
     lateinit var stack: LuaExecutionStack
-
+        private set
     var name: String? = null
+        private set
     var line: Int = 0
+        private set
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
@@ -207,14 +220,14 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
             val scriptIndexNode = attributes.getNamedItem("script_index")
             val lineNode = attributes.getNamedItem("line")
 
-            val script = process?.getScript(Integer.parseInt(scriptIndexNode.textContent))
+            val script = process.getScript(Integer.parseInt(scriptIndexNode.textContent))
             var scriptName: String? = null
             val line = Integer.parseInt(lineNode.textContent)
             var position: XSourcePosition? = null
             if (script != null) {
                 scriptName = script.name
                 // find source position
-                val file = LuaFileUtil.findFile(process?.session?.project!!, scriptName)
+                val file = LuaFileUtil.findFile(process.session?.project!!, scriptName)
                 if (file != null) {
                     position = XSourcePositionImpl.create(file, line)
 
@@ -236,19 +249,17 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
         var valueNode: Node? = stackNode.firstChild
         while (valueNode != null) {
             val value = LuaXValue.parse(valueNode, process)
-            if (value != null) {
-                var name = "unknown"
-                val valueNodeChildNodes = valueNode.childNodes
-                for (i in 0 until valueNodeChildNodes.length) {
-                    val item = valueNodeChildNodes.item(i)
-                    if (item.nodeName == "name") {
-                        name = item.textContent
-                        break
-                    }
+            var name = "unknown"
+            val valueNodeChildNodes = valueNode.childNodes
+            for (i in 0 until valueNodeChildNodes.length) {
+                val item = valueNodeChildNodes.item(i)
+                if (item.nodeName == "name") {
+                    name = item.textContent
+                    break
                 }
-                value.name = name
-                list.add(name, value)
             }
+            value.name = name
+            list.add(name, value)
             valueNode = valueNode.nextSibling
         }
         return list
@@ -280,8 +291,11 @@ class DMEvaluate(private val evalId: Int,
 class DMEvalResult : LuaAttachMessage(DebugMessageId.EvalResult) {
 
     var xValue: LuaXValue? = null
+        private set
     var success: Boolean = false
+        private set
     var evalId: Int = 0
+        private set
     private lateinit var result: String
 
     override fun read(stream: DataInputStream) {
@@ -290,17 +304,6 @@ class DMEvalResult : LuaAttachMessage(DebugMessageId.EvalResult) {
         success = stream.readInt() == 1
         evalId = stream.readInt()
         result = stream.readString()
-
-        try {
-            val builderFactory = DocumentBuilderFactory.newInstance()
-            val documentBuilder = builderFactory.newDocumentBuilder()
-
-            val document = documentBuilder.parse(ByteArrayInputStream(result.toByteArray(charset("UTF-8"))))
-            val root = document.documentElement
-            xValue = LuaXValue.parse(root, process)
-        } catch (e: Exception) {
-            println("Parse exception:")
-            println(result)
-        }
+        xValue = LuaXValue.parse(result, process)
     }
 }

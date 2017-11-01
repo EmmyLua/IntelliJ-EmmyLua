@@ -14,36 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.attach;
+package com.tang.intellij.lua.debugger.attach
 
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFile
 
 /**
  *
  * Created by tangzx on 2017/4/3.
  */
-public class LoadedScript {
-
-    private VirtualFile file;
-    private int index;
-    private String name;
-
-    LoadedScript(VirtualFile file, int index, String name) {
-
-        this.file = file;
-        this.index = index;
-        this.name = name;
-    }
-
-    public VirtualFile getFile() {
-        return file;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-}
+data class LoadedScript internal constructor(val file: VirtualFile, val index: Int, val name: String)
