@@ -70,6 +70,7 @@ public:
 	bool ReadString(std::string& value) override { return false; }
 	bool ReadBool(bool& value) override { return false; }
 
+	void onDisconnect(DebugClient* client) override;
 	void handleStream(ByteInputStream* stream) override;
 	void Send(DebugMessage* message) override;
 };

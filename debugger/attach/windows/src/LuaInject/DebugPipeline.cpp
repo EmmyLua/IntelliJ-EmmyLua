@@ -47,6 +47,12 @@ bool SocketPipeline::IsAttached()
 	return server.numConnections() > 0;
 }
 
+void SocketPipeline::onDisconnect(DebugClient* client)
+{
+	DebugMessage detach(DebugMessageId::Detach);
+	DebugBackend::Get().HandleMessage(&detach);
+}
+
 void SocketPipeline::handleStream(ByteInputStream * stream)
 {
 	unsigned id = stream->ReadUInt32();
