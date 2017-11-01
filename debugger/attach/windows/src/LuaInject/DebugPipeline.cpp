@@ -42,6 +42,11 @@ bool SocketPipeline::Initialize()
 	return server.startup(processId, this);
 }
 
+bool SocketPipeline::IsAttached()
+{
+	return server.numConnections() > 0;
+}
+
 void SocketPipeline::handleStream(ByteInputStream * stream)
 {
 	unsigned id = stream->ReadUInt32();
@@ -70,12 +75,10 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 		msg = new DebugMessage(msgId);
 		break;
 	}
-	if (msg != nullptr)
-	{
-		msg->Read(stream);
-		DebugBackend::Get().HandleMessage(msg);
-		delete msg;
-	}
+
+	msg->Read(stream);
+	DebugBackend::Get().HandleMessage(msg);
+	delete msg;
 }
 
 void SocketPipeline::Send(DebugMessage* message)

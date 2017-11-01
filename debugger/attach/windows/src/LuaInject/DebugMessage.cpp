@@ -1,15 +1,12 @@
 ﻿#include "DebugMessage.h"
 #include "Stream.h"
 
-DebugMessage::DebugMessage(DebugMessageId id) : id(id), L(nullptr)
+DebugMessage::DebugMessage(DebugMessageId idValue) : id(idValue), L(nullptr)
 {
 }
 
 void DebugMessage::Read(ByteInputStream * stream)
 {
-	unsigned int idValue = stream->ReadUInt32();
-	id = (DebugMessageId)idValue;
-
 	size_t t = stream->ReadSize();
 	L = (lua_State*)t;
 }
@@ -74,6 +71,7 @@ void DMAddBreakpoint::Read(ByteInputStream* stream)
 
 	scriptIndex = stream->ReadUInt32();
 	line = stream->ReadUInt32();
+	stream->ReadString(expr);
 }
 
 DMSetBreakpoint::DMSetBreakpoint(): DebugMessage(DebugMessageId::SetBreakpoint), scriptIndex(0), line(0), success(false)

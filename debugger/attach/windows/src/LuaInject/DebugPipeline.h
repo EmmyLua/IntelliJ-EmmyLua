@@ -25,6 +25,7 @@ public:
 
 	virtual bool Initialize() = 0;
 	virtual void Destroy() = 0;
+	virtual bool IsAttached() = 0;
 };
 
 class ChannelPipeline : public DebugPipeline
@@ -34,6 +35,7 @@ class ChannelPipeline : public DebugPipeline
 public:
 	bool Initialize() override;
 	void Destroy() override;
+	bool IsAttached() override { return true; }
 
 	void WriteUInt32(unsigned value) override { m_eventChannel.WriteUInt32(value); }
 	void WriteSize(size_t value) override { m_eventChannel.WriteSize(value); }
@@ -54,6 +56,7 @@ class SocketPipeline : public DebugPipeline, public DebugServerListener
 public:
 	bool Initialize() override;
 	void Destroy() override {}
+	bool IsAttached() override;
 
 	void WriteUInt32(unsigned value) override {  }
 	void WriteSize(size_t value) override { }

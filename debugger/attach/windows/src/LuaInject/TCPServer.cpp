@@ -128,10 +128,15 @@ void DebugServer::sendMsg(const char * data, size_t size)
 	}
 }
 
-void DebugServer::onDisconnection(DebugClient * client)
+void DebugServer::onDisconnect(DebugClient * client)
 {
 	m_listener->onDisconnect(client);
 	m_client = nullptr;
+}
+
+int DebugServer::numConnections()
+{
+	return m_client == nullptr ? 0 : 1;
 }
 
 void DebugServer::onConnection(SOCKET newSocket)
@@ -141,7 +146,7 @@ void DebugServer::onConnection(SOCKET newSocket)
 		printf("--> onConnection.\n");
 		m_client = new DebugClient(this, newSocket);
 		m_client->startup();
-		m_listener->onConnection(m_client);
+		m_listener->onConnect(m_client);
 	}
 	else closesocket(newSocket);
 }
@@ -201,7 +206,7 @@ DWORD DebugClient::receive()
 
 		if (count == 0 || count == SOCKET_ERROR) //disconnected
 		{
-			m_server->onDisconnection(this);
+			m_server->onDisconnect(this);
 			break;
 		}
 

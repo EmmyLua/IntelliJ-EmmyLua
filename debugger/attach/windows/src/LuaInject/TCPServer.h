@@ -2,8 +2,6 @@
 #ifndef LUA_DEBUG_SERVER_H
 #define LUA_DEBUG_SERVER_H
 
-#include <string>
-
 class ByteOutputStream;
 class ByteInputStream;
 class DebugClient;
@@ -13,7 +11,7 @@ class DebugServerListener
 public:
 	virtual ~DebugServerListener() = default;
 
-	virtual void onConnection(DebugClient* client) {}
+	virtual void onConnect(DebugClient* client) {}
 	virtual void onDisconnect(DebugClient* client) {}
 	virtual void handleStream(ByteInputStream* stream) {}
 };
@@ -36,7 +34,8 @@ public:
 	void disConnectAll();
 	DWORD connectionProc();
 	void sendMsg(const char* data, size_t size);
-	void onDisconnection(DebugClient* client);
+	void onDisconnect(DebugClient* client);
+	int numConnections();
 private:
 	void onConnection(SOCKET newSocket);
 };

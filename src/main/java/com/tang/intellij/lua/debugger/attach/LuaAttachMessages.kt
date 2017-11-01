@@ -23,7 +23,9 @@ import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.attach.value.LuaXValue
 import com.tang.intellij.lua.psi.LuaFileUtil
+import org.w3c.dom.Element
 import org.w3c.dom.Node
+import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.util.*
@@ -79,7 +81,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
     }
 
     companion object {
-        fun parseMessage(stream: DataInputStream): LuaAttachMessage {
+        fun parseMessage(stream: DataInputStream, process: LuaAttachDebugProcess): LuaAttachMessage {
             val id = stream.readInt()
             val idType = DebugMessageId.values().find { it.ordinal == id }
             val m:LuaAttachMessage = when (idType) {
@@ -87,11 +89,13 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.Message -> DMMessage()
                 DebugMessageId.Exception -> DMException()
                 DebugMessageId.Break -> DMBreak()
+                DebugMessageId.SetBreakpoint -> DMSetBreakpoint()
                 DebugMessageId.CreateVM -> LuaAttachMessage(idType)
                 else -> {
                     throw Exception("unknown message id:$idType")
                 }
             }
+            m.process = process
             m.read(stream)
             return m
         }
@@ -184,7 +188,7 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
             val builderFactory = DocumentBuilderFactory.newInstance()
             val documentBuilder = builderFactory.newDocumentBuilder()
 
-            val document = documentBuilder.parse(stackXML)
+            val document = documentBuilder.parse(ByteArrayInputStream(stackXML.toByteArray(charset("UTF-8"))))
             val root = document.documentElement
             parseStack(root)
         } catch (e: Exception) {
@@ -193,11 +197,11 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
         }
     }
 
-    private fun parseStack(item: Node) {
+    private fun parseStack(item: Element) {
         val frames = ArrayList<XStackFrame>()
-        var stackNode: Node? = item.firstChild
-        var stackIndex = 0
-        while (stackNode != null) {
+        val nodeList = item.getElementsByTagName("stack")
+        for (stackIndex in 0 until nodeList.length) {
+            val stackNode = nodeList.item(stackIndex)
             val attributes = stackNode.attributes
             val functionNode = attributes.getNamedItem("function")
             val scriptIndexNode = attributes.getNamedItem("script_index")
@@ -223,9 +227,6 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
             val childrenList = parseValue(stackNode)
             val frame = LuaAttachStackFrame(this, childrenList, position, functionNode.textContent, scriptName, stackIndex)
             frames.add(frame)
-
-            stackIndex++
-            stackNode = stackNode.nextSibling
         }
         stack = LuaExecutionStack(frames)
     }

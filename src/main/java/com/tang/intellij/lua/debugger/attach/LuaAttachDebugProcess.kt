@@ -79,7 +79,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                 onLoadScript(proto)
             }
             is DMBreak -> {
-
+                onBreak(proto)
             }
             is DMMessage -> {
 
@@ -103,7 +103,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         }*/
     }
 
-    private fun onBreak(proto: LuaAttachBreakProto) {
+    private fun onBreak(proto: DMBreak) {
         val file = LuaFileUtil.findFile(session.project, proto.name)
         if (file == null) {
             bridge.sendRun()

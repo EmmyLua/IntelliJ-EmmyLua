@@ -25,7 +25,7 @@ unsigned int ByteInputStream::ReadUInt32()
 
 size_t ByteInputStream::ReadSize()
 {
-	int size = sizeof(size_t);
+	int size = 8;
 	assert(m_position + size <= m_size, "overflow");
 	auto value = readInt64InBigEndian(m_buff + m_position);
 	m_position = m_position + size;
@@ -36,7 +36,7 @@ void ByteInputStream::ReadString(std::string & value)
 {
 	unsigned int size = ReadUInt32();
 	assert(m_position + size <= m_size, "overflow");
-	value.copy((char*)m_buff[m_position], size);
+	value.copy(m_buff + m_position, size);
 	m_position = m_position + size;
 }
 

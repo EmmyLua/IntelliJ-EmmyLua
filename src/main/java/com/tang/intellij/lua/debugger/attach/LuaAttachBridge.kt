@@ -264,8 +264,7 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
     private fun handleMsg(byteArray: ByteArray) {
         protoHandler?.let {
             val reader = DataInputStream(ByteArrayInputStream(byteArray))
-            val message = LuaAttachMessage.parseMessage(reader)
-            message.process = process
+            val message = LuaAttachMessage.parseMessage(reader, process)
             it.handle(message)
         }
     }
