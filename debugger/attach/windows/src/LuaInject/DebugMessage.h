@@ -55,6 +55,17 @@ public:
 	lua_State* L;
 };
 
+class DMInitEmmy : public DebugMessage
+{
+public:
+	DMInitEmmy();
+
+	void Read(ByteInputStream* stream) override;
+
+	std::string symbolsDirectory;
+	std::string emmyLuaFile;
+};
+
 class DMException : public DebugMessage
 {
 public:

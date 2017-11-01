@@ -143,6 +143,7 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         writer = DataOutputStream(socket.getOutputStream())
 
         ApplicationManager.getApplication().executeOnPooledThread {
+            send(DMInitEmmy("", emmyLua!!))
             processPack()
         }
     }

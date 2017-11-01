@@ -117,6 +117,14 @@ fun DataInputStream.readString(): String {
     return String(bytes)
 }
 
+class DMInitEmmy(val symbolsDirectory: String, val emmyLuaFile: String) : LuaAttachMessage(DebugMessageId.InitEmmy) {
+    override fun write(stream: DataOutputStream) {
+        super.write(stream)
+        stream.writeString(symbolsDirectory)
+        stream.writeString(emmyLuaFile)
+    }
+}
+
 class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
 
     companion object {

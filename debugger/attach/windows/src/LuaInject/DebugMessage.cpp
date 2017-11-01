@@ -17,6 +17,17 @@ void DebugMessage::Write(ByteOutputStream * stream)
 	stream->WriteSize(reinterpret_cast<size_t>(L));
 }
 
+DMInitEmmy::DMInitEmmy(): DebugMessage(DebugMessageId::InitEmmy)
+{
+}
+
+void DMInitEmmy::Read(ByteInputStream* stream)
+{
+	DebugMessage::Read(stream);
+	stream->ReadString(symbolsDirectory);
+	stream->ReadString(emmyLuaFile);
+}
+
 DMException::DMException(): DebugMessage(DebugMessageId::Exception)
 {
 }

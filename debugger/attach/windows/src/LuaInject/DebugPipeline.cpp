@@ -54,6 +54,9 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 	DebugMessageId msgId = (DebugMessageId)id;
 	switch (msgId)
 	{
+	case DebugMessageId::InitEmmy:
+		msg = new DMInitEmmy();
+		break;
 	case DebugMessageId::AddBreakpoint:
 		msg = new DMAddBreakpoint();
 		break;
