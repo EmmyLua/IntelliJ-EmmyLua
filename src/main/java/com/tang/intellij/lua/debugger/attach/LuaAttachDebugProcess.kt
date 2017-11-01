@@ -160,7 +160,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     override fun createProto(type: Int): LuaAttachProto {
-        val proto: LuaAttachProto = when (type) {
+        /*val proto: LuaAttachProto = when (type) {
             LuaAttachProto.Exception, LuaAttachProto.Message -> LuaAttachMessageProto(type)
             LuaAttachProto.LoadScript -> LuaAttachLoadScriptProto()
             LuaAttachProto.SetBreakpoint -> LuaAttachSetBreakpointProto()
@@ -169,6 +169,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
             else -> LuaAttachProto(type)
         }
         proto.process = this
-        return proto
+        return proto*/
+        throw Exception("")
     }
 }

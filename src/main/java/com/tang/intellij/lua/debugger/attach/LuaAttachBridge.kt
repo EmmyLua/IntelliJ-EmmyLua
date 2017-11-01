@@ -28,7 +28,6 @@ import com.intellij.util.io.BinaryOutputReader
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.tang.intellij.lua.LuaBundle
-import com.tang.intellij.lua.debugger.attach.protos.LuaAttachEvalResultProto
 import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto
 import com.tang.intellij.lua.psi.LuaFileUtil
 import org.w3c.dom.Element
@@ -129,7 +128,7 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
     }
 
     interface EvalCallback {
-        fun onResult(result: LuaAttachEvalResultProto)
+        fun onResult(result: DMEvalResult)
     }
 
     internal inner class EvalInfo {
@@ -145,12 +144,11 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
 
     private fun handleEvalCallback(proto: DMEvalResult) {
         val info = callbackMap.remove(proto.evalId)
-        /*if (info != null) {
+        if (info != null) {
             val xValue = proto.xValue
-            if (xValue != null)
-                xValue.name = info.expr
-            info.callback!!.onResult(proto)
-        }*/
+            xValue?.name = info.expr
+            info.callback?.onResult(proto)
+        }
     }
 
     fun attach(processInfo: ProcessInfo) {

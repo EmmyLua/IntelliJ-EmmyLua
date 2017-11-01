@@ -278,10 +278,29 @@ class DMEvaluate(private val evalId: Int,
 }
 
 class DMEvalResult : LuaAttachMessage(DebugMessageId.EvalResult) {
+
+    var xValue: LuaXValue? = null
+    var success: Boolean = false
     var evalId: Int = 0
+    private lateinit var result: String
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
 
+        success = stream.readInt() == 1
+        evalId = stream.readInt()
+        result = stream.readString()
+
+        try {
+            val builderFactory = DocumentBuilderFactory.newInstance()
+            val documentBuilder = builderFactory.newDocumentBuilder()
+
+            val document = documentBuilder.parse(ByteArrayInputStream(result.toByteArray(charset("UTF-8"))))
+            val root = document.documentElement
+            xValue = LuaXValue.parse(root, process)
+        } catch (e: Exception) {
+            println("Parse exception:")
+            println(result)
+        }
     }
 }
