@@ -26,11 +26,8 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <windows.h>
 #include <vector>
 
-#include "wxEvtHandler.h"
 #include "Channel.h"
 #include "Protocol.h"
-#include "CriticalSection.h"
-#include "LineMapper.h"
 
 /**
  * Frontend for the debugger.
@@ -39,29 +36,6 @@ class DebugFrontend
 {
 
 public:
-
-    struct Script
-    {
-        std::string     name;       // Identifying name of the script (usually a file name)
-        std::string     source;     // Source code for the script
-        CodeState       state;
-        LineMapper      lineMapper; // Current mapping from lines in the local file to backend script lines.
-    };
-
-    struct StackFrame
-    {
-        unsigned int    scriptIndex;
-        unsigned int    line;
-        std::string     function;
-    };
-
-    enum State
-    {
-        State_Inactive,         // Not debugging.
-        State_Running,          // Debugging a program is is currently running.
-        State_Broken,           // Debugging a program is is currently break point.
-    };
-
     struct Process
     {
         unsigned int    id;     // Windows process identifier
@@ -80,20 +54,11 @@ public:
     static void Destroy();
 
     /**
-     * Set the event handler for messages from the client.
-     */
-    void SetEventHandler(wxEvtHandler* eventHandler);
- 
-    /**
      * Starts a new process that will be debugged.
      */
     bool Start(const char* command, const char* commandArguments, const char* currentDirectory, const char* symbolsDirectory, bool debug, bool startBroken);
 
-    /**
-     * Cleans up after the debugger has disconnected from the debugee. This should be
-     * called after processing the end event.
-     */
-    void Shutdown();
+	void Resume();
 
     /**
      * Attaches the debugger to a currently running process.
@@ -113,92 +78,9 @@ public:
     void Stop(bool kill);
 
     /**
-     * Instructs the debugger to continue until it hits the next breakpoint.
-     */
-    void Continue(size_t vm);
-
-    /**
-     * Instructs the debugger to break on the next line of script code it
-     * executes. Since the process being deugged may not currently be executing
-     * script code, this may not happen immediately.
-     */
-    void Break(size_t vm);
-
-    /**
-     * Instructs the debugger to step to the next line. If the current line
-     * is a function this will step over the function.
-     */
-    void StepOver(size_t vm);
-
-    /**
-     * Instructs the debugger to step to the next line. If the current line
-     * is a function this will step into the function.
-     */
-    void StepInto(size_t vm);
-
-	void StepOut(size_t vm);
-
-    /**
-     * Signals to the debugger that we've finished the processing we needed to
-     * do in response to a load script event.
-     */
-    void DoneLoadingScript(size_t vm);
-
-    /**
-     * Evaluates the expression in the current context.
-     */
-	bool Evaluate(size_t vm, int evalId, const char * expression, unsigned int stackLevel, unsigned int depath);
-
-    /**
-     * Toggles a breakpoint on the specified line.
-	 */
-	void AddBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line, const std::string& expr);
-	void DelBreakpoint(size_t vm, unsigned int scriptIndex, unsigned int line);
-    
-    /**
-     * Removes all breakpoints set this will also disable the line hook if the debug mode is set to continue
-     */
-    void RemoveAllBreakPoints(size_t vm);
-
-    /**
-     * Returns the specified script.
-     */
-    Script* GetScript(unsigned int scriptIndex);
-
-    /**
-     * Returns the index of the script with te specified name. If the name could not be
-     * matched the method returns -1.
-     */
-    unsigned int GetScriptIndex(const char* name) const;
-
-    /**
-     * Returns the number of frames in the call stack.
-     */
-    size_t GetNumStackFrames() const;
-
-    /**
-     * Returns the ith stack frame. The frames are numbered so that 0 is the
-     * top (current location) of the stack.
-     */
-    const StackFrame& GetStackFrame(unsigned int i) const;
-
-    /**
-     * Returns the current state of the debugger.
-     */
-    State GetState() const;
-
-    /**
      * Returns all of the processes on the machine that can be debugged.
      */
     void GetProcesses(std::vector<Process>& processes) const;
-
-    /**
-     * Instructs the backend to ignore the specified exception whenever it happens
-     * in the future.
-     */
-    void IgnoreException(const std::string& message);
-
-	void SetEmmyEnv(std::string& emmyLua) { m_emmyLua = emmyLua; }
 private:
 
     /**
@@ -226,17 +108,6 @@ private:
      * Gets the path that the EXE resides in.
      */
     bool GetStartupDirectory(char* path, int maxPathLength) const;
-    
-    /**
-     * Entry point into the event handling thread.
-     */
-    void EventThreadProc();
-
-    /**
-     * Static version of the event handler thread entry point. This just
-     * forwards to the non-static version.
-     */
-    static DWORD WINAPI StaticEventThreadProc(LPVOID param);
 
     /**
      * Sends a message event.
@@ -300,27 +171,16 @@ private:
      */
     void OutputError(DWORD error) const;
 
-private:
+	void Output(std::string &message) const;
 
     static DebugFrontend*       s_instance;
+
+	PROCESS_INFORMATION			processInfo;
 
     DWORD                       m_processId;
     HANDLE                      m_process;
 
-    wxEvtHandler*               m_eventHandler;    
-    Channel                     m_eventChannel;
     HANDLE                      m_eventThread;
-
-    Channel                     m_commandChannel;
-
-    mutable CriticalSection     m_criticalSection;
-    std::vector<Script*>        m_scripts;
-
-    std::vector<StackFrame>     m_stackFrames;
-
-    State                       m_state;
-
-	std::string					m_emmyLua;
 };
 
 #endif

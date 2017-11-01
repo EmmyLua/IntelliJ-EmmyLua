@@ -1,12 +1,10 @@
 #include "DebugFrontend.h"
 #include "cxxopts.hpp"
 #include <iostream>
-#include <assert.h>
 
 using namespace std;
 
 DebugFrontend& inst = DebugFrontend::Get();
-wxEvtHandler* handler = new wxEvtHandler();
 
 void split(std::string& s, std::string& delim, std::vector< std::string >* ret, size_t n)
 {
@@ -39,60 +37,9 @@ void mainLoop() {
 
 		string cmd = line.substr(0, index);
 
-		if (cmd == "run") {
-			inst.Continue(handler->vm);
-		}
-		else if (cmd == "stepover") {
-			inst.StepOver(handler->vm);
-		}
-		else if (cmd == "stepinto") {
-			inst.StepInto(handler->vm);
-		}
-		else if (cmd == "stepout") {
-			inst.StepOut(handler->vm);
-		}
-		else if (cmd == "setb") {
-			//setb [index] [line] [condition]
-			vector<string> list;
-			split(line, string(" "), &list, 4);
-			assert(list.size() >= 4);
-			int scriptIndex = atoi(list[1].c_str());
-			int pointPos = atoi(list[2].c_str());
-			inst.AddBreakpoint(handler->vm, scriptIndex, pointPos, list[3]);
-		}
-		else if (cmd == "delb") {
-			//delb [index] [line]
-			vector<string> list;
-			split(line, string(" "), &list, 3);
-			assert(list.size() >= 3);
-			int scriptIndex = atoi(list[1].c_str());
-			int pointPos = atoi(list[2].c_str());
-			inst.DelBreakpoint(handler->vm, scriptIndex, pointPos);
-		}
-		else if (cmd == "eval") {
-			//eval [id] [stack] [maxDepth] [script]
-			vector<string> list;
-			split(line, string(" "), &list, 5);
-			assert(list.size() >= 5);
-
-			string idString = list[1];
-			string stack = list[2];
-			string depath = list[3];
-			string script = list[4];
-
-			inst.Evaluate(
-				handler->vm,
-				atoi(idString.c_str()),
-				script.c_str(),
-				atoi(stack.c_str()),
-				atoi(depath.c_str()));
-		}
-		else if (cmd == "done") {
-			inst.DoneLoadingScript(handler->vm);
-		}
-		else if (cmd == "detach" || cmd.empty()) {
-			inst.Stop(false);
-			break;
+		if (cmd == "resume")
+		{
+			inst.Resume();
 		}
 	}
 }
@@ -111,12 +58,6 @@ int main(int argc, char** argv)
 		("e,emmy", "emmy lua", cxxopts::value<std::string>());
 	options.parse(argc, argv);
 	if (options.count("m") > 0) {
-		inst.SetEventHandler(handler);
-
-		if (options.count("e")) {
-			std::string emmy = options["e"].as<std::string>();
-			inst.SetEmmyEnv(emmy);
-		}
 
 		std::string mode = options["m"].as<std::string>();
 		if (mode == "attach") {

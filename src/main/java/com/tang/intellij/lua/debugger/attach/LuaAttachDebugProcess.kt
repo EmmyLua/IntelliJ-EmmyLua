@@ -31,9 +31,9 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * Created by tangzx on 2017/3/26.
  */
-abstract class LuaAttachDebugProcess protected constructor(session: XDebugSession) : LuaDebugProcess(session), LuaAttachBridge.ProtoHandler {
+abstract class LuaAttachDebugProcess protected constructor(session: XDebugSession) : LuaDebugProcess(session), LuaAttachBridgeBase.ProtoHandler {
     private val editorsProvider: LuaDebuggerEditorsProvider
-    lateinit var bridge: LuaAttachBridge
+    lateinit var bridge: LuaAttachBridgeBase
     private val loadedScriptMap = ConcurrentHashMap<Int, LoadedScript>()
 
     init {
@@ -41,7 +41,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         editorsProvider = LuaDebuggerEditorsProvider()
     }
 
-    protected abstract fun startBridge(): LuaAttachBridge
+    protected abstract fun startBridge(): LuaAttachBridgeBase
 
     override fun sessionInitialized() {
         super.sessionInitialized()

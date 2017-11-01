@@ -14,23 +14,26 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.attach
+package com.tang.intellij.lua.debugger.app
 
-import com.intellij.execution.process.ProcessInfo
 import com.intellij.xdebugger.XDebugSession
+import com.tang.intellij.lua.debugger.attach.LuaAttachBridgeBase
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
 
 /**
  *
  * Created by tangzx on 2017/5/7.
  */
-class LuaAttachDebugProcessEx internal constructor(session: XDebugSession, private val processInfo: ProcessInfo)
-    : LuaAttachDebugProcess(session) {
+class LuaAppAttachProcess internal constructor(session: XDebugSession) : LuaAttachDebugProcess(session) {
 
     override fun startBridge(): LuaAttachBridgeBase {
-        val bridge = LuaAttachBridge(this, session)
+        val configuration = (session.runProfile as LuaAppRunConfiguration?)!!
+        val workingDir = configuration.workingDir
+
+        val bridge = LuaAppAttachBridge(this, session)
         this.bridge = bridge
         bridge.setProtoHandler(this)
-        bridge.attach(processInfo)
+        bridge.launch(configuration.program, workingDir, configuration.parametersArray)
         return bridge
     }
 }

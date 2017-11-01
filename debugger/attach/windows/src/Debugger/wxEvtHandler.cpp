@@ -41,24 +41,6 @@ void wxEvtHandler::AddPendingEvent(wxDebugEvent & event)
 		document.LinkEndChild(root->Clone());
 		break;
 	}
-	case EventId_LoadScript:
-	{
-		auto script = DebugFrontend::Get().GetScript(event.GetScriptIndex());
-		document.LinkEndChild(WriteXmlNode("name", script->name));
-		document.LinkEndChild(WriteXmlNode("index", event.GetScriptIndex()));
-		if (script->name[0] == '@') {
-			DebugFrontend::Get().DoneLoadingScript(vm);
-		}
-		break;
-	}
-	case EventId_SetBreakpoint:
-	{
-		auto script = DebugFrontend::Get().GetScript(event.GetScriptIndex());
-		document.LinkEndChild(WriteXmlNode("name", script->name));
-		document.LinkEndChild(WriteXmlNode("index", event.GetScriptIndex()));
-		document.LinkEndChild(WriteXmlNode("line", event.GetLine()));
-		break;
-	}
 	case EventId_EvalResult:
 	{
 		document.LinkEndChild(WriteXmlNode("result", event.GetEvalResult() ? 1 : 0));

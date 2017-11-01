@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.attach
+package com.tang.intellij.lua.debugger.app
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
-import com.intellij.execution.process.ProcessInfo
 import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.util.Key
 import com.intellij.xdebugger.XDebugSession
 import com.tang.intellij.lua.LuaBundle
+import com.tang.intellij.lua.debugger.attach.*
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.nio.charset.Charset
 
-class LuaAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
+class LuaAppAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
     : LuaAttachBridgeBase(process, session) {
-
 
     private val processListener = object : ProcessListener {
 
@@ -39,7 +38,7 @@ class LuaAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
         }
 
         override fun processTerminated(processEvent: ProcessEvent) {
-
+            stop()
         }
 
         override fun processWillTerminate(processEvent: ProcessEvent, b: Boolean) {
@@ -58,35 +57,60 @@ class LuaAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
         }
     }
 
-    fun attach(processInfo: ProcessInfo) {
-        val pid = processInfo.pid.toString()
+    fun launch(program: String, workingDir: String?, args: Array<String>?) {
         val pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory()
         try {
             if (pluginVirtualDirectory != null) {
+                if (workingDir == null || workingDir.isEmpty()) {
+                    throw Exception("Working directory not found.")
+                }
+
                 // check arch
                 val archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe")
                 val processBuilder = ProcessBuilder(archExe!!)
                 val isX86: Boolean
-                val archChecker = processBuilder.command(archExe, "-pid", pid).start()
+                val archChecker = processBuilder.command(archExe, "-file", program).start()
                 archChecker.waitFor()
                 val exitValue = archChecker.exitValue()
+                if (exitValue == -1) {
+                    throw Exception(String.format("Program [%s] not found.", program))
+                }
                 isX86 = exitValue == 1
 
                 val archType = if (isX86) "x86" else "x64"
-                process.println(LuaBundle.message("run.attach.start_info", processInfo.executableName, pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
+                process.println(LuaBundle.message("run.attach.launch_info", program, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
                 // attach debugger
                 val exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType))
 
                 val commandLine = GeneralCommandLine(exe!!)
-                commandLine.addParameters("-m", "attach", "-p", pid, "-e", emmyLua)
                 commandLine.charset = Charset.forName("UTF-8")
+                commandLine.addParameters("-m", "run", "-c", program, "-e", emmyLua, "-w", workingDir)
+                if (args != null) {
+                    val argString = args.joinToString(" ")
+                    if (!argString.isEmpty()) {
+                        commandLine.addParameters("-a", argString)
+                    }
+                }
+
                 handler = OSProcessHandler(commandLine)
-                handler?.addProcessListener(processListener)
-                handler?.startNotify()
+                handler!!.addProcessListener(processListener)
+                handler!!.startNotify()
             }
         } catch (e: Exception) {
             process.error(e.message!!)
             session.stop()
+        }
+    }
+
+    override fun handleMessage(message: LuaAttachMessage) {
+        when (message.id ) {
+            DebugMessageId.Initialize -> {
+                handler?.process?.outputStream?.let {
+                    it.write("resume\n".toByteArray())
+                    it.flush()
+                }
+            }
+            else -> super.handleMessage(message)
         }
     }
 }
