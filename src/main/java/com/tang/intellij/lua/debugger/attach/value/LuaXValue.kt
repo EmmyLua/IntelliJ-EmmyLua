@@ -39,6 +39,7 @@ abstract class LuaXValue : XValue() {
     protected var process: LuaAttachDebugProcess? = null
     var name: String? = null
     var parent: LuaXValue? = null
+    var L: Long = 0
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
 
@@ -60,13 +61,13 @@ abstract class LuaXValue : XValue() {
 
     companion object {
 
-        fun parse(data: String, process: LuaAttachDebugProcess): LuaXValue? {
+        fun parse(data: String, L: Long, process: LuaAttachDebugProcess): LuaXValue? {
             val builderFactory = DocumentBuilderFactory.newInstance()
             try {
                 val documentBuilder = builderFactory.newDocumentBuilder()
                 val document = documentBuilder.parse(ByteArrayInputStream(data.toByteArray()))
                 val root = document.documentElement
-                return parse(root, process)
+                return parse(root, L, process)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -74,7 +75,7 @@ abstract class LuaXValue : XValue() {
             return null
         }
 
-        fun parse(node: Node, process: LuaAttachDebugProcess): LuaXValue {
+        fun parse(node: Node, L: Long, process: LuaAttachDebugProcess): LuaXValue {
             val nodeName = node.nodeName
             val value: LuaXValue = when (nodeName) {
                 "userdata" -> LuaXUserdata()
@@ -83,6 +84,7 @@ abstract class LuaXValue : XValue() {
                 "function" -> LuaXFunction()
                 else -> LuaXUserdata()
             }
+            value.L = L
             value.process = process
             value.doParse(node)
             return value

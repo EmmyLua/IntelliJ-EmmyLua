@@ -29,7 +29,6 @@ class LuaAttachDebugProcessEx internal constructor(session: XDebugSession, priva
     override fun startBridge(): LuaAttachBridge {
         bridge = LuaAttachBridge(this, session)
         bridge.setProtoHandler(this)
-        bridge.setProtoFactory(this)
         bridge.attach(processInfo)
         return bridge
     }

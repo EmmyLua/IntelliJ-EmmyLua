@@ -24,7 +24,6 @@ import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
 import com.intellij.xdebugger.frame.XSuspendContext
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
-import com.tang.intellij.lua.debugger.attach.protos.*
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.util.concurrent.ConcurrentHashMap
 
@@ -32,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * Created by tangzx on 2017/3/26.
  */
-abstract class LuaAttachDebugProcess protected constructor(session: XDebugSession) : LuaDebugProcess(session), LuaAttachBridge.ProtoHandler, LuaAttachBridge.ProtoFactory {
+abstract class LuaAttachDebugProcess protected constructor(session: XDebugSession) : LuaDebugProcess(session), LuaAttachBridge.ProtoHandler {
     private val editorsProvider: LuaDebuggerEditorsProvider
     lateinit var bridge: LuaAttachBridge
     private val loadedScriptMap = ConcurrentHashMap<Int, LoadedScript>()
@@ -157,19 +156,5 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
 
     fun getScript(index: Int): LoadedScript? {
         return loadedScriptMap[index]
-    }
-
-    override fun createProto(type: Int): LuaAttachProto {
-        /*val proto: LuaAttachProto = when (type) {
-            LuaAttachProto.Exception, LuaAttachProto.Message -> LuaAttachMessageProto(type)
-            LuaAttachProto.LoadScript -> LuaAttachLoadScriptProto()
-            LuaAttachProto.SetBreakpoint -> LuaAttachSetBreakpointProto()
-            LuaAttachProto.Break -> LuaAttachBreakProto()
-            LuaAttachProto.EvalResult -> LuaAttachEvalResultProto()
-            else -> LuaAttachProto(type)
-        }
-        proto.process = this
-        return proto*/
-        throw Exception("")
     }
 }

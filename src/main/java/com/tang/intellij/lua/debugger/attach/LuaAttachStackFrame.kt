@@ -29,7 +29,7 @@ import com.intellij.xdebugger.frame.XValueChildrenList
  *
  * Created by tangzx on 2017/4/2.
  */
-class LuaAttachStackFrame(proto: DMBreak,
+class LuaAttachStackFrame(val proto: DMBreak,
                           private val childrenList: XValueChildrenList,
                           private val position: XSourcePosition?,
                           private val function: String?,

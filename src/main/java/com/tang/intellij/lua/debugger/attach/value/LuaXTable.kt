@@ -89,11 +89,11 @@ open class LuaXTable : LuaXValue() {
             val content = item.firstChild
             when (item.nodeName) {
                 "key" -> {
-                    val keyV = LuaXValue.parse(content, process!!)
+                    val keyV = LuaXValue.parse(content, L, process!!)
                     key = keyV.toKeyString()
                 }
                 "data" -> {
-                    value = LuaXValue.parse(content, process!!)
+                    value = LuaXValue.parse(content, L, process!!)
                     value.parent = this
                 }
             }
@@ -109,7 +109,7 @@ open class LuaXTable : LuaXValue() {
         if (childrenList == null) {
             val frame = process!!.session.currentStackFrame as LuaAttachStackFrame? ?: return
 
-            process?.bridge?.eval(evalExpr, frame.stack, 2, object : LuaAttachBridge.EvalCallback {
+            process?.bridge?.eval(L, evalExpr, frame.stack, 2, object : LuaAttachBridge.EvalCallback {
                 override fun onResult(result: DMEvalResult) {
                     val value = result.xValue
                     childrenList = XValueChildrenList()

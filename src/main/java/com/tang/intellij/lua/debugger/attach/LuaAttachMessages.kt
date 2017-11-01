@@ -68,7 +68,7 @@ enum class DebugMessageId
 open class LuaAttachMessage(val id: DebugMessageId) {
 
     var L:Long = 0
-        private set
+        protected set
 
     lateinit var process: LuaAttachDebugProcess
 
@@ -91,6 +91,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.Exception -> DMException()
                 DebugMessageId.Break -> DMBreak()
                 DebugMessageId.SetBreakpoint -> DMSetBreakpoint()
+                DebugMessageId.EvalResult -> DMEvalResult()
                 DebugMessageId.CreateVM -> LuaAttachMessage(idType)
                 else -> {
                     throw Exception("unknown message id:$idType")
@@ -248,7 +249,7 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
         val list = XValueChildrenList()
         var valueNode: Node? = stackNode.firstChild
         while (valueNode != null) {
-            val value = LuaXValue.parse(valueNode, process)
+            val value = LuaXValue.parse(valueNode, L, process)
             var name = "unknown"
             val valueNodeChildNodes = valueNode.childNodes
             for (i in 0 until valueNodeChildNodes.length) {
@@ -275,10 +276,13 @@ class DMDelBreakpoint(private val scriptIndex: Int,
     }
 }
 
-class DMEvaluate(private val evalId: Int,
+class DMEvaluate(L: Long, private val evalId: Int,
                  private val stackLevel: Int,
                  private val depth: Int,
                  private val expr: String) : LuaAttachMessage(DebugMessageId.Evaluate) {
+    init {
+        this.L = L
+    }
     override fun write(stream: DataOutputStream) {
         super.write(stream)
         stream.writeInt(evalId)
@@ -304,6 +308,6 @@ class DMEvalResult : LuaAttachMessage(DebugMessageId.EvalResult) {
         success = stream.readInt() == 1
         evalId = stream.readInt()
         result = stream.readString()
-        xValue = LuaXValue.parse(result, process)
+        xValue = LuaXValue.parse(result, L, process)
     }
 }

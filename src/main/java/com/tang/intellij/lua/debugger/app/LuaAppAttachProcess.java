@@ -40,8 +40,6 @@ public class LuaAppAttachProcess extends LuaAttachDebugProcess {
 
         bridge = new LuaAttachBridge(this, getSession());
         bridge.setProtoHandler(this);
-        bridge.setProtoFactory(this);
-
         bridge.launch(configuration.getProgram(), workingDir, configuration.getParametersArray());
 
         return bridge;

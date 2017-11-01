@@ -35,9 +35,16 @@ size_t ByteInputStream::ReadSize()
 void ByteInputStream::ReadString(std::string & value)
 {
 	unsigned int size = ReadUInt32();
-	assert(m_position + size <= m_size, "overflow");
-	value.copy(m_buff + m_position, size);
-	m_position = m_position + size;
+	if (size > 0)
+	{
+		assert(m_position + size <= m_size, "overflow");
+		char* temp = (char*)malloc(size + 1);
+		memcpy(temp, m_buff + m_position, size);
+		temp[size] = '\0';
+		value = temp;
+		free(temp);
+		m_position = m_position + size;
+	}
 }
 
 ByteOutputStream::ByteOutputStream() : m_position(0)

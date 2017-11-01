@@ -28,16 +28,13 @@ import com.intellij.util.io.BinaryOutputReader
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.tang.intellij.lua.LuaBundle
-import com.tang.intellij.lua.debugger.attach.protos.LuaAttachProto
 import com.tang.intellij.lua.psi.LuaFileUtil
-import org.w3c.dom.Element
 import java.io.*
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.nio.charset.Charset
 import java.util.*
 import java.util.concurrent.Future
-import javax.xml.parsers.DocumentBuilderFactory
 
 /**
  * debug bridge
@@ -47,7 +44,6 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
     private var handler: OSProcessHandler? = null
     private var writer: DataOutputStream? = null
     private var protoHandler: ProtoHandler? = null
-    private var protoFactory: ProtoFactory? = null
     private var evalIdCounter = 0
     private var pid: Int = 0
     private val callbackMap = HashMap<Int, EvalInfo>()
@@ -94,7 +90,7 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
                         val data = sb!!.toString()
                         val proto = parse(data)
                         if (proto != null)
-                            handleProto(proto)
+                            handleMessage(proto)
                     } else {
                         sb!!.append(line)
                     }
@@ -115,16 +111,8 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         this.protoHandler = protoHandler
     }
 
-    fun setProtoFactory(protoFactory: ProtoFactory) {
-        this.protoFactory = protoFactory
-    }
-
     interface ProtoHandler {
         fun handle(proto: LuaAttachMessage)
-    }
-
-    interface ProtoFactory {
-        fun createProto(type: Int): LuaAttachProto
     }
 
     interface EvalCallback {
@@ -136,10 +124,10 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         var expr: String? = null
     }
 
-    private fun handleProto(proto: LuaAttachMessage) {
-        if (proto.id == DebugMessageId.EvalResult) {
-            handleEvalCallback(proto as DMEvalResult)
-        } else protoHandler?.handle(proto)
+    private fun handleMessage(message: LuaAttachMessage) {
+        if (message.id == DebugMessageId.EvalResult) {
+            handleEvalCallback(message as DMEvalResult)
+        } else protoHandler?.handle(message)
     }
 
     private fun handleEvalCallback(proto: DMEvalResult) {
@@ -260,11 +248,9 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
     }
 
     private fun handleMsg(byteArray: ByteArray) {
-        protoHandler?.let {
-            val reader = DataInputStream(ByteArrayInputStream(byteArray))
-            val message = LuaAttachMessage.parseMessage(reader, process)
-            it.handle(message)
-        }
+        val reader = DataInputStream(ByteArrayInputStream(byteArray))
+        val message = LuaAttachMessage.parseMessage(reader, process)
+        handleMessage(message)
     }
 
     private fun receive(data: ByteArray, size: Int) {
@@ -300,44 +286,14 @@ class LuaAttachBridge(private val process: LuaAttachDebugProcess, private val se
         socket.getOutputStream().flush()
     }
 
-    private fun parse(dataMsg: String): LuaAttachProto? {
-        var data = dataMsg
-        val builderFactory = DocumentBuilderFactory.newInstance()
-        try {
-            val documentBuilder = builderFactory.newDocumentBuilder()
-            data = "<data>$data</data>"
-            val document = documentBuilder.parse(ByteArrayInputStream(data.toByteArray(charset("UTF-8"))))
-            val root = document.documentElement
-            val childNodes = root.childNodes
-            for (i in 0 until childNodes.length) {
-                val item = childNodes.item(i)
-                if (item.nodeName == "type") {
-                    val type = Integer.parseInt(item.textContent)
-                    return createProto(type, root)
-                }
-            }
-        } catch (e: Exception) {
-            println("Parse exception:")
-            println(data)
-        }
-
-        return null
-    }
-
-    private fun createProto(type: Int, root: Element): LuaAttachProto {
-        val proto = protoFactory!!.createProto(type)
-        proto.doParse(root)
-        return proto
-    }
-
-    fun eval(expr: String, stack: Int, depth: Int, callback: EvalCallback) {
+    fun eval(L: Long, expr: String, stack: Int, depth: Int, callback: EvalCallback) {
         val id = evalIdCounter++
         val info = EvalInfo()
         info.callback = callback
         info.expr = expr
         callbackMap.put(id, info)
         //send(String.format("eval %d %d %d %s", id, stack, depth, expr))
-        send(DMEvaluate(id, stack, depth, expr))
+        send(DMEvaluate(L, id, stack, depth, expr))
     }
 
     fun addBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {
