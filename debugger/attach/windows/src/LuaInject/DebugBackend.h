@@ -404,7 +404,7 @@ private:
     
     struct Api
     {
-        Api() : IndexChained(NULL), NewIndexChained(NULL) { }
+        Api() : IndexChained(nullptr), NewIndexChained(nullptr) { }
         lua_CFunction   IndexChained;
         lua_CFunction   NewIndexChained;
     };
@@ -579,8 +579,11 @@ private:
      * Creates a call stack that unifies the native call stack and the script
      * call stack.
      */
-    unsigned int GetUnifiedStack(LAPI api, const StackEntry nativeStack[], unsigned int nativeStackSize,
-        const lua_Debug scriptStack[], unsigned int scriptStackSize,
+    unsigned int GetUnifiedStack(LAPI api,
+		const StackEntry nativeStack[],
+		unsigned int nativeStackSize,
+        const lua_Debug scriptStack[],
+		unsigned int scriptStackSize,
         StackEntry unifiedStack[]) const;
 
 private:
@@ -607,10 +610,7 @@ private:
     std::vector<Script*>            m_scripts;
     NameToScriptMap                 m_nameToScript;
 
-    //Channel                         m_eventChannel;
-
     HANDLE                          m_commandThread;
-    //Channel                         m_commandChannel;
 
     std::list<ClassInfo>            m_classInfos;
     std::vector<VirtualMachine*>    m_vms;
@@ -623,7 +623,8 @@ private:
 
     mutable bool                    m_warnedAboutUserData;
 
-	std::string						m_emmyLua;
+	bool							m_hooked;
+	std::string						m_emmyLuaFilePath;
 	DebugPipeline*					m_debugPipeline;
 
 };

@@ -2831,7 +2831,6 @@ bool InstallLuaHooker(HINSTANCE hInstance, const char* symbolsDirectory)
 		}
 	}
 
-	DebugBackend::Get().Message("Attach finish.");
 	return true;
 }
 
