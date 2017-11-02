@@ -94,6 +94,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.SetBreakpoint -> DMSetBreakpoint()
                 DebugMessageId.EvalResult -> DMEvalResult()
                 DebugMessageId.Initialize,
+                DebugMessageId.DestroyVM,
                 DebugMessageId.CreateVM -> LuaAttachMessage(idType)
                 else -> {
                     throw Exception("unknown message id:$idType")

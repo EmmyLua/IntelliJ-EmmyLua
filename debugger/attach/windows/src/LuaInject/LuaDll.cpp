@@ -726,6 +726,8 @@ void EnableIntercepts(LAPI apiIndex, bool enableIntercepts)
 
 bool GetAreInterceptsEnabled()
 {
+	if (!DebugBackend::Get().GetIsAttached())
+		return false;
 	int value = reinterpret_cast<int>(TlsGetValue(g_disableInterceptIndex));
 	return value <= 0;
 }
@@ -1374,9 +1376,16 @@ void lua_call_worker(LAPI api, lua_State* L, int nargs, int nresults)
 		DebugBackend::Get().Message("Warning 1005: lua_call called with too few arguments on the stack", MessageType_Warning);
 	}
 
-	if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+	if (GetAreInterceptsEnabled())
 	{
-		lua_error_dll(api, L);
+		if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+		{
+			lua_error_dll(api, L);
+		}
+	}
+	else
+	{
+		lua_call_dll(api, L, nargs, nresults);
 	}
 }
 // This function cannot be called like a normal function. It changes its
@@ -1400,9 +1409,18 @@ void lua_callk_worker(LAPI api, lua_State* L, int nargs, int nresults, int ctk, 
 		DebugBackend::Get().Message("Warning 1005: lua_call called with too few arguments on the stack", MessageType_Warning);
 	}
 
-	if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+	if (GetAreInterceptsEnabled())
 	{
-		lua_error_dll(api, L);
+		if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+		{
+			lua_error_dll(api, L);
+		}
+	}
+	else
+	{
+		//todo lua_callk_dll ???
+		assert(false);
+		lua_call_dll(api, L, nargs, nresults);
 	}
 }
 

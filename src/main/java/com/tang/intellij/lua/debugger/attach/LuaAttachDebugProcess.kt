@@ -84,6 +84,12 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                         bridge.stop(false)
                         session.stop()
                     }
+                    DebugMessageId.CreateVM -> {
+                        println("Create VM:${message.L}", ConsoleViewContentType.SYSTEM_OUTPUT)
+                    }
+                    DebugMessageId.DestroyVM -> {
+                        println("Destroy VM:${message.L}", ConsoleViewContentType.SYSTEM_OUTPUT)
+                    }
                     else -> {
                         println("unknown message : ${message.id}")
                     }

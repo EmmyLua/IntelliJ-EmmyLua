@@ -235,6 +235,12 @@ public:
 	LAPI GetApiForVm(lua_State* L) const;
 
 	void HandleMessage(DebugMessage* message);
+
+	/**
+	* Returns true if a debugger is currently attached to our process, or false
+	* if otherwise.
+	*/
+	bool GetIsAttached() const;
 private:
 	class Breakpoint
 	{
@@ -385,8 +391,6 @@ private:
      */
     static DWORD WINAPI FinishInitialize(LPVOID param);
 
-private:
-
     static const int s_maxModuleNameLength = 32;
     static const int s_maxEntryNameLength  = 256;
 
@@ -454,12 +458,6 @@ private:
      * Waits for the specified event or the detached event.
      */
     void WaitForEvent(HANDLE hEvent) const;
-
-    /**
-     * Returns true if a debugger is currently attached to our process, or false
-     * if otherwise.
-     */
-    bool GetIsAttached() const;
 
     /**
      * Converts from a string with (possibly) embedded zeros to an ASCII string. If force
