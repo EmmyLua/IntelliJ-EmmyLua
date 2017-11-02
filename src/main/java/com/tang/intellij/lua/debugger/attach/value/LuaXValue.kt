@@ -99,8 +99,7 @@ abstract class LuaXValue : XValue() {
                 val editor = FileEditorManager.getInstance(project).getSelectedEditor(file)
 
                 if (psiFile != null && editor is TextEditor) {
-                    val textEditor = editor as TextEditor?
-                    val document = textEditor!!.editor.document
+                    val document = editor.editor.document
                     val lineEndOffset = document.getLineStartOffset(currentPosition.line)
                     val element = psiFile.findElementAt(lineEndOffset)
                     LuaPsiTreeUtil.walkUpLocalNameDef(element) { nameDef ->
