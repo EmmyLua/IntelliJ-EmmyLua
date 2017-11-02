@@ -130,8 +130,8 @@ void DebugServer::sendMsg(const char * data, size_t size)
 
 void DebugServer::onDisconnect(DebugClient * client)
 {
-	m_listener->onDisconnect(client);
 	m_client = nullptr;
+	m_listener->onDisconnect(client);
 }
 
 int DebugServer::numConnections()

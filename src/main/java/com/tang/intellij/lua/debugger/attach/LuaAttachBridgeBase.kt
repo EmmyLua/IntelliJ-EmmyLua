@@ -106,6 +106,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
             }
         } catch (e: Exception) {
             println("----------> " + e.message)
+            session.stop()
         }
     }
 
@@ -115,13 +116,10 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
         handleMessage(message)
     }
 
-    fun stop(detach: Boolean = true) {
-        if (detach)
-            send(LuaAttachMessage(DebugMessageId.Detach))
+    fun stop() {
         writer = null
         handler?.destroyProcess()
         handler = null
-
         socket.close()
     }
 
