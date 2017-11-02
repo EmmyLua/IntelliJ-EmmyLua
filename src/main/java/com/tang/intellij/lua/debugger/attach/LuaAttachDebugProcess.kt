@@ -16,16 +16,26 @@
 
 package com.tang.intellij.lua.debugger.attach
 
+import com.intellij.debugger.ui.DebuggerContentInfo
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.execution.ui.RunnerLayoutUi
+import com.intellij.execution.ui.layout.PlaceInGrid
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.project.Project
+import com.intellij.ui.components.JBList
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
 import com.intellij.xdebugger.frame.XSuspendContext
+import com.intellij.xdebugger.ui.XDebugTabLayouter
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.psi.LuaFileUtil
+import java.awt.BorderLayout
 import java.util.concurrent.ConcurrentHashMap
+import javax.swing.DefaultListModel
+import javax.swing.JPanel
 
 /**
  *
@@ -36,6 +46,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     private val editorsProvider: LuaDebuggerEditorsProvider
     lateinit var bridge: LuaAttachBridgeBase
     private val loadedScriptMap = ConcurrentHashMap<Int, LoadedScript>()
+    lateinit var vmPanel: LuaVMPanel
 
     init {
         session.setPauseActionSupported(false)
@@ -86,10 +97,10 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                         session.stop()
                     }
                     DebugMessageId.CreateVM -> {
-                        println("Create VM:${message.L}", ConsoleViewContentType.SYSTEM_OUTPUT)
+                        vmPanel.addVM(message)
                     }
                     DebugMessageId.DestroyVM -> {
-                        println("Destroy VM:${message.L}", ConsoleViewContentType.SYSTEM_OUTPUT)
+                        vmPanel.removeVM(message)
                     }
                     else -> {
                         println("unknown message : ${message.id}")
@@ -153,5 +164,34 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
 
     fun getScript(index: Int): LoadedScript? {
         return loadedScriptMap[index]
+    }
+
+    override fun createTabLayouter(): XDebugTabLayouter {
+        return object : XDebugTabLayouter() {
+            override fun registerAdditionalContent(ui: RunnerLayoutUi) {
+                super.registerAdditionalContent(ui)
+                vmPanel = LuaVMPanel(session.project)
+                val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, vmPanel, "Lua VM", AllIcons.Debugger.Frame, null)
+                content.isCloseable = false
+                ui.addContent(content, 0, PlaceInGrid.left, false)
+            }
+        }
+    }
+}
+
+class LuaVMPanel(val project: Project) : JPanel(BorderLayout()) {
+    private val model = DefaultListModel<String>()
+
+    init {
+        val list = JBList<String>(model)
+        add(list, BorderLayout.CENTER)
+    }
+
+    fun addVM(message: LuaAttachMessage) {
+        model.addElement("0x${java.lang.Long.toHexString(message.L)}")
+    }
+
+    fun removeVM(message: LuaAttachMessage) {
+
     }
 }
