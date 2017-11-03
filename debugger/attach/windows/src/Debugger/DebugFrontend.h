@@ -24,7 +24,6 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #define DEBUG_FRONTEND_H
 
 #include <windows.h>
-#include <vector>
 
 #include "Channel.h"
 #include "Protocol.h"
@@ -36,12 +35,6 @@ class DebugFrontend
 {
 
 public:
-    struct Process
-    {
-        unsigned int    id;     // Windows process identifier
-        std::string     name;   // Executable name
-        std::string     title;  // Name from the main window of the process.
-    };
 
     /**
      * Singleton accessor.
@@ -76,11 +69,6 @@ public:
      * terminated. Otherwise the debugger will merely be detached.
      */
     void Stop(bool kill);
-
-    /**
-     * Returns all of the processes on the machine that can be debugged.
-     */
-    void GetProcesses(std::vector<Process>& processes) const;
 private:
 
     /**
