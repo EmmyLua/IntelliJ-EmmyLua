@@ -21,7 +21,11 @@ import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunnerLayoutUi
 import com.intellij.execution.ui.layout.PlaceInGrid
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.components.JBList
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
@@ -31,6 +35,7 @@ import com.intellij.xdebugger.frame.XSuspendContext
 import com.intellij.xdebugger.ui.XDebugTabLayouter
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
+import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.awt.BorderLayout
 import java.util.concurrent.ConcurrentHashMap
@@ -44,9 +49,10 @@ import javax.swing.JPanel
 abstract class LuaAttachDebugProcess protected constructor(session: XDebugSession)
     : LuaDebugProcess(session), LuaAttachBridgeBase.ProtoHandler {
     private val editorsProvider: LuaDebuggerEditorsProvider
-    lateinit var bridge: LuaAttachBridgeBase
     private val loadedScriptMap = ConcurrentHashMap<Int, LoadedScript>()
-    lateinit var vmPanel: LuaVMPanel
+    lateinit var bridge: LuaAttachBridgeBase
+    private lateinit var vmPanel: LuaVMPanel
+    private lateinit var memoryFilesPanel: MemoryFilesPanel
 
     init {
         session.setPauseActionSupported(false)
@@ -121,22 +127,34 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     private fun onLoadScript(proto: DMLoadScript) {
-        val file = LuaFileUtil.findFile(session.project, proto.fileName)
+        var file = LuaFileUtil.findFile(session.project, proto.fileName)
         if (file == null) {
-            print(String.format("[✘] File not found : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
-        } else {
-            val script = LoadedScript(file, proto.index, proto.fileName)
-            loadedScriptMap.put(proto.index, script)
-            print(String.format("[✔] File was loaded : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
+            file = createMemoryFile(proto)
+            //print(String.format("[✘] File not found : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
+            print(String.format("[✔] Create memory file : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
+        }
 
-            for (pos in registeredBreakpoints.keys) {
-                if (LuaFileUtil.fileEquals(file, pos.file)) {
-                    val breakpoint = registeredBreakpoints[pos]!!
-                    bridge.addBreakpoint(proto.index, breakpoint)
-                }
+        val script = LoadedScript(file, proto.index, proto.fileName)
+        loadedScriptMap.put(proto.index, script)
+        //print(String.format("[✔] File was loaded : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
+
+        for (pos in registeredBreakpoints.keys) {
+            if (LuaFileUtil.fileEquals(file, pos.file)) {
+                val breakpoint = registeredBreakpoints[pos]!!
+                bridge.addBreakpoint(proto.index, breakpoint)
             }
         }
         bridge.sendDone()
+    }
+
+    private fun createMemoryFile(dm: DMLoadScript): VirtualFile {
+        val file = LightVirtualFile(dm.fileName, LuaFileType.INSTANCE, dm.source)
+        file.isWritable = false
+        memoryFilesPanel.addFile(file)
+        ApplicationManager.getApplication().invokeLater {
+            FileEditorManagerEx.getInstance(session.project).openFile(file, true)
+        }
+        return file
     }
 
     override fun registerBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
@@ -170,12 +188,24 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         return object : XDebugTabLayouter() {
             override fun registerAdditionalContent(ui: RunnerLayoutUi) {
                 super.registerAdditionalContent(ui)
-                vmPanel = LuaVMPanel(session.project)
-                val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, vmPanel, "Lua VM", AllIcons.Debugger.Frame, null)
-                content.isCloseable = false
-                ui.addContent(content, 0, PlaceInGrid.left, false)
+                createVMPanel(ui)
+                createMemoryFilesPanel(ui)
             }
         }
+    }
+
+    private fun createVMPanel(ui: RunnerLayoutUi) {
+        vmPanel = LuaVMPanel(session.project)
+        val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, vmPanel, "Lua VM", AllIcons.Debugger.Frame, null)
+        content.isCloseable = false
+        ui.addContent(content, 0, PlaceInGrid.left, false)
+    }
+
+    private fun createMemoryFilesPanel(ui: RunnerLayoutUi) {
+        memoryFilesPanel = MemoryFilesPanel(session.project)
+        val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, memoryFilesPanel, "Memory files", AllIcons.Debugger.Frame, null)
+        content.isCloseable = false
+        ui.addContent(content, 0, PlaceInGrid.left, false)
     }
 }
 
