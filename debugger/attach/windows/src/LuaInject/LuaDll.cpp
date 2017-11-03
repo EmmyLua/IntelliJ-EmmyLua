@@ -1418,8 +1418,6 @@ void lua_callk_worker(LAPI api, lua_State* L, int nargs, int nresults, int ctk, 
 	}
 	else
 	{
-		//todo lua_callk_dll ???
-		assert(false);
 		lua_call_dll(api, L, nargs, nresults);
 	}
 }
