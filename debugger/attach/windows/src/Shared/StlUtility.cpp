@@ -77,3 +77,12 @@ bool GetIsSlash(char c)
 {
     return c == '\\' || c == '/';
 }
+
+void CopyString(std::string& dst, const char* data, size_t size)
+{
+	char* temp = (char*)malloc(size + 1);
+	memcpy(temp, data, size);
+	temp[size] = '\0';
+	dst = temp;
+	free(temp);
+}
