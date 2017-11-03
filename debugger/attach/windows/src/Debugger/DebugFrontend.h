@@ -127,12 +127,6 @@ private:
     std::string MakeValidFileName(const std::string& name) const;
 
     /**
-     * Returns the top level window for the specified process. The first such window
-     * that's found is returned.
-     */
-    HWND GetProcessWindow(DWORD processId) const;
-
-    /**
      * Initializes the debugger backend for the currently started process.
      */
     bool InitializeBackend(const char* symbolsDirectory);
