@@ -33,7 +33,7 @@ public:
 	void stop();
 	void disConnectAll();
 	DWORD connectionProc();
-	void sendMsg(const char* data, size_t size);
+	bool sendMsg(const char* data, size_t size);
 	void onDisconnect(DebugClient* client);
 	int numConnections();
 private:
@@ -50,7 +50,7 @@ public:
 	{}
 	SOCKET getSocket() const { return m_socket; }
 	void startup();
-	void sendMsg(const char* data, size_t size);
+	bool sendMsg(const char* data, size_t size);
 	void handleMsg(const char* data, size_t size);
 
 	DWORD receive();

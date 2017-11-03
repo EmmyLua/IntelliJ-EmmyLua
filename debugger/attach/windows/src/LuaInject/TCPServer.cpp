@@ -120,12 +120,13 @@ void DebugServer::disConnectAll()
 	}
 }
 
-void DebugServer::sendMsg(const char * data, size_t size)
+bool DebugServer::sendMsg(const char * data, size_t size)
 {
 	if (m_client != nullptr)
 	{
-		m_client->sendMsg(data, size);
+		return m_client->sendMsg(data, size);
 	}
+	return true;
 }
 
 void DebugServer::onDisconnect(DebugClient * client)
@@ -165,7 +166,7 @@ void DebugClient::startup()
 	m_thread = CreateThread(nullptr, 0, receiveThread, this, 0, &threadId);
 }
 
-void DebugClient::sendMsg(const char * data, size_t size)
+bool DebugClient::sendMsg(const char * data, size_t size)
 {
 	int leftSize = size;
 	int totalSend = 0;
@@ -174,11 +175,12 @@ void DebugClient::sendMsg(const char * data, size_t size)
 		int sendCount = send(m_socket, data + totalSend, leftSize, 0);
 		if (sendCount == SOCKET_ERROR)
 		{
-			break;
+			return false;
 		}
 		leftSize -= sendCount;
 		totalSend += sendCount;
 	}
+	return true;
 }
 
 void DebugClient::handleMsg(const char * data, size_t size)

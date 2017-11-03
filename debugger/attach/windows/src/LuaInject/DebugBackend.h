@@ -341,14 +341,14 @@ private:
      * be skipped. This is usful when the current execution point is an error
      * handler we defined.
      */
-    void SendBreakEvent(LAPI api, lua_State* L, int stackTop = 0);
+	bool SendBreakEvent(LAPI api, lua_State* L, int stackTop = 0);
 
     /**
      * Sends an exception event to the frontend. Break events should be sent
      * immediately before exception events so that the frontend has access
      * to the call stack.
      */
-    void SendExceptionEvent(lua_State* L, const char* message);
+	bool SendExceptionEvent(lua_State* L, const char* message);
 
     /**
      * Gets the directory that the DLL is in. The directory ends in a slash.

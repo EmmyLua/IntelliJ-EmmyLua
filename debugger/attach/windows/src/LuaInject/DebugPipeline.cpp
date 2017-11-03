@@ -90,17 +90,17 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 	delete msg;
 }
 
-void SocketPipeline::Send(DebugMessage* message)
+bool SocketPipeline::Send(DebugMessage* message)
 {
 	ByteOutputStream body;
 	message->Write(&body);
 	ByteOutputStream stream;
 	stream.WriteUInt32(body.GetPositon());
 	stream.Write((void*) body.GetBuf(), body.GetPositon());
-	server.sendMsg(stream.GetBuf(), stream.GetPositon());
+	return server.sendMsg(stream.GetBuf(), stream.GetPositon());
 }
 
-void DebugPipeline::Send(DebugMessage * message)
+bool DebugPipeline::Send(DebugMessage * message)
 {
-
+	return true;
 }

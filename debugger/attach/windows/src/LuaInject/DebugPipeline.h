@@ -21,7 +21,7 @@ public:
 	virtual bool ReadString(std::string& value) = 0;
 	virtual bool ReadBool(bool& value) = 0;
 
-	virtual void Send(DebugMessage* message);
+	virtual bool Send(DebugMessage* message);
 
 	virtual bool Initialize() = 0;
 	virtual void Destroy() = 0;
@@ -72,5 +72,5 @@ public:
 
 	void onDisconnect(DebugClient* client) override;
 	void handleStream(ByteInputStream* stream) override;
-	void Send(DebugMessage* message) override;
+	bool Send(DebugMessage* message) override;
 };
