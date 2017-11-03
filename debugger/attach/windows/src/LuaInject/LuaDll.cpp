@@ -1149,6 +1149,11 @@ void lua_call_dll(LAPI api, lua_State* L, int nargs, int nresults)
 	return g_interfaces[api].lua_call_dll_cdecl(L, nargs, nresults);
 }
 
+void lua_callk_dll(LAPI api, lua_State* L, int nargs, int nresults, int ctk, lua_CFunction k)
+{
+	return g_interfaces[api].lua_callk_dll_cdecl(L, nargs, nresults, ctk, k);
+}
+
 int lua_pcallk_dll(LAPI api, lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
 {
 	return g_interfaces[api].lua_pcallk_dll_cdecl(L, nargs, nresults, errfunc, ctx, k);
@@ -1420,7 +1425,7 @@ void lua_callk_worker(LAPI api, lua_State* L, int nargs, int nresults, int ctk, 
 	}
 	else
 	{
-		lua_call_dll(api, L, nargs, nresults);
+		lua_callk_dll(api, L, nargs, nresults, ctk, k);
 	}
 }
 
