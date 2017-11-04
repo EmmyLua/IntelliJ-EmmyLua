@@ -166,3 +166,15 @@ DMProfilerEnd::DMProfilerEnd() : DebugMessage(DebugMessageId::ReqProfilerEnd)
 DMProfilerData::DMProfilerData() : DebugMessage(DebugMessageId::RespProfilerData)
 {
 }
+
+void DMProfilerData::Write(ByteOutputStream* stream)
+{
+	DebugMessage::Write(stream);
+
+	stream->WriteUInt32(this->callList.size());
+	for (auto call : callList)
+	{
+		stream->WriteString(call->name);
+		stream->WriteUInt32(call->count);
+	}
+}

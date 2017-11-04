@@ -97,6 +97,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.Break -> DMBreak()
                 DebugMessageId.SetBreakpoint -> DMSetBreakpoint()
                 DebugMessageId.RespEvaluate -> DMRespEvaluate()
+                DebugMessageId.RespProfilerData -> DMRespProfilerData()
                 DebugMessageId.RespInitialize,
                 DebugMessageId.DestroyVM,
                 DebugMessageId.CreateVM -> LuaAttachMessage(idType)
@@ -346,5 +347,24 @@ class DMRespEvaluate : LuaAttachMessage(DebugMessageId.RespEvaluate) {
         evalId = stream.readInt()
         result = stream.readString()
         xValue = LuaXValue.parse(result, L, process)
+    }
+}
+
+data class DMProfilerCall(val scriptIndex: Int,
+                          val functionName: String)
+
+class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
+
+    val list = mutableListOf<DMProfilerCall>()
+
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        val size = stream.readInt()
+        for (i in 0 until size) {
+            val function = stream.readString()
+            val scriptIndex = stream.readInt()
+            val call = DMProfilerCall(scriptIndex, function)
+            list.add(call)
+        }
     }
 }

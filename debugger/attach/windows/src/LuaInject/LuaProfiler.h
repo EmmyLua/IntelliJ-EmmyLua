@@ -13,6 +13,8 @@ public:
 	size_t line;
 	size_t count;
 	size_t time;
+
+	bool isDirty;
 	size_t lastTime;
 };
 

@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include <string>
+#include <vector>
 #include "Protocol.h"
+#include "LuaProfiler.h"
 
 class ByteInputStream;
 class ByteOutputStream;
@@ -211,4 +213,7 @@ class DMProfilerData : public DebugMessage
 public:
 	DMProfilerData();
 
+	void Write(ByteOutputStream* stream) override;
+
+	std::vector<LPFunctionCall*> callList;
 };

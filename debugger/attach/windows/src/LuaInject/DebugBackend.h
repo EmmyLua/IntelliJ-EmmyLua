@@ -243,6 +243,8 @@ public:
 
 	void ProcProfiler(LAPI api, lua_State* L, lua_Debug* ar);
 
+	LPFunctionCall* GetProfilerCall(const char* key);
+
 	void EndProfiler();
 
 	/**
