@@ -26,6 +26,9 @@ enum class DebugMessageId
 	DeleteAllBreakpoints,
 	InitEmmy,
 
+	ReqProfilerBegin,
+	ReqProfilerEnd,
+
 	//resp
 	Initialize,
 	CreateVM,
@@ -38,6 +41,8 @@ enum class DebugMessageId
 	SessionEnd,
 	NameVM,
 	EvalResult,
+
+	RespProfilerData,
 };
 
 class DebugMessage
@@ -188,4 +193,23 @@ public:
 	void Write(ByteOutputStream* stream) override;
 
 	std::string name;
+};
+
+class DMProfilerBegin : public DebugMessage
+{
+public:
+	DMProfilerBegin();
+};
+
+class DMProfilerEnd: public DebugMessage
+{
+public:
+	DMProfilerEnd();
+};
+
+class DMProfilerData : public DebugMessage
+{
+public:
+	DMProfilerData();
+
 };

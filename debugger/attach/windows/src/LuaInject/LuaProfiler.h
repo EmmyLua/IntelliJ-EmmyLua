@@ -8,6 +8,7 @@ public:
 	LPFunctionCall();
 
 	size_t id;
+	std::string file;
 	std::string name;
 	size_t line;
 	size_t count;

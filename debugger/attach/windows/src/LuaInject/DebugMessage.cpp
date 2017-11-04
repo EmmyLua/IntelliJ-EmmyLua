@@ -154,3 +154,15 @@ void DMNameVM::Write(ByteOutputStream* stream)
 	DebugMessage::Write(stream);
 	stream->WriteString(name);
 }
+
+DMProfilerBegin::DMProfilerBegin() : DebugMessage(DebugMessageId::ReqProfilerBegin)
+{
+}
+
+DMProfilerEnd::DMProfilerEnd() : DebugMessage(DebugMessageId::ReqProfilerEnd)
+{
+}
+
+DMProfilerData::DMProfilerData() : DebugMessage(DebugMessageId::RespProfilerData)
+{
+}

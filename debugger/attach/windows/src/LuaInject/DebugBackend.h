@@ -236,6 +236,10 @@ public:
 
 	void HandleMessage(DebugMessage* message);
 
+	void BeginProfiler();
+
+	void EndProfiler();
+
 	/**
 	* Returns true if a debugger is currently attached to our process, or false
 	* if otherwise.
@@ -627,6 +631,7 @@ private:
 	std::string						m_emmyLuaFilePath;
 	DebugPipeline*					m_debugPipeline;
 
+	bool                            m_profiler;
 };
 
 #endif
