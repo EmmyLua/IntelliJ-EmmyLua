@@ -33,6 +33,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include <hash_set>
 #include <hash_map>
+#include "LuaProfiler.h"
 
 //
 // Forward declarations.
@@ -204,6 +205,8 @@ public:
      */
     void HookCallback(LAPI api, lua_State* L, lua_Debug* ar);
 
+	void SetAllHookMode(HookMode mode);
+
     /**
      * Called when a new API is created.
      */
@@ -237,6 +240,8 @@ public:
 	void HandleMessage(DebugMessage* message);
 
 	void BeginProfiler();
+
+	void ProcProfiler(LAPI api, lua_State* L, lua_Debug* ar);
 
 	void EndProfiler();
 
@@ -632,6 +637,7 @@ private:
 	DebugPipeline*					m_debugPipeline;
 
 	bool                            m_profiler;
+	std::hash_map<std::string, LPFunctionCall*> m_profilerCallMap;
 };
 
 #endif

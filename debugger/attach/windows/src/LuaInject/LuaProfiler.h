@@ -13,6 +13,7 @@ public:
 	size_t line;
 	size_t count;
 	size_t time;
+	size_t lastTime;
 };
 
 #endif

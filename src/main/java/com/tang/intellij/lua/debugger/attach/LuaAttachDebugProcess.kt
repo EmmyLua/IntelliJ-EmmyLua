@@ -21,6 +21,9 @@ import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunnerLayoutUi
 import com.intellij.execution.ui.layout.PlaceInGrid
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.Project
@@ -36,6 +39,7 @@ import com.intellij.xdebugger.ui.XDebugTabLayouter
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.lang.LuaFileType
+import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.awt.BorderLayout
 import java.util.concurrent.ConcurrentHashMap
@@ -182,6 +186,15 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
 
     fun getScript(index: Int): LoadedScript? {
         return loadedScriptMap[index]
+    }
+
+    override fun registerAdditionalActions(leftToolbar: DefaultActionGroup, topToolbar: DefaultActionGroup, settings: DefaultActionGroup) {
+        super.registerAdditionalActions(leftToolbar, topToolbar, settings)
+        topToolbar.add(object : AnAction(LuaIcons.FILE) {
+            override fun actionPerformed(event: AnActionEvent) {
+                bridge.send(LuaAttachMessage(DebugMessageId.ReqProfilerBegin))
+            }
+        })
     }
 
     override fun createTabLayouter(): XDebugTabLayouter {
