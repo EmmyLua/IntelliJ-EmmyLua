@@ -60,8 +60,8 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 	DebugMessageId msgId = (DebugMessageId)id;
 	switch (msgId)
 	{
-	case DebugMessageId::InitEmmy:
-		msg = new DMInitEmmy();
+	case DebugMessageId::ReqInitialize:
+		msg = new DMReqInitialize();
 		break;
 	case DebugMessageId::AddBreakpoint:
 		msg = new DMAddBreakpoint();
@@ -69,8 +69,8 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 	case DebugMessageId::DelBreakpoint:
 		msg = new DMDelBreakpoint();
 		break;
-	case DebugMessageId::Evaluate:
-		msg = new DMEvaluate();
+	case DebugMessageId::ReqEvaluate:
+		msg = new DMReqEvaluate();
 		break;
 	case DebugMessageId::ReqProfilerBegin:
 		msg = new DMProfilerBegin();

@@ -8,7 +8,9 @@ struct lua_State;
 
 enum class DebugMessageId
 {
-	//req
+	ReqInitialize,
+	RespInitialize,
+
 	Continue,
 	StepOver,
 	StepInto,
@@ -16,7 +18,6 @@ enum class DebugMessageId
 	AddBreakpoint,
 	DelBreakpoint,
 	Break,
-	Evaluate,
 	Detach,
 	PatchReplaceLine,
 	PatchInsertLine,
@@ -24,14 +25,9 @@ enum class DebugMessageId
 	LoadDone,
 	IgnoreException,
 	DeleteAllBreakpoints,
-	InitEmmy,
 
-	ReqProfilerBegin,
-	ReqProfilerEnd,
-
-	//resp
-	Initialize,
 	CreateVM,
+	NameVM,
 	DestroyVM,
 	LoadScript,
 	SetBreakpoint,
@@ -39,9 +35,12 @@ enum class DebugMessageId
 	LoadError,
 	Message,
 	SessionEnd,
-	NameVM,
-	EvalResult,
 
+	ReqEvaluate,
+	RespEvaluate,
+
+	ReqProfilerBegin,
+	ReqProfilerEnd,
 	RespProfilerData,
 };
 
@@ -60,10 +59,10 @@ public:
 	lua_State* L;
 };
 
-class DMInitEmmy : public DebugMessage
+class DMReqInitialize : public DebugMessage
 {
 public:
-	DMInitEmmy();
+	DMReqInitialize();
 
 	void Read(ByteInputStream* stream) override;
 
@@ -160,10 +159,10 @@ public:
 	unsigned int line;
 };
 
-class DMEvaluate : public DebugMessage
+class DMReqEvaluate : public DebugMessage
 {
 public:
-	DMEvaluate();
+	DMReqEvaluate();
 
 	void Read(ByteInputStream* stream) override;
 
@@ -173,10 +172,10 @@ public:
 	std::string expression;
 };
 
-class DMEvalResult : public DebugMessage
+class DMRespEvaluate : public DebugMessage
 {
 public:
-	DMEvalResult();
+	DMRespEvaluate();
 
 	void Write(ByteOutputStream* stream) override;
 

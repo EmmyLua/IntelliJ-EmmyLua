@@ -21,7 +21,7 @@ import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
-import com.tang.intellij.lua.debugger.attach.DMEvalResult
+import com.tang.intellij.lua.debugger.attach.DMRespEvaluate
 import com.tang.intellij.lua.debugger.attach.LuaAttachBridgeBase
 import com.tang.intellij.lua.debugger.attach.LuaAttachStackFrame
 import org.w3c.dom.Node
@@ -110,7 +110,7 @@ open class LuaXTable : LuaXValue() {
             val frame = process!!.session.currentStackFrame as LuaAttachStackFrame? ?: return
 
             process?.bridge?.eval(L, evalExpr, frame.stack, 2, object : LuaAttachBridgeBase.EvalCallback {
-                override fun onResult(result: DMEvalResult) {
+                override fun onResult(result: DMRespEvaluate) {
                     val value = result.xValue
                     childrenList = XValueChildrenList()
                     if (value is LuaXTable) {

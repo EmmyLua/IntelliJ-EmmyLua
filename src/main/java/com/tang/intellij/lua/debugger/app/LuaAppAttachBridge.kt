@@ -104,7 +104,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
 
     override fun handleMessage(message: LuaAttachMessage) {
         when (message.id ) {
-            DebugMessageId.Initialize -> {
+            DebugMessageId.RespInitialize -> {
                 handler?.process?.outputStream?.let {
                     it.write("resume\n".toByteArray())
                     it.flush()

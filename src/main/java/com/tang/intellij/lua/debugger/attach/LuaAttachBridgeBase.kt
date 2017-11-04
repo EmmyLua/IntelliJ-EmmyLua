@@ -53,7 +53,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
     }
 
     interface EvalCallback {
-        fun onResult(result: DMEvalResult)
+        fun onResult(result: DMRespEvaluate)
     }
 
     internal inner class EvalInfo {
@@ -63,12 +63,12 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
 
     protected open fun handleMessage(message: LuaAttachMessage) {
         when (message.id ) {
-            DebugMessageId.EvalResult -> handleEvalCallback(message as DMEvalResult)
+            DebugMessageId.RespEvaluate -> handleEvalCallback(message as DMRespEvaluate)
             else -> protoHandler?.handle(message)
         }
     }
 
-    private fun handleEvalCallback(proto: DMEvalResult) {
+    private fun handleEvalCallback(proto: DMRespEvaluate) {
         val info = callbackMap.remove(proto.evalId)
         if (info != null) {
             val xValue = proto.xValue
@@ -84,7 +84,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
         writer = DataOutputStream(socket.getOutputStream())
 
         ApplicationManager.getApplication().executeOnPooledThread {
-            send(DMInitEmmy("", emmyLua!!))
+            send(DMReqInitialize("", emmyLua!!))
             processPack()
         }
     }
@@ -144,7 +144,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
         info.callback = callback
         info.expr = expr
         callbackMap.put(id, info)
-        send(DMEvaluate(L, id, stack, depth, expr))
+        send(DMReqEvaluate(L, id, stack, depth, expr))
     }
 
     fun addBreakpoint(index: Int, breakpoint: XLineBreakpoint<*>) {

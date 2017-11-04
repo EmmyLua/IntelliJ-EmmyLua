@@ -17,11 +17,11 @@ void DebugMessage::Write(ByteOutputStream * stream)
 	stream->WriteSize(reinterpret_cast<size_t>(L));
 }
 
-DMInitEmmy::DMInitEmmy(): DebugMessage(DebugMessageId::InitEmmy)
+DMReqInitialize::DMReqInitialize(): DebugMessage(DebugMessageId::ReqInitialize)
 {
 }
 
-void DMInitEmmy::Read(ByteInputStream* stream)
+void DMReqInitialize::Read(ByteInputStream* stream)
 {
 	DebugMessage::Read(stream);
 	stream->ReadString(symbolsDirectory);
@@ -119,12 +119,12 @@ void DMDelBreakpoint::Read(ByteInputStream* stream)
 	line = stream->ReadUInt32();
 }
 
-DMEvaluate::DMEvaluate() : DebugMessage(DebugMessageId::Evaluate), evalId(0), stackLevel(0),
+DMReqEvaluate::DMReqEvaluate() : DebugMessage(DebugMessageId::ReqEvaluate), evalId(0), stackLevel(0),
                                                depth(0)
 {
 }
 
-void DMEvaluate::Read(ByteInputStream* stream)
+void DMReqEvaluate::Read(ByteInputStream* stream)
 {
 	DebugMessage::Read(stream);
 	evalId = stream->ReadUInt32();
@@ -133,11 +133,11 @@ void DMEvaluate::Read(ByteInputStream* stream)
 	stream->ReadString(expression);
 }
 
-DMEvalResult::DMEvalResult(): DebugMessage(DebugMessageId::EvalResult), success(false), evalId(0)
+DMRespEvaluate::DMRespEvaluate(): DebugMessage(DebugMessageId::RespEvaluate), success(false), evalId(0)
 {
 }
 
-void DMEvalResult::Write(ByteOutputStream* stream)
+void DMRespEvaluate::Write(ByteOutputStream* stream)
 {
 	DebugMessage::Write(stream);
 	stream->WriteUInt32(success);

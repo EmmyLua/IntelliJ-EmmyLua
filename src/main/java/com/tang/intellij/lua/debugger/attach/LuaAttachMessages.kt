@@ -34,7 +34,9 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 enum class DebugMessageId
 {
-    //resp
+    ReqInitialize,
+    RespInitialize,
+
     Continue,
     StepOver,
     StepInto,
@@ -42,7 +44,6 @@ enum class DebugMessageId
     AddBreakpoint,
     DelBreakpoint,
     Break,
-    Evaluate,
     Detach,
     PatchReplaceLine,
     PatchInsertLine,
@@ -50,11 +51,9 @@ enum class DebugMessageId
     LoadDone,
     IgnoreException,
     DeleteAllBreakpoints,
-    InitEmmy,
 
-    //req
-    Initialize,
     CreateVM,
+    NameVM,
     DestroyVM,
     LoadScript,
     SetBreakpoint,
@@ -62,8 +61,13 @@ enum class DebugMessageId
     LoadError,
     Message,
     SessionEnd,
-    NameVM,
-    EvalResult,
+
+    ReqEvaluate,
+    RespEvaluate,
+
+    ReqProfilerBegin,
+    ReqProfilerEnd,
+    RespProfilerData,
 }
 
 open class LuaAttachMessage(val id: DebugMessageId) {
@@ -92,8 +96,8 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.Exception -> DMException()
                 DebugMessageId.Break -> DMBreak()
                 DebugMessageId.SetBreakpoint -> DMSetBreakpoint()
-                DebugMessageId.EvalResult -> DMEvalResult()
-                DebugMessageId.Initialize,
+                DebugMessageId.RespEvaluate -> DMRespEvaluate()
+                DebugMessageId.RespInitialize,
                 DebugMessageId.DestroyVM,
                 DebugMessageId.CreateVM -> LuaAttachMessage(idType)
                 else -> {
@@ -119,7 +123,8 @@ fun DataInputStream.readString(): String {
     return String(bytes)
 }
 
-class DMInitEmmy(val symbolsDirectory: String, val emmyLuaFile: String) : LuaAttachMessage(DebugMessageId.InitEmmy) {
+class DMReqInitialize(private val symbolsDirectory: String, private val emmyLuaFile: String)
+    : LuaAttachMessage(DebugMessageId.ReqInitialize) {
     override fun write(stream: DataOutputStream) {
         super.write(stream)
         stream.writeString(symbolsDirectory)
@@ -308,10 +313,10 @@ class DMDelBreakpoint(private val scriptIndex: Int,
     }
 }
 
-class DMEvaluate(L: Long, private val evalId: Int,
-                 private val stackLevel: Int,
-                 private val depth: Int,
-                 private val expr: String) : LuaAttachMessage(DebugMessageId.Evaluate) {
+class DMReqEvaluate(L: Long, private val evalId: Int,
+                    private val stackLevel: Int,
+                    private val depth: Int,
+                    private val expr: String) : LuaAttachMessage(DebugMessageId.ReqEvaluate) {
     init {
         this.L = L
     }
@@ -324,7 +329,7 @@ class DMEvaluate(L: Long, private val evalId: Int,
     }
 }
 
-class DMEvalResult : LuaAttachMessage(DebugMessageId.EvalResult) {
+class DMRespEvaluate : LuaAttachMessage(DebugMessageId.RespEvaluate) {
 
     var xValue: LuaXValue? = null
         private set
