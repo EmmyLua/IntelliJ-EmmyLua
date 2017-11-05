@@ -175,6 +175,8 @@ void DMProfilerData::Write(ByteOutputStream* stream)
 	stream->WriteUInt32(this->callList.size());
 	for (auto call : callList)
 	{
+		stream->WriteUInt32(call->id);
+		stream->WriteString(call->file);
 		stream->WriteString(call->name);
 		stream->WriteUInt32(call->count);
 	}

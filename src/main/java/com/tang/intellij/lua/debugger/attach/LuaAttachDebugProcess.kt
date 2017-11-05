@@ -52,6 +52,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     lateinit var bridge: LuaAttachBridgeBase
     private lateinit var vmPanel: LuaVMPanel
     private lateinit var memoryFilesPanel: MemoryFilesPanel
+    private lateinit var profilerPanel: ProfilerPanel
 
     init {
         session.setPauseActionSupported(false)
@@ -95,6 +96,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
             is DMBreak -> onBreak(message)
             is DMException -> message.print()
             is DMMessage -> message.print()
+            is DMRespProfilerData -> onProfilerData(message)
             else -> {
                 when (message.id) {
                     DebugMessageId.SessionEnd -> {
@@ -113,6 +115,10 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                 }
             }
         }
+    }
+
+    private fun onProfilerData(message: DMRespProfilerData) {
+        profilerPanel.updateProfiler(message)
     }
 
     private fun onBreak(proto: DMBreak) {
@@ -198,6 +204,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                 super.registerAdditionalContent(ui)
                 createVMPanel(ui)
                 createMemoryFilesPanel(ui)
+                createProfilerPanel(ui)
             }
         }
     }
@@ -212,6 +219,13 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     private fun createMemoryFilesPanel(ui: RunnerLayoutUi) {
         memoryFilesPanel = MemoryFilesPanel(session.project)
         val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, memoryFilesPanel, "Memory files", AllIcons.Debugger.Frame, null)
+        content.isCloseable = false
+        ui.addContent(content, 0, PlaceInGrid.left, false)
+    }
+
+    private fun createProfilerPanel(ui: RunnerLayoutUi) {
+        profilerPanel = ProfilerPanel()
+        val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, profilerPanel, "Profiler", AllIcons.Debugger.Frame, null)
         content.isCloseable = false
         ui.addContent(content, 0, PlaceInGrid.left, false)
     }

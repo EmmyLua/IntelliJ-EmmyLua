@@ -350,8 +350,10 @@ class DMRespEvaluate : LuaAttachMessage(DebugMessageId.RespEvaluate) {
     }
 }
 
-data class DMProfilerCall(val scriptIndex: Int,
-                          val functionName: String)
+data class DMProfilerCall(val id: Int,
+                          val file: String,
+                          val functionName: String,
+                          var count: Int)
 
 class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
 
@@ -361,9 +363,11 @@ class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
         super.read(stream)
         val size = stream.readInt()
         for (i in 0 until size) {
+            val id = stream.readInt()
+            val file = stream.readString()
             val function = stream.readString()
-            val scriptIndex = stream.readInt()
-            val call = DMProfilerCall(scriptIndex, function)
+            val count = stream.readInt()
+            val call = DMProfilerCall(id, file, function, count)
             list.add(call)
         }
     }
