@@ -33,7 +33,6 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <list>
 #include <hash_set>
 #include <hash_map>
-#include "LuaProfiler.h"
 
 //
 // Forward declarations.
@@ -42,6 +41,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 class TiXmlNode;
 class DebugPipeline;
 class DebugMessage;
+class LPFunctionCall;
 
 /**
  * This class encapsulates the part of the debugger that runs inside the

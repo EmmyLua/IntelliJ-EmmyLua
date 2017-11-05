@@ -2,11 +2,11 @@
 #include <string>
 #include <vector>
 #include "Protocol.h"
-#include "LuaProfiler.h"
 
 class ByteInputStream;
 class ByteOutputStream;
 struct lua_State;
+class LPFunctionCall;
 
 enum class DebugMessageId
 {

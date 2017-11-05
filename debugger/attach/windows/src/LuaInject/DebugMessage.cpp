@@ -1,5 +1,6 @@
 ﻿#include "DebugMessage.h"
 #include "Stream.h"
+#include "LuaProfiler.h"
 
 DebugMessage::DebugMessage(DebugMessageId idValue) : id(idValue), L(nullptr)
 {
