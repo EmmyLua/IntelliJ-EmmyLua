@@ -22,6 +22,10 @@ public:
 	* data is available.
 	*/
 	void ReadString(std::string& value);
+
+	const char ReadByte();
+
+	bool ReadBool();
 };
 
 class ByteOutputStream
@@ -40,6 +44,10 @@ public:
 	void WriteSize(size_t value);
 
 	void WriteString(const std::string& value);
+
+	void WriteByte(char value);
+
+	void WriteBool(bool value);
 
 	const char* GetBuf() const { return m_buff; }
 

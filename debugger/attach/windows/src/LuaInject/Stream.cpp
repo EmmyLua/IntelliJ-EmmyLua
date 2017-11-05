@@ -47,6 +47,19 @@ void ByteInputStream::ReadString(std::string & value)
 	}
 }
 
+const char ByteInputStream::ReadByte()
+{
+	assert(m_position + 1 <= m_size, "overflow");
+	char c = m_buff[m_position];
+	m_position++;
+	return c;
+}
+
+bool ByteInputStream::ReadBool()
+{
+	return ReadByte() == 1;
+}
+
 ByteOutputStream::ByteOutputStream() : m_position(0)
 {
 	m_size = 1024 * 1024;
@@ -91,4 +104,16 @@ void ByteOutputStream::WriteString(const std::string& value)
 	{
 		Write((void*)value.c_str(), len);
 	}
+}
+
+void ByteOutputStream::WriteByte(char value)
+{
+	assert(m_position + 1 <= m_size);
+	m_buff[m_position] = value;
+	m_position++;
+}
+
+void ByteOutputStream::WriteBool(bool value)
+{
+	WriteByte(value ? 1 : 0);
 }
