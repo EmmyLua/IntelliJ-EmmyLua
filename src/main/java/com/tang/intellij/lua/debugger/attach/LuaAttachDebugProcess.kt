@@ -26,10 +26,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
-import com.intellij.ui.components.JBList
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -41,10 +39,7 @@ import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaFileUtil
-import java.awt.BorderLayout
 import java.util.concurrent.ConcurrentHashMap
-import javax.swing.DefaultListModel
-import javax.swing.JPanel
 
 /**
  *
@@ -219,22 +214,5 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, memoryFilesPanel, "Memory files", AllIcons.Debugger.Frame, null)
         content.isCloseable = false
         ui.addContent(content, 0, PlaceInGrid.left, false)
-    }
-}
-
-class LuaVMPanel(val project: Project) : JPanel(BorderLayout()) {
-    private val model = DefaultListModel<String>()
-
-    init {
-        val list = JBList<String>(model)
-        add(list, BorderLayout.CENTER)
-    }
-
-    fun addVM(message: LuaAttachMessage) {
-        model.addElement("0x${java.lang.Long.toHexString(message.L)}")
-    }
-
-    fun removeVM(message: LuaAttachMessage) {
-
     }
 }
