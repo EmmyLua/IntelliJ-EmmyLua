@@ -317,17 +317,6 @@ private:
     void WaitForContinue();
 
     /**
-     * Entry point into the command handling thread.
-     */
-    void CommandThreadProc();
-
-    /**
-     * Static version of the command handler thread entry point. This just
-     * forwards to the non-static version.
-     */
-    static DWORD WINAPI StaticCommandThreadProc(LPVOID param);
-
-    /**
      * Breaks from inside the script code. This will block until execution
      * is resumed.
      */
