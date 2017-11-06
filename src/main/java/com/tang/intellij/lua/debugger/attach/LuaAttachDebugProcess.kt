@@ -24,8 +24,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.xdebugger.XDebugSession
@@ -141,7 +139,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
 
         val script = LoadedScript(file, proto.index, proto.fileName)
         loadedScriptMap.put(proto.index, script)
-        //print(String.format("[✔] File was loaded : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
+        print(String.format("[✔] File was loaded : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
 
         for (pos in registeredBreakpoints.keys) {
             if (LuaFileUtil.fileEquals(file, pos.file)) {
@@ -156,9 +154,6 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         val file = LightVirtualFile(dm.fileName, LuaFileType.INSTANCE, dm.source)
         file.isWritable = false
         memoryFilesPanel.addFile(file)
-        ApplicationManager.getApplication().invokeLater {
-            FileEditorManagerEx.getInstance(session.project).openFile(file, true)
-        }
         return file
     }
 
