@@ -59,7 +59,13 @@ DebugFrontend::~DebugFrontend()
     Stop(false);
 }
 
-bool DebugFrontend::Start(const char* command, const char* commandArguments, const char* currentDirectory, const char* symbolsDirectory, bool debug, bool startBroken)
+ErrorCode DebugFrontend::Start(
+	const char* command,
+	const char* commandArguments,
+	const char* currentDirectory,
+	const char* symbolsDirectory,
+	bool debug,
+	bool startBroken)
 {
 
     Stop(false);
@@ -83,7 +89,7 @@ bool DebugFrontend::Start(const char* command, const char* commandArguments, con
     {
         if (!StartProcessAndRunToEntry(command, commandLine, directory.c_str(), processInfo))
         {
-            return false;
+            return ErrorCode::UNKNOWN;
         }
     }
     else
@@ -92,14 +98,13 @@ bool DebugFrontend::Start(const char* command, const char* commandArguments, con
         if (!CreateProcess(nullptr, commandLine, nullptr, nullptr, TRUE, 0, nullptr, directory.c_str(), &startUpInfo, &processInfo))
         {
             OutputError(GetLastError());
-            return false;
+            return ErrorCode::UNKNOWN;
         }
 
         // We're not debugging, so no need to proceed.
         CloseHandle(processInfo.hThread);
         CloseHandle(processInfo.hProcess);
-        return true;
-    
+        return ErrorCode::OK;
     }
 
     DWORD exitCode;
@@ -107,21 +112,22 @@ bool DebugFrontend::Start(const char* command, const char* commandArguments, con
     if (GetExitCodeProcess(processInfo.hProcess, &exitCode) && exitCode != STILL_ACTIVE)
     {
         MessageEvent("The process has terminated unexpectedly", MessageType_Error);
-        return false;
+        return ErrorCode::UNKNOWN;
     }
 
     m_process   = processInfo.hProcess;
     m_processId = processInfo.dwProcessId;
 
-    if (!InitializeBackend(symbolsDirectory))
+	ErrorCode code = InitializeBackend(symbolsDirectory);
+    if (code != ErrorCode::OK)
     {
         Stop(true);
-        return false;
+        return code;
     }
 
 	//tell IDEA debugger connect
 	std::cout << "port:" << m_processId << std::endl;
-    return true;
+    return ErrorCode::OK;
 }
 
 void DebugFrontend::Resume()
@@ -131,7 +137,7 @@ void DebugFrontend::Resume()
 	CloseHandle(processInfo.hThread);
 }
 
-bool DebugFrontend::Attach(unsigned int processId, const char* symbolsDirectory)
+ErrorCode DebugFrontend::Attach(unsigned int processId, const char* symbolsDirectory)
 {
 
     m_processId = processId;
@@ -141,31 +147,32 @@ bool DebugFrontend::Attach(unsigned int processId, const char* symbolsDirectory)
     {
         MessageEvent("Error: The process could not be opened", MessageType_Error);
         m_processId = 0;
-        return false;
+        return ErrorCode::CAN_NOT_OPEN_PROCESS;
     }
     
-    if (!InitializeBackend(symbolsDirectory))
+	ErrorCode code = InitializeBackend(symbolsDirectory);
+    if (code != ErrorCode::OK)
     {
         CloseHandle(m_process);
         m_process   = nullptr;
         m_processId = 0;
-        return false;
+        return code;
     }
 
 	//tell IDEA debugger connect
 	std::cout << "port:" << m_processId << std::endl;
-    return true;
+    return ErrorCode::OK;
 
 }
 
-bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
+ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 {
 	//MessageBox(nullptr, "Waiting to attach the debugger", nullptr, MB_OK);
 
     if (GetIsBeingDebugged(m_processId))
     {
         //MessageEvent("Error: The process cannot be debugged because it contains hooks from a previous session", MessageType_Error);
-        return true;
+        return ErrorCode::OK;//ALREADY_ATTACHED
     }
 
 	// Handshake channel
@@ -174,15 +181,15 @@ bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 	Channel handshakeChannel;
 	if (!handshakeChannel.Create(handshakeChannelName))
 	{
-		return false;
+		return ErrorCode::UNKNOWN;
 	}
 
     // Inject our debugger DLL into the process so that we can monitor from
     // inside the process's memory space.
     if (!InjectDll(m_processId, "LuaInject.dll"))
     {
-        MessageEvent("Error: LuaInject.dll could not be loaded into the process", MessageType_Error);
-        return false;
+        //MessageEvent("Error: LuaInject.dll could not be loaded into the process", MessageType_Error);
+        return ErrorCode::INJECT_ERROR;
     }
 
     // Wait for the client to connect.
@@ -191,11 +198,11 @@ bool DebugFrontend::InitializeBackend(const char* symbolsDirectory)
     // Read the initialization function from the event channel.
     if (!ProcessInitialization(handshakeChannel, symbolsDirectory))
     {
-        MessageEvent("Error: Backend couldn't be initialized", MessageType_Error);
-        return false;
+        //MessageEvent("Error: Backend couldn't be initialized", MessageType_Error);
+        return ErrorCode::BACKEND_INIT_ERROR;
     }
 
-    return true;
+    return ErrorCode::OK;
 }
 
 bool DebugFrontend::AttachDebuggerToHost() const

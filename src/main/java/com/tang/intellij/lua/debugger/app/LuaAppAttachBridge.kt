@@ -38,6 +38,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
         }
 
         override fun processTerminated(processEvent: ProcessEvent) {
+            onDebugHelperExit(processEvent.exitCode)
             stop()
         }
 

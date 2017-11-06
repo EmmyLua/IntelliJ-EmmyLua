@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.process.OSProcessHandler
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -59,6 +60,30 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
     internal inner class EvalInfo {
         var callback: EvalCallback? = null
         var expr: String? = null
+    }
+
+    protected fun onDebugHelperExit(code: Int) {
+        val errorCode = getDebugHelperExitCode(code)
+        when (errorCode) {
+            ErrorCode.OK, ErrorCode.ALREADY_ATTACHED -> {
+
+            }
+            ErrorCode.INJECT_ERROR -> {
+                process.println("Error: LuaInject.dll could not be loaded into the process", ConsoleViewContentType.ERROR_OUTPUT)
+                process.stop()
+            }
+            ErrorCode.BACKEND_INIT_ERROR -> {
+                process.println("Error: Backend couldn't be initialized", ConsoleViewContentType.ERROR_OUTPUT)
+                process.stop()
+            }
+            ErrorCode.CAN_NOT_OPEN_PROCESS -> {
+                process.println("Error: The process could not be opened", ConsoleViewContentType.ERROR_OUTPUT)
+                process.stop()
+            }
+            else -> {
+                process.stop()
+            }
+        }
     }
 
     protected open fun handleMessage(message: LuaAttachMessage) {

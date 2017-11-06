@@ -18,18 +18,12 @@
     <ClCompile Include="Debugger\DebugFrontend.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
-    <ClCompile Include="Debugger\DebugEvent.cpp">
-      <Filter>头文件</Filter>
-    </ClCompile>
     <ClCompile Include="Debugger\main.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debugger\DebugFrontend.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Debugger\DebugEvent.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Debugger\cxxopts.hpp">

@@ -32,6 +32,21 @@ import java.io.DataOutputStream
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
 
+enum class ErrorCode
+{
+    OK,
+
+    UNKNOWN,
+    CAN_NOT_OPEN_PROCESS,
+    ALREADY_ATTACHED,
+    INJECT_ERROR,
+    BACKEND_INIT_ERROR
+}
+
+fun getDebugHelperExitCode(value: Int): ErrorCode {
+    return ErrorCode.values().find { it.ordinal == value } ?: ErrorCode.UNKNOWN
+}
+
 enum class DebugMessageId
 {
     ReqInitialize,

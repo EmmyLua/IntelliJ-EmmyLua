@@ -165,13 +165,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Debugger\DebugEvent.cpp" />
     <ClCompile Include="Debugger\DebugFrontend.cpp" />
     <ClCompile Include="Debugger\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debugger\cxxopts.hpp" />
-    <ClInclude Include="Debugger\DebugEvent.h" />
     <ClInclude Include="Debugger\DebugFrontend.h" />
   </ItemGroup>
   <ItemGroup>

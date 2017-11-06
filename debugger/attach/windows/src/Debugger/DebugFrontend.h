@@ -28,6 +28,17 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include "Channel.h"
 #include "Protocol.h"
 
+enum class ErrorCode
+{
+	OK = 0,
+
+	UNKNOWN = 1,
+	CAN_NOT_OPEN_PROCESS = 2,
+	ALREADY_ATTACHED = 3,
+	INJECT_ERROR = 4,
+	BACKEND_INIT_ERROR = 5,
+};
+
 /**
  * Frontend for the debugger.
  */
@@ -49,14 +60,14 @@ public:
     /**
      * Starts a new process that will be debugged.
      */
-    bool Start(const char* command, const char* commandArguments, const char* currentDirectory, const char* symbolsDirectory, bool debug, bool startBroken);
+	ErrorCode Start(const char* command, const char* commandArguments, const char* currentDirectory, const char* symbolsDirectory, bool debug, bool startBroken);
 
 	void Resume();
 
     /**
      * Attaches the debugger to a currently running process.
      */
-    bool Attach(unsigned int processId, const char* symbolsDirectory);
+    ErrorCode Attach(unsigned int processId, const char* symbolsDirectory);
 
     /**
      * Attaches the default debugger (set on the machine) to the application
@@ -117,7 +128,7 @@ private:
     /**
      * Initializes the debugger backend for the currently started process.
      */
-    bool InitializeBackend(const char* symbolsDirectory);
+	ErrorCode InitializeBackend(const char* symbolsDirectory);
 
     /**
      * Duplicates a string into the memory of the specified process.

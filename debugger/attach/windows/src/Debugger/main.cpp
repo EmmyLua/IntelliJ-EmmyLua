@@ -46,6 +46,8 @@ void mainLoop() {
 
 int main(int argc, char** argv)
 {
+	ErrorCode code = ErrorCode::OK;
+
 	cxxopts::Options options("EmmyLua", "EmmyLua Debugger");
 	options.add_options()
 		("m,mode", "debug model attach/run", cxxopts::value<std::string>())
@@ -63,9 +65,7 @@ int main(int argc, char** argv)
 		if (mode == "attach") {
 			if (options.count("p")) {
 				int pid = options["p"].as<int>();
-				if (inst.Attach(pid, "")) {
-					//mainLoop();
-				}
+				code = inst.Attach(pid, "");
 			}
 		}
 		else if (mode == "run") {
@@ -91,7 +91,8 @@ int main(int argc, char** argv)
 			}
 
 			if (!cmd.empty()) {
-				if (inst.Start(cmd.c_str(), args.c_str(), wd.c_str(), "", debug, false)) {
+				code = inst.Start(cmd.c_str(), args.c_str(), wd.c_str(), "", debug, false);
+				if (code == ErrorCode::OK) {
 					mainLoop();
 				}
 			}
@@ -101,5 +102,5 @@ int main(int argc, char** argv)
 		auto help = options.help();
 		printf("%s", help.c_str());
 	}
-	return 0;
+	return (int)code;
 }
