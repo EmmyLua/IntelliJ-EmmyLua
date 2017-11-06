@@ -1,21 +1,28 @@
 ﻿#ifndef _LUA_PROFILER_H_
 #define _LUA_PROFILER_H_
 #include <string>
+#include <stack>
+#include <ctime>
 
 class LPFunctionCall
 {
 public:
 	LPFunctionCall();
 
-	size_t id;
+	unsigned int id;
 	std::string file;
 	std::string name;
-	size_t line;
-	size_t count;
-	size_t time;
+	unsigned int line;
+	unsigned int count;
+	unsigned int time;
 
 	bool isDirty;
-	size_t lastTime;
+
+	void Push();
+	void Pop();
+
+private:
+	std::stack<clock_t> m_timeStack;
 };
 
 #endif

@@ -26,7 +26,7 @@ class ProfilerPanel : JPanel(BorderLayout()) {
 
     inner class ProfilerModel : AbstractTableModel() {
 
-        private val names = arrayOf("Function", "Times", "?")
+        private val names = arrayOf("Function", "File", "Line", "Count", "Average time")
 
         private val list = mutableListOf<DMProfilerCall>()
 
@@ -37,6 +37,7 @@ class ProfilerPanel : JPanel(BorderLayout()) {
                 val c = list[i]
                 if (c.id == call.id) {
                     c.count = call.count
+                    c.time = call.time
                     fireTableRowsUpdated(i, i)
                     return
                 }
@@ -54,14 +55,17 @@ class ProfilerPanel : JPanel(BorderLayout()) {
         }
 
         override fun getColumnCount(): Int {
-            return 2
+            return 5
         }
 
         override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
             val call = list[rowIndex]
             return when (columnIndex) {
-                0 -> "${call.functionName}(${call.file})"
-                1 -> call.count
+                0 -> call.functionName
+                1 -> call.file
+                2 -> call.line
+                3 -> call.count
+                4 -> (call.time.toFloat() / call.count.toFloat())
                 else -> "unknown"
             }
         }

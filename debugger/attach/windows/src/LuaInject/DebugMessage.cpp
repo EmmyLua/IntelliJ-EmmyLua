@@ -178,6 +178,8 @@ void DMProfilerData::Write(ByteOutputStream* stream)
 		stream->WriteUInt32(call->id);
 		stream->WriteString(call->file);
 		stream->WriteString(call->name);
+		stream->WriteUInt32(call->line);
 		stream->WriteUInt32(call->count);
+		stream->WriteUInt32(call->time);
 	}
 }

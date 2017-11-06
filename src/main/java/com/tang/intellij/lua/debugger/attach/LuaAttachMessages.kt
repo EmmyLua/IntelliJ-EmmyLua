@@ -353,7 +353,9 @@ class DMRespEvaluate : LuaAttachMessage(DebugMessageId.RespEvaluate) {
 data class DMProfilerCall(val id: Int,
                           val file: String,
                           val functionName: String,
-                          var count: Int)
+                          val line: Int,
+                          var count: Int,
+                          var time: Int)
 
 class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
 
@@ -366,8 +368,10 @@ class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
             val id = stream.readInt()
             val file = stream.readString()
             val function = stream.readString()
+            val line = stream.readInt()
             val count = stream.readInt()
-            val call = DMProfilerCall(id, file, function, count)
+            val time = stream.readInt()
+            val call = DMProfilerCall(id, file, function, line, count, time)
             list.add(call)
         }
     }
