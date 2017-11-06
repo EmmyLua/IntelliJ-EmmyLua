@@ -59,7 +59,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                 if (classDef != null) {
                     val type = classDef.type
                     val superClassName = type.superClassName
-                    if (superClassName != null) {
+                    if (superClassName != null && superClassName != className) {
                         return process(superClassName, fieldName, context, processor)
                     }
                 }
