@@ -606,6 +606,7 @@ private:
 
     CriticalSection                 m_criticalSection;
     CriticalSection                 m_breakLock;
+	CriticalSection                 m_vmsLock;
 
     std::vector<Script*>            m_scripts;
     NameToScriptMap                 m_nameToScript;
