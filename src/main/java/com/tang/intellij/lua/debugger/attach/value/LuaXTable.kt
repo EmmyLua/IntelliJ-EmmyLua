@@ -36,6 +36,8 @@ open class LuaXTable : LuaXValue() {
     private var childrenList: XValueChildrenList? = null
     private val functionList: LuaXFunctionList = LuaXFunctionList()
 
+    private data class XValueItem(val name:String, val node: LuaXValue)
+
     private val evalExpr: String
         get() {
             var name = name
@@ -68,19 +70,21 @@ open class LuaXTable : LuaXValue() {
     }
 
     override fun doParse(node: Node) {
-        super.doParse(node)
+        val list = mutableListOf<XValueItem>()
         val childNodes = node.childNodes
         for (i in 0 until childNodes.length) {
             val item = childNodes.item(i)
             when (item.nodeName) {
-                "element" -> parseChild(item)
+                "element" -> parseChild(item, list)
             }
         }
         if (!functionList.isEmpty())
             childrenList?.add(functionList.name, functionList)
+        list.sortBy { it.name }
+        list.forEach { childrenList?.add(it.name, it.node) }
     }
 
-    private fun parseChild(childNode: Node) {
+    private fun parseChild(childNode: Node, list: MutableList<XValueItem>) {
         if (childrenList == null)
             childrenList = XValueChildrenList()
 
@@ -107,7 +111,7 @@ open class LuaXTable : LuaXValue() {
             if (value is LuaXFunction)
                 functionList.add(value)
             else
-                childrenList?.add(key, value)
+                list.add(XValueItem(key, value))
         }
     }
 

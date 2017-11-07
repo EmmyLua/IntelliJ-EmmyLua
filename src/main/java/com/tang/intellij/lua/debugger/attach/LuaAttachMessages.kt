@@ -296,8 +296,10 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
         stack = LuaExecutionStack(frames)
     }
 
+    private data class XValueItem(val name:String, val node: LuaXValue)
+
     private fun parseValue(stackNode: Node): XValueChildrenList {
-        val list = XValueChildrenList()
+        val sortList = mutableListOf<XValueItem>()
         var valueNode: Node? = stackNode.firstChild
         while (valueNode != null) {
             if (valueNode is Element) {
@@ -312,10 +314,14 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
                     }
                 }
                 value.name = name
-                list.add(name, value)
+                sortList.add(XValueItem(name, value))
             }
             valueNode = valueNode.nextSibling
         }
+        
+        val list = XValueChildrenList()
+        sortList.sortBy { it.name }
+        sortList.forEach { list.add(it.name, it.node) }
         return list
     }
 }
