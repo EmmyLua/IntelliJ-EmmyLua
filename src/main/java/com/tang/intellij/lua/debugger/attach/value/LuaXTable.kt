@@ -34,6 +34,7 @@ import java.util.*
 open class LuaXTable : LuaXValue() {
 
     private var childrenList: XValueChildrenList? = null
+    private val functionList: LuaXFunctionList = LuaXFunctionList()
 
     private val evalExpr: String
         get() {
@@ -75,6 +76,8 @@ open class LuaXTable : LuaXValue() {
                 "element" -> parseChild(item)
             }
         }
+        if (!functionList.isEmpty())
+            childrenList?.add(functionList.name, functionList)
     }
 
     private fun parseChild(childNode: Node) {
@@ -101,7 +104,10 @@ open class LuaXTable : LuaXValue() {
 
         if (key != null && value != null) {
             value.name = key
-            childrenList!!.add(key, value)
+            if (value is LuaXFunction)
+                functionList.add(value)
+            else
+                childrenList?.add(key, value)
         }
     }
 
