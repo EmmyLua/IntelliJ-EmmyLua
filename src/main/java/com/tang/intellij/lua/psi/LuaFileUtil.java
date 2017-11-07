@@ -91,34 +91,47 @@ public class LuaFileUtil {
         shortUrl = shortUrl.replace('\\', '/').trim();
         Module[] modules = ModuleManager.getInstance(project).getModules();
         for (Module module : modules) {
-            String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
+            ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
+            String[] sourceRoots = moduleRootManager.getSourceRootUrls();
             //相对路径
             for (String sourceRoot : sourceRoots) {
-                for (String ext : extensions) {
-                    String fixedURL = shortUrl;
-                    if (shortUrl.endsWith(ext)) { //aa.bb.lua -> aa.bb
-                        fixedURL = shortUrl.substring(0, shortUrl.length() - ext.length());
-                    }
-
-                    //将.转为/，但不处理 ..
-                    if (!fixedURL.contains("/")) {
-                        //aa.bb -> aa/bb.lua
-                        fixedURL = fixedURL.replaceAll("\\.", "/");
-                    }
-
-                    fixedURL = fixedURL + ext;
-
-                    VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + fixedURL);
-                    if (file != null && !file.isDirectory()) {
-                        return file;
-                    }
-                }
+                VirtualFile file = findFile(shortUrl, sourceRoot);
+                if (file != null) return file;
+            }
+            String[] contentRoots = moduleRootManager.getContentRootUrls();
+            for (String root : contentRoots) {
+                VirtualFile file = findFile(shortUrl, root);
+                if (file != null) return file;
             }
         }
 
         //绝对路径
         for (String ext : extensions) {
             VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(shortUrl + ext));
+            if (file != null && !file.isDirectory()) {
+                return file;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private static VirtualFile findFile(String shortUrl, String root) {
+        for (String ext : extensions) {
+            String fixedURL = shortUrl;
+            if (shortUrl.endsWith(ext)) { //aa.bb.lua -> aa.bb
+                fixedURL = shortUrl.substring(0, shortUrl.length() - ext.length());
+            }
+
+            //将.转为/，但不处理 ..
+            if (!fixedURL.contains("/")) {
+                //aa.bb -> aa/bb.lua
+                fixedURL = fixedURL.replaceAll("\\.", "/");
+            }
+
+            fixedURL = fixedURL + ext;
+
+            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(root + "/" + fixedURL);
             if (file != null && !file.isDirectory()) {
                 return file;
             }
