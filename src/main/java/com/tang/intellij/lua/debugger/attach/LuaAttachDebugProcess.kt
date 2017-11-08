@@ -21,9 +21,9 @@ import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunnerLayoutUi
 import com.intellij.execution.ui.layout.PlaceInGrid
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
 import com.intellij.xdebugger.XDebugSession
@@ -45,12 +45,13 @@ import java.util.concurrent.ConcurrentHashMap
  */
 abstract class LuaAttachDebugProcess protected constructor(session: XDebugSession)
     : LuaDebugProcess(session), LuaAttachBridgeBase.ProtoHandler {
+    lateinit var bridge: LuaAttachBridgeBase
     private val editorsProvider: LuaDebuggerEditorsProvider
     private val loadedScriptMap = ConcurrentHashMap<Int, LoadedScript>()
-    lateinit var bridge: LuaAttachBridgeBase
     private lateinit var vmPanel: LuaVMPanel
     private lateinit var memoryFilesPanel: MemoryFilesPanel
     private lateinit var profilerPanel: ProfilerPanel
+    private var toggleProfiler: Boolean = false
 
     init {
         session.setPauseActionSupported(false)
@@ -88,6 +89,14 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         bridge.sendRun()
     }
 
+    var profilerState: Boolean
+        set(value) {
+            val dm = if (value) LuaAttachMessage(DebugMessageId.ReqProfilerBegin)
+            else LuaAttachMessage(DebugMessageId.ReqProfilerEnd)
+            bridge.send(dm)
+        }
+        get() = toggleProfiler
+
     override fun handle(message: LuaAttachMessage) {
         when (message) {
             is DMLoadScript -> onLoadScript(message)
@@ -107,6 +116,8 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                     DebugMessageId.DestroyVM -> {
                         vmPanel.removeVM(message)
                     }
+                    DebugMessageId.RespProfilerBegin -> toggleProfiler = true
+                    DebugMessageId.RespProfilerEnd -> toggleProfiler = false
                     else -> {
                         println("unknown message : ${message.id}")
                     }
@@ -186,9 +197,13 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
 
     override fun registerAdditionalActions(leftToolbar: DefaultActionGroup, topToolbar: DefaultActionGroup, settings: DefaultActionGroup) {
         super.registerAdditionalActions(leftToolbar, topToolbar, settings)
-        topToolbar.add(object : AnAction(LuaIcons.FILE) {
-            override fun actionPerformed(event: AnActionEvent) {
-                bridge.send(LuaAttachMessage(DebugMessageId.ReqProfilerBegin))
+        topToolbar.add(object : ToggleAction("Lua profiler!", null, LuaIcons.Debugger.Actions.PROFILER) {
+            override fun isSelected(event: AnActionEvent): Boolean {
+                return profilerState
+            }
+
+            override fun setSelected(event: AnActionEvent, state: Boolean) {
+                profilerState = state
             }
         })
     }
@@ -219,7 +234,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     private fun createProfilerPanel(ui: RunnerLayoutUi) {
-        profilerPanel = ProfilerPanel()
+        profilerPanel = ProfilerPanel(this)
         val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, profilerPanel, "Profiler", AllIcons.Debugger.Frame, null)
         content.isCloseable = false
         ui.addContent(content, 0, PlaceInGrid.left, false)

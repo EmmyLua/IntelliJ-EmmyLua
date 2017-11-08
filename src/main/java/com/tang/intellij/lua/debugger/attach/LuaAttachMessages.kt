@@ -81,7 +81,9 @@ enum class DebugMessageId
     RespEvaluate,
 
     ReqProfilerBegin,
+    RespProfilerBegin,
     ReqProfilerEnd,
+    RespProfilerEnd,
     RespProfilerData,
 }
 
@@ -114,6 +116,8 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.RespEvaluate -> DMRespEvaluate()
                 DebugMessageId.RespProfilerData -> DMRespProfilerData()
                 DebugMessageId.RespInitialize,
+                DebugMessageId.RespProfilerBegin,
+                DebugMessageId.RespProfilerEnd,
                 DebugMessageId.DestroyVM,
                 DebugMessageId.CreateVM -> LuaAttachMessage(idType)
                 else -> {

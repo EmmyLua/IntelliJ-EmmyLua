@@ -42,7 +42,9 @@ enum class DebugMessageId
 	RespEvaluate,
 
 	ReqProfilerBegin,
+	RespProfilerBegin,
 	ReqProfilerEnd,
+	RespProfilerEnd,
 	RespProfilerData,
 };
 

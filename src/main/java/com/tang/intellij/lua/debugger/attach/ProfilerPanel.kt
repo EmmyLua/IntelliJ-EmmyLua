@@ -24,7 +24,7 @@ import java.awt.BorderLayout
 import java.util.*
 import javax.swing.JPanel
 
-class ProfilerPanel : JPanel(BorderLayout()) {
+class ProfilerPanel(val process: LuaAttachDebugProcess) : JPanel(BorderLayout()) {
 
     inner class CallColumnInfo(name: String, val index: Int) : ColumnInfo<DMProfilerCall, String>(name) {
 
