@@ -18,19 +18,57 @@ package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.table.JBTable
+import com.intellij.util.ui.ColumnInfo
+import com.intellij.util.ui.ListTableModel
 import java.awt.BorderLayout
+import java.util.*
 import javax.swing.JPanel
-import javax.swing.table.AbstractTableModel
 
 class ProfilerPanel : JPanel(BorderLayout()) {
 
-    inner class ProfilerModel : AbstractTableModel() {
+    inner class CallColumnInfo(name: String, val index: Int) : ColumnInfo<DMProfilerCall, String>(name) {
 
-        private val names = arrayOf("Function", "File", "Line", "Count", "Average time")
+        private val comparator = Comparator<DMProfilerCall> { o1, o2 ->
+            return@Comparator when (index) {
+                0 -> o1.functionName.compareTo(o2.functionName)
+                1 -> {
+                    var r = o1.file.compareTo(o2.file)
+                    if (r == 0) r = o1.line.compareTo(o2.line)
+                    r
+                }
+                2 -> o1.line.compareTo(o2.line)
+                3 -> o1.count.compareTo(o2.count)
+                4 -> o1.time.compareTo(o2.time)
+                else -> 0
+            }
+        }
 
+        override fun valueOf(call: DMProfilerCall): String {
+            return when (index) {
+                0 -> call.functionName
+                1 -> call.file
+                2 -> call.line.toString()
+                3 -> call.count.toString()
+                4 -> (call.time.toFloat() / call.count.toFloat()).toString()
+                else -> "unknown"
+            }
+        }
+
+        override fun getComparator() = comparator
+    }
+
+    inner class ProfilerModel : ListTableModel<DMProfilerCall>(
+            CallColumnInfo("Function", 0),
+            CallColumnInfo("File", 1),
+            CallColumnInfo("Line", 2),
+            CallColumnInfo("Count", 3),
+            CallColumnInfo("Average time", 4)
+    ) {
         private val list = mutableListOf<DMProfilerCall>()
 
-        override fun getColumnName(column: Int) = names[column]
+        init {
+            items = list
+        }
 
         fun update(call: DMProfilerCall) {
             for (i in 0 until list.size) {
@@ -42,34 +80,10 @@ class ProfilerPanel : JPanel(BorderLayout()) {
                     return
                 }
             }
-            add(call)
-        }
-
-        fun add(call: DMProfilerCall) {
-            list.add(call)
-            fireTableRowsInserted(list.size - 1, list.size - 1)
-        }
-
-        override fun getRowCount(): Int {
-            return list.size
-        }
-
-        override fun getColumnCount(): Int {
-            return 5
-        }
-
-        override fun getValueAt(rowIndex: Int, columnIndex: Int): Any {
-            val call = list[rowIndex]
-            return when (columnIndex) {
-                0 -> call.functionName
-                1 -> call.file
-                2 -> call.line
-                3 -> call.count
-                4 -> (call.time.toFloat() / call.count.toFloat())
-                else -> "unknown"
-            }
+            addRow(call)
         }
     }
+
     private val model = ProfilerModel()
     private val table = JBTable(model)
 

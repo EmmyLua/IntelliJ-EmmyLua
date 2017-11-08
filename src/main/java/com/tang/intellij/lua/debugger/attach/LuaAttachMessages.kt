@@ -318,7 +318,7 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
             }
             valueNode = valueNode.nextSibling
         }
-        
+
         val list = XValueChildrenList()
         sortList.sortBy { it.name }
         sortList.forEach { list.add(it.name, it.node) }
