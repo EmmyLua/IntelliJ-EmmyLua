@@ -3,6 +3,9 @@
 #include <vector>
 #include "Protocol.h"
 
+class StackNode;
+class StackNodeContainer;
+class EvalResultNode;
 class ByteInputStream;
 class ByteOutputStream;
 struct lua_State;
@@ -145,11 +148,11 @@ public:
 class DMBreak : public DebugMessage
 {
 public:
-	DMBreak();
+	DMBreak(StackNodeContainer* stacks);
 
 	void Write(ByteOutputStream* stream) override;
 
-	std::string stackXML;
+	StackNodeContainer* stackList;
 };
 
 class DMDelBreakpoint : public DebugMessage
@@ -183,9 +186,8 @@ public:
 
 	void Write(ByteOutputStream* stream) override;
 
-	bool success;
 	unsigned int evalId;
-	std::string result;
+	EvalResultNode* result;
 };
 
 class DMNameVM : public DebugMessage

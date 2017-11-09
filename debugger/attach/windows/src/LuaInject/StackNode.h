@@ -6,10 +6,18 @@ class ByteOutputStream;
 
 enum class StackNodeId
 {
+	List,
+	Eval,
+	StackRoot,
+
 	Table,
 	Function,
 	UserData,
-	Binary
+	String,
+	Binary,
+	Primitive,
+
+	Error,
 };
 
 class StackNode
@@ -19,12 +27,22 @@ public:
 	virtual ~StackNode() = default;
 	virtual void Write(ByteOutputStream* stream);
 
-	std::string key;
 private:
 	StackNodeId id;
 };
 
-class StackNodeContainer : StackNode
+class StackLuaObjectNode : public StackNode
+{
+public:
+	StackLuaObjectNode(StackNodeId id) : StackNode(id) {}
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string name;
+	std::string type;
+};
+
+class StackNodeContainer : public StackNode
 {
 public:
 	explicit StackNodeContainer(StackNodeId id)
@@ -33,27 +51,124 @@ public:
 	}
 
 	void AddChild(StackNode* child);
+	void Write(ByteOutputStream* stream) override;
 
 	~StackNodeContainer();
-protected:
-	void WriteChildren(ByteOutputStream* stream);
+
 private:
+	void WriteChildren(ByteOutputStream* stream);
+
 	std::vector<StackNode*> m_children;
 };
 
-class StackNodeTable : StackNodeContainer
+class EvalResultNode : public StackNodeContainer
 {
 public:
-	StackNodeTable();
+	EvalResultNode();
+
+	void Write(ByteOutputStream* stream) override;
+
+	bool success;
+	std::string error;
 };
 
-class StackNodeBinary : StackNode
+class StackRootNode : public StackNodeContainer
 {
 public:
-	StackNodeBinary();
+	StackRootNode();
+
+	void Write(ByteOutputStream* stream) override;
+
+	int scriptIndex;
+	int line;
+	std::string functionName;
+};
+
+class StackTableNode : public StackLuaObjectNode
+{
+	struct KVPair
+	{
+		StackNode* key;
+		StackNode* value;
+	};
+public:
+	StackTableNode();
+
+	~StackTableNode();
+
+	void AddChild(StackNode* key, StackNode* value);
+
+	void Write(ByteOutputStream* stream) override;
+private:
+	std::vector<KVPair*> list;
+};
+
+class StackFunctionNode : public StackLuaObjectNode
+{
+public:
+	StackFunctionNode();
+	
+	void Write(ByteOutputStream* stream) override;
+
+	int scriptIndex;
+	int line;
+};
+
+class StackBinaryNode : public StackLuaObjectNode
+{
+public:
+	StackBinaryNode();
 
 	void Write(ByteOutputStream* stream) override;
 
 	char* data;
 	size_t size;
+};
+
+class StackStringNode : public StackLuaObjectNode
+{
+public:
+	StackStringNode(std::string& data);
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string value;
+};
+
+class StackErrorNode : public StackLuaObjectNode
+{
+public:
+	StackErrorNode(const std::string& message)
+		: StackLuaObjectNode(StackNodeId::Error)
+	{
+		this->message = message;
+	}
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string message;
+};
+
+class StackUserData : public StackLuaObjectNode
+{
+public:
+	StackUserData(std::string toString);
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string toString;
+};
+
+class StackPrimitiveNode : public StackLuaObjectNode
+{
+public:
+	StackPrimitiveNode(std::string& data)
+		: StackLuaObjectNode(StackNodeId::Primitive)
+	{
+		this->value = data;
+	}
+
+	void Write(ByteOutputStream* stream) override;
+
+	std::string value;
 };

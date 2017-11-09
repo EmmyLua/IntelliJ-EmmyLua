@@ -38,6 +38,9 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 // Forward declarations.
 //
 
+class StackNode;
+class StackLuaObjectNode;
+class EvalResultNode;
 class TiXmlNode;
 class DebugPipeline;
 class DebugMessage;
@@ -133,7 +136,7 @@ public:
      * Evalates the expression. If there was an error evaluating the expression the
      * method returns false and the error message is stored in the result.
      */
-    bool Evaluate(LAPI api, lua_State* L, const std::string& expression, int stackLevel, int depth, std::string& result);
+	EvalResultNode* Evaluate(LAPI api, lua_State* L, const std::string& expression, int stackLevel, int depth);
 
     /**
      * Toggles a breakpoint on the line on or off.
@@ -230,7 +233,7 @@ public:
 	* Gets the value at location n on the stack as text. If expandTable is true
 	* then tables will be returned in their expanded form (i.e. "{ ... }")
 	*/
-	TiXmlNode* GetValueAsText(LAPI api, lua_State* L, int n, int maxDepth = 10, const char* typeNameOverride = nullptr, bool displayAsKey = false, bool askEmmy = true) const;
+	StackLuaObjectNode* GetValueAsText(LAPI api, lua_State* L, int n, int maxDepth = 10, const char* typeNameOverride = nullptr, bool displayAsKey = false, bool askEmmy = true) const;
 
 	/**
 	* Returns the index of the API that the VM was created in.
@@ -291,13 +294,12 @@ private:
 
     struct EvaluateData
     {
-		bool success;
 		lua_State* L;
 		LAPI api;
         int             stackLevel;
 		int				depth;
         std::string     expression;
-        std::string     result;
+		EvalResultNode* result;
     };
 
     /**
@@ -359,13 +361,13 @@ private:
      * Gets the value at location n on the stack as text. If expandTable is true
      * then tables will be returned in their expanded form (i.e. "{ ... }")
      */
-    TiXmlNode* GetLuaBindClassValue(LAPI api, lua_State* L, unsigned int maxDepth, bool displayAsKey = false) const;
+	StackNode* GetLuaBindClassValue(LAPI api, lua_State* L, unsigned int maxDepth, bool displayAsKey = false) const;
 
     /**
      * Gets the table value at location n on the stack as text. Nested tables are
      * not expanded.
      */
-    TiXmlNode* GetTableAsText(LAPI api, lua_State* L, int t, int maxDepth = 10, const char* typeNameOverride = NULL) const;
+	StackLuaObjectNode* GetTableAsText(LAPI api, lua_State* L, int t, int maxDepth = 10, const char* typeNameOverride = NULL) const;
 
     /**
      * Returns true if the name belongs to a Lua internal variable that we

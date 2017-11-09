@@ -1,6 +1,7 @@
 ﻿#include "DebugMessage.h"
 #include "Stream.h"
 #include "LuaProfiler.h"
+#include "StackNode.h"
 
 DebugMessage::DebugMessage(DebugMessageId idValue) : id(idValue), L(nullptr)
 {
@@ -98,14 +99,14 @@ void DMSetBreakpoint::Write(ByteOutputStream* stream)
 	stream->WriteUInt32(success);
 }
 
-DMBreak::DMBreak(): DebugMessage(DebugMessageId::Break)
+DMBreak::DMBreak(StackNodeContainer* stacks): DebugMessage(DebugMessageId::Break), stackList(stacks)
 {
 }
 
 void DMBreak::Write(ByteOutputStream* stream)
 {
 	DebugMessage::Write(stream);
-	stream->WriteString(stackXML);
+	stackList->Write(stream);
 }
 
 DMDelBreakpoint::DMDelBreakpoint() : DebugMessage(DebugMessageId::DelBreakpoint), scriptIndex(0),
@@ -134,16 +135,17 @@ void DMReqEvaluate::Read(ByteInputStream* stream)
 	stream->ReadString(expression);
 }
 
-DMRespEvaluate::DMRespEvaluate(): DebugMessage(DebugMessageId::RespEvaluate), success(false), evalId(0)
+DMRespEvaluate::DMRespEvaluate(): DebugMessage(DebugMessageId::RespEvaluate), evalId(0), result(nullptr)
 {
 }
 
 void DMRespEvaluate::Write(ByteOutputStream* stream)
 {
 	DebugMessage::Write(stream);
-	stream->WriteUInt32(success);
 	stream->WriteUInt32(evalId);
-	stream->WriteString(result);
+	stream->WriteBool(result != nullptr);
+	if (result != nullptr)
+		result->Write(stream);
 }
 
 DMNameVM::DMNameVM(): DebugMessage(DebugMessageId::NameVM)
