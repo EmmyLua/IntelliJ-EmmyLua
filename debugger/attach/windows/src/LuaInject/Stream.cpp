@@ -71,7 +71,7 @@ ByteOutputStream::~ByteOutputStream()
 	free(m_buff);
 }
 
-void ByteOutputStream::Write(void * data, int size)
+void ByteOutputStream::Write(void * data, size_t size)
 {
 	assert(m_position + size <= m_size);
 	memcpy(m_buff + m_position, data, size);

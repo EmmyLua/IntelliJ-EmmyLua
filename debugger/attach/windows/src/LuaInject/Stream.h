@@ -4,8 +4,8 @@
 class ByteInputStream
 {
 	char* m_buff;
-	int m_size;
-	int m_position;
+	size_t m_size;
+	size_t m_position;
 public:
 	ByteInputStream(char* buff, int size);
 	~ByteInputStream();
@@ -32,12 +32,12 @@ class ByteOutputStream
 {
 	char* m_buff;
 	size_t m_size;
-	int m_position;
+	size_t m_position;
 public:
 	ByteOutputStream();
 	~ByteOutputStream();
 
-	void Write(void* data, int size);
+	void Write(void* data, size_t size);
 
 	void WriteUInt32(unsigned int value);
 
@@ -53,7 +53,7 @@ public:
 
 	size_t GetSize() const { return m_size; }
 
-	int GetPositon() { return m_position; }
+	size_t GetPositon() { return m_position; }
 
 	void Reset() { m_position = 0; }
 };

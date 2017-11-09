@@ -28,6 +28,7 @@
     <ClCompile Include="LuaInject\LuaDll.cpp" />
     <ClCompile Include="LuaInject\DllMain.cpp" />
     <ClCompile Include="LuaInject\LuaProfiler.cpp" />
+    <ClCompile Include="LuaInject\StackNode.cpp" />
     <ClCompile Include="LuaInject\Stream.cpp" />
     <ClCompile Include="LuaInject\TCPServer.cpp" />
   </ItemGroup>
@@ -41,6 +42,7 @@
     <ClInclude Include="LuaInject\LuaDll.h" />
     <ClInclude Include="LuaInject\LuaProfiler.h" />
     <ClInclude Include="LuaInject\LuaTypes.h" />
+    <ClInclude Include="LuaInject\StackNode.h" />
     <ClInclude Include="LuaInject\Stream.h" />
     <ClInclude Include="LuaInject\TCPServer.h" />
   </ItemGroup>

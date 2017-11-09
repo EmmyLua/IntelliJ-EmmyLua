@@ -52,6 +52,8 @@ class StackNodeBinary : StackNode
 public:
 	StackNodeBinary();
 
+	void Write(ByteOutputStream* stream) override;
+
 	char* data;
 	size_t size;
 };

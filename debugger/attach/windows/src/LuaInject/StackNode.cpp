@@ -40,3 +40,10 @@ StackNodeTable::StackNodeTable(): StackNodeContainer(StackNodeId::Table)
 StackNodeBinary::StackNodeBinary(): StackNode(StackNodeId::Binary), data(nullptr), size(0)
 {
 }
+
+void StackNodeBinary::Write(ByteOutputStream* stream)
+{
+	StackNode::Write(stream);
+	stream->WriteSize(size);
+	stream->Write(data, size);
+}

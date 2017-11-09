@@ -168,8 +168,8 @@ void DebugClient::startup()
 
 bool DebugClient::sendMsg(const char * data, size_t size)
 {
-	int leftSize = size;
-	int totalSend = 0;
+	size_t leftSize = size;
+	size_t totalSend = 0;
 	while (leftSize > 0)
 	{
 		int sendCount = send(m_socket, data + totalSend, leftSize, 0);
