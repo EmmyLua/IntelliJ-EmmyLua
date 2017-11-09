@@ -103,6 +103,12 @@ DMBreak::DMBreak(StackNodeContainer* stacks): DebugMessage(DebugMessageId::Break
 {
 }
 
+DMBreak::~DMBreak()
+{
+	if (stackList != nullptr)
+		delete stackList;
+}
+
 void DMBreak::Write(ByteOutputStream* stream)
 {
 	DebugMessage::Write(stream);
@@ -137,6 +143,12 @@ void DMReqEvaluate::Read(ByteInputStream* stream)
 
 DMRespEvaluate::DMRespEvaluate(): DebugMessage(DebugMessageId::RespEvaluate), evalId(0), result(nullptr)
 {
+}
+
+DMRespEvaluate::~DMRespEvaluate()
+{
+	if (result != nullptr)
+		delete result;
 }
 
 void DMRespEvaluate::Write(ByteOutputStream* stream)

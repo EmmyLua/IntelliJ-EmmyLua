@@ -16,36 +16,32 @@
 
 package com.tang.intellij.lua.debugger.attach.value
 
-import com.intellij.icons.AllIcons
-import com.intellij.xdebugger.frame.XCompositeNode
-import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
+import com.tang.intellij.lua.debugger.LuaXStringPresentation
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.readString
+import java.io.DataInputStream
 
-class LuaXFunctionList(L: Long, process: LuaAttachDebugProcess)
-    : LuaXValue(L, process) {
-    init {
-        name = "Functions"
+class LuaXString (L: Long, process: LuaAttachDebugProcess)
+    : LuaXObjectValue(StackNodeId.String, L, process) {
+
+    private var data: String? = null
+
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        data = stream.readString()
     }
-
-    private val list = mutableListOf<LuaXFunction>()
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
-        xValueNode.setPresentation(AllIcons.Json.Object, name, "${list.size} function(s)", true)
+        var value = data
+        if (value!!.startsWith("\""))
+            value = value.substring(1, value.length - 1)
+
+        xValueNode.setPresentation(null, LuaXStringPresentation(value), false)
     }
 
-    override fun computeChildren(node: XCompositeNode) {
-        val childrenList = XValueChildrenList()
-        list.forEach { childrenList.add(it.name, it) }
-        node.addChildren(childrenList, true)
-    }
-
-    fun add(f: LuaXFunction) {
-        list.add(f)
-    }
-
-    fun isEmpty(): Boolean {
-        return list.isEmpty()
+    override fun toKeyString(): String {
+        return data!!
     }
 }

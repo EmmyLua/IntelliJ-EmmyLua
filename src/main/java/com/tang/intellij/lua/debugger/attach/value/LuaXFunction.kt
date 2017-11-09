@@ -18,20 +18,28 @@ package com.tang.intellij.lua.debugger.attach.value
 
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
 import com.tang.intellij.lua.lang.LuaIcons
-import org.w3c.dom.Node
+import java.io.DataInputStream
 
 /**
  * function
  * Created by tangzx on 2017/4/2.
  */
-class LuaXFunction : LuaXValue() {
+class LuaXFunction(L: Long, process: LuaAttachDebugProcess)
+    : LuaXObjectValue(StackNodeId.Function, L, process) {
 
     var line: Int = 0
         private set
     private var script: Int = 0
 
-    override fun doParse(node: Node) {
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        script = stream.readInt()
+        line = stream.readInt()
+    }
+
+    /*override fun doParse(node: Node) {
         super.doParse(node)
         var child: Node? = node.firstChild
         while (child != null) {
@@ -41,11 +49,11 @@ class LuaXFunction : LuaXValue() {
             }
             child = child.nextSibling
         }
-    }
+    }*/
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
         val info = if (line >= 0 && script >= 0) {
-            val loadedScript = process!!.getScript(this.script)
+            val loadedScript = process.getScript(this.script)
             if (loadedScript != null) {
                 String.format("line:%d, script:%s", line, loadedScript.name)
             } else {

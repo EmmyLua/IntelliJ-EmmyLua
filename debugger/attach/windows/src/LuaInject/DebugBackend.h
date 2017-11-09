@@ -40,6 +40,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 
 class StackNode;
 class StackLuaObjectNode;
+class StackTableNode;
 class EvalResultNode;
 class TiXmlNode;
 class DebugPipeline;
@@ -367,7 +368,7 @@ private:
      * Gets the table value at location n on the stack as text. Nested tables are
      * not expanded.
      */
-	StackLuaObjectNode* GetTableAsText(LAPI api, lua_State* L, int t, int maxDepth = 10, const char* typeNameOverride = NULL) const;
+	StackTableNode* GetTableAsText(LAPI api, lua_State* L, int t, int maxDepth = 10, const char* typeNameOverride = NULL) const;
 
     /**
      * Returns true if the name belongs to a Lua internal variable that we

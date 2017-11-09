@@ -84,6 +84,7 @@ public class LuaFileUtil {
         return list;
     }
 
+    @Nullable
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
         if (shortUrl == null)
             return null;

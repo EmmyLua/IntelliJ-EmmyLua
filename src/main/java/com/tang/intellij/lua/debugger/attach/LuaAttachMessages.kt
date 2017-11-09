@@ -22,15 +22,10 @@ import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.LuaExecutionStack
-import com.tang.intellij.lua.debugger.attach.value.LuaXValue
+import com.tang.intellij.lua.debugger.attach.value.*
 import com.tang.intellij.lua.psi.LuaFileUtil
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.DataOutputStream
-import java.util.*
-import javax.xml.parsers.DocumentBuilderFactory
 
 enum class ErrorCode
 {
@@ -136,11 +131,19 @@ fun DataOutputStream.writeString(s: String) {
     write(s.toByteArray())
 }
 
+fun DataOutputStream.writeSize(size: Long) {
+    writeLong(size)
+}
+
 fun DataInputStream.readString(): String {
     val len = this.readInt()
     val bytes = ByteArray(len)
     this.read(bytes)
     return String(bytes)
+}
+
+fun DataInputStream.readSize(): Long {
+    return readLong()
 }
 
 class DMReqInitialize(private val symbolsDirectory: String, private val emmyLuaFile: String)
@@ -242,7 +245,7 @@ class DMAddBreakpoint(private val scriptIndex: Int,
 }
 
 class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
-    private lateinit var stackXML: String
+    private lateinit var stacks: StackNodeContainer
     lateinit var stack: LuaExecutionStack
         private set
     var name: String? = null
@@ -252,21 +255,43 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
-        stackXML = stream.readString()
-        try {
-            val builderFactory = DocumentBuilderFactory.newInstance()
-            val documentBuilder = builderFactory.newDocumentBuilder()
+        val frames = mutableListOf<XStackFrame>()
+        stacks = readNode(stream, L, process) as StackNodeContainer
+        var stackIndex = 0
+        stacks.children.forEach {
+            val stack = it as StackRootNode
+            val childList = XValueChildrenList()
+            stack.children.forEach {
+                val value = it as LuaXValue
+                childList.add(value.name, value)
+            }
 
-            val document = documentBuilder.parse(ByteArrayInputStream(stackXML.toByteArray(charset("UTF-8"))))
-            val root = document.documentElement
-            parseStack(root)
-        } catch (e: Exception) {
-            println("Parse exception:")
-            println(stackXML)
+            val script = process.getScript(stack.scriptIndex)
+            var position: XSourcePosition? = null
+            if (script != null) {
+                val file = LuaFileUtil.findFile(process.session?.project!!, script.name)
+                if (file != null) {
+                    position = XSourcePositionImpl.create(file, stack.line)
+
+                    if (name == null) {
+                        this.line = stack.line
+                        this.name = script.name
+                    }
+                }
+            }
+
+            val frame = LuaAttachStackFrame(this,
+                    childList,
+                    position,
+                    stack.functionName,
+                    script?.name,
+                    stackIndex++)
+            frames.add(frame)
         }
+        stack = LuaExecutionStack(frames)
     }
 
-    private fun parseStack(item: Element) {
+    /*private fun parseStack(item: Element) {
         val frames = ArrayList<XStackFrame>()
         val nodeList = item.getElementsByTagName("stack")
         for (stackIndex in 0 until nodeList.length) {
@@ -327,7 +352,7 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
         sortList.sortBy { it.name }
         sortList.forEach { list.add(it.name, it.node) }
         return list
-    }
+    }*/
 }
 
 class DMDelBreakpoint(private val scriptIndex: Int,
@@ -357,21 +382,19 @@ class DMReqEvaluate(L: Long, private val evalId: Int,
 
 class DMRespEvaluate : LuaAttachMessage(DebugMessageId.RespEvaluate) {
 
-    var xValue: LuaXValue? = null
+    lateinit var resultNode: EvalResultNode
         private set
     var success: Boolean = false
         private set
     var evalId: Int = 0
         private set
-    private lateinit var result: String
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
 
-        success = stream.readInt() == 1
         evalId = stream.readInt()
-        result = stream.readString()
-        xValue = LuaXValue.parse(result, L, process)
+        success = stream.readBoolean()
+        resultNode = readNode(stream, L, process) as EvalResultNode
     }
 }
 

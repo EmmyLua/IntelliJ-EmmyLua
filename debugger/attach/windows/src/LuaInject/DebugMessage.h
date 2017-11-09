@@ -3,7 +3,6 @@
 #include <vector>
 #include "Protocol.h"
 
-class StackNode;
 class StackNodeContainer;
 class EvalResultNode;
 class ByteInputStream;
@@ -149,6 +148,7 @@ class DMBreak : public DebugMessage
 {
 public:
 	DMBreak(StackNodeContainer* stacks);
+	~DMBreak();
 
 	void Write(ByteOutputStream* stream) override;
 
@@ -183,6 +183,7 @@ class DMRespEvaluate : public DebugMessage
 {
 public:
 	DMRespEvaluate();
+	~DMRespEvaluate();
 
 	void Write(ByteOutputStream* stream) override;
 

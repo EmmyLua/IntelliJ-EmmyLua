@@ -26,26 +26,42 @@ import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.readString
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
+import java.io.DataInputStream
 import javax.xml.parsers.DocumentBuilderFactory
+
+enum class StackNodeId
+{
+    List,
+    Eval,
+    StackRoot,
+
+    Table,
+    Function,
+    UserData,
+    String,
+    Binary,
+    Primitive,
+
+    Error,
+}
 
 /**
  *
  * Created by tangzx on 2017/4/2.
  */
-abstract class LuaXValue : XValue() {
-    protected var process: LuaAttachDebugProcess? = null
+abstract class LuaXValue(override val L:Long,
+                         override val process: LuaAttachDebugProcess) : XValue(), IStackNode {
+
     var name: String? = null
     var parent: LuaXValue? = null
-    var L: Long = 0
+
+    lateinit var type: String
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
-
-    }
-
-    open fun doParse(node: Node) {
 
     }
 
@@ -54,42 +70,17 @@ abstract class LuaXValue : XValue() {
     }
 
     override fun computeSourcePosition(xNavigable: XNavigatable) {
-        if (name != null && process != null) {
-            computeSourcePosition(xNavigable, name!!, process!!.session)
+        if (name != null) {
+            computeSourcePosition(xNavigable, name!!, process.session)
         }
     }
 
+    override fun read(stream: DataInputStream) {
+        name = stream.readString()
+        type = stream.readString()
+    }
+
     companion object {
-
-        fun parse(data: String, L: Long, process: LuaAttachDebugProcess): LuaXValue? {
-            val builderFactory = DocumentBuilderFactory.newInstance()
-            try {
-                val documentBuilder = builderFactory.newDocumentBuilder()
-                val document = documentBuilder.parse(ByteArrayInputStream(data.toByteArray()))
-                val root = document.documentElement
-                return parse(root, L, process)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            return null
-        }
-
-        fun parse(node: Node, L: Long, process: LuaAttachDebugProcess): LuaXValue {
-            val nodeName = node.nodeName
-            val value: LuaXValue = when (nodeName) {
-                "userdata" -> LuaXUserdata()
-                "table" -> LuaXTable()
-                "value" -> LuaXPrimitive()
-                "function" -> LuaXFunction()
-                else -> LuaXUserdata()
-            }
-            value.L = L
-            value.process = process
-            value.doParse(node)
-            return value
-        }
-
         fun computeSourcePosition(xNavigable: XNavigatable, name: String, session: XDebugSession) {
             val currentPosition = session.currentPosition
             if (currentPosition != null) {
@@ -115,3 +106,6 @@ abstract class LuaXValue : XValue() {
         }
     }
 }
+
+open class LuaXObjectValue(val id: StackNodeId, L: Long, process: LuaAttachDebugProcess)
+    : LuaXValue(L, process)

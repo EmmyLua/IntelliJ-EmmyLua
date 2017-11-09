@@ -96,8 +96,8 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
     private fun handleEvalCallback(proto: DMRespEvaluate) {
         val info = callbackMap.remove(proto.evalId)
         if (info != null) {
-            val xValue = proto.xValue
-            xValue?.name = info.expr
+            val xValue = proto.resultNode.value
+            xValue.name = info.expr
             info.callback?.onResult(proto)
         }
     }
@@ -130,7 +130,8 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val sessi
                 handleMsg(bytes)
             }
         } catch (e: Exception) {
-            println("----------> " + e.message)
+            e.printStackTrace()
+            println("----------> " + e.stackTrace)
             session.stop()
         }
     }

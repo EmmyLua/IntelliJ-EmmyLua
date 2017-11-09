@@ -21,22 +21,21 @@ import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
-import com.tang.intellij.lua.debugger.attach.DMRespEvaluate
-import com.tang.intellij.lua.debugger.attach.LuaAttachBridgeBase
-import com.tang.intellij.lua.debugger.attach.LuaAttachStackFrame
-import org.w3c.dom.Node
+import com.tang.intellij.lua.debugger.attach.*
+import java.io.DataInputStream
 import java.util.*
 
 /**
  *
  * Created by tangzx on 2017/4/2.
  */
-open class LuaXTable : LuaXValue() {
+open class LuaXTable(L: Long, process: LuaAttachDebugProcess)
+    : LuaXObjectValue(StackNodeId.Table, L, process), IStackNode {
 
+    private val children = mutableListOf<LuaXValue>()
     private var childrenList: XValueChildrenList? = null
-    private val functionList: LuaXFunctionList = LuaXFunctionList()
-
-    private data class XValueItem(val name:String, val node: LuaXValue)
+    private val functionList: LuaXFunctionList = LuaXFunctionList(L, process)
+    private var deep = false
 
     private val evalExpr: String
         get() {
@@ -66,75 +65,62 @@ open class LuaXTable : LuaXValue() {
         }
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
-        xValueNode.setPresentation(AllIcons.Json.Object, "table", "", true)
+        val type = if (this.type.isEmpty()) "table" else type
+        xValueNode.setPresentation(AllIcons.Json.Object, type, "", true)
     }
 
-    override fun doParse(node: Node) {
-        val list = mutableListOf<XValueItem>()
-        val childNodes = node.childNodes
-        for (i in 0 until childNodes.length) {
-            val item = childNodes.item(i)
-            when (item.nodeName) {
-                "element" -> parseChild(item, list)
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        deep = stream.readBoolean()
+        if (deep) {
+            val size = stream.readSize()
+            for (i in 0 until size) {
+                val key = readNode(stream, L, process) as LuaXValue
+                val value = readNode(stream, L, process) as LuaXValue
+                val name = key.toKeyString()
+                value.name = name
+                add(value)
             }
+            sort()
         }
+    }
+
+    private fun add(value: LuaXValue) {
+        value.parent = this
+        children.add(value)
+    }
+
+    private fun sort() {
+        deep = true
+        val sortList = mutableListOf<LuaXValue>()
+        children.forEach {
+            if (it is LuaXFunction) {
+                functionList.add(it)
+            } else sortList.add(it)
+        }
+        val list = XValueChildrenList()
         if (!functionList.isEmpty())
-            childrenList?.add(functionList.name, functionList)
-        list.sortBy { it.name }
-        list.forEach { childrenList?.add(it.name, it.node) }
-    }
-
-    private fun parseChild(childNode: Node, list: MutableList<XValueItem>) {
-        if (childrenList == null)
-            childrenList = XValueChildrenList()
-
-        val childNodes = childNode.childNodes
-        var key: String? = null
-        var value: LuaXValue? = null
-        for (i in 0 until childNodes.length) {
-            val item = childNodes.item(i)
-            val content = item.firstChild
-            when (item.nodeName) {
-                "key" -> {
-                    val keyV = LuaXValue.parse(content, L, process!!)
-                    key = keyV.toKeyString()
-                }
-                "data" -> {
-                    value = LuaXValue.parse(content, L, process!!)
-                    value.parent = this
-                }
-            }
-        }
-
-        if (key != null && value != null) {
-            value.name = key
-            if (value is LuaXFunction)
-                functionList.add(value)
-            else
-                list.add(XValueItem(key, value))
-        }
+            list.add(functionList.name, functionList)
+        sortList.sortBy { it.name }
+        sortList.forEach { list.add(it.name, it) }
+        childrenList = list
     }
 
     override fun computeChildren(node: XCompositeNode) {
         if (childrenList == null) {
-            val frame = process!!.session.currentStackFrame as LuaAttachStackFrame? ?: return
+            val frame = process.session.currentStackFrame as? LuaAttachStackFrame ?: return
 
-            process?.bridge?.eval(L, evalExpr, frame.stack, 2, object : LuaAttachBridgeBase.EvalCallback {
+            process.bridge.eval(L, evalExpr, frame.stack, 2, object : LuaAttachBridgeBase.EvalCallback {
                 override fun onResult(result: DMRespEvaluate) {
-                    val value = result.xValue
-                    childrenList = XValueChildrenList()
+                    val value = result.resultNode.value
                     if (value is LuaXTable) {
-                        if (value.childrenList != null) {
-                            for (i in 0 until value.childrenList!!.size()) {
-                                val child = value.childrenList!!.getValue(i) as LuaXValue
-                                child.parent = this@LuaXTable
-                                childrenList!!.add(child.name, child)
-                            }
+                        value.children.forEach {
+                            add(it)
                         }
                     }
+                    sort()
                     node.addChildren(childrenList!!, true)
                 }
-
             })
         } else
             node.addChildren(childrenList!!, true)

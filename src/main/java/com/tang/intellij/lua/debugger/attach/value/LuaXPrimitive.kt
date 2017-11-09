@@ -19,42 +19,30 @@ package com.tang.intellij.lua.debugger.attach.value
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.tang.intellij.lua.debugger.LuaXNumberPresentation
-import com.tang.intellij.lua.debugger.LuaXStringPresentation
 import com.tang.intellij.lua.debugger.LuaXValuePresentation
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.readString
 import com.tang.intellij.lua.highlighting.LuaHighlightingData
-import org.w3c.dom.Node
+import java.io.DataInputStream
 
 /**
  *
  * Created by tangzx on 2017/4/2.
  */
-class LuaXPrimitive : LuaXValue() {
-    private var type: String? = null
+class LuaXPrimitive (L: Long, process: LuaAttachDebugProcess)
+    : LuaXObjectValue(StackNodeId.Primitive, L, process) {
+
     private var data: String? = null
 
-    override fun doParse(node: Node) {
-        super.doParse(node)
-        val childNodes = node.childNodes
-        for (i in 0 until childNodes.length) {
-            val item = childNodes.item(i)
-            when (item.nodeName) {
-                "type" -> type = item.textContent
-                "data" -> data = item.textContent
-            }
-        }
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        data = stream.readString()
     }
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
         when (type) {
-            "boolean" -> xValueNode.setPresentation(null, LuaXValuePresentation(type!!, data!!, LuaHighlightingData.PRIMITIVE_TYPE), false)
+            "boolean" -> xValueNode.setPresentation(null, LuaXValuePresentation(type, data!!, LuaHighlightingData.PRIMITIVE_TYPE), false)
             "number" -> xValueNode.setPresentation(null, LuaXNumberPresentation(data!!), false)
-            "string" -> {
-                var value = data
-                if (value!!.startsWith("\""))
-                    value = value.substring(1, value.length - 1)
-
-                xValueNode.setPresentation(null, LuaXStringPresentation(value), false)
-            }
             else -> xValueNode.setPresentation(null, type, data!!, false)
         }
     }

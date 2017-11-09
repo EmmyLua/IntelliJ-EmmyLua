@@ -16,36 +16,32 @@
 
 package com.tang.intellij.lua.debugger.attach.value
 
-import com.intellij.icons.AllIcons
 import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
 
-class LuaXFunctionList(L: Long, process: LuaAttachDebugProcess)
+class LuaXMultiValue(L: Long, process: LuaAttachDebugProcess)
     : LuaXValue(L, process) {
+
     init {
-        name = "Functions"
+        name = "multi-value"
     }
 
-    private val list = mutableListOf<LuaXFunction>()
+    private val list = mutableListOf<LuaXValue>()
+
+    fun addChild(node: LuaXValue) {
+        list.add(node)
+    }
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
-        xValueNode.setPresentation(AllIcons.Json.Object, name, "${list.size} function(s)", true)
+
     }
 
     override fun computeChildren(node: XCompositeNode) {
-        val childrenList = XValueChildrenList()
-        list.forEach { childrenList.add(it.name, it) }
-        node.addChildren(childrenList, true)
-    }
-
-    fun add(f: LuaXFunction) {
-        list.add(f)
-    }
-
-    fun isEmpty(): Boolean {
-        return list.isEmpty()
+        val ret = XValueChildrenList()
+        list.forEach { ret.add(it.name, it) }
+        node.addChildren(ret, true)
     }
 }

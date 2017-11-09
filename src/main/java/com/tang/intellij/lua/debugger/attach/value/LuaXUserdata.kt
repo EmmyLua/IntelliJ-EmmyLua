@@ -19,26 +19,22 @@ package com.tang.intellij.lua.debugger.attach.value
 import com.intellij.icons.AllIcons
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
-import org.w3c.dom.Node
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.readString
+import java.io.DataInputStream
 
 /**
  * user data
  * Created by Administrator on 2017/6/13.
  */
-class LuaXUserdata : LuaXTable() {
-    private var type = "userdata"
+class LuaXUserdata(L: Long, process: LuaAttachDebugProcess)
+    : LuaXObjectValue(StackNodeId.Error, L, process) {
+
     private var data = "unknown"
 
-    override fun doParse(node: Node) {
-        super.doParse(node)
-        val childNodes = node.childNodes
-        for (i in 0 until childNodes.length) {
-            val item = childNodes.item(i)
-            when (item.nodeName) {
-                "type" -> type = item.textContent
-                "data" -> data = item.textContent
-            }
-        }
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        data = stream.readString()
     }
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {

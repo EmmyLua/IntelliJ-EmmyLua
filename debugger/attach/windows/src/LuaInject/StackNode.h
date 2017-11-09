@@ -99,6 +99,8 @@ public:
 	void AddChild(StackNode* key, StackNode* value);
 
 	void Write(ByteOutputStream* stream) override;
+
+	bool deep;
 private:
 	std::vector<KVPair*> list;
 };

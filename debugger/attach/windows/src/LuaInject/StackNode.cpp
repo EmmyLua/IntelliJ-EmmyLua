@@ -71,7 +71,7 @@ void StackRootNode::Write(ByteOutputStream* stream)
 	stream->WriteString(functionName);
 }
 
-StackTableNode::StackTableNode(): StackLuaObjectNode(StackNodeId::Table)
+StackTableNode::StackTableNode(): StackLuaObjectNode(StackNodeId::Table), deep(false)
 {
 }
 
@@ -96,11 +96,15 @@ void StackTableNode::AddChild(StackNode* key, StackNode* value)
 void StackTableNode::Write(ByteOutputStream* stream)
 {
 	StackLuaObjectNode::Write(stream);
-	stream->WriteSize(list.size());
-	for (auto pair : list)
+	stream->WriteBool(deep);
+	if (deep)
 	{
-		pair->key->Write(stream);
-		pair->value->Write(stream);
+		stream->WriteSize(list.size());
+		for (auto pair : list)
+		{
+			pair->key->Write(stream);
+			pair->value->Write(stream);
+		}
 	}
 }
 
