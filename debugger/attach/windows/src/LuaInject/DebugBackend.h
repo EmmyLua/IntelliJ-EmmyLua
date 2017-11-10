@@ -42,7 +42,6 @@ class StackNode;
 class StackLuaObjectNode;
 class StackTableNode;
 class EvalResultNode;
-class TiXmlNode;
 class DebugPipeline;
 class DebugMessage;
 class LPFunctionCall;
