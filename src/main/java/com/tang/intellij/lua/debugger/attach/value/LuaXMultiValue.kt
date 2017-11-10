@@ -26,7 +26,7 @@ class LuaXMultiValue(L: Long, process: LuaAttachDebugProcess)
     : LuaXValue(L, process) {
 
     init {
-        name = "multi-value"
+        name = "multiple values"
     }
 
     private val list = mutableListOf<LuaXValue>()
