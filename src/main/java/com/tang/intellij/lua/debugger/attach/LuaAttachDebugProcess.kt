@@ -24,8 +24,8 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.ToggleAction
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.testFramework.LightVirtualFile
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -34,7 +34,7 @@ import com.intellij.xdebugger.frame.XSuspendContext
 import com.intellij.xdebugger.ui.XDebugTabLayouter
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
-import com.tang.intellij.lua.lang.LuaFileType
+import com.tang.intellij.lua.debugger.MemoryFileSystem
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.util.concurrent.ConcurrentHashMap
@@ -99,7 +99,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
 
     override fun handle(message: LuaAttachMessage) {
         when (message) {
-            is DMLoadScript -> onLoadScript(message)
+            is DMLoadScript -> with(ApplicationManager.getApplication()) { invokeLater { runWriteAction { onLoadScript(message) } }}
             is DMBreak -> onBreak(message)
             is DMException -> message.print()
             is DMMessage -> message.print()
@@ -162,10 +162,11 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     private fun createMemoryFile(dm: DMLoadScript): VirtualFile {
-        val file = LightVirtualFile(dm.fileName, LuaFileType.INSTANCE, dm.source)
-        file.isWritable = false
-        memoryFilesPanel.addFile(file)
-        return file
+        val sys = MemoryFileSystem.instance
+        val childFile = sys.createChildFile(this, sys.getRoot(), dm.fileName)
+        childFile.setBinaryContent(dm.source.toByteArray())
+        memoryFilesPanel.addFile(childFile)
+        return childFile
     }
 
     override fun registerBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
