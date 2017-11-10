@@ -48,7 +48,8 @@ fun readNode(stream: DataInputStream, L: Long, process: LuaAttachDebugProcess): 
         StackNodeId.Table -> LuaXTable(L, process)
         StackNodeId.Function -> LuaXFunction(L, process)
         StackNodeId.UserData -> LuaXUserdata(L, process)
-        StackNodeId.Error -> LuaXFunction(L, process)
+
+        StackNodeId.Error -> LuaXString(L, process)
         StackNodeId.String -> LuaXString(L, process)
         StackNodeId.Primitive -> LuaXPrimitive(L, process)
 

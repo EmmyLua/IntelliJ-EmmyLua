@@ -32,11 +32,12 @@ class LuaXMultiValue(L: Long, process: LuaAttachDebugProcess)
     private val list = mutableListOf<LuaXValue>()
 
     fun addChild(node: LuaXValue) {
+        node.name = "[${list.size + 1}]"
         list.add(node)
     }
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
-
+        xValueNode.setPresentation(null, name, "${list.size} item(s)", true)
     }
 
     override fun computeChildren(node: XCompositeNode) {
