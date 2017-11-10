@@ -53,9 +53,6 @@
     <ProjectReference Include="Shared.vcxproj">
       <Project>{2cd198e9-319c-48fb-85dc-ae3427a05bd2}</Project>
     </ProjectReference>
-    <ProjectReference Include="tinyxml\tinyxmlSTL.vcxproj">
-      <Project>{a3a84737-5017-4577-b8a2-79429a25b8b6}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{CB19A08F-478F-4AB2-8E62-602AFE298F77}</ProjectGuid>
@@ -111,7 +108,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libs\LuaPlus\include;tinyxml;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
+    <IncludePath>..\libs\LuaPlus\include;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)Build\$(Configuration)\x86\</OutDir>
@@ -119,7 +116,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\libs\LuaPlus\include;tinyxml;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
+    <IncludePath>..\libs\LuaPlus\include;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\x64\</OutDir>
     <IntDir>$(SolutionDir)Build\$(Configuration)\x64\Temp\$(ProjectName)</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
@@ -166,7 +163,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>EasyHook.lib;Psapi.lib;tinyxmlSTL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>EasyHook.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)Build\$(Configuration)\x64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
