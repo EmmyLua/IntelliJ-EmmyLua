@@ -52,6 +52,7 @@ public:
 	}
 
 	void AddChild(StackNode* child);
+	StackNode* GetChild(int idx) const;
 	void Write(ByteOutputStream* stream) override;
 
 	~StackNodeContainer();

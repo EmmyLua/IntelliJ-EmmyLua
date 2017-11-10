@@ -24,6 +24,13 @@ void StackNodeContainer::AddChild(StackNode* child)
 	m_children.push_back(child);
 }
 
+StackNode* StackNodeContainer::GetChild(int idx) const
+{
+	if (m_children.size() > idx)
+		return m_children[idx];
+	return nullptr;
+}
+
 void StackNodeContainer::Write(ByteOutputStream* stream)
 {
 	StackNode::Write(stream);
