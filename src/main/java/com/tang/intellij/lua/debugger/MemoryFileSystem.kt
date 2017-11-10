@@ -24,6 +24,7 @@ class MemoryFileSystem : DummyFileSystem() {
 
     companion object {
         val PROTOCOL = "lua-dummy"
+        private val ROOT = "root"
 
         val instance: MemoryFileSystem get() {
             return VirtualFileManager.getInstance().getFileSystem(PROTOCOL) as MemoryFileSystem
@@ -32,21 +33,40 @@ class MemoryFileSystem : DummyFileSystem() {
 
     private var root: VirtualFile? = null
 
+    fun clear() {
+        root?.let { r ->
+            r.children.forEach {
+                deleteFile(null, it)
+            }
+        }
+    }
+
     override fun getProtocol(): String {
         return PROTOCOL
     }
 
     fun getRoot(): VirtualFile {
         if (root == null) {
-            root = createRoot("test")
+            root = createRoot(ROOT)
             refresh(true)
         }
         return root!!
     }
 
+    fun findMemoryFile(path: String): VirtualFile? {
+        val list = path.split("/")
+        var file = root
+        for (i in 0 until list.size) {
+            if (file != null) {
+                file = file.findChild(list[i])
+            }
+        }
+        return file
+    }
+
     override fun findFileByPath(path: String): VirtualFile? {
         val list = path.split("/")
-        var file = if (list[0] == "test") root else null
+        var file = if (list[0] == ROOT) root else null
         for (i in 1 until list.size) {
             if (file != null) {
                 file = file.findChild(list[i])

@@ -23,7 +23,6 @@ import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.attach.value.*
-import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.DataInputStream
 import java.io.DataOutputStream
 
@@ -269,7 +268,7 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
             val script = process.getScript(stack.scriptIndex)
             var position: XSourcePosition? = null
             if (script != null) {
-                val file = LuaFileUtil.findFile(process.session?.project!!, script.name)
+                val file = process.findFile(script.name)
                 if (file != null) {
                     position = XSourcePositionImpl.create(file, stack.line)
 

@@ -27,6 +27,7 @@ import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
@@ -52,6 +53,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     private lateinit var memoryFilesPanel: MemoryFilesPanel
     private lateinit var profilerPanel: ProfilerPanel
     private var toggleProfiler: Boolean = false
+    private val memoryFileSystem = MemoryFileSystem.instance
 
     init {
         session.setPauseActionSupported(false)
@@ -63,6 +65,21 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     override fun sessionInitialized() {
         super.sessionInitialized()
         bridge = startBridge()
+        with(ApplicationManager.getApplication()) {
+            invokeLater {
+                runWriteAction {
+                    val manager = XDebuggerManager.getInstance(session.project)
+                    manager.breakpointManager.allBreakpoints.forEach {
+                        if (it is XLineBreakpoint) {
+                            if (it.fileUrl.startsWith(MemoryFileSystem.PROTOCOL)) {
+                                manager.breakpointManager.removeBreakpoint(it)
+                            }
+                        }
+                    }
+                    memoryFileSystem.clear()
+                }
+            }
+        }
     }
 
     override fun getEditorsProvider(): XDebuggerEditorsProvider {
@@ -130,8 +147,17 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         profilerPanel.updateProfiler(message)
     }
 
+    fun findFile(name: String?): VirtualFile? {
+        if (name != null) {
+            val f = memoryFileSystem.findMemoryFile(name)
+            if (f != null)
+                return f
+        }
+        return LuaFileUtil.findFile(session.project, name)
+    }
+
     private fun onBreak(proto: DMBreak) {
-        val file = LuaFileUtil.findFile(session.project, proto.name)
+        val file = findFile(proto.name)
         if (file == null) {
             bridge.sendRun()
             return
@@ -141,7 +167,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     private fun onLoadScript(proto: DMLoadScript) {
-        var file = LuaFileUtil.findFile(session.project, proto.fileName)
+        var file = findFile(proto.fileName)
         if (file == null) {
             file = createMemoryFile(proto)
             //print(String.format("[✘] File not found : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
@@ -162,8 +188,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
     }
 
     private fun createMemoryFile(dm: DMLoadScript): VirtualFile {
-        val sys = MemoryFileSystem.instance
-        val childFile = sys.createChildFile(this, sys.getRoot(), dm.fileName)
+        val childFile = memoryFileSystem.createChildFile(this, memoryFileSystem.getRoot(), dm.fileName)
         childFile.setBinaryContent(dm.source.toByteArray())
         memoryFilesPanel.addFile(childFile)
         return childFile
