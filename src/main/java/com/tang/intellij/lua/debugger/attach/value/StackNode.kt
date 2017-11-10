@@ -27,8 +27,14 @@ interface IStackNode {
     fun read(stream: DataInputStream)
 }
 
+private val map = mutableMapOf<Byte, StackNodeId>()
+private fun initMap() {
+    StackNodeId.values().forEach { map[it.ordinal.toByte()] = it }
+}
+
 private fun getNode(byte: Byte): StackNodeId {
-    val id = StackNodeId.values().find { it.ordinal.toByte() == byte }
+    if (map.isEmpty()) initMap()
+    val id = map[byte]
     return id!!
 }
 
