@@ -20,28 +20,19 @@ import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.tang.intellij.lua.debugger.LuaXStringPresentation
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
-import com.tang.intellij.lua.debugger.attach.readString
-import java.io.DataInputStream
 
 class LuaXString (L: Long, process: LuaAttachDebugProcess)
     : LuaXObjectValue(StackNodeId.String, L, process) {
 
-    private var data: String? = null
-
-    override fun read(stream: DataInputStream) {
-        super.read(stream)
-        data = stream.readString()
-    }
-
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
         var value = data
-        if (value!!.startsWith("\""))
+        if (value.startsWith("\""))
             value = value.substring(1, value.length - 1)
 
         xValueNode.setPresentation(null, LuaXStringPresentation(value), false)
     }
 
     override fun toKeyString(): String {
-        return data!!
+        return data
     }
 }

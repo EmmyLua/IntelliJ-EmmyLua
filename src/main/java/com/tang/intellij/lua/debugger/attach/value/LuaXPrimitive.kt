@@ -21,9 +21,7 @@ import com.intellij.xdebugger.frame.XValuePlace
 import com.tang.intellij.lua.debugger.LuaXNumberPresentation
 import com.tang.intellij.lua.debugger.LuaXValuePresentation
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
-import com.tang.intellij.lua.debugger.attach.readString
 import com.tang.intellij.lua.highlighting.LuaHighlightingData
-import java.io.DataInputStream
 
 /**
  *
@@ -32,22 +30,15 @@ import java.io.DataInputStream
 class LuaXPrimitive (L: Long, process: LuaAttachDebugProcess)
     : LuaXObjectValue(StackNodeId.Primitive, L, process) {
 
-    private var data: String? = null
-
-    override fun read(stream: DataInputStream) {
-        super.read(stream)
-        data = stream.readString()
-    }
-
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
         when (type) {
-            "boolean" -> xValueNode.setPresentation(null, LuaXValuePresentation(type, data!!, LuaHighlightingData.PRIMITIVE_TYPE), false)
-            "number" -> xValueNode.setPresentation(null, LuaXNumberPresentation(data!!), false)
-            else -> xValueNode.setPresentation(null, type, data!!, false)
+            "boolean" -> xValueNode.setPresentation(null, LuaXValuePresentation(type, data, LuaHighlightingData.PRIMITIVE_TYPE), false)
+            "number" -> xValueNode.setPresentation(null, LuaXNumberPresentation(data), false)
+            else -> xValueNode.setPresentation(null, type, data, false)
         }
     }
 
     override fun toKeyString(): String {
-        return data!!
+        return data
     }
 }

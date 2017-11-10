@@ -28,10 +28,7 @@ import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
 import com.tang.intellij.lua.debugger.attach.readString
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
-import org.w3c.dom.Node
-import java.io.ByteArrayInputStream
 import java.io.DataInputStream
-import javax.xml.parsers.DocumentBuilderFactory
 
 enum class StackNodeId
 {
@@ -53,13 +50,11 @@ enum class StackNodeId
  *
  * Created by tangzx on 2017/4/2.
  */
-abstract class LuaXValue(override val L:Long,
-                         override val process: LuaAttachDebugProcess) : XValue(), IStackNode {
+abstract class LuaXValue(val L:Long,
+                         val process: LuaAttachDebugProcess) : XValue() {
 
     var name: String? = null
     var parent: LuaXValue? = null
-
-    lateinit var type: String
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
 
@@ -73,11 +68,6 @@ abstract class LuaXValue(override val L:Long,
         if (name != null) {
             computeSourcePosition(xNavigable, name!!, process.session)
         }
-    }
-
-    override fun read(stream: DataInputStream) {
-        name = stream.readString()
-        type = stream.readString()
     }
 
     companion object {
@@ -108,4 +98,14 @@ abstract class LuaXValue(override val L:Long,
 }
 
 open class LuaXObjectValue(val id: StackNodeId, L: Long, process: LuaAttachDebugProcess)
-    : LuaXValue(L, process)
+    : LuaXValue(L, process), IStackNode {
+
+    lateinit var type: String
+    lateinit var data: String
+
+    override fun read(stream: DataInputStream) {
+        name = stream.readString()
+        type = stream.readString()
+        data = stream.readString()
+    }
+}

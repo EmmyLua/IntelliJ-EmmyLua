@@ -40,6 +40,7 @@ public:
 
 	std::string name;
 	std::string type;
+	std::string data;
 };
 
 class StackNodeContainer : public StackNode
@@ -131,46 +132,22 @@ class StackStringNode : public StackLuaObjectNode
 {
 public:
 	StackStringNode(std::string& data);
-
-	void Write(ByteOutputStream* stream) override;
-
-	std::string value;
 };
 
 class StackErrorNode : public StackLuaObjectNode
 {
 public:
-	StackErrorNode(const std::string& message)
-		: StackLuaObjectNode(StackNodeId::Error)
-	{
-		this->message = message;
-	}
-
-	void Write(ByteOutputStream* stream) override;
-
-	std::string message;
+	StackErrorNode(const std::string& message);
 };
 
 class StackUserData : public StackLuaObjectNode
 {
 public:
 	StackUserData(std::string toString);
-
-	void Write(ByteOutputStream* stream) override;
-
-	std::string toString;
 };
 
 class StackPrimitiveNode : public StackLuaObjectNode
 {
 public:
-	StackPrimitiveNode(std::string& data)
-		: StackLuaObjectNode(StackNodeId::Primitive)
-	{
-		this->value = data;
-	}
-
-	void Write(ByteOutputStream* stream) override;
-
-	std::string value;
+	StackPrimitiveNode(std::string& data);
 };

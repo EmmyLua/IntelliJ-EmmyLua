@@ -20,8 +20,6 @@ import com.intellij.icons.AllIcons
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
-import com.tang.intellij.lua.debugger.attach.readString
-import java.io.DataInputStream
 
 /**
  * user data
@@ -29,13 +27,6 @@ import java.io.DataInputStream
  */
 class LuaXUserdata(L: Long, process: LuaAttachDebugProcess)
     : LuaXObjectValue(StackNodeId.Error, L, process) {
-
-    private var data = "unknown"
-
-    override fun read(stream: DataInputStream) {
-        super.read(stream)
-        data = stream.readString()
-    }
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
         xValueNode.setPresentation(AllIcons.Json.Object, type, data, true)

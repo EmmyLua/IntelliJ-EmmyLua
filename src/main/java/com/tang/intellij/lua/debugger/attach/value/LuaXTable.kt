@@ -66,7 +66,7 @@ open class LuaXTable(L: Long, process: LuaAttachDebugProcess)
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {
         val type = if (this.type.isEmpty()) "table" else type
-        xValueNode.setPresentation(AllIcons.Json.Object, type, "", true)
+        xValueNode.setPresentation(AllIcons.Json.Object, type, data, true)
     }
 
     override fun read(stream: DataInputStream) {

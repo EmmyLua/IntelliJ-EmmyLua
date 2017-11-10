@@ -16,6 +16,7 @@ void StackLuaObjectNode::Write(ByteOutputStream* stream)
 
 	stream->WriteString(name);
 	stream->WriteString(type);
+	stream->WriteString(data);
 }
 
 void StackNodeContainer::AddChild(StackNode* child)
@@ -132,35 +133,20 @@ void StackBinaryNode::Write(ByteOutputStream* stream)
 
 StackStringNode::StackStringNode(std::string& data) : StackLuaObjectNode(StackNodeId::String)
 {
-	value = data;
+	this->data = data;
 }
 
-void StackStringNode::Write(ByteOutputStream* stream)
+StackErrorNode::StackErrorNode(const std::string& message) : StackLuaObjectNode(StackNodeId::Error)
 {
-	StackLuaObjectNode::Write(stream);
-	stream->WriteString(value);
-}
-
-void StackErrorNode::Write(ByteOutputStream* stream)
-{
-	StackLuaObjectNode::Write(stream);
-	stream->WriteString(message);
+	this->data = message;
 }
 
 StackUserData::StackUserData(std::string toString) : StackLuaObjectNode(StackNodeId::UserData)
 {
-	this->toString = toString;
+	this->data = toString;
 }
 
-void StackUserData::Write(ByteOutputStream* stream)
+StackPrimitiveNode::StackPrimitiveNode(std::string& data) : StackLuaObjectNode(StackNodeId::Primitive)
 {
-	StackLuaObjectNode::Write(stream);
-	stream->WriteString(toString);
-}
-
-void StackPrimitiveNode::Write(ByteOutputStream* stream)
-{
-	StackLuaObjectNode::Write(stream);
-	
-	stream->WriteString(value);
+	this->data = data;
 }
