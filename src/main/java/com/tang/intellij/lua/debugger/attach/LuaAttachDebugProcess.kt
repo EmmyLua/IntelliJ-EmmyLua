@@ -35,7 +35,7 @@ import com.intellij.xdebugger.frame.XSuspendContext
 import com.intellij.xdebugger.ui.XDebugTabLayouter
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
-import com.tang.intellij.lua.debugger.MemoryFileSystem
+import com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.util.concurrent.ConcurrentHashMap

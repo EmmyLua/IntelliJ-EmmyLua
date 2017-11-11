@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger
+package com.tang.intellij.lua.debugger.attach.vfs
 
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -26,12 +26,49 @@ class MemoryFileSystem : DummyFileSystem() {
         val PROTOCOL = "lua-dummy"
         private val ROOT = "root"
 
-        val instance: MemoryFileSystem get() {
+        val instance: MemoryFileSystem
+            get() {
             return VirtualFileManager.getInstance().getFileSystem(PROTOCOL) as MemoryFileSystem
         }
     }
 
-    private var root: VirtualFile? = null
+    private var root: MemoryVirtualFileDirectory? = null
+
+    override fun createChildDirectory(requestor: Any?, vDir: VirtualFile, dirName: String): MemoryVirtualFileDirectory {
+        val dir = vDir as MemoryVirtualFileDirectory
+        val child = MemoryVirtualFileDirectory(dirName, dir)
+        dir.addChild(child)
+        this.fireFileCreated(requestor, child)
+        return child
+    }
+
+    override fun createChildFile(requestor: Any?, vDir: VirtualFile, fileName: String): VirtualFile {
+        var dir = vDir as MemoryVirtualFileDirectory
+        val list = fileName.split("/")
+        for (i in 0 until list.size - 1) {
+            val dirName = list[i]
+            val subDir = dir.findChild(dirName)
+            if (subDir is MemoryVirtualFileDirectory) {
+                dir = subDir
+            } else {
+                dir = createChildDirectory(requestor, dir, dirName)
+            }
+        }
+        val child = MemoryDataVirtualFile(list.last(), dir)
+        dir.addChild(child)
+        this.fireFileCreated(requestor, child)
+        return child
+    }
+
+    override fun deleteFile(requestor: Any?, vFile: VirtualFile) {
+        this.fireBeforeFileDeletion(requestor, vFile)
+        val file = vFile as MemoryVirtualFile
+        val parent = file.parent
+        if (parent != null) {
+            parent.removeChild(file)
+            this.fireFileDeleted(requestor, vFile, vFile.getName(), parent)
+        }
+    }
 
     fun clear() {
         root?.let { r ->
@@ -47,7 +84,7 @@ class MemoryFileSystem : DummyFileSystem() {
 
     fun getRoot(): VirtualFile {
         if (root == null) {
-            root = createRoot(ROOT)
+            root = MemoryVirtualFileDirectory(ROOT, null)
             refresh(true)
         }
         return root!!
@@ -55,7 +92,7 @@ class MemoryFileSystem : DummyFileSystem() {
 
     fun findMemoryFile(path: String): VirtualFile? {
         val list = path.split("/")
-        var file = root
+        var file: VirtualFile? = root
         for (i in 0 until list.size) {
             if (file != null) {
                 file = file.findChild(list[i])
@@ -66,7 +103,7 @@ class MemoryFileSystem : DummyFileSystem() {
 
     override fun findFileByPath(path: String): VirtualFile? {
         val list = path.split("/")
-        var file = if (list[0] == ROOT) root else null
+        var file: VirtualFile? = if (list.first() == ROOT) root else null
         for (i in 1 until list.size) {
             if (file != null) {
                 file = file.findChild(list[i])

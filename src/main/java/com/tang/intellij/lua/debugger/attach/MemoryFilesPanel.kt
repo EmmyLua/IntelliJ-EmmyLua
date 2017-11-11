@@ -63,8 +63,8 @@ class MemoryFilesPanel(val project: Project) : JPanel(BorderLayout()) {
 
     init {
         list.cellRenderer = VirtualFilesRenderer()
-        list.addListSelectionListener { evt ->
-            val file = model.get(evt.firstIndex)
+        list.addListSelectionListener {
+            val file = list.selectedValue
             val isOpen = FileEditorManager.getInstance(project).isFileOpen(file)
             if (!isOpen)
                 FileEditorManager.getInstance(project).openFile(file, true)
