@@ -208,7 +208,7 @@ public:
      */
     void HookCallback(LAPI api, lua_State* L, lua_Debug* ar);
 
-	void SetAllHookMode(HookMode mode);
+	void SetAllHookModeLazy(HookMode mode);
 
     /**
      * Called when a new API is created.
@@ -430,7 +430,7 @@ private:
         int             callStackDepth;
         int             lastStepLine;
         int             lastStepScript;
-        LAPI   api;
+        LAPI            api;
         std::string     name;
         unsigned int    stackTop;
         bool            luaJitWorkAround;
@@ -439,6 +439,8 @@ private:
         std::string     lastFunctions;
 		bool			inEval;
 		bool			isEmmyLoaded;
+		HookMode        lazyHookMode;
+		bool            lazySetHook;
     };
 
     struct StackEntry
