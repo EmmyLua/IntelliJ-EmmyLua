@@ -75,4 +75,8 @@ class MemoryFilesPanel(val project: Project) : JPanel(BorderLayout()) {
     fun addFile(virtualFile: VirtualFile) {
         model.addElement(virtualFile)
     }
+
+    fun clear() {
+        model.clear()
+    }
 }

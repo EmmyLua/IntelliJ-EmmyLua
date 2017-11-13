@@ -25,6 +25,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebuggerManager
@@ -36,6 +37,7 @@ import com.intellij.xdebugger.ui.XDebugTabLayouter
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem
+import com.tang.intellij.lua.debugger.attach.vfs.MemoryVirtualFile
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.util.concurrent.ConcurrentHashMap
@@ -68,6 +70,7 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
         with(ApplicationManager.getApplication()) {
             invokeLater {
                 runWriteAction {
+                    //remove breakpoints
                     val manager = XDebuggerManager.getInstance(session.project)
                     manager.breakpointManager.allBreakpoints.forEach {
                         if (it is XLineBreakpoint) {
@@ -76,7 +79,17 @@ abstract class LuaAttachDebugProcess protected constructor(session: XDebugSessio
                             }
                         }
                     }
+                    //close file editor
+                    val fileEditorManager = FileEditorManager.getInstance(session.project)
+                    fileEditorManager.openFiles.forEach {
+                        if (it is MemoryVirtualFile) {
+                            fileEditorManager.closeFile(it)
+                        }
+                    }
+                    //clear memory files
                     memoryFileSystem.clear()
+
+                    memoryFilesPanel.clear()
                 }
             }
         }
