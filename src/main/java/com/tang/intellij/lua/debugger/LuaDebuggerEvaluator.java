@@ -16,16 +16,12 @@
 
 package com.tang.intellij.lua.debugger;
 
-import com.intellij.debugger.impl.DebuggerUtilsEx;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNameIdentifierOwner;
-import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.xdebugger.XSourcePosition;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
@@ -45,7 +41,10 @@ public abstract class LuaDebuggerEvaluator extends XDebuggerEvaluator {
         final Ref<TextRange> currentRange = Ref.create(null);
         PsiDocumentManager.getInstance(project).commitAndRunReadAction(() -> {
             try {
-                PsiElement element = DebuggerUtilsEx.findElementAt(PsiDocumentManager.getInstance(project).getPsiFile(document), offset);
+                PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(document);
+                if (file == null)
+                    return;
+                PsiElement element = file.findElementAt(offset);
                 if (element == null || !element.isValid()) {
                     return;
                 }
