@@ -183,10 +183,14 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         var file = findFile(proto.fileName)
         if (file == null) {
             file = createMemoryFile(proto)
-            print(String.format("[✔] Create memory file : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
+            print("[✔] Create memory file : ", ConsoleViewContentType.SYSTEM_OUTPUT)
         } else {
-            print(String.format("[✔] File was loaded : %s\n", proto.fileName), ConsoleViewContentType.SYSTEM_OUTPUT)
+            print("[✔] File was loaded :", ConsoleViewContentType.SYSTEM_OUTPUT)
         }
+        session.consoleView.printHyperlink(proto.fileName) {
+            FileEditorManager.getInstance(it).openFile(file!!, true)
+        }
+        print("\n")
 
         val script = LoadedScript(file, proto.index, proto.fileName, proto.state)
         loadedScriptMap.put(proto.index, script)
