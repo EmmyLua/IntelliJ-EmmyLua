@@ -437,7 +437,7 @@ private:
         bool            breakpointInStack;
         bool            haveActiveBreakpoints;
         std::string     lastFunctions;
-		bool			inEval;
+		bool			skipPostLoadScript;
 		bool			isEmmyLoaded;
 		HookMode        lazyHookMode;
 		bool            lazySetHook;
