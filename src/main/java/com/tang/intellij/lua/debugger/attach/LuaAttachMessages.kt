@@ -86,7 +86,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
     var L:Long = 0
         protected set
 
-    lateinit var process: LuaAttachDebugProcess
+    lateinit var process: LuaAttachDebugProcessBase
 
     open fun write(stream: DataOutputStream) {
         stream.writeInt(id.ordinal)
@@ -98,7 +98,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
     }
 
     companion object {
-        fun parseMessage(stream: DataInputStream, process: LuaAttachDebugProcess): LuaAttachMessage {
+        fun parseMessage(stream: DataInputStream, process: LuaAttachDebugProcessBase): LuaAttachMessage {
             val id = stream.readInt()
             val idType = DebugMessageId.values().find { it.ordinal == id }
             val m:LuaAttachMessage = when (idType) {

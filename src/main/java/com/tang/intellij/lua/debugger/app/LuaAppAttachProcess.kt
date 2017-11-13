@@ -18,13 +18,13 @@ package com.tang.intellij.lua.debugger.app
 
 import com.intellij.xdebugger.XDebugSession
 import com.tang.intellij.lua.debugger.attach.LuaAttachBridgeBase
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 
 /**
  *
  * Created by tangzx on 2017/5/7.
  */
-class LuaAppAttachProcess internal constructor(session: XDebugSession) : LuaAttachDebugProcess(session) {
+class LuaAppAttachProcess internal constructor(session: XDebugSession) : LuaAttachDebugProcessBase(session) {
 
     override fun startBridge(): LuaAttachBridgeBase {
         val configuration = (session.runProfile as LuaAppRunConfiguration?)!!

@@ -25,7 +25,7 @@ import com.intellij.xdebugger.frame.XValue
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.intellij.xdebugger.impl.XSourcePositionImpl
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 import com.tang.intellij.lua.debugger.attach.readString
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 import java.io.DataInputStream
@@ -51,7 +51,7 @@ enum class StackNodeId
  * Created by tangzx on 2017/4/2.
  */
 abstract class LuaXValue(val L:Long,
-                         val process: LuaAttachDebugProcess) : XValue() {
+                         val process: LuaAttachDebugProcessBase) : XValue() {
 
     var name: String? = null
     var parent: LuaXValue? = null
@@ -97,7 +97,7 @@ abstract class LuaXValue(val L:Long,
     }
 }
 
-open class LuaXObjectValue(val id: StackNodeId, L: Long, process: LuaAttachDebugProcess)
+open class LuaXObjectValue(val id: StackNodeId, L: Long, process: LuaAttachDebugProcessBase)
     : LuaXValue(L, process), IStackNode {
 
     lateinit var type: String

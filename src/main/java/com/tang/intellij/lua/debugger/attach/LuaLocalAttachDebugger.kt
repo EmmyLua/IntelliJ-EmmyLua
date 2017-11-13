@@ -41,7 +41,7 @@ class LuaLocalAttachDebugger internal constructor(private val processInfo: Proce
         XDebuggerManager.getInstance(project).startSessionAndShowTab(displayName, null, object : XDebugProcessStarter() {
             @Throws(ExecutionException::class)
             override fun start(xDebugSession: XDebugSession): XDebugProcess {
-                return LuaAttachDebugProcessEx(xDebugSession, processInfo)
+                return LuaAttachDebugProcess(xDebugSession, processInfo)
             }
         })
     }

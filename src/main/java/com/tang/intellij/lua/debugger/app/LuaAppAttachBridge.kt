@@ -28,7 +28,7 @@ import com.tang.intellij.lua.debugger.attach.*
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.nio.charset.Charset
 
-class LuaAppAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
+class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSession)
     : LuaAttachBridgeBase(process, session) {
 
     private val processListener = object : ProcessListener {

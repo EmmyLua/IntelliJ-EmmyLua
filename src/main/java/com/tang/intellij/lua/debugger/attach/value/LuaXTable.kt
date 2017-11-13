@@ -29,7 +29,7 @@ import java.util.*
  *
  * Created by tangzx on 2017/4/2.
  */
-open class LuaXTable(L: Long, process: LuaAttachDebugProcess)
+open class LuaXTable(L: Long, process: LuaAttachDebugProcessBase)
     : LuaXObjectValue(StackNodeId.Table, L, process), IStackNode {
 
     private val children = mutableListOf<LuaXValue>()

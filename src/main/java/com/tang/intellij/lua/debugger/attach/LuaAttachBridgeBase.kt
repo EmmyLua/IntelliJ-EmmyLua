@@ -34,7 +34,7 @@ import java.util.*
  * debug bridge
  * Created by tangzx on 2017/3/26.
  */
-abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcess, val session: XDebugSession) {
+abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val session: XDebugSession) {
     protected var handler: OSProcessHandler? = null
     private var writer: DataOutputStream? = null
     private var protoHandler: ProtoHandler? = null

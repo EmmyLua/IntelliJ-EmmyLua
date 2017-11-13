@@ -20,9 +20,9 @@ import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 
-class LuaXMultiValue(L: Long, process: LuaAttachDebugProcess)
+class LuaXMultiValue(L: Long, process: LuaAttachDebugProcessBase)
     : LuaXValue(L, process) {
 
     init {

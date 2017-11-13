@@ -20,14 +20,14 @@ import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.tang.intellij.lua.debugger.LuaXNumberPresentation
 import com.tang.intellij.lua.debugger.LuaXValuePresentation
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 import com.tang.intellij.lua.highlighting.LuaHighlightingData
 
 /**
  *
  * Created by tangzx on 2017/4/2.
  */
-class LuaXPrimitive (L: Long, process: LuaAttachDebugProcess)
+class LuaXPrimitive (L: Long, process: LuaAttachDebugProcessBase)
     : LuaXObjectValue(StackNodeId.Primitive, L, process) {
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {

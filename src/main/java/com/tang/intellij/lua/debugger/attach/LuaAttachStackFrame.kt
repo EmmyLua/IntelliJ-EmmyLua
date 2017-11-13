@@ -35,7 +35,7 @@ class LuaAttachStackFrame(val proto: DMBreak,
                           private val function: String?,
                           private val scriptName: String?,
                           val stack: Int) : XStackFrame() {
-    private val process: LuaAttachDebugProcess = proto.process
+    private val process: LuaAttachDebugProcessBase = proto.process
     private var evaluator: LuaAttachDebuggerEvaluator? = null
 
     override fun computeChildren(node: XCompositeNode) {

@@ -19,13 +19,13 @@ package com.tang.intellij.lua.debugger.attach.value
 import com.intellij.icons.AllIcons
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 
 /**
  * user data
  * Created by Administrator on 2017/6/13.
  */
-class LuaXUserdata(L: Long, process: LuaAttachDebugProcess)
+class LuaXUserdata(L: Long, process: LuaAttachDebugProcessBase)
     : LuaXObjectValue(StackNodeId.Error, L, process) {
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {

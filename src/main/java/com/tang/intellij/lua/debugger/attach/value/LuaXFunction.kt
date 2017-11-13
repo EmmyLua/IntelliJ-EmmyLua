@@ -18,7 +18,7 @@ package com.tang.intellij.lua.debugger.attach.value
 
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 import com.tang.intellij.lua.lang.LuaIcons
 import java.io.DataInputStream
 
@@ -26,7 +26,7 @@ import java.io.DataInputStream
  * function
  * Created by tangzx on 2017/4/2.
  */
-class LuaXFunction(L: Long, process: LuaAttachDebugProcess)
+class LuaXFunction(L: Long, process: LuaAttachDebugProcessBase)
     : LuaXObjectValue(StackNodeId.Function, L, process) {
 
     var line: Int = 0

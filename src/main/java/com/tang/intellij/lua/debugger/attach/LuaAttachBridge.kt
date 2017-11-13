@@ -28,7 +28,7 @@ import com.tang.intellij.lua.LuaBundle
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.nio.charset.Charset
 
-class LuaAttachBridge(process: LuaAttachDebugProcess, session: XDebugSession)
+class LuaAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSession)
     : LuaAttachBridgeBase(process, session) {
 
 

@@ -19,9 +19,9 @@ package com.tang.intellij.lua.debugger.attach.value
 import com.intellij.xdebugger.frame.XValueNode
 import com.intellij.xdebugger.frame.XValuePlace
 import com.tang.intellij.lua.debugger.LuaXStringPresentation
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 
-class LuaXString (L: Long, process: LuaAttachDebugProcess)
+class LuaXString (L: Long, process: LuaAttachDebugProcessBase)
     : LuaXObjectValue(StackNodeId.String, L, process) {
 
     override fun computePresentation(xValueNode: XValueNode, xValuePlace: XValuePlace) {

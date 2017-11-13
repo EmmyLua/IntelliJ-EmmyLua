@@ -16,14 +16,14 @@
 
 package com.tang.intellij.lua.debugger.attach.value
 
-import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcess
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 import com.tang.intellij.lua.debugger.attach.readSize
 import com.tang.intellij.lua.debugger.attach.readString
 import java.io.DataInputStream
 
 interface IStackNode {
     val L: Long
-    val process: LuaAttachDebugProcess
+    val process: LuaAttachDebugProcessBase
     fun read(stream: DataInputStream)
 }
 
@@ -38,7 +38,7 @@ private fun getNode(byte: Byte): StackNodeId {
     return id!!
 }
 
-fun readNode(stream: DataInputStream, L: Long, process: LuaAttachDebugProcess): IStackNode {
+fun readNode(stream: DataInputStream, L: Long, process: LuaAttachDebugProcessBase): IStackNode {
     val id = getNode(stream.readByte())
     val value: IStackNode = when (id) {
         StackNodeId.List -> StackNodeContainer(L, process)
@@ -60,7 +60,7 @@ fun readNode(stream: DataInputStream, L: Long, process: LuaAttachDebugProcess): 
 }
 
 open class StackNodeContainer(override var L: Long,
-                              override var process: LuaAttachDebugProcess) : IStackNode {
+                              override var process: LuaAttachDebugProcessBase) : IStackNode {
 
     val children = mutableListOf<IStackNode>()
 
@@ -73,7 +73,7 @@ open class StackNodeContainer(override var L: Long,
     }
 }
 
-class EvalResultNode(L: Long, process: LuaAttachDebugProcess) : StackNodeContainer(L, process) {
+class EvalResultNode(L: Long, process: LuaAttachDebugProcessBase) : StackNodeContainer(L, process) {
 
     var success: Boolean = false
     var error: String = ""
@@ -96,7 +96,7 @@ class EvalResultNode(L: Long, process: LuaAttachDebugProcess) : StackNodeContain
     }
 }
 
-class StackRootNode(L: Long, process: LuaAttachDebugProcess) : StackNodeContainer(L, process) {
+class StackRootNode(L: Long, process: LuaAttachDebugProcessBase) : StackNodeContainer(L, process) {
     var scriptIndex = 0
     var line = 0
     var functionName = ""
