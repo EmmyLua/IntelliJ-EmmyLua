@@ -190,7 +190,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         session.consoleView.printHyperlink(proto.fileName) {
             FileEditorManager.getInstance(it).openFile(file!!, true)
         }
-        print("\n")
+        print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
 
         val script = LoadedScript(file, proto.index, proto.fileName, proto.state)
         loadedScriptMap.put(proto.index, script)
