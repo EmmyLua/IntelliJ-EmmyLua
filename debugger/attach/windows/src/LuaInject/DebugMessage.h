@@ -117,7 +117,7 @@ public:
 	std::string fileName;
 	std::string source;
 	unsigned int index;
-	unsigned int state;
+	char state;
 };
 
 class DMAddBreakpoint : public DebugMessage

@@ -284,7 +284,10 @@ private:
 
         void ClearBreakpoints();
 
-        std::string                 name;
+		CodeState                   state;
+		size_t                      index;
+		std::string                 name;
+		std::string                 fileName;
         std::string                 source;
         std::string                 title;
 		std::vector<Breakpoint*>    breakpoints;    // Lines that have breakpoints on them.
@@ -591,7 +594,7 @@ private:
 private:
 
     typedef stdext::hash_map<lua_State*, VirtualMachine*>   StateToVmMap;
-    typedef stdext::hash_map<std::string, unsigned int>     NameToScriptMap;
+    typedef stdext::hash_map<std::string, size_t>     NameToScriptMap;
 
     static DebugBackend*            s_instance;
     static const unsigned int       s_maxStackSize  = 100;

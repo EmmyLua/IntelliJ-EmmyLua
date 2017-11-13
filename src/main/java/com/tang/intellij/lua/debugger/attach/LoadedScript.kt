@@ -18,8 +18,18 @@ package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.openapi.vfs.VirtualFile
 
+
+enum class CodeState {
+    Normal            ,    // The code is normal.
+    Unavailable       ,    // The code for the script was not available.
+    Binary            ,    // The code was loaded as a binary/compiled file
+}
+
 /**
  *
  * Created by tangzx on 2017/4/3.
  */
-data class LoadedScript internal constructor(val file: VirtualFile, val index: Int, val name: String)
+data class LoadedScript internal constructor(val file: VirtualFile,
+                                             val index: Int,
+                                             val name: String,
+                                             val codeState: CodeState)

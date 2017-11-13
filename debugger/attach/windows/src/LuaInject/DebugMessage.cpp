@@ -71,7 +71,7 @@ void DMLoadScript::Write(ByteOutputStream* stream)
 	stream->WriteString(fileName);
 	stream->WriteString(source);
 	stream->WriteUInt32(index);
-	stream->WriteUInt32(state);
+	stream->WriteByte(state);
 }
 
 DMAddBreakpoint::DMAddBreakpoint() : DebugMessage(DebugMessageId::AddBreakpoint), scriptIndex(0), line(0)

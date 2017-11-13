@@ -204,7 +204,7 @@ class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
         private set
     var index: Int = 0
         private set
-    var state: Int = 0
+    var state: CodeState = CodeState.Normal
         private set
 
     override fun read(stream: DataInputStream) {
@@ -212,7 +212,9 @@ class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
         fileName = stream.readString()
         source = stream.readString()
         index = stream.readInt()
-        state = stream.readInt()
+
+        val stateCode = stream.readByte()
+        this.state = CodeState.values().find { it.ordinal.toByte() == stateCode } ?: CodeState.Normal
     }
 }
 
