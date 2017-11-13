@@ -34,7 +34,7 @@ bool DebugServer::startup(int port, DebugServerListener* listener)
 	WSADATA wsaData;
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != NO_ERROR) {
-		wprintf(L"WSAStartup failed with error: %ld\n", iResult);
+		//wprintf(L"WSAStartup failed with error: %ld\n", iResult);
 		return false;
 	}
 	//----------------------
@@ -42,7 +42,7 @@ bool DebugServer::startup(int port, DebugServerListener* listener)
 	// incoming connection requests.
 	m_listenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (m_listenSocket == INVALID_SOCKET) {
-		wprintf(L"socket failed with error: %ld\n", WSAGetLastError());
+		//wprintf(L"socket failed with error: %ld\n", WSAGetLastError());
 		WSACleanup();
 		return false;
 	}
@@ -57,7 +57,7 @@ bool DebugServer::startup(int port, DebugServerListener* listener)
 
 	//绑定套接字到一个IP地址和一个端口上
 	if (bind(m_listenSocket, (SOCKADDR *)& addrServer, sizeof(addrServer)) == SOCKET_ERROR) {
-		wprintf(L"bind failed with error: %ld\n", WSAGetLastError());
+		//wprintf(L"bind failed with error: %ld\n", WSAGetLastError());
 		closesocket(m_listenSocket);
 		WSACleanup();
 		return false;
@@ -68,13 +68,13 @@ bool DebugServer::startup(int port, DebugServerListener* listener)
 	// Listen for incoming connection requests.
 	// on the created socket
 	if (listen(m_listenSocket, 1) == SOCKET_ERROR) {
-		wprintf(L"listen failed with error: %ld\n", WSAGetLastError());
+		//wprintf(L"listen failed with error: %ld\n", WSAGetLastError());
 		closesocket(m_listenSocket);
 		WSACleanup();
 		return false;
 	}
 
-	printf("begin tcp server on port:%d\n", port);
+	//printf("begin tcp server on port:%d\n", port);
 
 	DWORD threadId;
 	m_connectionThread = CreateThread(nullptr, 0, connectionThread, this, 0, &threadId);
@@ -88,7 +88,7 @@ DWORD DebugServer::connectionProc()
 	//以一个无限循环的方式，不停地接收客户端socket连接
 	while (true)
 	{
-		printf("wait for connection.\n");
+		//printf("wait for connection.\n");
 		//请求到来后，接受连接请求，返回一个新的对应于此次连接的套接字
 		SOCKET AcceptSocket = accept(m_listenSocket, (SOCKADDR*)&addrClient, &len);
 		if (AcceptSocket == INVALID_SOCKET)
@@ -144,7 +144,7 @@ void DebugServer::onConnection(SOCKET newSocket)
 {
 	if (m_client == nullptr)
 	{
-		printf("--> onConnection.\n");
+		//printf("--> onConnection.\n");
 		m_client = new DebugClient(this, newSocket);
 		m_client->startup();
 		m_listener->onConnect(m_client);
@@ -154,7 +154,7 @@ void DebugServer::onConnection(SOCKET newSocket)
 
 DWORD WINAPI receiveThread(LPVOID param)
 {
-	printf("receiveThread\n");
+	//printf("receiveThread\n");
 	DebugClient* client = (DebugClient*)param;
 
 	return client->receive();
@@ -204,7 +204,7 @@ DWORD DebugClient::receive()
 	while (true)
 	{
 		int count = recv(m_socket, buff, BUFF_SIZE, 0);
-		printf("receive msg pack size : %d\n", count);
+		//printf("receive msg pack size : %d\n", count);
 
 		if (count == 0 || count == SOCKET_ERROR) //disconnected
 		{
@@ -226,7 +226,7 @@ DWORD DebugClient::receive()
 				}
 				msgLen = readInt32InBigEndian(buff + bufPos);
 
-				printf("\t>msg len: %d\n", msgLen);
+				//printf("\t>msg len: %d\n", msgLen);
 				bufPos += sizeof(int);
 			}
 			remain = bufLen - bufPos;
@@ -239,7 +239,7 @@ DWORD DebugClient::receive()
 			//check full
 			if (msgLen == 0)
 			{
-				printf("\t>handle msg.\n");
+				//printf("\t>handle msg.\n");
 				handleMsg(is.GetBuf(), is.GetPositon());
 				is.Reset();
 			}
