@@ -67,7 +67,7 @@ class LuaAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSession
                 val archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe")
                 val processBuilder = ProcessBuilder(archExe!!)
                 val isX86: Boolean
-                val archChecker = processBuilder.command(archExe, "-pid", pid).start()
+                val archChecker = processBuilder.command(archExe, "arch", "-pid", pid).start()
                 archChecker.waitFor()
                 val exitValue = archChecker.exitValue()
                 isX86 = exitValue == 1

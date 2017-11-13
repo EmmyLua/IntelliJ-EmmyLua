@@ -1,5 +1,6 @@
 ﻿#include "WindowUtility.h"
 #include <tlhelp32.h>
+#include <psapi.h>
 
 HWND GetProcessWindow(DWORD processId)
 {
@@ -79,4 +80,27 @@ void GetProcesses(std::vector<Process>& processes)
 
 	}
 
+}
+
+bool GetProcess(DWORD processId, Process & process)
+{
+	char fileName[_MAX_PATH];
+	HANDLE m_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
+	if (m_process == nullptr)
+		return false;
+
+	GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
+
+	process.id = processId;
+	process.path = fileName;
+
+	HWND hWnd = GetProcessWindow(processId);
+
+	if (hWnd != nullptr)
+	{
+		char buffer[1024];
+		GetWindowText(hWnd, buffer, 1024);
+		process.title = buffer;
+	}
+	return true;
 }

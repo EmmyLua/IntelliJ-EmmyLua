@@ -15,9 +15,12 @@ struct Process
 	unsigned int    id;     // Windows process identifier
 	std::string     name;   // Executable name
 	std::string     title;  // Name from the main window of the process.
+	std::string     path;   // Full path
 };
 
 /**
 * Returns all of the processes on the machine that can be debugged.
 */
 void GetProcesses(std::vector<Process>& processes);
+
+bool GetProcess(DWORD processId, Process& process);
