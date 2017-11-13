@@ -593,6 +593,9 @@ private:
 		unsigned int scriptStackSize,
         StackEntry unifiedStack[]) const;
 
+	Script* GetScript(size_t index) const;
+
+	void SendScript(lua_State* L, Script* script) const;
 private:
 
     typedef stdext::hash_map<lua_State*, VirtualMachine*>   StateToVmMap;
