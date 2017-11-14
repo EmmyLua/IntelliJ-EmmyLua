@@ -83,11 +83,19 @@ elseif xlua then
 end
 
 function emmy.Reload(fileName)
+    local a, b, c = string.find(fileName, '%.lua')
+    if a then
+        fileName = string.sub(fileName, 1, a - 1)
+    end
+
+    emmy.DebugLog('reload : ' .. fileName, 1)
     local searchers = package.searchers or package.loaders
     for _, load in ipairs(searchers) do
         local s = load(fileName)
         if type(s) == 'function' then
             break
+        else
+            emmy.DebugLog(s, 1)
         end
     end
 end
