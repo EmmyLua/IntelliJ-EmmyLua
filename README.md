@@ -33,7 +33,7 @@ QQ交流群：`29850775`
 | Comment based type/class annotation  |    ✔     |
 | Method override line marker          |    ✔     |
 | Name suggestion for refactor         |    ✔     |
-| Quick Documentation(Ctrl + Q)        |   50%    |
+| Quick Documentation(Ctrl + Q)        |    ✔     |
 | Live templates                       |    ✔     |
 | Postfix completion templates         |    14    |
 | Code formatter                       |    ✔     |
@@ -45,6 +45,6 @@ QQ交流群：`29850775`
 | Remote Debugger                      |    ✔     |
 | Lua Check                            |    ✔     |
 | Embed Remote Debugger                |    0%    |
-| Lua Profiler                         |    0%    |
+| Lua Profiler                         |    ✔     |
 | ... .etc                             |          |
 
