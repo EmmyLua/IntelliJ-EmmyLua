@@ -74,10 +74,22 @@ function xluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAs
     end
 end
 
+emmy = {}
+
 if tolua then
     emmy = toluaDebugger
 elseif xlua then
     emmy = xluaDebugger
+end
+
+function emmy.Reload(fileName)
+    local searchers = package.searchers or package.loaders
+    for _, load in ipairs(searchers) do
+        local s = load(fileName)
+        if type(s) == 'function' then
+            break
+        end
+    end
 end
 
 if emmy_init then

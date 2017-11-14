@@ -101,7 +101,7 @@ public:
      * was not available for the script. This should be set if the script was encountered
      * through a call other than the load function.
      */
-    int RegisterScript(lua_State* L, const char* source, size_t size, const char* name, bool unavailable);
+    int RegisterScript(LAPI api, lua_State* L, const char* source, size_t size, const char* name, bool unavailable);
 
     int RegisterScript(LAPI api, lua_State* L, lua_Debug* ar);
 
