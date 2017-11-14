@@ -27,6 +27,7 @@ import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.PathUtil
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.XSourcePosition
@@ -161,12 +162,14 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     }
 
     fun findFile(name: String?): VirtualFile? {
-        if (name != null) {
-            val f = memoryFileSystem.findMemoryFile(name)
-            if (f != null)
-                return f
-        }
-        return LuaFileUtil.findFile(session.project, name)
+        if (name == null)
+            return null
+        val path = PathUtil.getCanonicalPath(name)
+
+        val f = memoryFileSystem.findMemoryFile(path)
+        if (f != null)
+            return f
+        return LuaFileUtil.findFile(session.project, path)
     }
 
     private fun onBreak(proto: DMBreak) {

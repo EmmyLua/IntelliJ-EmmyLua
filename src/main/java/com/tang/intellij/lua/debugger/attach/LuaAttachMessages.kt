@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.util.PathUtil
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValueChildrenList
@@ -209,7 +210,7 @@ class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
-        fileName = stream.readString()
+        fileName = PathUtil.getCanonicalPath(stream.readString())
         source = stream.readString()
         index = stream.readInt()
 
@@ -291,69 +292,6 @@ class DMBreak : LuaAttachMessage(DebugMessageId.Break) {
         }
         stack = LuaExecutionStack(frames)
     }
-
-    /*private fun parseStack(item: Element) {
-        val frames = ArrayList<XStackFrame>()
-        val nodeList = item.getElementsByTagName("stack")
-        for (stackIndex in 0 until nodeList.length) {
-            val stackNode = nodeList.item(stackIndex)
-            val attributes = stackNode.attributes
-            val functionNode = attributes.getNamedItem("function")
-            val scriptIndexNode = attributes.getNamedItem("script_index")
-            val lineNode = attributes.getNamedItem("line")
-
-            val script = process.getScript(Integer.parseInt(scriptIndexNode.textContent))
-            var scriptName: String? = null
-            val line = Integer.parseInt(lineNode.textContent)
-            var position: XSourcePosition? = null
-            if (script != null) {
-                scriptName = script.name
-                // find source position
-                val file = LuaFileUtil.findFile(process.session?.project!!, scriptName)
-                if (file != null) {
-                    position = XSourcePositionImpl.create(file, line)
-
-                    if (name == null) {
-                        this.line = line
-                        this.name = scriptName
-                    }
-                }
-            }
-            val childrenList = parseValue(stackNode)
-            val frame = LuaAttachStackFrame(this, childrenList, position, functionNode.textContent, scriptName, stackIndex)
-            frames.add(frame)
-        }
-        stack = LuaExecutionStack(frames)
-    }
-
-    private data class XValueItem(val name:String, val node: LuaXValue)
-
-    private fun parseValue(stackNode: Node): XValueChildrenList {
-        val sortList = mutableListOf<XValueItem>()
-        var valueNode: Node? = stackNode.firstChild
-        while (valueNode != null) {
-            if (valueNode is Element) {
-                val value = LuaXValue.parse(valueNode, L, process)
-                var name = "unknown"
-                val valueNodeChildNodes = valueNode.childNodes
-                for (i in 0 until valueNodeChildNodes.length) {
-                    val item = valueNodeChildNodes.item(i)
-                    if (item.nodeName == "name") {
-                        name = item.textContent
-                        break
-                    }
-                }
-                value.name = name
-                sortList.add(XValueItem(name, value))
-            }
-            valueNode = valueNode.nextSibling
-        }
-
-        val list = XValueChildrenList()
-        sortList.sortBy { it.name }
-        sortList.forEach { list.add(it.name, it.node) }
-        return list
-    }*/
 }
 
 class DMDelBreakpoint(private val scriptIndex: Int,
@@ -415,7 +353,7 @@ class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
         val size = stream.readInt()
         for (i in 0 until size) {
             val id = stream.readInt()
-            val file = stream.readString()
+            val file = PathUtil.getCanonicalPath(stream.readString())
             val function = stream.readString()
             val line = stream.readInt()
             val count = stream.readInt()
