@@ -60,7 +60,7 @@ public abstract class LuaRValue extends XNamedValue {
     @Override
     public void computeSourcePosition(@NotNull XNavigatable xNavigatable) {
         if (session != null) {
-            LuaXValue.computeSourcePosition(xNavigatable, getName(), session);
+            LuaXValue.Companion.computeSourcePosition(xNavigatable, getName(), session);
         }
     }
 }

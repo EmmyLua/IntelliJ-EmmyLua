@@ -372,7 +372,7 @@ void SetHookMode(LAPI api, lua_State* L, HookMode mode)
 	}
 	else
 	{
-		int mask;
+		int mask = 0;
 
 		switch (mode)
 		{
@@ -384,6 +384,8 @@ void SetHookMode(LAPI api, lua_State* L, HookMode mode)
 			break;
 		case HookMode_Full:
 			mask = LUA_MASKCALL | LUA_MASKRET | LUA_MASKLINE;
+			break;
+		default:
 			break;
 		}
 
@@ -726,6 +728,8 @@ void EnableIntercepts(LAPI apiIndex, bool enableIntercepts)
 
 bool GetAreInterceptsEnabled()
 {
+	if (!DebugBackend::Get().GetIsAttached())
+		return false;
 	int value = reinterpret_cast<int>(TlsGetValue(g_disableInterceptIndex));
 	return value <= 0;
 }
@@ -1145,6 +1149,11 @@ void lua_call_dll(LAPI api, lua_State* L, int nargs, int nresults)
 	return g_interfaces[api].lua_call_dll_cdecl(L, nargs, nresults);
 }
 
+void lua_callk_dll(LAPI api, lua_State* L, int nargs, int nresults, int ctk, lua_CFunction k)
+{
+	return g_interfaces[api].lua_callk_dll_cdecl(L, nargs, nresults, ctk, k);
+}
+
 int lua_pcallk_dll(LAPI api, lua_State* L, int nargs, int nresults, int errfunc, int ctx, lua_CFunction k)
 {
 	return g_interfaces[api].lua_pcallk_dll_cdecl(L, nargs, nresults, errfunc, ctx, k);
@@ -1374,9 +1383,16 @@ void lua_call_worker(LAPI api, lua_State* L, int nargs, int nresults)
 		DebugBackend::Get().Message("Warning 1005: lua_call called with too few arguments on the stack", MessageType_Warning);
 	}
 
-	if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+	if (GetAreInterceptsEnabled())
 	{
-		lua_error_dll(api, L);
+		if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+		{
+			lua_error_dll(api, L);
+		}
+	}
+	else
+	{
+		lua_call_dll(api, L, nargs, nresults);
 	}
 }
 // This function cannot be called like a normal function. It changes its
@@ -1400,9 +1416,16 @@ void lua_callk_worker(LAPI api, lua_State* L, int nargs, int nresults, int ctk, 
 		DebugBackend::Get().Message("Warning 1005: lua_call called with too few arguments on the stack", MessageType_Warning);
 	}
 
-	if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+	if (GetAreInterceptsEnabled())
 	{
-		lua_error_dll(api, L);
+		if (DebugBackend::Get().Call(api, L, nargs, nresults, 0))
+		{
+			lua_error_dll(api, L);
+		}
+	}
+	else
+	{
+		lua_callk_dll(api, L, nargs, nresults, ctk, k);
 	}
 }
 
@@ -1712,7 +1735,7 @@ void lua_close_intercept(lua_State* L)
 
 int luaL_newmetatable_worker(LAPI api, lua_State *L, const char* tname)
 {
-	int result;
+	int result = 0;
 	if (g_interfaces[api].luaL_newmetatable_dll_cdecl != nullptr)
 	{
 		result = g_interfaces[api].luaL_newmetatable_dll_cdecl(L, tname);
@@ -2558,9 +2581,9 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 
 					if (LocateSymbolFile(module, symbolFileName))
 					{
-						char message[1024];
-						_snprintf(message, 1024, "Warning 1002: Symbol file '%s' located but it does not match module '%s'", symbolFileName, moduleFileName);
-						DebugBackend::Get().Message(message, MessageType_Warning);
+						char message2[1024];
+						_snprintf(message2, 1024, "Warning 1002: Symbol file '%s' located but it does not match module '%s'", symbolFileName, moduleFileName);
+						DebugBackend::Get().Message(message2, MessageType_Warning);
 					}
 
 					// Remember that we've checked on this file, so no need to check again.
@@ -2602,9 +2625,9 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 
 				if (luaFile)
 				{
-					char message[1024];
-					_snprintf(message, 1024, "Warning 1001: '%s' appears to contain Lua functions however no Lua functions could located with the symbolic information", moduleFileName);
-					DebugBackend::Get().Message(message, MessageType_Warning);
+					char message2[1024];
+					_snprintf(message2, 1024, "Warning 1001: '%s' appears to contain Lua functions however no Lua functions could located with the symbolic information", moduleFileName);
+					DebugBackend::Get().Message(message2, MessageType_Warning);
 				}
 
 			}
@@ -2805,7 +2828,6 @@ bool InstallLuaHooker(HINSTANCE hInstance, const char* symbolsDirectory)
 		}
 
 		CloseHandle(hSnapshot);
-		hSnapshot = nullptr;
 
 		if (LdrLockLoaderLock_dll != nullptr && LdrUnlockLoaderLock_dll != nullptr)
 		{
@@ -2813,7 +2835,6 @@ bool InstallLuaHooker(HINSTANCE hInstance, const char* symbolsDirectory)
 		}
 	}
 
-	DebugBackend::Get().Message("Attach finish.");
 	return true;
 }
 

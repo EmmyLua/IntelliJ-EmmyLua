@@ -33,6 +33,27 @@
     <ClCompile Include="LuaInject\DllMain.cpp">
       <Filter>头文件\LuaInject</Filter>
     </ClCompile>
+    <ClCompile Include="LuaInject\DebugPipeline.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaInject\TCPServer.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaInject\Stream.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaInject\DebugMessage.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaInject\endian.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaInject\LuaProfiler.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaInject\StackNode.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaInject\DebugBackend.h">
@@ -48,6 +69,27 @@
       <Filter>头文件\LuaInject</Filter>
     </ClInclude>
     <ClInclude Include="LuaInject\LuaTypes.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\DebugPipeline.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\TCPServer.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\Stream.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\DebugMessage.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\endian.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\LuaProfiler.h">
+      <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInject\StackNode.h">
       <Filter>头文件\LuaInject</Filter>
     </ClInclude>
   </ItemGroup>

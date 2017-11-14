@@ -133,6 +133,8 @@
         <!--CreateFromTemplate-->
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
 
+        <virtualFileSystem implementationClass="com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem" key="lua-dummy"/>
+
         <!--module and library-->
         <moduleType id="LUA_MODULE" implementationClass="com.tang.intellij.lua.project.LuaModuleType"/>
         <moduleConfigurationEditorProvider implementation="com.tang.intellij.lua.project.LuaModuleConfigurationEditorProvider"/>

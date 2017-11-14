@@ -39,6 +39,9 @@
     <ClCompile Include="Shared\Utility.cpp">
       <Filter>头文件\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="Shared\WindowUtility.cpp">
+      <Filter>头文件\Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shared\Channel.h">
@@ -63,6 +66,9 @@
       <Filter>头文件\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Utility.h">
+      <Filter>头文件\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\WindowUtility.h">
       <Filter>头文件\Shared</Filter>
     </ClInclude>
   </ItemGroup>

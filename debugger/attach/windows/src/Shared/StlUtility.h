@@ -71,4 +71,6 @@ std::string GetDirectory(const std::string& fileName);
  */
 bool GetIsSlash(char c);
 
+void CopyString(std::string & dst, const char* data, size_t size);
+
 #endif

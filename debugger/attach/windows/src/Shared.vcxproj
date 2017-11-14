@@ -25,6 +25,7 @@
     <ClCompile Include="Shared\CriticalSectionTryLock.cpp" />
     <ClCompile Include="Shared\StlUtility.cpp" />
     <ClCompile Include="Shared\Utility.cpp" />
+    <ClCompile Include="Shared\WindowUtility.cpp" />
     <ClCompile Include="Shared\XmlUtility.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -35,6 +36,7 @@
     <ClInclude Include="Shared\Protocol.h" />
     <ClInclude Include="Shared\StlUtility.h" />
     <ClInclude Include="Shared\Utility.h" />
+    <ClInclude Include="Shared\WindowUtility.h" />
     <ClInclude Include="Shared\XmlUtility.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

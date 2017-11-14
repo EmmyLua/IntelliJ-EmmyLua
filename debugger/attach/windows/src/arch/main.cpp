@@ -3,14 +3,17 @@
 #include <string>
 #include <psapi.h>
 #include "Utility.h"
+#include "WindowUtility.h"
+
+using namespace std;
 
 int main(int argc, char** argv)
 {
-	if (argc >= 3)
-	{
-		std::string cmd = argv[1];
-		if (cmd == "-file") {
-			const char* fileName = argv[2];
+	string cmd = argv[1];
+	if (cmd == "arch") {
+		string type = argv[2];
+		if (type == "-file") {
+			const char* fileName = argv[3];
 			ExeInfo info;
 			if (GetExeInfo(fileName, info)) {
 				printf("%d", info.i386);
@@ -18,8 +21,8 @@ int main(int argc, char** argv)
 			}
 			return -1;//file not exist
 		}
-		else if(cmd == "-pid") {
-			const char* pid_str = argv[2];
+		else if (type == "-pid") {
+			const char* pid_str = argv[3];
 			DWORD processId = atoi(pid_str);
 
 			char fileName[_MAX_PATH];
@@ -32,6 +35,15 @@ int main(int argc, char** argv)
 				return info.i386;
 			}
 		}
+	}
+	else if (cmd == "getinfo") {
+		DWORD processId = atoi(argv[2]);
+		Process process;
+		if (!GetProcess(processId, process))
+			return -1;
+
+		printf("%s\n", process.title.c_str());
+		printf("%s\n", process.path.c_str());
 	}
 	return 0;
 }

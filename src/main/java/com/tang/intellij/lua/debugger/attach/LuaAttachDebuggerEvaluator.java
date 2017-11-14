@@ -26,19 +26,19 @@ import org.jetbrains.annotations.Nullable;
  * Created by tangzx on 2017/4/2.
  */
 public class LuaAttachDebuggerEvaluator extends LuaDebuggerEvaluator {
-    private LuaAttachDebugProcess process;
+    private LuaAttachDebugProcessBase process;
     private LuaAttachStackFrame stackFrame;
 
-    LuaAttachDebuggerEvaluator(LuaAttachDebugProcess process, LuaAttachStackFrame stackFrame) {
+    LuaAttachDebuggerEvaluator(LuaAttachDebugProcessBase process, LuaAttachStackFrame stackFrame) {
         this.process = process;
         this.stackFrame = stackFrame;
     }
 
     @Override
     protected void eval(@NotNull String express, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
-        process.getBridge().eval(express, stackFrame.getStack(), 1, result -> {
-            if (result.isSuccess() && result.getXValue() != null) {
-                xEvaluationCallback.evaluated(result.getXValue());
+        process.getBridge().eval(stackFrame.getProto().getL(), express, stackFrame.getStack(), 1, result -> {
+            if (result.getSuccess()) {
+                xEvaluationCallback.evaluated(result.getResultNode().getValue());
             } else {
                 xEvaluationCallback.errorOccurred("error");
             }
