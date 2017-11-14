@@ -80,6 +80,9 @@ enum class DebugMessageId
     ReqProfilerEnd,
     RespProfilerEnd,
     RespProfilerData,
+
+    ReqReloadScript,
+    RespReloadScript,
 }
 
 open class LuaAttachMessage(val id: DebugMessageId) {
@@ -361,5 +364,12 @@ class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
             val call = DMProfilerCall(id, file, function, line, count, time)
             list.add(call)
         }
+    }
+}
+
+class DMReqReloadScript(private val index: Int) : LuaAttachMessage(DebugMessageId.ReqReloadScript) {
+    override fun write(stream: DataOutputStream) {
+        super.write(stream)
+        stream.writeInt(index)
     }
 }

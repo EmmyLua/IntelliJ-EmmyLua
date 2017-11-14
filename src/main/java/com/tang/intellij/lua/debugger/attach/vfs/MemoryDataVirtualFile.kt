@@ -20,13 +20,18 @@ import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.util.ArrayUtil
 import com.intellij.util.LocalTimeCounter
+import com.tang.intellij.lua.debugger.attach.CodeState
 import com.tang.intellij.lua.lang.LuaFileType
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 
-class MemoryDataVirtualFile(name: String, parent: MemoryVirtualFileDirectory?)
+class MemoryDataVirtualFile(name: String,
+                            parent: MemoryVirtualFileDirectory?)
     : MemoryVirtualFile(name, parent) {
+
+    var index: Int = -1
+    var state = CodeState.Unavailable
 
     private var myContents: ByteArray = ArrayUtil.EMPTY_BYTE_ARRAY
     private var myModificationStamp: Long = LocalTimeCounter.currentTime()

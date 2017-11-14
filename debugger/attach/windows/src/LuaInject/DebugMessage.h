@@ -48,6 +48,9 @@ enum class DebugMessageId
 	ReqProfilerEnd,
 	RespProfilerEnd,
 	RespProfilerData,
+
+	ReqReloadScript,
+	RespReloadScript,
 };
 
 class DebugMessage
@@ -221,4 +224,14 @@ public:
 	void Write(ByteOutputStream* stream) override;
 
 	std::vector<LPFunctionCall*> callList;
+};
+
+class DMReqReloadScript : public DebugMessage
+{
+public:
+	DMReqReloadScript();
+
+	void Read(ByteInputStream* stream) override;
+
+	size_t index;
 };

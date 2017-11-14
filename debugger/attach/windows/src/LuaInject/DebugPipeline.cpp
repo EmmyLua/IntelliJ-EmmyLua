@@ -78,6 +78,9 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 	case DebugMessageId::ReqProfilerEnd:
 		msg = new DMProfilerEnd();
 		break;
+	case DebugMessageId::ReqReloadScript:
+		msg = new DMReqReloadScript();
+		break;
 	case DebugMessageId::Detach:
 	case DebugMessageId::Break:
 	case DebugMessageId::LoadDone:

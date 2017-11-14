@@ -596,6 +596,10 @@ private:
 	Script* GetScript(size_t index) const;
 
 	void SendScript(lua_State* L, Script* script) const;
+
+	void CheckReload(LAPI api, lua_State* L, int index);
+
+	void Reload(LAPI api, lua_State* L, Script* script);
 private:
 
     typedef stdext::hash_map<lua_State*, VirtualMachine*>   StateToVmMap;

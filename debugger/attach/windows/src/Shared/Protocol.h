@@ -36,6 +36,7 @@ enum CodeState
     CodeState_Unavailable       = 1,    // The code for the script was not available.
     CodeState_Binary            = 2,    // The code was loaded as a binary/compiled file
 	CodeState_Reload            = 3,
+	CodeState_ReqReload         = 4,
 };
 
 enum EventId

@@ -197,3 +197,13 @@ void DMProfilerData::Write(ByteOutputStream* stream)
 		stream->WriteUInt32(call->time);
 	}
 }
+
+DMReqReloadScript::DMReqReloadScript() : DebugMessage(DebugMessageId::ReqReloadScript), index(0)
+{
+}
+
+void DMReqReloadScript::Read(ByteInputStream* stream)
+{
+	DebugMessage::Read(stream);
+	index = stream->ReadUInt32();
+}

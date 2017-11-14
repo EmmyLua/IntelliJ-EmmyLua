@@ -37,6 +37,7 @@ import com.intellij.xdebugger.frame.XSuspendContext
 import com.intellij.xdebugger.ui.XDebugTabLayouter
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
+import com.tang.intellij.lua.debugger.attach.vfs.MemoryDataVirtualFile
 import com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem
 import com.tang.intellij.lua.debugger.attach.vfs.MemoryVirtualFile
 import com.tang.intellij.lua.lang.LuaIcons
@@ -182,12 +183,21 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         setStack(proto.stack)
     }
 
+    fun reload(file: MemoryDataVirtualFile) {
+        val dm = DMReqReloadScript(file.index)
+        bridge.send(dm)
+    }
+
     private fun onLoadScript(proto: DMLoadScript) {
         var file = findFile(proto.fileName)
         if (file == null) {
             file = createMemoryFile(proto)
             print("[✔] Create memory file : ", ConsoleViewContentType.SYSTEM_OUTPUT)
         } else {
+            if (file is MemoryDataVirtualFile) {
+                file.setBinaryContent(proto.source.toByteArray())
+                file.state = proto.state
+            }
             print("[✔] File was loaded :", ConsoleViewContentType.SYSTEM_OUTPUT)
         }
         session.consoleView.printHyperlink(proto.fileName) {
@@ -208,7 +218,9 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     }
 
     private fun createMemoryFile(dm: DMLoadScript): VirtualFile {
-        val childFile = memoryFileSystem.createChildFile(this, memoryFileSystem.getRoot(), dm.fileName)
+        val childFile = memoryFileSystem.createChildFile(this, memoryFileSystem.getRoot(), dm.fileName) as MemoryDataVirtualFile
+        childFile.index = dm.index
+        childFile.state = dm.state
         childFile.setBinaryContent(dm.source.toByteArray())
         memoryFilesPanel.addFile(childFile)
         return childFile
@@ -273,7 +285,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     }
 
     private fun createMemoryFilesPanel(ui: RunnerLayoutUi) {
-        memoryFilesPanel = MemoryFilesPanel(session.project)
+        memoryFilesPanel = MemoryFilesPanel(session.project, this)
         val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, memoryFilesPanel, "Memory files", AllIcons.Debugger.Frame, null)
         content.isCloseable = false
         ui.addContent(content, 0, PlaceInGrid.left, false)

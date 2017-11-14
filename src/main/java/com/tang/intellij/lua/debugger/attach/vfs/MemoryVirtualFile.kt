@@ -23,8 +23,8 @@ import com.intellij.openapi.vfs.ex.dummy.DummyFileIdGenerator
 import java.io.InputStream
 import java.io.OutputStream
 
-abstract class MemoryVirtualFile(val myName: String,
-                                 val myParent: MemoryVirtualFileDirectory?) : VirtualFile(), VirtualFileWithId {
+abstract class MemoryVirtualFile(private val myName: String,
+                                 private val myParent: MemoryVirtualFileDirectory?) : VirtualFile(), VirtualFileWithId {
 
     private val id = DummyFileIdGenerator.next()
     internal var myInvalid = true
