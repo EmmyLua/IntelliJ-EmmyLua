@@ -607,7 +607,7 @@ private:
 
 	void SendScript(lua_State* L, Script* script) const;
 
-	void CheckReload(LAPI api, lua_State* L, int index);
+	void CheckReload(LAPI api, lua_State* L);
 
 	void Reload(LAPI api, lua_State* L, Script* script);
 private:
@@ -654,6 +654,7 @@ private:
 
 	bool                            m_profiler;
 	std::hash_map<std::string, LPFunctionCall*> m_profilerCallMap;
+	bool                            m_checkReloadNextTime;
 };
 
 #endif
