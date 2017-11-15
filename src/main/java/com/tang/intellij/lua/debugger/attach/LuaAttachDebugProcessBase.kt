@@ -183,36 +183,45 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         setStack(proto.stack)
     }
 
-    fun reload(file: MemoryDataVirtualFile) {
-        val dm = DMReqReloadScript(file.index)
-        bridge.send(dm)
-    }
-
     private fun onLoadScript(proto: DMLoadScript) {
         var file = findFile(proto.fileName)
         if (file == null) {
-            file = createMemoryFile(proto)
-            print("[✔] Create memory file : ", ConsoleViewContentType.SYSTEM_OUTPUT)
+            if (proto.state != CodeState.Unavailable) {
+                file = createMemoryFile(proto)
+                print("[✔] Load memory file : ", ConsoleViewContentType.SYSTEM_OUTPUT)
+                session.consoleView.printHyperlink(proto.fileName) {
+                    FileEditorManager.getInstance(it).openFile(file!!, true)
+                }
+                print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
+            }
         } else {
             if (file is MemoryDataVirtualFile) {
                 file.setBinaryContent(proto.source.toByteArray())
                 file.state = proto.state
             }
             print("[✔] File was loaded :", ConsoleViewContentType.SYSTEM_OUTPUT)
-        }
-        session.consoleView.printHyperlink(proto.fileName) {
-            FileEditorManager.getInstance(it).openFile(file!!, true)
-        }
-        print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
-
-        val script = LoadedScript(file, proto.index, proto.fileName, proto.state)
-        loadedScriptMap.put(proto.index, script)
-
-        for (pos in registeredBreakpoints.keys) {
-            if (LuaFileUtil.fileEquals(file, pos.file)) {
-                val breakpoint = registeredBreakpoints[pos]!!
-                bridge.addBreakpoint(proto.index, breakpoint)
+            session.consoleView.printHyperlink(proto.fileName) {
+                FileEditorManager.getInstance(it).openFile(file!!, true)
             }
+            print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
+        }
+
+        if (file != null) {
+            val script = LoadedScript(file, proto.index, proto.fileName, proto.state)
+            loadedScriptMap.put(proto.index, script)
+
+            for (pos in registeredBreakpoints.keys) {
+                if (LuaFileUtil.fileEquals(file, pos.file)) {
+                    val breakpoint = registeredBreakpoints[pos]!!
+                    bridge.addBreakpoint(proto.index, breakpoint)
+                }
+            }
+        } else {
+            print("[✘] File not found ", ConsoleViewContentType.SYSTEM_OUTPUT)
+            session.consoleView.printHyperlink("[TRY MEMORY FILE]") {
+                bridge.send(DMReqReloadScript(proto.index))
+            }
+            print(": ${proto.fileName}\n", ConsoleViewContentType.SYSTEM_OUTPUT)
         }
         bridge.sendDone()
     }

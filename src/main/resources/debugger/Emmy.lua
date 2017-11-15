@@ -88,14 +88,12 @@ function emmy.Reload(fileName)
         fileName = string.sub(fileName, 1, a - 1)
     end
 
-    emmy.DebugLog('reload : ' .. fileName, 1)
+    emmy.DebugLog('Try reload : ' .. fileName, 1)
     local searchers = package.searchers or package.loaders
     for _, load in ipairs(searchers) do
-        local s = load(fileName)
-        if type(s) == 'function' then
+        local result = load(fileName)
+        if type(result) == 'function' then
             break
-        else
-            emmy.DebugLog(s, 1)
         end
     end
 end

@@ -46,6 +46,13 @@ class DebugPipeline;
 class DebugMessage;
 class LPFunctionCall;
 
+enum class ScriptRegisterResult
+{
+	RegisterAndSend,
+	RegisterOnly,
+	Exist
+};
+
 /**
  * This class encapsulates the part of the debugger that runs inside the
  * process begin debugged. It communicates with a DebugClient via a channel.
@@ -101,9 +108,9 @@ public:
      * was not available for the script. This should be set if the script was encountered
      * through a call other than the load function.
      */
-    int RegisterScript(LAPI api, lua_State* L, const char* source, size_t size, const char* name, bool unavailable);
+	ScriptRegisterResult RegisterScript(LAPI api, lua_State* L, const char* source, size_t size, const char* name, bool unavailable, size_t* index);
 
-    int RegisterScript(LAPI api, lua_State* L, lua_Debug* ar);
+	ScriptRegisterResult RegisterScript(LAPI api, lua_State* L, lua_Debug* ar, size_t* index);
 
     /**
      * Steps execution of a "broken" script by one line. If the current line
@@ -165,7 +172,7 @@ public:
      * name. The name is the same name that was supplied when the script was
      * loaded.
      */
-    int GetScriptIndex(const char* name) const;
+	size_t GetScriptIndex(const char* name) const;
 
     bool StackHasBreakpoint(LAPI api, lua_State* L);
 
@@ -284,7 +291,10 @@ private:
 
         void ClearBreakpoints();
 
+		bool ReadyToSend();
+
 		CodeState                   state;
+		bool                        reloading;
 		size_t                      index;
 		std::string                 name;
 		std::string                 fileName;

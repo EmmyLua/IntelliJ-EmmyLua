@@ -82,10 +82,10 @@ class MemoryFilesPanel(val project: Project, val process: LuaAttachDebugProcessB
             }
 
             override fun mouseClicked(e: MouseEvent) {
-                if (e.button == 3) {
+                /*if (e.button == 3) {
                     val file = list.selectedValue
                     process.reload(file)
-                }
+                }*/
             }
 
             override fun mouseExited(e: MouseEvent) {
