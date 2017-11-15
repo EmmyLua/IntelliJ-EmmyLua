@@ -59,6 +59,20 @@ std::string TrimSpaces(const std::string& string)
 
 }
 
+std::string FixFileName(const std::string& fileName)
+{
+	std::string out = fileName;
+	ReplaceAll(out, "\\", "/");
+	// remove ./
+	if (out[0] == '.' && out[1] == '/') {
+		out.erase(0, 2);
+	}
+	else if (out[0] == '@' && out[1] == '.' && out[2] == '/') {
+		out.erase(1, 2);
+	}
+	return out;
+}
+
 std::string GetDirectory(const std::string& fileName)
 {
 
