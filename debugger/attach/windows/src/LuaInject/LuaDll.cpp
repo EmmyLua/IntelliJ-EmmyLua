@@ -26,6 +26,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include "CriticalSectionLock.h"
 #include "DebugHelp.h"
 #include "easyHook.h"
+#include "libpe.h"
 
 #include <windows.h>
 #include <tlhelp32.h>
@@ -2503,9 +2504,9 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 	// Record that we've loaded this module so that we don't
 	// try to load it again.
 	loadedModules.insert(moduleName);
+	char modulePath[_MAX_PATH];
 	// skip module in c://WINDOWS
 	{
-		char modulePath[_MAX_PATH];
 		GetModuleFileNameEx(hProcess, hModule, modulePath, _MAX_PATH);
 
 		char windowsPath[MAX_PATH];
@@ -2515,6 +2516,38 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 				return;
 			}
 		}
+	}
+
+	PE pe = { 0 };
+	PE_STATUS st = peOpenFile(&pe, modulePath);
+
+	if (st == PE_SUCCESS)
+		st = peParseExportTable(&pe, 1000);
+	if (st == PE_SUCCESS && PE_HAS_TABLE(&pe, ExportTable))
+	{
+		PE_FOREACH_EXPORTED_SYMBOL(&pe, pSymbol)
+		{
+			if (PE_SYMBOL_HAS_NAME(pSymbol))
+			{
+				const char* name = pSymbol->Name;
+				if (name[0] == 'l' && name[1] == 'u' && name[2] == 'a') {
+					uint64_t addr = (uint64_t)(hModule);
+					addr += pSymbol->Address.VA - pe.qwBaseAddress;
+					symbols[pSymbol->Name] = addr;
+				}
+			}
+		}
+
+		/*st = peParseImportTable(&pe);
+		if (st == PE_SUCCESS && PE_HAS_TABLE(&pe, ImportTable))
+		{
+			PE_FOREACH_IMPORTED_MODULE(&pe, pModule)
+			{
+				//HMODULE hImportModule = GetModuleHandle(pModule->Name);
+				//LoadSymbolsRecursively(loadedModules, symbols, hProcess, hImportModule);
+			}
+		}*/
+		return;
 	}
 
 	{
