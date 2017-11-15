@@ -16,6 +16,9 @@
     <Filter Include="头文件\LuaInject">
       <UniqueIdentifier>{8dc70348-780f-409a-aeae-08b0ed7ccdb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\libpe">
+      <UniqueIdentifier>{aba42253-f24f-4941-8583-38b6fede3899}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LuaInject\DebugBackend.cpp">
@@ -54,6 +57,15 @@
     <ClCompile Include="LuaInject\StackNode.cpp">
       <Filter>头文件\LuaInject</Filter>
     </ClCompile>
+    <ClCompile Include="third-party\libpe\libpe\htable.cpp">
+      <Filter>头文件\libpe</Filter>
+    </ClCompile>
+    <ClCompile Include="third-party\libpe\libpe\libpe.cpp">
+      <Filter>头文件\libpe</Filter>
+    </ClCompile>
+    <ClCompile Include="third-party\libpe\libpe\llist.cpp">
+      <Filter>头文件\libpe</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaInject\DebugBackend.h">
@@ -91,6 +103,15 @@
     </ClInclude>
     <ClInclude Include="LuaInject\StackNode.h">
       <Filter>头文件\LuaInject</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\libpe\libpe\htable.h">
+      <Filter>头文件\libpe</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\libpe\libpe\libpe.h">
+      <Filter>头文件\libpe</Filter>
+    </ClInclude>
+    <ClInclude Include="third-party\libpe\libpe\llist.h">
+      <Filter>头文件\libpe</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
