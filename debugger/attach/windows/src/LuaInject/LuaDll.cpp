@@ -2494,7 +2494,7 @@ bool ScanForSignature(DWORD64 start, DWORD64 length, const char* signature)
 
 }
 
-void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_map<std::string, DWORD64>& symbols, HANDLE hProcess, HMODULE hModule)
+void LoadSymbolsRecursively(std::set<std::string>& loadedModules, HANDLE hProcess, HMODULE hModule)
 {
 	assert(hModule != NULL);
 	char moduleName[_MAX_PATH];
@@ -2517,6 +2517,10 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 			}
 		}
 	}
+
+	//printf("Examining '%s'\n", moduleName);
+	
+	stdext::hash_map<std::string, DWORD64> symbols;
 
 	PE pe = { 0 };
 	PE_STATUS st = peOpenFile(&pe, modulePath);
@@ -2546,10 +2550,10 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 				//HMODULE hImportModule = GetModuleHandle(pModule->Name);
 				//LoadSymbolsRecursively(loadedModules, symbols, hProcess, hImportModule);
 			}
-		}*/
-		return;
+		}
+		return;*/
 	}
-
+	else
 	{
 		MODULEINFO moduleInfo = { nullptr };
 		GetModuleInformation(hProcess, hModule, &moduleInfo, sizeof(moduleInfo));
@@ -2559,11 +2563,11 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 
 		DWORD64 base = SymLoadModule64_dll(hProcess, nullptr, moduleFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
 
-#ifdef VERBOSE
+/*#ifdef VERBOSE
 		char message[1024];
 		_snprintf(message, 1024, "Examining '%s' %s\n", moduleName, base ? "(symbols loaded)" : "");
 		DebugBackend::Get().Log(message);
-#endif
+#endif*/
 
 		// Check to see if there was a symbol file we failed to load (usually
 		// becase it didn't match the version of the module).
@@ -2670,30 +2674,28 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, stdext::hash_m
 
 		}
 
-		// Get the imports for the module. These are loaded before we're able to hook
-		// LoadLibrary for the module.
-
-		std::vector<std::string> imports;
-		GetModuleImports(hProcess, hModule, imports);
-
-		for (unsigned int i = 0; i < imports.size(); ++i)
-		{
-
-			HMODULE hImportModule = GetModuleHandle(imports[i].c_str());
-
-			// Sometimes the import module comes back NULL, which means that for some reason
-			// it wasn't loaded. Perhaps these are delay loaded and we'll catch them later?
-			if (hImportModule != nullptr)
-			{
-				LoadSymbolsRecursively(loadedModules, symbols, hProcess, hImportModule);
-			}
-
-		}
-
 		// Unload
 		SymUnloadModule64_dll(hProcess, base);
 	}
+	
+	LoadLuaFunctions(moduleName, symbols, hProcess);
 
+	// Get the imports for the module. These are loaded before we're able to hook
+	// LoadLibrary for the module.
+	std::vector<std::string> imports;
+	GetModuleImports(hProcess, hModule, imports);
+
+	for (unsigned int i = 0; i < imports.size(); ++i)
+	{
+		HMODULE hImportModule = GetModuleHandle(imports[i].c_str());
+
+		// Sometimes the import module comes back NULL, which means that for some reason
+		// it wasn't loaded. Perhaps these are delay loaded and we'll catch them later?
+		if (hImportModule != nullptr)
+		{
+			LoadSymbolsRecursively(loadedModules, hProcess, hImportModule);
+		}
+	}
 }
 
 BOOL CALLBACK SymbolCallbackFunction(HANDLE hProcess, ULONG code, ULONG64 data, ULONG64 UserContext)
@@ -2731,7 +2733,7 @@ void PostLoadLibrary(HMODULE hModule)
 
 		// Record that we've loaded this module so that we don't
 		// try to load it again.
-		g_loadedModules.insert(moduleName);
+		//g_loadedModules.insert(moduleName);
 
 		if (!g_initializedDebugHelp)
 		{
@@ -2744,18 +2746,11 @@ void PostLoadLibrary(HMODULE hModule)
 
 		//SymSetOptions(SYMOPT_DEBUG);
 
-		std::set<std::string> loadedModules;
-		stdext::hash_map<std::string, DWORD64> symbols;
-
-		LoadSymbolsRecursively(loadedModules, symbols, hProcess, hModule);
-
-		LoadLuaFunctions(moduleName, symbols, hProcess);
+		LoadSymbolsRecursively(g_loadedModules, hProcess, hModule);
 
 		//SymCleanup_dll(hProcess);
 		//hProcess = NULL;
-
 	}
-
 }
 
 void HookLoadLibrary()
