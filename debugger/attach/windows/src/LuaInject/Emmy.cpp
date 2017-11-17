@@ -61,6 +61,18 @@ int EmmyDebugLog(lua_State* L)
 	return 0;
 }
 
+int EmmyBeginProfiler(lua_State* L)
+{
+	DebugBackend::Get().BeginProfiler();
+	return 0;
+}
+
+int EmmyEndProfiler(lua_State* L)
+{
+	DebugBackend::Get().EndProfiler();
+	return 0;
+}
+
 void DebugBackend::RegisterEmmyLibrary(LAPI api, lua_State * L) const
 {
 	lua_rawgetglobal_dll(api, L, "emmy");
@@ -82,6 +94,14 @@ void DebugBackend::RegisterEmmyLibrary(LAPI api, lua_State * L) const
 		//emmy.DebugLog = function(log, type)
 		lua_pushstring_dll(api, L, "DebugLog");
 		lua_pushcfunction_dll(api, L, EmmyDebugLog);
+		lua_settable_dll(api, L, emmyTable);
+		//emmy.BeginProfiler = function()
+		lua_pushstring_dll(api, L, "BeginProfiler");
+		lua_pushcfunction_dll(api, L, EmmyBeginProfiler);
+		lua_settable_dll(api, L, emmyTable);
+		//emmy.EndProfiler = function()
+		lua_pushstring_dll(api, L, "EndProfiler");
+		lua_pushcfunction_dll(api, L, EmmyEndProfiler);
 		lua_settable_dll(api, L, emmyTable);
 	}
 	lua_pop_dll(api, L, 1);
