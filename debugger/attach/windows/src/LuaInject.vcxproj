@@ -23,6 +23,7 @@
     <ClCompile Include="LuaInject\DebugHelp.cpp" />
     <ClCompile Include="LuaInject\DebugMessage.cpp" />
     <ClCompile Include="LuaInject\DebugPipeline.cpp" />
+    <ClCompile Include="LuaInject\Emmy.cpp" />
     <ClCompile Include="LuaInject\endian.cpp" />
     <ClCompile Include="LuaInject\LuaCheckStack.cpp" />
     <ClCompile Include="LuaInject\LuaDll.cpp" />

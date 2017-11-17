@@ -66,6 +66,9 @@
     <ClCompile Include="third-party\libpe\libpe\llist.cpp">
       <Filter>头文件\libpe</Filter>
     </ClCompile>
+    <ClCompile Include="LuaInject\Emmy.cpp">
+      <Filter>头文件\LuaInject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaInject\DebugBackend.h">
