@@ -33,15 +33,17 @@ interface LuaTableFieldStub : StubElement<LuaTableField> {
     val typeName: String?
     val name: String?
 }
+
 class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
-    private var tableField: LuaTableField? = null
+    private var _tableField: LuaTableField? = null
     private var _typeName: String? = null
     private var _fieldName: String? = null
 
     constructor(field: LuaTableField,
                 parent: StubElement<*>,
                 elementType: IStubElementType<*, *>) : super(parent, elementType) {
-        tableField = field
+        _tableField = field
+        _fieldName = field.fieldName
     }
 
     constructor(typeName: String,
@@ -54,8 +56,8 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
 
     override val typeName: String?
         get() {
-            if (_typeName == null && tableField != null) {
-                val table = PsiTreeUtil.getParentOfType(tableField, LuaTableExpr::class.java)
+            if (_typeName == null && _tableField != null) {
+                val table = PsiTreeUtil.getParentOfType(_tableField, LuaTableExpr::class.java)
                 val optional = Optional.ofNullable(table)
                         .filter { s -> s.parent is LuaExprList }
                         .map<PsiElement> { it.parent }
@@ -70,10 +72,5 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
             return _typeName
         }
 
-    override val name: String?
-        get() {
-            if (_fieldName != null)
-                return _fieldName
-            return tableField?.fieldName
-        }
+    override val name = _fieldName
 }
