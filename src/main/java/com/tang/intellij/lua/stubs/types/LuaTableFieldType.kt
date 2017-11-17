@@ -63,7 +63,7 @@ class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Ta
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
         return LuaTableFieldStubImpl(StringRef.toString(typeName)!!,
-                StringRef.toString(fieldName)!!,
+                StringRef.toString(fieldName),
                 stubElement,
                 this)
     }

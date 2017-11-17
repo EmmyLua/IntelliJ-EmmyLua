@@ -47,7 +47,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
     }
 
     constructor(typeName: String,
-                fieldName: String,
+                fieldName: String?,
                 stubElement: StubElement<*>,
                 elementType: IStubElementType<*, *>) : super(stubElement, elementType) {
         _typeName = typeName
