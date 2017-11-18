@@ -32,7 +32,7 @@ import java.util.*
 
  * Created by tangzx on 2016/12/3.
  */
-open class LuaScriptBlock(psi: PsiElement,
+open class LuaScriptBlock(val psi: PsiElement,
                           wrap: Wrap?,
                           private val alignment: Alignment?,
                           private val indent: Indent,
