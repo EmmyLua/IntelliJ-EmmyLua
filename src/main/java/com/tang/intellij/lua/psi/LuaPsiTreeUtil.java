@@ -20,6 +20,7 @@ import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
+import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
@@ -231,5 +232,14 @@ public class LuaPsiTreeUtil {
             current = current.getParent();
         }
         return Ty.Companion.getUNKNOWN();
+    }
+
+    public static void processChildren(PsiElement parent, PsiElementProcessor<PsiElement> processor) {
+        PsiElement child = parent.getFirstChild();
+        while (child != null) {
+            if (processor.execute(child)) {
+                child = child.getNextSibling();
+            } else break;
+        }
     }
 }

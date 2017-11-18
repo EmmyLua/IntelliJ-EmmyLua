@@ -18,12 +18,13 @@ package com.tang.intellij.lua.editor.formatter.blocks
 
 import com.intellij.formatting.*
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.tang.intellij.lua.editor.formatter.LuaFormatContext
-import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.LuaTypes.*
 import java.util.*
 
@@ -31,12 +32,11 @@ import java.util.*
 
  * Created by tangzx on 2016/12/3.
  */
-open class LuaScriptBlock(private val parent: LuaScriptBlock?,
-                          node: ASTNode,
+open class LuaScriptBlock(psi: PsiElement,
                           wrap: Wrap?,
                           private val alignment: Alignment?,
                           private val indent: Indent,
-                          private val ctx: LuaFormatContext) : AbstractBlock(node, wrap, alignment) {
+                          private val ctx: LuaFormatContext) : AbstractBlock(psi.node, wrap, alignment) {
 
     //不创建 ASTBlock
     private val fakeBlockSet = TokenSet.create(
@@ -64,41 +64,55 @@ open class LuaScriptBlock(private val parent: LuaScriptBlock?,
 
     override fun buildChildren(): List<Block> {
         val blocks = ArrayList<Block>()
-        buildChildren(myNode, blocks)
+        buildChildren(myNode.psi, blocks)
         return blocks
     }
 
-    private fun buildChildren(parent: ASTNode, results: MutableList<Block>) {
-        var child: ASTNode? = parent.firstChildNode
-        val parentType = parent.elementType
-        var childIndent = Indent.getNoneIndent()
-        if (fakeBlockSet.contains(parentType)) {
-            childIndent = Indent.getNormalIndent()
-        }
-
-        while (child != null) {
-            val childType = child.elementType
-            if (parentType == TABLE_EXPR ) {
-                if (childType != LCURLY && childType != RCURLY)
-                    childIndent = Indent.getNormalIndent()
-                else
-                    childIndent = Indent.getNoneIndent()
-            }
-
+    private fun buildChildren(parent: PsiElement, results: MutableList<Block>) {
+        LuaPsiTreeUtil.processChildren(parent) { child ->
+            val childType = child.node.elementType
             if (fakeBlockSet.contains(childType)) {
-                buildChildren(child, results)
-            } else if (shouldCreateBlockFor(child)) {
-                results.add(createBlock(child, childIndent, null))
+                LuaPsiTreeUtil.processChildren(child) {
+                    if (shouldCreateBlockFor(it.node))
+                        results.add(buildChild(it, Indent.getNormalIndent()))
+                    true
+                }
+            } else if (shouldCreateBlockFor(child.node)) {
+                results.add(buildChild(child))
             }
-            child = child.treeNext
+            true
         }
     }
 
-    private fun createBlock(node: ASTNode, childIndent: Indent, alignment: Alignment?): LuaScriptBlock {
-        return when (node.elementType) {
-            UNARY_EXPR -> LuaUnaryScriptBlock(this, node, null, alignment, childIndent, ctx)
-            BINARY_EXPR -> LuaBinaryScriptBlock(this, node, null, alignment, childIndent, ctx)
-            else -> LuaScriptBlock(this, node, null, alignment, childIndent, ctx)
+    protected open fun buildChild(child:PsiElement, indent: Indent? = null): LuaScriptBlock {
+        var childIndent = Indent.getNoneIndent()
+        if (indent != null) {
+            childIndent = indent
+        } else {
+            val parent = node.psi
+            val childType = child.node.elementType
+            if (parent is LuaTableExpr) {
+                childIndent = if (childType != LCURLY && childType != RCURLY)
+                    Indent.getNormalIndent()
+                else
+                    Indent.getNoneIndent()
+            }
+            //local a = <continuation indent>1
+            else if (parent is LuaLocalDef) {
+                if (child is LuaExprList)
+                    childIndent = Indent.getContinuationIndent()
+            }
+        }
+
+        return createBlock(child, childIndent, null)
+    }
+
+    protected fun createBlock(element: PsiElement, childIndent: Indent, alignment: Alignment?): LuaScriptBlock {
+        return when (element) {
+            is LuaUnaryExpr -> LuaUnaryScriptBlock(element, null, alignment, childIndent, ctx)
+            is LuaBinaryExpr -> LuaBinaryScriptBlock(element, null, alignment, childIndent, ctx)
+            is LuaListArgs -> LuaListArgsBlock(element, null, alignment, childIndent, ctx)
+            else -> LuaScriptBlock(element, null, alignment, childIndent, ctx)
         }
     }
 

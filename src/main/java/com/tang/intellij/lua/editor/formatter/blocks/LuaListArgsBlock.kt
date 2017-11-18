@@ -19,10 +19,20 @@ package com.tang.intellij.lua.editor.formatter.blocks
 import com.intellij.formatting.Alignment
 import com.intellij.formatting.Indent
 import com.intellij.formatting.Wrap
-import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.editor.formatter.LuaFormatContext
+import com.tang.intellij.lua.psi.LuaExpr
+import com.tang.intellij.lua.psi.LuaListArgs
 
-class LuaAssignBlock(parent: LuaScriptBlock?, node: ASTNode, wrap: Wrap?, alignment: Alignment?, indent: Indent, ctx: LuaFormatContext)
-    : LuaScriptBlock(parent, node, wrap, alignment, indent, ctx) {
-    
+class LuaListArgsBlock(psi: LuaListArgs, wrap: Wrap?, alignment: Alignment?, indent: Indent, ctx: LuaFormatContext)
+    : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
+
+    private val align = Alignment.createAlignment()
+
+    override fun buildChild(child: PsiElement, indent: Indent?): LuaScriptBlock {
+        if (child is LuaExpr)
+            return createBlock(child, Indent.getContinuationIndent(), align)
+        return super.buildChild(child, indent)
+    }
+
 }
