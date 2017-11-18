@@ -17,26 +17,21 @@
 package com.tang.intellij.lua.editor.formatter.blocks
 
 import com.intellij.formatting.Alignment
-import com.intellij.formatting.ChildAttributes
 import com.intellij.formatting.Indent
 import com.intellij.formatting.Wrap
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.editor.formatter.LuaFormatContext
-import com.tang.intellij.lua.psi.LuaExpr
-import com.tang.intellij.lua.psi.LuaListArgs
+import com.tang.intellij.lua.psi.LuaFuncBody
+import com.tang.intellij.lua.psi.LuaParamNameDef
 
-class LuaListArgsBlock(psi: LuaListArgs, wrap: Wrap?, alignment: Alignment?, indent: Indent, ctx: LuaFormatContext)
+class LuaFuncBodyBlock(psi: LuaFuncBody, wrap: Wrap?, alignment: Alignment?, indent: Indent, ctx: LuaFormatContext)
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
 
-    private val paramAlign = Alignment.createAlignment()
-
     override fun buildChild(child: PsiElement, indent: Indent?): LuaScriptBlock {
-        if (child is LuaExpr)
-            return createBlock(child, Indent.getContinuationIndent(), paramAlign)
+        if (child is LuaParamNameDef) {
+            return createBlock(child, Indent.getContinuationIndent())
+        }
         return super.buildChild(child, indent)
     }
 
-    override fun getChildAttributes(newChildIndex: Int): ChildAttributes {
-        return ChildAttributes(Indent.getNormalIndent(), paramAlign)
-    }
 }

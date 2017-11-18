@@ -56,6 +56,7 @@ open class LuaScriptBlock(psi: PsiElement,
             ARGS
     ))
 
+    private var childBlocks:List<Block>? = null
     private val elementType: IElementType = node.elementType
 
     private fun shouldCreateBlockFor(node: ASTNode): Boolean {
@@ -63,9 +64,12 @@ open class LuaScriptBlock(psi: PsiElement,
     }
 
     override fun buildChildren(): List<Block> {
-        val blocks = ArrayList<Block>()
-        buildChildren(myNode.psi, blocks)
-        return blocks
+        if (childBlocks == null) {
+            val blocks = ArrayList<Block>()
+            buildChildren(myNode.psi, blocks)
+            childBlocks = blocks
+        }
+        return childBlocks!!
     }
 
     private fun buildChildren(parent: PsiElement, results: MutableList<Block>) {
@@ -107,11 +111,12 @@ open class LuaScriptBlock(psi: PsiElement,
         return createBlock(child, childIndent, null)
     }
 
-    protected fun createBlock(element: PsiElement, childIndent: Indent, alignment: Alignment?): LuaScriptBlock {
+    protected fun createBlock(element: PsiElement, childIndent: Indent, alignment: Alignment? = null): LuaScriptBlock {
         return when (element) {
             is LuaUnaryExpr -> LuaUnaryScriptBlock(element, null, alignment, childIndent, ctx)
             is LuaBinaryExpr -> LuaBinaryScriptBlock(element, null, alignment, childIndent, ctx)
             is LuaListArgs -> LuaListArgsBlock(element, null, alignment, childIndent, ctx)
+            is LuaFuncBody -> LuaFuncBodyBlock(element, null, alignment, childIndent, ctx)
             else -> LuaScriptBlock(element, null, alignment, childIndent, ctx)
         }
     }
