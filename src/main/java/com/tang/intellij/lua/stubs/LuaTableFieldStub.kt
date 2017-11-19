@@ -72,5 +72,5 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
             return _typeName
         }
 
-    override val name = _fieldName
+    override val name get() = _fieldName
 }
