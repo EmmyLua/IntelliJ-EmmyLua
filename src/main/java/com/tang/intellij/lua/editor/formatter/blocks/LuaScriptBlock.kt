@@ -89,25 +89,7 @@ open class LuaScriptBlock(val psi: PsiElement,
     }
 
     protected open fun buildChild(child:PsiElement, indent: Indent? = null): LuaScriptBlock {
-        var childIndent = Indent.getNoneIndent()
-        if (indent != null) {
-            childIndent = indent
-        } else {
-            val parent = node.psi
-            val childType = child.node.elementType
-            if (parent is LuaTableExpr) {
-                childIndent = if (childType != LCURLY && childType != RCURLY)
-                    Indent.getNormalIndent()
-                else
-                    Indent.getNoneIndent()
-            }
-            //local a = <continuation indent>1
-            else if (parent is LuaLocalDef) {
-                if (child is LuaExprList)
-                    childIndent = Indent.getContinuationIndent()
-            }
-        }
-
+        val childIndent = indent ?: Indent.getNoneIndent()
         return createBlock(child, childIndent, null)
     }
 
@@ -117,22 +99,13 @@ open class LuaScriptBlock(val psi: PsiElement,
             is LuaBinaryExpr -> LuaBinaryScriptBlock(element, null, alignment, childIndent, ctx)
             is LuaListArgs -> LuaListArgsBlock(element, null, alignment, childIndent, ctx)
             is LuaFuncBody -> LuaFuncBodyBlock(element, null, alignment, childIndent, ctx)
+            is LuaTableExpr -> LuaTableBlock(element, null, alignment, childIndent, ctx)
+            is LuaCallExpr -> LuaCallExprBlock(element, null, alignment, childIndent, ctx)
             else -> LuaScriptBlock(element, null, alignment, childIndent, ctx)
         }
     }
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
-        if (this.myNode.elementType === CALL_EXPR) {
-            if (child1 is LuaScriptBlock && child2 is LuaScriptBlock) {
-                // call(param)
-                if (child2.myNode.findChildByType(LuaTypes.LPAREN) != null) {
-                    return Spacing.createSpacing(0, 0, 0, false, 0)
-                } else {
-                    return Spacing.createSpacing(1, 1, 0, false, 0)
-                }// call "string"
-            }
-        }
-
         return ctx.spaceBuilder.getSpacing(this, child1, child2)
     }
 
