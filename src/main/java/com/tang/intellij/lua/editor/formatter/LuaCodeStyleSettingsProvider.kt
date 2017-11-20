@@ -44,7 +44,7 @@ class LuaCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
                         addIndentOptionsTab(styleSettings)
                         addSpacesTab(styleSettings)
                         //addBlankLinesTab(styleSettings)
-                        //addWrappingAndBracesTab(styleSettings);
+                        addWrappingAndBracesTab(styleSettings)
                     }
                 }
             }

@@ -29,7 +29,7 @@ import com.tang.intellij.lua.lang.LuaLanguage
  * Created by tangzx on 2017/2/22.
  */
 class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider() {
-    override fun getLanguage() = LuaLanguage.INSTANCE
+    override fun getLanguage(): LuaLanguage = LuaLanguage.INSTANCE
 
     override fun getCodeSample(settingsType: LanguageCodeStyleSettingsProvider.SettingsType): String {
         return CodeStyleAbstractPanel.readFromFile(this.javaClass, "preview.lua.template")
@@ -46,6 +46,15 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                 consumer.showStandardOptions("SPACE_AROUND_ASSIGNMENT_OPERATORS",
                         "SPACE_BEFORE_COMMA",
                         "SPACE_AFTER_COMMA")
+            }
+            LanguageCodeStyleSettingsProvider.SettingsType.WRAPPING_AND_BRACES_SETTINGS -> {
+                consumer.showStandardOptions(
+                        "METHOD_PARAMETERS_WRAP",
+                        "ALIGN_MULTILINE_PARAMETERS",
+
+                        "CALL_PARAMETERS_WRAP",
+                        "ALIGN_MULTILINE_PARAMETERS_IN_CALLS"
+                )
             }
             else -> {
             }

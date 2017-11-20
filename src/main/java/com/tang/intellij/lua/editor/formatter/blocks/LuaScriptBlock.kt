@@ -36,7 +36,7 @@ open class LuaScriptBlock(val psi: PsiElement,
                           wrap: Wrap?,
                           private val alignment: Alignment?,
                           private val indent: Indent,
-                          private val ctx: LuaFormatContext) : AbstractBlock(psi.node, wrap, alignment) {
+                          val ctx: LuaFormatContext) : AbstractBlock(psi.node, wrap, alignment) {
 
     companion object {
         //不创建 ASTBlock

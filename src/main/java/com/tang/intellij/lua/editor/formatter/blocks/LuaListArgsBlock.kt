@@ -30,12 +30,15 @@ class LuaListArgsBlock(psi: LuaListArgs, wrap: Wrap?, alignment: Alignment?, ind
 
     private val argAlign = Alignment.createAlignment()
 
+    private fun getAlign()
+            = if (ctx.settings.ALIGN_MULTILINE_PARAMETERS_IN_CALLS) argAlign else null
+
     override fun buildChild(child: PsiElement, indent: Indent?): LuaScriptBlock {
         if (child is LuaExpr)
-            return createBlock(child, Indent.getContinuationIndent(), argAlign)
+            return createBlock(child, Indent.getContinuationIndent(), getAlign())
         return super.buildChild(child, indent)
     }
 
     override fun getChildAttributes(newChildIndex: Int) =
-            ChildAttributes(Indent.getContinuationIndent(), argAlign)
+            ChildAttributes(Indent.getContinuationIndent(), getAlign())
 }
