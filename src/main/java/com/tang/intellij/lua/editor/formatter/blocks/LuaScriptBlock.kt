@@ -38,30 +38,29 @@ open class LuaScriptBlock(val psi: PsiElement,
                           private val indent: Indent,
                           private val ctx: LuaFormatContext) : AbstractBlock(psi.node, wrap, alignment) {
 
-    //不创建 ASTBlock
-    private val fakeBlockSet = TokenSet.create(
-            BLOCK
-    )
+    companion object {
+        //不创建 ASTBlock
+        private val fakeBlockSet = TokenSet.create(BLOCK)
 
-    //回车时
-    private val childAttrSet = TokenSet.orSet(fakeBlockSet, TokenSet.create(
-            IF_STAT,
-            DO_STAT,
-            FUNC_BODY,
-            FOR_A_STAT,
-            FOR_B_STAT,
-            REPEAT_STAT,
-            WHILE_STAT,
-            TABLE_EXPR,
-            ARGS
-    ))
+        //回车时
+        private val childAttrSet = TokenSet.orSet(fakeBlockSet, TokenSet.create(
+                IF_STAT,
+                DO_STAT,
+                FUNC_BODY,
+                FOR_A_STAT,
+                FOR_B_STAT,
+                REPEAT_STAT,
+                WHILE_STAT,
+                TABLE_EXPR,
+                ARGS
+        ))
+    }
 
     private var childBlocks:List<Block>? = null
     private val elementType: IElementType = node.elementType
 
-    private fun shouldCreateBlockFor(node: ASTNode): Boolean {
-        return node.textRange.length != 0 && node.elementType !== TokenType.WHITE_SPACE
-    }
+    private fun shouldCreateBlockFor(node: ASTNode) =
+            node.textRange.length != 0 && node.elementType !== TokenType.WHITE_SPACE
 
     override fun buildChildren(): List<Block> {
         if (childBlocks == null) {
@@ -105,21 +104,13 @@ open class LuaScriptBlock(val psi: PsiElement,
         }
     }
 
-    override fun getSpacing(child1: Block?, child2: Block): Spacing? {
-        return ctx.spaceBuilder.getSpacing(this, child1, child2)
-    }
+    override fun getSpacing(child1: Block?, child2: Block) = ctx.spaceBuilder.getSpacing(this, child1, child2)
 
-    override fun getAlignment(): Alignment? {
-        return alignment
-    }
+    override fun getAlignment() = alignment
 
-    override fun isLeaf(): Boolean {
-        return myNode.firstChildNode == null
-    }
+    override fun isLeaf() = myNode.firstChildNode == null
 
-    override fun getIndent(): Indent? {
-        return indent
-    }
+    override fun getIndent() = indent
 
     override fun getChildAttributes(newChildIndex: Int): ChildAttributes {
         if (childAttrSet.contains(elementType))
