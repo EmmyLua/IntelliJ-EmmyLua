@@ -56,22 +56,22 @@ open class LuaScriptBlock(val psi: PsiElement,
         ))
     }
 
-    private var childBlocks:List<Block>? = null
-    private val elementType: IElementType = node.elementType
+    protected var childBlocks:List<LuaScriptBlock>? = null
+    val elementType: IElementType = node.elementType
 
     private fun shouldCreateBlockFor(node: ASTNode) =
             node.textRange.length != 0 && node.elementType !== TokenType.WHITE_SPACE
 
     override fun buildChildren(): List<Block> {
         if (childBlocks == null) {
-            val blocks = ArrayList<Block>()
+            val blocks = ArrayList<LuaScriptBlock>()
             buildChildren(myNode.psi, blocks)
             childBlocks = blocks
         }
         return childBlocks!!
     }
 
-    private fun buildChildren(parent: PsiElement, results: MutableList<Block>) {
+    private fun buildChildren(parent: PsiElement, results: MutableList<LuaScriptBlock>) {
         LuaPsiTreeUtil.processChildren(parent) { child ->
             val childType = child.node.elementType
             if (fakeBlockSet.contains(childType)) {

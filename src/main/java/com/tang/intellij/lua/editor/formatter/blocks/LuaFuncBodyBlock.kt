@@ -24,6 +24,7 @@ import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.editor.formatter.LuaFormatContext
 import com.tang.intellij.lua.psi.LuaFuncBody
 import com.tang.intellij.lua.psi.LuaParamNameDef
+import com.tang.intellij.lua.psi.LuaTypes
 
 class LuaFuncBodyBlock(psi: LuaFuncBody, wrap: Wrap?, alignment: Alignment?, indent: Indent, ctx: LuaFormatContext)
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
@@ -37,6 +38,24 @@ class LuaFuncBodyBlock(psi: LuaFuncBody, wrap: Wrap?, alignment: Alignment?, ind
         return super.buildChild(child, indent)
     }
 
-    override fun getChildAttributes(newChildIndex: Int) =
+    private fun rp(): Int {
+        var idx = -1
+        childBlocks?.let {
+            for (i in 0 until it.size) {
+                val child = it[i]
+                if (child.elementType == LuaTypes.RPAREN) {
+                    idx = i
+                    break
+                }
+            }
+        }
+        return idx
+    }
+
+    override fun getChildAttributes(newChildIndex: Int): ChildAttributes {
+        return if (newChildIndex <= rp())
             ChildAttributes(Indent.getContinuationIndent(), paramAlign)
+        else
+            ChildAttributes(Indent.getNormalIndent(), null)
+    }
 }
