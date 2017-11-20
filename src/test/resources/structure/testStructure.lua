@@ -63,7 +63,9 @@ A.B.C.doitAgain = function () end
 A.B.C.var = 3
 
 globalVar = 3
-globalFunc2 = function () end
+globalFunc2 = function ()
+    local j = 3
+end
 
 globalTable = {
     a = function () end
@@ -76,3 +78,9 @@ globalC2 = {}
 local xyz
 
 xyz = 3
+
+e:doit(function ()
+    local a = 3;
+
+    local F.A.x = function () local x = 3 end
+end)
