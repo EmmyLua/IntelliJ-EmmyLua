@@ -28,15 +28,14 @@ import com.tang.intellij.lua.psi.LuaListArgs
 class LuaListArgsBlock(psi: LuaListArgs, wrap: Wrap?, alignment: Alignment?, indent: Indent, ctx: LuaFormatContext)
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
 
-    private val paramAlign = Alignment.createAlignment()
+    private val argAlign = Alignment.createAlignment()
 
     override fun buildChild(child: PsiElement, indent: Indent?): LuaScriptBlock {
         if (child is LuaExpr)
-            return createBlock(child, Indent.getContinuationIndent(), paramAlign)
+            return createBlock(child, Indent.getContinuationIndent(), argAlign)
         return super.buildChild(child, indent)
     }
 
-    override fun getChildAttributes(newChildIndex: Int): ChildAttributes {
-        return ChildAttributes(Indent.getNormalIndent(), paramAlign)
-    }
+    override fun getChildAttributes(newChildIndex: Int) =
+            ChildAttributes(Indent.getContinuationIndent(), argAlign)
 }
