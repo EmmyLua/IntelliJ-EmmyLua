@@ -113,6 +113,7 @@ open class LuaScriptBlock(val psi: PsiElement,
         return when (element) {
             is LuaUnaryExpr -> LuaUnaryExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaBinaryExpr -> LuaBinaryExprBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaParenExpr -> LuaParenExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaListArgs -> LuaListArgsBlock(element, wrap, alignment, childIndent, ctx)
             is LuaFuncBody -> LuaFuncBodyBlock(element, wrap, alignment, childIndent, ctx)
             is LuaTableExpr -> LuaTableBlock(element, wrap, alignment, childIndent, ctx)

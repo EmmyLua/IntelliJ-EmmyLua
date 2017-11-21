@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.editor.formatter.blocks
 
 import com.intellij.formatting.*
+import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.TokenSet
 import com.tang.intellij.lua.editor.formatter.LuaFormatContext
 import com.tang.intellij.lua.psi.LuaBinaryExpr
@@ -33,8 +34,13 @@ class LuaBinaryExprBlock internal constructor(psi: LuaBinaryExpr,
                                               ctx: LuaFormatContext)
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
 
-    //这几个特殊一点，前后必须要有空格
-    private val AND_NOT_OR = TokenSet.create(AND, NOT, OR)
+    companion object {
+        //这几个特殊一点，前后必须要有空格
+        private val AND_NOT_OR = TokenSet.create(AND, NOT, OR)
+    }
+
+    override fun buildChild(child: PsiElement, indent: Indent?) =
+            super.buildChild(child, Indent.getContinuationWithoutFirstIndent())
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
         if (child1 is LuaScriptBlock && child2 is LuaScriptBlock) {
