@@ -18,6 +18,7 @@ package com.tang.intellij.lua.editor.formatter.blocks
 
 import com.intellij.formatting.*
 import com.intellij.lang.ASTNode
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.intellij.psi.TokenType
 import com.intellij.psi.formatter.common.AbstractBlock
@@ -64,6 +65,14 @@ open class LuaScriptBlock(val psi: PsiElement,
 
     val nextBlock get() = next
     val prevBlock get() = prev
+
+    protected fun getPrevSkipComment(): LuaScriptBlock? {
+        return if (prev?.psi is PsiComment) prev?.getPrevSkipComment() else prev
+    }
+
+    protected fun getNextSkipComment(): LuaScriptBlock? {
+        return if (next?.psi is PsiComment) next?.getNextSkipComment() else next
+    }
 
     private fun shouldCreateBlockFor(node: ASTNode) =
             node.textRange.length != 0 && node.elementType !== TokenType.WHITE_SPACE
@@ -119,6 +128,8 @@ open class LuaScriptBlock(val psi: PsiElement,
             is LuaTableExpr -> LuaTableBlock(element, wrap, alignment, childIndent, ctx)
             is LuaCallExpr -> LuaCallExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaIndentRange -> LuaIndentBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaAssignStat,
+            is LuaLocalDef -> LuaAssignBlock(element, wrap, alignment, childIndent, ctx)
             else -> LuaScriptBlock(element, wrap, alignment, childIndent, ctx)
         }
     }

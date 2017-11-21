@@ -55,7 +55,11 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                         "CALL_PARAMETERS_WRAP",
                         "ALIGN_MULTILINE_PARAMETERS_IN_CALLS",
 
-                        "KEEP_SIMPLE_BLOCKS_IN_ONE_LINE"
+                        // keep when reformatting
+                        "KEEP_SIMPLE_BLOCKS_IN_ONE_LINE",
+
+                        //align group declarations
+                        "ALIGN_CONSECUTIVE_VARIABLE_DECLARATIONS"
                 )
             }
             else -> {
