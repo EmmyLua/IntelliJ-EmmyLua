@@ -51,6 +51,8 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .before(END).lineBreakInCode()
                 .after(DO).lineBreakInCode()
                 .after(THEN).lineBreakInCode()
+                .around(ELSE).lineBreakInCode()
+                .before(ELSEIF).lineBreakInCode()
                 .after(LOCAL).spaces(1) //local<SPACE>
                 .before(COMMA).spaces(if (settings.SPACE_BEFORE_COMMA) 1 else 0)
                 .after(COMMA).spaces(if (settings.SPACE_AFTER_COMMA) 1 else 0) //,<SPACE>
