@@ -59,6 +59,12 @@ open class LuaScriptBlock(val psi: PsiElement,
     protected var childBlocks:List<LuaScriptBlock>? = null
     val elementType: IElementType = node.elementType
 
+    private var next: LuaScriptBlock? = null
+    private var prev: LuaScriptBlock? = null
+
+    val nextBlock get() = next
+    val prevBlock get() = prev
+
     private fun shouldCreateBlockFor(node: ASTNode) =
             node.textRange.length != 0 && node.elementType !== TokenType.WHITE_SPACE
 
@@ -67,8 +73,19 @@ open class LuaScriptBlock(val psi: PsiElement,
             val blocks = ArrayList<LuaScriptBlock>()
             buildChildren(myNode.psi, blocks)
             childBlocks = blocks
+            var prev: LuaScriptBlock? = null
+            blocks.forEach {
+                it.prev = prev
+                prev?.next = it
+                prev = it
+            }
+            postBuildChildren(blocks)
         }
         return childBlocks!!
+    }
+
+    protected open fun postBuildChildren(children: List<LuaScriptBlock>) {
+
     }
 
     private fun buildChildren(parent: PsiElement, results: MutableList<LuaScriptBlock>) {
@@ -100,11 +117,18 @@ open class LuaScriptBlock(val psi: PsiElement,
             is LuaFuncBody -> LuaFuncBodyBlock(element, wrap, alignment, childIndent, ctx)
             is LuaTableExpr -> LuaTableBlock(element, wrap, alignment, childIndent, ctx)
             is LuaCallExpr -> LuaCallExprBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaIndentRange -> LuaIndentBlock(element, wrap, alignment, childIndent, ctx)
             else -> LuaScriptBlock(element, wrap, alignment, childIndent, ctx)
         }
     }
 
-    override fun getSpacing(child1: Block?, child2: Block) = ctx.spaceBuilder.getSpacing(this, child1, child2)
+    override fun getSpacing(child1: Block?, child2: Block): Spacing? {
+        if ((child1 is LuaScriptBlock && child1.psi is LuaStatement) &&
+                (child2 is LuaScriptBlock && child2.psi is LuaStatement)) {
+            return Spacing.createSpacing(1, 0, 1, true, 1)
+        }
+        return ctx.spaceBuilder.getSpacing(this, child1, child2)
+    }
 
     override fun getAlignment() = alignment
 

@@ -53,7 +53,9 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                         "ALIGN_MULTILINE_PARAMETERS",
 
                         "CALL_PARAMETERS_WRAP",
-                        "ALIGN_MULTILINE_PARAMETERS_IN_CALLS"
+                        "ALIGN_MULTILINE_PARAMETERS_IN_CALLS",
+
+                        "KEEP_SIMPLE_BLOCKS_IN_ONE_LINE"
                 )
             }
             else -> {
