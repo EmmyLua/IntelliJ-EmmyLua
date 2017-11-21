@@ -30,13 +30,16 @@ class LuaFuncBodyBlock(psi: LuaFuncBody, wrap: Wrap?, alignment: Alignment?, ind
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
 
     private val paramAlign = Alignment.createAlignment()
+    private var paramIndex = 0
 
     private fun getAlign()
             = if (ctx.settings.ALIGN_MULTILINE_PARAMETERS) paramAlign else null
 
     override fun buildChild(child: PsiElement, indent: Indent?): LuaScriptBlock {
         if (child is LuaParamNameDef) {
-            return createBlock(child, Indent.getContinuationIndent(), getAlign())
+            val wrap = if (paramIndex++ == 0) null else
+                Wrap.createWrap(ctx.settings.METHOD_PARAMETERS_WRAP, true)
+            return createBlock(child, Indent.getContinuationIndent(), getAlign(), wrap)
         }
         return super.buildChild(child, indent)
     }

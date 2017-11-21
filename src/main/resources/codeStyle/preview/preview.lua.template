@@ -1,10 +1,12 @@
 local var = 1 -- a short comment
 --- doc comment
 --- @param par1 Par1Type @some strings
-function var:fun(par1, par2)
+function var:testFun(par1, par2, par3, par4, par5)
    print('hello')
    return self.len + 2
 end
+
+var:testFun('par1Value', 'par2Value', 'par3Value', 'par4Value', 'par5Value')
 
 function globalFun()
    return "string" .. var
