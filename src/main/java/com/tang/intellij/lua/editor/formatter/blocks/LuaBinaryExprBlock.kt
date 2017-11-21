@@ -26,11 +26,11 @@ import com.tang.intellij.lua.psi.LuaTypes.*
  * binary
  * Created by tangzx on 2017/4/23.
  */
-class LuaBinaryScriptBlock internal constructor(psi: LuaBinaryExpr,
-                                                wrap: Wrap?,
-                                                alignment: Alignment?,
-                                                indent: Indent,
-                                                ctx: LuaFormatContext)
+class LuaBinaryExprBlock internal constructor(psi: LuaBinaryExpr,
+                                              wrap: Wrap?,
+                                              alignment: Alignment?,
+                                              indent: Indent,
+                                              ctx: LuaFormatContext)
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
 
     //这几个特殊一点，前后必须要有空格

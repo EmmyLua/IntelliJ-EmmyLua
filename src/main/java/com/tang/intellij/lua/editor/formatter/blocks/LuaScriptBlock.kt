@@ -111,8 +111,8 @@ open class LuaScriptBlock(val psi: PsiElement,
 
     protected fun createBlock(element: PsiElement, childIndent: Indent, alignment: Alignment? = null, wrap: Wrap? = null): LuaScriptBlock {
         return when (element) {
-            is LuaUnaryExpr -> LuaUnaryScriptBlock(element, wrap, alignment, childIndent, ctx)
-            is LuaBinaryExpr -> LuaBinaryScriptBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaUnaryExpr -> LuaUnaryExprBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaBinaryExpr -> LuaBinaryExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaListArgs -> LuaListArgsBlock(element, wrap, alignment, childIndent, ctx)
             is LuaFuncBody -> LuaFuncBodyBlock(element, wrap, alignment, childIndent, ctx)
             is LuaTableExpr -> LuaTableBlock(element, wrap, alignment, childIndent, ctx)

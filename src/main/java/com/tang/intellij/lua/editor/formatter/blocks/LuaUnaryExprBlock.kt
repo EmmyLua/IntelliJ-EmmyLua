@@ -25,11 +25,11 @@ import com.tang.intellij.lua.psi.LuaUnaryExpr
  *
  * Created by tangzx on 2017/4/23.
  */
-class LuaUnaryScriptBlock internal constructor(psi: LuaUnaryExpr,
-                                               wrap: Wrap?,
-                                               alignment: Alignment?,
-                                               indent: Indent,
-                                               ctx: LuaFormatContext)
+class LuaUnaryExprBlock internal constructor(psi: LuaUnaryExpr,
+                                             wrap: Wrap?,
+                                             alignment: Alignment?,
+                                             indent: Indent,
+                                             ctx: LuaFormatContext)
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
