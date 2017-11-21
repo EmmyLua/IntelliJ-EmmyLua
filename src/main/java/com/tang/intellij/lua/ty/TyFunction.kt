@@ -189,7 +189,18 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
     }
 
     override val mainSignature: IFunSignature by lazy {
-        FunSignature(selfCall, psi.guessReturnType(searchContext), psi.params)
+        var returnTy = psi.guessReturnType(searchContext)
+        /**
+         * todo optimize this bug solution
+         * local function test()
+         *      return test
+         * end
+         * -- will crash after type `test`
+         */
+        if (returnTy is TyPsiFunction && returnTy.psi == psi) {
+           returnTy = Ty.UNKNOWN
+        }
+        FunSignature(selfCall, returnTy, psi.params)
     }
 
     override val signatures: Array<IFunSignature> by lazy {
