@@ -66,13 +66,14 @@ open class LuaScriptBlock(val psi: PsiElement,
     val nextBlock get() = next
     val prevBlock get() = prev
 
-    protected fun getPrevSkipComment(): LuaScriptBlock? {
-        return if (prev?.psi is PsiComment) prev?.getPrevSkipComment() else prev
-    }
+    protected fun getPrevSkipComment(): LuaScriptBlock? =
+            if (prev?.psi is PsiComment) prev?.getPrevSkipComment() else prev
 
-    protected fun getNextSkipComment(): LuaScriptBlock? {
-        return if (next?.psi is PsiComment) next?.getNextSkipComment() else next
-    }
+    protected fun getNextSkipComment(): LuaScriptBlock? =
+            if (next?.psi is PsiComment) next?.getNextSkipComment() else next
+
+    private var parent: LuaScriptBlock? = null
+    val parentBlock get() = parent
 
     private fun shouldCreateBlockFor(node: ASTNode) =
             node.textRange.length != 0 && node.elementType !== TokenType.WHITE_SPACE
@@ -119,7 +120,7 @@ open class LuaScriptBlock(val psi: PsiElement,
     }
 
     protected fun createBlock(element: PsiElement, childIndent: Indent, alignment: Alignment? = null, wrap: Wrap? = null): LuaScriptBlock {
-        return when (element) {
+        val block = when (element) {
             is LuaUnaryExpr -> LuaUnaryExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaBinaryExpr -> LuaBinaryExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaParenExpr -> LuaParenExprBlock(element, wrap, alignment, childIndent, ctx)
@@ -128,10 +129,13 @@ open class LuaScriptBlock(val psi: PsiElement,
             is LuaTableExpr -> LuaTableBlock(element, wrap, alignment, childIndent, ctx)
             is LuaCallExpr -> LuaCallExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaIndentRange -> LuaIndentBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaIndexExpr -> LuaIndexExprBlock(element, wrap, alignment, childIndent, ctx)
             is LuaAssignStat,
             is LuaLocalDef -> LuaAssignBlock(element, wrap, alignment, childIndent, ctx)
             else -> LuaScriptBlock(element, wrap, alignment, childIndent, ctx)
         }
+        block.parent = this
+        return block
     }
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
