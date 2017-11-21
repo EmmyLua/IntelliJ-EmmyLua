@@ -92,15 +92,15 @@ open class LuaScriptBlock(val psi: PsiElement,
         return createBlock(child, childIndent, null)
     }
 
-    protected fun createBlock(element: PsiElement, childIndent: Indent, alignment: Alignment? = null): LuaScriptBlock {
+    protected fun createBlock(element: PsiElement, childIndent: Indent, alignment: Alignment? = null, wrap: Wrap? = null): LuaScriptBlock {
         return when (element) {
-            is LuaUnaryExpr -> LuaUnaryScriptBlock(element, null, alignment, childIndent, ctx)
-            is LuaBinaryExpr -> LuaBinaryScriptBlock(element, null, alignment, childIndent, ctx)
-            is LuaListArgs -> LuaListArgsBlock(element, null, alignment, childIndent, ctx)
-            is LuaFuncBody -> LuaFuncBodyBlock(element, null, alignment, childIndent, ctx)
-            is LuaTableExpr -> LuaTableBlock(element, null, alignment, childIndent, ctx)
-            is LuaCallExpr -> LuaCallExprBlock(element, null, alignment, childIndent, ctx)
-            else -> LuaScriptBlock(element, null, alignment, childIndent, ctx)
+            is LuaUnaryExpr -> LuaUnaryScriptBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaBinaryExpr -> LuaBinaryScriptBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaListArgs -> LuaListArgsBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaFuncBody -> LuaFuncBodyBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaTableExpr -> LuaTableBlock(element, wrap, alignment, childIndent, ctx)
+            is LuaCallExpr -> LuaCallExprBlock(element, wrap, alignment, childIndent, ctx)
+            else -> LuaScriptBlock(element, wrap, alignment, childIndent, ctx)
         }
     }
 
