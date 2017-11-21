@@ -28,7 +28,7 @@ public class LuaCodeStyleSettings extends CustomCodeStyleSettings {
 
     public boolean SPACE_AFTER_TABLE_FIELD_SEP = true;
 
-    public boolean ALIGIN_EQ = true;
+    public boolean ALIGN_TABLE_FIELD_ASSIGN = false;
 
     LuaCodeStyleSettings(CodeStyleSettings container) {
         super(LuaLanguage.INSTANCE.getID(), container);

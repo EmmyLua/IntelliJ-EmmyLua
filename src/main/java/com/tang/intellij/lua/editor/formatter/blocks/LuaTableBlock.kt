@@ -48,7 +48,7 @@ class LuaTableFieldBlock(private val assignAlign:Alignment, psi: LuaTableField, 
     : LuaScriptBlock(psi, wrap, alignment, indent, ctx) {
 
     override fun buildChild(child: PsiElement, indent: Indent?): LuaScriptBlock {
-        if (ctx.settings.ALIGN_CONSECUTIVE_VARIABLE_DECLARATIONS) {
+        if (ctx.luaSettings.ALIGN_TABLE_FIELD_ASSIGN) {
             if (child.node.elementType == LuaTypes.ASSIGN) {
                 return createBlock(child, Indent.getNoneIndent(), assignAlign)
             }

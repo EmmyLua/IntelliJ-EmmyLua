@@ -1,3 +1,9 @@
+local emmy = {
+    name = "Emmy",
+    age = 7,
+}
+local a = 1
+local b, c = 2, "3"
 local var = 1 -- a short comment
 --- doc comment
 --- @param par1 Par1Type @some strings
@@ -11,7 +17,3 @@ var:testFun('par1Value', 'par2Value', 'par3Value', 'par4Value', 'par5Value')
 function globalFun()
    return "string" .. var
 end
-
-globalVar = {
-   property = value
-}
