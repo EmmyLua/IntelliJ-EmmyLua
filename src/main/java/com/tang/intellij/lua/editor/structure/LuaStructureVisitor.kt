@@ -180,7 +180,7 @@ class LuaStructureVisitor : LuaVisitor() {
     }
 
     override fun visitCallStat(o: LuaCallStat) {
-        val callExpr = o.firstChild as LuaCallExpr
+        val callExpr = o.expr as LuaCallExpr
 
         val args = callExpr.args as LuaListArgs
 
