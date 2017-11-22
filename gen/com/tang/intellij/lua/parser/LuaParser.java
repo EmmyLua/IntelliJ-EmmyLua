@@ -550,33 +550,14 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (unaryExpr | valueExpr) binaryExpr?
+  // <<parseExpr primaryExpr>>
   public static boolean expr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expr")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, EXPR, "<expr>");
-    r = expr_0(b, l + 1);
-    r = r && expr_1(b, l + 1);
+    r = parseExpr(b, l + 1, primaryExpr_parser_);
     exit_section_(b, l, m, r, false, null);
     return r;
-  }
-
-  // unaryExpr | valueExpr
-  private static boolean expr_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = unaryExpr(b, l + 1);
-    if (!r) r = valueExpr(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // binaryExpr?
-  private static boolean expr_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "expr_1")) return false;
-    binaryExpr(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */
@@ -1704,6 +1685,11 @@ public class LuaParser implements PsiParser, LightPsiParser {
   final static Parser parList_recover_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return parList_recover(b, l + 1);
+    }
+  };
+  final static Parser primaryExpr_parser_ = new Parser() {
+    public boolean parse(PsiBuilder b, int l) {
+      return primaryExpr(b, l + 1);
     }
   };
   final static Parser stat_recover_parser_ = new Parser() {

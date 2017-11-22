@@ -156,6 +156,9 @@ public interface LuaTypes {
       else if (type == DO_STAT) {
         return new LuaDoStatImpl(node);
       }
+      else if (type == EXPR) {
+        return new LuaExprImpl(node);
+      }
       else if (type == EXPR_LIST) {
         return new LuaExprListImpl(node);
       }

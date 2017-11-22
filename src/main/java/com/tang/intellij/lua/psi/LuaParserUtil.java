@@ -253,4 +253,8 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             type = builder.getTokenType();
         }
     }
+
+    public static boolean parseExpr(PsiBuilder b, int l, Parser primaryExprParser) {
+        return LuaExpressionParser.INSTANCE.parse(b, l, primaryExprParser);
+    }
 }

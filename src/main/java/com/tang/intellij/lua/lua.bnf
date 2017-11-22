@@ -333,8 +333,8 @@ valueExpr ::= primaryExpr | closureExpr
 
 private varExpr ::= primaryExpr
 
-expr ::= (unaryExpr | valueExpr) binaryExpr?
-{
+//expr ::= (unaryExpr | valueExpr) binaryExpr?
+expr ::= <<parseExpr primaryExpr>> {
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
     implements = [
         "com.tang.intellij.lua.psi.LuaTypeGuessable"

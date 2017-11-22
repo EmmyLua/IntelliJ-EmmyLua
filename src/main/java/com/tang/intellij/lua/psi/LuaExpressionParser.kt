@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.parser.GeneratedParserUtilBase.*
 import com.intellij.psi.tree.TokenSet
+import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaExpressionParser {
@@ -48,10 +49,16 @@ object LuaExpressionParser {
         T_UNARY(TokenSet.create(NOT, GETN, MINUS, BIT_TILDE)),
         // ^
         T_EXP(TokenSet.create(EXP)),
+        // value expr
+        T_VALUE(TokenSet.EMPTY)
     }
 
-    fun parse(builder: PsiBuilder, l:Int)
-            = parseExpr(builder, ExprType.T_OR, l)
+    private var primaryExprParser: Parser? = null
+
+    fun parse(builder: PsiBuilder, l:Int, valueExprParser: Parser): Boolean {
+        this.primaryExprParser = valueExprParser
+        return parseExpr(builder, ExprType.T_OR, l) != null
+    }
 
     private fun parseExpr(builder: PsiBuilder, type: ExprType, l:Int): PsiBuilder.Marker? = when (type) {
         ExprType.T_OR -> parseBinary(builder, type.ops, ExprType.T_AND, l)
@@ -64,39 +71,58 @@ object LuaExpressionParser {
         ExprType.T_CONCAT -> parseBinary(builder, type.ops, ExprType.T_ADDITIVE, l)
         ExprType.T_ADDITIVE -> parseBinary(builder, type.ops, ExprType.T_MULTIPLICATIVE, l)
         ExprType.T_MULTIPLICATIVE -> parseBinary(builder, type.ops, ExprType.T_UNARY, l)
-        ExprType.T_UNARY -> parseUnary(builder, type.ops, l)
-        ExprType.T_EXP -> parseUnary(builder, type.ops, l)
+        ExprType.T_UNARY -> parseUnary(builder, type.ops, ExprType.T_EXP, l)
+        ExprType.T_EXP -> parseUnary(builder, type.ops, ExprType.T_VALUE, l)
+        ExprType.T_VALUE -> parseValue(builder, l)
     }
 
     private fun parseBinary(builder: PsiBuilder, ops: TokenSet, next: ExprType, l:Int): PsiBuilder.Marker? {
         var result = parseExpr(builder, next, l + 1) ?: return null
         while (true) {
             if (ops.contains(builder.tokenType)) {
+
+                val opMarker = builder.mark()
                 builder.advanceLexer()
+                opMarker.done(BINARY_OP)
+
                 val right = parseExpr(builder, next, l + 1)
                 //save
                 result = result.precede()
+                result.done(BINARY_EXPR)
                 if (right == null) {
                     error(builder, "Expression expected")
                     break
                 }
-                result.done(BINARY_EXPR)
             } else break
         }
         return result
     }
 
-    private fun parseUnary(b: PsiBuilder, ops: TokenSet, l: Int): PsiBuilder.Marker? {
-        var r: Boolean
-        val m = enter_section_(b, l, _NONE_, LITERAL_EXPR, "<literal expr>")
-        r = consumeToken(b, NIL)
-        if (!r) r = consumeToken(b, FALSE)
-        if (!r) r = consumeToken(b, TRUE)
-        if (!r) r = consumeToken(b, NUMBER)
-        if (!r) r = consumeToken(b, STRING)
-        if (!r) r = consumeToken(b, ELLIPSIS)
-        exit_section_(b, l, m, r, false, null)
+    private fun parseUnary(b: PsiBuilder, ops: TokenSet, next: ExprType, l: Int): PsiBuilder.Marker? {
+        val isUnary = ops.contains(b.tokenType)
+        if (isUnary) {
+            val m = b.mark()
 
+            val opMarker = b.mark()
+            b.advanceLexer()
+            opMarker.done(UNARY_OP)
+
+            val right = parseUnary(b, ops, next, l)
+            m.done(UNARY_EXPR)
+            if (right == null) {
+                error(b, "Expression expected")
+            }
+            return m
+        }
+        return parseExpr(b, next, l)
+    }
+
+    private fun parseValue(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        var r: Boolean
+        val m = enter_section_(b, l, _COLLAPSE_, VALUE_EXPR, "<value expr>")
+        r = primaryExprParser?.parse(b, l + 1) ?: false
+        if (!r) r = LuaParser.closureExpr(b, l + 1)
+        exit_section_(b, l, m, r, false, null)
         return if (r) m else null
     }
 

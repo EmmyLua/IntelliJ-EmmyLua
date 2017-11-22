@@ -10,7 +10,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 
-public abstract class LuaExprImpl extends LuaExprMixin implements LuaExpr {
+public class LuaExprImpl extends LuaExprMixin implements LuaExpr {
 
   public LuaExprImpl(ASTNode node) {
     super(node);

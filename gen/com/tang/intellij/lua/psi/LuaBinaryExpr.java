@@ -10,7 +10,7 @@ public interface LuaBinaryExpr extends LuaExpr {
   @NotNull
   LuaBinaryOp getBinaryOp();
 
-  @NotNull
-  List<LuaExpr> getExprList();
+  @Nullable
+  LuaExpr getExpr();
 
 }
