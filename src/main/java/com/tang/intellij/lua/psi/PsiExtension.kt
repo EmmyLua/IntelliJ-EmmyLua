@@ -20,6 +20,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.getTableTypeName
 
@@ -130,6 +131,15 @@ val LuaLiteralExpr.kind: LuaLiteralKind get() = when(node.firstChildNode.element
     else -> LuaLiteralKind.Unknown
 }
 
+val LuaLiteralExpr.stringValue: String get() {
+    val content = LuaString.getContent(text)
+    return content.value
+}
+
+val LuaLiteralExpr.boolValue: Boolean get() = text == "true"
+
+val LuaLiteralExpr.numberValue: Float get() = text.toFloat()
+
 val LuaDocClassDef.aliasName: String? get() {
     val owner = LuaCommentUtil.findOwner(this)
     when (owner) {
@@ -202,10 +212,8 @@ val LuaCallExpr.argList: List<LuaExpr> get() {
     }
 }
 
-val LuaBinaryExpr.left: LuaExpr get() {
-    return this.firstChild as LuaExpr
-}
+val LuaBinaryExpr.left: LuaExpr get() =
+    this.firstChild as LuaExpr
 
-val LuaBinaryExpr.right: LuaExpr? get() {
-    return PsiTreeUtil.nextVisibleLeaf(this.binaryOp) as? LuaExpr?
-}
+val LuaBinaryExpr.right: LuaExpr? get() =
+    PsiTreeUtil.getNextSiblingOfType(binaryOp, LuaExpr::class.java)

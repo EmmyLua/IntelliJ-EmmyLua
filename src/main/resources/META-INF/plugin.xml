@@ -296,6 +296,10 @@
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.SetVisibilityIntention</className>
         </intentionAction>
+        <intentionAction>
+            <category>Lua</category>
+            <className>com.tang.intellij.lua.codeInsight.intention.ComputeConstantValueIntention</className>
+        </intentionAction>
 
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
