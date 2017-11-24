@@ -12,6 +12,7 @@ jflex*.jar
 *.exe
 /*.zip
 
+.vs
 */Debug
 */Release
 *.log
