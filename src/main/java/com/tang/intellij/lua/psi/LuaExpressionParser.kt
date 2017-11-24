@@ -70,9 +70,9 @@ object LuaExpressionParser {
         ExprType.T_BIT_SHIFT -> parseBinary(builder, type.ops, ExprType.T_CONCAT, l)
         ExprType.T_CONCAT -> parseBinary(builder, type.ops, ExprType.T_ADDITIVE, l)
         ExprType.T_ADDITIVE -> parseBinary(builder, type.ops, ExprType.T_MULTIPLICATIVE, l)
-        ExprType.T_MULTIPLICATIVE -> parseBinary(builder, type.ops, ExprType.T_UNARY, l)
-        ExprType.T_UNARY -> parseUnary(builder, type.ops, ExprType.T_EXP, l)
-        ExprType.T_EXP -> parseUnary(builder, type.ops, ExprType.T_VALUE, l)
+        ExprType.T_MULTIPLICATIVE -> parseBinary(builder, type.ops, ExprType.T_EXP, l)
+        ExprType.T_EXP -> parseBinary(builder, type.ops, ExprType.T_UNARY, l)
+        ExprType.T_UNARY -> parseUnary(builder, type.ops, ExprType.T_VALUE, l)
         ExprType.T_VALUE -> parseValue(builder, l)
     }
 
