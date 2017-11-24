@@ -2,6 +2,35 @@
 #include "LuaDll.h"
 #include "StackNode.h"
 
+void DebugBackend::InitEmmy(LAPI api, lua_State * L) const
+{
+	auto vm = Get().GetVm(L);
+	if (vm == nullptr || vm->isEmmyLoaded || m_emmyLuaFilePath.empty())
+		return;
+
+	vm->skipPostLoadScript = true;
+	vm->isEmmyLoaded = true;
+	EnableIntercepts(api, false);
+	SetHookMode(api, L, HookMode_None);
+
+	int t = lua_gettop_dll(api, L);
+
+	lua_rawgetglobal_dll(api, L, "emmy");
+	if (lua_isnil_dll(api, L, -1))
+	{
+		lua_dofile_dll(api, L, m_emmyLuaFilePath.c_str());
+	}
+
+	RegisterEmmyLibrary(api, L);
+
+	lua_settop_dll(api, L, t);
+
+	//reset
+	vm->skipPostLoadScript = false;
+	SetHookMode(api, L, HookMode_Full);
+	EnableIntercepts(api, true);
+}
+
 int EmmyCreateNode(lua_State* L)
 {
 	LAPI api = DebugBackend::Get().GetApiForVm(L);
