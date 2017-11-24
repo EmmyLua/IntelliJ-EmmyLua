@@ -29,7 +29,7 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
 
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
         val expr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaExpr::class.java, false)
-        if (expr != null) {
+        if (expr is LuaBinaryExpr) {
             val result = compute(expr)
             text = "Compute constant value of ${expr.text}"
             return result != null
@@ -42,8 +42,21 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
         if (expr is LuaBinaryExpr) {
             val result = compute(expr)
             if (result != null) {
-                val new = LuaElementFactory.createLiteral(project, result.nValue.toString())
-                expr.replace(new)
+                when (result.kind) {
+                    Kind.Number,
+                    Kind.Bool,
+                    Kind.Nil -> {
+                        val new = LuaElementFactory.createLiteral(project, result.string)
+                        expr.replace(new)
+                    }
+                    Kind.String -> {
+                        val new = LuaElementFactory.createLiteral(project, "[[${result.string}]]")
+                        expr.replace(new)
+                    }
+                    Kind.Other -> {
+                        result.expr?.let { expr.replace(it) }
+                    }
+                }
             }
         }
     }
@@ -51,7 +64,18 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
     private data class ComputeResult(val kind: Kind,
                                      var bValue: Boolean = false,
                                      var nValue: Float = 0f,
-                                     var sValue: String = "")
+                                     var sValue: String = "",
+                                     var expr: LuaExpr? = null) {
+        val string: String get() = when (kind) {
+            Kind.Number -> {
+                val int = nValue.toInt()
+                if (int.compareTo(nValue) == 0) int.toString() else nValue.toString()
+            }
+            Kind.String -> sValue
+            Kind.Bool -> bValue.toString()
+            else -> sValue
+        }
+    }
 
     private enum class Kind {
         String, Bool, Number, Nil, Other
@@ -64,6 +88,7 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
                     LuaLiteralKind.String -> ComputeResult(Kind.String, false, 0f, expr.stringValue)
                     LuaLiteralKind.Bool -> ComputeResult(Kind.Bool, expr.boolValue)
                     LuaLiteralKind.Number -> ComputeResult(Kind.Number, false, expr.numberValue)
+                    LuaLiteralKind.Nil -> ComputeResult(Kind.Nil, false, 0f, "nil")
                     else -> null
                 }
             }
@@ -71,26 +96,14 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
                 val left = compute(expr.left) ?: return null
                 val rExpr = expr.right ?: return null
                 val right = compute(rExpr) ?: return null
-                if (left.kind == right.kind) {
-                    val op = expr.binaryOp
-                    return calcBinary(left, right, op.node.firstChildNode.elementType)
-                }
-                return null
-            }
-            is LuaUnaryExpr -> {
-                /*val rExpr = expr.expr
-                if (rExpr != null) {
-                    val op = expr.unaryOp
-                    val right = compute(rExpr)
-
-                }*/
-                return null
+                val op = expr.binaryOp
+                return calcBinary(left, right, op.node.firstChildNode.elementType)
             }
             is LuaParenExpr -> {
                 val inner = expr.expr
                 if (inner != null) compute(inner) else null
             }
-            else -> return null
+            else -> return ComputeResult(Kind.Other, true, 0f, "", expr)
         }
     }
 
@@ -99,7 +112,7 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
         var n = 0f
         var s = ""
         var k = l.kind
-        var isValid = true
+        var isValid = false
 
         when (op) {
             OR -> {
@@ -118,7 +131,7 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
                 n = l.nValue - r.nValue
                 isValid = l.kind == Kind.Number && r.kind == Kind.Number
             }
-            // x
+            // *
             MULT -> {
                 n = l.nValue * r.nValue
                 isValid = l.kind == Kind.Number && r.kind == Kind.Number
@@ -127,6 +140,7 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
             DIV -> {
                 n = l.nValue / r.nValue
                 isValid = l.kind == Kind.Number && r.kind == Kind.Number
+                isValid = isValid && r.nValue != 0f
             }
             // //
             DOUBLE_DIV -> {
@@ -147,15 +161,18 @@ class ComputeConstantValueIntention : BaseIntentionAction() {
                     isValid = l.kind == Kind.Number
                 }
                 k = Kind.String
-                s = l.sValue + r.sValue
+                if (isValid)
+                    s = l.string + r.string
             }
         }
-        if (!b) {
-            b = when (k) {
-                Kind.Number, Kind.String -> true
-                else -> false
-            }
+
+        b = b || when (k) {
+            Kind.Other,
+            Kind.Number,
+            Kind.String -> true
+            else -> false
         }
+
         return if (isValid) ComputeResult(k, b, n, s) else null
     }
 }
