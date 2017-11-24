@@ -18,7 +18,28 @@ void DebugBackend::InitEmmy(LAPI api, lua_State * L) const
 	lua_rawgetglobal_dll(api, L, "emmy");
 	if (lua_isnil_dll(api, L, -1))
 	{
-		lua_dofile_dll(api, L, m_emmyLuaFilePath.c_str());
+		const char* fileName = m_emmyLuaFilePath.c_str();
+		FILE* file = fopen(fileName, "rb");
+
+		if (file != nullptr)
+		{
+			std::string name = "@";
+			name += fileName;
+
+			fseek(file, 0, SEEK_END);
+			unsigned int length = ftell(file);
+
+			char* buffer = new char[length];
+			fseek(file, 0, SEEK_SET);
+			fread(buffer, 1, length, file);
+
+			fclose(file);
+
+			lua_dobuffer_dll(api, L, buffer, length, name.c_str());
+
+			delete[] buffer;
+
+		}
 	}
 
 	RegisterEmmyLibrary(api, L);
