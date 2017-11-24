@@ -73,6 +73,12 @@ ByteOutputStream::~ByteOutputStream()
 
 void ByteOutputStream::Write(void * data, size_t size)
 {
+	if (m_position + size > m_size) {
+		size_t s = m_size;
+		if (s < size) s = size;
+		m_size = s * 2;
+		m_buff = (char*)realloc(m_buff, m_size);
+	}
 	assert(m_position + size <= m_size);
 	memcpy(m_buff + m_position, data, size);
 	m_position += size;
