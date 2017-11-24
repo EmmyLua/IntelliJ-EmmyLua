@@ -182,9 +182,9 @@ class LuaStructureVisitor : LuaVisitor() {
     override fun visitCallStat(o: LuaCallStat) {
         val callExpr = o.expr as LuaCallExpr
 
-        val args = callExpr.args as LuaListArgs
+        val args = callExpr.args as? LuaListArgs
 
-        args.exprList.forEach{ arg ->
+        args?.exprList?.forEach{ arg ->
             if (arg is LuaClosureExpr) {
                 val elem = LuaLocalFuncElement(arg, "<anonymous>", arg.paramSignature)
 
