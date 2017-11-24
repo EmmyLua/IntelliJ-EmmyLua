@@ -33,7 +33,7 @@ class LuaAppAttachProcess internal constructor(session: XDebugSession) : LuaAtta
         val bridge = LuaAppAttachBridge(this, session)
         this.bridge = bridge
         bridge.setProtoHandler(this)
-        bridge.launch(configuration.program, workingDir, configuration.parametersArray)
+        bridge.launch(configuration.program, workingDir, configuration)
         return bridge
     }
 }

@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.app;
 
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.execution.configuration.EnvironmentVariablesTextFieldWithBrowseButton;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -53,6 +54,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
     private TextFieldWithBrowseButton myWorkingDir;
     private RawCommandLineEditor parameters;
     private HoverHyperlinkLabel mobdebugLink;
+    private EnvironmentVariablesTextFieldWithBrowseButton myEnvironments;
     private Project project;
 
     LuaAppSettingsEditor(Project project) {
@@ -84,7 +86,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         myFile.setText(luaAppRunConfiguration.getFile());
         myDebugger.setSelectedItem(luaAppRunConfiguration.getDebuggerType());
         parameters.setText(luaAppRunConfiguration.getParameters());
-        
+        myEnvironments.setEnvs(luaAppRunConfiguration.getEnvs());
         mobdebugLink.setVisible(luaAppRunConfiguration.getDebuggerType() == DebuggerType.Mob);
     }
 
@@ -95,6 +97,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         luaAppRunConfiguration.setFile(myFile.getText());
         luaAppRunConfiguration.setDebuggerType((DebuggerType) myDebugger.getSelectedItem());
         luaAppRunConfiguration.setParameters(parameters.getText());
+        luaAppRunConfiguration.setEnvs(myEnvironments.getEnvs());
     }
 
     @NotNull

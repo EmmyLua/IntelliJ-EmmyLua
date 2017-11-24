@@ -199,17 +199,13 @@ public class LuaAppRunConfiguration extends LuaRunConfiguration implements IRemo
         if (workingDir == null || !new File(workingDir).exists()) {
             throw new RuntimeConfigurationError("Working dir doesn't exist.");
         }
-
-        /*VirtualFile virtualFile = getVirtualFile();
-        if (virtualFile == null) {
-            throw new RuntimeConfigurationError("Entry file doesn't exist.");
-        }*/
     }
 
     @Override
     public GeneralCommandLine createCommandLine() {
         GeneralCommandLine commandLine = new GeneralCommandLine().withExePath(program);
         String[] params = getParametersArray();
+        commandLine.withEnvironment(getEnvs());
         commandLine.addParameters(params);
         commandLine.setWorkDirectory(getWorkingDir());
         commandLine.setCharset(Charset.forName("UTF-8"));

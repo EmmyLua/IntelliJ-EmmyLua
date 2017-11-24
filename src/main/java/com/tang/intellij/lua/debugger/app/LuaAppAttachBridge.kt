@@ -58,7 +58,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
         }
     }
 
-    fun launch(program: String, workingDir: String?, args: Array<String>?) {
+    fun launch(program: String, workingDir: String?, configuration: LuaAppRunConfiguration) {
         val pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory()
         try {
             if (pluginVirtualDirectory != null) {
@@ -84,13 +84,13 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
                 val exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType))
 
                 val commandLine = GeneralCommandLine(exe!!)
+                commandLine.withEnvironment(configuration.envs)
                 commandLine.charset = Charset.forName("UTF-8")
                 commandLine.addParameters("-m", "run", "-c", program, "-e", emmyLua, "-w", workingDir)
-                if (args != null) {
-                    val argString = args.joinToString(" ")
-                    if (!argString.isEmpty()) {
-                        commandLine.addParameters("-a", argString)
-                    }
+                val args = configuration.parametersArray
+                val argString = args.joinToString(" ")
+                if (!argString.isEmpty()) {
+                    commandLine.addParameters("-a", argString)
                 }
 
                 handler = OSProcessHandler(commandLine)
