@@ -33,23 +33,11 @@ model {
                         srcDir "src/arch/"
                         include "*.cpp"
                     }
+                    lib library:"Shared", linkage: 'static'
                 }
             }
             binaries.all {
-                linker.args "imagehlp.lib"
-            }
-        }
-        tinyxml(NativeLibrarySpec) {
-            sources {
-                cpp {
-                    source {
-                        srcDir "src/tinyxml"
-                        include "*.cpp"
-                    }
-                    exportedHeaders {
-                        srcDir "src/tinyxml"
-                    }
-                }
+                linker.args "user32.lib", "imagehlp.lib"
             }
         }
         EasyHook(NativeLibrarySpec) {
@@ -113,8 +101,10 @@ model {
                     exportedHeaders {
                         srcDir "src/Shared"
                     }
-                    lib library:"tinyxml", linkage: 'static'
                 }
+            }
+            binaries.all {
+                linker.args "user32.lib", "imagehlp.lib"
             }
         }
         Debugger(NativeExecutableSpec) {
@@ -123,7 +113,6 @@ model {
                     srcDir "src/Debugger/"
                     include "*.cpp"
                 }
-                lib library:"tinyxml", linkage: 'static'
                 lib library:"Shared", linkage: 'static'
             }
             binaries.all {
@@ -134,12 +123,13 @@ model {
             sources.cpp {
                 source {
                     srcDir "src/LuaInject"
+                    srcDir "src/third-party/libpe/libpe"
                     include "*.cpp"
                 }
                 exportedHeaders {
+                    srcDir "src/third-party/libpe/libpe"
                     srcDir "libs/LuaPlus/include"
                 }
-                lib library:"tinyxml", linkage: 'static'
                 lib library:"Shared", linkage: 'static'
                 lib library:"EasyHook", linkage: 'shared'
             }
@@ -184,8 +174,7 @@ model {
             cppCompiler.args "/FS"
             cppCompiler.args "/MTd"
             cCompiler.args "/MTd"
-
-            cppCompiler.define "TIXML_USE_STL"
+            
             cppCompiler.define "_MBCS"
             cppCompiler.define "_USRDLL"
             cppCompiler.define "_CRT_SECURE_NO_WARNINGS"

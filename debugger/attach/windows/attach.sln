@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaInject", "src\LuaInject.vcxproj", "{CB19A08F-478F-4AB2-8E62-602AFE298F77}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared", "src\Shared.vcxproj", "{2CD198E9-319C-48FB-85DC-AE3427A05BD2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Debugger", "src\Debugger.vcxproj", "{944F0195-406B-4E4A-9E10-BF0CC4793E0A}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tinyxmlSTL", "src\tinyxml\tinyxmlSTL.vcxproj", "{A3A84737-5017-4577-B8A2-79429A25B8B6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "src\Lua.vcxproj", "{891ED13A-BFEC-4A53-997A-A10434FC6BC9}"
 EndProject
@@ -49,14 +47,6 @@ Global
 		{944F0195-406B-4E4A-9E10-BF0CC4793E0A}.Release|x64.Build.0 = Release|x64
 		{944F0195-406B-4E4A-9E10-BF0CC4793E0A}.Release|x86.ActiveCfg = Release|Win32
 		{944F0195-406B-4E4A-9E10-BF0CC4793E0A}.Release|x86.Build.0 = Release|Win32
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Debug|x64.ActiveCfg = Debug|x64
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Debug|x64.Build.0 = Debug|x64
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Debug|x86.ActiveCfg = Debug|Win32
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Debug|x86.Build.0 = Debug|Win32
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Release|x64.ActiveCfg = Release|x64
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Release|x64.Build.0 = Release|x64
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Release|x86.ActiveCfg = Release|Win32
-		{A3A84737-5017-4577-B8A2-79429A25B8B6}.Release|x86.Build.0 = Release|Win32
 		{891ED13A-BFEC-4A53-997A-A10434FC6BC9}.Debug|x64.ActiveCfg = Debug|x64
 		{891ED13A-BFEC-4A53-997A-A10434FC6BC9}.Debug|x64.Build.0 = Debug|x64
 		{891ED13A-BFEC-4A53-997A-A10434FC6BC9}.Debug|x86.ActiveCfg = Debug|Win32
@@ -84,5 +74,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {89E26AF9-CE39-46F9-B407-A7A93975FDB7}
 	EndGlobalSection
 EndGlobal
