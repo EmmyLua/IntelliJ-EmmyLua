@@ -478,8 +478,8 @@ bool DebugFrontend::ProcessInitialization(Channel& handshakeChannel, const char*
         return false;
     }
 
-	size_t function;
-	handshakeChannel.ReadSize(function);
+	uint64_t function;
+	handshakeChannel.ReadUint64(function);
 
     // Call the initializtion function.
 

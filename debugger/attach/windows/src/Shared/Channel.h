@@ -69,9 +69,9 @@ public:
     /**
      * Writes a 32-bit unsigned integer to the channel and returns immediately.
      */
-    bool WriteUInt32(unsigned int value) const;
+    bool WriteUInt32(uint32_t value) const;
 
-	bool WriteSize(size_t size) const;
+	bool WriteUInt64(uint64_t size) const;
 
     /**
      * Writes a string to the channel and returns immediately.
@@ -92,9 +92,9 @@ public:
      * Reads a 32-bit unsigned integer from the channel. This operation blocks
      * until the data is available.
      */
-    bool ReadUInt32(unsigned int& value) const;
+    bool ReadUInt32(uint32_t& value) const;
 
-	bool ReadSize(size_t& size) const;
+	bool ReadUint64(uint64_t& size) const;
 
     /**
      * Reads a string from the channel. This operation blocks until the

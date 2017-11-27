@@ -9,14 +9,13 @@ DebugMessage::DebugMessage(DebugMessageId idValue) : id(idValue), L(nullptr)
 
 void DebugMessage::Read(ByteInputStream * stream)
 {
-	size_t t = stream->ReadSize();
-	L = (lua_State*)t;
+	L = (lua_State*)stream->ReadUInt64();
 }
 
 void DebugMessage::Write(ByteOutputStream * stream)
 {
 	stream->WriteUInt32((unsigned int)id);
-	stream->WriteSize(reinterpret_cast<size_t>(L));
+	stream->WriteUInt64(reinterpret_cast<uint64_t>(L));
 }
 
 DMReqInitialize::DMReqInitialize(): DebugMessage(DebugMessageId::ReqInitialize)

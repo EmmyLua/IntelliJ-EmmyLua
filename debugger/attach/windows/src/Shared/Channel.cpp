@@ -167,15 +167,15 @@ bool Channel::Write(const void* buffer, unsigned int length) const
 
 }
 
-bool Channel::WriteUInt32(unsigned int value) const
+bool Channel::WriteUInt32(uint32_t value) const
 {
     DWORD temp = value;
     return Write(&temp, 4);
 }
 
-bool Channel::WriteSize(size_t size) const
+bool Channel::WriteUInt64(uint64_t size) const
 {
-	size_t temp = size;
+	uint64_t temp = size;
 	return Write(&temp, 8);
 }
 
@@ -212,7 +212,7 @@ bool Channel::WriteBool(bool value) const
     return WriteUInt32(value ? 1 : 0);
 }
 
-bool Channel::ReadUInt32(unsigned int& value) const
+bool Channel::ReadUInt32(uint32_t& value) const
 {
     DWORD temp;
     if (!Read(&temp, 4))
@@ -223,9 +223,9 @@ bool Channel::ReadUInt32(unsigned int& value) const
     return true;
 }
 
-bool Channel::ReadSize(size_t& size) const
+bool Channel::ReadUint64(uint64_t& size) const
 {
-	size_t temp;
+	uint64_t temp;
 	if (!Read(&temp, 8)) {
 		return false;
 	}

@@ -31,16 +31,16 @@ void ByteInputStream::Reset(const void* data, size_t size)
 	m_position = 0;
 }
 
-unsigned int ByteInputStream::ReadUInt32()
+uint32_t ByteInputStream::ReadUInt32()
 {
-	int size = sizeof(unsigned int);
+	int size = sizeof(uint32_t);
 	assert(m_position + size <= m_size, "overflow");
 	auto value = readInt32InBigEndian(m_buff + m_position);
 	m_position = m_position + size;
 	return value;
 }
 
-size_t ByteInputStream::ReadSize()
+uint64_t ByteInputStream::ReadUInt64()
 {
 	int size = 8;
 	assert(m_position + size <= m_size, "overflow");
@@ -101,16 +101,16 @@ void ByteOutputStream::Write(void * data, size_t size)
 	m_position += size;
 }
 
-void ByteOutputStream::WriteUInt32(unsigned int value)
+void ByteOutputStream::WriteUInt32(uint32_t value)
 {
-	int size = sizeof(unsigned int);
+	int size = sizeof(uint32_t);
 	assert(m_position + size <= m_size);
 	//writeInt32InLittleEndian(m_buff, value);
 	writeInt32InBigEndian(m_buff + m_position, value);
 	m_position += size;
 }
 
-void ByteOutputStream::WriteSize(size_t value)
+void ByteOutputStream::WriteUInt64(uint64_t value)
 {
 	int size = 8;
 	assert(m_position + size <= m_size);

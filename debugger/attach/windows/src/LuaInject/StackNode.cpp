@@ -47,7 +47,7 @@ StackNodeContainer::~StackNodeContainer()
 
 void StackNodeContainer::WriteChildren(ByteOutputStream* stream)
 {
-	stream->WriteSize(m_children.size());
+	stream->WriteUInt64(m_children.size());
 	for (auto node : m_children)
 	{
 		node->Write(stream);
@@ -107,7 +107,7 @@ void StackTableNode::Write(ByteOutputStream* stream)
 	stream->WriteBool(deep);
 	if (deep)
 	{
-		stream->WriteSize(list.size());
+		stream->WriteUInt64(list.size());
 		for (auto pair : list)
 		{
 			pair->key->Write(stream);
@@ -134,7 +134,7 @@ StackBinaryNode::StackBinaryNode(): StackLuaObjectNode(StackNodeId::Binary), dat
 void StackBinaryNode::Write(ByteOutputStream* stream)
 {
 	StackLuaObjectNode::Write(stream);
-	stream->WriteSize(size);
+	stream->WriteUInt64(size);
 	stream->Write(data, size);
 }
 

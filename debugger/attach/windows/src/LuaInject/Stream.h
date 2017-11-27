@@ -16,9 +16,9 @@ public:
 	* Reads a 32-bit unsigned integer from the channel. This operation blocks
 	* until the data is available.
 	*/
-	unsigned int ReadUInt32();
+	uint32_t ReadUInt32();
 
-	size_t ReadSize();
+	uint64_t ReadUInt64();
 
 	/**
 	* Reads a string from the channel. This operation blocks until the
@@ -42,9 +42,9 @@ public:
 
 	void Write(void* data, size_t size);
 
-	void WriteUInt32(unsigned int value);
+	void WriteUInt32(uint32_t value);
 
-	void WriteSize(size_t value);
+	void WriteUInt64(uint64_t value);
 
 	void WriteString(const std::string& value);
 
