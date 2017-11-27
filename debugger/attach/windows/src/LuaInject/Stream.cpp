@@ -3,7 +3,13 @@
 #include <cassert>
 #include "endian.h"
 
-ByteInputStream::ByteInputStream(char * buff, int size) : m_size(size), m_position(0)
+ByteInputStream::ByteInputStream() : m_position(0)
+{
+	m_size = 1024 * 1024;
+	m_buff = (char*)malloc(m_size);
+}
+
+ByteInputStream::ByteInputStream(char * buff, size_t size) : m_size(size), m_position(0)
 {
 	m_buff = (char*)malloc(size);
 	memcpy(m_buff, buff, size);
@@ -12,6 +18,17 @@ ByteInputStream::ByteInputStream(char * buff, int size) : m_size(size), m_positi
 ByteInputStream::~ByteInputStream()
 {
 	free(m_buff);
+}
+
+void ByteInputStream::Reset(const void* data, size_t size)
+{
+	if (m_size < size)
+	{
+		m_size = size;
+		m_buff = (char*)realloc(m_buff, size);
+	}
+	memcpy(m_buff, data, size);
+	m_position = 0;
 }
 
 unsigned int ByteInputStream::ReadUInt32()
@@ -47,7 +64,7 @@ void ByteInputStream::ReadString(std::string & value)
 	}
 }
 
-const char ByteInputStream::ReadByte()
+char ByteInputStream::ReadByte()
 {
 	assert(m_position + 1 <= m_size, "overflow");
 	char c = m_buff[m_position];

@@ -7,8 +7,11 @@ class ByteInputStream
 	size_t m_size;
 	size_t m_position;
 public:
-	ByteInputStream(char* buff, int size);
+	ByteInputStream();
+	ByteInputStream(char* buff, size_t size);
 	~ByteInputStream();
+
+	void Reset(const void* data, size_t size);
 	/**
 	* Reads a 32-bit unsigned integer from the channel. This operation blocks
 	* until the data is available.
@@ -23,7 +26,7 @@ public:
 	*/
 	void ReadString(std::string& value);
 
-	const char ReadByte();
+	char ReadByte();
 
 	bool ReadBool();
 };

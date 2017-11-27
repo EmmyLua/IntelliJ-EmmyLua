@@ -101,12 +101,13 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 
 bool SocketPipeline::Send(DebugMessage* message)
 {
-	ByteOutputStream body;
-	message->Write(&body);
-	ByteOutputStream stream;
-	stream.WriteUInt32(body.GetPositon());
-	stream.Write((void*) body.GetBuf(), body.GetPositon());
-	return server.sendMsg(stream.GetBuf(), stream.GetPositon());
+	bodyStream.Reset();
+	dataStream.Reset();
+
+	message->Write(&bodyStream);
+	dataStream.WriteUInt32(bodyStream.GetPositon());
+	dataStream.Write((void*)bodyStream.GetBuf(), bodyStream.GetPositon());
+	return server.sendMsg(dataStream.GetBuf(), dataStream.GetPositon());
 }
 
 bool DebugPipeline::Send(DebugMessage * message)

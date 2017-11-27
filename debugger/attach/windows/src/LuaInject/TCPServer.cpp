@@ -160,6 +160,17 @@ DWORD WINAPI receiveThread(LPVOID param)
 	return client->receive();
 }
 
+DebugClient::DebugClient(DebugServer* server, SOCKET socket) : m_socket(socket), m_server(server), m_thread(nullptr)
+{
+	m_msgStream = new ByteInputStream;
+}
+
+DebugClient::~DebugClient()
+{
+	if (m_msgStream != nullptr)
+		delete m_msgStream;
+}
+
 void DebugClient::startup()
 {
 	DWORD threadId;
@@ -185,10 +196,8 @@ bool DebugClient::sendMsg(const char * data, size_t size)
 
 void DebugClient::handleMsg(const char * data, size_t size)
 {
-	char* temp = (char*)malloc(size);
-	memcpy(temp, data, size);
-	ByteInputStream os(temp, size);
-	this->m_server->m_listener->handleStream(&os);
+	m_msgStream->Reset(data, size);
+	this->m_server->m_listener->handleStream(m_msgStream);
 }
 
 DWORD DebugClient::receive()

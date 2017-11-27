@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <string>
+#include "Stream.h"
 #include "Channel.h"
 #include "TCPServer.h"
 
@@ -29,6 +29,8 @@ public:
 class SocketPipeline : public DebugPipeline, public DebugServerListener
 {
 	DebugServer server;
+	ByteOutputStream bodyStream;
+	ByteOutputStream dataStream;
 public:
 	bool Initialize() override;
 	void Destroy() override {}

@@ -45,9 +45,11 @@ class DebugClient
 	SOCKET m_socket;
 	DebugServer* m_server;
 	HANDLE m_thread;
+	ByteInputStream* m_msgStream;
 public:
-	DebugClient(DebugServer* server, SOCKET socket) : m_socket(socket), m_server(server), m_thread(nullptr)
-	{}
+	DebugClient(DebugServer* server, SOCKET socket);
+	~DebugClient();
+
 	SOCKET getSocket() const { return m_socket; }
 	void startup();
 	bool sendMsg(const char* data, size_t size);
