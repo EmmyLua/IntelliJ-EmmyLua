@@ -50,7 +50,10 @@ public class LuaString {
         } else {
             content.start = 1;
             content.end = text.length() - 1;
-            content.value = text.substring(1, text.length() - 1);
+            if (content.end > content.start)
+                content.value = text.substring(content.start, content.end);
+            else
+                content.end = content.start;
         }
         return content;
     }
