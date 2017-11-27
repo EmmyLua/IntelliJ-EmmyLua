@@ -223,8 +223,8 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(TargetDir)..\x64\EasyHook32.dll"
-copy "$(TargetDir)EasyHook32.lib" "$(TargetDir)..\x64\EasyHook32.lib"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <MASM>
       <GenerateDebugInformation>false</GenerateDebugInformation>
