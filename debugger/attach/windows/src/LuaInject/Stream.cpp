@@ -34,7 +34,7 @@ void ByteInputStream::Reset(const void* data, size_t size)
 uint32_t ByteInputStream::ReadUInt32()
 {
 	int size = sizeof(uint32_t);
-	assert(m_position + size <= m_size, "overflow");
+	assert(m_position + size <= m_size);
 	auto value = readInt32InBigEndian(m_buff + m_position);
 	m_position = m_position + size;
 	return value;
@@ -43,7 +43,7 @@ uint32_t ByteInputStream::ReadUInt32()
 uint64_t ByteInputStream::ReadUInt64()
 {
 	int size = 8;
-	assert(m_position + size <= m_size, "overflow");
+	assert(m_position + size <= m_size);
 	auto value = readInt64InBigEndian(m_buff + m_position);
 	m_position = m_position + size;
 	return value;
@@ -54,7 +54,7 @@ void ByteInputStream::ReadString(std::string & value)
 	unsigned int size = ReadUInt32();
 	if (size > 0)
 	{
-		assert(m_position + size <= m_size, "overflow");
+		assert(m_position + size <= m_size);
 		char* temp = (char*)malloc(size + 1);
 		memcpy(temp, m_buff + m_position, size);
 		temp[size] = '\0';
@@ -66,7 +66,7 @@ void ByteInputStream::ReadString(std::string & value)
 
 char ByteInputStream::ReadByte()
 {
-	assert(m_position + 1 <= m_size, "overflow");
+	assert(m_position + 1 <= m_size);
 	char c = m_buff[m_position];
 	m_position++;
 	return c;

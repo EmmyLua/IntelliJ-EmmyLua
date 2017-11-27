@@ -35,7 +35,10 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 #include <hash_map>
 #include <hash_set>
-#include <shlobj.h>  
+#include <shlobj.h>
+
+#pragma warning(disable:4311)
+#pragma warning(disable:4302)
 
 // Macro for convenient pointer addition.
 // Essentially treats the last two parameters as DWORDs.  The first

@@ -183,7 +183,7 @@ bool DebugClient::sendMsg(const char * data, size_t size)
 	size_t totalSend = 0;
 	while (leftSize > 0)
 	{
-		int sendCount = send(m_socket, data + totalSend, leftSize, 0);
+		const size_t sendCount = send(m_socket, data + totalSend, leftSize, 0);
 		if (sendCount == SOCKET_ERROR)
 		{
 			return false;
