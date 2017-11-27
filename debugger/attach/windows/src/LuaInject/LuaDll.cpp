@@ -1230,7 +1230,9 @@ int luaL_newmetatable_dll(LAPI api, lua_State *L, const char *tname)
 
 int luaL_loadbuffer_dll(LAPI api, lua_State *L, const char *buff, size_t sz, const char *name)
 {
-	return g_interfaces[api].luaL_loadbuffer_dll_cdecl(L, buff, sz, name);
+	if (g_interfaces[api].luaL_loadbuffer_dll_cdecl)
+		return g_interfaces[api].luaL_loadbuffer_dll_cdecl(L, buff, sz, name);
+	return 1;
 }
 
 int luaL_loadbufferx_dll(LAPI api, lua_State *L, const char *buff, size_t sz, const char *name, const char* mode)
@@ -1240,7 +1242,9 @@ int luaL_loadbufferx_dll(LAPI api, lua_State *L, const char *buff, size_t sz, co
 
 int luaL_loadfile_dll(LAPI api, lua_State* L, const char* fileName)
 {
-	return g_interfaces[api].luaL_loadfile_dll_cdecl(L, fileName);
+	if (g_interfaces[api].luaL_loadfile_dll_cdecl)
+		return g_interfaces[api].luaL_loadfile_dll_cdecl(L, fileName);
+	return 1;
 }
 
 int luaL_loadfilex_dll(LAPI api, lua_State* L, const char* fileName, const char* mode)
@@ -2271,7 +2275,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 	// Setup our API.
 
 	luaInterface.EmmyInit = (lua_CFunction)CreateCFunction(api, EmmyInit, EmmyInit_intercept);
-	luaInterface.CPCallHandler = (lua_CFunction)CreateCFunction(api, CPCallHandler, CPCallHandler_intercept);
+	//luaInterface.CPCallHandler = (lua_CFunction)CreateCFunction(api, CPCallHandler, CPCallHandler_intercept);
 	luaInterface.HookHandler = (lua_Hook)CreateCFunction(api, HookHandler, HookHandler_intercept);
 
 	g_interfaces.push_back(luaInterface);
