@@ -27,3 +27,5 @@ jflex*.jar
 *.opendb
 *.suo
 *.sdf
+*.iobj
+*.ipdb
