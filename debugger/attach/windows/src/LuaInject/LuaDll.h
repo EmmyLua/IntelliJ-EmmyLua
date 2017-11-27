@@ -117,7 +117,7 @@ int                 lua_iswstring_dll   (LAPI api, lua_State *L, int index);
 #define lua_pushcfunction_dll(api,L,f)            (lua_pushcclosure_dll(api, L, (f), 0))
 #define lua_register_dll(api, L,n,f)              (lua_pushcfunction_dll(api, L, f), lua_setglobal_dll(api, L, n))
 #define lua_dofile_dll(api, L, filename)          (luaL_loadfile_dll(api, L, filename) || lua_pcall_dll(api, L, 0, LUA_MULTRET, 0))
-#define lua_dobuffer_dll(api, L, buff, sz, name)  (luaL_loadbuffer_dll(api, L, buff, sz, name) || lua_pcall_dll(api, L, 0, LUA_MULTRET, 0))
+#define lua_dobuffer_dll(api, L, buff, sz, name)  (lua_loadbuffer_dll(api, L, buff, sz, name, nullptr) || lua_pcall_dll(api, L, 0, LUA_MULTRET, 0))
 
 /**
  * This is similar to lua_cpcall_dll, but it handles the differences between

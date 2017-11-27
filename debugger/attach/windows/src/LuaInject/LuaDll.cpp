@@ -1150,6 +1150,12 @@ int lua_loadbuffer_dll(LAPI api, lua_State* L, const char* buffer, size_t size, 
 
 void lua_call_dll(LAPI api, lua_State* L, int nargs, int nresults)
 {
+	// Lua 5.2.
+	if (g_interfaces[api].lua_callk_dll_cdecl)
+	{
+		return g_interfaces[api].lua_callk_dll_cdecl(L, nargs, nresults, 0, nullptr);
+	}
+	// Lua 5.1 and earlier.
 	return g_interfaces[api].lua_call_dll_cdecl(L, nargs, nresults);
 }
 
