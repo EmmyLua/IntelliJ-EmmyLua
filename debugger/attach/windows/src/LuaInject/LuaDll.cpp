@@ -2012,43 +2012,53 @@ std::string GetApplicationDirectory()
 
 }
 
+#define GET_FUNCTION_OPTIONAL(function)																						\
+{																															\
+    stdext::hash_map<std::string, DWORD64>::const_iterator iterator = symbols.find(#function);								\
+    if (iterator != symbols.end())																							\
+    {																														\
+        luaInterface.function##_dll_cdecl = reinterpret_cast<function##_cdecl_t>(iterator->second);							\
+    }																														\
+}
+#define GET_FUNCTION(function)																								\
+{																															\
+	GET_FUNCTION_OPTIONAL(function);																						\
+	if (luaInterface.function##_dll_cdecl == NULL)                                                                          \
+    {                                                                                                                       \
+        if (report)                                                                                                         \
+        {                                                                                                                   \
+            DebugBackend::Get().Message("Warning 1004: Couldn't hook Lua function '" #function "'", MessageType_Warning);   \
+        }                                                                                                                   \
+        return false;                                                                                                       \
+    }																														\
+}
+#define GET_FUNCTION_OR(function1, function2)					\
+{																\
+	GET_FUNCTION_OPTIONAL(function1);							\
+	if (luaInterface.function1##_dll_cdecl == nullptr)			\
+	{															\
+		GET_FUNCTION(function2);								\
+	}															\
+}
+#define HOOK_FUNCTION(function)									\
+{																\
+	if (luaInterface.function##_dll_cdecl != NULL)				\
+    {                                                           \
+        void* original = luaInterface.function##_dll_cdecl;     \
+		TRACED_HOOK_HANDLE      hHook = new HOOK_TRACE_INFO();	\
+		ULONG                   ACLEntries[1] = { 0 };			\
+		NTSTATUS status = LhInstallHook(						\
+			original,											\
+			function##_intercept,								\
+			(PVOID)api,											\
+			hHook);												\
+		if (status != 0) hHook = NULL;							\
+		luaInterface.function##_hook_info = hHook;				\
+    }															\
+}
+
 bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string, DWORD64>& symbols, HANDLE hProcess)
 {
-
-#define GET_FUNCTION_OPTIONAL(function)                                                                                     \
-        {                                                                                                                       \
-            stdext::hash_map<std::string, DWORD64>::const_iterator iterator = symbols.find(#function);                          \
-            if (iterator != symbols.end())                                                                                      \
-            {                                                                                                                   \
-                luaInterface.function##_dll_cdecl = reinterpret_cast<function##_cdecl_t>(iterator->second);                     \
-            }                                                                                                                   \
-        }
-
-#define GET_FUNCTION(function)                                                                                              \
-        GET_FUNCTION_OPTIONAL(function)                                                                                         \
-        if (luaInterface.function##_dll_cdecl == NULL)                                                                          \
-        {                                                                                                                       \
-            if (report)                                                                                                         \
-            {                                                                                                                   \
-                DebugBackend::Get().Message("Warning 1004: Couldn't hook Lua function '" #function "'", MessageType_Warning);   \
-            }                                                                                                                   \
-            return false;                                                                                                       \
-        }
-
-#define HOOK_FUNCTION(function)                                                                                             \
-        if (luaInterface.function##_dll_cdecl != NULL)                                                                          \
-        {                                                                                                                       \
-            void* original = luaInterface.function##_dll_cdecl;                                                                 \
-			TRACED_HOOK_HANDLE      hHook = new HOOK_TRACE_INFO();\
-			ULONG                   ACLEntries[1] = { 0 };\
-			NTSTATUS status = LhInstallHook(\
-				original,\
-				function##_intercept,\
-				(PVOID)api,\
-				hHook);\
-			if (status != 0) hHook = NULL;\
-			luaInterface.function##_hook_info = hHook;\
-        }
 	LuaInterface luaInterface = { 0 };
 
 	size_t api = g_interfaces.size();
@@ -2105,13 +2115,8 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 			return false;
 		}
 	}
-
 	// Only present in Lua 4.0 and Lua 5.0 (not 5.1)
-	GET_FUNCTION_OPTIONAL(lua_open);
-	if (luaInterface.lua_open_dll_cdecl == nullptr)
-	{
-		GET_FUNCTION(lua_newstate);
-	}
+	GET_FUNCTION_OR(lua_open, lua_newstate);
 
 	// Start reporting errors about functions we couldn't hook.
 	report = true;
@@ -2155,46 +2160,20 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 	GET_FUNCTION_OPTIONAL(lua_tointeger);
 	GET_FUNCTION_OPTIONAL(lua_tointegerx);
 
-	// Only present in Lua 4.0 and 5.0 (exists as a macro in Lua 5.1)
-	GET_FUNCTION_OPTIONAL(lua_tostring);
-
-	if (luaInterface.lua_tostring_dll_cdecl == nullptr)
-	{
-		GET_FUNCTION(lua_tolstring);
-	}
-
-	GET_FUNCTION_OPTIONAL(lua_tonumberx);
-
-	if (luaInterface.lua_tonumberx_dll_cdecl == nullptr)
-	{
-		// If the Lua 5.2 tonumber isn't present, require the previous version.
-		GET_FUNCTION(lua_tonumber);
-	}
-
 	GET_FUNCTION(lua_toboolean);
 	GET_FUNCTION(lua_tocfunction);
 	GET_FUNCTION(lua_touserdata);
 
-	// Exists as a macro in Lua 5.2
-	GET_FUNCTION_OPTIONAL(lua_callk);
-	if (luaInterface.lua_callk_dll_cdecl == nullptr)
-	{
-		GET_FUNCTION(lua_call);
-	}
-
-	// Exists as a macro in Lua 5.2
-	GET_FUNCTION_OPTIONAL(lua_pcallk);
-	if (luaInterface.lua_pcallk_dll_cdecl == nullptr)
-	{
-		GET_FUNCTION(lua_pcall);
-	}
-
 	// Only present in Lua 4.0 and 5.0 (exists as a macro in Lua 5.1)
-	GET_FUNCTION_OPTIONAL(lua_newtable);
-	if (luaInterface.lua_newtable_dll_cdecl == nullptr)
-	{
-		GET_FUNCTION(lua_createtable);
-	}
+	GET_FUNCTION_OR(lua_tostring, lua_tolstring);
+	// If the Lua 5.2 tonumber isn't present, require the previous version.
+	GET_FUNCTION_OR(lua_tonumberx, lua_tonumber);
+	// Exists as a macro in Lua 5.2
+	GET_FUNCTION_OR(lua_callk, lua_call);
+	// Exists as a macro in Lua 5.2
+	GET_FUNCTION_OR(lua_pcallk, lua_pcall);
+	// Only present in Lua 4.0 and 5.0 (exists as a macro in Lua 5.1)
+	GET_FUNCTION_OR(lua_newtable, lua_createtable);
 
 	GET_FUNCTION(lua_load);
 	GET_FUNCTION(lua_next);
@@ -2211,7 +2190,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 	GET_FUNCTION_OPTIONAL(lua_getfenv);
 	GET_FUNCTION_OPTIONAL(lua_setfenv);
 
-	if (luaInterface.version >= 510)
+	if (luaInterface.version >= LUA_V510)
 	{
 		GET_FUNCTION(lua_pushthread);
 	}
