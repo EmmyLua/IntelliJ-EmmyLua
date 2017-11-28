@@ -693,37 +693,37 @@ void EnableIntercepts(LAPI apiIndex, bool enableIntercepts)
 
 	LuaInterface api = g_interfaces[apiIndex];
 	TRACED_HOOK_HANDLE all[] = {
+		api.lua_open_hook_info,
+		api.lua_open_500_hook_info,
+		api.lua_newstate_hook_info,
+		api.lua_close_hook_info,
+		api.lua_newthread_hook_info,
+		api.lua_load_hook_info,
+		api.lua_load_510_hook_info,
 		api.lua_call_hook_info,
 		api.lua_callk_hook_info,
-		api.lua_close_hook_info,
-		api.lua_load_510_hook_info,
-		api.lua_load_hook_info,
-		api.lua_newstate_hook_info,
-		api.lua_newthread_hook_info,
-		api.lua_open_500_hook_info,
-		api.lua_open_hook_info,
 		api.lua_pcall_hook_info,
 		api.lua_pcallk_hook_info,
+		api.luaL_newmetatable_hook_info,
 		api.luaL_loadbuffer_hook_info,
 		api.luaL_loadbufferx_hook_info,
 		api.luaL_loadfile_hook_info,
 		api.luaL_loadfilex_hook_info,
-		api.luaL_newmetatable_hook_info,
-		api.luaL_newstate_hook_info
+		api.luaL_newstate_hook_info,
 	};
-	for (int i = 0; i < 17; i++)
+	for (TRACED_HOOK_HANDLE info : all)
 	{
-		if (all[i] != nullptr)
+		if (info != nullptr)
 		{
 			ULONG ACLEntries[1] = { 0 };
 			if (enableIntercepts)
 			{
-				NTSTATUS status = LhSetExclusiveACL(ACLEntries, 0, all[i]);
+				NTSTATUS status = LhSetExclusiveACL(ACLEntries, 0, info);
 				assert(status == 0);
 			}
 			else
 			{
-				NTSTATUS status = LhSetInclusiveACL(ACLEntries, 0, all[i]);
+				NTSTATUS status = LhSetInclusiveACL(ACLEntries, 0, info);
 				assert(status == 0);
 			}
 		}
