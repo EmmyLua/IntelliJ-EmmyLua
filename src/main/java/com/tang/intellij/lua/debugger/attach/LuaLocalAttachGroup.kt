@@ -30,25 +30,25 @@ import javax.swing.Icon
  */
 class LuaLocalAttachGroup : XLocalAttachGroup {
 
-    override fun getOrder(): Int {
-        return XLocalAttachGroup.DEFAULT.order - 10
-    }
+    override fun getOrder() = XLocalAttachGroup.DEFAULT.order - 10
 
-    override fun getGroupName(): String {
-        return LuaLanguage.INSTANCE.id
-    }
+    override fun getGroupName() = LuaLanguage.INSTANCE.id
 
-    override fun getProcessIcon(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): Icon {
-        return LuaIcons.FILE
-    }
+    override fun getProcessIcon(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): Icon =
+            LuaIcons.FILE
 
     override fun getProcessDisplayText(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): String {
+        val map = userDataHolder.getUserData(LuaLocalAttachDebuggerProvider.DETAIL_KEY)
+        if (map != null) {
+            val detail = map[processInfo.pid]
+            if (detail != null)
+                return getDisplayName(processInfo, detail)
+        }
         return processInfo.executableName
     }
 
-    override fun compare(project: Project, a: ProcessInfo, b: ProcessInfo, userDataHolder: UserDataHolder): Int {
-        return XLocalAttachGroup.DEFAULT.compare(project, a, b, userDataHolder)
-    }
+    override fun compare(project: Project, a: ProcessInfo, b: ProcessInfo, userDataHolder: UserDataHolder) =
+            XLocalAttachGroup.DEFAULT.compare(project, a, b, userDataHolder)
 
     companion object {
 

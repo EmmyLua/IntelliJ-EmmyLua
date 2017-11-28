@@ -36,14 +36,20 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-	else if (cmd == "getinfo") {
-		DWORD processId = atoi(argv[2]);
-		Process process;
-		if (!GetProcess(processId, process))
-			return -1;
+	else if (cmd == "list_processes") {
+		std::vector<Process> list;
+		GetProcesses(list);
 
-		printf("%s\n", process.title.c_str());
-		printf("%s\n", process.path.c_str());
+		printf("<list>");
+		for (int i = 0; i < list.size(); ++i)
+		{
+			auto& value = list[i];
+			printf("<process pid=\"%d\">", value.id);
+			printf("<title><![CDATA[%s]]></title>", value.title.c_str());
+			printf("<path><![CDATA[%s]]></path>", value.path.c_str());
+			printf("</process>");
+		}
+		printf("</list>\n");
 	}
 	return 0;
 }

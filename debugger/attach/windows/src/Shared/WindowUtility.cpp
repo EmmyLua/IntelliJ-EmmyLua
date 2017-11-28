@@ -35,7 +35,7 @@ HWND GetProcessWindow(DWORD processId)
 
 void GetProcesses(std::vector<Process>& processes)
 {
-
+	static char fileName[_MAX_PATH];
 	// Get the id of this process so that we can filter it out of the list.
 	DWORD currentProcessId = GetCurrentProcessId();
 
@@ -59,6 +59,11 @@ void GetProcesses(std::vector<Process>& processes)
 					process.id = processEntry.th32ProcessID;
 					process.name = processEntry.szExeFile;
 
+					HANDLE m_process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, processEntry.th32ProcessID);
+					if (m_process) {
+						GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
+						process.path = fileName;
+					}
 
 					HWND hWnd = GetProcessWindow(processEntry.th32ProcessID);
 

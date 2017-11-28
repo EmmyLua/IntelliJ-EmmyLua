@@ -29,20 +29,18 @@ import com.intellij.xdebugger.attach.XLocalAttachDebugger
  *
  * Created by tangzx on 2017/2/28.
  */
-class LuaLocalAttachDebugger internal constructor(private val processInfo: ProcessInfo) : XLocalAttachDebugger {
+class LuaLocalAttachDebugger internal constructor(private val processInfo: ProcessInfo, private val detailInfo: ProcessDetailInfo) : XLocalAttachDebugger {
 
-    override fun getDebuggerDisplayName(): String {
-        return processInfo.executableDisplayName
-    }
+    override fun getDebuggerDisplayName() =
+            getDisplayName(processInfo, detailInfo)
 
     @Throws(ExecutionException::class)
     override fun attachDebugSession(project: Project, processInfo: ProcessInfo) {
-        val displayName = String.format("%s(PID:%d)", processInfo.executableDisplayName, processInfo.pid)
+        val displayName = "PID:${processInfo.pid}($debuggerDisplayName)"
         XDebuggerManager.getInstance(project).startSessionAndShowTab(displayName, null, object : XDebugProcessStarter() {
             @Throws(ExecutionException::class)
-            override fun start(xDebugSession: XDebugSession): XDebugProcess {
-                return LuaAttachDebugProcess(xDebugSession, processInfo)
-            }
+            override fun start(xDebugSession: XDebugSession): XDebugProcess =
+                    LuaAttachDebugProcess(xDebugSession, processInfo)
         })
     }
 }
