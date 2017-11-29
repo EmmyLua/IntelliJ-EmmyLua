@@ -115,7 +115,11 @@ abstract class TyClass(override val className: String, override var superClassNa
         return null
     }
 
-    override val displayName: String get() = if(isAnonymous) "Anonymous" else className
+    override val displayName: String get() = when {
+        isAnonymous -> "Anonymous"
+        isGlobal -> "Global"
+        else -> className
+    }
 
     override fun lazyInit(searchContext: SearchContext) {
         if (!_lazyInitialized) {
@@ -174,9 +178,8 @@ abstract class TyClass(override val className: String, override var superClassNa
             return TySerializedClass(tyName, null, null, TyFlags.ANONYMOUS)
         }
 
-        fun createGlobalType(nameExpr: LuaNameExpr): TyClass {
-            return TySerializedClass(nameExpr.text, null, null, TyFlags.GLOBAL)
-        }
+        fun createGlobalType(nameExpr: LuaNameExpr): TyClass =
+                TySerializedClass("__${nameExpr.text}", null, null, TyFlags.GLOBAL)
     }
 }
 
@@ -192,7 +195,8 @@ class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
     override fun doLazyInit(searchContext: SearchContext) {}
 }
 
-open class TySerializedClass(name: String, supper: String? = null,
+open class TySerializedClass(name: String,
+                             supper: String? = null,
                              alias: String? = null,
                              flags: Int = 0)
     : TyClass(name, supper) {
