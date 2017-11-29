@@ -61,7 +61,8 @@ class LuaLocalAttachGroup : XLocalAttachGroup {
     }
 
     override fun compare(project: Project, a: ProcessInfo, b: ProcessInfo, userDataHolder: UserDataHolder) =
-            XLocalAttachGroup.DEFAULT.compare(project, a, b, userDataHolder)
+            a.executableName.toLowerCase().compareTo(b.executableName.toLowerCase())
+            //XLocalAttachGroup.DEFAULT.compare(project, a, b, userDataHolder)
 
     companion object {
 
