@@ -133,8 +133,17 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         //comment content
         if (classMember is LuaCommentOwner)
             renderComment(sb, classMember.comment)
-        else if (classMember is LuaDocFieldDef)
-            renderCommentString("  ", null, sb, classMember.commentString)
+        else {
+            if (classMember is LuaDocFieldDef)
+                renderCommentString("  ", null, sb, classMember.commentString)
+            else if (classMember is LuaIndexExpr) {
+                val p1 = classMember.parent
+                val p2 = p1.parent
+                if (p1 is LuaVarList && p2 is LuaAssignStat) {
+                    renderComment(sb, p2.comment)
+                }
+            }
+        }
     }
 
     private fun renderParamNameDef(sb: StringBuilder, paramNameDef: LuaParamNameDef) {
