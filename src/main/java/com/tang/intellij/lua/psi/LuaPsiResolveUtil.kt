@@ -212,6 +212,9 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
     //作为函数参数，类型在函数注释里找
     if (nameDef is LuaParamNameDef) {
         type = resolveParamType(nameDef, context)
+        //anonymous
+        if (Ty.isInvalid(type))
+            type = TyClass.createAnonymousType(nameDef)
     } else if (nameDef.parent is LuaTableField) {
         val field = nameDef.parent as LuaTableField
         val expr = PsiTreeUtil.findChildOfType(field, LuaExpr::class.java)
