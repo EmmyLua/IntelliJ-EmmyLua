@@ -30,12 +30,18 @@ import java.io.ByteArrayInputStream
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class ProcessDetailInfo(var pid: Int, var path: String, var title: String)
+data class ProcessDetailInfo(var pid: Int, var path: String, var title: String, var icon: String)
+
+private val MAX_DISPLAY_LEN = 60
 
 internal fun getDisplayName(processInfo: ProcessInfo, detailInfo: ProcessDetailInfo): String {
-    if (detailInfo.title.isNotEmpty())
-        return "${processInfo.executableName} - ${detailInfo.title}"
-    return processInfo.executableName
+    val s = if (detailInfo.title.isNotEmpty())
+        "${processInfo.executableName} - ${detailInfo.title}"
+    else processInfo.executableName
+
+    if (s.length > MAX_DISPLAY_LEN)
+        return "${s.substring(0, MAX_DISPLAY_LEN)}..."
+    return s
 }
 
 /**
@@ -69,7 +75,7 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
         root.childNodes.let {
             for (i in 0 until it.length) {
                 val c = it.item(i)
-                val p = ProcessDetailInfo(0, "", "")
+                val p = ProcessDetailInfo(0, "", "", "")
                 val map = c.attributes
                 map.getNamedItem("pid")?.let {
                     p.pid = it.nodeValue.toInt()
@@ -77,13 +83,19 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
                 val childNodes = c.childNodes
                 for (j in 0 until childNodes.length) {
                     val child = childNodes.item(j)
-                    if (child.nodeName == "title") {
-                        val item = child.childNodes.item(0)
-                        p.title = item?.nodeValue ?: ""
-                    }
-                    else if (child.nodeName == "path") {
-                        val item = child.childNodes.item(0)
-                        p.path = item?.nodeValue ?: ""
+                    when (child.nodeName) {
+                        "title" -> {
+                            val item = child.childNodes.item(0)
+                            p.title = item?.nodeValue ?: ""
+                        }
+                        "path" -> {
+                            val item = child.childNodes.item(0)
+                            p.path = item?.nodeValue ?: ""
+                        }
+                        "icon" -> {
+                            val item = child.childNodes.item(0)
+                            p.icon = item?.nodeValue ?: ""
+                        }
                     }
                 }
                 processMap[p.pid] = p

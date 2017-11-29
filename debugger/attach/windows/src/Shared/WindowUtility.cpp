@@ -1,6 +1,7 @@
 ﻿#include "WindowUtility.h"
 #include <tlhelp32.h>
 #include <psapi.h>
+#include <shlobj.h>
 
 HWND GetProcessWindow(DWORD processId)
 {
@@ -81,6 +82,7 @@ void SaveIcon(HICON hIcon, const char* path) {
 void GetProcesses(std::vector<Process>& processes)
 {
 	static char fileName[_MAX_PATH];
+	static char tempPath[_MAX_PATH];
 	// Get the id of this process so that we can filter it out of the list.
 	DWORD currentProcessId = GetCurrentProcessId();
 
@@ -109,25 +111,32 @@ void GetProcesses(std::vector<Process>& processes)
 						GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
 						process.path = fileName;
 
-						SHFILEINFO info;
-						SHGetFileInfo(fileName, 0, &info, sizeof(info), SHGFI_ICON | SHGFI_LARGEICON);
-						if (info.hIcon) {
-							sprintf(fileName, "c:/temp/%d.bmp", process.id);
-							SaveIcon(info.hIcon, fileName);
+						if (!process.path.empty()) {
+							char windowsPath[MAX_PATH];
+							if (SHGetFolderPath(nullptr, CSIDL_WINDOWS, nullptr, SHGFP_TYPE_CURRENT, windowsPath) == 0) {
+								if (process.path.find(windowsPath) == std::string::npos) {
+
+									HWND hWnd = GetProcessWindow(processEntry.th32ProcessID);
+
+									if (hWnd != nullptr)
+									{
+										char buffer[1024];
+										GetWindowText(hWnd, buffer, 1024);
+										process.title = buffer;
+									}
+									processes.push_back(process);
+									/*SHFILEINFO info;
+									SHGetFileInfo(fileName, 0, &info, sizeof(info), SHGFI_ICON | SHGFI_LARGEICON);
+									if (info.hIcon) {
+										GetTempPath(MAX_PATH, tempPath);
+										sprintf(fileName, "%s%d.bmp", tempPath, process.id);
+										process.iconPath = fileName;
+										SaveIcon(info.hIcon, process.iconPath.c_str());
+									}*/
+								}
+							}
 						}
 					}
-
-					HWND hWnd = GetProcessWindow(processEntry.th32ProcessID);
-
-					if (hWnd != nullptr)
-					{
-						char buffer[1024];
-						GetWindowText(hWnd, buffer, 1024);
-						process.title = buffer;
-					}
-
-					processes.push_back(process);
-
 				}
 			} while (Process32Next(snapshot, &processEntry));
 
@@ -137,27 +146,4 @@ void GetProcesses(std::vector<Process>& processes)
 
 	}
 
-}
-
-bool GetProcess(DWORD processId, Process & process)
-{
-	char fileName[_MAX_PATH];
-	HANDLE m_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
-	if (m_process == nullptr)
-		return false;
-
-	GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
-
-	process.id = processId;
-	process.path = fileName;
-
-	HWND hWnd = GetProcessWindow(processId);
-
-	if (hWnd != nullptr)
-	{
-		char buffer[1024];
-		GetWindowText(hWnd, buffer, 1024);
-		process.title = buffer;
-	}
-	return true;
 }

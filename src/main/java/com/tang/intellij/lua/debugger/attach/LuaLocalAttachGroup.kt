@@ -22,7 +22,11 @@ import com.intellij.openapi.util.UserDataHolder
 import com.intellij.xdebugger.attach.XLocalAttachGroup
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.LuaLanguage
+import sun.awt.shell.ShellFolder
+import java.io.File
 import javax.swing.Icon
+import javax.swing.ImageIcon
+
 
 /**
  *
@@ -34,8 +38,17 @@ class LuaLocalAttachGroup : XLocalAttachGroup {
 
     override fun getGroupName() = LuaLanguage.INSTANCE.id
 
-    override fun getProcessIcon(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): Icon =
-            LuaIcons.FILE
+    override fun getProcessIcon(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): Icon {
+        val map = userDataHolder.getUserData(LuaLocalAttachDebuggerProvider.DETAIL_KEY)
+        if (map != null) {
+            val detail = map[processInfo.pid]
+            if (detail != null) {
+                val sf = ShellFolder.getShellFolder(File(detail.path))
+                return ImageIcon(sf.getIcon(false))
+            }
+        }
+        return LuaIcons.FILE
+    }
 
     override fun getProcessDisplayText(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): String {
         val map = userDataHolder.getUserData(LuaLocalAttachDebuggerProvider.DETAIL_KEY)
