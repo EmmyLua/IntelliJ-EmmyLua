@@ -87,5 +87,13 @@
             <option name="LUA_CODE" value="true" />
         </context>
     </template>
+    <template resource-bundle="LuaBundle" key="livetemplate.description.param_sig"
+              name="paramsig" toReformat="false" toShortenFQNames="true"
+              value="$PARAMS$">
+        <variable name="PARAMS" expression="LuaFunctionParamSignature()" defaultValue="" alwaysStopAt="true" />
+        <context>
+            <option name="LUA_CODE" value="true" />
+        </context>
+    </template>
 
 </templateSet>
