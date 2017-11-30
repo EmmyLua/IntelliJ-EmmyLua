@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.lexer
+package com.tang.intellij.lua.lexer;
 
-/**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
- */
-class LuaLexerAdapter : LuaLexer()
+import com.intellij.lexer.FlexAdapter;
+
+public class LuaLexer extends FlexAdapter {
+    public LuaLexer() {
+        super(new _LuaLexer());
+    }
+}

@@ -58,8 +58,10 @@ ID=[A-Za-z_][A-Za-z0-9_]*
 
 //Number
 n=[0-9]+
-exp=[Ee][+-]?{n}
-NUMBER=(0[xX][0-9a-fA-F]+|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
+h=[0-9a-fA-F]+
+exp=[Ee]([+-]?{n})?
+ppp=[Pp][+-]{n}
+NUMBER=(0[xX]({h}|{h}[.]{h})({exp}|{ppp})?|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 
 //Comments
 REGION_START =--region({LINE_WS}+[^\r\n]*)*
