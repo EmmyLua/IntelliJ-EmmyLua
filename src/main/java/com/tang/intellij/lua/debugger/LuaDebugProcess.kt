@@ -28,6 +28,7 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.frame.XSuspendContext
+import com.intellij.xdebugger.impl.XDebugSessionImpl
 import com.intellij.xdebugger.impl.actions.XDebuggerActions
 import java.util.concurrent.ConcurrentHashMap
 
@@ -126,7 +127,11 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
                     }
                 } else {
                     ApplicationManager.getApplication().invokeLater {
-                        session.positionReached(LuaSuspendContext(stack))
+                        val se = session
+                        if (se is XDebugSessionImpl)
+                            se.positionReached(LuaSuspendContext(stack), true)
+                        else
+                            se.positionReached(LuaSuspendContext(stack))
                         session.showExecutionPoint()
                     }
                 }
