@@ -179,7 +179,7 @@ abstract class TyClass(override val className: String, override var superClassNa
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr): TyClass =
-                TySerializedClass("__${nameExpr.text}", null, null, TyFlags.GLOBAL)
+                TySerializedClass(getGlobalTypeName(nameExpr), null, null, TyFlags.GLOBAL)
     }
 }
 
@@ -212,6 +212,10 @@ class TyLazyClass(name: String) : TySerializedClass(name)
 fun getTableTypeName(table: LuaTableExpr): String {
     val fileName = table.containingFile.name
     return "$fileName@(${table.node.startOffset})table"
+}
+
+fun getGlobalTypeName(expr: LuaNameExpr): String {
+    return "__${expr.text}"
 }
 
 class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {

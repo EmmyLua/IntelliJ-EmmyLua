@@ -650,7 +650,7 @@ fun getTypeName(stat: LuaAssignStat, index: Int): String? {
         }
         // 否则直接当成Global，以名字作类型
         if (typeName == null)
-            typeName = expr.text
+            typeName = getGlobalTypeName(expr)
     }
     return typeName
 }
