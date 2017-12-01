@@ -67,7 +67,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                     if (superMethod != null) {
                         val builder = NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
                                 .setTargets(superMethod)
-                                .setTooltipText("Override in " + superTypeName)
+                                .setTooltipText("Overrides function in $superTypeName")
                         result.add(builder.createLineMarkerInfo(classMethodNameId))
                         break
                     }
@@ -82,7 +82,8 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                         element.textRange,
                         AllIcons.Gutter.OverridenMethod,
                         Pass.LINE_MARKERS,
-                        overridingMethodTooltipProvider,
+                        null,
+                        //overridingMethodTooltipProvider,
                         overridingMethodNavigator,
                         GutterIconRenderer.Alignment.CENTER))
             }
@@ -172,32 +173,28 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
     companion object {
 
         private val overridingMethodTooltipProvider = Function<LuaClassMethod, String> {
-            /*final StringBuilder builder = new StringBuilder("<html>Is overridden in:");
-            LuaClassMethod methodDef = PsiTreeUtil.getParentOfType(methodName, LuaClassMethod.class);
-            assert methodDef != null;
-            LuaOverridingMethodsSearch.Companion.search(methodDef).forEach(luaClassMethodDef -> {
-            });
-            return builder.toString();*/
-            "<html>Is overridden in"
+            val query = LuaOverridingMethodsSearch.search(it)
+            buildString {
+                append("Is overridden in<br>")
+                val all = query.findAll()
+                all.forEach { append("${it.name}<br>") }
+            }
         }
 
         private val overridingMethodNavigator = object : LuaLineMarkerNavigator<LuaClassMethod, LuaClassMethod>() {
 
-            override fun getTitle(elt: LuaClassMethod): String {
-                return "Choose Overriding Method of " + elt.name!!
-            }
+            override fun getTitle(elt: LuaClassMethod)
+                    = "Choose Overriding Method of ${elt.name}"
 
-            override fun search(elt: LuaClassMethod): Query<LuaClassMethod>? {
-                return LuaOverridingMethodsSearch.search(elt)
-            }
+            override fun search(elt: LuaClassMethod)
+                    = LuaOverridingMethodsSearch.search(elt)
         }
 
         private val subclassTooltipProvider = Function<LuaDocClassDef, String> { it.name }
 
         private val subclassNavigator = object : LuaLineMarkerNavigator<LuaDocClassDef, LuaDocClassDef>() {
-            override fun getTitle(elt: LuaDocClassDef): String {
-                return "Choose Subclass of " + elt.name
-            }
+            override fun getTitle(elt: LuaDocClassDef)
+                    = "Choose Subclass of ${elt.name}"
 
             override fun search(elt: LuaDocClassDef): Query<LuaDocClassDef> {
                 val project = elt.project
