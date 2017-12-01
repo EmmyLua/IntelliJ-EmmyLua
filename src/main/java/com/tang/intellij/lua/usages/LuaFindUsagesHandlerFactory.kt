@@ -28,6 +28,8 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
 import com.tang.intellij.lua.reference.LuaOverridingMethodReference
+import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITyClass
 
 class LuaFindUsagesHandlerFactory : FindUsagesHandlerFactory() {
     override fun createFindUsagesHandler(element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler? {
@@ -54,6 +56,23 @@ class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler
                 collection.add(LuaOverridingMethodReference(it, methodDef))
         }
         return collection
+    }
+
+    override fun getPrimaryElements(): Array<PsiElement> {
+        val arr: MutableList<PsiElement> = mutableListOf(methodDef)
+        val ctx = SearchContext(psiElement.project)
+        //base declarations
+        val methodName = methodDef.name
+        var parentType = methodDef.guessParentType(ctx) as? ITyClass
+        while (methodName != null && parentType != null) {
+            val superClass = parentType.getSuperClass(ctx) as? ITyClass
+            if (superClass != null) {
+                val superMethod = superClass.findMember(methodName, ctx)
+                if (superMethod != null) arr.add(superMethod)
+            }
+            parentType = superClass
+        }
+        return arr.toTypedArray()
     }
 
     override fun processElementUsages(element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions): Boolean {
