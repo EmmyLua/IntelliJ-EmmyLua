@@ -19,7 +19,6 @@ package com.tang.intellij.lua.psi
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.util.RecursionManager
-import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
@@ -93,18 +92,19 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
 
     fun guessReturnedType(context: SearchContext): ITy {
         return RecursionManager.doPreventingRecursion(this, true) {
+            val lastChild = lastChild
+            var returnStat: LuaReturnStat? = null
+            LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) {
+                returnStat = it
+                false
+            }
+            val retTy = guessReturnType(returnStat, 0, context)
+
             val moduleName = this.moduleName
             val ty:ITy = if (moduleName != null)
-                TyLazyClass(moduleName)
-            else {
-                val lastChild = lastChild
-                val returnStatRef = Ref.create<LuaReturnStat>()
-                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) { luaReturnStat ->
-                    returnStatRef.set(luaReturnStat)
-                    false
-                }
-                guessReturnType(returnStatRef.get(), 0, context)
-            }
+                TyLazyClass(moduleName).union(retTy)
+            else retTy
+
             ty
         } ?: Ty.UNKNOWN
     }
