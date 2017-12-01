@@ -49,7 +49,7 @@ class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDe
         val id = methodDef.nameIdentifier
         val expr = methodName.expr
         var clazzName = expr.text
-        val searchContext = SearchContext(methodDef.project, methodDef.containingFile)
+        val searchContext = SearchContext(methodDef.project, methodDef.containingFile, true)
 
         val type = TyUnion.getPerfectClass(expr.guessTypeFromCache(searchContext))
         if (type != null)

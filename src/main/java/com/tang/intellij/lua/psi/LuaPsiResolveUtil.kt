@@ -208,7 +208,7 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
 }
 
 internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
-    var type: ITy? = null
+    var type: ITy = Ty.UNKNOWN
     //作为函数参数，类型在函数注释里找
     if (nameDef is LuaParamNameDef) {
         type = resolveParamType(nameDef, context)
@@ -238,11 +238,10 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
             }
 
             //anonymous
-            if (Ty.isInvalid(type))
-                type = TyClass.createAnonymousType(nameDef)
+            type = type.union(TyClass.createAnonymousType(nameDef))
         }
     }
-    return type ?: Ty.UNKNOWN
+    return type
 }
 
 /**

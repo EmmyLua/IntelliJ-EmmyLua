@@ -270,16 +270,12 @@ fun isFunctionCall(callExpr: LuaCallExpr): Boolean {
 }
 
 fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
+    if (context.forStore)
+        return Ty.UNKNOWN
     val exprList = list.exprList
-    val index = context.index
-    if (exprList.size > index) {
-        context.index = 0
-        return exprList[index].guessTypeFromCache(context)
-    } else if (exprList.size == 1) {
-        val exp0 = exprList[0]
-        return exp0.guessTypeFromCache(context)
-    }
-    return Ty.UNKNOWN
+    val index = if (exprList.size > context.index) context.index else 0
+    context.index = 0
+    return exprList[index].guessTypeFromCache(context)
 }
 
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {

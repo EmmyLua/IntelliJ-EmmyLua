@@ -28,7 +28,7 @@ import com.tang.intellij.lua.project.LuaPredefinedLibraryProvider
 
  * Created by tangzx on 2017/1/14.
  */
-class SearchContext(val project: Project, val currentFile: PsiFile? = null) {
+class SearchContext(val project: Project, private val currentFile: PsiFile? = null, var forStore: Boolean = false) {
     constructor(project: Project) : this(project, null)
 
     /**
