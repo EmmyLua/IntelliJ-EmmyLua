@@ -34,19 +34,6 @@ class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
     override fun createHighlightUsagesHandler(editor: Editor,
                                               psiFile: PsiFile,
                                               psiElement: PsiElement): HighlightUsagesHandlerBase<*>? {
-        val expr = PsiTreeUtil.getParentOfType(psiElement, LuaUnaryExpr::class.java, LuaBinaryExpr::class.java)
-        if (expr != null) {
-            return object : HighlightUsagesHandlerBase<PsiElement>(editor, psiFile) {
-                override fun selectTargets(list: MutableList<PsiElement>?, consumer: Consumer<MutableList<PsiElement>>?) { }
-
-                override fun computeUsages(list: MutableList<PsiElement>) {
-                    addOccurrence(expr)
-                }
-
-                override fun getTargets() = arrayListOf(psiElement)
-            }
-        }
-
         when(psiElement.node.elementType) {
             LuaTypes.RETURN -> {
                 val returnStat = PsiTreeUtil.getParentOfType(psiElement, LuaReturnStat::class.java)
@@ -64,43 +51,21 @@ class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
                     return LoopHandler(editor, psiFile, psiElement, loop)
             }
 
-            /*in binaryOp -> {
-                val expr = PsiTreeUtil.getParentOfType(psiElement, LuaExpr::class.java)
-                if (expr != null) {
+            else -> {
+                val parent = psiElement.parent
+                val parentType = parent.node.elementType
+                if (parentType == LuaTypes.BINARY_OP || parentType == LuaTypes.UNARY_OP) {
                     return object : HighlightUsagesHandlerBase<PsiElement>(editor, psiFile) {
                         override fun selectTargets(list: MutableList<PsiElement>?, consumer: Consumer<MutableList<PsiElement>>?) { }
 
                         override fun computeUsages(list: MutableList<PsiElement>) {
-                            addOccurrence(expr)
+                            addOccurrence(parent.parent)
                         }
 
                         override fun getTargets() = arrayListOf(psiElement)
                     }
                 }
-            }*/
-
-            // local a = value
-            /*LuaTypes.ID -> {
-                val offset = editor.caretModel.offset
-                val name = PsiTreeUtil.findElementOfClassAtOffset(psiFile, offset, LuaNameDef::class.java, false)
-                if (name != null) {
-                    val local = PsiTreeUtil.getParentOfType(name, LuaLocalDef::class.java)
-                    val expr = local?.getExprFor(name)
-                    if (expr != null) {
-                        return object : HighlightUsagesHandlerBase<PsiElement>(editor, psiFile) {
-                            override fun selectTargets(p0: MutableList<PsiElement>?, p1: Consumer<MutableList<PsiElement>>?) { }
-
-                            override fun computeUsages(list: MutableList<PsiElement>) {
-                                addOccurrence(expr)
-                            }
-
-                            override fun getTargets() = arrayListOf(psiElement)
-
-                            override fun highlightReferences() = true
-                        }
-                    }
-                }
-            }*/
+            }
         }
         return null
     }
