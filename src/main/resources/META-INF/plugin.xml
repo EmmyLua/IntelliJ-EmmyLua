@@ -142,6 +142,10 @@
         <library.type implementation="com.tang.intellij.lua.project.LuaLibraryType"/>
         <indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>
 
+        <!-- unity dll -->
+        <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
+        <virtualFileSystem implementationClass="com.tang.intellij.lua.unity.vfs.NetFileSystem" key="dll"/>
+
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
         <lang.braceMatcher language="Lua" implementationClass="com.tang.intellij.lua.braces.LuaBraceMatcher"/>
