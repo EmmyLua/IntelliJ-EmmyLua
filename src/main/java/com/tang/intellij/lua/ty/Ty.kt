@@ -313,18 +313,18 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun process(ty: ITy, process: (ITy) -> Boolean) {
             if (ty is TyUnion) {
-                for (child in ty.childSet) {
+                for (child in ty.childSet.toTypedArray()) {
                     if (!process(child))
                         break
                 }
             } else process(ty)
         }
 
-        fun each(ty: ITy, process: (ITy) -> Unit) {
-            if (ty is TyUnion) {
-                //ConcurrentModificationException
-                ty.childSet.toTypedArray().forEach(process)
-            } else process(ty)
+        fun each(ty: ITy, fn: (ITy) -> Unit) {
+            process(ty) {
+                fn(it)
+                true
+            }
         }
 
         fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
