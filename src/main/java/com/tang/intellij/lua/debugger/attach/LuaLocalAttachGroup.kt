@@ -43,8 +43,11 @@ class LuaLocalAttachGroup : XLocalAttachGroup {
         if (map != null) {
             val detail = map[processInfo.pid]
             if (detail != null) {
-                val sf = ShellFolder.getShellFolder(File(detail.path))
-                return ImageIcon(sf.getIcon(false))
+                val file = File(detail.path)
+                if (file.exists()) {
+                    val sf = ShellFolder.getShellFolder(file)
+                    return ImageIcon(sf.getIcon(false))
+                }
             }
         }
         return LuaIcons.FILE
