@@ -17,12 +17,44 @@
 package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.IStubElementType
-import com.intellij.psi.stubs.StubBase
-import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.*
+import com.tang.intellij.lua.lang.LuaLanguage
+import com.tang.intellij.lua.psi.LuaPsiElement
 
-abstract class LuaStubBase<T : PsiElement>(parent: StubElement<*>, type: IStubElementType<*, *>)
+abstract class LuaStubBase<T : PsiElement>(parent: StubElement<*>?, type: IStubElementType<*, *>)
     : StubBase<T>(parent, type)
+
+class LuaPlaceholderStub(parent: StubElement<*>?, elementType: IStubElementType<*, *>)
+    : LuaStubBase<LuaPsiElement>(parent, elementType) {
+
+    class Type<PsiT : LuaPsiElement>(debugName: String, val ctor: (LuaPlaceholderStub, IStubElementType<*, *>) -> PsiT)
+        : IStubElementType<LuaPlaceholderStub, PsiT>(debugName, LuaLanguage.INSTANCE) {
+        override fun createStub(psi: PsiT, stubElement: StubElement<*>?): LuaPlaceholderStub {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun getExternalId(): String {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun serialize(p0: LuaPlaceholderStub, p1: StubOutputStream) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun deserialize(p0: StubInputStream, p1: StubElement<*>?): LuaPlaceholderStub {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+        override fun createPsi(stub: LuaPlaceholderStub): PsiT {
+            return ctor(stub, this)
+        }
+
+        override fun indexStub(stub: LuaPlaceholderStub, sink: IndexSink) {
+        }
+
+    }
+
+}
 
 abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>, type: IStubElementType<StubElement<T>, *>)
     : LuaStubBase<T>(parent, type)
