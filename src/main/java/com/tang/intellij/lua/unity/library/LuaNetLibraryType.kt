@@ -43,7 +43,8 @@ class LuaNetLibraryType : LibraryType<DummyLibraryProperties>(LuaNetLibraryKind.
             override fun addRoots(libraryEditor: LibraryEditor) {
                 for (file in files) {
                     val virtualFile = VirtualFileManager.getInstance().findFileByUrl("dll://${file.path}!/")
-                    libraryEditor.addRoot(virtualFile, OrderRootType.CLASSES)
+                    if (virtualFile != null)
+                        libraryEditor.addRoot(virtualFile, OrderRootType.CLASSES)
                 }
             }
         }
