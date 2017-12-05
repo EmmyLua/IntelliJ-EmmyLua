@@ -23,19 +23,60 @@ import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 
 private val TypeRef.luaType: String get() {
     val ns: String? = namespace
-    return if (ns == null || ns.isEmpty())
+    val fullQName = if (ns == null || ns.isEmpty())
         name
     else
         "$ns.$name"
+
+    val converted = typeConvertMap[fullQName]
+    return converted ?: fullQName
 }
+
+private val obsoleteAttrSet = mutableSetOf(
+        "ObsoleteAttribute",
+        "MonoNotSupportedAttribute",
+        "MonoTODOAttribute"
+)
+private val typeConvertMap = mapOf(
+        "System.Single" to "number",
+        "System.Int32" to "number",
+        "System.UInt32" to "number",
+        "System.Double" to "number",
+        "System.Int16" to "number",
+        "System.UInt16" to "number",
+        "System.Int64" to "number",
+        "System.UInt64" to "number",
+        "System.Decimal" to "number",
+
+        "System.Boolean" to "boolean",
+        "System.String" to "string",
+        "System.Object" to "table"
+)
 
 private val TypeRef.isValid: Boolean get() {
     if (namespace.isNotEmpty() && !LuaRefactoringUtil.isLuaIdentifier(namespace))
         return false
-    return LuaRefactoringUtil.isLuaIdentifier(name)
+    if (!LuaRefactoringUtil.isLuaIdentifier(name))
+        return false
+    for (attribute in this.customAttributes) {
+        if (obsoleteAttrSet.contains(attribute.typeRef.name)) {
+            return false
+        }
+    }
+    return true
 }
 
 private val Method.isPublic: Boolean get() = this.flags and Method.FLAGS_VISIBILITY_PUBLIC == Method.FLAGS_VISIBILITY_PUBLIC
+
+private val Method.isStatic: Boolean get() = this.flags and Method.FLAGS_STATIC == Method.FLAGS_STATIC
+
+private val Method.isValid: Boolean get() {
+    return isPublic
+            && LuaRefactoringUtil.isLuaIdentifier(name)
+            && !isPropertyMethod
+            && !isEventMethod
+            && !name.startsWith("op_")
+}
 
 private val Property.isPublic: Boolean get() {
     return this.methods.any { it.isPublic }
@@ -112,28 +153,37 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
             append("local m = {}\n")
 
             type.methods.forEach {
-                val methodName = it.name
-                if (it.isPublic && LuaRefactoringUtil.isLuaIdentifier(methodName)) {
+                if (it.isValid) {
+                    val methodName = it.name
                     val signature = it.methodSignature
-                    if (!it.isPropertyMethod && !it.isEventMethod && !it.name.startsWith("op_")) {
-                        append("\n")
-                        signature.parameters.forEach { par ->
-                            append("---@param ${par.name} ${par.typeRef.luaType}\n")
-                        }
 
-                        val ret = signature.returnType
-                        if (ret.name != null)
-                            append("---@return ${signature.returnType.luaType}\n")
-                        append("function m:$methodName(")
-                        var parIndex = 0
-                        signature.parameters.forEach { par ->
-                            if (parIndex++ == 0)
-                                append(par.name)
-                            else
-                                append(", ${par.name}")
-                        }
-                        append(")end\n")
+                    append("\n")
+
+                    //parameter docs
+                    signature.parameters.forEach { par ->
+                        append("---@param ${par.name} ${par.typeRef.luaType}\n")
                     }
+
+                    //return
+                    val ret = signature.returnType
+                    if (ret.name != null)
+                        append("---@return ${signature.returnType.luaType}\n")
+
+                    //static or instance
+                    if (it.isStatic)
+                        append("function m.$methodName(")
+                    else
+                        append("function m:$methodName(")
+
+                    //parameters
+                    var parIndex = 0
+                    signature.parameters.forEach { par ->
+                        if (parIndex++ == 0)
+                            append(par.name)
+                        else
+                            append(", ${par.name}")
+                    }
+                    append(")end\n")
                 }
             }
 
