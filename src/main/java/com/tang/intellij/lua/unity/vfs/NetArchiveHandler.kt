@@ -157,12 +157,31 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
                 append("---@class ${type.luaType}\n")
             append("local m = {}\n")
 
-            type.methods.forEach {
-                if (it.isValid) {
-                    val methodName = it.name
-                    val signature = it.methodSignature
+            val processedMethod = mutableSetOf<String>()
+            type.methods.forEach { method ->
+                if (method.isValid && processedMethod.add(method.name)) {
+                    val methodName = method.name
+                    val signature = method.methodSignature
 
                     append("\n")
+
+                    //overloads
+                    val overloads = type.methods.filter { it.name == methodName && it != method }
+                    overloads.forEach { overload ->
+                        val sig = overload.methodSignature
+                        append("---@overload fun(")
+                        var parIndex = 0
+                        sig.parameters.forEach { parameter ->
+                            if (parIndex++ > 0)
+                                append(", ")
+                            append("${parameter.name}: ${parameter.typeRef.luaType}")
+                        }
+                        append(")")
+                        val ret = sig.returnType
+                        if (ret.name != null && !ret.isVoid)
+                            append(":${ret.luaType}")
+                        append("\n")
+                    }
 
                     //parameter docs
                     signature.parameters.forEach { par ->
@@ -172,10 +191,10 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
                     //return
                     val ret = signature.returnType
                     if (ret.name != null && !ret.isVoid)
-                        append("---@return ${signature.returnType.luaType}\n")
+                        append("---@return ${ret.luaType}\n")
 
                     //static or instance
-                    if (it.isStatic)
+                    if (method.isStatic)
                         append("function m.$methodName(")
                     else
                         append("function m:$methodName(")
@@ -183,10 +202,9 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
                     //parameters
                     var parIndex = 0
                     signature.parameters.forEach { par ->
-                        if (parIndex++ == 0)
-                            append(par.name)
-                        else
-                            append(", ${par.name}")
+                        if (parIndex++ > 0)
+                            append(", ")
+                        append(par.name)
                     }
                     append(")end\n")
                 }

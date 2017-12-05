@@ -16,8 +16,6 @@
 
 package com.tang.intellij.lua.unity.vfs
 
-import at.pollaknet.api.facile.symtab.symbols.Type
-import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -28,7 +26,6 @@ class NetFileSystem : ArchiveFileSystem() {
     companion object {
         val PROTOCOL = "dll"
         val DLL_SEPARATOR = "!/"
-        val NET_TYPE_KEY = Key.create<Type>("lua.net.type")
 
         val instance: NetFileSystem
             get() =
