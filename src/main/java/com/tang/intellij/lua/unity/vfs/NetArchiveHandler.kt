@@ -24,12 +24,16 @@ import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 private val TypeRef.luaType: String get() {
     val ns: String? = namespace
     val fullQName = if (ns == null || ns.isEmpty())
-        name
+        name ?: "any"
     else
         "$ns.$name"
 
     val converted = typeConvertMap[fullQName]
     return converted ?: fullQName
+}
+
+private val TypeRef.isVoid: Boolean get() {
+    return "Void" == name
 }
 
 private val obsoleteAttrSet = mutableSetOf(
@@ -54,9 +58,10 @@ private val typeConvertMap = mapOf(
 )
 
 private val TypeRef.isValid: Boolean get() {
-    if (namespace.isNotEmpty() && !LuaRefactoringUtil.isLuaIdentifier(namespace))
+    val ns = namespace.replace(".", "_")
+    if (ns.isNotEmpty() && !LuaRefactoringUtil.isLuaIdentifier(ns))
         return false
-    if (!LuaRefactoringUtil.isLuaIdentifier(name))
+    if (!LuaRefactoringUtil.isLuaIdentifier(ns))
         return false
     for (attribute in this.customAttributes) {
         if (obsoleteAttrSet.contains(attribute.typeRef.name)) {
@@ -166,7 +171,7 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
 
                     //return
                     val ret = signature.returnType
-                    if (ret.name != null)
+                    if (ret.name != null && !ret.isVoid)
                         append("---@return ${signature.returnType.luaType}\n")
 
                     //static or instance

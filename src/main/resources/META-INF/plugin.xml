@@ -145,6 +145,7 @@
         <!-- unity dll -->
         <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
         <virtualFileSystem implementationClass="com.tang.intellij.lua.unity.vfs.NetFileSystem" key="dll"/>
+        <iconProvider implementation="com.tang.intellij.lua.unity.NetDirectoryIconProvider" order="before javaDirectory"/>
 
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
