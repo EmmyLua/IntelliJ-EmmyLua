@@ -108,8 +108,10 @@ void GetProcesses(std::vector<Process>& processes)
 
 					HANDLE m_process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, processEntry.th32ProcessID);
 					if (m_process) {
-						GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
-						process.path = fileName;
+						int err = GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
+						if (err == 0) // ERROR_ACCESS_DENIED = 5
+							process.path = "error";
+						else process.path = fileName;
 
 						if (!process.path.empty()) {
 							char windowsPath[MAX_PATH];
