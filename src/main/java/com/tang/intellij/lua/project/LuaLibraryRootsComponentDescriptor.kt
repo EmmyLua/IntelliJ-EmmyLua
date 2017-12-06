@@ -29,7 +29,7 @@ import com.intellij.openapi.vfs.VirtualFile
  *
  * Created by tangzx on 2016/12/24.
  */
-class LuaLibraryRootsComponentDescriptor : LibraryRootsComponentDescriptor() {
+open class LuaLibraryRootsComponentDescriptor : LibraryRootsComponentDescriptor() {
     override fun getRootTypePresentation(orderRootType: OrderRootType): OrderRootTypePresentation? = null
 
     override fun createAttachFilesChooserDescriptor(libraryName: String?): FileChooserDescriptor {
