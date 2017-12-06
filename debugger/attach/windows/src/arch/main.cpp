@@ -47,7 +47,6 @@ int main(int argc, char** argv)
 			printf("<process pid=\"%d\">", value.id);
 			printf("<title><![CDATA[%s]]></title>", value.title.c_str());
 			printf("<path><![CDATA[%s]]></path>", value.path.c_str());
-			printf("<icon><![CDATA[%s]]></icon>", value.iconPath.c_str());
 			printf("</process>");
 		}
 		printf("</list>\n");

@@ -30,7 +30,7 @@ import java.io.ByteArrayInputStream
 import java.util.*
 import javax.xml.parsers.DocumentBuilderFactory
 
-data class ProcessDetailInfo(var pid: Int, var path: String, var title: String, var icon: String)
+data class ProcessDetailInfo(var pid: Int = 0, var path: String = "", var title: String = "")
 
 private val MAX_DISPLAY_LEN = 60
 
@@ -75,7 +75,7 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
         root.childNodes.let {
             for (i in 0 until it.length) {
                 val c = it.item(i)
-                val p = ProcessDetailInfo(0, "", "", "")
+                val p = ProcessDetailInfo()
                 val map = c.attributes
                 map.getNamedItem("pid")?.let {
                     p.pid = it.nodeValue.toInt()
@@ -91,10 +91,6 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
                         "path" -> {
                             val item = child.childNodes.item(0)
                             p.path = item?.nodeValue ?: ""
-                        }
-                        "icon" -> {
-                            val item = child.childNodes.item(0)
-                            p.icon = item?.nodeValue ?: ""
                         }
                     }
                 }
