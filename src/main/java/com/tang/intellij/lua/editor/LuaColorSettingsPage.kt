@@ -35,7 +35,7 @@ import javax.swing.Icon
  */
 class LuaColorSettingsPage : ColorSettingsPage {
 
-    override fun getIcon(): Icon? {
+    override fun getIcon(): Icon {
         return LuaIcons.FILE
     }
 
@@ -66,7 +66,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 "}\n"
     }
 
-    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey>? {
+    override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey> {
         return ourTags
     }
 
@@ -84,7 +84,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
 
     companion object {
         private val ourAttributeDescriptors = arrayOf(
-                AttributesDescriptor("Keyword", LuaHighlightingData.KEYWORD),
+                AttributesDescriptor("Keywords", LuaHighlightingData.KEYWORD),
                 AttributesDescriptor("self", LuaHighlightingData.SELF),
                 AttributesDescriptor("String", LuaHighlightingData.STRING),
                 AttributesDescriptor("nil/true/false", LuaHighlightingData.PRIMITIVE_TYPE),
