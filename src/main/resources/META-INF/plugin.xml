@@ -70,6 +70,19 @@
 
     <change-notes><![CDATA[
 
+    <strong>1.2.1</strong>
+    <ul>
+        <li>[IMPROVE]faster attach debugger</li>
+        <li>[IMPROVE]provide icons for processes list</li>
+        <li>[Experimental]show memory files</li>
+        <li>[Experimental]lua profiler</li>
+        <li>[IMPROVE]improve formatting</li>
+        <li>[IMPROVE]highlight unary && binary expression range</li>
+        <li>[NEW]now support use .net dll as lib to provide lua apis (useful for unity developers)</li>
+        <li>fix bug #72 #43 #79 #81 #83 </li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
+
     <strong>1.2.0</strong>
     <ul>
         <li>[NEW] Breadcrumbs info</li>
