@@ -16,8 +16,10 @@
 
 package com.tang.intellij.lua.stubs
 
+import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.*
+import com.intellij.psi.tree.IStubFileElementType
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaPsiElement
 
@@ -27,23 +29,30 @@ abstract class LuaStubBase<T : PsiElement>(parent: StubElement<*>?, type: IStubE
 class LuaPlaceholderStub(parent: StubElement<*>?, elementType: IStubElementType<*, *>)
     : LuaStubBase<LuaPsiElement>(parent, elementType) {
 
-    class Type<PsiT : LuaPsiElement>(debugName: String, val ctor: (LuaPlaceholderStub, IStubElementType<*, *>) -> PsiT)
+    class Type<PsiT : LuaPsiElement>(debugName: String, private val ctor: (LuaPlaceholderStub, IStubElementType<*, *>) -> PsiT)
         : IStubElementType<LuaPlaceholderStub, PsiT>(debugName, LuaLanguage.INSTANCE) {
-        override fun createStub(psi: PsiT, stubElement: StubElement<*>?): LuaPlaceholderStub {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        override fun createStub(psi: PsiT, parentStub: StubElement<*>?): LuaPlaceholderStub {
+            return LuaPlaceholderStub(parentStub, this)
         }
 
-        override fun getExternalId(): String {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        private fun createStubIfParentIsStub(node: ASTNode): Boolean {
+            val parent = node.treeParent
+            val parentType = parent.elementType
+            return (parentType is IStubElementType<*, *> && parentType.shouldCreateStub(parent)) ||
+                    parentType is IStubFileElementType<*>
         }
 
-        override fun serialize(p0: LuaPlaceholderStub, p1: StubOutputStream) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        override fun shouldCreateStub(node: ASTNode): Boolean {
+            return createStubIfParentIsStub(node)
         }
 
-        override fun deserialize(p0: StubInputStream, p1: StubElement<*>?): LuaPlaceholderStub {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        override fun getExternalId() = "lua.${super.toString()}"
+
+        override fun serialize(stub: LuaPlaceholderStub, dataStream: StubOutputStream) {
         }
+
+        override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?)
+                = LuaPlaceholderStub(parentStub, this)
 
         override fun createPsi(stub: LuaPlaceholderStub): PsiT {
             return ctor(stub, this)
@@ -51,9 +60,7 @@ class LuaPlaceholderStub(parent: StubElement<*>?, elementType: IStubElementType<
 
         override fun indexStub(stub: LuaPlaceholderStub, sink: IndexSink) {
         }
-
     }
-
 }
 
 abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>, type: IStubElementType<StubElement<T>, *>)

@@ -308,6 +308,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
 nameList ::= nameDef (',' nameDef)*
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
     implements = [
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"

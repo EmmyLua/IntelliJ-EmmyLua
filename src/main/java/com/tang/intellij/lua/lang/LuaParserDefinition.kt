@@ -32,10 +32,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocElementType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.parser.LuaParser
-import com.tang.intellij.lua.psi.LuaElementType
-import com.tang.intellij.lua.psi.LuaPsiFile
-import com.tang.intellij.lua.psi.LuaTokenType
-import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.impl.LuaLocalDefImpl
+import com.tang.intellij.lua.stubs.LuaPlaceholderStub
 import com.tang.intellij.lua.stubs.types.LuaFileElementType
 
 /**
@@ -104,6 +103,7 @@ fun createType(string: String): IElementType {
         "TABLE_FIELD" -> LuaElementType.TABLE_FIELD
         "INDEX_EXPR" -> LuaElementType.INDEX
         "NAME_EXPR" -> LuaElementType.NAME
+        "LOCAL_DEF" -> LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
         else -> LuaElementType(string)
     }
 }
