@@ -305,7 +305,9 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         getParams
     ]
 }
-nameList ::= nameDef (',' nameDef)*
+nameList ::= nameDef (',' nameDef)* {
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
     stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
@@ -474,16 +476,20 @@ unaryOp ::= '-' | 'not' | '#'
     // lua5.3
     | '~'
 
-fake name ::= ID {
+nameDef ::= ID {
     implements = [
         "com.tang.intellij.lua.psi.LuaNamedElement"
+        "com.tang.intellij.lua.psi.LuaTypeGuessable"
+        "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    methods = [setName getName]
-}
-nameDef ::= ID {
-    implements = ["com.tang.intellij.lua.psi.LuaTypeGuessable" "com.intellij.psi.PsiNameIdentifierOwner"]
-    methods = [guessType getNameIdentifier getUseScope]
-    extends = name
+    methods = [
+        getName
+        setName
+        guessType
+        getNameIdentifier
+        getUseScope
+    ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaNameDefStub"
 }
 nameExpr ::= ID {
     implements = ["com.tang.intellij.lua.psi.LuaPsiElement"
@@ -502,4 +508,5 @@ nameExpr ::= ID {
 }
 paramNameDef ::= ID {
     extends = nameDef
+    stubClass = "com.tang.intellij.lua.stubs.LuaNameDefStub"
 }

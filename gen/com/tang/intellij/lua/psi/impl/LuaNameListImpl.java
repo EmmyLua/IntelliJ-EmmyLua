@@ -8,13 +8,24 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
+import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
 
-public class LuaNameListImpl extends ASTWrapperPsiElement implements LuaNameList {
+public class LuaNameListImpl extends StubBasedPsiElementBase<LuaPlaceholderStub> implements LuaNameList {
+
+  public LuaNameListImpl(LuaPlaceholderStub stub, IStubElementType type) {
+    super(stub, type);
+  }
 
   public LuaNameListImpl(ASTNode node) {
     super(node);
+  }
+
+  public LuaNameListImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
@@ -29,7 +40,7 @@ public class LuaNameListImpl extends ASTWrapperPsiElement implements LuaNameList
   @Override
   @NotNull
   public List<LuaNameDef> getNameDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaNameDef.class);
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaNameDef.class);
   }
 
 }

@@ -140,12 +140,8 @@ public class LuaVisitor extends PsiElementVisitor {
     // visitPsiNameIdentifierOwner(o);
   }
 
-  public void visitName(@NotNull LuaName o) {
-    visitNamedElement(o);
-  }
-
   public void visitNameDef(@NotNull LuaNameDef o) {
-    visitName(o);
+    visitNamedElement(o);
     // visitTypeGuessable(o);
     // visitPsiNameIdentifierOwner(o);
   }

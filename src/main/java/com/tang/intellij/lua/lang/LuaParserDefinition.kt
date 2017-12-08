@@ -102,8 +102,10 @@ fun createType(string: String): IElementType {
         "TABLE_EXPR" -> LuaElementType.TABLE
         "TABLE_FIELD" -> LuaElementType.TABLE_FIELD
         "INDEX_EXPR" -> LuaElementType.INDEX
-        "NAME_EXPR" -> LuaElementType.NAME
+        "NAME_EXPR" -> LuaElementType.NAME_EXPR
         "LOCAL_DEF" -> LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
+        "NAME_DEF" -> LuaElementType.NAME_DEF
+        "PARAM_NAME_DEF" -> LuaElementType.PARAM_NAME_DEF
         else -> LuaElementType(string)
     }
 }

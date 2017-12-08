@@ -23,30 +23,34 @@ import com.intellij.psi.tree.IStubFileElementType
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaPsiElement
 
-abstract class LuaStubBase<T : PsiElement>(parent: StubElement<*>?, type: IStubElementType<*, *>)
+abstract class LuaStubElementType<StubT : StubElement<*>, PsiT : LuaPsiElement>(debugName: String)
+    : IStubElementType<StubT, PsiT>(debugName, LuaLanguage.INSTANCE) {
+
+    protected fun createStubIfParentIsStub(node: ASTNode): Boolean {
+        val parent = node.treeParent
+        val parentType = parent.elementType
+        return (parentType is IStubElementType<*, *> && parentType.shouldCreateStub(parent)) ||
+                parentType is IStubFileElementType<*>
+    }
+
+    override fun getExternalId() = "lua.${super.toString()}"
+}
+
+abstract class LuaStubBase<T : PsiElement>(parent: StubElement<*>?, type: LuaStubElementType<*, *>)
     : StubBase<T>(parent, type)
 
-class LuaPlaceholderStub(parent: StubElement<*>?, elementType: IStubElementType<*, *>)
+class LuaPlaceholderStub(parent: StubElement<*>?, elementType: LuaStubElementType<*, *>)
     : LuaStubBase<LuaPsiElement>(parent, elementType) {
 
     class Type<PsiT : LuaPsiElement>(debugName: String, private val ctor: (LuaPlaceholderStub, IStubElementType<*, *>) -> PsiT)
-        : IStubElementType<LuaPlaceholderStub, PsiT>(debugName, LuaLanguage.INSTANCE) {
+        : LuaStubElementType<LuaPlaceholderStub, PsiT>(debugName) {
         override fun createStub(psi: PsiT, parentStub: StubElement<*>?): LuaPlaceholderStub {
             return LuaPlaceholderStub(parentStub, this)
-        }
-
-        private fun createStubIfParentIsStub(node: ASTNode): Boolean {
-            val parent = node.treeParent
-            val parentType = parent.elementType
-            return (parentType is IStubElementType<*, *> && parentType.shouldCreateStub(parent)) ||
-                    parentType is IStubFileElementType<*>
         }
 
         override fun shouldCreateStub(node: ASTNode): Boolean {
             return createStubIfParentIsStub(node)
         }
-
-        override fun getExternalId() = "lua.${super.toString()}"
 
         override fun serialize(stub: LuaPlaceholderStub, dataStream: StubOutputStream) {
         }
@@ -63,5 +67,5 @@ class LuaPlaceholderStub(parent: StubElement<*>?, elementType: IStubElementType<
     }
 }
 
-abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>, type: IStubElementType<StubElement<T>, *>)
+abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>, type: LuaStubElementType<StubElement<T>, *>)
     : LuaStubBase<T>(parent, type)

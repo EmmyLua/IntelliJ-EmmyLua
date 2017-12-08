@@ -44,12 +44,12 @@ import com.tang.intellij.lua.ty.*
 import java.util.*
 import javax.swing.Icon
 
-fun setName(identifier: LuaNamedElement, name: String): PsiElement {
-    val newId = LuaElementFactory.createIdentifier(identifier.project, name)
-    val oldId = identifier.firstChild
-    oldId.replace(newId)
-    return newId
-}
+//fun setName(identifier: LuaNamedElement, name: String): PsiElement {
+//    val newId = LuaElementFactory.createIdentifier(identifier.project, name)
+//    val oldId = identifier.firstChild
+//    oldId.replace(newId)
+//    return newId
+//}
 
 fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
     val oldId = owner.nameIdentifier
@@ -61,9 +61,9 @@ fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
     return owner
 }
 
-fun getName(identifier: LuaNamedElement): String {
-    return identifier.text
-}
+//fun getName(identifier: LuaNamedElement): String {
+//    return identifier.text
+//}
 
 fun guessType(nameDef: LuaNameDef, context: SearchContext): ITy {
     return resolveType(nameDef, context)
@@ -508,6 +508,10 @@ fun getNameIdentifier(localFuncDef: LuaLocalFuncDef): PsiElement? {
 
 fun getUseScope(localFuncDef: LuaLocalFuncDef): SearchScope {
     return GlobalSearchScope.fileScope(localFuncDef.containingFile)
+}
+
+fun getName(nameDef: LuaNameDef): String {
+    return nameDef.id.text
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {

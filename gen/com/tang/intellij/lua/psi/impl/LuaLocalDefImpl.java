@@ -47,7 +47,7 @@ public class LuaLocalDefImpl extends StubBasedPsiElementBase<LuaPlaceholderStub>
   @Override
   @Nullable
   public LuaNameList getNameList() {
-    return PsiTreeUtil.getChildOfType(this, LuaNameList.class);
+    return PsiTreeUtil.getStubChildOfType(this, LuaNameList.class);
   }
 
   @Nullable

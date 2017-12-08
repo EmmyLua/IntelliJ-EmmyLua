@@ -31,6 +31,8 @@ import com.tang.intellij.lua.comment.psi.impl.LuaCommentImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
+import com.tang.intellij.lua.stubs.LuaNameDefElementType;
+import com.tang.intellij.lua.stubs.ParamNameDefElementType;
 import com.tang.intellij.lua.stubs.types.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -75,7 +77,7 @@ public class LuaElementType extends IElementType {
     public static IStubElementType TABLE = new LuaTableType();
     public static IStubElementType TABLE_FIELD = new LuaTableFieldType();
     public static IStubElementType INDEX = new LuaIndexType();
-    public static IStubElementType NAME = new LuaNameType();
+    public static IStubElementType NAME_EXPR = new LuaNameType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
 
     static class LuaBlockElementType extends IReparseableElementType {
@@ -103,4 +105,7 @@ public class LuaElementType extends IElementType {
             return null;
         }
     }
+
+    public static LuaNameDefElementType NAME_DEF = new LuaNameDefElementType();
+    public static ParamNameDefElementType PARAM_NAME_DEF = new ParamNameDefElementType();
 }

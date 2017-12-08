@@ -9,11 +9,22 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaNameDefStub;
 
 public class LuaParamNameDefImpl extends LuaNameDefImpl implements LuaParamNameDef {
 
+  public LuaParamNameDefImpl(LuaNameDefStub stub, IStubElementType type) {
+    super(stub, type);
+  }
+
   public LuaParamNameDefImpl(ASTNode node) {
     super(node);
+  }
+
+  public LuaParamNameDefImpl(LuaNameDefStub stub, IElementType type, ASTNode node) {
+    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
