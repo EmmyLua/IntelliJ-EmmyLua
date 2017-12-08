@@ -62,8 +62,6 @@ int EmmyCreateNode(lua_State* L)
 	{
 		//const char* tag = lua_tostring_dll(api, L, -2);
 		//const char* data = lua_tostring_dll(api, L, -1);
-		//TiXmlNode* node = WriteXmlNode(tag, data);
-		//lua_pushlightuserdata_dll(api, L, node);
 	}
 	return 0;
 }
