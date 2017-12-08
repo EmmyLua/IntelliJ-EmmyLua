@@ -22,6 +22,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.getGlobalTypeName
 import com.tang.intellij.lua.ty.getTableTypeName
 
 /**
@@ -145,7 +146,10 @@ val LuaDocClassDef.aliasName: String? get() {
     when (owner) {
         is LuaAssignStat -> {
             val expr = owner.getExprAt(0)
-            if (expr != null) return expr.text
+            if (expr is LuaNameExpr)
+                return getGlobalTypeName(expr)
+            else if (expr != null)
+                return expr.text
         }
 
         is LuaLocalDef -> {

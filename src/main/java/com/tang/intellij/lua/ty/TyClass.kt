@@ -215,7 +215,8 @@ fun getTableTypeName(table: LuaTableExpr): String {
 }
 
 fun getGlobalTypeName(expr: LuaNameExpr): String {
-    return "__${expr.text}"
+    val text = expr.text
+    return if (text == Constants.WORD_G) text else "__$text"
 }
 
 class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
