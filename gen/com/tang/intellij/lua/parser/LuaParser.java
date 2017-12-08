@@ -173,10 +173,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
     create_token_set_(BINARY_EXPR, CALL_EXPR, CLOSURE_EXPR, EXPR,
       INDEX_EXPR, LITERAL_EXPR, NAME_EXPR, PAREN_EXPR,
       TABLE_EXPR, UNARY_EXPR, VALUE_EXPR),
-    create_token_set_(ASSIGN_STAT, BREAK_STAT, CALL_STAT, DO_STAT,
-      FOR_A_STAT, FOR_B_STAT, GOTO_STAT, IF_STAT,
-      INCOMPLETE_STAT, LABEL_STAT, REPEAT_STAT, RETURN_STAT,
-      WHILE_STAT),
+    create_token_set_(BREAK_STAT, CALL_STAT, DO_STAT, FOR_A_STAT,
+      FOR_B_STAT, GOTO_STAT, IF_STAT, INCOMPLETE_STAT,
+      LABEL_STAT, REPEAT_STAT, RETURN_STAT, WHILE_STAT),
   };
 
   /* ********************************************************** */

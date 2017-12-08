@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface LuaBlock extends LuaPsiElement {
 
   @NotNull
+  List<LuaAssignStat> getAssignStatList();
+
+  @NotNull
   List<LuaClassMethodDef> getClassMethodDefList();
 
   @NotNull

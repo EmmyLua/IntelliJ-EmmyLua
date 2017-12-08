@@ -32,8 +32,11 @@ import com.tang.intellij.lua.comment.psi.LuaDocElementType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.parser.LuaParser
-import com.tang.intellij.lua.psi.*
-import com.tang.intellij.lua.psi.impl.LuaLocalDefImpl
+import com.tang.intellij.lua.psi.LuaElementType
+import com.tang.intellij.lua.psi.LuaPsiFile
+import com.tang.intellij.lua.psi.LuaTokenType
+import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.impl.*
 import com.tang.intellij.lua.stubs.LuaPlaceholderStub
 import com.tang.intellij.lua.stubs.types.LuaFileElementType
 
@@ -103,9 +106,15 @@ fun createType(string: String): IElementType {
         "TABLE_FIELD" -> LuaElementType.TABLE_FIELD
         "INDEX_EXPR" -> LuaElementType.INDEX
         "NAME_EXPR" -> LuaElementType.NAME_EXPR
-        "LOCAL_DEF" -> LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
         "NAME_DEF" -> LuaElementType.NAME_DEF
         "PARAM_NAME_DEF" -> LuaElementType.PARAM_NAME_DEF
+
+        "EXPR_LIST" -> LuaPlaceholderStub.Type("EXPR_LIST", ::LuaExprListImpl)
+        "NAME_LIST" -> LuaPlaceholderStub.Type("NAME_LIST", ::LuaNameListImpl)
+        "LOCAL_DEF" -> LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
+        "ASSIGN_STAT" -> LuaPlaceholderStub.Type("ASSIGN_STAT", ::LuaAssignStatImpl)
+        "VAR_LIST" -> LuaPlaceholderStub.Type("VAR_LIST", ::LuaVarListImpl)
+
         else -> LuaElementType(string)
     }
 }

@@ -149,13 +149,18 @@ private stat_recover ::= !(ID
     | nil | true | false | STRING | NUMBER | '::' | 'goto'
     | unaryOp)
 
-varList ::= varExpr (',' varExpr)* { extends = exprList }
+varList ::= varExpr (',' varExpr)* {
+    extends = exprList
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 assignStat ::= varList '=' exprList {
     pin = 2
     implements = [
         "com.tang.intellij.lua.psi.LuaDeclaration"
     ]
     methods = [assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
+    extends = "com.tang.intellij.lua.psi.impl.LuaStatMixin"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
 doStat ::= 'do' <<lazyBlock>> 'end' {
     pin = 1
@@ -322,7 +327,10 @@ returnStat ::= return exprList?
 breakStat ::= break
 private lastStat ::= returnStat | breakStat
 
-exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
+exprList ::= (expr ',')* expr {
+    methods = [guessTypeAt]
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..." {
     mixin = 'com.tang.intellij.lua.psi.impl.LuaLiteralExprMixin'
