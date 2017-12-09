@@ -23,7 +23,10 @@ import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.lang.type.LuaString
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaElementFactory
+import com.tang.intellij.lua.psi.LuaLiteralExpr
+import com.tang.intellij.lua.psi.LuaLiteralKind
+import com.tang.intellij.lua.psi.kind
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaLiteralExprStub
 import com.tang.intellij.lua.ty.ITy
@@ -48,14 +51,13 @@ internal class TextEscaper(host: LuaLiteralExprMixin) : LiteralTextEscaper<LuaLi
 }
 
 open class LuaLiteralExprMixin
-    : LuaExprStubMixin<LuaLiteralExprStub>, PsiLanguageInjectionHost {
+    : LuaExprStubMixin<LuaLiteralExprStub>, PsiLanguageInjectionHost, LuaLiteralExpr {
     override fun guessType(context: SearchContext): ITy {
-        val child = firstChild
-        return when (child.node.elementType) {
-            LuaTypes.TRUE , LuaTypes.FALSE -> Ty.BOOLEAN
-            LuaTypes.STRING -> Ty.STRING
-            LuaTypes.NUMBER -> Ty.NUMBER
-            LuaTypes.NIL -> Ty.NIL
+        return when (this.kind) {
+            LuaLiteralKind.Bool -> Ty.BOOLEAN
+            LuaLiteralKind.String -> Ty.STRING
+            LuaLiteralKind.Number -> Ty.NUMBER
+            LuaLiteralKind.Nil -> Ty.NIL
             else -> Ty.UNKNOWN
         }
     }

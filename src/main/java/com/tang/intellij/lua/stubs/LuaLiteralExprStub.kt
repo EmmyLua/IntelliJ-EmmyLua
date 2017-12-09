@@ -16,25 +16,33 @@
 
 package com.tang.intellij.lua.stubs
 
+import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.psi.LuaLiteralExpr
+import com.tang.intellij.lua.psi.LuaLiteralKind
 import com.tang.intellij.lua.psi.impl.LuaLiteralExprImpl
+import com.tang.intellij.lua.psi.kind
 
 class LuaLiteralElementType
     : LuaStubElementType<LuaLiteralExprStub, LuaLiteralExpr>("LITERAL_EXPR") {
     override fun serialize(stub: LuaLiteralExprStub, stream: StubOutputStream) {
+        stream.writeByte(stub.kind.ordinal)
+    }
 
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        return createStubIfParentIsStub(node)
     }
 
     override fun createStub(expr: LuaLiteralExpr, parentStub: StubElement<*>?): LuaLiteralExprStub {
-        return LuaLiteralExprStub(parentStub, this)
+        return LuaLiteralExprStub(expr.kind, parentStub, this)
     }
 
     override fun deserialize(stream: StubInputStream, parentStub: StubElement<*>?): LuaLiteralExprStub {
-        return LuaLiteralExprStub(parentStub, this)
+        val kind = stream.readByte()
+        return LuaLiteralExprStub(LuaLiteralKind.toEnum(kind), parentStub, this)
     }
 
     override fun indexStub(stub: LuaLiteralExprStub, sink: IndexSink) {
@@ -46,5 +54,5 @@ class LuaLiteralElementType
     }
 }
 
-class LuaLiteralExprStub(parent: StubElement<*>?, type: LuaStubElementType<*, *>)
+class LuaLiteralExprStub(val kind: LuaLiteralKind, parent: StubElement<*>?, type: LuaStubElementType<*, *>)
     : LuaStubBase<LuaLiteralExpr>(parent, type)

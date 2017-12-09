@@ -120,16 +120,28 @@ enum class LuaLiteralKind {
     Bool,
     Number,
     Nil,
-    Unknown
+    Unknown;
+
+    companion object {
+        fun toEnum(ID: Byte): LuaLiteralKind {
+            return LuaLiteralKind.values().find { it.ordinal == ID.toInt() } ?: Unknown
+        }
+    }
 }
 
-val LuaLiteralExpr.kind: LuaLiteralKind get() = when(node.firstChildNode.elementType) {
-    LuaTypes.STRING -> LuaLiteralKind.String
-    LuaTypes.TRUE -> LuaLiteralKind.Bool
-    LuaTypes.FALSE -> LuaLiteralKind.Bool
-    LuaTypes.NIL -> LuaLiteralKind.Nil
-    LuaTypes.NUMBER -> LuaLiteralKind.Number
-    else -> LuaLiteralKind.Unknown
+val LuaLiteralExpr.kind: LuaLiteralKind get() {
+    val stub = this.stub
+    if (stub != null)
+        return stub.kind
+
+    return when(node.firstChildNode.elementType) {
+        LuaTypes.STRING -> LuaLiteralKind.String
+        LuaTypes.TRUE -> LuaLiteralKind.Bool
+        LuaTypes.FALSE -> LuaLiteralKind.Bool
+        LuaTypes.NIL -> LuaLiteralKind.Nil
+        LuaTypes.NUMBER -> LuaLiteralKind.Number
+        else -> LuaLiteralKind.Unknown
+    }
 }
 
 val LuaLiteralExpr.stringValue: String get() {
