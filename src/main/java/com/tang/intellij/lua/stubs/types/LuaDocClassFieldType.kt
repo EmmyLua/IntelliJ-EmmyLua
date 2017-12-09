@@ -17,15 +17,18 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl
-import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStub
 import com.tang.intellij.lua.stubs.LuaDocClassFieldStubImpl
+import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.Ty
@@ -35,7 +38,7 @@ import java.io.IOException
 
  * Created by tangzx on 2016/12/10.
  */
-class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldDef>("Class Doc Field", LuaLanguage.INSTANCE) {
+class LuaDocClassFieldType : LuaStubElementType<LuaDocClassFieldStub, LuaDocFieldDef>("CLASS_DOC_FIELD") {
 
     override fun createPsi(luaFieldStub: LuaDocClassFieldStub) = LuaDocFieldDefImpl(luaFieldStub, this)
 

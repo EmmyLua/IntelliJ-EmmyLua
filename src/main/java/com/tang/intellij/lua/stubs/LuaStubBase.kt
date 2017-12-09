@@ -37,7 +37,11 @@ abstract class LuaStubElementType<StubT : StubElement<*>, PsiT : LuaPsiElement>(
 }
 
 abstract class LuaStubBase<T : PsiElement>(parent: StubElement<*>?, type: LuaStubElementType<*, *>)
-    : StubBase<T>(parent, type)
+    : StubBase<T>(parent, type) {
+    override fun toString(): String {
+        return "${super.toString()}($stubType)"
+    }
+}
 
 class LuaPlaceholderStub(parent: StubElement<*>?, elementType: LuaStubElementType<*, *>)
     : LuaStubBase<LuaPsiElement>(parent, elementType) {
@@ -67,5 +71,5 @@ class LuaPlaceholderStub(parent: StubElement<*>?, elementType: LuaStubElementTyp
     }
 }
 
-abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>, type: LuaStubElementType<StubElement<T>, *>)
+abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>?, type: LuaStubElementType<*, *>)
     : LuaStubBase<T>(parent, type)

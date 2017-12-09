@@ -334,6 +334,7 @@ exprList ::= (expr ',')* expr {
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..." {
     mixin = 'com.tang.intellij.lua.psi.impl.LuaLiteralExprMixin'
+    stubClass = 'com.tang.intellij.lua.stubs.LuaLiteralExprStub'
 }
 stringExpr ::= STRING {
     extends = literalExpr
@@ -379,7 +380,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         "com.intellij.psi.PsiNameIdentifierOwner"
         "com.tang.intellij.lua.psi.LuaClassMember"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaIndexStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaIndexExprStub"
     mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExprMixin"
 }
 
@@ -434,7 +435,7 @@ tableExpr ::= '{' fieldList '}' {
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
     mixin = "com.tang.intellij.lua.psi.impl.LuaTableExprMixin"
-    stubClass = "com.tang.intellij.lua.stubs.LuaTableStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaTableExprStub"
 }
 
 private fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
@@ -512,7 +513,7 @@ nameExpr ::= ID {
         toString
     ]
     mixin = "com.tang.intellij.lua.psi.impl.LuaNameExprMixin"
-    stubClass = "com.tang.intellij.lua.stubs.LuaNameStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaNameExprStub"
 }
 paramNameDef ::= ID {
     extends = nameDef

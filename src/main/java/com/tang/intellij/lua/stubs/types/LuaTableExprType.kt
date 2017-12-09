@@ -17,25 +17,28 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.stubs.*
-import com.tang.intellij.lua.lang.LuaLanguage
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.psi.impl.LuaTableExprImpl
 import com.tang.intellij.lua.psi.shouldCreateStub
-import com.tang.intellij.lua.stubs.LuaTableStub
-import com.tang.intellij.lua.stubs.LuaTableStubImpl
+import com.tang.intellij.lua.stubs.LuaStubElementType
+import com.tang.intellij.lua.stubs.LuaTableExprStub
+import com.tang.intellij.lua.stubs.LuaTableExprStubImpl
 import java.io.IOException
 
 /**
  * table
  * Created by tangzx on 2017/1/12.
  */
-class LuaTableType : IStubElementType<LuaTableStub, LuaTableExpr>("Table", LuaLanguage.INSTANCE) {
+class LuaTableExprType : LuaStubElementType<LuaTableExprStub, LuaTableExpr>("TABLE") {
 
-    override fun createPsi(luaTableStub: LuaTableStub) = LuaTableExprImpl(luaTableStub, this)
+    override fun createPsi(luaTableStub: LuaTableExprStub) = LuaTableExprImpl(luaTableStub, this)
 
-    override fun createStub(tableConstructor: LuaTableExpr, stubElement: StubElement<*>): LuaTableStub {
-        return LuaTableStubImpl(stubElement, this)
+    override fun createStub(tableConstructor: LuaTableExpr, stubElement: StubElement<*>): LuaTableExprStub {
+        return LuaTableExprStubImpl(stubElement, this)
     }
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
@@ -46,14 +49,14 @@ class LuaTableType : IStubElementType<LuaTableStub, LuaTableExpr>("Table", LuaLa
     override fun getExternalId() = "lua.table"
 
     @Throws(IOException::class)
-    override fun serialize(luaTableStub: LuaTableStub, stubOutputStream: StubOutputStream) {
+    override fun serialize(luaTableStub: LuaTableExprStub, stubOutputStream: StubOutputStream) {
 
     }
 
     @Throws(IOException::class)
-    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaTableStub {
-        return LuaTableStubImpl(stubElement, this)
+    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaTableExprStub {
+        return LuaTableExprStubImpl(stubElement, this)
     }
 
-    override fun indexStub(luaTableStub: LuaTableStub, indexSink: IndexSink) {}
+    override fun indexStub(luaTableStub: LuaTableExprStub, indexSink: IndexSink) {}
 }

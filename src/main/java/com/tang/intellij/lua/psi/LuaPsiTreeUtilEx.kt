@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs
+package com.tang.intellij.lua.psi
 
-import com.intellij.psi.stubs.IStubElementType
-import com.intellij.psi.stubs.StubBase
-import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.psi.LuaTableExpr
+import com.intellij.psi.PsiElement
+import com.intellij.util.Processor
 
-/**
+object LuaPsiTreeUtilEx {
+    fun walkUpNameDef(psi: PsiElement, processor: Processor<PsiElement>) {
 
- * Created by tangzx on 2017/1/12.
- */
-interface LuaTableStub : StubElement<LuaTableExpr>
-
-class LuaTableStubImpl(parent: StubElement<*>, elementType: IStubElementType<*, *>)
-    : StubBase<LuaTableExpr>(parent, elementType), LuaTableStub
+    }
+}

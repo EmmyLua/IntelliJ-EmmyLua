@@ -17,8 +17,6 @@
 package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.IStubElementType
-import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.*
@@ -34,7 +32,7 @@ interface LuaTableFieldStub : LuaClassMemberStub<LuaTableField> {
     val name: String?
 }
 
-class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
+class LuaTableFieldStubImpl : LuaStubBase<LuaTableField>, LuaTableFieldStub {
     private var _tableField: LuaTableField? = null
     private var _typeName: String? = null
     private var _fieldName: String? = null
@@ -42,7 +40,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
 
     constructor(field: LuaTableField,
                 parent: StubElement<*>,
-                elementType: IStubElementType<*, *>) : super(parent, elementType) {
+                elementType: LuaStubElementType<*, *>) : super(parent, elementType) {
         _tableField = field
         _fieldName = field.fieldName
     }
@@ -50,7 +48,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
     constructor(typeName: String,
                 fieldName: String?,
                 stubElement: StubElement<*>,
-                elementType: IStubElementType<*, *>) : super(stubElement, elementType) {
+                elementType: LuaStubElementType<*, *>) : super(stubElement, elementType) {
         _typeName = typeName
         _fieldName = fieldName
     }

@@ -17,12 +17,15 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
-import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
 import com.tang.intellij.lua.psi.shouldCreateStub
+import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.LuaTableFieldStub
 import com.tang.intellij.lua.stubs.LuaTableFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -33,7 +36,7 @@ import java.io.IOException
 
  * Created by tangzx on 2017/1/14.
  */
-class LuaTableFieldType : IStubElementType<LuaTableFieldStub, LuaTableField>("Table Field", LuaLanguage.INSTANCE) {
+class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("TABLE_FIELD") {
 
     override fun createPsi(luaTableFieldStub: LuaTableFieldStub): LuaTableField {
         return LuaTableFieldImpl(luaTableFieldStub, this)

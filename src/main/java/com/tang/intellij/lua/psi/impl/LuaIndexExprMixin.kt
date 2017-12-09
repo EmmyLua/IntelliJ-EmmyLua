@@ -29,7 +29,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.LuaIndexStub
+import com.tang.intellij.lua.stubs.LuaIndexExprStub
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
 
@@ -37,13 +37,13 @@ import com.tang.intellij.lua.ty.*
 
  * Created by TangZX on 2017/4/12.
  */
-abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexStub>, LuaExpr, LuaClassField {
+abstract class LuaIndexExprMixin : StubBasedPsiElementBase<LuaIndexExprStub>, LuaExpr, LuaClassField {
 
-    internal constructor(stub: LuaIndexStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
+    internal constructor(stub: LuaIndexExprStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     internal constructor(node: ASTNode) : super(node)
 
-    internal constructor(stub: LuaIndexStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
+    internal constructor(stub: LuaIndexExprStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
 
     override fun getReferences(): Array<PsiReference> {

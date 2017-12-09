@@ -16,18 +16,21 @@
 
 package com.tang.intellij.lua.stubs.types
 
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocTypeDefImpl
-import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.stubs.LuaDocTyStub
 import com.tang.intellij.lua.stubs.LuaDocTyStubImpl
+import com.tang.intellij.lua.stubs.LuaStubElementType
 
 /**
  * type for ---@type
  * Created by tangzx on 2017/7/3.
  */
-class LuaDocTyType : IStubElementType<LuaDocTyStub, LuaDocTypeDef>("Type Def", LuaLanguage.INSTANCE){
+class LuaDocTyType : LuaStubElementType<LuaDocTyStub, LuaDocTypeDef>("DOC_TY"){
     override fun indexStub(stub: LuaDocTyStub, sink: IndexSink) {
     }
 

@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.psi.LuaElementType
@@ -38,7 +37,7 @@ class LuaDocClassStubImpl(override val className: String,
                           override val aliasName: String?,
                           override val superClassName: String?,
                           parent: StubElement<*>)
-    : StubBase<LuaDocClassDef>(parent, LuaElementType.CLASS_DEF), LuaDocClassStub {
+    : LuaDocStubBase<LuaDocClassDef>(parent, LuaElementType.CLASS_DEF), LuaDocClassStub {
 
     override val classType: TyClass
         get() {

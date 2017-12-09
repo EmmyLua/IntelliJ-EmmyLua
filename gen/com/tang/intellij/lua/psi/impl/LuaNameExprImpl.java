@@ -11,13 +11,13 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
-import com.tang.intellij.lua.stubs.LuaNameStub;
+import com.tang.intellij.lua.stubs.LuaNameExprStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
 public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
 
-  public LuaNameExprImpl(LuaNameStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaNameExprImpl(LuaNameExprStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
@@ -25,7 +25,7 @@ public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
     super(node);
   }
 
-  public LuaNameExprImpl(LuaNameStub stub, IElementType type, ASTNode node) {
+  public LuaNameExprImpl(LuaNameExprStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 

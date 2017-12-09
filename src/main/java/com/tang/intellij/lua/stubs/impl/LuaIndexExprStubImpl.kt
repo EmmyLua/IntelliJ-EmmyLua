@@ -20,18 +20,18 @@ import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.Visibility
-import com.tang.intellij.lua.stubs.LuaIndexStub
-import com.tang.intellij.lua.stubs.types.LuaIndexType
+import com.tang.intellij.lua.stubs.LuaIndexExprStub
+import com.tang.intellij.lua.stubs.types.LuaIndexExprType
 import com.tang.intellij.lua.ty.ITy
 
 /**
  *
  * Created by TangZX on 2017/4/12.
  */
-class LuaIndexStubImpl(override val className: String?,
-                       override val name: String?,
-                       override val valueType: ITy,
-                       override val visibility: Visibility,
-                       stubElement: StubElement<*>,
-                       indexType: LuaIndexType)
-    : StubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexStub
+class LuaIndexExprStubImpl(override val className: String?,
+                           override val name: String?,
+                           override val valueType: ITy,
+                           override val visibility: Visibility,
+                           stubElement: StubElement<*>,
+                           indexType: LuaIndexExprType)
+    : StubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexExprStub

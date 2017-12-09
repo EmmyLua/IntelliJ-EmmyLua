@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaTableStub;
+import com.tang.intellij.lua.stubs.LuaTableExprStub;
 
-public interface LuaTableExpr extends LuaExpr, LuaIndentRange, StubBasedPsiElement<LuaTableStub> {
+public interface LuaTableExpr extends LuaExpr, LuaIndentRange, StubBasedPsiElement<LuaTableExprStub> {
 
   @NotNull
   List<LuaTableField> getTableFieldList();

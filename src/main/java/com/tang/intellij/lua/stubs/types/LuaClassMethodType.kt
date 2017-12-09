@@ -17,9 +17,11 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
-import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.psi.guessTypeFromCache
@@ -27,6 +29,7 @@ import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMethodStub
 import com.tang.intellij.lua.stubs.LuaClassMethodStubImpl
+import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.ITyFunction
@@ -38,7 +41,7 @@ import java.io.IOException
 
  * Created by tangzx on 2016/12/4.
  */
-class LuaClassMethodType : IStubElementType<LuaClassMethodStub, LuaClassMethodDef>("Class Method", LuaLanguage.INSTANCE) {
+class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethodDef>("Class Method") {
 
     override fun createPsi(luaClassMethodStub: LuaClassMethodStub): LuaClassMethodDef {
         return LuaClassMethodDefImpl(luaClassMethodStub, this)

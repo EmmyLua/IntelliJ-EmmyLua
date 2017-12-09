@@ -20,11 +20,14 @@ import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.LiteralTextEscaper
 import com.intellij.psi.PsiLanguageInjectionHost
+import com.intellij.psi.stubs.IStubElementType
+import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.lang.type.LuaString
-import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.psi.LuaLiteralExpr
-import com.tang.intellij.lua.psi.LuaLiteralKind
-import com.tang.intellij.lua.psi.kind
+import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaLiteralExprStub
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 import java.lang.StringBuilder
 
 internal class TextEscaper(host: LuaLiteralExprMixin) : LiteralTextEscaper<LuaLiteralExprMixin>(host) {
@@ -44,7 +47,27 @@ internal class TextEscaper(host: LuaLiteralExprMixin) : LiteralTextEscaper<LuaLi
 
 }
 
-open class LuaLiteralExprMixin(node: ASTNode) : LuaExprMixin(node), PsiLanguageInjectionHost {
+open class LuaLiteralExprMixin
+    : LuaExprStubMixin<LuaLiteralExprStub>, PsiLanguageInjectionHost {
+    override fun guessType(context: SearchContext): ITy {
+        val child = firstChild
+        return when (child.node.elementType) {
+            LuaTypes.TRUE , LuaTypes.FALSE -> Ty.BOOLEAN
+            LuaTypes.STRING -> Ty.STRING
+            LuaTypes.NUMBER -> Ty.NUMBER
+            LuaTypes.NIL -> Ty.NIL
+            else -> Ty.UNKNOWN
+        }
+    }
+
+    constructor(stub: LuaLiteralExprStub, nodeType: IStubElementType<*, *>)
+            : super(stub, nodeType)
+
+    constructor(node: ASTNode) : super(node)
+
+    constructor(stub: LuaLiteralExprStub, nodeType: IElementType, node: ASTNode)
+            : super(stub, nodeType, node)
+
     override fun updateText(text: String): PsiLanguageInjectionHost {
         val expr = LuaElementFactory.createLiteral(project, text)
         node.replaceChild(node.firstChildNode, expr.node.firstChildNode)

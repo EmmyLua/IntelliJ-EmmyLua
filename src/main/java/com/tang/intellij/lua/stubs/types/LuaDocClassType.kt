@@ -17,14 +17,17 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.psi.NavigatablePsiElement
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl
-import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.aliasName
 import com.tang.intellij.lua.stubs.LuaDocClassStub
 import com.tang.intellij.lua.stubs.LuaDocClassStubImpl
+import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex
@@ -34,7 +37,7 @@ import java.io.IOException
 
  * Created by tangzx on 2016/11/28.
  */
-class LuaDocClassType : IStubElementType<LuaDocClassStub, LuaDocClassDef>("Class", LuaLanguage.INSTANCE) {
+class LuaDocClassType : LuaStubElementType<LuaDocClassStub, LuaDocClassDef>("DOC_CLASS") {
 
     override fun createPsi(luaDocClassStub: LuaDocClassStub): LuaDocClassDef {
         return LuaDocClassDefImpl(luaDocClassStub, this)

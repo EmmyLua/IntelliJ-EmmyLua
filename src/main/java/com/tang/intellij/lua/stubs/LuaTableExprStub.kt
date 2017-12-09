@@ -17,14 +17,13 @@
 package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
-import com.tang.intellij.lua.psi.LuaElementType
+import com.tang.intellij.lua.psi.LuaTableExpr
 
-interface LuaDocTyStub : StubElement<LuaDocTypeDef> {
+/**
 
-}
+ * Created by tangzx on 2017/1/12.
+ */
+interface LuaTableExprStub : StubElement<LuaTableExpr>
 
-class LuaDocTyStubImpl(parent: StubElement<*>?)
-    : LuaDocStubBase<LuaDocTypeDef>(parent, LuaElementType.TYPE_DEF), LuaDocTyStub {
-
-}
+class LuaTableExprStubImpl(parent: StubElement<*>, elementType: LuaStubElementType<*, *>)
+    : LuaStubBase<LuaTableExpr>(parent, elementType), LuaTableExprStub

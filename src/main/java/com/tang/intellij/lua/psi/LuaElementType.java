@@ -31,7 +31,9 @@ import com.tang.intellij.lua.comment.psi.impl.LuaCommentImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
+import com.tang.intellij.lua.stubs.LuaLiteralElementType;
 import com.tang.intellij.lua.stubs.LuaNameDefElementType;
+import com.tang.intellij.lua.stubs.LuaStubElementType;
 import com.tang.intellij.lua.stubs.ParamNameDefElementType;
 import com.tang.intellij.lua.stubs.types.*;
 import org.jetbrains.annotations.NotNull;
@@ -71,13 +73,13 @@ public class LuaElementType extends IElementType {
 
     public static IStubElementType FUNC_DEF = new LuaFuncType();
     public static IStubElementType CLASS_METHOD_DEF = new LuaClassMethodType();
-    public static IStubElementType CLASS_FIELD_DEF = new LuaDocClassFieldType();
-    public static IStubElementType TYPE_DEF = new LuaDocTyType();
-    public static IStubElementType CLASS_DEF = new LuaDocClassType();
-    public static IStubElementType TABLE = new LuaTableType();
+    public static LuaStubElementType CLASS_FIELD_DEF = new LuaDocClassFieldType();
+    public static LuaStubElementType TYPE_DEF = new LuaDocTyType();
+    public static LuaStubElementType CLASS_DEF = new LuaDocClassType();
+    public static IStubElementType TABLE = new LuaTableExprType();
     public static IStubElementType TABLE_FIELD = new LuaTableFieldType();
-    public static IStubElementType INDEX = new LuaIndexType();
-    public static IStubElementType NAME_EXPR = new LuaNameType();
+    public static IStubElementType INDEX = new LuaIndexExprType();
+    public static IStubElementType NAME_EXPR = new LuaNameExprType();
     public static ILazyParseableElementType BLOCK = new LuaBlockElementType();
 
     static class LuaBlockElementType extends IReparseableElementType {
@@ -108,4 +110,5 @@ public class LuaElementType extends IElementType {
 
     public static LuaNameDefElementType NAME_DEF = new LuaNameDefElementType();
     public static ParamNameDefElementType PARAM_NAME_DEF = new ParamNameDefElementType();
+    public static LuaLiteralElementType LITERAL_EXPR = new LuaLiteralElementType();
 }

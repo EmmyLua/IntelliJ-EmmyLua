@@ -17,16 +17,19 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaNameExpr
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
-import com.tang.intellij.lua.stubs.LuaNameStub
-import com.tang.intellij.lua.stubs.LuaNameStubImpl
+import com.tang.intellij.lua.stubs.LuaNameExprStub
+import com.tang.intellij.lua.stubs.LuaNameExprStubImpl
+import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
@@ -36,39 +39,39 @@ import java.io.IOException
  * global var
  * Created by TangZX on 2017/4/12.
  */
-class LuaNameType : IStubElementType<LuaNameStub, LuaNameExpr>("NameExpr", LuaLanguage.INSTANCE) {
+class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_EXPR") {
 
-    override fun createPsi(luaNameStub: LuaNameStub) = LuaNameExprImpl(luaNameStub, this)
+    override fun createPsi(luaNameStub: LuaNameExprStub) = LuaNameExprImpl(luaNameStub, this)
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val psi = node.psi as LuaNameExpr
         return psi.parent is LuaVarList
     }
 
-    override fun createStub(luaNameExpr: LuaNameExpr, stubElement: StubElement<*>): LuaNameStub {
+    override fun createStub(luaNameExpr: LuaNameExpr, stubElement: StubElement<*>): LuaNameExprStub {
         val psiFile = luaNameExpr.containingFile
         val module = if (psiFile is LuaPsiFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
-        return LuaNameStubImpl(luaNameExpr, module, stubElement, this)
+        return LuaNameExprStubImpl(luaNameExpr, module, stubElement, this)
     }
 
     override fun getExternalId() = "lua.name_expr"
 
     @Throws(IOException::class)
-    override fun serialize(luaNameStub: LuaNameStub, stubOutputStream: StubOutputStream) {
+    override fun serialize(luaNameStub: LuaNameExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaNameStub.name)
         stubOutputStream.writeName(luaNameStub.module)
         stubOutputStream.writeBoolean(luaNameStub.isGlobal)
     }
 
     @Throws(IOException::class)
-    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameStub {
+    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameExprStub {
         val nameRef = stubInputStream.readName()
         val moduleRef = stubInputStream.readName()
         val isGlobal = stubInputStream.readBoolean()
-        return LuaNameStubImpl(StringRef.toString(nameRef)!!, StringRef.toString(moduleRef)!!, isGlobal, stubElement,this)
+        return LuaNameExprStubImpl(StringRef.toString(nameRef)!!, StringRef.toString(moduleRef)!!, isGlobal, stubElement,this)
     }
 
-    override fun indexStub(luaNameStub: LuaNameStub, indexSink: IndexSink) {
+    override fun indexStub(luaNameStub: LuaNameExprStub, indexSink: IndexSink) {
         if (luaNameStub.isGlobal) {
             val module = luaNameStub.module
 

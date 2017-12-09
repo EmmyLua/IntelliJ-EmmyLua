@@ -16,23 +16,22 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.psi.stubs.StubBase
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.resolveLocal
-import com.tang.intellij.lua.stubs.types.LuaNameType
+import com.tang.intellij.lua.stubs.types.LuaNameExprType
 
 /**
  * name stub
  * Created by TangZX on 2017/4/12.
  */
-interface LuaNameStub : StubElement<LuaNameExpr> {
+interface LuaNameExprStub : StubElement<LuaNameExpr> {
     val name: String
     val module: String
     val isGlobal: Boolean
 }
 
-class LuaNameStubImpl : StubBase<LuaNameExpr>, LuaNameStub {
+class LuaNameExprStubImpl : LuaStubBase<LuaNameExpr>, LuaNameExprStub {
 
     override var module: String
 
@@ -40,14 +39,14 @@ class LuaNameStubImpl : StubBase<LuaNameExpr>, LuaNameStub {
     private var _name: String
     private var _isGlobal:Boolean = false
 
-    constructor(luaNameExpr: LuaNameExpr, module: String, parent: StubElement<*>, elementType: LuaNameType)
+    constructor(luaNameExpr: LuaNameExpr, module: String, parent: StubElement<*>, elementType: LuaNameExprType)
             : super(parent, elementType) {
         this.module = module
         _nameExpr = luaNameExpr
         _name = luaNameExpr.name
     }
 
-    constructor(name: String, module: String, isGlobal: Boolean, stubElement: StubElement<*>, luaNameType: LuaNameType)
+    constructor(name: String, module: String, isGlobal: Boolean, stubElement: StubElement<*>, luaNameType: LuaNameExprType)
             : super(stubElement, luaNameType) {
         this.module = module
         _name = name

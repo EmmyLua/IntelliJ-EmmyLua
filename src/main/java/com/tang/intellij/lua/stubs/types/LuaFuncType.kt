@@ -17,17 +17,20 @@
 package com.tang.intellij.lua.stubs.types
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaFuncDef
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.forwardDeclaration
 import com.tang.intellij.lua.psi.impl.LuaFuncDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncStub
 import com.tang.intellij.lua.stubs.LuaFuncStubImpl
+import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
@@ -39,7 +42,7 @@ import java.io.IOException
 
  * Created by tangzx on 2016/11/26.
  */
-class LuaFuncType : IStubElementType<LuaFuncStub, LuaFuncDef>("Global Function", LuaLanguage.INSTANCE) {
+class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function") {
 
     override fun createPsi(luaGlobalFuncStub: LuaFuncStub): LuaFuncDef {
         return LuaFuncDefImpl(luaGlobalFuncStub, this)

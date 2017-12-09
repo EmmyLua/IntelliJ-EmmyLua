@@ -25,7 +25,7 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.LuaNameStub
+import com.tang.intellij.lua.stubs.LuaNameExprStub
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
@@ -35,12 +35,12 @@ import com.tang.intellij.lua.ty.TySerializedClass
 
  * Created by TangZX on 2017/4/12.
  */
-abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, LuaClassField {
-    internal constructor(stub: LuaNameStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
+abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaExpr, LuaClassField {
+    internal constructor(stub: LuaNameExprStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     internal constructor(node: ASTNode) : super(node)
 
-    internal constructor(stub: LuaNameStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
+    internal constructor(stub: LuaNameExprStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
     override fun getReference(): PsiReference? {
         return references.firstOrNull()
@@ -56,11 +56,11 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
             var type:ITy = Ty.UNKNOWN
             val nameExpr = this as LuaNameExpr
 
-            val multiResolve = multiResolve(nameExpr, context)
+            /*val multiResolve = multiResolve(nameExpr, context)
             multiResolve.forEach {
                 val set = getType(context, it)
                 type = type.union(set)
-            }
+            }*/
 
             if (Ty.isInvalid(type)) {
                 type = type.union(getType(context, nameExpr))
