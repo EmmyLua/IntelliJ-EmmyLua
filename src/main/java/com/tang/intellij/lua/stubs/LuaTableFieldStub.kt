@@ -29,7 +29,7 @@ import java.util.*
  * table field stub
  * Created by tangzx on 2017/1/14.
  */
-interface LuaTableFieldStub : StubElement<LuaTableField> {
+interface LuaTableFieldStub : LuaClassMemberStub<LuaTableField> {
     val typeName: String?
     val name: String?
 }
@@ -38,6 +38,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
     private var _tableField: LuaTableField? = null
     private var _typeName: String? = null
     private var _fieldName: String? = null
+    private var _visibility: Visibility = Visibility.PUBLIC
 
     constructor(field: LuaTableField,
                 parent: StubElement<*>,
@@ -73,4 +74,7 @@ class LuaTableFieldStubImpl : StubBase<LuaTableField>, LuaTableFieldStub {
         }
 
     override val name get() = _fieldName
+
+    override val visibility: Visibility
+        get() = _visibility
 }

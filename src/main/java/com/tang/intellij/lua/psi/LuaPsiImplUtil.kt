@@ -39,6 +39,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaClassMemberStub
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 import com.tang.intellij.lua.ty.*
 import java.util.*
@@ -671,6 +672,12 @@ fun getNameIdentifier(label: LuaLabelStat): PsiElement? {
 }
 
 fun getVisibility(member: LuaClassMember): Visibility {
+    if (member is StubBasedPsiElement<*>) {
+        val stub = member.stub
+        if (stub is LuaClassMemberStub) {
+            return stub.visibility
+        }
+    }
     if (member is LuaCommentOwner) {
         val comment = member.comment
         comment?.findTag(LuaDocAccessModifier::class.java)?.let {
