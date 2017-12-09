@@ -25,7 +25,6 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.LuaPsiFile
-import com.tang.intellij.lua.psi.LuaVarList
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
 import com.tang.intellij.lua.stubs.LuaNameExprStub
 import com.tang.intellij.lua.stubs.LuaNameExprStubImpl
@@ -44,8 +43,9 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
     override fun createPsi(luaNameStub: LuaNameExprStub) = LuaNameExprImpl(luaNameStub, this)
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
-        val psi = node.psi as LuaNameExpr
-        return psi.parent is LuaVarList
+        /*val psi = node.psi as LuaNameExpr
+        return psi.parent is LuaVarList*/
+        return createStubIfParentIsStub(node)
     }
 
     override fun createStub(luaNameExpr: LuaNameExpr, stubElement: StubElement<*>): LuaNameExprStub {
