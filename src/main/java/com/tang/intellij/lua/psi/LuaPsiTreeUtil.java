@@ -22,6 +22,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Processor;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.tang.intellij.lua.ty.Ty;
@@ -36,25 +37,21 @@ import java.util.List;
  */
 public class LuaPsiTreeUtil {
 
-    public interface ElementProcessor<T extends PsiElement> {
-        boolean accept(T t);
-    }
-
-    public static void walkUpLabel(PsiElement current, ElementProcessor<LuaLabelStat> processor) {
+    public static void walkUpLabel(PsiElement current, Processor<LuaLabelStat> processor) {
         PsiElement prev = current.getPrevSibling();
         while (true) {
             if (prev == null)
                 prev = current.getParent();
             if (prev == null || prev instanceof PsiFile)
                 break;
-            if (prev instanceof LuaLabelStat && !processor.accept((LuaLabelStat) prev))
+            if (prev instanceof LuaLabelStat && !processor.process((LuaLabelStat) prev))
                 break;
             current = prev;
             prev = prev.getPrevSibling();
         }
     }
 
-    public static <T extends PsiElement> void walkTopLevelInFile(PsiElement element, Class<T> cls, ElementProcessor<T> processor) {
+    public static <T extends PsiElement> void walkTopLevelInFile(PsiElement element, Class<T> cls, Processor<T> processor) {
         if (element == null || processor == null)
             return;
         PsiElement parent = element;
@@ -63,7 +60,7 @@ public class LuaPsiTreeUtil {
 
         for(PsiElement child = parent; child != null; child = child.getPrevSibling()) {
             if (cls.isInstance(child)) {
-                if (!processor.accept(cls.cast(child))) {
+                if (!processor.process(cls.cast(child))) {
                     break;
                 }
             }
@@ -75,7 +72,7 @@ public class LuaPsiTreeUtil {
      * @param current 当前搜导起点
      * @param processor 处理器
      */
-    public static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaLocalFuncDef> processor) {
+    public static void walkUpLocalFuncDef(PsiElement current, Processor<LuaLocalFuncDef> processor) {
         if (current == null || processor == null)
             return;
         boolean continueSearch = true;
@@ -85,7 +82,7 @@ public class LuaPsiTreeUtil {
         do {
             if (curr instanceof LuaLocalFuncDef) {
                 LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
-                continueSearch = processor.accept(localFuncDef);
+                continueSearch = processor.process(localFuncDef);
                 funcDeep++;
             }
 
@@ -103,7 +100,7 @@ public class LuaPsiTreeUtil {
      * @param element 当前搜索起点
      * @param processor 处理器
      */
-    public static void walkUpLocalNameDef(PsiElement element, ElementProcessor<LuaNameDef> processor) {
+    public static void walkUpLocalNameDef(PsiElement element, Processor<LuaNameDef> processor) {
         if (element == null || processor == null)
             return;
         boolean continueSearch = true;
@@ -133,7 +130,7 @@ public class LuaPsiTreeUtil {
                 // for name = x, y do end
                 else if (curr instanceof LuaForAStat) {
                     LuaForAStat forAStat = (LuaForAStat) curr;
-                    continueSearch = processor.accept(forAStat.getParamNameDef());
+                    continueSearch = processor.process(forAStat.getParamNameDef());
                 }
                 // for name in xxx do end
                 else if (curr instanceof LuaForBStat) {
@@ -144,28 +141,28 @@ public class LuaPsiTreeUtil {
         } while (continueSearch && !(curr instanceof PsiFile));
     }
 
-    private static boolean resolveInFuncBody(LuaFuncBody funcBody, ElementProcessor<LuaNameDef> processor) {
+    private static boolean resolveInFuncBody(LuaFuncBody funcBody, Processor<LuaNameDef> processor) {
         if (funcBody != null) {
             for (LuaParamNameDef parDef : funcBody.getParamNameDefList()) {
-                if (!processor.accept(parDef)) return false;
+                if (!processor.process(parDef)) return false;
             }
         }
         return true;
     }
 
-    private static boolean resolveInNameList(LuaNameList nameList, ElementProcessor<LuaNameDef> processor) {
+    private static boolean resolveInNameList(LuaNameList nameList, Processor<LuaNameDef> processor) {
         if (nameList != null) {
             for (LuaNameDef nameDef : nameList.getNameDefList()) {
-                if (!processor.accept(nameDef)) return false;
+                if (!processor.process(nameDef)) return false;
             }
         }
         return true;
     }
 
-    private static boolean resolveInNameList(List<LuaParamNameDef> nameList, ElementProcessor<LuaNameDef> processor) {
+    private static boolean resolveInNameList(List<LuaParamNameDef> nameList, Processor<LuaNameDef> processor) {
         if (nameList != null) {
             for (LuaNameDef nameDef : nameList) {
-                if (!processor.accept(nameDef)) return false;
+                if (!processor.process(nameDef)) return false;
             }
         }
         return true;

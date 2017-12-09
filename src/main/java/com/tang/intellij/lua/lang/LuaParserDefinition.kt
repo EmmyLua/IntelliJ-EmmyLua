@@ -32,12 +32,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocElementType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.parser.LuaParser
-import com.tang.intellij.lua.psi.LuaElementType
-import com.tang.intellij.lua.psi.LuaPsiFile
-import com.tang.intellij.lua.psi.LuaTokenType
-import com.tang.intellij.lua.psi.LuaTypes
-import com.tang.intellij.lua.psi.impl.*
-import com.tang.intellij.lua.stubs.LuaPlaceholderStub
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.stubs.types.LuaFileElementType
 
 /**
@@ -110,12 +105,12 @@ fun createType(string: String): IElementType {
         "PARAM_NAME_DEF" -> LuaElementType.PARAM_NAME_DEF
         "LITERAL_EXPR" -> LuaElementType.LITERAL_EXPR
 
-        "CALL_EXPR" -> LuaPlaceholderStub.Type("CALL_EXPR", ::LuaCallExprImpl)
-        "EXPR_LIST" -> LuaPlaceholderStub.Type("EXPR_LIST", ::LuaExprListImpl)
-        "NAME_LIST" -> LuaPlaceholderStub.Type("NAME_LIST", ::LuaNameListImpl)
-        "LOCAL_DEF" -> LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
-        "ASSIGN_STAT" -> LuaPlaceholderStub.Type("ASSIGN_STAT", ::LuaAssignStatImpl)
-        "VAR_LIST" -> LuaPlaceholderStub.Type("VAR_LIST", ::LuaVarListImpl)
+        "CALL_EXPR" -> LuaElementTypes.CALL_EXPR
+        "EXPR_LIST" -> LuaElementTypes.EXPR_LIST
+        "NAME_LIST" -> LuaElementTypes.NAME_LIST
+        "LOCAL_DEF" -> LuaElementTypes.LOCAL_DEF
+        "ASSIGN_STAT" -> LuaElementTypes.ASSIGN_STAT
+        "VAR_LIST" -> LuaElementTypes.VAR_LIST
 
         else -> LuaElementType(string)
     }

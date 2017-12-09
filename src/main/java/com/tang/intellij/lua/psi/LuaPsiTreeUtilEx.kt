@@ -17,10 +17,29 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.stubs.StubElement
 import com.intellij.util.Processor
 
 object LuaPsiTreeUtilEx {
-    fun walkUpNameDef(psi: PsiElement, processor: Processor<PsiElement>) {
 
+    private fun StubElement<*>.walkUp(curChild: StubElement<*>, processor: Processor<StubElement<*>>) {
+        val list = this.childrenStubs
+        val index = list.indexOf(curChild)
+        if (index > 0) {
+            for (i in index until 0) {
+                val element = list[i]
+                if (!processor.process(element)) break
+            }
+        }
+    }
+
+    fun walkUpNameDef(psi: PsiElement, processor: Processor<LuaNameDef>) {
+        if (psi is StubElement<*>) {
+            val scope = psi.parentStub
+            scope.walkUp(psi, Processor { cur ->
+
+                true
+            })
+        } else LuaPsiTreeUtil.walkUpLocalNameDef(psi, processor)
     }
 }
