@@ -63,13 +63,13 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
     var ret: PsiElement? = null
 
     //local/param
-    LuaPsiTreeUtil.walkUpLocalNameDef(ref) { nameDef ->
+    LuaPsiTreeUtilEx.walkUpNameDef(ref, Processor { nameDef ->
         if (refName == nameDef.name) {
             ret = nameDef
-            return@walkUpLocalNameDef false
+            return@Processor false
         }
         true
-    }
+    })
 
     if (refName == Constants.WORD_SELF) {
         val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)

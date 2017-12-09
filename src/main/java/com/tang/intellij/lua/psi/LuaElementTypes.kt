@@ -21,7 +21,7 @@ import com.tang.intellij.lua.stubs.LuaPlaceholderStub
 
 object LuaElementTypes {
     val LOCAL_DEF = LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
-    val CALL_EXPR = LuaPlaceholderStub.Type("EXPR_LIST", ::LuaExprListImpl)
+    val CALL_EXPR = LuaPlaceholderStub.Type("CALL_EXPR", ::LuaCallExprImpl)
     val EXPR_LIST = LuaPlaceholderStub.Type("EXPR_LIST", ::LuaExprListImpl)
     val NAME_LIST = LuaPlaceholderStub.Type("NAME_LIST", ::LuaNameListImpl)
     val ASSIGN_STAT = LuaPlaceholderStub.Type("ASSIGN_STAT", ::LuaAssignStatImpl)

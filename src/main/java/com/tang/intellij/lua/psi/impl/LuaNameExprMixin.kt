@@ -56,11 +56,11 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaE
             var type:ITy = Ty.UNKNOWN
             val nameExpr = this as LuaNameExpr
 
-            /*val multiResolve = multiResolve(nameExpr, context)
+            val multiResolve = multiResolve(nameExpr, context)
             multiResolve.forEach {
                 val set = getType(context, it)
                 type = type.union(set)
-            }*/
+            }
 
             if (Ty.isInvalid(type)) {
                 type = type.union(getType(context, nameExpr))
