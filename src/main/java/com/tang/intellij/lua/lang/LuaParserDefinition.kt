@@ -110,6 +110,7 @@ fun createType(string: String): IElementType {
         "PARAM_NAME_DEF" -> LuaElementType.PARAM_NAME_DEF
         "LITERAL_EXPR" -> LuaElementType.LITERAL_EXPR
 
+        "CALL_EXPR" -> LuaPlaceholderStub.Type("CALL_EXPR", ::LuaCallExprImpl)
         "EXPR_LIST" -> LuaPlaceholderStub.Type("EXPR_LIST", ::LuaExprListImpl)
         "NAME_LIST" -> LuaPlaceholderStub.Type("NAME_LIST", ::LuaNameListImpl)
         "LOCAL_DEF" -> LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)

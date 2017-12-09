@@ -399,6 +399,8 @@ left callExpr ::= args {
         isMethodCall
         isFunctionCall
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
+    mixin = 'com.tang.intellij.lua.psi.impl.LuaCallExprMixin'
 }
 
 private suffixExpr ::= indexExpr | callExpr
