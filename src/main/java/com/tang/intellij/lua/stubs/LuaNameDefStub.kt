@@ -20,6 +20,7 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.LuaNameDef
 import com.tang.intellij.lua.psi.LuaParamNameDef
@@ -32,11 +33,11 @@ class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("Lu
     }
 
     override fun createStub(nameDef: LuaNameDef, parentStub: StubElement<*>?): LuaNameDefStub {
-        return LuaNameDefStub(parentStub, LuaElementType.NAME_DEF)
+        return LuaNameDefStub(nameDef.text, parentStub, LuaElementType.NAME_DEF)
     }
 
     override fun serialize(stub: LuaNameDefStub, dataStream: StubOutputStream) {
-
+        dataStream.writeName(stub.name)
     }
 
     override fun createPsi(stub: LuaNameDefStub): LuaNameDef {
@@ -44,36 +45,36 @@ class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("Lu
     }
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaNameDefStub {
-        return LuaNameDefStub(parentStub, LuaElementType.NAME_DEF)
+        val name = dataStream.readName()
+        return LuaNameDefStub(StringRef.toString(name), parentStub, LuaElementType.NAME_DEF)
     }
 }
 
-open class LuaNameDefStub(parentStub: StubElement<*>?, type: LuaStubElementType<*, *>)
-    : LuaStubBase<LuaNameDef>(parentStub, type) {
-}
+open class LuaNameDefStub(val name: String, parentStub: StubElement<*>?, type: LuaStubElementType<*, *>)
+    : LuaStubBase<LuaNameDef>(parentStub, type)
 
-class ParamNameDefElementType : LuaStubElementType<ParamNameDefStub, LuaParamNameDef>("LuaNameDef") {
+class ParamNameDefElementType : LuaStubElementType<ParamNameDefStub, LuaParamNameDef>("LuaParamNameDef") {
     override fun indexStub(stub: ParamNameDefStub, sink: IndexSink) {
 
     }
 
     override fun createStub(nameDef: LuaParamNameDef, parentStub: StubElement<*>?): ParamNameDefStub {
-        return ParamNameDefStub(parentStub, LuaElementType.NAME_DEF)
+        return ParamNameDefStub(nameDef.text, parentStub, LuaElementType.PARAM_NAME_DEF)
     }
 
     override fun serialize(stub: ParamNameDefStub, dataStream: StubOutputStream) {
-
+        dataStream.writeName(stub.name)
     }
 
     override fun createPsi(stub: ParamNameDefStub): LuaParamNameDef {
-        return LuaParamNameDefImpl(stub, LuaElementType.NAME_DEF)
+        return LuaParamNameDefImpl(stub, LuaElementType.PARAM_NAME_DEF)
     }
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): ParamNameDefStub {
-        return ParamNameDefStub(parentStub, LuaElementType.NAME_DEF)
+        val name = dataStream.readName()
+        return ParamNameDefStub(StringRef.toString(name), parentStub, LuaElementType.PARAM_NAME_DEF)
     }
 }
 
-class ParamNameDefStub(parentStub: StubElement<*>?, type: LuaStubElementType<*, *>)
-    : LuaNameDefStub(parentStub, type) {
-}
+class ParamNameDefStub(name: String, parentStub: StubElement<*>?, type: LuaStubElementType<*, *>)
+    : LuaNameDefStub(name, parentStub, type)
