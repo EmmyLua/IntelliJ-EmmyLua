@@ -26,4 +26,5 @@ object LuaElementTypes {
     val NAME_LIST = LuaPlaceholderStub.Type("NAME_LIST", ::LuaNameListImpl)
     val ASSIGN_STAT = LuaPlaceholderStub.Type("ASSIGN_STAT", ::LuaAssignStatImpl)
     val VAR_LIST = LuaPlaceholderStub.Type("VAR_LIST", ::LuaVarListImpl)
+    val PAREN_EXPR = LuaPlaceholderStub.Type("PAREN_EXPR", ::LuaParenExprImpl)
 }

@@ -35,9 +35,9 @@ open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(
     override fun guessType(context: SearchContext): ITy {
         val iTy = RecursionManager.doPreventingRecursion<ITy>(this, true) {
             when(this) {
-                is LuaCallExpr -> guessType(this, context)
-                is LuaParenExpr -> guessType(this, context)
-                is LuaLiteralExpr -> guessType(this)
+                //is LuaCallExpr -> guessType(this, context)
+                //is LuaParenExpr -> guessType(this, context)
+                //is LuaLiteralExpr -> guessType(this)
                 is LuaClosureExpr -> asTy(context)
                 is LuaBinaryExpr -> guessType(this, context)
                 is LuaUnaryExpr -> guessType(this, context)

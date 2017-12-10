@@ -353,7 +353,11 @@ expr ::= <<parseExpr primaryExpr>> {
     ]
 }
 
-parenExpr ::= '(' expr ')' { pin = 1 }
+parenExpr ::= '(' expr ')' {
+    pin = 1
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+    mixin = "com.tang.intellij.lua.psi.impl.LuaParenExprMixin"
+}
 unaryExpr ::= unaryOp (unaryExpr | primaryExpr) { pin = 1 }
 
 left binaryExpr ::= binaryOp expr { pin = 1 }
