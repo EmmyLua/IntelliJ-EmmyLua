@@ -31,8 +31,8 @@ object LuaPsiTreeUtilEx {
         val list = this.childrenStubs
         val index = list.indexOf(curChild)
         if (index > 0) {
-            for (i in index until 0) {
-                val element = list[i]
+            for (i in 0 until index) {
+                val element = list[index - i - 1]
                 if (!processor.process(element)) break
             }
         }
@@ -90,5 +90,31 @@ object LuaPsiTreeUtilEx {
 
         if (continueSearch)
             LuaPsiTreeUtil.walkUpLocalNameDef(psi, processor)
+    }
+
+    fun walkUpLocalFuncDef(psi: PsiElement, processor: Processor<LuaLocalFuncDef>) {
+        var continueSearch = true
+        if (psi is STUB_PSI) {
+            val stub = psi.stub
+            if (stub != null) {
+                var cur: STUB_ELE = stub
+                do {
+                    val scope = cur.parentStub
+                    scope.walkUp(cur, Processor { next ->
+                        val psiElement = next.psi
+                        if (psiElement is LuaLocalFuncDef) {
+                            continueSearch = !processor.process(psiElement)
+                        }
+                        continueSearch
+                    })
+                    if (scope is LuaFileStub)
+                        break
+                    cur = scope
+                } while (continueSearch)
+                continueSearch = false
+            }
+        }
+        if (continueSearch)
+            LuaPsiTreeUtil.walkUpLocalFuncDef(psi, processor)
     }
 }

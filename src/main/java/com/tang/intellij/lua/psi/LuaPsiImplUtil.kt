@@ -503,6 +503,13 @@ fun getParamSignature(funcBodyOwner: LuaFuncBodyOwner): String {
     return "(" + list.joinToString(", ") + ")"
 }
 
+fun getName(localFuncDef: LuaLocalFuncDef): String? {
+    val stub = localFuncDef.stub
+    if (stub != null)
+        return stub.name
+    return getName(localFuncDef as PsiNameIdentifierOwner)
+}
+
 fun getNameIdentifier(localFuncDef: LuaLocalFuncDef): PsiElement? {
     return localFuncDef.id
 }
@@ -512,6 +519,9 @@ fun getUseScope(localFuncDef: LuaLocalFuncDef): SearchScope {
 }
 
 fun getName(nameDef: LuaNameDef): String {
+    val stub = nameDef.stub
+    if (stub != null)
+        return stub.name
     return nameDef.id.text
 }
 

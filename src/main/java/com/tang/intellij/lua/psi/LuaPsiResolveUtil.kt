@@ -102,14 +102,14 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
 
     //local 函数名
     if (ret == null) {
-        LuaPsiTreeUtil.walkUpLocalFuncDef(ref) { nameDef ->
+        LuaPsiTreeUtilEx.walkUpLocalFuncDef(ref, Processor { nameDef ->
             val name = nameDef.name
             if (refName == name) {
                 ret = nameDef
-                return@walkUpLocalFuncDef false
+                return@Processor false
             }
             true
-        }
+        })
     }
 
     return ret
