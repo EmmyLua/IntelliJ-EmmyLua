@@ -22,28 +22,28 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocTypeDefImpl
-import com.tang.intellij.lua.stubs.LuaDocTyStub
-import com.tang.intellij.lua.stubs.LuaDocTyStubImpl
+import com.tang.intellij.lua.stubs.LuaDocTypeDefStub
+import com.tang.intellij.lua.stubs.LuaDocTypeDefStubImpl
 import com.tang.intellij.lua.stubs.LuaStubElementType
 
 /**
  * type for ---@type
  * Created by tangzx on 2017/7/3.
  */
-class LuaDocTyType : LuaStubElementType<LuaDocTyStub, LuaDocTypeDef>("DOC_TY"){
-    override fun indexStub(stub: LuaDocTyStub, sink: IndexSink) {
+class LuaDocTypeDefType : LuaStubElementType<LuaDocTypeDefStub, LuaDocTypeDef>("DOC_TY"){
+    override fun indexStub(stub: LuaDocTypeDefStub, sink: IndexSink) {
     }
 
-    override fun deserialize(inputStream: StubInputStream, stubElement: StubElement<*>?): LuaDocTyStub {
-        return LuaDocTyStubImpl(stubElement)
+    override fun deserialize(inputStream: StubInputStream, stubElement: StubElement<*>?): LuaDocTypeDefStub {
+        return LuaDocTypeDefStubImpl(stubElement)
     }
 
-    override fun createPsi(stub: LuaDocTyStub) = LuaDocTypeDefImpl(stub, this)
+    override fun createPsi(stub: LuaDocTypeDefStub) = LuaDocTypeDefImpl(stub, this)
 
-    override fun serialize(stub: LuaDocTyStub, stubElement: StubOutputStream) {
+    override fun serialize(stub: LuaDocTypeDefStub, stubElement: StubOutputStream) {
     }
 
-    override fun createStub(def: LuaDocTypeDef, stubElement: StubElement<*>?): LuaDocTyStub {
-        return LuaDocTyStubImpl(stubElement)
+    override fun createStub(def: LuaDocTypeDef, stubElement: StubElement<*>?): LuaDocTypeDefStub {
+        return LuaDocTypeDefStubImpl(stubElement)
     }
 }

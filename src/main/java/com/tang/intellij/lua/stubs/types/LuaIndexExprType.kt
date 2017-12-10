@@ -23,14 +23,12 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaVarList
-import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexExprStub
+import com.tang.intellij.lua.stubs.LuaIndexExprStubImpl
 import com.tang.intellij.lua.stubs.LuaStubElementType
-import com.tang.intellij.lua.stubs.impl.LuaIndexExprStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
@@ -58,6 +56,9 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     }
 
     override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexExprStub {
+        val stat = indexExpr.assignStat
+        val docTy = stat?.comment?.docTy
+
         val context = SearchContext(indexExpr.project, indexExpr.containingFile, true)
         val ty = indexExpr.guessParentType(context)
         val type = TyUnion.getPerfectClass(ty)
@@ -70,6 +71,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
 
         return LuaIndexExprStubImpl(typeName,
                 indexExpr.name,
+                docTy,
                 valueType,
                 visibility,
                 stubElement,
@@ -79,6 +81,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun serialize(indexStub: LuaIndexExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(indexStub.className)
         stubOutputStream.writeName(indexStub.name)
+        Ty.serializeNullable(indexStub.docTy, stubOutputStream)
         Ty.serialize(indexStub.valueType, stubOutputStream)
         stubOutputStream.writeByte(indexStub.visibility.ordinal)
     }
@@ -86,10 +89,12 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexExprStub {
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
+        val docTy = Ty.deserializeNullable(stubInputStream)
         val valueType = Ty.deserialize(stubInputStream)
         val visibility = Visibility.get(stubInputStream.readByte().toInt())
         return LuaIndexExprStubImpl(StringRef.toString(typeName),
                 StringRef.toString(fieldName),
+                docTy,
                 valueType,
                 visibility,
                 stubElement,

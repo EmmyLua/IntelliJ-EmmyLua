@@ -17,24 +17,14 @@
 package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.psi.LuaNameExpr
-import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
+import com.tang.intellij.lua.psi.LuaElementType
 
-/**
- * name expr stub
- * Created by TangZX on 2017/4/12.
- */
-interface LuaNameExprStub : StubElement<LuaNameExpr>, LuaDocTyStub {
-    val name: String
-    val module: String
-    val isGlobal: Boolean
+interface LuaDocTypeDefStub : StubElement<LuaDocTypeDef> {
+
 }
 
-class LuaNameExprStubImpl(
-        override val name: String,
-        override val module: String,
-        override val isGlobal: Boolean,
-        override val docTy: ITy?,
-        parent: StubElement<*>,
-        elementType: LuaStubElementType<*, *>
-) : LuaStubBase<LuaNameExpr>(parent, elementType), LuaNameExprStub
+class LuaDocTypeDefStubImpl(parent: StubElement<*>?)
+    : LuaDocStubBase<LuaDocTypeDef>(parent, LuaElementType.TYPE_DEF), LuaDocTypeDefStub {
+
+}

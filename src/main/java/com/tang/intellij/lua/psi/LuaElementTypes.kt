@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi
 
 import com.tang.intellij.lua.psi.impl.*
+import com.tang.intellij.lua.stubs.LuaLocalFuncDefElementType
 import com.tang.intellij.lua.stubs.LuaPlaceholderStub
 
 object LuaElementTypes {
@@ -27,4 +28,5 @@ object LuaElementTypes {
     val ASSIGN_STAT = LuaPlaceholderStub.Type("ASSIGN_STAT", ::LuaAssignStatImpl)
     val VAR_LIST = LuaPlaceholderStub.Type("VAR_LIST", ::LuaVarListImpl)
     val PAREN_EXPR = LuaPlaceholderStub.Type("PAREN_EXPR", ::LuaParenExprImpl)
+    val LOCAL_FUNC_DEF = LuaLocalFuncDefElementType()
 }

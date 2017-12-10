@@ -196,7 +196,7 @@ class_def ::= (TAG_CLASS|TAG_MODULE) ID (EXTENDS class_name_ref)? comment_string
 // @type CLASS_REF
 type_def ::= TAG_TYPE ty comment_string? {
     pin = 1
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocTyStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTypeDefStub"
     methods = [getType]
 }
 

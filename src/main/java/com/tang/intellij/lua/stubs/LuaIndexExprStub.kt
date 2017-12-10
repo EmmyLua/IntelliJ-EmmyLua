@@ -18,6 +18,8 @@ package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaIndexExpr
+import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.stubs.types.LuaIndexExprType
 import com.tang.intellij.lua.ty.ITy
 
 /**
@@ -29,3 +31,12 @@ interface LuaIndexExprStub : StubElement<LuaIndexExpr>, LuaClassMemberStub<LuaIn
     val name: String?
     val valueType: ITy
 }
+
+class LuaIndexExprStubImpl(override val className: String?,
+                           override val name: String?,
+                           override val docTy: ITy?,
+                           override val valueType: ITy,
+                           override val visibility: Visibility,
+                           stubElement: StubElement<*>,
+                           indexType: LuaIndexExprType)
+    : LuaStubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexExprStub

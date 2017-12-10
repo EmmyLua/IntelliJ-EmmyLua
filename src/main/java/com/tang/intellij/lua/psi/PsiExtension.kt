@@ -181,6 +181,26 @@ val LuaIndexExpr.prefixExpr: LuaExpr get() {
     return firstChild as LuaExpr
 }
 
+val LuaIndexExpr.assignStat: LuaAssignStat? get() {
+    val p1 = parent
+    if (p1 is LuaVarList) {
+        val p2 = p1.parent
+        if (p2 is LuaAssignStat)
+            return p2
+    }
+    return null
+}
+
+val LuaNameExpr.assignStat: LuaAssignStat? get() {
+    val p1 = parent
+    if (p1 is LuaVarList) {
+        val p2 = p1.parent
+        if (p2 is LuaAssignStat)
+            return p2
+    }
+    return null
+}
+
 val LuaTableField.shouldCreateStub: Boolean get() {
     if (id == null && idExpr == null)
         return false

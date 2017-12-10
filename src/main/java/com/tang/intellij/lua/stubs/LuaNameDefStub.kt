@@ -27,7 +27,7 @@ import com.tang.intellij.lua.psi.LuaParamNameDef
 import com.tang.intellij.lua.psi.impl.LuaNameDefImpl
 import com.tang.intellij.lua.psi.impl.LuaParamNameDefImpl
 
-class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("LuaNameDef") {
+class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("NAME_DEF") {
     override fun indexStub(stub: LuaNameDefStub, sink: IndexSink) {
 
     }
@@ -53,7 +53,7 @@ class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("Lu
 open class LuaNameDefStub(val name: String, parentStub: StubElement<*>?, type: LuaStubElementType<*, *>)
     : LuaStubBase<LuaNameDef>(parentStub, type)
 
-class ParamNameDefElementType : LuaStubElementType<ParamNameDefStub, LuaParamNameDef>("LuaParamNameDef") {
+class ParamNameDefElementType : LuaStubElementType<ParamNameDefStub, LuaParamNameDef>("PARAM_NAME_DEF") {
     override fun indexStub(stub: ParamNameDefStub, sink: IndexSink) {
 
     }

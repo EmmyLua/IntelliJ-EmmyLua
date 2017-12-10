@@ -23,18 +23,19 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.psi.LuaNameExpr
-import com.tang.intellij.lua.psi.LuaPsiFile
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
+import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaNameExprStub
 import com.tang.intellij.lua.stubs.LuaNameExprStubImpl
 import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.ty.Ty
 
 /**
- * global var
+ * name expr
  * Created by TangZX on 2017/4/12.
  */
 class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_EXPR") {
@@ -42,28 +43,42 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
     override fun createPsi(luaNameStub: LuaNameExprStub) = LuaNameExprImpl(luaNameStub, this)
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
-        /*val psi = node.psi as LuaNameExpr
-        return psi.parent is LuaVarList*/
         return createStubIfParentIsStub(node)
     }
 
     override fun createStub(luaNameExpr: LuaNameExpr, stubElement: StubElement<*>): LuaNameExprStub {
         val psiFile = luaNameExpr.containingFile
+        val name = luaNameExpr.name
         val module = if (psiFile is LuaPsiFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
-        return LuaNameExprStubImpl(luaNameExpr, module, stubElement, this)
+        val isGlobal = resolveLocal(luaNameExpr, SearchContext(luaNameExpr.project)) == null
+        val comment = luaNameExpr.assignStat?.comment
+        val docTy = comment?.docTy ?: comment?.classDef?.type
+        return LuaNameExprStubImpl(name,
+                module,
+                isGlobal,
+                docTy,
+                stubElement,
+                this)
     }
 
     override fun serialize(luaNameStub: LuaNameExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaNameStub.name)
         stubOutputStream.writeName(luaNameStub.module)
         stubOutputStream.writeBoolean(luaNameStub.isGlobal)
+        Ty.serializeNullable(luaNameStub.docTy, stubOutputStream)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameExprStub {
         val nameRef = stubInputStream.readName()
         val moduleRef = stubInputStream.readName()
         val isGlobal = stubInputStream.readBoolean()
-        return LuaNameExprStubImpl(StringRef.toString(nameRef)!!, StringRef.toString(moduleRef)!!, isGlobal, stubElement,this)
+        val docTy = Ty.deserializeNullable(stubInputStream)
+        return LuaNameExprStubImpl(StringRef.toString(nameRef),
+                StringRef.toString(moduleRef),
+                isGlobal,
+                docTy,
+                stubElement,
+                this)
     }
 
     override fun indexStub(luaNameStub: LuaNameExprStub, indexSink: IndexSink) {

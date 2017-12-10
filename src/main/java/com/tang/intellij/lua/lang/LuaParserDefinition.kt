@@ -112,6 +112,7 @@ fun createType(string: String): IElementType {
         "ASSIGN_STAT" -> LuaElementTypes.ASSIGN_STAT
         "VAR_LIST" -> LuaElementTypes.VAR_LIST
         "PAREN_EXPR" -> LuaElementTypes.PAREN_EXPR
+        "LOCAL_FUNC_DEF" -> LuaElementTypes.LOCAL_FUNC_DEF
 
         else -> LuaElementType(string)
     }

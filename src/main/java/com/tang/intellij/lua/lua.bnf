@@ -309,6 +309,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         guessReturnType
         getParams
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaLocalFuncDefStub'
 }
 nameList ::= nameDef (',' nameDef)* {
     stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
