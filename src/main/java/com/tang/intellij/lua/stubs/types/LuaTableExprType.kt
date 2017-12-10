@@ -46,8 +46,6 @@ class LuaTableExprType : LuaStubElementType<LuaTableExprStub, LuaTableExpr>("TAB
         return tab.shouldCreateStub
     }
 
-    override fun getExternalId() = "lua.table"
-
     @Throws(IOException::class)
     override fun serialize(luaTableStub: LuaTableExprStub, stubOutputStream: StubOutputStream) {
 

@@ -539,12 +539,12 @@ fun guessParentType(tableField: LuaTableField, context: SearchContext): ITy {
 }
 
 fun guessType(tableField: LuaTableField, context: SearchContext): ITy {
+    val stub = tableField.stub
     //from comment
-    val comment = tableField.comment
-    if (comment != null) {
-        val tyDef = comment.typeDef?.type
-        if (tyDef != null) return tyDef
-    }
+    val docTy = if (stub != null) stub.docTy else tableField.comment?.docTy
+    if (docTy != null)
+        return docTy
+
     //guess from value
     val lastChild = tableField.lastChild
     if (lastChild is LuaExpr) {

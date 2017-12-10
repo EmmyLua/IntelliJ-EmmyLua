@@ -36,7 +36,6 @@ import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnion
-import java.io.IOException
 
 /**
 
@@ -77,9 +76,6 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
                 this)
     }
 
-    override fun getExternalId() = "lua.index_expr"
-
-    @Throws(IOException::class)
     override fun serialize(indexStub: LuaIndexExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(indexStub.className)
         stubOutputStream.writeName(indexStub.name)
@@ -87,7 +83,6 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         stubOutputStream.writeByte(indexStub.visibility.ordinal)
     }
 
-    @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexExprStub {
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()

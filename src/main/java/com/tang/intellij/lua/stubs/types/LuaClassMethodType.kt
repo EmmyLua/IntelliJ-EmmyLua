@@ -66,8 +66,6 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         return LuaClassMethodStubImpl(id.text, clazzName, ty, isStatic, visibility, stubElement)
     }
 
-    override fun getExternalId() = "lua.class_method"
-
     override fun shouldCreateStub(node: ASTNode): Boolean {
         //确定是完整的，并且是 class:method, class.method 形式的， 否则会报错
         val psi = node.psi as LuaClassMethodDef

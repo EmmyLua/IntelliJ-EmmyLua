@@ -39,4 +39,7 @@ class LuaDocClassFieldStubImpl(parent: StubElement<*>,
                                override val className: String?,
                                override val visibility: Visibility,
                                override val type: ITy)
-    : LuaDocStubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocClassFieldStub
+    : LuaDocStubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocClassFieldStub {
+    override val docTy: ITy?
+        get() = null
+}

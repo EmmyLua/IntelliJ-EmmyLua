@@ -34,4 +34,7 @@ class LuaIndexExprStubImpl(override val className: String?,
                            override val visibility: Visibility,
                            stubElement: StubElement<*>,
                            indexType: LuaIndexExprType)
-    : StubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexExprStub
+    : StubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexExprStub {
+    override val docTy: ITy?
+        get() = null
+}

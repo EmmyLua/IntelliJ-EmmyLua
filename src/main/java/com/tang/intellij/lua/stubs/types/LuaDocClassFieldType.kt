@@ -64,9 +64,6 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocClassFieldStub, LuaDocFiel
                 fieldDef.ty?.getType() ?: Ty.UNKNOWN)
     }
 
-    override fun getExternalId() = "lua.class.field"
-
-    @Throws(IOException::class)
     override fun serialize(luaFieldStub: LuaDocClassFieldStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaFieldStub.name)
         stubOutputStream.writeName(luaFieldStub.className)

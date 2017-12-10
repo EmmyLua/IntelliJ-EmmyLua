@@ -16,12 +16,87 @@
 
 package com.tang.intellij.lua.stubs
 
+import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.getTableTypeName
 import java.util.*
+
+class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("TABLE_FIELD") {
+
+    override fun createPsi(luaTableFieldStub: LuaTableFieldStub): LuaTableField {
+        return LuaTableFieldImpl(luaTableFieldStub, this)
+    }
+
+    override fun shouldCreateStub(node: ASTNode): Boolean {
+        val tableField = node.psi as LuaTableField
+        return tableField.shouldCreateStub
+    }
+
+    private fun findTableExprTypeName(_tableField: LuaTableField): String {
+        val table = PsiTreeUtil.getParentOfType(_tableField, LuaTableExpr::class.java)
+        val optional = Optional.ofNullable(table)
+                .filter { s -> s.parent is LuaExprList }
+                .map<PsiElement> { it.parent }
+                .filter { s -> s.parent is LuaAssignStat }
+                .map<PsiElement> { it.parent }
+                .map<String> { s ->
+                    val assignStat = s as LuaAssignStat
+                    getTypeName(assignStat, 0)
+                }
+        return optional.orElse(if (table != null) getTableTypeName(table) else null)
+    }
+
+    override fun createStub(field: LuaTableField, parentStub: StubElement<*>): LuaTableFieldStub {
+        val ty = field.comment?.docTy
+        return LuaTableFieldStubImpl(ty,
+                field.fieldName,
+                findTableExprTypeName(field),
+                Visibility.PUBLIC,
+                parentStub,
+                this)
+    }
+
+    override fun serialize(fieldStub: LuaTableFieldStub, stubOutputStream: StubOutputStream) {
+        Ty.serializeNullable(fieldStub.docTy, stubOutputStream)
+        val fieldName = fieldStub.name
+        stubOutputStream.writeName(fieldName)
+        stubOutputStream.writeName(fieldStub.typeName)
+    }
+
+    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaTableFieldStub {
+        val ty = Ty.deserializeNullable(stubInputStream)
+        val fieldName = stubInputStream.readName()
+        val typeName = stubInputStream.readName()
+        return LuaTableFieldStubImpl(ty,
+                StringRef.toString(fieldName),
+                StringRef.toString(typeName),
+                Visibility.PUBLIC,
+                stubElement,
+                this)
+    }
+
+    override fun indexStub(fieldStub: LuaTableFieldStub, indexSink: IndexSink) {
+        val fieldName = fieldStub.name
+        val typeName = fieldStub.typeName
+        if (fieldName != null && typeName != null) {
+            LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
+
+            indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
+        }
+    }
+}
 
 /**
  * table field stub
@@ -32,47 +107,11 @@ interface LuaTableFieldStub : LuaClassMemberStub<LuaTableField> {
     val name: String?
 }
 
-class LuaTableFieldStubImpl : LuaStubBase<LuaTableField>, LuaTableFieldStub {
-    private var _tableField: LuaTableField? = null
-    private var _typeName: String? = null
-    private var _fieldName: String? = null
-    private var _visibility: Visibility = Visibility.PUBLIC
-
-    constructor(field: LuaTableField,
-                parent: StubElement<*>,
-                elementType: LuaStubElementType<*, *>) : super(parent, elementType) {
-        _tableField = field
-        _fieldName = field.fieldName
-    }
-
-    constructor(typeName: String,
-                fieldName: String?,
-                stubElement: StubElement<*>,
-                elementType: LuaStubElementType<*, *>) : super(stubElement, elementType) {
-        _typeName = typeName
-        _fieldName = fieldName
-    }
-
-    override val typeName: String?
-        get() {
-            if (_typeName == null && _tableField != null) {
-                val table = PsiTreeUtil.getParentOfType(_tableField, LuaTableExpr::class.java)
-                val optional = Optional.ofNullable(table)
-                        .filter { s -> s.parent is LuaExprList }
-                        .map<PsiElement> { it.parent }
-                        .filter { s -> s.parent is LuaAssignStat }
-                        .map<PsiElement> { it.parent }
-                        .map<String> { s ->
-                            val assignStat = s as LuaAssignStat
-                            getTypeName(assignStat, 0)
-                        }
-                _typeName = optional.orElse(if (table != null) getTableTypeName(table) else null)
-            }
-            return _typeName
-        }
-
-    override val name get() = _fieldName
-
-    override val visibility: Visibility
-        get() = _visibility
-}
+class LuaTableFieldStubImpl(
+        override val docTy: ITy?,
+        override val name: String?,
+        override val typeName: String?,
+        override val visibility: Visibility,
+        parent: StubElement<*>,
+        elementType: LuaStubElementType<*, *>
+) : LuaStubBase<LuaTableField>(parent, elementType), LuaTableFieldStub

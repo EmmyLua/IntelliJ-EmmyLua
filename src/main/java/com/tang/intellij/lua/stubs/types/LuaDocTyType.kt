@@ -46,6 +46,4 @@ class LuaDocTyType : LuaStubElementType<LuaDocTyStub, LuaDocTypeDef>("DOC_TY"){
     override fun createStub(def: LuaDocTypeDef, stubElement: StubElement<*>?): LuaDocTyStub {
         return LuaDocTyStubImpl(stubElement)
     }
-
-    override fun getExternalId() = "lua.doc.type_def"
 }

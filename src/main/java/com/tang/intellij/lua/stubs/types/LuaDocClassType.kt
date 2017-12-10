@@ -31,7 +31,6 @@ import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex
-import java.io.IOException
 
 /**
 
@@ -51,16 +50,12 @@ class LuaDocClassType : LuaStubElementType<LuaDocClassStub, LuaDocClassDef>("DOC
         return LuaDocClassStubImpl(luaDocClassDef.name, aliasName, superClassName, stubElement)
     }
 
-    override fun getExternalId() = "lua.class"
-
-    @Throws(IOException::class)
     override fun serialize(luaDocClassStub: LuaDocClassStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaDocClassStub.className)
         stubOutputStream.writeName(luaDocClassStub.aliasName)
         stubOutputStream.writeName(luaDocClassStub.superClassName)
     }
 
-    @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocClassStub {
         val className = stubInputStream.readName()
         val aliasName = stubInputStream.readName()

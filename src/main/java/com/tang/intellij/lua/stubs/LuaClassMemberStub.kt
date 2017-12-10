@@ -19,7 +19,9 @@ package com.tang.intellij.lua.stubs
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.ty.ITy
 
 interface LuaClassMemberStub<T : PsiElement> : StubElement<T> {
     val visibility: Visibility
+    val docTy: ITy?
 }

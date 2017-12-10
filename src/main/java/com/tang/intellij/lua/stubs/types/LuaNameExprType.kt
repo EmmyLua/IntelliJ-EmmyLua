@@ -32,7 +32,6 @@ import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import java.io.IOException
 
 /**
  * global var
@@ -54,16 +53,12 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
         return LuaNameExprStubImpl(luaNameExpr, module, stubElement, this)
     }
 
-    override fun getExternalId() = "lua.name_expr"
-
-    @Throws(IOException::class)
     override fun serialize(luaNameStub: LuaNameExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaNameStub.name)
         stubOutputStream.writeName(luaNameStub.module)
         stubOutputStream.writeBoolean(luaNameStub.isGlobal)
     }
 
-    @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameExprStub {
         val nameRef = stubInputStream.readName()
         val moduleRef = stubInputStream.readName()

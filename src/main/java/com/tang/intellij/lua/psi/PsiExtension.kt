@@ -20,8 +20,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.getGlobalTypeName
 import com.tang.intellij.lua.ty.getTableTypeName
 
@@ -152,6 +154,10 @@ val LuaLiteralExpr.stringValue: String get() {
 val LuaLiteralExpr.boolValue: Boolean get() = text == "true"
 
 val LuaLiteralExpr.numberValue: Float get() = text.toFloat()
+
+val LuaComment.docTy: ITy? get() {
+    return this.typeDef?.type
+}
 
 val LuaDocClassDef.aliasName: String? get() {
     val owner = LuaCommentUtil.findOwner(this)
