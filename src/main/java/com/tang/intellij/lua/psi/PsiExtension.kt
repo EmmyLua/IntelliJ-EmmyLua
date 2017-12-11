@@ -182,6 +182,14 @@ val LuaIndexExpr.brack: Boolean get() {
     return if (stub != null) stub.brack else lbrack != null
 }
 
+val LuaIndexExpr.docTy: ITy? get() {
+    val stub = stub
+    return if (stub != null)
+        stub.docTy
+    else
+        assignStat?.comment?.docTy
+}
+
 val LuaIndexExpr.prefixExpr: LuaExpr get() {
     return firstChild as LuaExpr
 }

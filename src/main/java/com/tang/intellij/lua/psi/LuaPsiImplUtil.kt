@@ -280,8 +280,8 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
 }
 
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
-    val prefix = indexExpr.firstChild as LuaExpr
-    return prefix.guessTypeFromCache(context)
+    val expr = PsiTreeUtil.getStubChildOfType(indexExpr, LuaExpr::class.java)
+    return expr?.guessTypeFromCache(context) ?: Ty.UNKNOWN
 }
 
 fun getNameIdentifier(indexExpr: LuaIndexExpr): PsiElement? {
@@ -358,17 +358,13 @@ fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
         return stub.valueType
     }
 
-    val setOptional = Optional.of(indexExpr)
-            .filter { s -> s.parent is LuaVarList }
-            .map<PsiElement>({ it.parent })
-            .filter { s -> s.parent is LuaAssignStat }
-            .map<PsiElement>({ it.parent })
-            .map<ITy> { s ->
-                val assignStat = s as LuaAssignStat
-                context.index = assignStat.getIndexFor(indexExpr)
-                assignStat.valueExprList?.guessTypeAt(context)
-            }
-    return setOptional.orElse(Ty.UNKNOWN)
+    var ret: ITy = Ty.UNKNOWN
+    val assignStat = indexExpr.assignStat
+    if (assignStat != null) {
+        context.index = assignStat.getIndexFor(indexExpr)
+        ret = assignStat.valueExprList?.guessTypeAt(context) ?: Ty.UNKNOWN
+    }
+    return ret
 }
 
 fun findField(table: LuaTableExpr, fieldName: String): LuaTableField? {

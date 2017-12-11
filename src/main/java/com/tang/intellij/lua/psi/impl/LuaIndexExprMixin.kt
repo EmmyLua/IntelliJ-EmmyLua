@@ -65,7 +65,7 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
             }
 
             //from @type annotation
-            val docTy = indexExpr.assignStat?.comment?.docTy
+            val docTy = indexExpr.docTy
             if (docTy != null)
                 return@doPreventingRecursion docTy
 
