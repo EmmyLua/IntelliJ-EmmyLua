@@ -29,4 +29,6 @@ object LuaElementTypes {
     val VAR_LIST = LuaPlaceholderStub.Type("VAR_LIST", ::LuaVarListImpl)
     val PAREN_EXPR = LuaPlaceholderStub.Type("PAREN_EXPR", ::LuaParenExprImpl)
     val LOCAL_FUNC_DEF = LuaLocalFuncDefElementType()
+    val CLOSURE_EXPR = LuaPlaceholderStub.Type("CLOSURE_EXPR", ::LuaClosureExprImpl)
+    val FUNC_BODY = LuaPlaceholderStub.Type("FUNC_BODY", ::LuaFuncBodyImpl)
 }

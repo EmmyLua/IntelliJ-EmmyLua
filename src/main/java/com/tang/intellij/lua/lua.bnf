@@ -419,6 +419,8 @@ closureExpr ::= 'function' funcBody {
     pin = 2
     implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
     methods = [getParamNameDefList guessReturnType getParams]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
+    mixin = 'com.tang.intellij.lua.psi.impl.LuaClosureExprMixin'
 }
 
 funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
@@ -430,6 +432,7 @@ funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
         RPAREN = 'RPAREN'
         ELLIPSIS = 'ELLIPSIS'
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
 }
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...' { recoverWhile = parList_recover }

@@ -44,7 +44,7 @@ public class LuaLocalFuncDefImpl extends StubBasedPsiElementBase<LuaLocalFuncDef
   @Override
   @Nullable
   public LuaFuncBody getFuncBody() {
-    return PsiTreeUtil.getChildOfType(this, LuaFuncBody.class);
+    return PsiTreeUtil.getStubChildOfType(this, LuaFuncBody.class);
   }
 
   @Override

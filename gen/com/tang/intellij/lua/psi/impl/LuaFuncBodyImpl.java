@@ -8,13 +8,24 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
+import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
 
-public class LuaFuncBodyImpl extends ASTWrapperPsiElement implements LuaFuncBody {
+public class LuaFuncBodyImpl extends StubBasedPsiElementBase<LuaPlaceholderStub> implements LuaFuncBody {
+
+  public LuaFuncBodyImpl(LuaPlaceholderStub stub, IStubElementType type) {
+    super(stub, type);
+  }
 
   public LuaFuncBodyImpl(ASTNode node) {
     super(node);
+  }
+
+  public LuaFuncBodyImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
@@ -29,7 +40,7 @@ public class LuaFuncBodyImpl extends ASTWrapperPsiElement implements LuaFuncBody
   @Override
   @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaParamNameDef.class);
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaParamNameDef.class);
   }
 
   @Override
