@@ -21,6 +21,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.*
 import com.intellij.psi.tree.IStubFileElementType
 import com.tang.intellij.lua.lang.LuaLanguage
+import com.tang.intellij.lua.psi.LuaBlock
 import com.tang.intellij.lua.psi.LuaPsiElement
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
@@ -29,7 +30,10 @@ abstract class LuaStubElementType<StubT : StubElement<*>, PsiT : LuaPsiElement>(
     : IStubElementType<StubT, PsiT>(debugName, LuaLanguage.INSTANCE) {
 
     protected fun createStubIfParentIsStub(node: ASTNode): Boolean {
-        val parent = node.treeParent
+        var parent = node.treeParent
+        if (parent.psi is LuaBlock)
+            parent = parent.treeParent
+
         val parentType = parent.elementType
         return (parentType is IStubElementType<*, *> && parentType.shouldCreateStub(parent)) ||
                 parentType is IStubFileElementType<*>

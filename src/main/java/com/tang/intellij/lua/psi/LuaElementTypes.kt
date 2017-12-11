@@ -31,4 +31,5 @@ object LuaElementTypes {
     val LOCAL_FUNC_DEF = LuaLocalFuncDefElementType()
     val CLOSURE_EXPR = LuaPlaceholderStub.Type("CLOSURE_EXPR", ::LuaClosureExprImpl)
     val FUNC_BODY = LuaPlaceholderStub.Type("FUNC_BODY", ::LuaFuncBodyImpl)
+    val CLASS_METHOD_NAME = LuaPlaceholderStub.Type("CLASS_METHOD_NAME", ::LuaClassMethodNameImpl)
 }

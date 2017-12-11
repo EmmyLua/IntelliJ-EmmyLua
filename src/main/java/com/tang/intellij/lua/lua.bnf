@@ -264,6 +264,7 @@ classMethodName ::=  nameExpr (funcPrefixRef)* (('.' ID) | (':' ID)) {
         dot = 'DOT'
         colon = 'COLON'
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2

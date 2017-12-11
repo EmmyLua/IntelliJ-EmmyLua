@@ -115,6 +115,7 @@ fun createType(string: String): IElementType {
         "LOCAL_FUNC_DEF" -> LuaElementTypes.LOCAL_FUNC_DEF
         "CLOSURE_EXPR" -> LuaElementTypes.CLOSURE_EXPR
         "FUNC_BODY" -> LuaElementTypes.FUNC_BODY
+        "CLASS_METHOD_NAME" -> LuaElementTypes.CLASS_METHOD_NAME
 
         else -> LuaElementType(string)
     }
