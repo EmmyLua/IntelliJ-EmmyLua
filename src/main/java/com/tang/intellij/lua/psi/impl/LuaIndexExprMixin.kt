@@ -49,8 +49,8 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
     override fun guessType(context: SearchContext): ITy {
         val retTy = RecursionManager.doPreventingRecursion(this, true) {
             val indexExpr = this as LuaIndexExpr
-            // xxx[yyy]
-            if (indexExpr.lbrack != null) {
+            // xxx[yyy] as an array element?
+            if (indexExpr.brack) {
                 val tySet = indexExpr.guessParentType(context)
 
                 // Type[]
@@ -62,17 +62,12 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
                 val table = TyUnion.find(tySet, ITyGeneric::class.java)
                 if (table != null)
                     return@doPreventingRecursion table.getParamTy(1)
-
-                //return@doPreventingRecursion Ty.UNKNOWN
             }
 
             //from @type annotation
-            val comment = this.comment
-            if (comment != null) {
-                val set = comment.typeDef?.type
-                if (set != null)
-                    return@doPreventingRecursion set
-            }
+            val docTy = indexExpr.assignStat?.comment?.docTy
+            if (docTy != null)
+                return@doPreventingRecursion docTy
 
             // xxx.yyy = zzz
             //from value

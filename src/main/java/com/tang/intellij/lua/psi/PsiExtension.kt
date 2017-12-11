@@ -177,6 +177,11 @@ val LuaDocClassDef.aliasName: String? get() {
     return null
 }
 
+val LuaIndexExpr.brack: Boolean get() {
+    val stub = stub
+    return if (stub != null) stub.brack else lbrack != null
+}
+
 val LuaIndexExpr.prefixExpr: LuaExpr get() {
     return firstChild as LuaExpr
 }

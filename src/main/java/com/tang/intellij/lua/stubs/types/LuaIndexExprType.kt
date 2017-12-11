@@ -26,9 +26,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.LuaIndexExprStub
-import com.tang.intellij.lua.stubs.LuaIndexExprStubImpl
-import com.tang.intellij.lua.stubs.LuaStubElementType
+import com.tang.intellij.lua.stubs.*
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
@@ -73,6 +71,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
                 indexExpr.name,
                 docTy,
                 valueType,
+                indexExpr.lbrack != null,
                 visibility,
                 stubElement,
                 this)
@@ -81,21 +80,24 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun serialize(indexStub: LuaIndexExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(indexStub.className)
         stubOutputStream.writeName(indexStub.name)
-        Ty.serializeNullable(indexStub.docTy, stubOutputStream)
+        stubOutputStream.writeTyNullable(indexStub.docTy)
         Ty.serialize(indexStub.valueType, stubOutputStream)
+        stubOutputStream.writeBoolean(indexStub.brack)
         stubOutputStream.writeByte(indexStub.visibility.ordinal)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexExprStub {
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
-        val docTy = Ty.deserializeNullable(stubInputStream)
+        val docTy = stubInputStream.readTyNullable()
         val valueType = Ty.deserialize(stubInputStream)
+        val brack = stubInputStream.readBoolean()
         val visibility = Visibility.get(stubInputStream.readByte().toInt())
         return LuaIndexExprStubImpl(StringRef.toString(typeName),
                 StringRef.toString(fieldName),
                 docTy,
                 valueType,
+                brack,
                 visibility,
                 stubElement,
                 this)
