@@ -23,7 +23,6 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
-import com.intellij.util.SmartList
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -146,40 +145,31 @@ fun isUpValue(ref: LuaNameExpr, context: SearchContext): Boolean {
 
 /**
  * 查找这个引用
- * @param ref 要查找的ref
+ * @param nameExpr 要查找的ref
  * *
  * @param context context
  * *
  * @return PsiElement
  */
-fun resolve(ref: LuaNameExpr, context: SearchContext): PsiElement? {
+fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
     //search local
-    var resolveResult = resolveLocal(ref, context)
+    var resolveResult = resolveLocal(nameExpr, context)
 
-    val refName = ref.name
     //global
     if (resolveResult == null) {
-        val moduleName = ref.moduleName
-        if (moduleName != null) {
-            LuaClassMemberIndex.process(moduleName, refName, context, Processor {
-                resolveResult = it
-                false
-            })
-        }
-
-        if (resolveResult == null) {
-            LuaClassMemberIndex.process(Constants.WORD_G, refName, context, Processor {
-                resolveResult = it
-                false
-            })
-        }
+        val refName = nameExpr.name
+        val moduleName = nameExpr.moduleName ?: Constants.WORD_G
+        LuaClassMemberIndex.process(moduleName, refName, context, Processor {
+            resolveResult = it
+            false
+        })
     }
 
     return resolveResult
 }
 
 fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
-    val list = SmartList<PsiElement>()
+    val list = mutableListOf<PsiElement>()
     //search local
     val resolveResult = resolveLocal(ref, context)
     if (resolveResult != null) {
