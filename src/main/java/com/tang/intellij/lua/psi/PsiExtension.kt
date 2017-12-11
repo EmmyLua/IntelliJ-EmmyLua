@@ -32,14 +32,20 @@ import com.tang.intellij.lua.ty.getTableTypeName
  */
 fun LuaLocalDef.getIndexFor(psi: LuaNameDef): Int {
     var idx = 0
-    PsiTreeUtil.processElements(this.nameList, {
-        if (it is LuaNameDef) {
-            if (it == psi)
-                return@processElements false
-            idx++
-        }
-        return@processElements true
-    })
+    val nameList = nameList
+    val stub = nameList?.stub
+    if (stub != null) {
+        idx = stub.childrenStubs.indexOf(psi.stub)
+    } else {
+        PsiTreeUtil.processElements(nameList, {
+            if (it is LuaNameDef) {
+                if (it == psi)
+                    return@processElements false
+                idx++
+            }
+            return@processElements true
+        })
+    }
     return idx
 }
 
@@ -74,8 +80,12 @@ fun LuaListArgs.getIndexFor(psi: LuaExpr): Int {
     return idx
 }
 
+val LuaExprList.exprStubList: List<LuaExpr> get() {
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaExpr::class.java)
+}
+
 fun LuaExprList.getExprAt(idx: Int): LuaExpr? {
-    return exprList[idx]
+    return exprStubList[idx]
 }
 
 fun LuaParametersOwner.getIndexFor(paramNameDef: LuaParamNameDef): Int {

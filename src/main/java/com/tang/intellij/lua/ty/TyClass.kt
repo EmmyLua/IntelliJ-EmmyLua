@@ -174,7 +174,8 @@ abstract class TyClass(override val className: String, override var superClassNa
         val G: TyClass = TySerializedClass(Constants.WORD_G)
 
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
-            val tyName = "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
+            val stub = nameDef.stub
+            val tyName = if (stub != null) stub.anonymousType else getAnonymousType(nameDef)
             return TySerializedClass(tyName, null, null, TyFlags.ANONYMOUS)
         }
 
@@ -216,6 +217,10 @@ fun getTableTypeName(table: LuaTableExpr): String {
 
     val fileName = table.containingFile.name
     return "$fileName@(${table.node.startOffset})table"
+}
+
+fun getAnonymousType(nameDef: LuaNameDef): String {
+    return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
 }
 
 fun getGlobalTypeName(expr: LuaNameExpr): String {

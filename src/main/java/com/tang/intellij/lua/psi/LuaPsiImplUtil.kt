@@ -273,7 +273,7 @@ fun isFunctionCall(callExpr: LuaCallExpr): Boolean {
 fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
     //if (context.forStore)
     //    return Ty.UNKNOWN
-    val exprList = list.exprList
+    val exprList = list.exprStubList
     val index = if (exprList.size > context.index) context.index else 0
     context.index = 0
     return exprList[index].guessTypeFromCache(context)
