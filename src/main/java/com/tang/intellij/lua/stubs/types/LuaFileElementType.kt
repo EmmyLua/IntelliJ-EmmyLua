@@ -74,10 +74,11 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
         dataStream.writeName(stub.module)
         val returnedType = stub.getReturnedType(SearchContext(stub.project))
         Ty.serialize(returnedType, dataStream)
-
-        println("--------- START: ${stub.psi.name}")
-        println(stub.printTree())
-        println("--------- END: ${stub.psi.name}")
+        if (LOG.isDebugEnabled) {
+            println("--------- START: ${stub.psi.name}")
+            println(stub.printTree())
+            println("--------- END: ${stub.psi.name}")
+        }
     }
 
     @Throws(IOException::class)
