@@ -78,26 +78,37 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaE
                 val stub = def.stub
                 stub?.module?.let {
                     val memberType = TySerializedClass(it).findMemberType(def.name, context)
-                    if (memberType != null) return memberType
+                    if (memberType != null)
+                        return memberType
                 }
 
-                var type: ITy = Ty.UNKNOWN
-                val p1 = def.parent // should be VAR_LIST
-                val p2 = p1.parent // should be ASSIGN_STAT
-                if (p2 is LuaAssignStat) {
-                    val comment = p2.comment
+                var type: ITy = def.docTy ?: Ty.UNKNOWN
+                //guess from value expr
+                if (Ty.isInvalid(type)) {
+                    val stat = def.assignStat
+                    if (stat != null) {
+                        val exprList = stat.valueExprList
+                        if (exprList != null) {
+                            context.index = stat.getIndexFor(def)
+                            type = exprList.guessTypeAt(context)
+                        }
+                    }
+                }
+                /*val stat = def.assignStat
+                if (stat != null) {
+                    val comment = stat.comment
                     //guess from comment
                     if (comment != null)
                         type = comment.guessType(context)
                     //guess from value expr
                     if (Ty.isInvalid(type)) {
-                        val exprList = p2.valueExprList
+                        val exprList = stat.valueExprList
                         if (exprList != null) {
-                            context.index = p2.getIndexFor(def)
+                            context.index = stat.getIndexFor(def)
                             type = exprList.guessTypeAt(context)
                         }
                     }
-                }
+                }*/
 
                 //Global
                 if (isGlobal(def)) {

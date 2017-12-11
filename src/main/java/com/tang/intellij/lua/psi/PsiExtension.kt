@@ -169,6 +169,11 @@ val LuaComment.docTy: ITy? get() {
     return this.typeDef?.type
 }
 
+val LuaComment.ty: ITy? get() {
+    val cls = classDef?.type
+    return cls ?: typeDef?.type
+}
+
 val LuaDocClassDef.aliasName: String? get() {
     val owner = LuaCommentUtil.findOwner(this)
     when (owner) {
@@ -222,6 +227,13 @@ val LuaNameExpr.assignStat: LuaAssignStat? get() {
             return p2
     }
     return null
+}
+
+val LuaNameExpr.docTy: ITy? get() {
+    val stub = stub
+    if (stub != null)
+        return stub.docTy
+    return assignStat?.comment?.ty
 }
 
 val LuaTableField.shouldCreateStub: Boolean get() {
