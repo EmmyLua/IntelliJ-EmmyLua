@@ -159,7 +159,7 @@ assignStat ::= varList '=' exprList {
         "com.tang.intellij.lua.psi.LuaDeclaration"
     ]
     methods = [assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
-    extends = "com.tang.intellij.lua.psi.impl.LuaStatMixin"
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
     stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
 doStat ::= 'do' <<lazyBlock>> 'end' {
@@ -325,7 +325,10 @@ localDef ::= 'local' nameList ('=' exprList)? {
     methods = [getComment assign = 'ASSIGN']
 }
 
-returnStat ::= return exprList?
+returnStat ::= return exprList? {
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 breakStat ::= break
 private lastStat ::= returnStat | breakStat
 

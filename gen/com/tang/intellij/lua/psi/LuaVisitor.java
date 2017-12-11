@@ -12,7 +12,8 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitAssignStat(@NotNull LuaAssignStat o) {
-    visitDeclaration(o);
+    visitStatement(o);
+    // visitDeclaration(o);
   }
 
   public void visitBinaryExpr(@NotNull LuaBinaryExpr o) {

@@ -8,12 +8,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
-import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
+import com.tang.intellij.lua.psi.*;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaAssignStatImpl extends LuaStatMixin implements LuaAssignStat {
+public class LuaAssignStatImpl extends LuaStatMixin<LuaPlaceholderStub> implements LuaAssignStat {
 
   public LuaAssignStatImpl(LuaPlaceholderStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);

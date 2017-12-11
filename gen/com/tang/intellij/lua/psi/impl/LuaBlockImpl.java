@@ -28,12 +28,6 @@ public class LuaBlockImpl extends ASTWrapperPsiElement implements LuaBlock {
 
   @Override
   @NotNull
-  public List<LuaAssignStat> getAssignStatList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaAssignStat.class);
-  }
-
-  @Override
-  @NotNull
   public List<LuaClassMethodDef> getClassMethodDefList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaClassMethodDef.class);
   }
