@@ -210,6 +210,10 @@ open class TySerializedClass(name: String,
 class TyLazyClass(name: String) : TySerializedClass(name)
 
 fun getTableTypeName(table: LuaTableExpr): String {
+    val stub = table.stub
+    if (stub != null)
+        return stub.tableTypeName
+
     val fileName = table.containingFile.name
     return "$fileName@(${table.node.startOffset})table"
 }

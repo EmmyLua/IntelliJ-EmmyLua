@@ -21,24 +21,26 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.psi.impl.LuaTableExprImpl
 import com.tang.intellij.lua.psi.shouldCreateStub
 import com.tang.intellij.lua.stubs.LuaStubElementType
 import com.tang.intellij.lua.stubs.LuaTableExprStub
 import com.tang.intellij.lua.stubs.LuaTableExprStubImpl
-import java.io.IOException
+import com.tang.intellij.lua.ty.getTableTypeName
 
 /**
- * table
+ * table expr
  * Created by tangzx on 2017/1/12.
  */
-class LuaTableExprType : LuaStubElementType<LuaTableExprStub, LuaTableExpr>("TABLE") {
+class LuaTableExprType : LuaStubElementType<LuaTableExprStub, LuaTableExpr>("TABLE_EXPR") {
 
     override fun createPsi(luaTableStub: LuaTableExprStub) = LuaTableExprImpl(luaTableStub, this)
 
-    override fun createStub(tableConstructor: LuaTableExpr, stubElement: StubElement<*>): LuaTableExprStub {
-        return LuaTableExprStubImpl(stubElement, this)
+    override fun createStub(tableExpr: LuaTableExpr, stubElement: StubElement<*>): LuaTableExprStub {
+        val tableTypeName = getTableTypeName(tableExpr)
+        return LuaTableExprStubImpl(tableTypeName, stubElement, this)
     }
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
@@ -46,14 +48,13 @@ class LuaTableExprType : LuaStubElementType<LuaTableExprStub, LuaTableExpr>("TAB
         return tab.shouldCreateStub
     }
 
-    @Throws(IOException::class)
-    override fun serialize(luaTableStub: LuaTableExprStub, stubOutputStream: StubOutputStream) {
-
+    override fun serialize(stub: LuaTableExprStub, stubOutputStream: StubOutputStream) {
+        stubOutputStream.writeName(stub.tableTypeName)
     }
 
-    @Throws(IOException::class)
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaTableExprStub {
-        return LuaTableExprStubImpl(stubElement, this)
+        val tableTypeName = stubInputStream.readName()
+        return LuaTableExprStubImpl(StringRef.toString(tableTypeName), stubElement, this)
     }
 
     override fun indexStub(luaTableStub: LuaTableExprStub, indexSink: IndexSink) {}

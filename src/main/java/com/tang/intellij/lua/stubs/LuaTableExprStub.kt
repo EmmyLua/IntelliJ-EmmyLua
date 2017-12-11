@@ -23,7 +23,12 @@ import com.tang.intellij.lua.psi.LuaTableExpr
 
  * Created by tangzx on 2017/1/12.
  */
-interface LuaTableExprStub : StubElement<LuaTableExpr>
+interface LuaTableExprStub : StubElement<LuaTableExpr> {
+    val tableTypeName: String
+}
 
-class LuaTableExprStubImpl(parent: StubElement<*>, elementType: LuaStubElementType<*, *>)
-    : LuaStubBase<LuaTableExpr>(parent, elementType), LuaTableExprStub
+class LuaTableExprStubImpl(
+        override val tableTypeName: String,
+        parent: StubElement<*>,
+        elementType: LuaStubElementType<*, *>
+) : LuaStubBase<LuaTableExpr>(parent, elementType), LuaTableExprStub
