@@ -78,7 +78,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaE
                 val stub = def.stub
                 stub?.module?.let {
                     val memberType = TySerializedClass(it).findMemberType(def.name, context)
-                    if (memberType != null)
+                    if (memberType != null && !Ty.isInvalid(memberType))
                         return memberType
                 }
 
