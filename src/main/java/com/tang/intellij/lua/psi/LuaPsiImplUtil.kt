@@ -556,9 +556,9 @@ fun guessType(tableField: LuaTableField, context: SearchContext): ITy {
         return docTy
 
     //guess from value
-    val lastChild = tableField.lastChild
-    if (lastChild is LuaExpr) {
-        return lastChild.guessTypeFromCache(context)
+    val valueExpr = PsiTreeUtil.getStubChildOfType(tableField, LuaExpr::class.java)
+    if (valueExpr != null) {
+        return valueExpr.guessTypeFromCache(context)
     }
     return Ty.UNKNOWN
 }

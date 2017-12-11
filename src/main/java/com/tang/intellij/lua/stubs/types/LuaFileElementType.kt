@@ -75,8 +75,9 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
         val returnedType = stub.getReturnedType(SearchContext(stub.project))
         Ty.serialize(returnedType, dataStream)
 
-        println("--------- print stub tree of file : ${stub.psi.name}")
+        println("--------- START: ${stub.psi.name}")
         println(stub.printTree())
+        println("--------- END: ${stub.psi.name}")
     }
 
     @Throws(IOException::class)
