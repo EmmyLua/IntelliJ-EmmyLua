@@ -25,7 +25,6 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.intellij.util.SmartList
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.reference.LuaReference
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
@@ -228,13 +227,12 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
         val expr = PsiTreeUtil.findChildOfType(field, LuaExpr::class.java)
         if (expr != null) type = expr.guessTypeFromCache(context)
     } else {
+        val docTy = nameDef.docTy
+        if (docTy != null)
+            return docTy
+
         val localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef::class.java)
         if (localDef != null) {
-            val comment = localDef.comment
-            if (comment != null) {
-                type = comment.guessType(context)
-            }
-
             //计算 expr 返回类型
             if (Ty.isInvalid(type)) {
                 val nameList = localDef.nameList

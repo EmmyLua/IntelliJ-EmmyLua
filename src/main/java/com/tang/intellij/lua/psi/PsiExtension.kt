@@ -49,6 +49,15 @@ fun LuaLocalDef.getIndexFor(psi: LuaNameDef): Int {
     return idx
 }
 
+val LuaNameDef.docTy: ITy? get() {
+    val stub = stub
+    if (stub != null)
+        return stub.docTy
+
+    val localDef = PsiTreeUtil.getParentOfType(this, LuaLocalDef::class.java)
+    return localDef?.comment?.docTy
+}
+
 fun LuaAssignStat.getIndexFor(psi: LuaExpr): Int {
     var idx = 0
     PsiTreeUtil.processElements(this.varExprList, {
