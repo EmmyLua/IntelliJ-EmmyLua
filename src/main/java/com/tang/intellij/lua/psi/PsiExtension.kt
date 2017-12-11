@@ -55,7 +55,7 @@ val LuaNameDef.docTy: ITy? get() {
         return stub.docTy
 
     val localDef = PsiTreeUtil.getParentOfType(this, LuaLocalDef::class.java)
-    return localDef?.comment?.docTy
+    return localDef?.comment?.ty
 }
 
 fun LuaAssignStat.getIndexFor(psi: LuaExpr): Int {
