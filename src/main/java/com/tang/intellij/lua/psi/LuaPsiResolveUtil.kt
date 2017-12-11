@@ -72,17 +72,25 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
     })
 
     if (refName == Constants.WORD_SELF) {
-        val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
+        val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(ref, LuaClassMethodDef::class.java)
+        if (methodDef != null && !methodDef.isStatic) {
+            val methodName = methodDef.classMethodName
+            val expr = PsiTreeUtil.getStubChildOfType(methodName, LuaExpr::class.java)!!
+            if (expr is LuaNameExpr && context != null) {
+                ret = resolve(expr, context)
+            }
+        }
+        /*val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
         if (block != null) {
             val methodDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)
             if (methodDef != null && !methodDef.isStatic) {
-                /**
+                *//**
                  * eg.
                  * function xx:aa()
                  *     local self = {}
                  *     return self
                  * end
-                 */
+                 *//*
                 ret?.textRange?.let {
                     if (block.textRange.contains(it))
                         return ret
@@ -97,7 +105,7 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
                 if (ret == null && expr is LuaNameExpr)
                     ret = expr
             }
-        }
+        }*/
     }
 
     //local 函数名
