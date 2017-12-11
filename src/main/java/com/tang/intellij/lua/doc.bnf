@@ -127,7 +127,7 @@ field_def ::= TAG_FIELD access_modifier? ID ty comment_string? {
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocClassFieldStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocFieldDefStub"
     methods = [
         guessType
         guessParentType

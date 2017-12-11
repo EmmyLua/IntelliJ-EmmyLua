@@ -26,7 +26,7 @@ import com.tang.intellij.lua.ty.ITy
 
  * Created by tangzx on 2016/12/10.
  */
-interface LuaDocClassFieldStub : LuaClassMemberStub<LuaDocFieldDef> {
+interface LuaDocFieldDefStub : LuaClassMemberStub<LuaDocFieldDef> {
     val name: String
 
     val type: ITy
@@ -34,12 +34,11 @@ interface LuaDocClassFieldStub : LuaClassMemberStub<LuaDocFieldDef> {
     val className: String?
 }
 
-class LuaDocClassFieldStubImpl(parent: StubElement<*>,
-                               override val name: String,
-                               override val className: String?,
-                               override val visibility: Visibility,
-                               override val type: ITy)
-    : LuaDocStubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocClassFieldStub {
-    override val docTy: ITy?
-        get() = null
+class LuaDocFieldDefStubImpl(parent: StubElement<*>,
+                             override val name: String,
+                             override val className: String?,
+                             override val visibility: Visibility,
+                             override val type: ITy)
+    : LuaDocStubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocFieldDefStub {
+    override val docTy = type
 }

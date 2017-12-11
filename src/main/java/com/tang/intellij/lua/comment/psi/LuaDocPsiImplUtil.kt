@@ -103,6 +103,10 @@ fun guessParentType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
 }
 
 fun getVisibility(fieldDef: LuaDocFieldDef): Visibility {
+    val stub = fieldDef.stub
+    if (stub != null)
+        return stub.visibility
+
     val v = fieldDef.accessModifier?.let { Visibility.get(it.text) }
     return v ?: Visibility.PUBLIC
 }
