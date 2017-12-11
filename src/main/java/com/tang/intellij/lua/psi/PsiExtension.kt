@@ -60,14 +60,25 @@ val LuaNameDef.docTy: ITy? get() {
 
 fun LuaAssignStat.getIndexFor(psi: LuaExpr): Int {
     var idx = 0
-    PsiTreeUtil.processElements(this.varExprList, {
-        if (it is LuaExpr) {
-            if (it == psi)
-                return@processElements false
-            idx++
+    val stub = valueExprList?.stub
+    if (stub != null) {
+        val children = stub.childrenStubs
+        for (i in 0 until children.size) {
+            if (psi == children[i].psi) {
+                idx = i
+                break
+            }
         }
-        return@processElements true
-    })
+    } else {
+        PsiTreeUtil.processElements(this.varExprList, {
+            if (it is LuaExpr) {
+                if (it == psi)
+                    return@processElements false
+                idx++
+            }
+            return@processElements true
+        })
+    }
     return idx
 }
 
