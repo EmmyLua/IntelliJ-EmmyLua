@@ -29,7 +29,6 @@ import com.tang.intellij.lua.psi.LuaParamNameDef
 import com.tang.intellij.lua.psi.impl.LuaNameDefImpl
 import com.tang.intellij.lua.psi.impl.LuaParamNameDefImpl
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
 
 class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("NAME_DEF") {
     override fun indexStub(stub: LuaNameDefStub, sink: IndexSink) {
@@ -48,7 +47,7 @@ class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("NA
 
     override fun serialize(stub: LuaNameDefStub, dataStream: StubOutputStream) {
         dataStream.writeName(stub.name)
-        Ty.serializeNullable(stub.docTy, dataStream)
+        dataStream.writeTyNullable(stub.docTy)
     }
 
     override fun createPsi(stub: LuaNameDefStub): LuaNameDef {
@@ -57,7 +56,7 @@ class LuaNameDefElementType : LuaStubElementType<LuaNameDefStub, LuaNameDef>("NA
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaNameDefStub {
         val name = dataStream.readName()
-        val docTy = Ty.deserializeNullable(dataStream)
+        val docTy = dataStream.readTyNullable()
         return LuaNameDefStub(StringRef.toString(name), docTy, parentStub, LuaElementType.NAME_DEF)
     }
 }
@@ -86,6 +85,7 @@ class ParamNameDefElementType : LuaStubElementType<ParamNameDefStub, LuaParamNam
 
     override fun serialize(stub: ParamNameDefStub, dataStream: StubOutputStream) {
         dataStream.writeName(stub.name)
+        dataStream.writeTyNullable(stub.docTy)
     }
 
     override fun createPsi(stub: ParamNameDefStub): LuaParamNameDef {
@@ -94,7 +94,7 @@ class ParamNameDefElementType : LuaStubElementType<ParamNameDefStub, LuaParamNam
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): ParamNameDefStub {
         val name = dataStream.readName()
-        val docTy = Ty.deserializeNullable(dataStream)
+        val docTy = dataStream.readTyNullable()
         return ParamNameDefStub(StringRef.toString(name), docTy, parentStub, LuaElementType.PARAM_NAME_DEF)
     }
 }

@@ -22,6 +22,8 @@ import com.intellij.psi.stubs.*
 import com.intellij.psi.tree.IStubFileElementType
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaPsiElement
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 
 abstract class LuaStubElementType<StubT : StubElement<*>, PsiT : LuaPsiElement>(debugName: String)
     : IStubElementType<StubT, PsiT>(debugName, LuaLanguage.INSTANCE) {
@@ -73,3 +75,11 @@ class LuaPlaceholderStub(parent: StubElement<*>?, elementType: LuaStubElementTyp
 
 abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>?, type: LuaStubElementType<*, *>)
     : LuaStubBase<T>(parent, type)
+
+fun StubInputStream.readTyNullable(): ITy? {
+    return Ty.deserializeNullable(this)
+}
+
+fun StubOutputStream.writeTyNullable(ty: ITy?) {
+    Ty.serializeNullable(ty, this)
+}
