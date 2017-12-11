@@ -29,14 +29,12 @@ import com.tang.intellij.lua.ty.ITy
 interface LuaIndexExprStub : StubElement<LuaIndexExpr>, LuaClassMemberStub<LuaIndexExpr> {
     val className: String?
     val name: String?
-    val valueType: ITy
     val brack: Boolean
 }
 
 class LuaIndexExprStubImpl(override val className: String?,
                            override val name: String?,
                            override val docTy: ITy?,
-                           override val valueType: ITy,
                            override val brack: Boolean,
                            override val visibility: Visibility,
                            stubElement: StubElement<*>,

@@ -30,7 +30,6 @@ import com.tang.intellij.lua.stubs.*
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnion
 
 /**
@@ -68,13 +67,11 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         if (type != null)
             typeName = type.className
         context.forStore = false
-        val valueType = indexExpr.guessValueType(context)
         val visibility = indexExpr.visibility
 
         return LuaIndexExprStubImpl(typeName,
                 indexExpr.name,
                 docTy,
-                valueType,
                 indexExpr.lbrack != null,
                 visibility,
                 stubElement,
@@ -85,7 +82,6 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         stubOutputStream.writeName(indexStub.className)
         stubOutputStream.writeName(indexStub.name)
         stubOutputStream.writeTyNullable(indexStub.docTy)
-        Ty.serialize(indexStub.valueType, stubOutputStream)
         stubOutputStream.writeBoolean(indexStub.brack)
         stubOutputStream.writeByte(indexStub.visibility.ordinal)
     }
@@ -94,13 +90,11 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         val typeName = stubInputStream.readName()
         val fieldName = stubInputStream.readName()
         val docTy = stubInputStream.readTyNullable()
-        val valueType = Ty.deserialize(stubInputStream)
         val brack = stubInputStream.readBoolean()
         val visibility = Visibility.get(stubInputStream.readByte().toInt())
         return LuaIndexExprStubImpl(StringRef.toString(typeName),
                 StringRef.toString(fieldName),
                 docTy,
-                valueType,
                 brack,
                 visibility,
                 stubElement,

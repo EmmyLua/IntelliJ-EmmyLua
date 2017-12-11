@@ -353,11 +353,6 @@ fun setName(indexExpr: LuaIndexExpr, name: String): PsiElement {
 }
 
 fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
-    val stub = indexExpr.stub
-    if (stub != null) {
-        return stub.valueType
-    }
-
     var ret: ITy = Ty.UNKNOWN
     val assignStat = indexExpr.assignStat
     if (assignStat != null) {
