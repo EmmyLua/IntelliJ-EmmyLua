@@ -51,10 +51,13 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
         val name = luaNameExpr.name
         val module = if (psiFile is LuaPsiFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
         val isGlobal = resolveLocal(luaNameExpr, SearchContext(luaNameExpr.project)) == null
-        val comment = luaNameExpr.assignStat?.comment
-        val docTy = comment?.docTy ?: comment?.classDef?.type
+
+        val stat = luaNameExpr.assignStat
+        val docTy = stat?.comment?.ty
+
         return LuaNameExprStubImpl(name,
                 module,
+                stat != null,
                 isGlobal,
                 docTy,
                 stubElement,
@@ -64,6 +67,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
     override fun serialize(luaNameStub: LuaNameExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaNameStub.name)
         stubOutputStream.writeName(luaNameStub.module)
+        stubOutputStream.writeBoolean(luaNameStub.isName)
         stubOutputStream.writeBoolean(luaNameStub.isGlobal)
         Ty.serializeNullable(luaNameStub.docTy, stubOutputStream)
     }
@@ -71,18 +75,20 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameExprStub {
         val nameRef = stubInputStream.readName()
         val moduleRef = stubInputStream.readName()
+        val isName = stubInputStream.readBoolean()
         val isGlobal = stubInputStream.readBoolean()
         val docTy = Ty.deserializeNullable(stubInputStream)
         return LuaNameExprStubImpl(StringRef.toString(nameRef),
                 StringRef.toString(moduleRef),
                 isGlobal,
+                isName,
                 docTy,
                 stubElement,
                 this)
     }
 
     override fun indexStub(luaNameStub: LuaNameExprStub, indexSink: IndexSink) {
-        if (luaNameStub.isGlobal) {
+        if (luaNameStub.isGlobal &&luaNameStub.isName) {
             val module = luaNameStub.module
 
             LuaClassMemberIndex.indexStub(indexSink, module, luaNameStub.name)

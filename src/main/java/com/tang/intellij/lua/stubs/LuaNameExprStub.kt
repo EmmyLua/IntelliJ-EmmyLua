@@ -27,12 +27,14 @@ import com.tang.intellij.lua.ty.ITy
 interface LuaNameExprStub : StubElement<LuaNameExpr>, LuaDocTyStub {
     val name: String
     val module: String
+    val isName: Boolean
     val isGlobal: Boolean
 }
 
 class LuaNameExprStubImpl(
         override val name: String,
         override val module: String,
+        override val isName: Boolean,
         override val isGlobal: Boolean,
         override val docTy: ITy?,
         parent: StubElement<*>,
