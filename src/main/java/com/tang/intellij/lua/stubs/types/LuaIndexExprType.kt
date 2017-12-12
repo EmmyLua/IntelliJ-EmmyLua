@@ -73,6 +73,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
                 indexExpr.name,
                 docTy,
                 indexExpr.lbrack != null,
+                stat != null,
                 visibility,
                 stubElement,
                 this)
@@ -83,6 +84,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         stubOutputStream.writeName(indexStub.name)
         stubOutputStream.writeTyNullable(indexStub.docTy)
         stubOutputStream.writeBoolean(indexStub.brack)
+        stubOutputStream.writeBoolean(indexStub.isAssign)
         stubOutputStream.writeByte(indexStub.visibility.ordinal)
     }
 
@@ -91,11 +93,13 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         val fieldName = stubInputStream.readName()
         val docTy = stubInputStream.readTyNullable()
         val brack = stubInputStream.readBoolean()
+        val isAssign = stubInputStream.readBoolean()
         val visibility = Visibility.get(stubInputStream.readByte().toInt())
         return LuaIndexExprStubImpl(StringRef.toString(typeName),
                 StringRef.toString(fieldName),
                 docTy,
                 brack,
+                isAssign,
                 visibility,
                 stubElement,
                 this)
@@ -104,7 +108,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun indexStub(indexStub: LuaIndexExprStub, indexSink: IndexSink) {
         val fieldName = indexStub.name
         val typeName = indexStub.className
-        if (typeName != null && fieldName != null) {
+        if (indexStub.isAssign && typeName != null && fieldName != null) {
             LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
 
             indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
