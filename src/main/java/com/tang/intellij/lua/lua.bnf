@@ -348,7 +348,7 @@ exprList ::= (expr ',')* expr {
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..." {
     mixin = 'com.tang.intellij.lua.psi.impl.LuaLiteralExprMixin'
-    stubClass = 'com.tang.intellij.lua.stubs.LuaLiteralExprStub'
+    stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'
 }
 stringExpr ::= STRING {
     extends = literalExpr
@@ -362,6 +362,7 @@ private varExpr ::= primaryExpr
 //expr ::= (unaryExpr | valueExpr) binaryExpr?
 expr ::= <<parseExpr primaryExpr>> {
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
+    stubClass = "com.tang.intellij.lua.stubs.LuaExprStub"
     implements = [
         "com.tang.intellij.lua.psi.LuaTypeGuessable"
     ]
@@ -398,7 +399,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         "com.intellij.psi.PsiNameIdentifierOwner"
         "com.tang.intellij.lua.psi.LuaClassMember"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaIndexExprStub"
+//    stubClass = "com.tang.intellij.lua.stubs.LuaIndexExprStub"
     mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExprMixin"
 }
 
@@ -434,7 +435,7 @@ closureExpr ::= 'function' funcBody {
     pin = 2
     implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
     methods = [getParamNameDefList guessReturnType getParams]
-    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
+    stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'
     mixin = 'com.tang.intellij.lua.psi.impl.LuaClosureExprMixin'
 }
 
@@ -538,7 +539,7 @@ nameExpr ::= ID {
         toString
     ]
     mixin = "com.tang.intellij.lua.psi.impl.LuaNameExprMixin"
-    stubClass = "com.tang.intellij.lua.stubs.LuaNameExprStub"
+    //stubClass = "com.tang.intellij.lua.stubs.LuaNameExprStub"
 }
 paramNameDef ::= ID {
     extends = nameDef

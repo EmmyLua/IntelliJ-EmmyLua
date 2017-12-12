@@ -39,7 +39,7 @@ public class LuaSingleArgImpl extends LuaArgsImpl implements LuaSingleArg {
   @Override
   @NotNull
   public LuaExpr getExpr() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaExpr.class));
+    return notNullChild(PsiTreeUtil.getStubChildOfType(this, LuaExpr.class));
   }
 
 }

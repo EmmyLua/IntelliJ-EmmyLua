@@ -40,7 +40,7 @@ public class LuaClassMethodNameImpl extends StubBasedPsiElementBase<LuaPlacehold
   @Override
   @NotNull
   public LuaExpr getExpr() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaExpr.class));
+    return notNullChild(PsiTreeUtil.getStubChildOfType(this, LuaExpr.class));
   }
 
   @Override

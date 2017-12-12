@@ -14,6 +14,7 @@ import com.intellij.psi.PsiReference;
 import com.tang.intellij.lua.stubs.LuaNameExprStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
 
@@ -67,11 +68,6 @@ public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
   @NotNull
   public PsiReference[] getReferences() {
     return LuaPsiImplUtilKt.getReferences(this);
-  }
-
-  @NotNull
-  public String toString() {
-    return LuaPsiImplUtilKt.toString(this);
   }
 
 }

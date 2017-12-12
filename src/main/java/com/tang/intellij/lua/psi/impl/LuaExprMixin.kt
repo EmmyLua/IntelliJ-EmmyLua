@@ -18,19 +18,27 @@ package com.tang.intellij.lua.psi.impl
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.RecursionManager
+import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaExprStubImpl
 import com.tang.intellij.lua.ty.*
 
 /**
  * 表达式基类
  * Created by TangZX on 2016/12/4.
  */
-open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpr {
+open class LuaExprMixin : LuaExprStubMixin<LuaExprStubImpl<*>>, LuaExpr {
+
+    constructor(stub: LuaExprStubImpl<*>, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
+
+    constructor(node: ASTNode) : super(node)
+
+    constructor(stub: LuaExprStubImpl<*>, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
     override fun guessType(context: SearchContext): ITy {
         val iTy = RecursionManager.doPreventingRecursion<ITy>(this, true) {

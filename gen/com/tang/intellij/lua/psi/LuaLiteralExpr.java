@@ -5,8 +5,8 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaLiteralExprStub;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
-public interface LuaLiteralExpr extends LuaExpr, StubBasedPsiElement<LuaLiteralExprStub> {
+public interface LuaLiteralExpr extends LuaExpr, StubBasedPsiElement<LuaExprStub> {
 
 }

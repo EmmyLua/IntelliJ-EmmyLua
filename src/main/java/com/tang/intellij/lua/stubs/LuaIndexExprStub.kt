@@ -26,7 +26,7 @@ import com.tang.intellij.lua.ty.ITy
 
  * Created by TangZX on 2017/4/12.
  */
-interface LuaIndexExprStub : StubElement<LuaIndexExpr>, LuaClassMemberStub<LuaIndexExpr> {
+interface LuaIndexExprStub : LuaExprStub<LuaIndexExpr>, LuaClassMemberStub<LuaIndexExpr> {
     val className: String?
     val name: String?
     val brack: Boolean

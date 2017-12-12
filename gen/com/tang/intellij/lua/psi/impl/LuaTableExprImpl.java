@@ -53,9 +53,4 @@ public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr 
     return LuaPsiImplUtilKt.findField(this, fieldName);
   }
 
-  @NotNull
-  public String toString() {
-    return LuaPsiImplUtilKt.toString(this);
-  }
-
 }

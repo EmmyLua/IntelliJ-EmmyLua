@@ -55,4 +55,4 @@ class LuaLiteralElementType
 }
 
 class LuaLiteralExprStub(val kind: LuaLiteralKind, parent: StubElement<*>?, type: LuaStubElementType<*, *>)
-    : LuaStubBase<LuaLiteralExpr>(parent, type)
+    : LuaExprStubImpl<LuaLiteralExpr>(parent, type)

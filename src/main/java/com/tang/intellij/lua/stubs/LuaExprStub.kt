@@ -16,3 +16,17 @@
 
 package com.tang.intellij.lua.stubs
 
+import com.intellij.psi.stubs.StubElement
+import com.tang.intellij.lua.psi.LuaExpr
+
+interface LuaExprStub<T : LuaExpr> : StubElement<T>
+
+open class LuaExprStubImpl<T : LuaExpr>(
+        parent: StubElement<*>?,
+        elementType: LuaStubElementType<*, *>
+) : LuaStubBase<T>(parent, elementType), LuaExprStub<T>
+
+class LuaExprPlaceStub(
+        parent: StubElement<*>?,
+        elementType: LuaStubElementType<*, *>
+) : LuaExprStubImpl<LuaExpr>(parent, elementType)

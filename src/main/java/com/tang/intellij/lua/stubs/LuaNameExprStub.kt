@@ -24,7 +24,7 @@ import com.tang.intellij.lua.ty.ITy
  * name expr stub
  * Created by TangZX on 2017/4/12.
  */
-interface LuaNameExprStub : StubElement<LuaNameExpr>, LuaDocTyStub {
+interface LuaNameExprStub : LuaExprStub<LuaNameExpr>, LuaDocTyStub {
     val name: String
     val module: String
     val isName: Boolean

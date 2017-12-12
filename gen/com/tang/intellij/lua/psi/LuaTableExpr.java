@@ -18,4 +18,8 @@ public interface LuaTableExpr extends LuaExpr, LuaIndentRange, StubBasedPsiEleme
   @Nullable
   LuaTableField findField(String fieldName);
 
+  //WARNING: toString(...) is skipped
+  //matching toString(LuaTableExpr, ...)
+  //methods are not found in LuaPsiImplUtilKt
+
 }

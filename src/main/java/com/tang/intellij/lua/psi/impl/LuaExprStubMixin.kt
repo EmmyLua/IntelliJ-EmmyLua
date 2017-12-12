@@ -22,11 +22,11 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.PsiReferenceService
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.stubs.IStubElementType
-import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.LuaExpr
+import com.tang.intellij.lua.stubs.LuaExprStub
 
-abstract class LuaExprStubMixin<T:StubElement<*>> : StubBasedPsiElementBase<T>, LuaExpr {
+abstract class LuaExprStubMixin<T: LuaExprStub<*>> : StubBasedPsiElementBase<T>, LuaExpr {
     constructor(stub: T, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     constructor(node: ASTNode) : super(node)

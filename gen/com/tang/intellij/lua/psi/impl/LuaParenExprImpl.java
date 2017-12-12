@@ -39,7 +39,7 @@ public class LuaParenExprImpl extends LuaParenExprMixin implements LuaParenExpr 
   @Override
   @Nullable
   public LuaExpr getExpr() {
-    return PsiTreeUtil.getChildOfType(this, LuaExpr.class);
+    return PsiTreeUtil.getStubChildOfType(this, LuaExpr.class);
   }
 
 }
