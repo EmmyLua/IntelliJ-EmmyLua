@@ -167,6 +167,8 @@ doStat ::= 'do' <<lazyBlock>> 'end' {
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
 whileStat ::= 'while' expr 'do' <<lazyBlock>> 'end' {
     pin = 1
@@ -190,6 +192,8 @@ ifStat ::= 'if' expr 'then' <<lazyBlock>> ('elseif' expr 'then' <<lazyBlock>>)* 
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
 forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' <<lazyBlock>> 'end' {
     pin = 3

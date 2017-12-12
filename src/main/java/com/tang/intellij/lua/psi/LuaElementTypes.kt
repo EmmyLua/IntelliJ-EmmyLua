@@ -33,4 +33,6 @@ object LuaElementTypes {
     val FUNC_BODY = LuaPlaceholderStub.Type("FUNC_BODY", ::LuaFuncBodyImpl)
     val CLASS_METHOD_NAME = LuaPlaceholderStub.Type("CLASS_METHOD_NAME", ::LuaClassMethodNameImpl)
     val RETURN_STAT = LuaPlaceholderStub.Type("RETURN_STAT", ::LuaReturnStatImpl)
+    val DO_STAT = LuaPlaceholderStub.Type("DO_STAT", ::LuaDoStatImpl)
+    val IF_STAT = LuaPlaceholderStub.Type("IF_STAT", ::LuaIfStatImpl)
 }

@@ -116,7 +116,10 @@ fun createType(string: String): IElementType {
         "CLOSURE_EXPR" -> LuaElementTypes.CLOSURE_EXPR
         "FUNC_BODY" -> LuaElementTypes.FUNC_BODY
         "CLASS_METHOD_NAME" -> LuaElementTypes.CLASS_METHOD_NAME
+
         "RETURN_STAT" -> LuaElementTypes.RETURN_STAT
+        "DO_STAT" -> LuaElementTypes.DO_STAT
+        "IF_STAT" -> LuaElementTypes.IF_STAT
 
         else -> LuaElementType(string)
     }
