@@ -8,13 +8,24 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.extapi.psi.StubBasedPsiElementBase;
+import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
 
-public abstract class LuaArgsImpl extends ASTWrapperPsiElement implements LuaArgs {
+public abstract class LuaArgsImpl extends StubBasedPsiElementBase<LuaPlaceholderStub> implements LuaArgs {
+
+  public LuaArgsImpl(LuaPlaceholderStub stub, IStubElementType type) {
+    super(stub, type);
+  }
 
   public LuaArgsImpl(ASTNode node) {
     super(node);
+  }
+
+  public LuaArgsImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {

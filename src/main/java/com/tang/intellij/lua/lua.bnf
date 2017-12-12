@@ -231,7 +231,12 @@ gotoStat ::= 'goto' ID {
     ]
 }
 private defStat ::= classMethodDef | funcDef | localFuncDef | localDef
-callStat ::= funcCallExpr { extends = exprStat }
+callStat ::= funcCallExpr {
+    extends = exprStat
+    methods = [getExpr]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 incompleteStat ::= expr { extends = exprStat }
 
 funcDef ::= 'function' ID funcBody {
@@ -397,7 +402,9 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExprMixin"
 }
 
-args ::= listArgs | singleArg
+args ::= listArgs | singleArg {
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
+}
 singleArg ::= tableExpr | stringExpr { extends = args }
 private arg_expr_list ::= (expr ',')* (expr |& ')')
 listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }

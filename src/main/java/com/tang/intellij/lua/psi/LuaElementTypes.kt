@@ -23,6 +23,9 @@ import com.tang.intellij.lua.stubs.LuaPlaceholderStub
 object LuaElementTypes {
     val LOCAL_DEF = LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
     val CALL_EXPR = LuaPlaceholderStub.Type("CALL_EXPR", ::LuaCallExprImpl)
+    val SINGLE_ARG = LuaPlaceholderStub.Type("SINGLE_ARG", ::LuaSingleArgImpl)
+    val LIST_ARGS = LuaPlaceholderStub.Type("LIST_ARGS", ::LuaListArgsImpl)
+
     val EXPR_LIST = LuaPlaceholderStub.Type("EXPR_LIST", ::LuaExprListImpl)
     val NAME_LIST = LuaPlaceholderStub.Type("NAME_LIST", ::LuaNameListImpl)
     val ASSIGN_STAT = LuaPlaceholderStub.Type("ASSIGN_STAT", ::LuaAssignStatImpl)
@@ -32,7 +35,9 @@ object LuaElementTypes {
     val CLOSURE_EXPR = LuaPlaceholderStub.Type("CLOSURE_EXPR", ::LuaClosureExprImpl)
     val FUNC_BODY = LuaPlaceholderStub.Type("FUNC_BODY", ::LuaFuncBodyImpl)
     val CLASS_METHOD_NAME = LuaPlaceholderStub.Type("CLASS_METHOD_NAME", ::LuaClassMethodNameImpl)
+
     val RETURN_STAT = LuaPlaceholderStub.Type("RETURN_STAT", ::LuaReturnStatImpl)
     val DO_STAT = LuaPlaceholderStub.Type("DO_STAT", ::LuaDoStatImpl)
     val IF_STAT = LuaPlaceholderStub.Type("IF_STAT", ::LuaIfStatImpl)
+    val CALL_STAT = LuaPlaceholderStub.Type("CALL_STAT", ::LuaCallStatImpl)
 }

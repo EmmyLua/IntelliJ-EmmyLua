@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
@@ -39,9 +40,12 @@ open class LuaCallExprMixin : LuaExprStubMixin<LuaPlaceholderStub> {
     override fun guessType(context: SearchContext): ITy {
         val luaCallExpr = this as LuaCallExpr
         // xxx()
-        val expr = luaCallExpr.expr
+        val expr = PsiTreeUtil.getStubChildOfType(luaCallExpr, LuaExpr::class.java)//luaCallExpr.expr
+        if (expr == null) {
+            return Ty.UNKNOWN
+        }
         // 从 require 'xxx' 中获取返回类型
-        if (expr.textMatches("require")) {
+        if (expr is LuaNameExpr && expr.name == "require") {
             var filePath: String? = null
             val string = luaCallExpr.firstStringArg
             if (string != null) {
@@ -67,7 +71,7 @@ open class LuaCallExprMixin : LuaExprStubMixin<LuaPlaceholderStub> {
                         true
                     })
                 }
-            //constructor : Class table __call
+                //constructor : Class table __call
                 is ITyClass -> ret = ret.union(it)
             }
         }

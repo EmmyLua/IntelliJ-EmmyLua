@@ -41,7 +41,7 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
   @Override
   @NotNull
   public LuaArgs getArgs() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaArgs.class));
+    return notNullChild(PsiTreeUtil.getStubChildOfType(this, LuaArgs.class));
   }
 
   @Override

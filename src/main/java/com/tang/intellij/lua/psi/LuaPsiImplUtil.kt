@@ -276,6 +276,8 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
     val exprList = list.exprStubList
     val index = if (exprList.size > context.index) context.index else 0
     context.index = 0
+    if (exprList.isEmpty())
+        return Ty.UNKNOWN
     return exprList[index].guessTypeFromCache(context)
 }
 
@@ -694,4 +696,8 @@ fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
 
     }
     return getVisibility(classMethodDef as LuaClassMember)
+}
+
+fun getExpr(callStat: LuaCallStat): LuaExpr {
+    return PsiTreeUtil.getStubChildOfType(callStat, LuaExpr::class.java)!!
 }

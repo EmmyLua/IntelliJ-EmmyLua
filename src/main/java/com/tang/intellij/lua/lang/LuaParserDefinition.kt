@@ -106,6 +106,9 @@ fun createType(string: String): IElementType {
         "LITERAL_EXPR" -> LuaElementType.LITERAL_EXPR
 
         "CALL_EXPR" -> LuaElementTypes.CALL_EXPR
+        "SINGLE_ARG" -> LuaElementTypes.SINGLE_ARG
+        "LIST_ARGS" -> LuaElementTypes.LIST_ARGS
+
         "EXPR_LIST" -> LuaElementTypes.EXPR_LIST
         "NAME_LIST" -> LuaElementTypes.NAME_LIST
         "LOCAL_DEF" -> LuaElementTypes.LOCAL_DEF
@@ -120,6 +123,7 @@ fun createType(string: String): IElementType {
         "RETURN_STAT" -> LuaElementTypes.RETURN_STAT
         "DO_STAT" -> LuaElementTypes.DO_STAT
         "IF_STAT" -> LuaElementTypes.IF_STAT
+        "CALL_STAT" -> LuaElementTypes.CALL_STAT
 
         else -> LuaElementType(string)
     }
