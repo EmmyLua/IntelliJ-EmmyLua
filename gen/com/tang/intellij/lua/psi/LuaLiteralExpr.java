@@ -4,9 +4,9 @@ package com.tang.intellij.lua.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaExprStub;
+import com.tang.intellij.lua.stubs.LuaExprStubElement;
+import com.tang.intellij.lua.stubs.LuaLiteralExprStub;
 
-public interface LuaLiteralExpr extends LuaExpr, StubBasedPsiElement<LuaExprStub> {
+public interface LuaLiteralExpr extends LuaExpr, LuaExprStubElement<LuaLiteralExprStub> {
 
 }

@@ -11,13 +11,14 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
-import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
+import com.tang.intellij.lua.stubs.LuaExprPlaceStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
 
-  public LuaCallExprImpl(LuaPlaceholderStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaCallExprImpl(LuaExprPlaceStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
@@ -25,7 +26,7 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
     super(node);
   }
 
-  public LuaCallExprImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+  public LuaCallExprImpl(LuaExprPlaceStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 

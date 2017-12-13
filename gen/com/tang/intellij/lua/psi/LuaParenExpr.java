@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
-public interface LuaParenExpr extends LuaExpr, StubBasedPsiElement<LuaPlaceholderStub> {
+public interface LuaParenExpr extends LuaExpr, StubBasedPsiElement<LuaExprStub> {
 
   @Nullable
   LuaExpr getExpr();

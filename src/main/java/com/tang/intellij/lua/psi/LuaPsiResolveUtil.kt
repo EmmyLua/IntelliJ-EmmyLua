@@ -73,7 +73,7 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
         val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(ref, LuaClassMethodDef::class.java)
         if (methodDef != null && !methodDef.isStatic) {
             val methodName = methodDef.classMethodName
-            val expr = PsiTreeUtil.getStubChildOfType(methodName, LuaExpr::class.java)!!
+            val expr = methodName.expr
             if (expr is LuaNameExpr && context != null) {
                 ret = resolve(expr, context)
             }

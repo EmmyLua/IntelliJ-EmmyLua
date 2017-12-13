@@ -9,13 +9,14 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
+import com.tang.intellij.lua.stubs.LuaExprPlaceStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaParenExprImpl extends LuaParenExprMixin implements LuaParenExpr {
 
-  public LuaParenExprImpl(LuaPlaceholderStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaParenExprImpl(LuaExprPlaceStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
@@ -23,7 +24,7 @@ public class LuaParenExprImpl extends LuaParenExprMixin implements LuaParenExpr 
     super(node);
   }
 
-  public LuaParenExprImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+  public LuaParenExprImpl(LuaExprPlaceStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 

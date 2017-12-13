@@ -21,18 +21,18 @@ import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.LuaParenExpr
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.LuaPlaceholderStub
+import com.tang.intellij.lua.stubs.LuaExprPlaceStub
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 
-open class LuaParenExprMixin : LuaExprStubMixin<LuaPlaceholderStub> {
+open class LuaParenExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
 
-    constructor(stub: LuaPlaceholderStub, nodeType: IStubElementType<*, *>)
+    constructor(stub: LuaExprPlaceStub, nodeType: IStubElementType<*, *>)
             : super(stub, nodeType)
 
     constructor(node: ASTNode) : super(node)
 
-    constructor(stub: LuaPlaceholderStub, nodeType: IElementType, node: ASTNode)
+    constructor(stub: LuaExprPlaceStub, nodeType: IElementType, node: ASTNode)
             : super(stub, nodeType, node)
 
     override fun guessType(context: SearchContext): ITy {

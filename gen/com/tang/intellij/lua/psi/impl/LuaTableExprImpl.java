@@ -12,6 +12,7 @@ import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.stubs.LuaTableExprStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr {
 

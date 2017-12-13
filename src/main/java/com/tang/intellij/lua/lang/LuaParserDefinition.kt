@@ -125,6 +125,9 @@ fun createType(string: String): IElementType {
         "IF_STAT" -> LuaElementTypes.IF_STAT
         "CALL_STAT" -> LuaElementTypes.CALL_STAT
 
+        "UNARY_EXPR" -> LuaElementTypes.UNARY_EXPR
+        "BINARY_EXPR" -> LuaElementTypes.BINARY_EXPR
+
         else -> LuaElementType(string)
     }
 }

@@ -17,12 +17,12 @@
 package com.tang.intellij.lua.psi
 
 import com.tang.intellij.lua.psi.impl.*
+import com.tang.intellij.lua.stubs.LuaExprPlaceStub
 import com.tang.intellij.lua.stubs.LuaLocalFuncDefElementType
 import com.tang.intellij.lua.stubs.LuaPlaceholderStub
 
 object LuaElementTypes {
     val LOCAL_DEF = LuaPlaceholderStub.Type("LOCAL_DEF", ::LuaLocalDefImpl)
-    val CALL_EXPR = LuaPlaceholderStub.Type("CALL_EXPR", ::LuaCallExprImpl)
     val SINGLE_ARG = LuaPlaceholderStub.Type("SINGLE_ARG", ::LuaSingleArgImpl)
     val LIST_ARGS = LuaPlaceholderStub.Type("LIST_ARGS", ::LuaListArgsImpl)
 
@@ -30,11 +30,15 @@ object LuaElementTypes {
     val NAME_LIST = LuaPlaceholderStub.Type("NAME_LIST", ::LuaNameListImpl)
     val ASSIGN_STAT = LuaPlaceholderStub.Type("ASSIGN_STAT", ::LuaAssignStatImpl)
     val VAR_LIST = LuaPlaceholderStub.Type("VAR_LIST", ::LuaVarListImpl)
-    val PAREN_EXPR = LuaPlaceholderStub.Type("PAREN_EXPR", ::LuaParenExprImpl)
     val LOCAL_FUNC_DEF = LuaLocalFuncDefElementType()
-    val CLOSURE_EXPR = LuaPlaceholderStub.Type("CLOSURE_EXPR", ::LuaClosureExprImpl)
     val FUNC_BODY = LuaPlaceholderStub.Type("FUNC_BODY", ::LuaFuncBodyImpl)
     val CLASS_METHOD_NAME = LuaPlaceholderStub.Type("CLASS_METHOD_NAME", ::LuaClassMethodNameImpl)
+
+    val CLOSURE_EXPR = LuaExprPlaceStub.Type("CLOSURE_EXPR", ::LuaClosureExprImpl)
+    val PAREN_EXPR = LuaExprPlaceStub.Type("PAREN_EXPR", ::LuaParenExprImpl)
+    val CALL_EXPR = LuaExprPlaceStub.Type("CALL_EXPR", ::LuaCallExprImpl)
+    val UNARY_EXPR = LuaExprPlaceStub.Type("UNARY_EXPR", ::LuaUnaryExprImpl)
+    val BINARY_EXPR = LuaExprPlaceStub.Type("BINARY_EXPR", ::LuaBinaryExprImpl)
 
     val RETURN_STAT = LuaPlaceholderStub.Type("RETURN_STAT", ::LuaReturnStatImpl)
     val DO_STAT = LuaPlaceholderStub.Type("DO_STAT", ::LuaDoStatImpl)

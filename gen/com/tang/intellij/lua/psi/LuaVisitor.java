@@ -4,6 +4,11 @@ package com.tang.intellij.lua.psi;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.tang.intellij.lua.stubs.LuaExprStubElement;
+import com.tang.intellij.lua.stubs.LuaNameExprStub;
+import com.tang.intellij.lua.stubs.LuaTableExprStub;
+import com.tang.intellij.lua.stubs.LuaLiteralExprStub;
+import com.tang.intellij.lua.stubs.LuaIndexExprStub;
 
 public class LuaVisitor extends PsiElementVisitor {
 
@@ -113,6 +118,7 @@ public class LuaVisitor extends PsiElementVisitor {
     visitExpr(o);
     // visitPsiNameIdentifierOwner(o);
     // visitClassMember(o);
+    // visitExprStubElement(o);
   }
 
   public void visitLabelStat(@NotNull LuaLabelStat o) {
@@ -126,6 +132,7 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitLiteralExpr(@NotNull LuaLiteralExpr o) {
     visitExpr(o);
+    // visitExprStubElement(o);
   }
 
   public void visitLocalDef(@NotNull LuaLocalDef o) {
@@ -149,6 +156,7 @@ public class LuaVisitor extends PsiElementVisitor {
   public void visitNameExpr(@NotNull LuaNameExpr o) {
     visitExpr(o);
     // visitPsiNameIdentifierOwner(o);
+    // visitExprStubElement(o);
   }
 
   public void visitNameList(@NotNull LuaNameList o) {
@@ -188,6 +196,7 @@ public class LuaVisitor extends PsiElementVisitor {
   public void visitTableExpr(@NotNull LuaTableExpr o) {
     visitExpr(o);
     // visitIndentRange(o);
+    // visitExprStubElement(o);
   }
 
   public void visitTableField(@NotNull LuaTableField o) {

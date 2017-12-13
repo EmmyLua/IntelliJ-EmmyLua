@@ -50,7 +50,7 @@ internal class TextEscaper(host: LuaLiteralExprMixin) : LiteralTextEscaper<LuaLi
 
 }
 
-open class LuaLiteralExprMixin
+abstract class LuaLiteralExprMixin
     : LuaExprStubMixin<LuaLiteralExprStub>, PsiLanguageInjectionHost, LuaLiteralExpr {
     override fun guessType(context: SearchContext): ITy {
         return when (this.kind) {

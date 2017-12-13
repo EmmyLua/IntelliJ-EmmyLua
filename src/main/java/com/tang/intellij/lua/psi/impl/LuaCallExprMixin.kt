@@ -19,31 +19,27 @@ package com.tang.intellij.lua.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.LuaPlaceholderStub
+import com.tang.intellij.lua.stubs.LuaExprPlaceStub
 import com.tang.intellij.lua.ty.*
 
-open class LuaCallExprMixin : LuaExprStubMixin<LuaPlaceholderStub> {
+open class LuaCallExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
 
-    constructor(stub: LuaPlaceholderStub, nodeType: IStubElementType<*, *>)
+    constructor(stub: LuaExprPlaceStub, nodeType: IStubElementType<*, *>)
             : super(stub, nodeType)
 
     constructor(node: ASTNode) : super(node)
 
-    constructor(stub: LuaPlaceholderStub, nodeType: IElementType, node: ASTNode)
+    constructor(stub: LuaExprPlaceStub, nodeType: IElementType, node: ASTNode)
             : super(stub, nodeType, node)
 
     override fun guessType(context: SearchContext): ITy {
         val luaCallExpr = this as LuaCallExpr
         // xxx()
-        val expr = PsiTreeUtil.getStubChildOfType(luaCallExpr, LuaExpr::class.java)//luaCallExpr.expr
-        if (expr == null) {
-            return Ty.UNKNOWN
-        }
+        val expr = luaCallExpr.expr
         // 从 require 'xxx' 中获取返回类型
         if (expr is LuaNameExpr && expr.name == "require") {
             var filePath: String? = null
