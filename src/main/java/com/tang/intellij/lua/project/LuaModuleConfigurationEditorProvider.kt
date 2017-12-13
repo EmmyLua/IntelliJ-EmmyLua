@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.project
 
 import com.intellij.openapi.module.ModuleConfigurationEditor
+import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.roots.ui.configuration.DefaultModuleConfigurationEditorFactory
 import com.intellij.openapi.roots.ui.configuration.ModuleConfigurationEditorProvider
 import com.intellij.openapi.roots.ui.configuration.ModuleConfigurationState
@@ -30,7 +31,8 @@ class LuaModuleConfigurationEditorProvider : ModuleConfigurationEditorProvider {
     override fun createEditors(moduleConfigurationState: ModuleConfigurationState): Array<ModuleConfigurationEditor> {
         val editors = ArrayList<ModuleConfigurationEditor>()
         val module = moduleConfigurationState.rootModel.module
-        if (module.moduleTypeName == LuaModuleType.MODULE_TYPE) {
+        val moduleType = ModuleType.get(module)
+        if (moduleType == LuaModuleType.instance) {
             val factory = DefaultModuleConfigurationEditorFactory.getInstance()
             editors.add(factory.createModuleContentRootsEditor(moduleConfigurationState))
             editors.add(factory.createClasspathEditor(moduleConfigurationState))
