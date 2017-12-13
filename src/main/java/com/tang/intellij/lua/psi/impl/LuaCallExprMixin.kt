@@ -44,9 +44,8 @@ open class LuaCallExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
         if (expr is LuaNameExpr && expr.name == "require") {
             var filePath: String? = null
             val string = luaCallExpr.firstStringArg
-            if (string != null) {
-                filePath = string.text
-                filePath = filePath!!.substring(1, filePath.length - 1)
+            if (string is LuaLiteralExpr) {
+                filePath = string.stringValue
             }
             var file: LuaPsiFile? = null
             if (filePath != null)

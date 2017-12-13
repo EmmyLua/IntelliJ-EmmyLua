@@ -177,6 +177,9 @@ val LuaLiteralExpr.kind: LuaLiteralKind get() {
 }
 
 val LuaLiteralExpr.stringValue: String get() {
+    val stub = stub
+    if (stub != null)
+        return stub.string ?: ""
     val content = LuaString.getContent(text)
     return content.value
 }

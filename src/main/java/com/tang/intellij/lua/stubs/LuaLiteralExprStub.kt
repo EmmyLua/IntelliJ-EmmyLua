@@ -25,24 +25,33 @@ import com.tang.intellij.lua.psi.LuaLiteralExpr
 import com.tang.intellij.lua.psi.LuaLiteralKind
 import com.tang.intellij.lua.psi.impl.LuaLiteralExprImpl
 import com.tang.intellij.lua.psi.kind
+import com.tang.intellij.lua.psi.stringValue
 
 class LuaLiteralElementType
     : LuaStubElementType<LuaLiteralExprStub, LuaLiteralExpr>("LITERAL_EXPR") {
-    override fun serialize(stub: LuaLiteralExprStub, stream: StubOutputStream) {
-        stream.writeByte(stub.kind.ordinal)
-    }
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
         return createStubIfParentIsStub(node)
     }
 
     override fun createStub(expr: LuaLiteralExpr, parentStub: StubElement<*>?): LuaLiteralExprStub {
-        return LuaLiteralExprStub(expr.kind, parentStub, this)
+        val str = if (expr.kind == LuaLiteralKind.String) expr.stringValue else null
+        return LuaLiteralExprStub(expr.kind, str, parentStub, this)
+    }
+
+    override fun serialize(stub: LuaLiteralExprStub, stream: StubOutputStream) {
+        stream.writeByte(stub.kind.ordinal)
+        val str = stub.string
+        stream.writeBoolean(str != null)
+        if (str != null)
+            stream.writeUTF(str)
     }
 
     override fun deserialize(stream: StubInputStream, parentStub: StubElement<*>?): LuaLiteralExprStub {
         val kind = stream.readByte()
-        return LuaLiteralExprStub(LuaLiteralKind.toEnum(kind), parentStub, this)
+        val hasStr = stream.readBoolean()
+        val str = if (hasStr) stream.readUTF() else null
+        return LuaLiteralExprStub(LuaLiteralKind.toEnum(kind), str, parentStub, this)
     }
 
     override fun indexStub(stub: LuaLiteralExprStub, sink: IndexSink) {
@@ -54,5 +63,9 @@ class LuaLiteralElementType
     }
 }
 
-class LuaLiteralExprStub(val kind: LuaLiteralKind, parent: StubElement<*>?, type: LuaStubElementType<*, *>)
-    : LuaExprStubImpl<LuaLiteralExpr>(parent, type)
+class LuaLiteralExprStub(
+        val kind: LuaLiteralKind,
+        val string: String?,
+        parent: StubElement<*>?,
+        type: LuaStubElementType<*, *>
+) : LuaExprStubImpl<LuaLiteralExpr>(parent, type)

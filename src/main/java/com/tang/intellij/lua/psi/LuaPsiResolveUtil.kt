@@ -186,8 +186,8 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
 }
 
 fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
-    val id = indexExpr.id ?: return null
-    return resolve(indexExpr, id.text, context)
+    val name = indexExpr.name ?: return null
+    return resolve(indexExpr, name, context)
 }
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
