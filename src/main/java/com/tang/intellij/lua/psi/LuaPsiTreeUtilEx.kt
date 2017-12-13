@@ -67,12 +67,16 @@ object LuaPsiTreeUtilEx {
                 do {
                     val scope = cur.parentStub
                     scope.walkUp(cur, Processor { next ->
-                        when (next.psi) {
+                        val element = next.psi
+                        when (element) {
                             is LuaLocalDef -> {
                                 findStubOfType(next, LuaNameDef::class.java) {
                                     continueSearch = !processor.process(it)
                                     continueSearch
                                 }
+                            }
+                            is LuaParamNameDef -> {
+                                continueSearch = !processor.process(element)
                             }
                             else -> { }
                         }

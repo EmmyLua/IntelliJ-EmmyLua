@@ -251,14 +251,12 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
 private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
     val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
     if (owner != null) {
-        val paramName = paramNameDef.text
-        val comment = owner.comment
-        if (comment != null) {
-            val paramDef = comment.getParamDef(paramName)
-            if (paramDef != null) {
-                return paramDef.type
-            }
-        }
+        val stub = paramNameDef.stub
+        val paramName = paramNameDef.name
+
+        val docTy = if (stub != null) stub.docTy else owner.comment?.getParamDef(paramName)?.type
+        if (docTy != null)
+            return docTy
 
         // 如果是个类方法，则有可能在父类里
         if (owner is LuaClassMethodDef) {
