@@ -133,7 +133,7 @@ public class LuaPsiTreeUtil {
             } else if (nameExprElementProcessor != null && curr instanceof LuaAssignStat) {
                 LuaAssignStat stat = (LuaAssignStat) curr;
                 for (LuaExpr expr : stat.getVarExprList().getExprList()) {
-                    if (expr instanceof LuaNameExpr) {
+                    if (expr != element && expr instanceof LuaNameExpr) {
                         LuaNameExpr nameExpr = (LuaNameExpr) expr;
                         if (nameExprElementProcessor.accept(nameExpr)) {
                             break;
