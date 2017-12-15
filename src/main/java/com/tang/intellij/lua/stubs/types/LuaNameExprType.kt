@@ -50,7 +50,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
         val psiFile = luaNameExpr.containingFile
         val name = luaNameExpr.name
         val module = if (psiFile is LuaPsiFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
-        val isGlobal = resolveLocal(luaNameExpr, SearchContext(luaNameExpr.project)) == null
+        val isGlobal = resolveLocal(luaNameExpr, SearchContext(luaNameExpr.project, psiFile)) == null
 
         val stat = luaNameExpr.assignStat
         val docTy = stat?.comment?.ty
