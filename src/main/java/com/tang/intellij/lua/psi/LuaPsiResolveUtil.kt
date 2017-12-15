@@ -61,17 +61,24 @@ fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? = resol
 
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
+    var lastNameExpr: LuaNameExpr? = null
 
-    //local/param
-    LuaPsiTreeUtil.walkUpLocalNameDef(ref) { nameDef ->
+    LuaPsiTreeUtil.walkUpName(ref, { nameDef ->
         if (refName == nameDef.name) {
             ret = nameDef
-            return@walkUpLocalNameDef false
+            return@walkUpName false
         }
         true
-    }
+    }, {
+        if (refName == it.name)
+            lastNameExpr = it
+        true
+    })
 
-    if (refName == Constants.WORD_SELF) {
+    if (ret == null)
+        ret = lastNameExpr
+
+    if (ret == null && refName == Constants.WORD_SELF) {
         val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
         if (block != null) {
             val methodDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)

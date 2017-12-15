@@ -104,7 +104,11 @@ public class LuaPsiTreeUtil {
      * @param processor 处理器
      */
     public static void walkUpLocalNameDef(PsiElement element, ElementProcessor<LuaNameDef> processor) {
-        if (element == null || processor == null)
+        walkUpName(element, processor, null);
+    }
+
+    public static void walkUpName(PsiElement element, @NotNull ElementProcessor<LuaNameDef> processor, @Nullable ElementProcessor<LuaNameExpr> nameExprElementProcessor) {
+        if (element == null)
             return;
         boolean continueSearch = true;
 
@@ -125,6 +129,16 @@ public class LuaPsiTreeUtil {
                 if (!localDef.getNode().getTextRange().contains(element.getNode().getTextRange())) {
                     LuaNameList nameList = localDef.getNameList();
                     continueSearch = resolveInNameList(nameList, processor);
+                }
+            } else if (nameExprElementProcessor != null && curr instanceof LuaAssignStat) {
+                LuaAssignStat stat = (LuaAssignStat) curr;
+                for (LuaExpr expr : stat.getVarExprList().getExprList()) {
+                    if (expr instanceof LuaNameExpr) {
+                        LuaNameExpr nameExpr = (LuaNameExpr) expr;
+                        if (nameExprElementProcessor.accept(nameExpr)) {
+                            break;
+                        }
+                    }
                 }
             } else if (isParent) {
                 if (curr instanceof LuaFuncBody) {
