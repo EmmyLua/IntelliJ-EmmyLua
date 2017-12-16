@@ -32,13 +32,13 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
     var ret:LuaFuncBodyOwner? = null
     val refName = ref.name
     //local 函数名
-    LuaPsiTreeUtil.walkUpLocalFuncDef(ref) { localFuncDef ->
+    LuaPsiTreeUtilEx.walkUpLocalFuncDef(ref, Processor { localFuncDef ->
         if (refName == localFuncDef.name) {
             ret = localFuncDef
-            return@walkUpLocalFuncDef false
+            return@Processor false
         }
         true
-    }
+    })
 
     //global function
     if (ret == null) {
@@ -69,7 +69,7 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
         true
     })
 
-    if (refName == Constants.WORD_SELF) {
+    if (ret == null && refName == Constants.WORD_SELF) {
         val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(ref, LuaClassMethodDef::class.java)
         if (methodDef != null && !methodDef.isStatic) {
             val methodName = methodDef.classMethodName
