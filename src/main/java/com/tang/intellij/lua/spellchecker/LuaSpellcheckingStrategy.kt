@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.editor
+package com.tang.intellij.lua.spellchecker
 
 import com.intellij.psi.PsiElement
 import com.intellij.spellchecker.inspections.PlainTextSplitter
