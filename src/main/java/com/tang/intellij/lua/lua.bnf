@@ -436,9 +436,11 @@ private funcCallExpr ::= primaryExpr <<checkType 'CALL_EXPR'>>
 
 closureExpr ::= 'function' funcBody {
     pin = 2
-    implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+    implements = [
+        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaClosureExprStub>"
+    ]
     methods = [getParamNameDefList guessReturnType getParams]
-    stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'
     mixin = 'com.tang.intellij.lua.psi.impl.LuaClosureExprMixin'
 }
 
@@ -465,7 +467,6 @@ tableExpr ::= '{' fieldList '}' {
         "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaTableExprStub>"
     ]
     mixin = "com.tang.intellij.lua.psi.impl.LuaTableExprMixin"
-    //stubClass = "com.tang.intellij.lua.stubs.LuaExprStub"
 }
 
 private fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?

@@ -9,6 +9,7 @@ import com.tang.intellij.lua.stubs.LuaNameExprStub;
 import com.tang.intellij.lua.stubs.LuaTableExprStub;
 import com.tang.intellij.lua.stubs.LuaLiteralExprStub;
 import com.tang.intellij.lua.stubs.LuaIndexExprStub;
+import com.tang.intellij.lua.stubs.LuaClosureExprStub;
 
 public class LuaVisitor extends PsiElementVisitor {
 
@@ -58,6 +59,7 @@ public class LuaVisitor extends PsiElementVisitor {
   public void visitClosureExpr(@NotNull LuaClosureExpr o) {
     visitExpr(o);
     // visitFuncBodyOwner(o);
+    // visitExprStubElement(o);
   }
 
   public void visitDoStat(@NotNull LuaDoStat o) {

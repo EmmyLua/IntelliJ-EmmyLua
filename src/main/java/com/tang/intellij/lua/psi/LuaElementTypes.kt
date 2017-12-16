@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi
 
 import com.tang.intellij.lua.psi.impl.*
+import com.tang.intellij.lua.stubs.LuaClosureExprType
 import com.tang.intellij.lua.stubs.LuaExprPlaceStub
 import com.tang.intellij.lua.stubs.LuaLocalFuncDefElementType
 import com.tang.intellij.lua.stubs.LuaPlaceholderStub
@@ -34,7 +35,7 @@ object LuaElementTypes {
     val FUNC_BODY = LuaPlaceholderStub.Type("FUNC_BODY", ::LuaFuncBodyImpl)
     val CLASS_METHOD_NAME = LuaPlaceholderStub.Type("CLASS_METHOD_NAME", ::LuaClassMethodNameImpl)
 
-    val CLOSURE_EXPR = LuaExprPlaceStub.Type("CLOSURE_EXPR", ::LuaClosureExprImpl)
+    val CLOSURE_EXPR = LuaClosureExprType()
     val PAREN_EXPR = LuaExprPlaceStub.Type("PAREN_EXPR", ::LuaParenExprImpl)
     val CALL_EXPR = LuaExprPlaceStub.Type("CALL_EXPR", ::LuaCallExprImpl)
     val UNARY_EXPR = LuaExprPlaceStub.Type("UNARY_EXPR", ::LuaUnaryExprImpl)
