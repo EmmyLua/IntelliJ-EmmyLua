@@ -18,7 +18,6 @@ package com.tang.intellij.lua.stubs
 
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBuilder
 import com.intellij.psi.stubs.*
@@ -28,7 +27,6 @@ import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 
 /**
@@ -61,7 +59,7 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
         return object : DefaultStubBuilder() {
             override fun createStubForFile(file: PsiFile): StubElement<*> {
                 if (file is LuaPsiFile)
-                    return LuaFileStub(file)
+                    return LuaFileStub(file, file.moduleName)
                 return super.createStubForFile(file)
             }
         }
@@ -69,8 +67,6 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
 
     override fun serialize(stub: LuaFileStub, dataStream: StubOutputStream) {
         dataStream.writeName(stub.module)
-        val returnedType = stub.getReturnedType(SearchContext(stub.project))
-        Ty.serialize(returnedType, dataStream)
         if (LOG.isTraceEnabled) {
             println("--------- START: ${stub.psi.name}")
             println(stub.printTree())
@@ -80,27 +76,21 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaFileStub {
         val moduleRef = dataStream.readName()
-        val type = Ty.deserialize(dataStream)
-        return LuaFileStub(null, StringRef.toString(moduleRef), type)
+        return LuaFileStub(null, StringRef.toString(moduleRef))
     }
 
     override fun getExternalId() = "lua.file"
 }
 
 class LuaFileStub : PsiFileStubImpl<LuaPsiFile> {
-    private var retTypeRef: Ref<ITy>? = null
     private var file: LuaPsiFile? = null
     private var moduleName:String? = null
 
-    constructor(file: LuaPsiFile) : super(file) {
-        this.file = file
-        moduleName = file.findModuleName()
-    }
+    constructor(file: LuaPsiFile) : this(file, null)
 
-    constructor(file: LuaPsiFile?, module:String?, type: ITy) : super(file) {
+    constructor(file: LuaPsiFile?, module:String?) : super(file) {
         this.file = file
         moduleName = module
-        retTypeRef = Ref.create(type)
     }
 
     val module: String? get() {
@@ -108,12 +98,4 @@ class LuaFileStub : PsiFileStubImpl<LuaPsiFile> {
     }
 
     override fun getType(): LuaFileElementType = LuaParserDefinition.FILE
-
-    fun getReturnedType(context: SearchContext): ITy {
-        if (retTypeRef == null && file != null) {
-            val returnedType = file!!.guessReturnedType(context)
-            retTypeRef = Ref.create(returnedType)
-        }
-        return retTypeRef?.get() ?: Ty.UNKNOWN
-    }
 }

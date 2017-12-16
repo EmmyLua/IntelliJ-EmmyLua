@@ -37,7 +37,7 @@ import com.tang.intellij.lua.ty.TyLazyClass
  * Created by TangZhiXu on 2015/11/15.
  * Email:272669294@qq.com
  */
-class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider, LuaLanguage.INSTANCE) {
+class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider, LuaLanguage.INSTANCE), LuaTypeGuessable {
 
     override fun getFileType(): FileType {
         return LuaFileType.INSTANCE
@@ -55,7 +55,7 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
             return if (stub != null) stub.module else findModuleName()
         }
 
-    fun findModuleName():String? {
+    private fun findModuleName():String? {
         var child: PsiElement? = firstChild
         while (child != null) {
             if (child is LuaComment) { // ---@module name
@@ -86,27 +86,22 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
      * 获取最后返回的类型
      * @return LuaType
      */
-    fun getReturnedType(context: SearchContext): ITy {
-        val greenStub = greenStub
-        return (greenStub as? LuaFileStub)?.getReturnedType(context) ?: guessReturnedType(context)
-    }
-
-    fun guessReturnedType(context: SearchContext): ITy {
+    override fun guessType(context: SearchContext): ITy {
         return recursionGuard(this, Computable {
-            val lastChild = lastChild
-            var returnStat: LuaReturnStat? = null
-            LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) {
-                returnStat = it
-                false
-            }
-            val retTy = guessReturnType(returnStat, 0, context)
-
             val moduleName = this.moduleName
-            val ty:ITy = if (moduleName != null)
-                TyLazyClass(moduleName).union(retTy)
-            else retTy
-
-            ty
+            if (moduleName != null)
+                TyLazyClass(moduleName)
+            else {
+                val stub = this.stub
+                if (stub != null) {
+                    val statStub = stub.childrenStubs.lastOrNull { it.psi is LuaReturnStat }
+                    val stat = statStub?.psi
+                    if (stat is LuaReturnStat)
+                        guessReturnType(stat, 0, context)
+                    else null
+                }
+                else null
+            }
         }) ?: Ty.UNKNOWN
     }
 }

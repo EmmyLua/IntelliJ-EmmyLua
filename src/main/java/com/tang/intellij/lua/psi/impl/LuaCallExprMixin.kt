@@ -20,6 +20,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.intellij.util.Processor
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -41,7 +42,7 @@ open class LuaCallExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
         // xxx()
         val expr = luaCallExpr.expr
         // 从 require 'xxx' 中获取返回类型
-        if (expr is LuaNameExpr && expr.name == "require") {
+        if (expr is LuaNameExpr && expr.name == Constants.WORD_REQUIRE) {
             var filePath: String? = null
             val string = luaCallExpr.firstStringArg
             if (string is LuaLiteralExpr) {
@@ -51,7 +52,7 @@ open class LuaCallExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
             if (filePath != null)
                 file = resolveRequireFile(filePath, luaCallExpr.project)
             if (file != null)
-                return file.getReturnedType(context)
+                return file.guessType(context)
 
             return Ty.UNKNOWN
         }
