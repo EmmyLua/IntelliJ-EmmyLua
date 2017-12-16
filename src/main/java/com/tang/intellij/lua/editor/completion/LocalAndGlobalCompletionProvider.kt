@@ -56,7 +56,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         }
         when (psi) {
             is LuaFuncBodyOwner -> {
-                addTy(psi.asTy(SearchContext(psi.project)))
+                addTy(psi.guessType(SearchContext(psi.project)))
             }
             is LuaTypeGuessable -> {
                 val type = psi.guessTypeFromCache(SearchContext(psi.project))

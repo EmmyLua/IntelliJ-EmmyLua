@@ -155,7 +155,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                             handlerProcessor: HandlerProcessor?) {
         val methodName = classMethod.name
         if (methodName != null) {
-            val ty = classMethod.asTy(SearchContext(classMethod.project))
+            val ty = classMethod.guessType(SearchContext(classMethod.project))
             ty.process(Processor {
                 val lookupString = handlerProcessor?.processLookupString(methodName) ?: methodName
                 val le = TyFunctionLookupElement(lookupString, classMethod, it, bold, ty, classMethod.visibility.warpIcon(LuaIcons.CLASS_METHOD))

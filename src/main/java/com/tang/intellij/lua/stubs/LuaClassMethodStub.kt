@@ -22,6 +22,7 @@ import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITyFunction
 
@@ -44,6 +45,7 @@ class LuaClassMethodStubImpl(override val name: String,
                              override val visibility: Visibility,
                              override val returnDocTy: ITy?,
                              override val params: Array<LuaParamInfo>,
+                             override val overloads: Array<IFunSignature>,
                              parent: StubElement<*>)
     : StubBase<LuaClassMethodDef>(parent, LuaElementType.CLASS_METHOD_DEF), LuaClassMethodStub {
     override val docTy: ITy? = null

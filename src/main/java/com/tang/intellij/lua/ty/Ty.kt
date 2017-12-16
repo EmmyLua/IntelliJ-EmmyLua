@@ -22,6 +22,8 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.readSignatures
+import com.tang.intellij.lua.stubs.writeSignatures
 
 enum class TyKind {
     Unknown,
@@ -157,10 +159,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 is ITyFunction -> {
                     FunSignature.serialize(ty.mainSignature, stream)
-                    stream.writeByte(ty.signatures.size)
-                    for (sig in ty.signatures) {
-                        FunSignature.serialize(sig, stream)
-                    }
+                    stream.writeSignatures(ty.signatures)
                 }
                 is ITyClass -> {
                     stream.writeName(ty.className)
@@ -192,12 +191,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 TyKind.Function -> {
                     val mainSig = FunSignature.deserialize(stream)
-                    val size = stream.readByte()
-                    val arr = mutableListOf<IFunSignature>()
-                    for (i in 0 until size) {
-                        arr.add(FunSignature.deserialize(stream))
-                    }
-                    TySerializedFunction(mainSig, arr.toTypedArray(), flags)
+                    val arr = stream.readSignatures()
+                    TySerializedFunction(mainSig, arr, flags)
                 }
                 TyKind.Class -> {
                     val className = stream.readName()

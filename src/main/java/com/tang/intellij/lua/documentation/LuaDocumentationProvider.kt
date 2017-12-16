@@ -80,7 +80,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
             is LuaLocalFuncDef -> {
                 sb.wrapTag("pre") {
                     sb.append("local function ${element.name}")
-                    renderSignature(sb, element.asTy(SearchContext(element.project)).mainSignature)
+                    renderSignature(sb, element.guessType(SearchContext(element.project)).mainSignature)
                 }
                 renderComment(sb, element.comment)
             }

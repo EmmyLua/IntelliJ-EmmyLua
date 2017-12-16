@@ -14,6 +14,7 @@ import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaReturnStat
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 
@@ -24,6 +25,7 @@ import com.tang.intellij.lua.ty.Ty
 interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
     val returnDocTy:ITy?
     val params: Array<LuaParamInfo>
+    val overloads: Array<IFunSignature>
 
     private fun walkStub(stub: StubElement<*>, context: SearchContext): ITy? {
         val psi = stub.psi

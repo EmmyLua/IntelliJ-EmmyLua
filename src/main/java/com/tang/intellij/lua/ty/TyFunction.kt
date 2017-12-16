@@ -22,9 +22,10 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.psi.readParamInfoArray
-import com.tang.intellij.lua.psi.writeParamInfoArray
+import com.tang.intellij.lua.psi.overloads
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.readParamInfoArray
+import com.tang.intellij.lua.stubs.writeParamInfoArray
 
 interface IFunSignature {
     val selfCall: Boolean
@@ -196,19 +197,7 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
     }
 
     override val signatures: Array<IFunSignature> by lazy {
-        val list = mutableListOf<IFunSignature>()
-        if (psi is LuaCommentOwner) {
-            val comment = psi.comment
-            if (comment != null) {
-                val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocOverloadDef::class.java)
-                children.forEach {
-                    val fty = it.functionTy
-                    if (fty != null)
-                        list.add(FunSignature.create(selfCall, fty))
-                }
-            }
-        }
-        list.toTypedArray()
+        psi.overloads
     }
 }
 

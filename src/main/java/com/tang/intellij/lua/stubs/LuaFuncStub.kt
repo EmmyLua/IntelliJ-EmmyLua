@@ -22,6 +22,7 @@ import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaFuncDef
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
 
 /**
@@ -37,5 +38,6 @@ class LuaFuncStubImpl(override val name: String,
                       override val module: String,
                       override val returnDocTy: ITy?,
                       override val params: Array<LuaParamInfo>,
+                      override val overloads: Array<IFunSignature>,
                       parent: StubElement<*>)
     : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub

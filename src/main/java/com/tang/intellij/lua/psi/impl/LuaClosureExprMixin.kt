@@ -20,9 +20,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.LuaClosureExpr
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaExprPlaceStub
-import com.tang.intellij.lua.ty.ITy
 
 abstract class LuaClosureExprMixin : LuaExprStubMixin<LuaExprPlaceStub>, LuaClosureExpr {
 
@@ -33,8 +31,4 @@ abstract class LuaClosureExprMixin : LuaExprStubMixin<LuaExprPlaceStub>, LuaClos
 
     constructor(stub: LuaExprPlaceStub, nodeType: IElementType, node: ASTNode)
             : super(stub, nodeType, node)
-
-    override fun guessType(context: SearchContext): ITy {
-        return asTy(context)
-    }
 }

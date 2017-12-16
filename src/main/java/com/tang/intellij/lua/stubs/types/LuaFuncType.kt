@@ -23,8 +23,11 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaFuncDef
+import com.tang.intellij.lua.psi.LuaPsiFile
+import com.tang.intellij.lua.psi.forwardDeclaration
 import com.tang.intellij.lua.psi.impl.LuaFuncDefImpl
+import com.tang.intellij.lua.psi.overloads
 import com.tang.intellij.lua.stubs.*
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
@@ -47,8 +50,14 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         if (file is LuaPsiFile) moduleName = file.moduleName ?: Constants.WORD_G
         val retDocTy = funcDef.comment?.returnDef?.resolveTypeAt(0)
         val params = funcDef.params
+        val overloads = funcDef.overloads
 
-        return LuaFuncStubImpl(nameRef.text, moduleName, retDocTy, params, stubElement)
+        return LuaFuncStubImpl(nameRef.text,
+                moduleName,
+                retDocTy,
+                params,
+                overloads,
+                stubElement)
     }
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
@@ -59,11 +68,12 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         return false
     }
 
-    override fun serialize(luaGlobalFuncStub: LuaFuncStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeName(luaGlobalFuncStub.name)
-        stubOutputStream.writeName(luaGlobalFuncStub.module)
-        stubOutputStream.writeTyNullable(luaGlobalFuncStub.returnDocTy)
-        stubOutputStream.writeParamInfoArray(luaGlobalFuncStub.params)
+    override fun serialize(stub: LuaFuncStub, stubOutputStream: StubOutputStream) {
+        stubOutputStream.writeName(stub.name)
+        stubOutputStream.writeName(stub.module)
+        stubOutputStream.writeTyNullable(stub.returnDocTy)
+        stubOutputStream.writeParamInfoArray(stub.params)
+        stubOutputStream.writeSignatures(stub.overloads)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaFuncStub {
@@ -71,10 +81,12 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         val module = stubInputStream.readName()
         val retDocTy = stubInputStream.readTyNullable()
         val params = stubInputStream.readParamInfoArray()
+        val overloads = stubInputStream.readSignatures()
         return LuaFuncStubImpl(StringRef.toString(name),
                 StringRef.toString(module),
                 retDocTy,
                 params,
+                overloads,
                 stubElement)
     }
 

@@ -22,8 +22,11 @@ import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaClassMethodDef
+import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.psi.guessTypeFromCache
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
+import com.tang.intellij.lua.psi.overloads
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.*
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -55,6 +58,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val visibility = methodDef.visibility
         val retDocTy = methodDef.comment?.returnDef?.resolveTypeAt(0)
         val params = methodDef.params
+        val overloads = methodDef.overloads
 
         return LuaClassMethodStubImpl(id.text,
                 clazzName,
@@ -62,6 +66,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
                 visibility,
                 retDocTy,
                 params,
+                overloads,
                 stubElement)
     }
 
@@ -81,6 +86,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         stubOutputStream.writeByte(stub.visibility.ordinal)
         stubOutputStream.writeTyNullable(stub.returnDocTy)
         stubOutputStream.writeParamInfoArray(stub.params)
+        stubOutputStream.writeSignatures(stub.overloads)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaClassMethodStub {
@@ -90,12 +96,14 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val visibility = stubInputStream.readByte()
         val retDocTy = stubInputStream.readTyNullable()
         val params = stubInputStream.readParamInfoArray()
+        val overloads = stubInputStream.readSignatures()
         return LuaClassMethodStubImpl(StringRef.toString(shortName),
                 StringRef.toString(className),
                 isStatic,
                 Visibility.get(visibility.toInt()),
                 retDocTy,
                 params,
+                overloads,
                 stubElement)
     }
 

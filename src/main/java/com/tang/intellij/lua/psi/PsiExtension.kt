@@ -16,16 +16,17 @@
 
 package com.tang.intellij.lua.psi
 
+import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.getGlobalTypeName
-import com.tang.intellij.lua.ty.getTableTypeName
+import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
+import com.tang.intellij.lua.ty.*
 
 /**
  * 获取所在的位置
@@ -141,11 +142,31 @@ fun LuaLocalDef.getExprFor(nameDef: LuaNameDef): LuaExpr? {
     return exprList.getExprAt(idx)
 }
 
-val LuaParamNameDef.funcBodyOwner: LuaFuncBodyOwner?
-    get() = PsiTreeUtil.getParentOfType(this, LuaFuncBodyOwner::class.java)
-
 val LuaParamNameDef.owner: LuaParametersOwner
     get() = PsiTreeUtil.getParentOfType(this, LuaParametersOwner::class.java)!!
+
+val LuaFuncBodyOwner.overloads: Array<IFunSignature> get() {
+    if (this is StubBasedPsiElementBase<*>) {
+        val stub = this.stub
+        if (stub is LuaFuncBodyOwnerStub<*>) {
+            return stub.overloads
+        }
+    }
+
+    val list = mutableListOf<IFunSignature>()
+    if (this is LuaCommentOwner) {
+        val comment = comment
+        if (comment != null) {
+            val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocOverloadDef::class.java)
+            children.forEach {
+                val fty = it.functionTy
+                if (fty != null)
+                    list.add(FunSignature.create(false, fty))
+            }
+        }
+    }
+    return list.toTypedArray()
+}
 
 enum class LuaLiteralKind {
     String,
