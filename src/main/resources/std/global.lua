@@ -189,7 +189,8 @@ function rawequal(v1, v2) end
 --- Gets the real value of `table[index]`, without invoking any
 --- metamethod. `table` must be a table; `index` may be any value.
 ---@param table table
----@param index number
+---@param index any
+---@return any
 function rawget(table, index) end
 
 ---
@@ -198,7 +199,7 @@ function rawget(table, index) end
 --- and `value` any Lua value.
 --- This function returns `table`.
 ---@param table table
----@param index number
+---@param index any
 ---@param value any
 function rawset(table, index, value) end
 
@@ -337,4 +338,5 @@ function module(name, ...) end
 --- If there is any error loading or running the module, or if it cannot find
 --- any loader for the module, then `require` signals an error.
 ---@param modname string
+---@return any
 function require(modname) end
