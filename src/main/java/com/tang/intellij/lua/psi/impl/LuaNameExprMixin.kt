@@ -18,11 +18,12 @@ package com.tang.intellij.lua.psi.impl
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.RecursionManager
+import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
+import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaNameExprStub
@@ -52,7 +53,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaE
     }
 
     override fun guessType(context: SearchContext): ITy {
-        val set = RecursionManager.doPreventingRecursion(this, true) {
+        val set = recursionGuard(this, Computable {
             var type:ITy = Ty.UNKNOWN
             val nameExpr = this as LuaNameExpr
 
@@ -67,7 +68,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaE
             }
 
             type
-        }
+        })
         return set ?: Ty.UNKNOWN
     }
 

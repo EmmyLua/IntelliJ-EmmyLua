@@ -18,12 +18,13 @@ package com.tang.intellij.lua.psi
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
-import com.intellij.openapi.util.RecursionManager
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.search.SearchContext
@@ -91,7 +92,7 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
     }
 
     fun guessReturnedType(context: SearchContext): ITy {
-        return RecursionManager.doPreventingRecursion(this, true) {
+        return recursionGuard(this, Computable {
             val lastChild = lastChild
             var returnStat: LuaReturnStat? = null
             LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) {
@@ -106,6 +107,6 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
             else retTy
 
             ty
-        } ?: Ty.UNKNOWN
+        }) ?: Ty.UNKNOWN
     }
 }

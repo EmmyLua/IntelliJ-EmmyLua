@@ -21,8 +21,8 @@ package com.tang.intellij.lua.psi
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.search.GlobalSearchScope
@@ -36,6 +36,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
@@ -212,7 +213,7 @@ fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
  * @return LuaFuncBodyOwner
  */
 fun resolveFuncBodyOwner(callExpr: LuaCallExpr, context: SearchContext): LuaFuncBodyOwner? {
-    return RecursionManager.doPreventingRecursion<LuaFuncBodyOwner>(callExpr, true) {
+    return recursionGuard(callExpr, Computable {
         var owner: LuaFuncBodyOwner? = null
         val expr = callExpr.expr
         if (expr is LuaIndexExpr) {
@@ -223,7 +224,7 @@ fun resolveFuncBodyOwner(callExpr: LuaCallExpr, context: SearchContext): LuaFunc
             owner = resolveFuncBodyOwner(expr, context)
         }
         owner
-    }
+    })
 }
 
 /**
@@ -402,7 +403,7 @@ private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchC
     }
 
     //infer from return stat
-    return RecursionManager.doPreventingRecursion(owner, true, {
+    return recursionGuard(owner, Computable {
         var type: ITy = Ty.UNKNOWN
         owner.acceptChildren(object : LuaRecursiveVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {

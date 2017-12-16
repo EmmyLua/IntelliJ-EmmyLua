@@ -17,13 +17,14 @@
 package com.tang.intellij.lua.psi.impl
 
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.RecursionManager
+import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaIndexExprStub
@@ -47,7 +48,7 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
     }
 
     override fun guessType(context: SearchContext): ITy {
-        val retTy = RecursionManager.doPreventingRecursion(this, true) {
+        val retTy = recursionGuard(this, Computable {
             val indexExpr = this as LuaIndexExpr
             // xxx[yyy] as an array element?
             if (indexExpr.brack) {
@@ -56,18 +57,18 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
                 // Type[]
                 val array = TyUnion.find(tySet, ITyArray::class.java)
                 if (array != null)
-                    return@doPreventingRecursion array.base
+                    return@Computable array.base
 
                 // table<number, Type>
                 val table = TyUnion.find(tySet, ITyGeneric::class.java)
                 if (table != null)
-                    return@doPreventingRecursion table.getParamTy(1)
+                    return@Computable table.getParamTy(1)
             }
 
             //from @type annotation
             val docTy = indexExpr.docTy
             if (docTy != null)
-                return@doPreventingRecursion docTy
+                return@Computable docTy
 
             // xxx.yyy = zzz
             //from value
@@ -86,7 +87,7 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
                 }
             }
             result
-        }
+        })
 
         return retTy ?: Ty.UNKNOWN
     }

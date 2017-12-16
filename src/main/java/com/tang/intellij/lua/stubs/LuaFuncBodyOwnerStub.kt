@@ -8,8 +8,9 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.openapi.util.RecursionManager
+import com.intellij.openapi.util.Computable
 import com.intellij.psi.stubs.StubElement
+import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.LuaClosureExpr
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
@@ -30,7 +31,7 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
 
     private fun walkStub(stub: StubElement<*>, context: SearchContext): ITy? {
         val psi = stub.psi
-        return RecursionManager.doPreventingRecursion(stub, true) {
+        return recursionGuard(stub, Computable {
             val ty = when (psi) {
                 is LuaFuncBodyOwner,
                 is LuaClosureExpr -> { null }
@@ -48,7 +49,7 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
                 }
             }
             ty
-        }
+        })
     }
 
     fun guessReturnTy(context: SearchContext): ITy {
