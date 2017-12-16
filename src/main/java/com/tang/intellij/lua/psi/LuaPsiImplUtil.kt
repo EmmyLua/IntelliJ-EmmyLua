@@ -390,8 +390,6 @@ fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy 
     return guessReturnTypeInner(owner, searchContext)
 }
 
-private val FUNCTION_RETURN_TYPESET = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.function.return_typeset")
-
 private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
     if (owner is LuaCommentOwner) {
         val comment = LuaCommentUtil.findComment(owner)
@@ -404,11 +402,11 @@ private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchC
     }
 
     //infer from return stat
-    return CachedValuesManager.getManager(owner.project).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, { ctx ->
+    return RecursionManager.doPreventingRecursion(owner, true, {
         var type: ITy = Ty.UNKNOWN
-        owner.acceptChildren(object : LuaVisitor() {
+        owner.acceptChildren(object : LuaRecursiveVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
-                val guessReturnType = guessReturnType(o, ctx.index, ctx)
+                val guessReturnType = guessReturnType(o, searchContext.index, searchContext)
                 TyUnion.each(guessReturnType) {
                     /**
                      * 注意，不能排除anonymous
@@ -426,20 +424,13 @@ private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchC
                 }
             }
 
-            override fun visitFuncBodyOwner(o: LuaFuncBodyOwner) {
-                // ignore sub function
-            }
+            override fun visitFuncBodyOwner(o: LuaFuncBodyOwner) { }
 
-            override fun visitClosureExpr(o: LuaClosureExpr) {
-
-            }
-
-            override fun visitPsiElement(o: LuaPsiElement) {
-                o.acceptChildren(this)
-            }
+            override fun visitClosureExpr(o: LuaClosureExpr) { }
         })
         CachedValueProvider.Result.create(type, owner)
-    }, false, searchContext)
+        type
+    }) ?: Ty.UNKNOWN
 }
 
 fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {

@@ -8,6 +8,7 @@
 
 package com.tang.intellij.lua.stubs
 
+import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.psi.LuaClosureExpr
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
@@ -29,18 +30,24 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
 
     private fun walkStub(stub: StubElement<*>, context: SearchContext): ITy? {
         val psi = stub.psi
-        return when (psi) {
-            is LuaFuncBodyOwner,
-            is LuaClosureExpr -> { null }
-            is LuaReturnStat -> {
-                return psi.exprList?.guessTypeAt(context)
+        return RecursionManager.doPreventingRecursion(stub, true) {
+            val ty = when (psi) {
+                is LuaFuncBodyOwner,
+                is LuaClosureExpr -> { null }
+                is LuaReturnStat -> {
+                    psi.exprList?.guessTypeAt(context)
+                }
+                else -> {
+                    var ret: ITy? = null
+                    for (childrenStub in stub.childrenStubs) {
+                        ret = walkStub(childrenStub, context)
+                        if (ret != null)
+                            break
+                    }
+                    ret
+                }
             }
-            else -> {
-                stub.childrenStubs
-                        .mapNotNull { walkStub(it, context) }
-                        .forEach { return it }
-                null
-            }
+            ty
         }
     }
 
