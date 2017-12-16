@@ -27,6 +27,7 @@ public class Constants {
     public static final String WORD_PAIRS = "pairs";
     public static final String WORD_IPAIRS = "ipairs";
     public static final String WORD_ANY = "any";
+    public static final String WORD_VOID = "void";
     public static final String WORD_MODULE = "module";
     public static final String WORD_NIL = "nil";
     public static final String WORD_STRING = "string";

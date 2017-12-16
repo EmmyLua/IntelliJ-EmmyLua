@@ -144,16 +144,7 @@ abstract class TyClass(override val className: String,
     override fun getSuperClass(context: SearchContext): ITy? {
         val clsName = superClassName
         if (clsName != null) {
-            return when (clsName){
-                Constants.WORD_NIL -> Ty.NIL
-                Constants.WORD_ANY -> Ty.UNKNOWN
-                Constants.WORD_BOOLEAN -> Ty.BOOLEAN
-                Constants.WORD_STRING -> Ty.STRING
-                Constants.WORD_NUMBER -> Ty.NUMBER
-                Constants.WORD_TABLE -> Ty.TABLE
-                Constants.WORD_FUNCTION -> Ty.FUNCTION
-                else -> LuaClassIndex.find(clsName, context)?.type
-            }
+            return Ty.getBuiltin(clsName) ?: LuaClassIndex.find(clsName, context)?.type
         }
         return null
     }

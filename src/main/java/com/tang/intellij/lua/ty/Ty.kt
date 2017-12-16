@@ -148,8 +148,22 @@ abstract class Ty(override val kind: TyKind) : ITy {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
         }
 
+        fun getBuiltin(name: String): ITy? {
+            return when (name) {
+                Constants.WORD_NIL -> Ty.NIL
+                Constants.WORD_VOID -> Ty.VOID
+                Constants.WORD_ANY -> Ty.UNKNOWN
+                Constants.WORD_BOOLEAN -> Ty.BOOLEAN
+                Constants.WORD_STRING -> Ty.STRING
+                Constants.WORD_NUMBER -> Ty.NUMBER
+                Constants.WORD_TABLE -> Ty.TABLE
+                Constants.WORD_FUNCTION -> Ty.FUNCTION
+                else -> null
+            }
+        }
+
         fun isInvalid(ty: ITy?): Boolean {
-            return ty == null || ty is TyUnknown || ty is TyNil
+            return ty == null || ty is TyUnknown || ty is TyNil || ty is TyVoid
         }
 
         fun serialize(ty: ITy, stream: StubOutputStream) {
@@ -423,7 +437,7 @@ class TyNil : Ty(TyKind.Nil) {
 
 class TyVoid : Ty(TyKind.Void) {
     override val displayName: String
-        get() = "void"
+        get() = Constants.WORD_VOID
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return false
