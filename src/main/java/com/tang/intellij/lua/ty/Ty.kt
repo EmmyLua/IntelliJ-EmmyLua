@@ -165,6 +165,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 is ITyClass -> {
                     stream.writeName(ty.className)
+                    stream.writeName(ty.varName)
                     stream.writeName(ty.superClassName)
                     stream.writeName(ty.aliasName)
                 }
@@ -198,9 +199,11 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 TyKind.Class -> {
                     val className = stream.readName()
+                    val varName = stream.readName()
                     val superName = stream.readName()
                     val aliasName = stream.readName()
                     TySerializedClass(StringRef.toString(className),
+                            StringRef.toString(varName),
                             StringRef.toString(superName),
                             StringRef.toString(aliasName),
                             flags)

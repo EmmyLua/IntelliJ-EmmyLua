@@ -93,7 +93,7 @@ class LuaDocClassStubImpl(override val className: String,
 
     override val classType: TyClass
         get() {
-            val luaType = TySerializedClass(className, superClassName)
+            val luaType = TySerializedClass(className, className, superClassName)
             luaType.aliasName = aliasName
             return luaType
         }

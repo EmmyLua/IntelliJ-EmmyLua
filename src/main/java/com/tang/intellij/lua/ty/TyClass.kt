@@ -29,6 +29,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
 interface ITyClass : ITy {
     val className: String
+    val varName: String
     var superClassName: String?
     var aliasName: String?
     fun lazyInit(searchContext: SearchContext)
@@ -58,7 +59,10 @@ fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visi
     return isVisible
 }
 
-abstract class TyClass(override val className: String, override var superClassName: String? = null) : Ty(TyKind.Class), ITyClass {
+abstract class TyClass(override val className: String,
+                       override val varName: String = "",
+                       override var superClassName: String? = null
+) : Ty(TyKind.Class), ITyClass {
 
     final override var aliasName: String? = null
 
@@ -116,8 +120,8 @@ abstract class TyClass(override val className: String, override var superClassNa
     }
 
     override val displayName: String get() = when {
-        isAnonymous -> "Anonymous"
-        isGlobal -> "Global"
+        isAnonymous -> "$varName(Local)"
+        isGlobal -> "$varName(Global)"
         else -> className
     }
 
@@ -175,12 +179,12 @@ abstract class TyClass(override val className: String, override var superClassNa
 
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
             val stub = nameDef.stub
-            val tyName = if (stub != null) stub.anonymousType else getAnonymousType(nameDef)
-            return TySerializedClass(tyName, null, null, TyFlags.ANONYMOUS)
+            val tyName = stub?.anonymousType ?: getAnonymousType(nameDef)
+            return TySerializedClass(tyName, nameDef.name, null, null, TyFlags.ANONYMOUS)
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr): TyClass =
-                TySerializedClass(getGlobalTypeName(nameExpr), null, null, TyFlags.GLOBAL)
+                TySerializedClass(getGlobalTypeName(nameExpr), nameExpr.name, null, null, TyFlags.GLOBAL)
     }
 }
 
@@ -197,10 +201,11 @@ class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
 }
 
 open class TySerializedClass(name: String,
+                             varName: String = name,
                              supper: String? = null,
                              alias: String? = null,
                              flags: Int = 0)
-    : TyClass(name, supper) {
+    : TyClass(name, varName, supper) {
     init {
         aliasName = alias
         this.flags = flags
