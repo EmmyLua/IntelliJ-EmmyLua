@@ -23,12 +23,19 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.LuaLocalFuncDef
+import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.impl.LuaLocalFuncDefImpl
+import com.tang.intellij.lua.psi.overloads
+import com.tang.intellij.lua.ty.IFunSignature
+import com.tang.intellij.lua.ty.ITy
 
 class LuaLocalFuncDefElementType
     : LuaStubElementType<LuaLocalFuncDefStub, LuaLocalFuncDef>("LOCAL_FUNC_DEF") {
     override fun serialize(stub: LuaLocalFuncDefStub, stream: StubOutputStream) {
         stream.writeName(stub.name)
+        stream.writeTyNullable(stub.returnDocTy)
+        stream.writeParamInfoArray(stub.params)
+        stream.writeSignatures(stub.overloads)
     }
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
@@ -37,12 +44,28 @@ class LuaLocalFuncDefElementType
     }
 
     override fun createStub(def: LuaLocalFuncDef, parentStub: StubElement<*>?): LuaLocalFuncDefStub {
-        return LuaLocalFuncDefStub(def.name!!, parentStub, this)
+        val retDocTy = def.comment?.returnDef?.resolveTypeAt(0)
+        val params = def.params
+        val overloads = def.overloads
+        return LuaLocalFuncDefStub(def.name!!,
+                retDocTy,
+                params,
+                overloads,
+                parentStub,
+                this)
     }
 
     override fun deserialize(stream: StubInputStream, parentStub: StubElement<*>?): LuaLocalFuncDefStub {
         val name = stream.readName()
-        return LuaLocalFuncDefStub(StringRef.toString(name), parentStub, this)
+        val retDocTy = stream.readTyNullable()
+        val params = stream.readParamInfoArray()
+        val overloads = stream.readSignatures()
+        return LuaLocalFuncDefStub(StringRef.toString(name),
+                retDocTy,
+                params,
+                overloads,
+                parentStub,
+                this)
     }
 
     override fun indexStub(stub: LuaLocalFuncDefStub, sink: IndexSink) {
@@ -56,6 +79,9 @@ class LuaLocalFuncDefElementType
 
 class LuaLocalFuncDefStub(
         val name: String,
+        override val returnDocTy: ITy?,
+        override val params: Array<LuaParamInfo>,
+        override val overloads: Array<IFunSignature>,
         parent: StubElement<*>?,
         type: LuaStubElementType<*, *>
-) : LuaStubBase<LuaLocalFuncDef>(parent, type)
+) : LuaStubBase<LuaLocalFuncDef>(parent, type), LuaFuncBodyOwnerStub<LuaLocalFuncDef>
