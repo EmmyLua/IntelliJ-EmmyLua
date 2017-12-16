@@ -385,7 +385,6 @@ fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy 
         if (stub is LuaFuncBodyOwnerStub<*>) {
             return stub.guessReturnTy(searchContext)
         }
-        return Ty.UNKNOWN
     }
 
     return guessReturnTypeInner(owner, searchContext)
