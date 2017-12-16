@@ -16,15 +16,33 @@
 
 package com.tang.intellij.lua.stubs
 
+import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
+import com.tang.intellij.lua.comment.psi.impl.LuaDocTypeDefImpl
 import com.tang.intellij.lua.psi.LuaElementType
 
-interface LuaDocTypeDefStub : StubElement<LuaDocTypeDef> {
+class LuaDocTypeDefType : LuaStubElementType<LuaDocTypeDefStub, LuaDocTypeDef>("DOC_TY"){
+    override fun indexStub(stub: LuaDocTypeDefStub, sink: IndexSink) {
+    }
 
+    override fun deserialize(inputStream: StubInputStream, stubElement: StubElement<*>?): LuaDocTypeDefStub {
+        return LuaDocTypeDefStubImpl(stubElement)
+    }
+
+    override fun createPsi(stub: LuaDocTypeDefStub) = LuaDocTypeDefImpl(stub, this)
+
+    override fun serialize(stub: LuaDocTypeDefStub, stubElement: StubOutputStream) {
+    }
+
+    override fun createStub(def: LuaDocTypeDef, stubElement: StubElement<*>?): LuaDocTypeDefStub {
+        return LuaDocTypeDefStubImpl(stubElement)
+    }
 }
+
+interface LuaDocTypeDefStub : StubElement<LuaDocTypeDef>
 
 class LuaDocTypeDefStubImpl(parent: StubElement<*>?)
-    : LuaDocStubBase<LuaDocTypeDef>(parent, LuaElementType.TYPE_DEF), LuaDocTypeDefStub {
-
-}
+    : LuaDocStubBase<LuaDocTypeDef>(parent, LuaElementType.TYPE_DEF), LuaDocTypeDefStub

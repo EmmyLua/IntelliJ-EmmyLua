@@ -33,7 +33,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.*
-import com.tang.intellij.lua.stubs.types.LuaFileElementType
+import com.tang.intellij.lua.stubs.LuaFileElementType
 
 /**
  * Created by TangZhiXu on 2015/11/15.
