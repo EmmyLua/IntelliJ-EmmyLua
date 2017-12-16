@@ -79,11 +79,3 @@ class LuaPlaceholderStub(parent: StubElement<*>?, elementType: LuaStubElementTyp
 
 abstract class LuaDocStubBase<T : PsiElement>(parent: StubElement<*>?, type: LuaStubElementType<*, *>)
     : LuaStubBase<T>(parent, type)
-
-fun StubInputStream.readTyNullable(): ITy? {
-    return Ty.deserializeNullable(this)
-}
-
-fun StubOutputStream.writeTyNullable(ty: ITy?) {
-    Ty.serializeNullable(ty, this)
-}

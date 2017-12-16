@@ -21,6 +21,8 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.ty.FunSignature
 import com.tang.intellij.lua.ty.IFunSignature
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 
 fun StubOutputStream.writeParamInfoArray(params: Array<LuaParamInfo>) {
     writeByte(params.size)
@@ -52,4 +54,12 @@ fun StubInputStream.readSignatures(): Array<IFunSignature> {
         arr.add(FunSignature.deserialize(this))
     }
     return arr.toTypedArray()
+}
+
+fun StubInputStream.readTyNullable(): ITy? {
+    return Ty.deserializeNullable(this)
+}
+
+fun StubOutputStream.writeTyNullable(ty: ITy?) {
+    Ty.serializeNullable(ty, this)
 }
