@@ -376,9 +376,21 @@ parenExpr ::= '(' expr ')' {
     stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'
     mixin = "com.tang.intellij.lua.psi.impl.LuaParenExprMixin"
 }
-unaryExpr ::= unaryOp (unaryExpr | primaryExpr) { pin = 1 }
+unaryExpr ::= unaryOp (unaryExpr | primaryExpr) {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaUnaryExprStub>"
+    ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaUnaryExprMixin"
+}
 
-left binaryExpr ::= binaryOp expr { pin = 1 }
+left binaryExpr ::= binaryOp expr {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaBinaryExprStub>"
+    ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaBinaryExprMixin"
+}
 
 left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1

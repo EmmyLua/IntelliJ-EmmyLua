@@ -9,14 +9,14 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
-import com.tang.intellij.lua.stubs.LuaExprStubImpl;
+import com.tang.intellij.lua.stubs.LuaUnaryExprStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.stubs.LuaExprStub;
 
-public class LuaUnaryExprImpl extends LuaExprImpl implements LuaUnaryExpr {
+public class LuaUnaryExprImpl extends LuaUnaryExprMixin implements LuaUnaryExpr {
 
-  public LuaUnaryExprImpl(LuaExprStubImpl<?> stub, IStubElementType<?, ?> nodeType) {
+  public LuaUnaryExprImpl(LuaUnaryExprStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
@@ -24,7 +24,7 @@ public class LuaUnaryExprImpl extends LuaExprImpl implements LuaUnaryExpr {
     super(node);
   }
 
-  public LuaUnaryExprImpl(LuaExprStubImpl<?> stub, IElementType type, ASTNode node) {
+  public LuaUnaryExprImpl(LuaUnaryExprStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 

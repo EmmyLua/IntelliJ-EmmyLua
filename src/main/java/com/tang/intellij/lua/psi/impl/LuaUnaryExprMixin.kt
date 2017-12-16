@@ -19,24 +19,30 @@ package com.tang.intellij.lua.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.tang.intellij.lua.psi.LuaExpr
+import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.LuaUnaryExpr
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.LuaExprStubImpl
+import com.tang.intellij.lua.stubs.LuaUnaryExprStub
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 
-/**
- * 表达式基类
- * Created by TangZX on 2016/12/4.
- */
-abstract class LuaExprMixin : LuaExprStubMixin<LuaExprStubImpl<*>>, LuaExpr {
-
-    constructor(stub: LuaExprStubImpl<*>, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
+abstract class LuaUnaryExprMixin: LuaExprStubMixin<LuaUnaryExprStub>, LuaUnaryExpr {
+    constructor(stub: LuaUnaryExprStub, nodeType: IStubElementType<*, *>)
+            : super(stub, nodeType)
 
     constructor(node: ASTNode) : super(node)
 
-    constructor(stub: LuaExprStubImpl<*>, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
+    constructor(stub: LuaUnaryExprStub, nodeType: IElementType, node: ASTNode)
+            : super(stub, nodeType, node)
 
     override fun guessType(context: SearchContext): ITy {
-        TODO("not implemented")
+        val stub = stub
+        val operator = if (stub != null) stub.opType else unaryOp.node.firstChildNode.elementType
+
+        return when (operator) {
+            LuaTypes.MINUS -> expr?.guessType(context) ?: Ty.UNKNOWN // Negative something
+            LuaTypes.GETN -> Ty.NUMBER // Table length is a number
+            else -> Ty.UNKNOWN
+        }
     }
 }

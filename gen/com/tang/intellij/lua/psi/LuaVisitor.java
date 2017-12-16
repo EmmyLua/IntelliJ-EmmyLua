@@ -6,7 +6,9 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.tang.intellij.lua.stubs.LuaExprStubElement;
 import com.tang.intellij.lua.stubs.LuaNameExprStub;
+import com.tang.intellij.lua.stubs.LuaUnaryExprStub;
 import com.tang.intellij.lua.stubs.LuaTableExprStub;
+import com.tang.intellij.lua.stubs.LuaBinaryExprStub;
 import com.tang.intellij.lua.stubs.LuaLiteralExprStub;
 import com.tang.intellij.lua.stubs.LuaIndexExprStub;
 import com.tang.intellij.lua.stubs.LuaClosureExprStub;
@@ -24,6 +26,7 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitBinaryExpr(@NotNull LuaBinaryExpr o) {
     visitExpr(o);
+    // visitExprStubElement(o);
   }
 
   public void visitBinaryOp(@NotNull LuaBinaryOp o) {
@@ -213,6 +216,7 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitUnaryExpr(@NotNull LuaUnaryExpr o) {
     visitExpr(o);
+    // visitExprStubElement(o);
   }
 
   public void visitUnaryOp(@NotNull LuaUnaryOp o) {
