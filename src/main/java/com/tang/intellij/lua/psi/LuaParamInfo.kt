@@ -63,3 +63,19 @@ class LuaParamInfo {
         }
     }
 }
+
+fun StubOutputStream.writeParamInfoArray(params: Array<LuaParamInfo>) {
+    writeByte(params.size)
+    for (param in params) {
+        LuaParamInfo.serialize(param, this)
+    }
+}
+
+fun StubInputStream.readParamInfoArray(): Array<LuaParamInfo> {
+    val list = mutableListOf<LuaParamInfo>()
+    val size = readByte()
+    for (j in 0 until size) {
+        list.add(LuaParamInfo.deserialize(this))
+    }
+    return list.toTypedArray()
+}

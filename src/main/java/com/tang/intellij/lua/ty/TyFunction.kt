@@ -18,13 +18,12 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
-import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
-import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
+import com.tang.intellij.lua.psi.readParamInfoArray
+import com.tang.intellij.lua.psi.writeParamInfoArray
 import com.tang.intellij.lua.search.SearchContext
 
 interface IFunSignature {
@@ -80,21 +79,14 @@ class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, o
         fun serialize(sig: IFunSignature, stream: StubOutputStream) {
             stream.writeBoolean(sig.selfCall)
             Ty.serialize(sig.returnTy, stream)
-            stream.writeByte(sig.params.size)
-            for (param in sig.params) {
-                LuaParamInfo.serialize(param, stream)
-            }
+            stream.writeParamInfoArray(sig.params)
         }
 
         fun deserialize(stream: StubInputStream): IFunSignature {
             val selfCall = stream.readBoolean()
             val ret = Ty.deserialize(stream)
-            val paramSize = stream.readByte()
-            val params = mutableListOf<LuaParamInfo>()
-            for (j in 0 until paramSize) {
-                params.add(LuaParamInfo.deserialize(stream))
-            }
-            return FunSignature(selfCall, ret, params.toTypedArray())
+            val params = stream.readParamInfoArray()
+            return FunSignature(selfCall, ret, params)
         }
     }
 

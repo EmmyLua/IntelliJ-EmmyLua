@@ -9,13 +9,45 @@
 package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.stubs.StubElement
+import com.tang.intellij.lua.psi.LuaClosureExpr
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
-import com.tang.intellij.lua.ty.ITyFunction
+import com.tang.intellij.lua.psi.LuaParamInfo
+import com.tang.intellij.lua.psi.LuaReturnStat
+import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 
 /**
  * func body owner stub
  * Created by TangZX on 2017/2/4.
  */
 interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
-    val ty: ITyFunction
+    val returnDocTy:ITy?
+    val params: Array<LuaParamInfo>
+
+    private fun walkStub(stub: StubElement<*>, context: SearchContext): ITy? {
+        val psi = stub.psi
+        return when (psi) {
+            is LuaFuncBodyOwner,
+            is LuaClosureExpr -> { null }
+            is LuaReturnStat -> {
+                return psi.exprList?.guessTypeAt(context)
+            }
+            else -> {
+                stub.childrenStubs
+                        .mapNotNull { walkStub(it, context) }
+                        .forEach { return it }
+                null
+            }
+        }
+    }
+
+    fun guessReturnTy(context: SearchContext): ITy {
+        val docTy = returnDocTy
+        if (docTy != null) return docTy
+        childrenStubs
+                .mapNotNull { walkStub(it, context) }
+                .forEach { return it }
+        return Ty.UNKNOWN
+    }
 }

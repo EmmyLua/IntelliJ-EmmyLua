@@ -383,8 +383,9 @@ fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy 
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
-            return stub.ty.mainSignature.returnTy
+            return stub.guessReturnTy(searchContext)
         }
+        return Ty.UNKNOWN
     }
 
     return guessReturnTypeInner(owner, searchContext)
@@ -446,7 +447,7 @@ fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
-            return stub.ty.mainSignature.params
+            return stub.params
         }
     }
     return getParamsInner(owner)
