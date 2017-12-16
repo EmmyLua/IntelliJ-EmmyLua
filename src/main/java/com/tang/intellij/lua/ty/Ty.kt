@@ -245,17 +245,6 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 else -> TyUnknown()
             }
         }
-
-        fun serializeNullable(ty: ITy?, stream: StubOutputStream) {
-            stream.writeBoolean(ty != null)
-            if (ty != null)
-                serialize(ty, stream)
-        }
-
-        fun deserializeNullable(stream: StubInputStream): ITy? {
-            val notNull = stream.readBoolean()
-            return if (notNull) deserialize(stream) else null
-        }
     }
 }
 

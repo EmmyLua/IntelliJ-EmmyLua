@@ -29,7 +29,6 @@ import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.getTableTypeName
 import java.util.*
 
@@ -69,16 +68,15 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
     }
 
     override fun serialize(fieldStub: LuaTableFieldStub, stubOutputStream: StubOutputStream) {
-        Ty.serializeNullable(fieldStub.docTy, stubOutputStream)
-        val fieldName = fieldStub.name
-        stubOutputStream.writeName(fieldName)
+        stubOutputStream.writeTyNullable(fieldStub.docTy)
+        stubOutputStream.writeName(fieldStub.name)
         stubOutputStream.writeName(fieldStub.typeName)
     }
 
-    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaTableFieldStub {
-        val ty = Ty.deserializeNullable(stubInputStream)
-        val fieldName = stubInputStream.readName()
-        val typeName = stubInputStream.readName()
+    override fun deserialize(stream: StubInputStream, stubElement: StubElement<*>): LuaTableFieldStub {
+        val ty = stream.readTyNullable()
+        val fieldName = stream.readName()
+        val typeName = stream.readName()
         return LuaTableFieldStubImpl(ty,
                 StringRef.toString(fieldName),
                 StringRef.toString(typeName),

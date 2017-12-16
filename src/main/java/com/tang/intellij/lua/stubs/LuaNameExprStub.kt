@@ -30,7 +30,6 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
 
 /**
  * name expr stub
@@ -62,20 +61,20 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
                 this)
     }
 
-    override fun serialize(luaNameStub: LuaNameExprStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeName(luaNameStub.name)
-        stubOutputStream.writeName(luaNameStub.module)
-        stubOutputStream.writeBoolean(luaNameStub.isName)
-        stubOutputStream.writeBoolean(luaNameStub.isGlobal)
-        Ty.serializeNullable(luaNameStub.docTy, stubOutputStream)
+    override fun serialize(stub: LuaNameExprStub, stream: StubOutputStream) {
+        stream.writeName(stub.name)
+        stream.writeName(stub.module)
+        stream.writeBoolean(stub.isName)
+        stream.writeBoolean(stub.isGlobal)
+        stream.writeTyNullable(stub.docTy)
     }
 
-    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaNameExprStub {
-        val nameRef = stubInputStream.readName()
-        val moduleRef = stubInputStream.readName()
-        val isName = stubInputStream.readBoolean()
-        val isGlobal = stubInputStream.readBoolean()
-        val docTy = Ty.deserializeNullable(stubInputStream)
+    override fun deserialize(stream: StubInputStream, stubElement: StubElement<*>): LuaNameExprStub {
+        val nameRef = stream.readName()
+        val moduleRef = stream.readName()
+        val isName = stream.readBoolean()
+        val isGlobal = stream.readBoolean()
+        val docTy = stream.readTyNullable()
         return LuaNameExprStubImpl(StringRef.toString(nameRef),
                 StringRef.toString(moduleRef),
                 isGlobal,

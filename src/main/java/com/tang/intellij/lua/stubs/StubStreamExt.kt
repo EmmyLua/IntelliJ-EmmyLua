@@ -57,9 +57,12 @@ fun StubInputStream.readSignatures(): Array<IFunSignature> {
 }
 
 fun StubInputStream.readTyNullable(): ITy? {
-    return Ty.deserializeNullable(this)
+    val notNull = readBoolean()
+    return if (notNull) Ty.deserialize(this) else null
 }
 
 fun StubOutputStream.writeTyNullable(ty: ITy?) {
-    Ty.serializeNullable(ty, this)
+    writeBoolean(ty != null)
+    if (ty != null)
+        Ty.serialize(ty, this)
 }
