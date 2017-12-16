@@ -58,6 +58,6 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
         childrenStubs
                 .mapNotNull { walkStub(it, context) }
                 .forEach { return it }
-        return Ty.UNKNOWN
+        return Ty.VOID
     }
 }

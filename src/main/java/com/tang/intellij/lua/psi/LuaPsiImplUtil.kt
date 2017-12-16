@@ -404,7 +404,7 @@ private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchC
 
     //infer from return stat
     return recursionGuard(owner, Computable {
-        var type: ITy = Ty.UNKNOWN
+        var type: ITy = Ty.VOID
         owner.acceptChildren(object : LuaRecursiveVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
                 val guessReturnType = guessReturnType(o, searchContext.index, searchContext)

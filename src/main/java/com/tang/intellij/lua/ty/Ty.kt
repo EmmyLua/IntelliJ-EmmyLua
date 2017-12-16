@@ -33,7 +33,8 @@ enum class TyKind {
     Class,
     Union,
     Generic,
-    Nil
+    Nil,
+    Void,
 }
 enum class TyPrimitiveKind {
     String,
@@ -124,6 +125,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
     companion object {
 
         val UNKNOWN = TyUnknown()
+        val VOID = TyVoid()
         val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
         val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
         val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
@@ -222,6 +224,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     TySerializedGeneric(params.toTypedArray(), base)
                 }
                 TyKind.Nil -> NIL
+                TyKind.Void -> VOID
                 else -> TyUnknown()
             }
         }
@@ -412,5 +415,14 @@ class TyNil : Ty(TyKind.Nil) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
 
         return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
+    }
+}
+
+class TyVoid : Ty(TyKind.Void) {
+    override val displayName: String
+        get() = "void"
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return false
     }
 }
