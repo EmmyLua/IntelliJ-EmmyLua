@@ -48,6 +48,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
 
         return LuaFuncStubImpl(nameRef.text,
                 moduleName,
+                funcDef.visibility,
                 retDocTy,
                 params,
                 overloads,
@@ -62,22 +63,25 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         return false
     }
 
-    override fun serialize(stub: LuaFuncStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeName(stub.name)
-        stubOutputStream.writeName(stub.module)
-        stubOutputStream.writeTyNullable(stub.returnDocTy)
-        stubOutputStream.writeParamInfoArray(stub.params)
-        stubOutputStream.writeSignatures(stub.overloads)
+    override fun serialize(stub: LuaFuncStub, stream: StubOutputStream) {
+        stream.writeName(stub.name)
+        stream.writeName(stub.module)
+        stream.writeByte(stub.visibility.ordinal)
+        stream.writeTyNullable(stub.returnDocTy)
+        stream.writeParamInfoArray(stub.params)
+        stream.writeSignatures(stub.overloads)
     }
 
-    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaFuncStub {
-        val name = stubInputStream.readName()
-        val module = stubInputStream.readName()
-        val retDocTy = stubInputStream.readTyNullable()
-        val params = stubInputStream.readParamInfoArray()
-        val overloads = stubInputStream.readSignatures()
+    override fun deserialize(stream: StubInputStream, stubElement: StubElement<*>): LuaFuncStub {
+        val name = stream.readName()
+        val module = stream.readName()
+        val visibility = stream.readByte()
+        val retDocTy = stream.readTyNullable()
+        val params = stream.readParamInfoArray()
+        val overloads = stream.readSignatures()
         return LuaFuncStubImpl(StringRef.toString(name),
                 StringRef.toString(module),
+                Visibility.Companion.get(visibility.toInt()),
                 retDocTy,
                 params,
                 overloads,
@@ -94,15 +98,19 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
     }
 }
 
-interface LuaFuncStub : LuaFuncBodyOwnerStub<LuaFuncDef> {
+interface LuaFuncStub : LuaFuncBodyOwnerStub<LuaFuncDef>, LuaClassMemberStub<LuaFuncDef> {
     val name: String
     val module: String
 }
 
 class LuaFuncStubImpl(override val name: String,
                       override val module: String,
+                      override val visibility: Visibility,
                       override val returnDocTy: ITy?,
                       override val params: Array<LuaParamInfo>,
                       override val overloads: Array<IFunSignature>,
                       parent: StubElement<*>)
-    : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub
+    : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub {
+    override val docTy: ITy?
+        get() = null
+}
