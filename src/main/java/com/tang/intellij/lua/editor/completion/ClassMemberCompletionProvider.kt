@@ -17,10 +17,8 @@
 package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.*
-import com.intellij.codeInsight.completion.impl.CamelHumpMatcher
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.project.Project
-import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
@@ -39,14 +37,6 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         abstract fun process(element: LuaLookupElement)
     }
 
-    private class InsertHandlerWrapper(val deleteLen: Int, val name:String, val base: InsertHandler<LookupElement>?) : InsertHandler<LookupElement> {
-        override fun handleInsert(insertionContext: InsertionContext, lookupElement: LookupElement) {
-            base?.handleInsert(insertionContext, lookupElement)
-            val startOffset = insertionContext.startOffset - deleteLen
-            insertionContext.document.replaceString(startOffset, insertionContext.startOffset - 1, name)
-        }
-    }
-
     override fun addCompletions(completionParameters: CompletionParameters,
                                 processingContext: ProcessingContext,
                                 completionResultSet: CompletionResultSet) {
@@ -63,22 +53,24 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                 complete(isColon, project, contextTy, prefixType, completionResultSet, completionResultSet.prefixMatcher, null)
             }
             //smart
-            val nameExpr = PsiTreeUtil.getChildOfType(indexExpr, LuaNameExpr::class.java)
-            if (nameExpr != null) {
+            val nameExpr = indexExpr.prefixExpr
+            if (nameExpr is LuaNameExpr) {
                 val colon = if (isColon) ":" else "."
-                val nameText = nameExpr.text
-                val matcher = CamelHumpMatcher(nameText)
+                val prefixName = nameExpr.text
+                val postfixName = indexExpr.name?.let { it.substring(0, it.indexOf(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)) }
+
+                val matcher = completionResultSet.prefixMatcher.cloneWithPrefix(prefixName)
                 LuaPsiTreeUtil.walkUpLocalNameDef(indexExpr, {
                     val txt = it.text
-                    if (nameText != txt && matcher.prefixMatches(txt)) {
+                    if (prefixName != txt && matcher.prefixMatches(txt)) {
                         val type = it.guessTypeFromCache(searchContext)
                         if (!Ty.isInvalid(prefixType)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
-                            val resultSet = completionResultSet.withPrefixMatcher(prefixMatcher.prefix)
+                            val resultSet = completionResultSet.withPrefixMatcher("$prefixName*$postfixName")
                             complete(isColon, project, contextTy, type, resultSet, prefixMatcher, object : HandlerProcessor() {
                                 override fun process(element: LuaLookupElement) {
                                     element.itemText = txt + colon + element.itemText
-                                    element.handler = InsertHandlerWrapper(nameExpr.textLength + 1, txt, element.handler)
+                                    element.lookupString = txt + colon + element.lookupString
                                 }
                             })
                         }
