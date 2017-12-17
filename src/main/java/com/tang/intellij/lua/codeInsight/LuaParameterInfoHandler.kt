@@ -54,16 +54,18 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
             val type = callExpr.guessParentType(SearchContext(context.project))
-            if (type is ITyFunction) {
-                val list = mutableListOf<IFunSignature>()
-                type.process(Processor {
-                    if (it.params.isNotEmpty()) {
-                        list.add(it)
-                    }
-                    true
-                })
-                context.itemsToShow = list.toTypedArray()
+            val list = mutableListOf<IFunSignature>()
+            TyUnion.each(type) { ty ->
+                if (ty is ITyFunction) {
+                    ty.process(Processor {
+                        if (it.params.isNotEmpty()) {
+                            list.add(it)
+                        }
+                        true
+                    })
+                }
             }
+            context.itemsToShow = list.toTypedArray()
         }
         return luaArgs
     }
