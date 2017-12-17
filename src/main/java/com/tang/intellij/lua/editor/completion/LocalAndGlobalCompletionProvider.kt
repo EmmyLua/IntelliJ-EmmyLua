@@ -60,19 +60,22 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
             }
             is LuaTypeGuessable -> {
                 val type = psi.guessTypeFromCache(SearchContext(psi.project))
-                val cls = TyUnion.getPerfectClass(type)
-                if (cls != null) {
-                    var icon = LuaIcons.LOCAL_VAR
-                    if (psi is LuaParamNameDef)
-                        icon = LuaIcons.PARAMETER
-
-                    val elementBuilder = LuaTypeGuessableLookupElement(name, psi, cls, false, icon)
-                    session.resultSet.addElement(elementBuilder)
-                }
-
+                var isFn = false
                 TyUnion.each(type) {
                     if (it is ITyFunction) {
+                        isFn = true
                         addTy(it)
+                    }
+                }
+                if (!isFn) {
+                    val cls = TyUnion.getPerfectClass(type)
+                    if (cls != null) {
+                        var icon = LuaIcons.LOCAL_VAR
+                        if (psi is LuaParamNameDef)
+                            icon = LuaIcons.PARAMETER
+
+                        val elementBuilder = LuaTypeGuessableLookupElement(name, psi, cls, false, icon)
+                        session.resultSet.addElement(elementBuilder)
                     }
                 }
             }
