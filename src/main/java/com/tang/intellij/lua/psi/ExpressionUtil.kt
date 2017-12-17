@@ -53,7 +53,7 @@ class ExpressionUtil {
                     }
                 }
                 is LuaBinaryExpr -> {
-                    val left = compute(expr.left) ?: return null
+                    val left = compute(expr.left!!) ?: return null
                     val rExpr = expr.right ?: return null
                     val right = compute(rExpr) ?: return null
                     val op = expr.binaryOp

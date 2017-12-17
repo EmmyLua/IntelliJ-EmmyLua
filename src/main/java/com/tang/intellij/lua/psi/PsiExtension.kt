@@ -331,8 +331,8 @@ val LuaCallExpr.argList: List<LuaExpr> get() {
     }
 }
 
-val LuaBinaryExpr.left: LuaExpr get() {
-    return checkNotNull(PsiTreeUtil.getStubChildOfType(this, LuaExpr::class.java))
+val LuaBinaryExpr.left: LuaExpr? get() {
+    return PsiTreeUtil.getStubChildOfType(this, LuaExpr::class.java)
 }
 
 val LuaBinaryExpr.right: LuaExpr? get() {

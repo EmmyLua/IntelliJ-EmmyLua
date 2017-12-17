@@ -66,7 +66,7 @@ abstract class LuaBinaryExprMixin : LuaExprStubMixin<LuaBinaryExprStub>, LuaBina
 
     private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
         val lhs = binaryExpr.left
-        val lty = lhs.guessType(context)
+        val lty = lhs?.guessType(context) ?: Ty.UNKNOWN
         return if (operator == LuaTypes.OR) {
             val rhs = binaryExpr.right
             if (rhs != null) lty.union(rhs.guessType(context)) else lty
@@ -78,6 +78,6 @@ abstract class LuaBinaryExprMixin : LuaExprStubMixin<LuaBinaryExprStub>, LuaBina
     private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
         val lhs = binaryExpr.left
         // TODO: Search for operator overrides
-        return lhs.guessType(context)
+        return lhs?.guessType(context) ?: Ty.UNKNOWN
     }
 }
