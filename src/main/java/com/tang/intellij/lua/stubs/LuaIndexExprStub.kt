@@ -22,12 +22,10 @@ import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
-import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaGlobalIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.TyUnion
@@ -112,9 +110,6 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
             LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
 
             indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
-            if (typeName == Constants.WORD_G) {
-                indexSink.occurrence(LuaGlobalIndex.KEY, fieldName)
-            }
         }
     }
 }
