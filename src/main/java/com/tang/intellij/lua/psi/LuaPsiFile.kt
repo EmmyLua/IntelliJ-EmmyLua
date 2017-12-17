@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
+import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.ext.recursionGuard
@@ -99,8 +100,17 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
                     if (stat is LuaReturnStat)
                         guessReturnType(stat, 0, context)
                     else null
+                } else {
+                    val lastChild = lastChild
+                    var stat: LuaReturnStat? = null
+                    LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java, {
+                        stat = it
+                        false
+                    })
+                    if (stat != null)
+                        guessReturnType(stat, 0, context)
+                    else null
                 }
-                else null
             }
         }) ?: Ty.UNKNOWN
     }
