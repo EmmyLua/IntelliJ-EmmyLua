@@ -30,11 +30,11 @@ import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 
 fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
     return when (element) {
+        is LuaFuncBodyOwner -> element.infer(context)
         is LuaExpr -> inferExpr(element, context)
         is LuaParamNameDef -> element.infer(context)
         is LuaNameDef -> element.infer(context)
         is LuaDocFieldDef -> element.infer()
-        is LuaFuncBodyOwner -> element.infer(context)
         is LuaTableField -> element.infer(context)
         is LuaPsiFile -> inferFile(element, context)
         null -> Ty.UNKNOWN
