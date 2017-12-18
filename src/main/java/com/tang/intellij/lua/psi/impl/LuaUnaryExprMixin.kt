@@ -19,12 +19,8 @@ package com.tang.intellij.lua.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.psi.LuaUnaryExpr
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaUnaryExprStub
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
 
 abstract class LuaUnaryExprMixin: LuaExprStubMixin<LuaUnaryExprStub>, LuaUnaryExpr {
     constructor(stub: LuaUnaryExprStub, nodeType: IStubElementType<*, *>)
@@ -34,15 +30,4 @@ abstract class LuaUnaryExprMixin: LuaExprStubMixin<LuaUnaryExprStub>, LuaUnaryEx
 
     constructor(stub: LuaUnaryExprStub, nodeType: IElementType, node: ASTNode)
             : super(stub, nodeType, node)
-
-    override fun guessType(context: SearchContext): ITy {
-        val stub = stub
-        val operator = if (stub != null) stub.opType else unaryOp.node.firstChildNode.elementType
-
-        return when (operator) {
-            LuaTypes.MINUS -> expr?.guessType(context) ?: Ty.UNKNOWN // Negative something
-            LuaTypes.GETN -> Ty.NUMBER // Table length is a number
-            else -> Ty.UNKNOWN
-        }
-    }
 }

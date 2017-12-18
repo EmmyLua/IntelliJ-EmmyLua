@@ -88,11 +88,6 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
   }
 
   @NotNull
-  public ITy guessType(SearchContext context) {
-    return LuaPsiImplUtilKt.guessType(this, context);
-  }
-
-  @NotNull
   public ITy guessParentType(SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }

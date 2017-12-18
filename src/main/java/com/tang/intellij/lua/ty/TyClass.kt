@@ -105,7 +105,7 @@ abstract class TyClass(override val className: String,
     }
 
     override fun findMemberType(name: String, searchContext: SearchContext): ITy? {
-        return findMember(name, searchContext)?.guessType(searchContext)
+        return infer(findMember(name, searchContext), searchContext)
     }
 
     override fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {

@@ -19,11 +19,7 @@ package com.tang.intellij.lua.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.tang.intellij.lua.psi.LuaParenExpr
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaExprPlaceStub
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
 
 open class LuaParenExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
 
@@ -34,9 +30,4 @@ open class LuaParenExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
 
     constructor(stub: LuaExprPlaceStub, nodeType: IElementType, node: ASTNode)
             : super(stub, nodeType, node)
-
-    override fun guessType(context: SearchContext): ITy {
-        val paren = this as LuaParenExpr
-        return paren.expr?.guessType(context) ?: Ty.UNKNOWN
-    }
 }

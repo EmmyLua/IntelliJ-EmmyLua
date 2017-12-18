@@ -27,10 +27,7 @@ import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.LuaLiteralExpr
 import com.tang.intellij.lua.psi.LuaLiteralKind
 import com.tang.intellij.lua.psi.kind
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaLiteralExprStub
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
 import java.lang.StringBuilder
 
 internal class TextEscaper(host: LuaLiteralExprMixin) : LiteralTextEscaper<LuaLiteralExprMixin>(host) {
@@ -52,15 +49,6 @@ internal class TextEscaper(host: LuaLiteralExprMixin) : LiteralTextEscaper<LuaLi
 
 abstract class LuaLiteralExprMixin
     : LuaExprStubMixin<LuaLiteralExprStub>, PsiLanguageInjectionHost, LuaLiteralExpr {
-    override fun guessType(context: SearchContext): ITy {
-        return when (this.kind) {
-            LuaLiteralKind.Bool -> Ty.BOOLEAN
-            LuaLiteralKind.String -> Ty.STRING
-            LuaLiteralKind.Number -> Ty.NUMBER
-            LuaLiteralKind.Nil -> Ty.NIL
-            else -> Ty.UNKNOWN
-        }
-    }
 
     constructor(stub: LuaLiteralExprStub, nodeType: IStubElementType<*, *>)
             : super(stub, nodeType)

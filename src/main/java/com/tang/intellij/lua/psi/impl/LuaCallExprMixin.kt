@@ -19,13 +19,7 @@ package com.tang.intellij.lua.psi.impl
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.intellij.util.Processor
-import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.project.LuaSettings
-import com.tang.intellij.lua.psi.*
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaExprPlaceStub
-import com.tang.intellij.lua.ty.*
 
 open class LuaCallExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
 
@@ -36,57 +30,4 @@ open class LuaCallExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
 
     constructor(stub: LuaExprPlaceStub, nodeType: IElementType, node: ASTNode)
             : super(stub, nodeType, node)
-
-    override fun guessType(context: SearchContext): ITy {
-        val luaCallExpr = this as LuaCallExpr
-        // xxx()
-        val expr = luaCallExpr.expr
-        // 从 require 'xxx' 中获取返回类型
-        if (expr is LuaNameExpr && expr.name == Constants.WORD_REQUIRE) {
-            var filePath: String? = null
-            val string = luaCallExpr.firstStringArg
-            if (string is LuaLiteralExpr) {
-                filePath = string.stringValue
-            }
-            var file: LuaPsiFile? = null
-            if (filePath != null)
-                file = resolveRequireFile(filePath, luaCallExpr.project)
-            if (file != null)
-                return file.guessType(context)
-
-            return Ty.UNKNOWN
-        }
-
-        var ret: ITy = Ty.UNKNOWN
-        val ty = expr.guessTypeFromCache(context)
-        TyUnion.each(ty) {
-            when(it) {
-                is ITyFunction -> {
-                    it.process(Processor { sig ->
-                        ret = ret.union(sig.returnTy)
-                        true
-                    })
-                }
-                //constructor : Class table __call
-                is ITyClass -> ret = ret.union(it)
-            }
-        }
-
-        //todo TyFunction
-        if (Ty.isInvalid(ret)) {
-            val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
-            if (bodyOwner != null)
-                ret = bodyOwner.guessReturnType(context)
-        }
-
-        // xxx.new()
-        if (expr is LuaIndexExpr) {
-            val fnName = expr.name
-            if (fnName != null && LuaSettings.isConstructorName(fnName)) {
-                ret = ret.union(expr.guessParentType(context))
-            }
-        }
-
-        return ret
-    }
 }

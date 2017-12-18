@@ -1,6 +1,7 @@
 // This is a generated file. Not intended for manual editing.
 package com.tang.intellij.lua.comment.psi.impl;
 
+import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -62,11 +63,6 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocFieldDefSt
   @Nullable
   public PsiElement getId() {
     return findChildByType(ID);
-  }
-
-  @NotNull
-  public ITy guessType(SearchContext context) {
-    return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 
   @NotNull

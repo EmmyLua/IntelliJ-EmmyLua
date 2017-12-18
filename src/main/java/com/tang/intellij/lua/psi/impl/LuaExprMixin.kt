@@ -20,9 +20,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.LuaExpr
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaExprStubImpl
-import com.tang.intellij.lua.ty.Ty
 
 /**
  * 表达式基类
@@ -35,6 +33,4 @@ abstract class LuaExprMixin : LuaExprStubMixin<LuaExprStubImpl<*>>, LuaExpr {
     constructor(node: ASTNode) : super(node)
 
     constructor(stub: LuaExprStubImpl<*>, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
-
-    override fun guessType(context: SearchContext) = Ty.UNKNOWN
 }

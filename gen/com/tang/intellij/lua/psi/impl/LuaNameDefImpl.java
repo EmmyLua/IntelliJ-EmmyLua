@@ -12,8 +12,6 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaNameDefStub;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.psi.search.SearchScope;
-import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.ITy;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
@@ -54,11 +52,6 @@ public class LuaNameDefImpl extends StubBasedPsiElementBase<LuaNameDefStub> impl
   @NotNull
   public PsiElement setName(String name) {
     return LuaPsiImplUtilKt.setName(this, name);
-  }
-
-  @NotNull
-  public ITy guessType(SearchContext context) {
-    return LuaPsiImplUtilKt.guessType(this, context);
   }
 
   @NotNull

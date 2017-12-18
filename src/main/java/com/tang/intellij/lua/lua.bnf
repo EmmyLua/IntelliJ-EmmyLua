@@ -497,7 +497,6 @@ tableField ::= tableField1 | tableField2 | expr {
 
         getFieldName
         getPresentation
-        guessType
         guessParentType
         getVisibility
         getComment
@@ -537,7 +536,6 @@ nameDef ::= ID {
     methods = [
         getName
         setName
-        guessType
         getNameIdentifier
         getUseScope
     ]
