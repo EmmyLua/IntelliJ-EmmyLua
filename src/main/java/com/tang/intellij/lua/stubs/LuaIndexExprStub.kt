@@ -16,13 +16,15 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaIndexExpr
+import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.psi.assignStat
+import com.tang.intellij.lua.psi.docTy
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -40,7 +42,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         return LuaIndexExprImpl(indexStub, this)
     }
 
-    override fun shouldCreateStub(node: ASTNode): Boolean {
+    /*override fun shouldCreateStub(node: ASTNode): Boolean {
         val psi = node.psi as LuaIndexExpr
         val parent = psi.parent
         if (parent is LuaExprList || parent is LuaCallExpr)
@@ -52,7 +54,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
             }
         }
         return false
-    }
+    }*/
 
     override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexExprStub {
         val stat = indexExpr.assignStat

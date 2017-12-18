@@ -91,9 +91,10 @@ fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): Psi
         if (methodDef != null && !methodDef.isStatic) {
             val methodName = methodDef.classMethodName
             val expr = methodName.expr
-            if (expr is LuaNameExpr && context != null) {
-                ret = resolve(expr, context)
-            }
+            ret = if (expr is LuaNameExpr && context != null)
+                resolve(expr, context)
+            else
+                expr
         }
     }
     return ret
