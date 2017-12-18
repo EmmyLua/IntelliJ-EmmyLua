@@ -18,21 +18,14 @@ package com.tang.intellij.lua.psi
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
-import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
-import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFileStub
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyLazyClass
 
 /**
  * Created by TangZhiXu on 2015/11/15.
@@ -81,37 +74,5 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
             child = child.nextSibling
         }
         return null
-    }
-
-    /**
-     * 获取最后返回的类型
-     * @return LuaType
-     */
-    override fun guessType(context: SearchContext): ITy {
-        return recursionGuard(this, Computable {
-            val moduleName = this.moduleName
-            if (moduleName != null)
-                TyLazyClass(moduleName)
-            else {
-                val stub = this.stub
-                if (stub != null) {
-                    val statStub = stub.childrenStubs.lastOrNull { it.psi is LuaReturnStat }
-                    val stat = statStub?.psi
-                    if (stat is LuaReturnStat)
-                        guessReturnType(stat, 0, context)
-                    else null
-                } else {
-                    val lastChild = lastChild
-                    var stat: LuaReturnStat? = null
-                    LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java, {
-                        stat = it
-                        false
-                    })
-                    if (stat != null)
-                        guessReturnType(stat, 0, context)
-                    else null
-                }
-            }
-        }) ?: Ty.UNKNOWN
     }
 }

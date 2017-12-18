@@ -36,6 +36,7 @@ fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
         is LuaDocFieldDef -> element.infer()
         is LuaFuncBodyOwner -> element.infer(context)
         is LuaTableField -> element.infer(context)
+        is LuaPsiFile -> inferFile(element, context)
         null -> Ty.UNKNOWN
         else -> Ty.UNKNOWN
     }
@@ -162,4 +163,32 @@ private fun LuaTableField.infer(context: SearchContext): ITy {
         return inferExpr(valueExpr, context)
     }
     return Ty.UNKNOWN
+}
+
+private fun inferFile(file: LuaPsiFile, context: SearchContext): ITy {
+    return recursionGuard(file, Computable {
+        val moduleName = file.moduleName
+        if (moduleName != null)
+            TyLazyClass(moduleName)
+        else {
+            val stub = file.stub
+            if (stub != null) {
+                val statStub = stub.childrenStubs.lastOrNull { it.psi is LuaReturnStat }
+                val stat = statStub?.psi
+                if (stat is LuaReturnStat)
+                    guessReturnType(stat, 0, context)
+                else null
+            } else {
+                val lastChild = file.lastChild
+                var stat: LuaReturnStat? = null
+                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java, {
+                    stat = it
+                    false
+                })
+                if (stat != null)
+                    guessReturnType(stat, 0, context)
+                else null
+            }
+        }
+    }) ?: Ty.UNKNOWN
 }
