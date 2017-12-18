@@ -55,22 +55,39 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
     return ret
 }
 
-fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? = resolveLocal(ref.name, ref, context)
+fun resolveLocal(ref: LuaNameExpr, context: SearchContext?) = resolveLocal(ref.name, ref, context)
 
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
+    val element = resolveInFile(refName, ref, context)
+    if (element is LuaNameExpr)
+        return null
+    return element
+}
+
+fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
+    var lastName: LuaNameExpr? = null
 
     //local/param
-    LuaPsiTreeUtilEx.walkUpNameDef(ref, Processor { nameDef ->
+    LuaPsiTreeUtilEx.walkUpNameDef(pin, Processor { nameDef ->
         if (refName == nameDef.name) {
             ret = nameDef
             return@Processor false
         }
         true
+    }, Processor {
+        if (refName == it.name) {
+            lastName = it
+            return@Processor false
+        }
+        true
     })
 
+    if (ret == null)
+        ret = lastName
+
     if (ret == null && refName == Constants.WORD_SELF) {
-        val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(ref, LuaClassMethodDef::class.java)
+        val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(pin, LuaClassMethodDef::class.java)
         if (methodDef != null && !methodDef.isStatic) {
             val methodName = methodDef.classMethodName
             val expr = methodName.expr
@@ -108,9 +125,9 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
 
     //local 函数名
     if (ret == null) {
-        LuaPsiTreeUtilEx.walkUpLocalFuncDef(ref, Processor { nameDef ->
+        LuaPsiTreeUtilEx.walkUpLocalFuncDef(pin, Processor { nameDef ->
             val name = nameDef.name
-            if (refName == name) {
+            if (name == name) {
                 ret = nameDef
                 return@Processor false
             }
@@ -153,7 +170,7 @@ fun isUpValue(ref: LuaNameExpr, context: SearchContext): Boolean {
  */
 fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
     //search local
-    var resolveResult = resolveLocal(nameExpr, context)
+    var resolveResult = resolveInFile(nameExpr.name, nameExpr, context)
 
     //global
     if (resolveResult == null) {
@@ -171,7 +188,7 @@ fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
 fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
     val list = mutableListOf<PsiElement>()
     //search local
-    val resolveResult = resolveLocal(ref, context)
+    val resolveResult = resolve(ref, context)
     if (resolveResult != null) {
         list.add(resolveResult)
     } else {

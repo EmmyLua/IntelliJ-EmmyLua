@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.Processor
@@ -38,7 +39,7 @@ object LuaPsiTreeUtilEx {
         }
     }
 
-    fun <T> findStubOfType(stub: STUB_ELE, clazz: Class<T>, collector: (t:T) -> Boolean) {
+    private fun <T> findStubOfType(stub: STUB_ELE, clazz: Class<T>, collector: (t:T) -> Boolean) {
         val list = stub.childrenStubs
         for (i in 0 until list.size) {
             val stubElement = list[i]
@@ -49,16 +50,7 @@ object LuaPsiTreeUtilEx {
         }
     }
 
-    fun <T> findStubOfType(stub: STUB_ELE, clazz: Class<T>): List<T> {
-        val list = mutableListOf<T>()
-        findStubOfType(stub, clazz) { psi ->
-            list.add(psi)
-            true
-        }
-        return list
-    }
-
-    fun walkUpNameDef(psi: PsiElement, processor: Processor<LuaNameDef>) {
+    fun walkUpNameDef(psi: PsiElement, processor: Processor<LuaNameDef>, nameExprProcessor: Processor<LuaNameExpr>? = null) {
         var continueSearch = true
         if (psi is STUB_PSI) {
             val stub = psi.stub
@@ -93,7 +85,74 @@ object LuaPsiTreeUtilEx {
         }
 
         if (continueSearch)
-            LuaPsiTreeUtil.walkUpLocalNameDef(psi, processor)
+            walkUpPsiLocalName(psi, processor, nameExprProcessor)
+    }
+
+    /**
+     * 向上寻找 local 定义
+     * @param element 当前搜索起点
+     * @param processor 处理器
+     */
+    private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<LuaNameDef>, nameExprProcessor: Processor<LuaNameExpr>?) {
+        var continueSearch = true
+
+        var curr: PsiElement = element
+        do {
+            val next: PsiElement? = curr.prevSibling
+            var isParent = false
+            if (next == null) {
+                curr = curr.parent
+                isParent = true
+            } else
+                curr = next
+
+            if (curr is LuaLocalDef) {
+                // 跳过类似
+                // local name = name //skip
+                if (!curr.node.textRange.contains(element.node.textRange)) {
+                    val nameList = curr.nameList
+                    continueSearch = resolveInNameList(nameList, processor)
+                }
+            } else if (curr is LuaAssignStat && nameExprProcessor != null) {
+                for (expr in curr.varExprList.exprList) {
+                    if (expr is LuaNameExpr) {
+                        if (!nameExprProcessor.process(expr))
+                            break
+                    }
+                }
+            } else if (isParent) {
+                when (curr) {
+                    is LuaFuncBody -> continueSearch = resolveInFuncBody(curr, processor)
+                    is LuaForAStat -> continueSearch = processor.process(curr.paramNameDef)
+                    is LuaForBStat -> continueSearch = resolveInNameList(curr.paramNameDefList, processor)
+                }
+            }
+        } while (continueSearch && curr !is PsiFile)
+    }
+
+    private fun resolveInFuncBody(funcBody: LuaFuncBody, processor: Processor<LuaNameDef>): Boolean {
+        for (parDef in funcBody.paramNameDefList) {
+            if (!processor.process(parDef)) return false
+        }
+        return true
+    }
+
+    private fun resolveInNameList(nameList: LuaNameList?, processor: Processor<LuaNameDef>): Boolean {
+        if (nameList != null) {
+            for (nameDef in nameList.nameDefList) {
+                if (!processor.process(nameDef)) return false
+            }
+        }
+        return true
+    }
+
+    private fun resolveInNameList(nameList: List<LuaParamNameDef>?, processor: Processor<LuaNameDef>): Boolean {
+        if (nameList != null) {
+            for (nameDef in nameList) {
+                if (!processor.process(nameDef)) return false
+            }
+        }
+        return true
     }
 
     fun walkUpLocalFuncDef(psi: PsiElement, processor: Processor<LuaLocalFuncDef>) {
@@ -119,6 +178,22 @@ object LuaPsiTreeUtilEx {
             }
         }
         if (continueSearch)
-            LuaPsiTreeUtil.walkUpLocalFuncDef(psi, processor)
+            walkUpPsiLocalFunc(psi, processor)
+    }
+
+    /**
+     * 向上寻找 local function 定义
+     * @param current 当前搜导起点
+     * @param processor 处理器
+     */
+    private fun walkUpPsiLocalFunc(current: PsiElement, processor: Processor<LuaLocalFuncDef>) {
+        var continueSearch = true
+        var curr = current
+        do {
+            if (curr is LuaLocalFuncDef)
+                continueSearch = processor.process(curr)
+
+            curr = curr.prevSibling ?: curr.parent
+        } while (continueSearch && curr !is PsiFile)
     }
 }
