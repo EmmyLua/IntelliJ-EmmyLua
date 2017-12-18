@@ -120,7 +120,7 @@ object LuaPsiTreeUtilEx {
                 continueSearch = processor.process(curr)
             } else if (curr is LuaAssignStat && nameExprProcessor != null) {
                 for (expr in curr.varExprList.exprList) {
-                    if (expr is LuaNameExpr) {
+                    if (expr is LuaNameExpr && expr != element) {
                         if (!nameExprProcessor.process(expr))
                             break
                     }
