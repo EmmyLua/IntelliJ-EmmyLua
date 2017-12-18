@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
 import com.intellij.util.Processor
@@ -50,7 +51,9 @@ object LuaPsiTreeUtilEx {
         }
     }
 
-    fun walkUpNameDef(psi: PsiElement, processor: Processor<LuaNameDef>, nameExprProcessor: Processor<LuaNameExpr>? = null) {
+    fun walkUpNameDef(psi: PsiElement?, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaNameExpr>? = null) {
+        if (psi == null) return
+
         var continueSearch = true
         if (psi is STUB_PSI) {
             val stub = psi.stub
@@ -93,7 +96,7 @@ object LuaPsiTreeUtilEx {
      * @param element 当前搜索起点
      * @param processor 处理器
      */
-    private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<LuaNameDef>, nameExprProcessor: Processor<LuaNameExpr>?) {
+    private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaNameExpr>?) {
         var continueSearch = true
 
         var curr: PsiElement = element
@@ -113,6 +116,8 @@ object LuaPsiTreeUtilEx {
                     val nameList = curr.nameList
                     continueSearch = resolveInNameList(nameList, processor)
                 }
+            } else if (curr is LuaLocalFuncDef) {
+                continueSearch = processor.process(curr)
             } else if (curr is LuaAssignStat && nameExprProcessor != null) {
                 for (expr in curr.varExprList.exprList) {
                     if (expr is LuaNameExpr) {
@@ -130,14 +135,14 @@ object LuaPsiTreeUtilEx {
         } while (continueSearch && curr !is PsiFile)
     }
 
-    private fun resolveInFuncBody(funcBody: LuaFuncBody, processor: Processor<LuaNameDef>): Boolean {
+    private fun resolveInFuncBody(funcBody: LuaFuncBody, processor: Processor<PsiNamedElement>): Boolean {
         for (parDef in funcBody.paramNameDefList) {
             if (!processor.process(parDef)) return false
         }
         return true
     }
 
-    private fun resolveInNameList(nameList: LuaNameList?, processor: Processor<LuaNameDef>): Boolean {
+    private fun resolveInNameList(nameList: LuaNameList?, processor: Processor<PsiNamedElement>): Boolean {
         if (nameList != null) {
             for (nameDef in nameList.nameDefList) {
                 if (!processor.process(nameDef)) return false
@@ -146,7 +151,7 @@ object LuaPsiTreeUtilEx {
         return true
     }
 
-    private fun resolveInNameList(nameList: List<LuaParamNameDef>?, processor: Processor<LuaNameDef>): Boolean {
+    private fun resolveInNameList(nameList: List<LuaParamNameDef>?, processor: Processor<PsiNamedElement>): Boolean {
         if (nameList != null) {
             for (nameDef in nameList) {
                 if (!processor.process(nameDef)) return false

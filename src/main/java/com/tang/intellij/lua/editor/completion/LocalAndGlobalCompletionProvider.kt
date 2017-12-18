@@ -100,25 +100,18 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         val localNamesSet = mutableSetOf<String>()
 
         //local
-        if (has(LOCAL_VAR)) {
-            LuaPsiTreeUtil.walkUpLocalNameDef(cur) { nameDef ->
-                val name = nameDef.text
-                if (completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
+        if (has(LOCAL_FUN) || has(LOCAL_VAR)) {
+            LuaPsiTreeUtilEx.walkUpNameDef(cur, Processor { nameDef ->
+                val name = nameDef.name
+                if (nameDef is LuaPsiElement &&
+                        name != null &&
+                        completionResultSet.prefixMatcher.prefixMatches(name) &&
+                        localNamesSet.add(name)) {
                     session.addWord(name)
                     addCompletion(name, session, nameDef)
                 }
                 true
-            }
-        }
-        if (has(LOCAL_FUN)) {
-            LuaPsiTreeUtil.walkUpLocalFuncDef(cur) { localFuncDef ->
-                val name = localFuncDef.name
-                if (name != null && completionResultSet.prefixMatcher.prefixMatches(name) && localNamesSet.add(name)) {
-                    session.addWord(name)
-                    addCompletion(name, session, localFuncDef)
-                }
-                true
-            }
+            })
         }
 
         //global

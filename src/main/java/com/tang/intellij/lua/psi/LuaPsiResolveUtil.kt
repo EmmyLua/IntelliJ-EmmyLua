@@ -95,46 +95,7 @@ fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): Psi
                 ret = resolve(expr, context)
             }
         }
-        /*val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
-        if (block != null) {
-            val methodDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)
-            if (methodDef != null && !methodDef.isStatic) {
-                *//**
-                 * eg.
-                 * function xx:aa()
-                 *     local self = {}
-                 *     return self
-                 * end
-                 *//*
-                ret?.textRange?.let {
-                    if (block.textRange.contains(it))
-                        return ret
-                }
-
-                val expr = methodDef.classMethodName.expr
-                val reference = expr.reference
-                if (reference is LuaReference && context != null) {
-                    val resolve = reference.resolve(context)
-                    ret = resolve
-                }
-                if (ret == null && expr is LuaNameExpr)
-                    ret = expr
-            }
-        }*/
     }
-
-    //local 函数名
-    if (ret == null) {
-        LuaPsiTreeUtilEx.walkUpLocalFuncDef(pin, Processor { nameDef ->
-            val name = nameDef.name
-            if (name == name) {
-                ret = nameDef
-                return@Processor false
-            }
-            true
-        })
-    }
-
     return ret
 }
 

@@ -60,9 +60,9 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                 val postfixName = indexExpr.name?.let { it.substring(0, it.indexOf(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)) }
 
                 val matcher = completionResultSet.prefixMatcher.cloneWithPrefix(prefixName)
-                LuaPsiTreeUtil.walkUpLocalNameDef(indexExpr, {
-                    val txt = it.text
-                    if (prefixName != txt && matcher.prefixMatches(txt)) {
+                LuaPsiTreeUtilEx.walkUpNameDef(indexExpr, Processor {
+                    val txt = it.name
+                    if (it is LuaTypeGuessable && txt != null && prefixName != txt && matcher.prefixMatches(txt)) {
                         val type = it.guessTypeFromCache(searchContext)
                         if (!Ty.isInvalid(prefixType)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
