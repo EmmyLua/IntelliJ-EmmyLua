@@ -227,7 +227,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
  * *
  * @return LuaType
  */
-private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
+fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
     val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
     if (owner != null) {
         val stub = paramNameDef.stub

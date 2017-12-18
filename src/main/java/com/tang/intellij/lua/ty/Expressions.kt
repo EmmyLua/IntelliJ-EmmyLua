@@ -29,17 +29,18 @@ import com.tang.intellij.lua.psi.impl.LuaNameExprMixin
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
-fun infer(expr: LuaExpr?, context: SearchContext): ITy {
+fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
     return when (expr) {
         is LuaUnaryExpr -> expr.infer(context)
         is LuaBinaryExpr -> expr.infer(context)
         is LuaCallExpr -> expr.infer(context)
-        is LuaClosureExpr -> guessReturnType(expr, context)
+        is LuaClosureExpr -> infer(expr, context)
         is LuaTableExpr -> TyTable(expr)
-        is LuaParenExpr -> infer(expr.expr, context)
+        is LuaParenExpr -> inferExpr(expr.expr, context)
         is LuaNameExpr -> expr.infer(context)
         is LuaLiteralExpr -> expr.infer(context)
         is LuaIndexExpr -> expr.infer(context)
+        null -> Ty.UNKNOWN
         else -> Ty.UNKNOWN
     }
 }
@@ -49,7 +50,7 @@ private fun LuaUnaryExpr.infer(context: SearchContext): ITy {
     val operator = if (stub != null) stub.opType else unaryOp.node.firstChildNode.elementType
 
     return when (operator) {
-        LuaTypes.MINUS -> expr?.guessType(context) ?: Ty.UNKNOWN // Negative something
+        LuaTypes.MINUS -> inferExpr(expr, context) // Negative something
         LuaTypes.GETN -> Ty.NUMBER // Table length is a number
         else -> Ty.UNKNOWN
     }
@@ -83,19 +84,17 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
 
 private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
     val lhs = binaryExpr.left
-    val lty = lhs?.guessType(context) ?: Ty.UNKNOWN
+    val lty = inferExpr(lhs, context)
     return if (operator == LuaTypes.OR) {
         val rhs = binaryExpr.right
-        if (rhs != null) lty.union(rhs.guessType(context)) else lty
-    } else {
-        lty
-    }
+        if (rhs != null) lty.union(inferExpr(rhs, context)) else lty
+    } else lty
 }
 
 private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
     val lhs = binaryExpr.left
     // TODO: Search for operator overrides
-    return lhs?.guessType(context) ?: Ty.UNKNOWN
+    return inferExpr(lhs, context)
 }
 
 private fun LuaCallExpr.infer(context: SearchContext): ITy {
@@ -119,7 +118,7 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     }
 
     var ret: ITy = Ty.UNKNOWN
-    val ty = expr.guessTypeFromCache(context)
+    val ty = inferExpr(expr, context)//expr.guessTypeFromCache(context)
     TyUnion.each(ty) {
         when(it) {
             is ITyFunction -> {
@@ -137,7 +136,7 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     if (Ty.isInvalid(ret)) {
         val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
         if (bodyOwner != null)
-            ret = bodyOwner.guessReturnType(context)
+            ret = inferReturnTy(bodyOwner, context)
     }
 
     // xxx.new()
