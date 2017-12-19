@@ -112,6 +112,8 @@ public:
 
 	ScriptRegisterResult RegisterScript(LAPI api, lua_State* L, lua_Debug* ar, size_t* index);
 
+	void UnregisterScript(const char* name, const char* fixedName);
+
     /**
      * Steps execution of a "broken" script by one line. If the current line
      * is a function call, this will step into the function call.
