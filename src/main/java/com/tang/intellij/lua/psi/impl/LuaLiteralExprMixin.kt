@@ -69,9 +69,8 @@ abstract class LuaLiteralExprMixin
     }
 
     override fun isValidHost(): Boolean {
-        val le = this as LuaLiteralExpr
-        if (le.kind == LuaLiteralKind.String) {
-            val content = LuaString.getContent(le.text)
+        if (kind == LuaLiteralKind.String) {
+            val content = LuaString.getContent(text)
             return content.start >= 2
         }
         return false

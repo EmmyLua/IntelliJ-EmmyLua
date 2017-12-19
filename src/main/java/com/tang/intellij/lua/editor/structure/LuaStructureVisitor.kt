@@ -241,7 +241,7 @@ class LuaStructureVisitor : LuaVisitor() {
         for (idx in 0 until names.size) {
             val declaration = declarations?.getOrNull(idx)
             val valueExpr = exprs?.getOrNull(idx)
-            val nameDef = names[idx] as LuaNameDef
+            val nameDef = names[idx]
 
             val exprOwner: LuaTreeElement
             if (declaration is LuaClassElement) {
