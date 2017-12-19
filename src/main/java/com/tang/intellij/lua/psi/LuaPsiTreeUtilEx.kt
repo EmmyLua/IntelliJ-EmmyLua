@@ -201,4 +201,14 @@ object LuaPsiTreeUtilEx {
             curr = curr.prevSibling ?: curr.parent
         } while (continueSearch && curr !is PsiFile)
     }
+
+    fun processChildren(element: PsiElement?, processor: Processor<PsiElement>) {
+        var child = element?.firstChild
+        while (child != null) {
+            if (!processor.process(child)) {
+                break
+            }
+            child = child.nextSibling
+        }
+    }
 }

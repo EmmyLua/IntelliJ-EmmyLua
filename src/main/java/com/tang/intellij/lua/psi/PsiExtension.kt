@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
@@ -38,13 +39,13 @@ fun LuaLocalDef.getIndexFor(psi: LuaNameDef): Int {
     if (stub != null) {
         idx = stub.childrenStubs.indexOf(psi.stub)
     } else {
-        PsiTreeUtil.processElements(nameList, {
+        LuaPsiTreeUtilEx.processChildren(nameList, Processor{
             if (it is LuaNameDef) {
                 if (it == psi)
-                    return@processElements false
+                    return@Processor false
                 idx++
             }
-            return@processElements true
+            return@Processor true
         })
     }
     return idx
@@ -71,13 +72,13 @@ fun LuaAssignStat.getIndexFor(psi: LuaExpr): Int {
             }
         }
     } else {
-        PsiTreeUtil.processElements(this.varExprList, {
+        LuaPsiTreeUtilEx.processChildren(this.varExprList, Processor{
             if (it is LuaExpr) {
                 if (it == psi)
-                    return@processElements false
+                    return@Processor false
                 idx++
             }
-            return@processElements true
+            return@Processor true
         })
     }
     return idx
@@ -90,13 +91,13 @@ fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
 
 fun LuaListArgs.getIndexFor(psi: LuaExpr): Int {
     var idx = 0
-    PsiTreeUtil.processElements(this, {
+    LuaPsiTreeUtilEx.processChildren(this, Processor {
         if (it is LuaExpr) {
             if (it == psi)
-                return@processElements false
+                return@Processor false
             idx++
         }
-        return@processElements true
+        return@Processor true
     })
     return idx
 }
