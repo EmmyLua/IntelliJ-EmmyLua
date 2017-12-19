@@ -29,6 +29,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.TyFunction
+import com.tang.intellij.lua.ty.infer
 import com.tang.intellij.lua.ty.isSelfCall
 
 /**
@@ -154,7 +155,9 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         if (docParamDef != null) {
             renderDocParam(sb, docParamDef)
         } else {
-            sb.append("<li><b>param</b> ${paramNameDef.name}:any")
+            val ty = infer(paramNameDef, SearchContext(paramNameDef.project))
+            sb.append("<li><b>param</b> ${paramNameDef.name}:")
+            renderTy(sb, ty)
         }
     }
 }
