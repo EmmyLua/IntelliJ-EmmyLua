@@ -27,6 +27,7 @@ import com.tang.intellij.lua.editor.completion.LuaDocumentationLookupElement
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.TyFunction
 import com.tang.intellij.lua.ty.isSelfCall
 
@@ -80,7 +81,8 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
             is LuaLocalFuncDef -> {
                 sb.wrapTag("pre") {
                     sb.append("local function ${element.name}")
-                    renderSignature(sb, element.asTy(SearchContext(element.project)).mainSignature)
+                    val type = element.guessType(SearchContext(element.project)) as ITyFunction
+                    renderSignature(sb, type.mainSignature)
                 }
                 renderComment(sb, element.comment)
             }

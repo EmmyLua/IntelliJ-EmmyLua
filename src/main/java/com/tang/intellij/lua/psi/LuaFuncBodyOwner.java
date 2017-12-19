@@ -16,14 +16,8 @@
 
 package com.tang.intellij.lua.psi;
 
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.intellij.psi.stubs.StubElement;
 import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub;
 import com.tang.intellij.lua.ty.ITy;
-import com.tang.intellij.lua.ty.ITyFunction;
-import com.tang.intellij.lua.ty.TyFlags;
-import com.tang.intellij.lua.ty.TyPsiFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,29 +41,6 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
 
     @NotNull
     LuaParamInfo[] getParams();
-
-    @NotNull
-    default ITy guessType(SearchContext context) { return asTy(context); }
-
-    @NotNull
-    default ITyFunction asTy(SearchContext searchContext) {
-        if (this instanceof StubBasedPsiElementBase<?>) {
-            StubBasedPsiElementBase<?> stubBase = (StubBasedPsiElementBase<?>) this;
-            StubElement stub = stubBase.getStub();
-            if (stub instanceof LuaFuncBodyOwnerStub<?>) {
-                LuaFuncBodyOwnerStub<?> stub1 = (LuaFuncBodyOwnerStub<?>) stub;
-                return stub1.getTy();
-            }
-        }
-
-        if (this instanceof LuaFuncDef)
-            return new TyPsiFunction(false, this, searchContext, TyFlags.Companion.getGLOBAL());
-        if (this instanceof LuaClassMethodDef) {
-            LuaClassMethodDef classMethodDef = (LuaClassMethodDef) this;
-            return new TyPsiFunction(!classMethodDef.isStatic(), this, searchContext, 0);
-        }
-        return new TyPsiFunction(false, this, searchContext, 0);
-    }
 
     default String getParamSignature() {
         return LuaPsiImplUtilKt.getParamSignature(this);

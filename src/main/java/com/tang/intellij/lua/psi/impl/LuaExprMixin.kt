@@ -17,156 +17,20 @@
 package com.tang.intellij.lua.psi.impl
 
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.RecursionManager
+import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.Processor
-import com.tang.intellij.lua.project.LuaSettings
-import com.tang.intellij.lua.psi.*
-import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.*
+import com.tang.intellij.lua.psi.LuaExpr
+import com.tang.intellij.lua.stubs.LuaExprStubImpl
 
 /**
  * 表达式基类
  * Created by TangZX on 2016/12/4.
  */
-open class LuaExprMixin internal constructor(node: ASTNode) : LuaPsiElementImpl(node), LuaExpr {
+abstract class LuaExprMixin : LuaExprStubMixin<LuaExprStubImpl<*>>, LuaExpr {
 
-    override fun guessType(context: SearchContext): ITy {
-        val iTy = RecursionManager.doPreventingRecursion<ITy>(this, true) {
-            when(this) {
-                is LuaCallExpr -> guessType(this, context)
-                is LuaParenExpr -> guessType(this, context)
-                is LuaLiteralExpr -> guessType(this)
-                is LuaClosureExpr -> asTy(context)
-                is LuaBinaryExpr -> guessType(this, context)
-                is LuaUnaryExpr -> guessType(this, context)
-                else -> Ty.UNKNOWN
-            }
-        }
-        return iTy ?: Ty.UNKNOWN
-    }
+    constructor(stub: LuaExprStubImpl<*>, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
-    private fun guessType(binaryExpr: LuaBinaryExpr, context: SearchContext): ITy {
-        val firstChild = binaryExpr.firstChild
-        val nextVisibleLeaf = PsiTreeUtil.nextVisibleLeaf(firstChild)
-        val operator = nextVisibleLeaf?.node?.elementType
-        var ty: ITy = Ty.UNKNOWN
-        operator.let {
-            ty = when (it) {
-                //..
-                LuaTypes.CONCAT -> Ty.STRING
-                //<=, ==, <, ~=, >=, >
-                LuaTypes.LE, LuaTypes.EQ, LuaTypes.LT, LuaTypes.NE, LuaTypes.GE, LuaTypes.GT -> Ty.BOOLEAN
-                //and, or
-                LuaTypes.AND, LuaTypes.OR -> guessAndOrType(binaryExpr, operator, context)
-                    //&, <<, |, >>, ~, ^
-                LuaTypes.BIT_AND, LuaTypes.BIT_LTLT, LuaTypes.BIT_OR, LuaTypes.BIT_RTRT, LuaTypes.BIT_TILDE, LuaTypes.EXP,
-                //+, -, *, /, //, %
-                LuaTypes.PLUS, LuaTypes.MINUS, LuaTypes.MULT, LuaTypes.DIV, LuaTypes.DOUBLE_DIV, LuaTypes.MOD -> guessBinaryOpType(binaryExpr, operator, context)
-                else -> Ty.UNKNOWN
-            }
-        }
-        return ty
-    }
+    constructor(node: ASTNode) : super(node)
 
-    private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
-        val lhs = binaryExpr.left
-        val lty = lhs.guessType(context)
-        return if (operator == LuaTypes.OR) {
-            val rhs = binaryExpr.right
-            if (rhs != null) lty.union(rhs.guessType(context)) else lty
-        } else {
-            lty
-        }
-    }
-
-    private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
-        val lhs = binaryExpr.firstChild as LuaExpr
-        val rhs = binaryExpr.lastChild
-
-        // TODO: Search for operator overrides
-        return lhs.guessType(context)
-    }
-
-    private fun guessType(unaryExpr: LuaUnaryExpr, context: SearchContext): ITy {
-        val operator = unaryExpr.unaryOp.node.firstChildNode.elementType
-
-        return when (operator) {
-            LuaTypes.MINUS -> unaryExpr.expr?.guessType(context) ?: Ty.UNKNOWN // Negative something
-            LuaTypes.GETN -> Ty.NUMBER // Table length is a number
-            else -> Ty.UNKNOWN
-        }
-    }
-
-    private fun guessType(literalExpr: LuaLiteralExpr): ITy {
-        val child = literalExpr.firstChild
-        return when (child.node.elementType) {
-            LuaTypes.TRUE ,LuaTypes.FALSE -> Ty.BOOLEAN
-            LuaTypes.STRING -> Ty.STRING
-            LuaTypes.NUMBER -> Ty.NUMBER
-            LuaTypes.NIL -> Ty.NIL
-            else -> Ty.UNKNOWN
-        }
-    }
-
-    private fun guessType(luaParenExpr: LuaParenExpr, context: SearchContext): ITy {
-        val inner = luaParenExpr.expr
-        if (inner != null)
-            return inner.guessTypeFromCache(context)
-        return Ty.UNKNOWN
-    }
-
-    private fun guessType(luaCallExpr: LuaCallExpr, context: SearchContext): ITy {
-        // xxx()
-        val expr = luaCallExpr.expr
-        // 从 require 'xxx' 中获取返回类型
-        if (expr.textMatches("require")) {
-            var filePath: String? = null
-            val string = luaCallExpr.firstStringArg
-            if (string != null) {
-                filePath = string.text
-                filePath = filePath!!.substring(1, filePath.length - 1)
-            }
-            var file: LuaPsiFile? = null
-            if (filePath != null)
-                file = resolveRequireFile(filePath, luaCallExpr.project)
-            if (file != null)
-                return file.getReturnedType(context)
-
-            return Ty.UNKNOWN
-        }
-
-        var ret: ITy = Ty.UNKNOWN
-        val ty = expr.guessTypeFromCache(context)
-        TyUnion.each(ty) {
-            when(it) {
-                is ITyFunction -> {
-                    it.process(Processor {sig ->
-                        ret = ret.union(sig.returnTy)
-                        true
-                    })
-                }
-                //constructor : Class table __call
-                is ITyClass -> ret = ret.union(it)
-            }
-        }
-
-        //todo TyFunction
-        if (Ty.isInvalid(ret)) {
-            val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
-            if (bodyOwner != null)
-                ret = bodyOwner.guessReturnType(context)
-        }
-
-        // xxx.new()
-        if (expr is LuaIndexExpr) {
-            val fnName = expr.name
-            if (fnName != null && LuaSettings.isConstructorName(fnName)) {
-                ret = ret.union(expr.guessParentType(context))
-            }
-        }
-
-        return ret
-    }
+    constructor(stub: LuaExprStubImpl<*>, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 }

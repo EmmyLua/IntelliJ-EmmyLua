@@ -12,13 +12,14 @@ import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
-import com.tang.intellij.lua.stubs.LuaIndexStub;
+import com.tang.intellij.lua.stubs.LuaIndexExprStub;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr {
 
-  public LuaIndexExprImpl(LuaIndexStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaIndexExprImpl(LuaIndexExprStub stub, IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
@@ -26,7 +27,7 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
     super(node);
   }
 
-  public LuaIndexExprImpl(LuaIndexStub stub, IElementType type, ASTNode node) {
+  public LuaIndexExprImpl(LuaIndexExprStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 
@@ -42,7 +43,7 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
   @Override
   @NotNull
   public List<LuaExpr> getExprList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaExpr.class);
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaExpr.class);
   }
 
   @Override
@@ -78,11 +79,6 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
   @Nullable
   public LuaLiteralExpr getIdExpr() {
     return LuaPsiImplUtilKt.getIdExpr(this);
-  }
-
-  @NotNull
-  public String toString() {
-    return LuaPsiImplUtilKt.toString(this);
   }
 
   @NotNull

@@ -61,14 +61,14 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
                 paramIndex = 1
             else if (isInstanceMethodUsedAsStaticMethod && !exprList.isEmpty()) {
                 val expr = exprList[argIndex++]
-                list.add(InlayInfo(Constants.WORD_SELF, expr.textOffset))
+                list.add(InlayInfo(Constants.WORD_SELF, expr.node.startOffset))
             }
 
             while (argIndex < exprList.size && paramIndex < paramCount) {
                 val expr = exprList[argIndex]
 
                 if (PsiTreeUtil.instanceOf(expr, *EXPR_HINT))
-                    list.add(InlayInfo(parameters[paramIndex].name, expr.textOffset))
+                    list.add(InlayInfo(parameters[paramIndex].name, expr.node.startOffset))
                 paramIndex++
                 argIndex++
             }

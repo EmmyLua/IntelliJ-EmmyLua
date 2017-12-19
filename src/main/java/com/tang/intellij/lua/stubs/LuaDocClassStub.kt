@@ -16,10 +16,19 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.psi.stubs.StubBase
+import com.intellij.psi.NavigatablePsiElement
+import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl
 import com.tang.intellij.lua.psi.LuaElementType
+import com.tang.intellij.lua.psi.aliasName
+import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TySerializedClass
 
@@ -27,6 +36,48 @@ import com.tang.intellij.lua.ty.TySerializedClass
 
  * Created by tangzx on 2016/11/28.
  */
+class LuaDocClassType : LuaStubElementType<LuaDocClassStub, LuaDocClassDef>("DOC_CLASS") {
+
+    override fun createPsi(luaDocClassStub: LuaDocClassStub): LuaDocClassDef {
+        return LuaDocClassDefImpl(luaDocClassStub, this)
+    }
+
+    override fun createStub(luaDocClassDef: LuaDocClassDef, stubElement: StubElement<*>): LuaDocClassStub {
+        val superClassNameRef = luaDocClassDef.superClassNameRef
+        val superClassName = superClassNameRef?.text
+        val aliasName: String? = luaDocClassDef.aliasName
+
+        return LuaDocClassStubImpl(luaDocClassDef.name, aliasName, superClassName, stubElement)
+    }
+
+    override fun serialize(luaDocClassStub: LuaDocClassStub, stubOutputStream: StubOutputStream) {
+        stubOutputStream.writeName(luaDocClassStub.className)
+        stubOutputStream.writeName(luaDocClassStub.aliasName)
+        stubOutputStream.writeName(luaDocClassStub.superClassName)
+    }
+
+    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocClassStub {
+        val className = stubInputStream.readName()
+        val aliasName = stubInputStream.readName()
+        val superClassName = stubInputStream.readName()
+        return LuaDocClassStubImpl(StringRef.toString(className)!!,
+                StringRef.toString(aliasName),
+                StringRef.toString(superClassName),
+                stubElement)
+    }
+
+    override fun indexStub(luaDocClassStub: LuaDocClassStub, indexSink: IndexSink) {
+        val classType = luaDocClassStub.classType
+        indexSink.occurrence(LuaClassIndex.KEY, classType.className)
+        indexSink.occurrence<NavigatablePsiElement, String>(LuaShortNameIndex.KEY, classType.className)
+
+        val superClassName = classType.superClassName
+        if (superClassName != null) {
+            indexSink.occurrence(LuaSuperClassIndex.KEY, superClassName)
+        }
+    }
+}
+
 interface LuaDocClassStub : StubElement<LuaDocClassDef> {
     val className: String
     val aliasName: String?
@@ -38,11 +89,11 @@ class LuaDocClassStubImpl(override val className: String,
                           override val aliasName: String?,
                           override val superClassName: String?,
                           parent: StubElement<*>)
-    : StubBase<LuaDocClassDef>(parent, LuaElementType.CLASS_DEF), LuaDocClassStub {
+    : LuaDocStubBase<LuaDocClassDef>(parent, LuaElementType.CLASS_DEF), LuaDocClassStub {
 
     override val classType: TyClass
         get() {
-            val luaType = TySerializedClass(className, superClassName)
+            val luaType = TySerializedClass(className, className, superClassName)
             luaType.aliasName = aliasName
             return luaType
         }

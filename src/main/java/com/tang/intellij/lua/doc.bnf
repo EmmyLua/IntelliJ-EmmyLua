@@ -127,9 +127,8 @@ field_def ::= TAG_FIELD access_modifier? ID ty comment_string? {
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocClassFieldStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocFieldDefStub"
     methods = [
-        guessType
         guessParentType
         getVisibility
         getNameIdentifier
@@ -196,7 +195,7 @@ class_def ::= (TAG_CLASS|TAG_MODULE) ID (EXTENDS class_name_ref)? comment_string
 // @type CLASS_REF
 type_def ::= TAG_TYPE ty comment_string? {
     pin = 1
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocTyStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTypeDefStub"
     methods = [getType]
 }
 

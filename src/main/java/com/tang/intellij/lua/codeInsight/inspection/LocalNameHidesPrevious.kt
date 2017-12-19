@@ -21,38 +21,53 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.RefactoringQuickFix
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiNameIdentifierOwner
+import com.intellij.psi.PsiNamedElement
 import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.RefactoringActionHandlerFactory
+import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaLocalDef
-import com.tang.intellij.lua.psi.LuaPsiTreeUtil
+import com.tang.intellij.lua.psi.LuaLocalFuncDef
+import com.tang.intellij.lua.psi.LuaPsiTreeUtilEx
 import com.tang.intellij.lua.psi.LuaVisitor
 
 class LocalNameHidesPrevious : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor {
         return object : LuaVisitor() {
+
+            private fun check(namedElement: PsiNamedElement) {
+                LuaPsiTreeUtilEx.walkUpNameDef(namedElement, Processor{ nameDef ->
+                    val psi = if (namedElement is PsiNameIdentifierOwner) namedElement.nameIdentifier else namedElement
+                    if (psi != null && namedElement.name == nameDef.name) {
+                        holder.registerProblem(psi, "Local name hides previous", object : RefactoringQuickFix {
+                            override fun getHandler(): RefactoringActionHandler {
+                                return RefactoringActionHandlerFactory.getInstance().createRenameHandler()
+                            }
+
+                            override fun getFamilyName(): String {
+                                return "Rename"
+                            }
+                        })
+                        return@Processor false
+                    }
+                    return@Processor true
+                })
+            }
+
             override fun visitLocalDef(o: LuaLocalDef) {
                 o.nameList?.nameDefList?.forEach {
                     val name = it.name
                     if (name != Constants.WORD_UNDERLINE) {
-                        LuaPsiTreeUtil.walkUpLocalNameDef(it) { nameDef ->
-                            if (it.name == nameDef.name) {
-                                holder.registerProblem(it, "Local name hides previous", object : RefactoringQuickFix {
-                                    override fun getHandler(): RefactoringActionHandler {
-                                        return RefactoringActionHandlerFactory.getInstance().createRenameHandler()
-                                    }
-
-                                    override fun getFamilyName(): String {
-                                        return "Rename"
-                                    }
-                                })
-                                return@walkUpLocalNameDef false
-                            }
-                            return@walkUpLocalNameDef true
-                        }
+                        check(it)
                     }
                 }
                 super.visitLocalDef(o)
+            }
+
+            override fun visitLocalFuncDef(o: LuaLocalFuncDef) {
+                check(o)
+                super.visitLocalFuncDef(o)
             }
         }
     }

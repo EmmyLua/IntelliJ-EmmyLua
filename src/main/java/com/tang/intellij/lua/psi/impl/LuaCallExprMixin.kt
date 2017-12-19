@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi
+package com.tang.intellij.lua.psi.impl
 
-import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
+import com.intellij.lang.ASTNode
+import com.intellij.psi.stubs.IStubElementType
+import com.intellij.psi.tree.IElementType
+import com.tang.intellij.lua.stubs.LuaExprPlaceStub
 
-/**
- *
- * Created by tangzx on 2016/12/1.
- */
-interface LuaTypeGuessable : LuaPsiElement {
-    fun guessType(context: SearchContext): ITy
+open class LuaCallExprMixin : LuaExprStubMixin<LuaExprPlaceStub> {
+
+    constructor(stub: LuaExprPlaceStub, nodeType: IStubElementType<*, *>)
+            : super(stub, nodeType)
+
+    constructor(node: ASTNode) : super(node)
+
+    constructor(stub: LuaExprPlaceStub, nodeType: IElementType, node: ASTNode)
+            : super(stub, nodeType, node)
 }

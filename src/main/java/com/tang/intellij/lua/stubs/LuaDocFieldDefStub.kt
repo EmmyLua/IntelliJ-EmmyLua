@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs.types
+package com.tang.intellij.lua.stubs
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.stubs.*
+import com.intellij.psi.stubs.IndexSink
+import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl
-import com.tang.intellij.lua.lang.LuaLanguage
+import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.Visibility
-import com.tang.intellij.lua.stubs.LuaDocClassFieldStub
-import com.tang.intellij.lua.stubs.LuaDocClassFieldStubImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import java.io.IOException
 
@@ -35,9 +37,9 @@ import java.io.IOException
 
  * Created by tangzx on 2016/12/10.
  */
-class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldDef>("Class Doc Field", LuaLanguage.INSTANCE) {
+class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldDef>("CLASS_DOC_FIELD") {
 
-    override fun createPsi(luaFieldStub: LuaDocClassFieldStub) = LuaDocFieldDefImpl(luaFieldStub, this)
+    override fun createPsi(stub: LuaDocFieldDefStub) = LuaDocFieldDefImpl(stub, this)
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val element = node.psi as LuaDocFieldDef
@@ -45,7 +47,7 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
         return comment.classDef != null && element.nameIdentifier != null
     }
 
-    override fun createStub(fieldDef: LuaDocFieldDef, stubElement: StubElement<*>): LuaDocClassFieldStub {
+    override fun createStub(fieldDef: LuaDocFieldDef, stubElement: StubElement<*>): LuaDocFieldDefStub {
         val comment = LuaCommentUtil.findContainer(fieldDef)
         val name = fieldDef.name!!
         val classDef = comment.classDef
@@ -54,42 +56,55 @@ class LuaDocClassFieldType : IStubElementType<LuaDocClassFieldStub, LuaDocFieldD
             className = classDef.name
         }
 
-        return LuaDocClassFieldStubImpl(stubElement,
+        return LuaDocFieldDefStubImpl(stubElement,
                 name,
                 className,
                 fieldDef.visibility,
                 fieldDef.ty?.getType() ?: Ty.UNKNOWN)
     }
 
-    override fun getExternalId() = "lua.class.field"
-
-    @Throws(IOException::class)
-    override fun serialize(luaFieldStub: LuaDocClassFieldStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeName(luaFieldStub.name)
-        stubOutputStream.writeName(luaFieldStub.className)
-        Ty.serialize(luaFieldStub.type, stubOutputStream)
-        stubOutputStream.writeByte(luaFieldStub.visibility.ordinal)
+    override fun serialize(stub: LuaDocFieldDefStub, stubOutputStream: StubOutputStream) {
+        stubOutputStream.writeName(stub.name)
+        stubOutputStream.writeName(stub.className)
+        Ty.serialize(stub.type, stubOutputStream)
+        stubOutputStream.writeByte(stub.visibility.ordinal)
     }
 
-    @Throws(IOException::class)
-    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocClassFieldStub {
+    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocFieldDefStub {
         val name = stubInputStream.readName()
         val className = stubInputStream.readName()
         val type = Ty.deserialize(stubInputStream)
         val visibility = stubInputStream.readByte()
-        return LuaDocClassFieldStubImpl(stubElement,
+        return LuaDocFieldDefStubImpl(stubElement,
                 StringRef.toString(name)!!,
                 StringRef.toString(className)!!,
                 Visibility.get(visibility.toInt()),
                 type)
     }
 
-    override fun indexStub(luaFieldStub: LuaDocClassFieldStub, indexSink: IndexSink) {
-        val className = luaFieldStub.className
+    override fun indexStub(stub: LuaDocFieldDefStub, indexSink: IndexSink) {
+        val className = stub.className
         className ?: return
 
-        LuaClassMemberIndex.indexStub(indexSink, className, luaFieldStub.name)
+        LuaClassMemberIndex.indexStub(indexSink, className, stub.name)
 
-        indexSink.occurrence(LuaShortNameIndex.KEY, luaFieldStub.name)
+        indexSink.occurrence(LuaShortNameIndex.KEY, stub.name)
     }
+}
+
+interface LuaDocFieldDefStub : LuaClassMemberStub<LuaDocFieldDef> {
+    val name: String
+
+    val type: ITy
+
+    val className: String?
+}
+
+class LuaDocFieldDefStubImpl(parent: StubElement<*>,
+                             override val name: String,
+                             override val className: String?,
+                             override val visibility: Visibility,
+                             override val type: ITy)
+    : LuaDocStubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocFieldDefStub {
+    override val docTy = type
 }

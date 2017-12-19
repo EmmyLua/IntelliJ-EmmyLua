@@ -5,12 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
-import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaNameStub;
+import com.tang.intellij.lua.stubs.LuaExprStubElement;
+import com.tang.intellij.lua.stubs.LuaNameExprStub;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
 
-public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, StubBasedPsiElement<LuaNameStub> {
+public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, LuaExprStubElement<LuaNameExprStub> {
 
   @NotNull
   PsiElement getId();
@@ -29,5 +29,9 @@ public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, StubBasedP
 
   @NotNull
   PsiReference[] getReferences();
+
+  //WARNING: toString(...) is skipped
+  //matching toString(LuaNameExpr, ...)
+  //methods are not found in LuaPsiImplUtilKt
 
 }

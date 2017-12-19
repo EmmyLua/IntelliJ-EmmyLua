@@ -16,15 +16,8 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.psi.stubs.StubBase
-import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.comment.psi.LuaDocTypeDef
-import com.tang.intellij.lua.psi.LuaElementType
+import com.tang.intellij.lua.ty.ITy
 
-interface LuaDocTyStub : StubElement<LuaDocTypeDef> {
-
-}
-
-class LuaDocTyStubImpl(parent: StubElement<*>?) : StubBase<LuaDocTypeDef>(parent, LuaElementType.TYPE_DEF), LuaDocTyStub {
-
+interface LuaDocTyStub {
+    val docTy: ITy?
 }

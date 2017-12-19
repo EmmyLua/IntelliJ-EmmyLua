@@ -44,7 +44,7 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
   @Override
   @NotNull
   public List<LuaExpr> getExprList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaExpr.class);
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaExpr.class);
   }
 
   @Override
@@ -85,11 +85,6 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
   @NotNull
   public ItemPresentation getPresentation() {
     return LuaPsiImplUtilKt.getPresentation(this);
-  }
-
-  @NotNull
-  public ITy guessType(SearchContext context) {
-    return LuaPsiImplUtilKt.guessType(this, context);
   }
 
   @NotNull

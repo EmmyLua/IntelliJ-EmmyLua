@@ -1,12 +1,15 @@
 --- builtin types
 
-_G = nil
+---@class _G
+_G = {}
 
 ---@class boolean
 
 ---@class number
 
 ---@class void
+
+---@class any
 
 ---@class table
 

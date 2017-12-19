@@ -149,19 +149,26 @@ private stat_recover ::= !(ID
     | nil | true | false | STRING | NUMBER | '::' | 'goto'
     | unaryOp)
 
-varList ::= varExpr (',' varExpr)* { extends = exprList }
+varList ::= varExpr (',' varExpr)* {
+    extends = exprList
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 assignStat ::= varList '=' exprList {
     pin = 2
     implements = [
         "com.tang.intellij.lua.psi.LuaDeclaration"
     ]
     methods = [assign = 'ASSIGN' varExprList = '/exprList[0]' valueExprList = '/exprList[1]']
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
 doStat ::= 'do' <<lazyBlock>> 'end' {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
 whileStat ::= 'while' expr 'do' <<lazyBlock>> 'end' {
     pin = 1
@@ -185,6 +192,8 @@ ifStat ::= 'if' expr 'then' <<lazyBlock>> ('elseif' expr 'then' <<lazyBlock>>)* 
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
 forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' <<lazyBlock>> 'end' {
     pin = 3
@@ -222,7 +231,12 @@ gotoStat ::= 'goto' ID {
     ]
 }
 private defStat ::= classMethodDef | funcDef | localFuncDef | localDef
-callStat ::= funcCallExpr { extends = exprStat }
+callStat ::= funcCallExpr {
+    extends = exprStat
+    methods = [getExpr]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 incompleteStat ::= expr { extends = exprStat }
 
 funcDef ::= 'function' ID funcBody {
@@ -259,6 +273,7 @@ classMethodName ::=  nameExpr (funcPrefixRef)* (('.' ID) | (':' ID)) {
         dot = 'DOT'
         colon = 'COLON'
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
 }
 classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
@@ -304,10 +319,14 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         guessReturnType
         getParams
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaLocalFuncDefStub'
 }
-nameList ::= nameDef (',' nameDef)*
+nameList ::= nameDef (',' nameDef)* {
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 localDef ::= 'local' nameList ('=' exprList)? {
     pin = 1
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
     implements = [
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
@@ -315,14 +334,24 @@ localDef ::= 'local' nameList ('=' exprList)? {
     methods = [getComment assign = 'ASSIGN']
 }
 
-returnStat ::= return exprList?
+returnStat ::= return exprList? {
+    mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 breakStat ::= break
 private lastStat ::= returnStat | breakStat
 
-exprList ::= (expr ',')* expr { methods = [guessTypeAt] }
+exprList ::= (expr ',')* expr {
+    methods = [guessTypeAt]
+    stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
+}
 
 literalExpr ::= nil | false | true | NUMBER | STRING | "..." {
     mixin = 'com.tang.intellij.lua.psi.impl.LuaLiteralExprMixin'
+    implements = [
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaLiteralExprStub>"
+    ]
+    //stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'
 }
 stringExpr ::= STRING {
     extends = literalExpr
@@ -336,15 +365,32 @@ private varExpr ::= primaryExpr
 //expr ::= (unaryExpr | valueExpr) binaryExpr?
 expr ::= <<parseExpr primaryExpr>> {
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
+    stubClass = "com.tang.intellij.lua.stubs.LuaExprStub"
     implements = [
         "com.tang.intellij.lua.psi.LuaTypeGuessable"
     ]
 }
 
-parenExpr ::= '(' expr ')' { pin = 1 }
-unaryExpr ::= unaryOp (unaryExpr | primaryExpr) { pin = 1 }
+parenExpr ::= '(' expr ')' {
+    pin = 1
+    stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'
+    mixin = "com.tang.intellij.lua.psi.impl.LuaParenExprMixin"
+}
+unaryExpr ::= unaryOp (unaryExpr | primaryExpr) {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaUnaryExprStub>"
+    ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaUnaryExprMixin"
+}
 
-left binaryExpr ::= binaryOp expr { pin = 1 }
+left binaryExpr ::= binaryOp expr {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaBinaryExprStub>"
+    ]
+    mixin = "com.tang.intellij.lua.psi.impl.LuaBinaryExprMixin"
+}
 
 left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     pin(".*") = 1
@@ -367,12 +413,14 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
     implements = [
         "com.intellij.psi.PsiNameIdentifierOwner"
         "com.tang.intellij.lua.psi.LuaClassMember"
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaIndexExprStub>"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaIndexStub"
     mixin = "com.tang.intellij.lua.psi.impl.LuaIndexExprMixin"
 }
 
-args ::= listArgs | singleArg
+args ::= listArgs | singleArg {
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
+}
 singleArg ::= tableExpr | stringExpr { extends = args }
 private arg_expr_list ::= (expr ',')* (expr |& ')')
 listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }
@@ -387,6 +435,8 @@ left callExpr ::= args {
         isMethodCall
         isFunctionCall
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'
+    mixin = 'com.tang.intellij.lua.psi.impl.LuaCallExprMixin'
 }
 
 private suffixExpr ::= indexExpr | callExpr
@@ -398,8 +448,12 @@ private funcCallExpr ::= primaryExpr <<checkType 'CALL_EXPR'>>
 
 closureExpr ::= 'function' funcBody {
     pin = 2
-    implements = "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+    implements = [
+        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaClosureExprStub>"
+    ]
     methods = [getParamNameDefList guessReturnType getParams]
+    mixin = 'com.tang.intellij.lua.psi.impl.LuaClosureExprMixin'
 }
 
 funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
@@ -411,6 +465,7 @@ funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
         RPAREN = 'RPAREN'
         ELLIPSIS = 'ELLIPSIS'
     ]
+    stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
 }
 
 private parList ::= paramNameDef (',' paramNameDef)* (',' '...')? | '...' { recoverWhile = parList_recover }
@@ -421,9 +476,9 @@ tableExpr ::= '{' fieldList '}' {
     methods = [findField toString]
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaTableExprStub>"
     ]
     mixin = "com.tang.intellij.lua.psi.impl.LuaTableExprMixin"
-    stubClass = "com.tang.intellij.lua.stubs.LuaTableStub"
 }
 
 private fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
@@ -442,7 +497,6 @@ tableField ::= tableField1 | tableField2 | expr {
 
         getFieldName
         getPresentation
-        guessType
         guessParentType
         getVisibility
         getComment
@@ -473,20 +527,26 @@ unaryOp ::= '-' | 'not' | '#'
     // lua5.3
     | '~'
 
-fake name ::= ID {
+nameDef ::= ID {
     implements = [
         "com.tang.intellij.lua.psi.LuaNamedElement"
+        "com.tang.intellij.lua.psi.LuaTypeGuessable"
+        "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    methods = [setName getName]
-}
-nameDef ::= ID {
-    implements = ["com.tang.intellij.lua.psi.LuaTypeGuessable" "com.intellij.psi.PsiNameIdentifierOwner"]
-    methods = [guessType getNameIdentifier getUseScope]
-    extends = name
+    methods = [
+        getName
+        setName
+        getNameIdentifier
+        getUseScope
+    ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaNameDefStub"
 }
 nameExpr ::= ID {
-    implements = ["com.tang.intellij.lua.psi.LuaPsiElement"
-        "com.intellij.psi.PsiNameIdentifierOwner" ]
+    implements = [
+        "com.tang.intellij.lua.psi.LuaPsiElement"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaNameExprStub>"
+    ]
     methods = [
         setName
         getName
@@ -497,8 +557,8 @@ nameExpr ::= ID {
         toString
     ]
     mixin = "com.tang.intellij.lua.psi.impl.LuaNameExprMixin"
-    stubClass = "com.tang.intellij.lua.stubs.LuaNameStub"
 }
 paramNameDef ::= ID {
     extends = nameDef
+    stubClass = "com.tang.intellij.lua.stubs.LuaNameDefStub"
 }

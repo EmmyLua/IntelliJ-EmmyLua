@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs
+package com.tang.intellij.lua.spellchecker
 
-import com.intellij.psi.stubs.IStubElementType
-import com.intellij.psi.stubs.StubBase
-import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.psi.LuaTableExpr
+import com.intellij.spellchecker.BundledDictionaryProvider
 
-/**
-
- * Created by tangzx on 2017/1/12.
- */
-interface LuaTableStub : StubElement<LuaTableExpr>
-
-class LuaTableStubImpl(parent: StubElement<*>, elementType: IStubElementType<*, *>)
-    : StubBase<LuaTableExpr>(parent, elementType), LuaTableStub
+class LuaSpellBundledDictionaryProvider : BundledDictionaryProvider {
+    override fun getBundledDictionaries() = arrayOf("lua.dict")
+}

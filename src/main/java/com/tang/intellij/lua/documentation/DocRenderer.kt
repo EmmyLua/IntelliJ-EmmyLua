@@ -50,7 +50,7 @@ internal fun renderTy(sb: StringBuilder, ty: ITy) {
             sb.append("[]")
         }
         is TyUnknown -> {
-            sb.appendClassLink("any")
+            sb.append("any")
         }
         is TyUnion -> {
             var idx = 0
@@ -62,10 +62,9 @@ internal fun renderTy(sb: StringBuilder, ty: ITy) {
         }
         is TyPrimitive -> {
             sb.appendClassLink(ty.displayName)
-            //sb.append(ty.displayName)
         }
         else -> {
-            sb.append("<<${ty.createTypeString()}>>")
+            sb.append(ty.createTypeString())
         }
     }
 }

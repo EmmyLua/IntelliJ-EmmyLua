@@ -22,13 +22,12 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.util.Processor;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.tang.intellij.lua.ty.Ty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  *
@@ -36,25 +35,21 @@ import java.util.List;
  */
 public class LuaPsiTreeUtil {
 
-    public interface ElementProcessor<T extends PsiElement> {
-        boolean accept(T t);
-    }
-
-    public static void walkUpLabel(PsiElement current, ElementProcessor<LuaLabelStat> processor) {
+    public static void walkUpLabel(PsiElement current, Processor<LuaLabelStat> processor) {
         PsiElement prev = current.getPrevSibling();
         while (true) {
             if (prev == null)
                 prev = current.getParent();
             if (prev == null || prev instanceof PsiFile)
                 break;
-            if (prev instanceof LuaLabelStat && !processor.accept((LuaLabelStat) prev))
+            if (prev instanceof LuaLabelStat && !processor.process((LuaLabelStat) prev))
                 break;
             current = prev;
             prev = prev.getPrevSibling();
         }
     }
 
-    public static <T extends PsiElement> void walkTopLevelInFile(PsiElement element, Class<T> cls, ElementProcessor<T> processor) {
+    public static <T extends PsiElement> void walkTopLevelInFile(PsiElement element, Class<T> cls, Processor<T> processor) {
         if (element == null || processor == null)
             return;
         PsiElement parent = element;
@@ -63,126 +58,11 @@ public class LuaPsiTreeUtil {
 
         for(PsiElement child = parent; child != null; child = child.getPrevSibling()) {
             if (cls.isInstance(child)) {
-                if (!processor.accept(cls.cast(child))) {
+                if (!processor.process(cls.cast(child))) {
                     break;
                 }
             }
         }
-    }
-
-    /**
-     * 向上寻找 local function 定义
-     * @param current 当前搜导起点
-     * @param processor 处理器
-     */
-    public static void walkUpLocalFuncDef(PsiElement current, ElementProcessor<LuaLocalFuncDef> processor) {
-        if (current == null || processor == null)
-            return;
-        boolean continueSearch = true;
-        int treeDeep = 0;
-        int funcDeep = 0;
-        PsiElement curr = current;
-        do {
-            if (curr instanceof LuaLocalFuncDef) {
-                LuaLocalFuncDef localFuncDef = (LuaLocalFuncDef) curr;
-                continueSearch = processor.accept(localFuncDef);
-                funcDeep++;
-            }
-
-            PsiElement prevSibling = curr.getPrevSibling();
-            if (prevSibling == null) {
-                treeDeep++;
-                prevSibling = curr.getParent();
-            }
-            curr = prevSibling;
-        } while (continueSearch && !(curr instanceof PsiFile));
-    }
-
-    /**
-     * 向上寻找 local 定义
-     * @param element 当前搜索起点
-     * @param processor 处理器
-     */
-    public static void walkUpLocalNameDef(PsiElement element, ElementProcessor<LuaNameDef> processor) {
-        walkUpName(element, processor, null);
-    }
-
-    public static void walkUpName(PsiElement element, @NotNull ElementProcessor<LuaNameDef> processor, @Nullable ElementProcessor<LuaNameExpr> nameExprElementProcessor) {
-        if (element == null)
-            return;
-        boolean continueSearch = true;
-
-        PsiElement curr = element;
-        do {
-            PsiElement next = curr.getPrevSibling();
-            boolean isParent = false;
-            if (next == null) {
-                next = curr.getParent();
-                isParent = true;
-            }
-            curr = next;
-
-            if (curr instanceof LuaLocalDef) {
-                LuaLocalDef localDef = (LuaLocalDef) curr;
-                // 跳过类似
-                // local name = name //skip
-                if (!localDef.getNode().getTextRange().contains(element.getNode().getTextRange())) {
-                    LuaNameList nameList = localDef.getNameList();
-                    continueSearch = resolveInNameList(nameList, processor);
-                }
-            } else if (nameExprElementProcessor != null && curr instanceof LuaAssignStat) {
-                LuaAssignStat stat = (LuaAssignStat) curr;
-                for (LuaExpr expr : stat.getVarExprList().getExprList()) {
-                    if (expr != element && expr instanceof LuaNameExpr) {
-                        LuaNameExpr nameExpr = (LuaNameExpr) expr;
-                        if (nameExprElementProcessor.accept(nameExpr)) {
-                            break;
-                        }
-                    }
-                }
-            } else if (isParent) {
-                if (curr instanceof LuaFuncBody) {
-                    continueSearch = resolveInFuncBody((LuaFuncBody) curr, processor);
-                }
-                // for name = x, y do end
-                else if (curr instanceof LuaForAStat) {
-                    LuaForAStat forAStat = (LuaForAStat) curr;
-                    continueSearch = processor.accept(forAStat.getParamNameDef());
-                }
-                // for name in xxx do end
-                else if (curr instanceof LuaForBStat) {
-                    LuaForBStat forBStat = (LuaForBStat) curr;
-                    continueSearch = resolveInNameList(forBStat.getParamNameDefList(), processor);
-                }
-            }
-        } while (continueSearch && !(curr instanceof PsiFile));
-    }
-
-    private static boolean resolveInFuncBody(LuaFuncBody funcBody, ElementProcessor<LuaNameDef> processor) {
-        if (funcBody != null) {
-            for (LuaParamNameDef parDef : funcBody.getParamNameDefList()) {
-                if (!processor.accept(parDef)) return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean resolveInNameList(LuaNameList nameList, ElementProcessor<LuaNameDef> processor) {
-        if (nameList != null) {
-            for (LuaNameDef nameDef : nameList.getNameDefList()) {
-                if (!processor.accept(nameDef)) return false;
-            }
-        }
-        return true;
-    }
-
-    private static boolean resolveInNameList(List<LuaParamNameDef> nameList, ElementProcessor<LuaNameDef> processor) {
-        if (nameList != null) {
-            for (LuaNameDef nameDef : nameList) {
-                if (!processor.accept(nameDef)) return false;
-            }
-        }
-        return true;
     }
 
     @Nullable
@@ -207,9 +87,7 @@ public class LuaPsiTreeUtil {
                 element = element.getParent();
             }
 
-            @SuppressWarnings("unchecked")
-            T e = (T) element;
-            return e;
+            return aClass.cast(element);
         }
     }
 

@@ -22,7 +22,8 @@ import com.intellij.codeInsight.template.Expression
 import com.intellij.codeInsight.template.ExpressionContext
 import com.intellij.codeInsight.template.Macro
 import com.intellij.codeInsight.template.Result
-import com.tang.intellij.lua.psi.LuaPsiTreeUtil
+import com.intellij.util.Processor
+import com.tang.intellij.lua.psi.LuaPsiTreeUtilEx
 
 /**
  *
@@ -43,10 +44,10 @@ class SuggestFirstLuaVarNameMacro : Macro() {
 
     override fun calculateLookupItems(params: Array<out Expression>, context: ExpressionContext): Array<LookupElement>? {
         val list = mutableListOf<LookupElement>()
-        LuaPsiTreeUtil.walkUpLocalNameDef(context.psiElementAtStartOffset) { nameDef ->
-            list.add(LookupElementBuilder.create(nameDef.name))
+        LuaPsiTreeUtilEx.walkUpNameDef(context.psiElementAtStartOffset, Processor { nameDef ->
+            nameDef.name?.let { list.add(LookupElementBuilder.create(it)) }
             true
-        }
+        })
         return list.toTypedArray()
     }
 }

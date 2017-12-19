@@ -26,7 +26,6 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
@@ -49,16 +48,7 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
-    return when (nameRef.text){
-        Constants.WORD_NIL -> Ty.NIL
-        Constants.WORD_ANY -> Ty.UNKNOWN
-        Constants.WORD_BOOLEAN -> Ty.BOOLEAN
-        Constants.WORD_STRING -> Ty.STRING
-        Constants.WORD_NUMBER -> Ty.NUMBER
-        Constants.WORD_TABLE -> Ty.TABLE
-        Constants.WORD_FUNCTION -> Ty.FUNCTION
-        else -> TyLazyClass(nameRef.text)
-    }
+    return Ty.getBuiltin(nameRef.text) ?: TyLazyClass(nameRef.text)
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {
@@ -103,6 +93,10 @@ fun guessParentType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
 }
 
 fun getVisibility(fieldDef: LuaDocFieldDef): Visibility {
+    val stub = fieldDef.stub
+    if (stub != null)
+        return stub.visibility
+
     val v = fieldDef.accessModifier?.let { Visibility.get(it.text) }
     return v ?: Visibility.PUBLIC
 }
@@ -234,7 +228,7 @@ fun getType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
 
 fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
     val set = luaDocFunctionTy.typeList?.tyList?.firstOrNull()
-    return set?.getType() ?: Ty.UNKNOWN
+    return set?.getType() ?: Ty.VOID
 }
 
 fun getType(luaDocGenericTy: LuaDocGenericTy): ITy {

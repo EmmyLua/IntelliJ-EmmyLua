@@ -22,6 +22,8 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.readSignatures
+import com.tang.intellij.lua.stubs.writeSignatures
 
 enum class TyKind {
     Unknown,
@@ -31,7 +33,8 @@ enum class TyKind {
     Class,
     Union,
     Generic,
-    Nil
+    Nil,
+    Void,
 }
 enum class TyPrimitiveKind {
     String,
@@ -122,6 +125,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
     companion object {
 
         val UNKNOWN = TyUnknown()
+        val VOID = TyVoid()
         val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
         val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
         val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
@@ -144,8 +148,22 @@ abstract class Ty(override val kind: TyKind) : ITy {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
         }
 
+        fun getBuiltin(name: String): ITy? {
+            return when (name) {
+                Constants.WORD_NIL -> Ty.NIL
+                Constants.WORD_VOID -> Ty.VOID
+                Constants.WORD_ANY -> Ty.UNKNOWN
+                Constants.WORD_BOOLEAN -> Ty.BOOLEAN
+                Constants.WORD_STRING -> Ty.STRING
+                Constants.WORD_NUMBER -> Ty.NUMBER
+                Constants.WORD_TABLE -> Ty.TABLE
+                Constants.WORD_FUNCTION -> Ty.FUNCTION
+                else -> null
+            }
+        }
+
         fun isInvalid(ty: ITy?): Boolean {
-            return ty == null || ty is TyUnknown || ty is TyNil
+            return ty == null || ty is TyUnknown || ty is TyNil || ty is TyVoid
         }
 
         fun serialize(ty: ITy, stream: StubOutputStream) {
@@ -157,13 +175,11 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 is ITyFunction -> {
                     FunSignature.serialize(ty.mainSignature, stream)
-                    stream.writeByte(ty.signatures.size)
-                    for (sig in ty.signatures) {
-                        FunSignature.serialize(sig, stream)
-                    }
+                    stream.writeSignatures(ty.signatures)
                 }
                 is ITyClass -> {
                     stream.writeName(ty.className)
+                    stream.writeName(ty.varName)
                     stream.writeName(ty.superClassName)
                     stream.writeName(ty.aliasName)
                 }
@@ -192,18 +208,16 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 TyKind.Function -> {
                     val mainSig = FunSignature.deserialize(stream)
-                    val size = stream.readByte()
-                    val arr = mutableListOf<IFunSignature>()
-                    for (i in 0 until size) {
-                        arr.add(FunSignature.deserialize(stream))
-                    }
-                    TySerializedFunction(mainSig, arr.toTypedArray(), flags)
+                    val arr = stream.readSignatures()
+                    TySerializedFunction(mainSig, arr, flags)
                 }
                 TyKind.Class -> {
                     val className = stream.readName()
+                    val varName = stream.readName()
                     val superName = stream.readName()
                     val aliasName = stream.readName()
                     TySerializedClass(StringRef.toString(className),
+                            StringRef.toString(varName),
                             StringRef.toString(superName),
                             StringRef.toString(aliasName),
                             flags)
@@ -227,6 +241,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     TySerializedGeneric(params.toTypedArray(), base)
                 }
                 TyKind.Nil -> NIL
+                TyKind.Void -> VOID
                 else -> TyUnknown()
             }
         }
@@ -349,8 +364,8 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun union(t1: ITy, t2: ITy): ITy {
             return when {
-                t1 is TyUnknown -> t2
-                t2 is TyUnknown -> t1
+                isInvalid(t1) -> t2
+                isInvalid(t2) -> t1
                 t1 is TyUnion -> t1.union2(t2)
                 t2 is TyUnion -> t2.union2(t1)
                 else -> {
@@ -406,5 +421,14 @@ class TyNil : Ty(TyKind.Nil) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
 
         return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
+    }
+}
+
+class TyVoid : Ty(TyKind.Void) {
+    override val displayName: String
+        get() = Constants.WORD_VOID
+
+    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+        return false
     }
 }

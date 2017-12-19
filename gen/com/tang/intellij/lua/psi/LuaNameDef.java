@@ -5,14 +5,20 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.intellij.psi.StubBasedPsiElement;
+import com.tang.intellij.lua.stubs.LuaNameDefStub;
 import com.intellij.psi.search.SearchScope;
-import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaNameDef extends LuaName, LuaTypeGuessable, PsiNameIdentifierOwner {
+public interface LuaNameDef extends LuaNamedElement, LuaTypeGuessable, PsiNameIdentifierOwner, StubBasedPsiElement<LuaNameDefStub> {
 
   @NotNull
-  ITy guessType(SearchContext context);
+  PsiElement getId();
+
+  @NotNull
+  String getName();
+
+  @NotNull
+  PsiElement setName(String name);
 
   @NotNull
   PsiElement getNameIdentifier();

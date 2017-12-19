@@ -44,13 +44,13 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
   @Override
   @NotNull
   public LuaClassMethodName getClassMethodName() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaClassMethodName.class));
+    return notNullChild(PsiTreeUtil.getStubChildOfType(this, LuaClassMethodName.class));
   }
 
   @Override
   @Nullable
   public LuaFuncBody getFuncBody() {
-    return PsiTreeUtil.getChildOfType(this, LuaFuncBody.class);
+    return PsiTreeUtil.getStubChildOfType(this, LuaFuncBody.class);
   }
 
   @Nullable

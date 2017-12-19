@@ -11,11 +11,23 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
+import com.tang.intellij.lua.stubs.LuaExprPlaceStub;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaExprStub;
 
-public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
+public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
+
+  public LuaCallExprImpl(LuaExprPlaceStub stub, IStubElementType<?, ?> nodeType) {
+    super(stub, nodeType);
+  }
 
   public LuaCallExprImpl(ASTNode node) {
     super(node);
+  }
+
+  public LuaCallExprImpl(LuaExprPlaceStub stub, IElementType type, ASTNode node) {
+    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
@@ -30,13 +42,13 @@ public class LuaCallExprImpl extends LuaExprImpl implements LuaCallExpr {
   @Override
   @NotNull
   public LuaArgs getArgs() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaArgs.class));
+    return notNullChild(PsiTreeUtil.getStubChildOfType(this, LuaArgs.class));
   }
 
   @Override
   @NotNull
   public LuaExpr getExpr() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaExpr.class));
+    return notNullChild(PsiTreeUtil.getStubChildOfType(this, LuaExpr.class));
   }
 
   @NotNull

@@ -32,11 +32,8 @@ import com.tang.intellij.lua.comment.psi.LuaDocElementType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.parser.LuaParser
-import com.tang.intellij.lua.psi.LuaElementType
-import com.tang.intellij.lua.psi.LuaPsiFile
-import com.tang.intellij.lua.psi.LuaTokenType
-import com.tang.intellij.lua.psi.LuaTypes
-import com.tang.intellij.lua.stubs.types.LuaFileElementType
+import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.stubs.LuaFileElementType
 
 /**
  * Created by TangZhiXu on 2015/11/15.
@@ -103,7 +100,34 @@ fun createType(string: String): IElementType {
         "TABLE_EXPR" -> LuaElementType.TABLE
         "TABLE_FIELD" -> LuaElementType.TABLE_FIELD
         "INDEX_EXPR" -> LuaElementType.INDEX
-        "NAME_EXPR" -> LuaElementType.NAME
+        "NAME_EXPR" -> LuaElementType.NAME_EXPR
+        "NAME_DEF" -> LuaElementType.NAME_DEF
+        "PARAM_NAME_DEF" -> LuaElementType.PARAM_NAME_DEF
+        "LITERAL_EXPR" -> LuaElementType.LITERAL_EXPR
+
+        "CALL_EXPR" -> LuaElementTypes.CALL_EXPR
+        "SINGLE_ARG" -> LuaElementTypes.SINGLE_ARG
+        "LIST_ARGS" -> LuaElementTypes.LIST_ARGS
+
+        "EXPR_LIST" -> LuaElementTypes.EXPR_LIST
+        "NAME_LIST" -> LuaElementTypes.NAME_LIST
+        "LOCAL_DEF" -> LuaElementTypes.LOCAL_DEF
+        "ASSIGN_STAT" -> LuaElementTypes.ASSIGN_STAT
+        "VAR_LIST" -> LuaElementTypes.VAR_LIST
+        "PAREN_EXPR" -> LuaElementTypes.PAREN_EXPR
+        "LOCAL_FUNC_DEF" -> LuaElementTypes.LOCAL_FUNC_DEF
+        "CLOSURE_EXPR" -> LuaElementTypes.CLOSURE_EXPR
+        "FUNC_BODY" -> LuaElementTypes.FUNC_BODY
+        "CLASS_METHOD_NAME" -> LuaElementTypes.CLASS_METHOD_NAME
+
+        "RETURN_STAT" -> LuaElementTypes.RETURN_STAT
+        "DO_STAT" -> LuaElementTypes.DO_STAT
+        "IF_STAT" -> LuaElementTypes.IF_STAT
+        "CALL_STAT" -> LuaElementTypes.CALL_STAT
+
+        "UNARY_EXPR" -> LuaElementTypes.UNARY_EXPR
+        "BINARY_EXPR" -> LuaElementTypes.BINARY_EXPR
+
         else -> LuaElementType(string)
     }
 }

@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.stubs
+package com.tang.intellij.lua.psi;
 
-import com.intellij.psi.stubs.StubElement
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.search.SearchContext;
+import com.tang.intellij.lua.ty.DeclarationsKt;
+import com.tang.intellij.lua.ty.ITy;
 
 /**
-
- * Created by TangZX on 2017/4/12.
+ *
+ * Created by tangzx on 2016/12/1.
  */
-interface LuaIndexStub : StubElement<LuaIndexExpr>, LuaClassMemberStub<LuaIndexExpr> {
-    val className: String?
-    val name: String?
-    val valueType: ITy
+public interface LuaTypeGuessable extends LuaPsiElement {
+    default ITy guessType(SearchContext context) {
+        return DeclarationsKt.infer(this, context);
+    }
 }

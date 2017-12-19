@@ -23,9 +23,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
-import com.intellij.util.SmartList
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.reference.LuaReference
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
@@ -34,13 +32,13 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
     var ret:LuaFuncBodyOwner? = null
     val refName = ref.name
     //local 函数名
-    LuaPsiTreeUtil.walkUpLocalFuncDef(ref) { localFuncDef ->
+    LuaPsiTreeUtilEx.walkUpLocalFuncDef(ref, Processor { localFuncDef ->
         if (refName == localFuncDef.name) {
             ret = localFuncDef
-            return@walkUpLocalFuncDef false
+            return@Processor false
         }
         true
-    }
+    })
 
     //global function
     if (ret == null) {
@@ -57,68 +55,48 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
     return ret
 }
 
-fun resolveLocal(ref: LuaNameExpr, context: SearchContext?): PsiElement? = resolveLocal(ref.name, ref, context)
+fun resolveLocal(ref: LuaNameExpr, context: SearchContext?) = resolveLocal(ref.name, ref, context)
 
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
-    var ret: PsiElement? = null
-    var lastNameExpr: LuaNameExpr? = null
+    val element = resolveInFile(refName, ref, context)
+    if (element is LuaNameExpr)
+        return null
+    return element
+}
 
-    LuaPsiTreeUtil.walkUpName(ref, { nameDef ->
+fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): PsiElement? {
+    var ret: PsiElement? = null
+    var lastName: LuaNameExpr? = null
+
+    //local/param
+    LuaPsiTreeUtilEx.walkUpNameDef(pin, Processor { nameDef ->
         if (refName == nameDef.name) {
             ret = nameDef
-            return@walkUpName false
+            return@Processor false
         }
         true
-    }, {
-        if (refName == it.name)
-            lastNameExpr = it
+    }, Processor {
+        if (refName == it.name) {
+            lastName = it
+            return@Processor false
+        }
         true
     })
 
     if (ret == null)
-        ret = lastNameExpr
+        ret = lastName
 
     if (ret == null && refName == Constants.WORD_SELF) {
-        val block = PsiTreeUtil.getParentOfType(ref, LuaBlock::class.java)
-        if (block != null) {
-            val methodDef = PsiTreeUtil.getParentOfType(block, LuaClassMethodDef::class.java)
-            if (methodDef != null && !methodDef.isStatic) {
-                /**
-                 * eg.
-                 * function xx:aa()
-                 *     local self = {}
-                 *     return self
-                 * end
-                 */
-                ret?.textRange?.let {
-                    if (block.textRange.contains(it))
-                        return ret
-                }
-
-                val expr = methodDef.classMethodName.expr
-                val reference = expr.reference
-                if (reference is LuaReference && context != null) {
-                    val resolve = reference.resolve(context)
-                    ret = resolve
-                }
-                if (ret == null && expr is LuaNameExpr)
-                    ret = expr
-            }
+        val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(pin, LuaClassMethodDef::class.java)
+        if (methodDef != null && !methodDef.isStatic) {
+            val methodName = methodDef.classMethodName
+            val expr = methodName.expr
+            ret = if (expr is LuaNameExpr && context != null)
+                resolve(expr, context)
+            else
+                expr
         }
     }
-
-    //local 函数名
-    if (ret == null) {
-        LuaPsiTreeUtil.walkUpLocalFuncDef(ref) { nameDef ->
-            val name = nameDef.name
-            if (refName == name) {
-                ret = nameDef
-                return@walkUpLocalFuncDef false
-            }
-            true
-        }
-    }
-
     return ret
 }
 
@@ -146,42 +124,33 @@ fun isUpValue(ref: LuaNameExpr, context: SearchContext): Boolean {
 
 /**
  * 查找这个引用
- * @param ref 要查找的ref
+ * @param nameExpr 要查找的ref
  * *
  * @param context context
  * *
  * @return PsiElement
  */
-fun resolve(ref: LuaNameExpr, context: SearchContext): PsiElement? {
+fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
     //search local
-    var resolveResult = resolveLocal(ref, context)
+    var resolveResult = resolveInFile(nameExpr.name, nameExpr, context)
 
-    val refName = ref.name
     //global
     if (resolveResult == null) {
-        val moduleName = ref.moduleName
-        if (moduleName != null) {
-            LuaClassMemberIndex.process(moduleName, refName, context, Processor {
-                resolveResult = it
-                false
-            })
-        }
-
-        if (resolveResult == null) {
-            LuaClassMemberIndex.process(Constants.WORD_G, refName, context, Processor {
-                resolveResult = it
-                false
-            })
-        }
+        val refName = nameExpr.name
+        val moduleName = nameExpr.moduleName ?: Constants.WORD_G
+        LuaClassMemberIndex.process(moduleName, refName, context, Processor {
+            resolveResult = it
+            false
+        })
     }
 
     return resolveResult
 }
 
 fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
-    val list = SmartList<PsiElement>()
+    val list = mutableListOf<PsiElement>()
     //search local
-    val resolveResult = resolveLocal(ref, context)
+    val resolveResult = resolve(ref, context)
     if (resolveResult != null) {
         list.add(resolveResult)
     } else {
@@ -196,8 +165,8 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
 }
 
 fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
-    val id = indexExpr.id ?: return null
-    return resolve(indexExpr, id.text, context)
+    val name = indexExpr.name ?: return null
+    return resolve(indexExpr, name, context)
 }
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
@@ -227,13 +196,12 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
         val expr = PsiTreeUtil.findChildOfType(field, LuaExpr::class.java)
         if (expr != null) type = expr.guessTypeFromCache(context)
     } else {
+        val docTy = nameDef.docTy
+        if (docTy != null)
+            return docTy
+
         val localDef = PsiTreeUtil.getParentOfType(nameDef, LuaLocalDef::class.java)
         if (localDef != null) {
-            val comment = localDef.comment
-            if (comment != null) {
-                type = comment.guessType(context)
-            }
-
             //计算 expr 返回类型
             if (Ty.isInvalid(type)) {
                 val nameList = localDef.nameList
@@ -259,17 +227,15 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
  * *
  * @return LuaType
  */
-private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
+fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy {
     val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
     if (owner != null) {
-        val paramName = paramNameDef.text
-        val comment = owner.comment
-        if (comment != null) {
-            val paramDef = comment.getParamDef(paramName)
-            if (paramDef != null) {
-                return paramDef.type
-            }
-        }
+        val stub = paramNameDef.stub
+        val paramName = paramNameDef.name
+
+        val docTy = if (stub != null) stub.docTy else owner.comment?.getParamDef(paramName)?.type
+        if (docTy != null)
+            return docTy
 
         // 如果是个类方法，则有可能在父类里
         if (owner is LuaClassMethodDef) {

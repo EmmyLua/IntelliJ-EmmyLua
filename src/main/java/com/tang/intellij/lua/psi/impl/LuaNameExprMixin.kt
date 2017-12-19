@@ -18,29 +18,27 @@ package com.tang.intellij.lua.psi.impl
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.lang.ASTNode
-import com.intellij.openapi.util.RecursionManager
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaClassField
+import com.tang.intellij.lua.psi.LuaExpr
+import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.LuaNameStub
+import com.tang.intellij.lua.stubs.LuaNameExprStub
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TySerializedClass
 
 /**
 
  * Created by TangZX on 2017/4/12.
  */
-abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr, LuaClassField {
-    internal constructor(stub: LuaNameStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
+abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaExpr, LuaClassField {
+    internal constructor(stub: LuaNameExprStub, nodeType: IStubElementType<*, *>) : super(stub, nodeType)
 
     internal constructor(node: ASTNode) : super(node)
 
-    internal constructor(stub: LuaNameStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
+    internal constructor(stub: LuaNameExprStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
 
     override fun getReference(): PsiReference? {
         return references.firstOrNull()
@@ -49,72 +47,6 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameStub>, LuaExpr,
     override fun guessParentType(context: SearchContext): ITy {
         //todo: model type
         return Ty.UNKNOWN
-    }
-
-    override fun guessType(context: SearchContext): ITy {
-        val set = RecursionManager.doPreventingRecursion(this, true) {
-            var type:ITy = Ty.UNKNOWN
-            val nameExpr = this as LuaNameExpr
-
-            val multiResolve = multiResolve(nameExpr, context)
-            multiResolve.forEach {
-                val set = getType(context, it)
-                type = type.union(set)
-            }
-
-            if (Ty.isInvalid(type)) {
-                type = type.union(getType(context, nameExpr))
-            }
-
-            type
-        }
-        return set ?: Ty.UNKNOWN
-    }
-
-    private fun getType(context: SearchContext, def: PsiElement): ITy {
-        when (def) {
-            is LuaNameExpr -> {
-                //todo stub.module -> ty
-                val stub = def.stub
-                stub?.module?.let {
-                    val memberType = TySerializedClass(it).findMemberType(def.name, context)
-                    if (memberType != null) return memberType
-                }
-
-                var type: ITy = Ty.UNKNOWN
-                val p1 = def.parent // should be VAR_LIST
-                val p2 = p1.parent // should be ASSIGN_STAT
-                if (p2 is LuaAssignStat) {
-                    val comment = p2.comment
-                    //guess from comment
-                    if (comment != null)
-                        type = comment.guessType(context)
-                    //guess from value expr
-                    if (Ty.isInvalid(type)) {
-                        val exprList = p2.valueExprList
-                        if (exprList != null) {
-                            context.index = p2.getIndexFor(def)
-                            type = exprList.guessTypeAt(context)
-                        }
-                    }
-                }
-
-                //Global
-                if (isGlobal(def)) {
-                    //use globalClassTy to store class members, that's very important
-                    type = type.union(TyClass.createGlobalType(def))
-                }
-                return type
-            }
-            is LuaTypeGuessable -> return def.guessTypeFromCache(context)
-            else -> return Ty.UNKNOWN
-        }
-    }
-
-    private fun isGlobal(nameExpr: LuaNameExpr):Boolean {
-        val minx = nameExpr as LuaNameExprMixin
-        val gs = minx.greenStub
-        return gs?.isGlobal ?: (resolveLocal(nameExpr, null) == null)
     }
 
     override val visibility: Visibility

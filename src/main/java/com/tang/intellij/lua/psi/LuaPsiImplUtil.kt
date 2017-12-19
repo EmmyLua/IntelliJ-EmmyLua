@@ -21,8 +21,8 @@ package com.tang.intellij.lua.psi
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.RecursionManager
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.search.GlobalSearchScope
@@ -36,20 +36,22 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaClassMemberStub
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 import com.tang.intellij.lua.ty.*
 import java.util.*
 import javax.swing.Icon
 
-fun setName(identifier: LuaNamedElement, name: String): PsiElement {
-    val newId = LuaElementFactory.createIdentifier(identifier.project, name)
-    val oldId = identifier.firstChild
-    oldId.replace(newId)
-    return newId
-}
+//fun setName(identifier: LuaNamedElement, name: String): PsiElement {
+//    val newId = LuaElementFactory.createIdentifier(identifier.project, name)
+//    val oldId = identifier.firstChild
+//    oldId.replace(newId)
+//    return newId
+//}
 
 fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
     val oldId = owner.nameIdentifier
@@ -61,9 +63,9 @@ fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
     return owner
 }
 
-fun getName(identifier: LuaNamedElement): String {
-    return identifier.text
-}
+//fun getName(identifier: LuaNamedElement): String {
+//    return identifier.text
+//}
 
 fun guessType(nameDef: LuaNameDef, context: SearchContext): ITy {
     return resolveType(nameDef, context)
@@ -211,7 +213,7 @@ fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
  * @return LuaFuncBodyOwner
  */
 fun resolveFuncBodyOwner(callExpr: LuaCallExpr, context: SearchContext): LuaFuncBodyOwner? {
-    return RecursionManager.doPreventingRecursion<LuaFuncBodyOwner>(callExpr, true) {
+    return recursionGuard(callExpr, Computable {
         var owner: LuaFuncBodyOwner? = null
         val expr = callExpr.expr
         if (expr is LuaIndexExpr) {
@@ -222,7 +224,7 @@ fun resolveFuncBodyOwner(callExpr: LuaCallExpr, context: SearchContext): LuaFunc
             owner = resolveFuncBodyOwner(expr, context)
         }
         owner
-    }
+    })
 }
 
 /**
@@ -272,15 +274,17 @@ fun isFunctionCall(callExpr: LuaCallExpr): Boolean {
 fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
     //if (context.forStore)
     //    return Ty.UNKNOWN
-    val exprList = list.exprList
+    val exprList = list.exprStubList
     val index = if (exprList.size > context.index) context.index else 0
     context.index = 0
+    if (exprList.isEmpty())
+        return Ty.UNKNOWN
     return exprList[index].guessTypeFromCache(context)
 }
 
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
-    val prefix = indexExpr.firstChild as LuaExpr
-    return prefix.guessTypeFromCache(context)
+    val expr = PsiTreeUtil.getStubChildOfType(indexExpr, LuaExpr::class.java)
+    return expr?.guessTypeFromCache(context) ?: Ty.UNKNOWN
 }
 
 fun getNameIdentifier(indexExpr: LuaIndexExpr): PsiElement? {
@@ -352,22 +356,13 @@ fun setName(indexExpr: LuaIndexExpr, name: String): PsiElement {
 }
 
 fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
-    val stub = indexExpr.stub
-    if (stub != null) {
-        return stub.valueType
+    var ret: ITy = Ty.UNKNOWN
+    val assignStat = indexExpr.assignStat
+    if (assignStat != null) {
+        context.index = assignStat.getIndexFor(indexExpr)
+        ret = assignStat.valueExprList?.guessTypeAt(context) ?: Ty.UNKNOWN
     }
-
-    val setOptional = Optional.of(indexExpr)
-            .filter { s -> s.parent is LuaVarList }
-            .map<PsiElement>({ it.parent })
-            .filter { s -> s.parent is LuaAssignStat }
-            .map<PsiElement>({ it.parent })
-            .map<ITy> { s ->
-                val assignStat = s as LuaAssignStat
-                context.index = assignStat.getIndexFor(indexExpr)
-                assignStat.valueExprList?.guessTypeAt(context)
-            }
-    return setOptional.orElse(Ty.UNKNOWN)
+    return ret
 }
 
 fun findField(table: LuaTableExpr, fieldName: String): LuaTableField? {
@@ -389,14 +384,12 @@ fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy 
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
-            return stub.ty.mainSignature.returnTy
+            return stub.guessReturnTy(searchContext)
         }
     }
 
     return guessReturnTypeInner(owner, searchContext)
 }
-
-private val FUNCTION_RETURN_TYPESET = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.function.return_typeset")
 
 private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
     if (owner is LuaCommentOwner) {
@@ -410,11 +403,11 @@ private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchC
     }
 
     //infer from return stat
-    return CachedValuesManager.getManager(owner.project).getParameterizedCachedValue(owner, FUNCTION_RETURN_TYPESET, { ctx ->
-        var type: ITy = Ty.UNKNOWN
-        owner.acceptChildren(object : LuaVisitor() {
+    return recursionGuard(owner, Computable {
+        var type: ITy = Ty.VOID
+        owner.acceptChildren(object : LuaRecursiveVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
-                val guessReturnType = guessReturnType(o, ctx.index, ctx)
+                val guessReturnType = guessReturnType(o, searchContext.index, searchContext)
                 TyUnion.each(guessReturnType) {
                     /**
                      * 注意，不能排除anonymous
@@ -432,27 +425,20 @@ private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchC
                 }
             }
 
-            override fun visitFuncBodyOwner(o: LuaFuncBodyOwner) {
-                // ignore sub function
-            }
+            override fun visitFuncBodyOwner(o: LuaFuncBodyOwner) { }
 
-            override fun visitClosureExpr(o: LuaClosureExpr) {
-
-            }
-
-            override fun visitPsiElement(o: LuaPsiElement) {
-                o.acceptChildren(this)
-            }
+            override fun visitClosureExpr(o: LuaClosureExpr) { }
         })
         CachedValueProvider.Result.create(type, owner)
-    }, false, searchContext)
+        type
+    }) ?: Ty.UNKNOWN
 }
 
 fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
-            return stub.ty.mainSignature.params
+            return stub.params
         }
     }
     return getParamsInner(owner)
@@ -502,12 +488,26 @@ fun getParamSignature(funcBodyOwner: LuaFuncBodyOwner): String {
     return "(" + list.joinToString(", ") + ")"
 }
 
+fun getName(localFuncDef: LuaLocalFuncDef): String? {
+    val stub = localFuncDef.stub
+    if (stub != null)
+        return stub.name
+    return getName(localFuncDef as PsiNameIdentifierOwner)
+}
+
 fun getNameIdentifier(localFuncDef: LuaLocalFuncDef): PsiElement? {
     return localFuncDef.id
 }
 
 fun getUseScope(localFuncDef: LuaLocalFuncDef): SearchScope {
     return GlobalSearchScope.fileScope(localFuncDef.containingFile)
+}
+
+fun getName(nameDef: LuaNameDef): String {
+    val stub = nameDef.stub
+    if (stub != null)
+        return stub.name
+    return nameDef.id.text
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {
@@ -534,16 +534,16 @@ fun guessParentType(tableField: LuaTableField, context: SearchContext): ITy {
 }
 
 fun guessType(tableField: LuaTableField, context: SearchContext): ITy {
+    val stub = tableField.stub
     //from comment
-    val comment = tableField.comment
-    if (comment != null) {
-        val tyDef = comment.typeDef?.type
-        if (tyDef != null) return tyDef
-    }
+    val docTy = if (stub != null) stub.docTy else tableField.comment?.docTy
+    if (docTy != null)
+        return docTy
+
     //guess from value
-    val lastChild = tableField.lastChild
-    if (lastChild is LuaExpr) {
-        return lastChild.guessTypeFromCache(context)
+    val valueExpr = PsiTreeUtil.getStubChildOfType(tableField, LuaExpr::class.java)
+    if (valueExpr != null) {
+        return valueExpr.guessTypeFromCache(context)
     }
     return Ty.UNKNOWN
 }
@@ -667,6 +667,12 @@ fun getNameIdentifier(label: LuaLabelStat): PsiElement? {
 }
 
 fun getVisibility(member: LuaClassMember): Visibility {
+    if (member is StubBasedPsiElement<*>) {
+        val stub = member.stub
+        if (stub is LuaClassMemberStub) {
+            return stub.visibility
+        }
+    }
     if (member is LuaCommentOwner) {
         val comment = member.comment
         comment?.findTag(LuaDocAccessModifier::class.java)?.let {
@@ -682,4 +688,8 @@ fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
 
     }
     return getVisibility(classMethodDef as LuaClassMember)
+}
+
+fun getExpr(callStat: LuaCallStat): LuaExpr {
+    return PsiTreeUtil.getStubChildOfType(callStat, LuaExpr::class.java)!!
 }

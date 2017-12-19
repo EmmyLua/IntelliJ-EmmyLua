@@ -175,7 +175,8 @@
         <psi.referenceContributor language="Lua" implementation="com.tang.intellij.lua.reference.LuaReferenceContributor"/>
         <languageInjector implementation="com.tang.intellij.lua.lang.LuaLanguageInjector"/>
 
-        <spellchecker.support implementationClass="com.tang.intellij.lua.editor.LuaSpellcheckingStrategy" language="Lua"/>
+        <spellchecker.support implementationClass="com.tang.intellij.lua.spellchecker.LuaSpellcheckingStrategy" language="Lua"/>
+        <spellchecker.bundledDictionaryProvider implementation="com.tang.intellij.lua.spellchecker.LuaSpellBundledDictionaryProvider"/>
 
         <!--usage-->
         <lang.findUsagesProvider language="Lua" implementationClass="com.tang.intellij.lua.usages.LuaFindUsagesProvider"/>
@@ -227,7 +228,6 @@
         <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
         <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassIndex"/>
-        <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaGlobalIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMemberIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaSuperClassIndex"/>

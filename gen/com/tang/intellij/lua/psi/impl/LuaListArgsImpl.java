@@ -9,11 +9,22 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 
 public class LuaListArgsImpl extends LuaArgsImpl implements LuaListArgs {
 
+  public LuaListArgsImpl(LuaPlaceholderStub stub, IStubElementType type) {
+    super(stub, type);
+  }
+
   public LuaListArgsImpl(ASTNode node) {
     super(node);
+  }
+
+  public LuaListArgsImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
@@ -28,7 +39,7 @@ public class LuaListArgsImpl extends LuaArgsImpl implements LuaListArgs {
   @Override
   @NotNull
   public List<LuaExpr> getExprList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaExpr.class);
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaExpr.class);
   }
 
 }
