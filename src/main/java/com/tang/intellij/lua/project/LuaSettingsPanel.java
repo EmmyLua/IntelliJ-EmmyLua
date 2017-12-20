@@ -42,6 +42,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox showWordsInFile;
     private JCheckBox enforceTypeSafety;
     private JCheckBox nilStrict;
+    private JCheckBox recognizeGlobalNameAsCheckBox;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -51,6 +52,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         showWordsInFile.setSelected(settings.isShowWordsInFile());
         enforceTypeSafety.setSelected(settings.isEnforceTypeSafety());
         nilStrict.setSelected(settings.isNilStrict());
+        recognizeGlobalNameAsCheckBox.setSelected(settings.isRecognizeGlobalNameAsType());
     }
 
     @NotNull
@@ -78,7 +80,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
                 settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
                 settings.isShowWordsInFile() != showWordsInFile.isSelected() ||
                 settings.isEnforceTypeSafety() != enforceTypeSafety.isSelected() ||
-                settings.isNilStrict() != nilStrict.isSelected();
+                settings.isNilStrict() != nilStrict.isSelected() ||
+                settings.isRecognizeGlobalNameAsType() != recognizeGlobalNameAsCheckBox.isSelected();
     }
 
     @Override
@@ -90,6 +93,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setShowWordsInFile(showWordsInFile.isSelected());
         settings.setEnforceTypeSafety(enforceTypeSafety.isSelected());
         settings.setNilStrict(nilStrict.isSelected());
+        settings.setRecognizeGlobalNameAsType(recognizeGlobalNameAsCheckBox.isSelected());
 
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             DaemonCodeAnalyzer.getInstance(project).restart();

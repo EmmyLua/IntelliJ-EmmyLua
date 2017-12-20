@@ -46,6 +46,8 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
 
     var isNilStrict: Boolean = false
 
+    var isRecognizeGlobalNameAsType = true
+
     override fun getState(): LuaSettings? {
         return this
     }

@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.search.LuaPredefinedScope
@@ -174,8 +175,8 @@ abstract class TyClass(override val className: String,
             return TySerializedClass(tyName, nameDef.name, null, null, TyFlags.ANONYMOUS)
         }
 
-        fun createGlobalType(nameExpr: LuaNameExpr): TyClass =
-                TySerializedClass(getGlobalTypeName(nameExpr), nameExpr.name, null, null, TyFlags.GLOBAL)
+        fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): TyClass =
+                TySerializedClass(getGlobalTypeName(nameExpr, store), nameExpr.name, null, null, TyFlags.GLOBAL)
     }
 }
 
@@ -219,8 +220,10 @@ fun getAnonymousType(nameDef: LuaNameDef): String {
     return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
 }
 
-fun getGlobalTypeName(expr: LuaNameExpr): String {
+fun getGlobalTypeName(expr: LuaNameExpr, store: Boolean = true): String {
     val text = expr.name
+    if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
+        return text
     return if (text == Constants.WORD_G) text else "__$text"
 }
 

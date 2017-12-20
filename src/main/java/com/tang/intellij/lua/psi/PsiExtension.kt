@@ -225,7 +225,7 @@ val LuaDocClassDef.aliasName: String? get() {
         is LuaAssignStat -> {
             val expr = owner.getExprAt(0)
             if (expr is LuaNameExpr)
-                return getGlobalTypeName(expr)
+                return getGlobalTypeName(expr, true)
         }
 
         is LuaLocalDef -> {

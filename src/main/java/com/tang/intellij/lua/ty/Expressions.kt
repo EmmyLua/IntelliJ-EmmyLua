@@ -210,7 +210,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
             //Global
             if (isGlobal(def)) {
                 //use globalClassTy to store class members, that's very important
-                type = type.union(TyClass.createGlobalType(def))
+                type = type.union(TyClass.createGlobalType(def, context.forStore))
             }
             return type
         }
