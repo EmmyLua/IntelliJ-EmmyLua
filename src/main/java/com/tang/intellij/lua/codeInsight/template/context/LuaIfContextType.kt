@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.codeInsight;
+package com.tang.intellij.lua.codeInsight.template.context
 
-import com.intellij.codeInsight.template.TemplateContextType;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.tang.intellij.lua.psi.LuaIfStat;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.codeInsight.template.TemplateContextType
+import com.intellij.psi.PsiFile
+import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.psi.LuaIfStat
 
 /**
  * in if statement
  * Created by TangZX on 2017/4/14.
  */
-public class LuaIfContextType extends TemplateContextType {
-    protected LuaIfContextType() {
-        super("LUA_IF", "Lua");
-    }
+class LuaIfContextType : TemplateContextType("LUA_IF", "If statement", LuaCodeContextType::class.java) {
 
-    @Override
-    public boolean isInContext(@NotNull PsiFile psiFile, int i) {
-        return PsiTreeUtil.findElementOfClassAtOffset(psiFile, i, LuaIfStat.class, false) != null;
+    override fun isInContext(psiFile: PsiFile, i: Int): Boolean {
+        return PsiTreeUtil.findElementOfClassAtOffset(psiFile, i, LuaIfStat::class.java, false) != null
     }
 }
