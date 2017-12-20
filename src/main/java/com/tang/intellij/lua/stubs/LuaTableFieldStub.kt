@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.stubs
 
 import com.intellij.lang.ASTNode
-import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -26,11 +25,12 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
+import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.TyUnion
 import com.tang.intellij.lua.ty.getTableTypeName
-import java.util.*
 
 class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("TABLE_FIELD") {
 
@@ -43,18 +43,20 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
         return tableField.shouldCreateStub
     }
 
-    private fun findTableExprTypeName(_tableField: LuaTableField): String {
-        val table = PsiTreeUtil.getParentOfType(_tableField, LuaTableExpr::class.java)
-        val optional = Optional.ofNullable(table)
-                .filter { s -> s.parent is LuaExprList }
-                .map<PsiElement> { it.parent }
-                .filter { s -> s.parent is LuaAssignStat }
-                .map<PsiElement> { it.parent }
-                .map<String> { s ->
-                    val assignStat = s as LuaAssignStat
-                    getTypeName(assignStat, 0)
-                }
-        return optional.orElse(if (table != null) getTableTypeName(table) else null)
+    private fun findTableExprTypeName(field: LuaTableField): String? {
+        val table = PsiTreeUtil.getParentOfType(field, LuaTableExpr::class.java)
+        val p1 = table?.parent as? LuaExprList
+        val p2 = p1?.parent as? LuaAssignStat
+        var ty: String? = null
+        if (p2 != null) {
+            val type = p2.getExprAt(0)?.guessType(SearchContext(p2.project, field.containingFile, true))
+            if (type != null) {
+                ty = TyUnion.getPerfectClass(type)?.className
+            }
+        }
+        if (ty == null && table != null)
+            ty = getTableTypeName(table)
+        return ty
     }
 
     override fun createStub(field: LuaTableField, parentStub: StubElement<*>): LuaTableFieldStub {

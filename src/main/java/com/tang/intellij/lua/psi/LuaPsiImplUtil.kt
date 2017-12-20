@@ -624,33 +624,6 @@ fun getName(nameExpr: LuaNameExpr): String {
     return nameExpr.text
 }
 
-/**
- * 找出 LuaAssignStat 的第 index 位置上的 Var 的类型String
- * @param stat LuaAssignStat
- * *
- * @param index index
- * *
- * @return type string
- */
-fun getTypeName(stat: LuaAssignStat, index: Int): String? {
-    val expr = stat.getExprAt(index)
-    var typeName: String? = null
-    if (expr is LuaNameExpr) {
-        // common 优先
-        val comment = stat.comment
-        if (comment != null) {
-            val classDef = comment.classDef
-            if (classDef != null) {
-                typeName = classDef.name
-            }
-        }
-        // 否则直接当成Global，以名字作类型
-        if (typeName == null)
-            typeName = getGlobalTypeName(expr)
-    }
-    return typeName
-}
-
 fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchContext): ITy {
     if (returnStat != null) {
         val returnExpr = returnStat.exprList
