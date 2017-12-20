@@ -175,8 +175,12 @@ abstract class TyClass(override val className: String,
             return TySerializedClass(tyName, nameDef.name, null, null, TyFlags.ANONYMOUS)
         }
 
-        fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): TyClass =
-                TySerializedClass(getGlobalTypeName(nameExpr, store), nameExpr.name, null, null, TyFlags.GLOBAL)
+        fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
+            val g = TySerializedClass(getGlobalTypeName(nameExpr), nameExpr.name, null, null, TyFlags.GLOBAL)
+            if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
+                return TySerializedClass(nameExpr.text).union(g)
+            return g
+        }
     }
 }
 
@@ -220,10 +224,8 @@ fun getAnonymousType(nameDef: LuaNameDef): String {
     return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
 }
 
-fun getGlobalTypeName(expr: LuaNameExpr, store: Boolean = true): String {
+fun getGlobalTypeName(expr: LuaNameExpr): String {
     val text = expr.name
-    if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
-        return text
     return if (text == Constants.WORD_G) text else "__$text"
 }
 
