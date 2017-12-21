@@ -30,7 +30,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.SmartList;
-import com.tang.intellij.lua.project.LuaSettings;
+import com.tang.intellij.lua.ext.LuaFileResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,51 +89,11 @@ public class LuaFileUtil {
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
         if (shortUrl == null)
             return null;
-
-        shortUrl = shortUrl.replace('\\', '/').trim();
-        Module[] modules = ModuleManager.getInstance(project).getModules();
-        for (Module module : modules) {
-            ModuleRootManager moduleRootManager = ModuleRootManager.getInstance(module);
-            String[] sourceRoots = moduleRootManager.getSourceRootUrls();
-            //相对路径
-            for (String sourceRoot : sourceRoots) {
-                VirtualFile file = findFile(shortUrl, sourceRoot);
-                if (file != null) return file;
-            }
-            String[] contentRoots = moduleRootManager.getContentRootUrls();
-            for (String root : contentRoots) {
-                VirtualFile file = findFile(shortUrl, root);
-                if (file != null) return file;
-            }
-        }
-
-        //绝对路径
-        for (String ext : extensions) {
-            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(shortUrl + ext));
-            if (file != null && !file.isDirectory()) {
-                return file;
-            }
-        }
-        return findAdditionalFile(shortUrl);
+        return LuaFileResolver.Companion.findLuaFile(project, shortUrl, extensions);
     }
 
     @Nullable
-    private static VirtualFile findAdditionalFile(String shortUrl) {
-        String[] sourcesRoot = LuaSettings.Companion.getInstance().getAdditionalSourcesRoot();
-        for (String sr : sourcesRoot) {
-            for (String ext : extensions) {
-                String path = sr + "/" + shortUrl + ext;
-                VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(path));
-                if (file != null && !file.isDirectory()) {
-                    return file;
-                }
-            }
-        }
-        return null;
-    }
-
-    @Nullable
-    private static VirtualFile findFile(String shortUrl, String root) {
+    public static VirtualFile findFile(String shortUrl, String root) {
         for (String ext : extensions) {
             String fixedURL = shortUrl;
             if (shortUrl.endsWith(ext)) { //aa.bb.lua -> aa.bb
