@@ -20,15 +20,16 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.template.*
 import com.intellij.psi.PsiFile
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType
+import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 
 class LuaFunctionParamSigMacro : Macro() {
     override fun getPresentableName() = "LuaFunctionParamSignature()"
 
     override fun getName() = "LuaFunctionParamSignature"
     
-    override fun calculateResult(p0: Array<out Expression>, p1: ExpressionContext?): Result? {
-        var e = p1?.psiElementAtStartOffset
+    override fun calculateResult(expressions: Array<out Expression>, context: ExpressionContext?): Result? {
+        var e = context?.psiElementAtStartOffset
         while (e != null && e !is PsiFile) {
             e = e.parent
             if (e is LuaFuncBodyOwner) {
@@ -50,5 +51,9 @@ class LuaFunctionParamSigMacro : Macro() {
             }
         }
         return list.toTypedArray()
+    }
+
+    override fun isAcceptableInContext(context: TemplateContextType): Boolean {
+        return context is LuaFunContextType
     }
 }

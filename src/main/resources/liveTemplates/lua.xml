@@ -92,7 +92,7 @@
               value="$PARAMS$">
         <variable name="PARAMS" expression="LuaFunctionParamSignature()" defaultValue="" alwaysStopAt="true" />
         <context>
-            <option name="LUA_CODE" value="true" />
+            <option name="LUA_FUNCTION" value="true" />
         </context>
     </template>
 
