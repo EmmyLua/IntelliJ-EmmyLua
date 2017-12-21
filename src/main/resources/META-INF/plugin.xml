@@ -254,6 +254,8 @@
         <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaCodeContextType"/>
         <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestFirstLuaVarNameMacro"/>
+        <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaCurrentFunctionNameMacro"/>
+        <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaFunctionParamSigMacro"/>
 
         <!--lua settings-->
         <applicationService serviceInterface="com.tang.intellij.lua.project.LuaSettings"
