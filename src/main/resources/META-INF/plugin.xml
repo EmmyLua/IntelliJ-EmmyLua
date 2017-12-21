@@ -207,6 +207,7 @@
         <codeInsight.template.postfixTemplateProvider language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.postfix.LuaPostfixTemplateProvider"/>
         <highlightVisitor implementation="com.tang.intellij.lua.codeInsight.LuaRainbowVisitor"/>
         <highlightUsagesHandlerFactory implementation="com.tang.intellij.lua.codeInsight.highlighting.LuaHighlightUsagesHandlerFactory"/>
+        <readWriteAccessDetector implementation="com.tang.intellij.lua.codeInsight.LuaReadWriteAccessDetector"/>
 
         <!--editor handlers-->
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterAfterUnmatchedBraceHandler" />

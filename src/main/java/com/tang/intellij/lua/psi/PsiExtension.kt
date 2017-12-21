@@ -264,7 +264,7 @@ val LuaIndexExpr.assignStat: LuaAssignStat? get() {
     return null
 }
 
-val LuaNameExpr.assignStat: LuaAssignStat? get() {
+val LuaExpr.assignStat: LuaAssignStat? get() {
     val p1 = parent
     if (p1 is LuaVarList) {
         val p2 = p1.parent
