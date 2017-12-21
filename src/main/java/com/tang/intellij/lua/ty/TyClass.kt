@@ -18,6 +18,7 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.project.LuaSettings
@@ -33,6 +34,7 @@ interface ITyClass : ITy {
     val varName: String
     var superClassName: String?
     var aliasName: String?
+    fun eachAlias(processor: Processor<String>)
     fun lazyInit(searchContext: SearchContext)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean = true)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
@@ -77,6 +79,14 @@ abstract class TyClass(override val className: String,
         return className.hashCode()
     }
 
+    override fun eachAlias(processor: Processor<String>) {
+        val alias = aliasName
+        if (alias != null)
+            processor.process(alias)
+        if (!isGlobal && !isAnonymous && LuaSettings.instance.isRecognizeGlobalNameAsType)
+            processor.process(getGlobalTypeName(className))
+    }
+
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         val clazzName = className
         val project = context.project
@@ -84,11 +94,10 @@ abstract class TyClass(override val className: String,
         val memberIndex = LuaClassMemberIndex.instance
         val list = memberIndex.get(clazzName.hashCode(), project, LuaPredefinedScope(project))
 
-        val alias = aliasName
-        if (alias != null) {
+        eachAlias(Processor { alias ->
             val classMembers = memberIndex.get(alias.hashCode(), project, LuaPredefinedScope(project))
             list.addAll(classMembers)
-        }
+        })
 
         for (member in list) {
             processor(this, member)
@@ -224,9 +233,12 @@ fun getAnonymousType(nameDef: LuaNameDef): String {
     return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
 }
 
-fun getGlobalTypeName(expr: LuaNameExpr): String {
-    val text = expr.name
+fun getGlobalTypeName(text: String): String {
     return if (text == Constants.WORD_G) text else "__$text"
+}
+
+fun getGlobalTypeName(nameExpr: LuaNameExpr): String {
+    return getGlobalTypeName(nameExpr.name)
 }
 
 class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {

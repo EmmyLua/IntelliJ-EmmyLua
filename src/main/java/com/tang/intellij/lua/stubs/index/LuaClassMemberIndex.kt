@@ -97,20 +97,20 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
         fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>) {
             if (process(type.className, fieldName, context, processor)) {
                 type.lazyInit(context)
-                val alias = type.aliasName
-                if (alias != null) {
-                    process(alias, fieldName, context, processor)
-                }
+                type.eachAlias(Processor {
+                    process(it, fieldName, context, processor)
+                    true
+                })
             }
         }
 
         fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {
             if (process(type.className, context, processor)) {
                 type.lazyInit(context)
-                val alias = type.aliasName
-                if (alias != null) {
-                    process(alias, context, processor)
-                }
+                type.eachAlias(Processor {
+                    process(it, context, processor)
+                    true
+                })
             }
         }
 
