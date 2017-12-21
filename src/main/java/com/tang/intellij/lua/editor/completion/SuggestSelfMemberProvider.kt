@@ -18,6 +18,7 @@ package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.CompletionParameters
 import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.psi.*
@@ -43,13 +44,14 @@ class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
                     if (curType.isVisibleInScope(project, contextTy, member.visibility)) {
                         if (member is LuaClassField) {
                             addField(completionResultSet, curType === type, curType.className, member, object : HandlerProcessor() {
-                                override fun process(element: LuaLookupElement) {
+                                override fun process(element: LuaLookupElement): LookupElement {
                                     element.lookupString = "self.${member.name}"
+                                    return element
                                 }
                             })
                         } else if (member is LuaClassMethod) {
                             addMethod(completionResultSet, curType === type, curType.className, member,  object : HandlerProcessor() {
-                                override fun process(element: LuaLookupElement) { }
+                                override fun process(element: LuaLookupElement): LookupElement { return element }
 
                                 override fun processLookupString(lookupString: String): String {
                                     return "self:${member.name}"

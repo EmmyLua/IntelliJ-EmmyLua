@@ -34,7 +34,7 @@ import com.tang.intellij.lua.ty.*
 open class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>() {
     protected abstract class HandlerProcessor {
         open fun processLookupString(lookupString: String): String = lookupString
-        abstract fun process(element: LuaLookupElement)
+        abstract fun process(element: LuaLookupElement): LookupElement
     }
 
     override fun addCompletions(completionParameters: CompletionParameters,
@@ -68,9 +68,10 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher("$prefixName*$postfixName")
                             complete(isColon, project, contextTy, type, resultSet, prefixMatcher, object : HandlerProcessor() {
-                                override fun process(element: LuaLookupElement) {
+                                override fun process(element: LuaLookupElement): LookupElement {
                                     element.itemText = txt + colon + element.itemText
                                     element.lookupString = txt + colon + element.lookupString
+                                    return PrioritizedLookupElement.withPriority(element, -2.0)
                                 }
                             })
                         }
@@ -124,19 +125,20 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                            handlerProcessor: HandlerProcessor?) {
         val name = field.name
         if (name != null) {
-            val elementBuilder = LuaFieldLookupElement(name, field, bold)
+            val element = LuaFieldLookupElement(name, field, bold)
             if (!LuaRefactoringUtil.isLuaIdentifier(name)) {
-                elementBuilder.lookupString = "['$name']"
-                val baseHandler = elementBuilder.handler
-                elementBuilder.handler = InsertHandler<LookupElement> { insertionContext, lookupElement ->
+                element.lookupString = "['$name']"
+                val baseHandler = element.handler
+                element.handler = InsertHandler<LookupElement> { insertionContext, lookupElement ->
                     baseHandler.handleInsert(insertionContext, lookupElement)
                     // remove '.'
                     insertionContext.document.deleteString(insertionContext.startOffset - 1, insertionContext.startOffset)
                 }
             }
-            elementBuilder.setTailText("  [$clazzName]")
-            handlerProcessor?.process(elementBuilder)
-            completionResultSet.addElement(elementBuilder)
+            element.setTailText("  [$clazzName]")
+
+            val ele = handlerProcessor?.process(element) ?: element
+            completionResultSet.addElement(ele)
         }
     }
 
@@ -150,12 +152,13 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
             val ty = classMethod.guessType(SearchContext(classMethod.project)) as ITyFunction
             ty.process(Processor {
                 val lookupString = handlerProcessor?.processLookupString(methodName) ?: methodName
-                val le = TyFunctionLookupElement(lookupString, classMethod, it, bold, ty, classMethod.visibility.warpIcon(LuaIcons.CLASS_METHOD))
-                le.handler = SignatureInsertHandler(it)
-                if (!ty.isSelfCall) le.setItemTextUnderlined(true)
-                le.setTailText("  [$clazzName]")
-                handlerProcessor?.process(le)
-                completionResultSet.addElement(le)
+                val element = TyFunctionLookupElement(lookupString, classMethod, it, bold, ty, classMethod.visibility.warpIcon(LuaIcons.CLASS_METHOD))
+                element.handler = SignatureInsertHandler(it)
+                if (!ty.isSelfCall) element.setItemTextUnderlined(true)
+                element.setTailText("  [$clazzName]")
+
+                val ele = handlerProcessor?.process(element) ?: element
+                completionResultSet.addElement(ele)
                 true
             })
         }
