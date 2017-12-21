@@ -23,6 +23,7 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.ArrayUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,6 +44,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox enforceTypeSafety;
     private JCheckBox nilStrict;
     private JCheckBox recognizeGlobalNameAsCheckBox;
+    private LuaAdditionalSourcesRootPanel additionalRoots;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -53,6 +55,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         enforceTypeSafety.setSelected(settings.isEnforceTypeSafety());
         nilStrict.setSelected(settings.isNilStrict());
         recognizeGlobalNameAsCheckBox.setSelected(settings.isRecognizeGlobalNameAsType());
+        additionalRoots.setRoots(settings.getAdditionalSourcesRoot());
     }
 
     @NotNull
@@ -81,7 +84,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
                 settings.isShowWordsInFile() != showWordsInFile.isSelected() ||
                 settings.isEnforceTypeSafety() != enforceTypeSafety.isSelected() ||
                 settings.isNilStrict() != nilStrict.isSelected() ||
-                settings.isRecognizeGlobalNameAsType() != recognizeGlobalNameAsCheckBox.isSelected();
+                settings.isRecognizeGlobalNameAsType() != recognizeGlobalNameAsCheckBox.isSelected() ||
+                !ArrayUtil.equals(settings.getAdditionalSourcesRoot(), additionalRoots.getRoots(), String::compareTo);
     }
 
     @Override
@@ -94,6 +98,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setEnforceTypeSafety(enforceTypeSafety.isSelected());
         settings.setNilStrict(nilStrict.isSelected());
         settings.setRecognizeGlobalNameAsType(recognizeGlobalNameAsCheckBox.isSelected());
+        settings.setAdditionalSourcesRoot(additionalRoots.getRoots());
 
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             DaemonCodeAnalyzer.getInstance(project).restart();

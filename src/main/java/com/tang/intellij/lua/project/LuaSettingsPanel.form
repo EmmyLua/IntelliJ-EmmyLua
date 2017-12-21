@@ -6,9 +6,11 @@
     <rowspec value="center:max(d;4px):noGrow"/>
     <rowspec value="top:4dlu:noGrow"/>
     <rowspec value="center:max(d;4px):noGrow"/>
+    <rowspec value="top:4dlu:noGrow"/>
+    <rowspec value="center:max(d;4px):noGrow"/>
     <colspec value="fill:d:grow"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="500" height="514"/>
     </constraints>
     <properties/>
     <border type="none"/>
@@ -163,6 +165,13 @@
           </component>
         </children>
       </grid>
+      <component id="7ec70" class="com.tang.intellij.lua.project.LuaAdditionalSourcesRootPanel" binding="additionalRoots">
+        <constraints>
+          <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+          <forms/>
+        </constraints>
+        <properties/>
+      </component>
     </children>
   </grid>
 </form>

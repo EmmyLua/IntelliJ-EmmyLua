@@ -48,6 +48,8 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
 
     var isRecognizeGlobalNameAsType = true
 
+    var additionalSourcesRoot = arrayOf<String>()
+
     override fun getState(): LuaSettings? {
         return this
     }

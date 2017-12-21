@@ -30,6 +30,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.SmartList;
+import com.tang.intellij.lua.project.LuaSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -111,6 +112,21 @@ public class LuaFileUtil {
             VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(shortUrl + ext));
             if (file != null && !file.isDirectory()) {
                 return file;
+            }
+        }
+        return findAdditionalFile(shortUrl);
+    }
+
+    @Nullable
+    private static VirtualFile findAdditionalFile(String shortUrl) {
+        String[] sourcesRoot = LuaSettings.Companion.getInstance().getAdditionalSourcesRoot();
+        for (String sr : sourcesRoot) {
+            for (String ext : extensions) {
+                String path = sr + "/" + shortUrl + ext;
+                VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(path));
+                if (file != null && !file.isDirectory()) {
+                    return file;
+                }
             }
         }
         return null;
