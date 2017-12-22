@@ -17,9 +17,11 @@
 package com.tang.intellij.lua.unity.ty
 
 import com.intellij.psi.PsiNamedElement
+import com.intellij.util.Processor
 import com.tang.intellij.lua.ext.ILuaTypeInfer
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TySerializedClass
@@ -32,7 +34,15 @@ class UnityTypeInfer : ILuaTypeInfer {
                 if (name == "GetComponent") {
                     val arg = target.argList.firstOrNull()
                     if (arg is LuaLiteralExpr) {
-                        return TySerializedClass("UnityEngine.${arg.stringValue}")
+                        val shortName = arg.stringValue
+                        var ty:ITy = Ty.UNKNOWN
+                        LuaClassIndex.processKeys(context.project, Processor {
+                            if (it.endsWith(shortName)) {
+                                ty = TySerializedClass(it)
+                            }
+                            true
+                        })
+                        return ty
                     }
                 }
                 Ty.UNKNOWN
