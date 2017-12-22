@@ -19,6 +19,10 @@ package com.tang.intellij.lua.codeInsight
 import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
+import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
+import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
+import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef
 import com.tang.intellij.lua.psi.LuaExpr
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.LuaNameDef
@@ -34,16 +38,20 @@ class LuaReadWriteAccessDetector : ReadWriteAccessDetector() {
     }
 
     override fun getExpressionAccess(element: PsiElement): Access {
-        when (element) {
-            is LuaNameDef -> return Access.Write
+        return when (element) {
+            is LuaNameDef -> Access.Write
             is LuaExpr -> {
-                return if (element.assignStat != null)
+                if (element.assignStat != null)
                     Access.Write
                 else Access.Read
             }
-            is LuaIndexExpr -> return Access.Read
+            is LuaIndexExpr -> Access.Read
+            is LuaDocClassDef -> Access.Write
+            is LuaDocClassNameRef -> Access.Read
+            is LuaDocParamNameRef -> Access.Read
+            is LuaDocFieldDef -> Access.Write
+            else -> return Access.ReadWrite
         }
-        return Access.ReadWrite
     }
 
     override fun isDeclarationWriteAccess(element: PsiElement): Boolean {
