@@ -36,7 +36,7 @@ class LuaClassNavigationContributor : GotoClassContributor {
     }
 
     override fun getNames(project: Project, b: Boolean): Array<String> {
-        val allClasses = LuaClassIndex.getInstance().getAllKeys(project)
+        val allClasses = LuaClassIndex.instance.getAllKeys(project)
         return allClasses.toTypedArray()
     }
 

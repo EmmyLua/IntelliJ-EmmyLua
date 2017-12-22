@@ -41,14 +41,17 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
         fun process(key: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             if (context.isDumb)
                 return false
-            val all = LuaClassMemberIndex.instance.get(key.hashCode(), context.project, context.getScope())
-            @Suppress("LoopToCallChain")
-            for (member in all) {
-                if (!processor.process(member)) {
-                    return false
-                }
-            }
-            return true
+            var ret = true
+            StubIndex.getInstance().processElements(StubKeys.CLASS_MEMBER,
+                    key.hashCode(),
+                    context.project,
+                    context.getScope(),
+                    LuaClassMember::class.java,
+                    {
+                        ret = processor.process(it)
+                        ret
+                    })
+            return ret
         }
 
         fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
@@ -99,7 +102,6 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                 type.lazyInit(context)
                 type.eachAlias(Processor {
                     process(it, fieldName, context, processor)
-                    true
                 })
             }
         }
@@ -109,7 +111,6 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                 type.lazyInit(context)
                 type.eachAlias(Processor {
                     process(it, context, processor)
-                    true
                 })
             }
         }

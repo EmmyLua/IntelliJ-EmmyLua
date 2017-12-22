@@ -30,14 +30,20 @@ import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex
 class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassInheritorsSearch.SearchParameters> {
 
     private fun processInheritors(searchParameters: LuaClassInheritorsSearch.SearchParameters, typeName: String, processor: Processor<LuaDocClassDef>): Boolean {
-        val classDefs = LuaSuperClassIndex.getInstance().get(typeName, searchParameters.project, searchParameters.searchScope)
-        for (classDef in classDefs) {
-            if (!processor.process(classDef))
-                return false
-            if (searchParameters.isDeep && !processInheritors(searchParameters, classDef.name, processor))
-                return false
+        var ret = true
+        val processed = mutableListOf<LuaDocClassDef>()
+        LuaSuperClassIndex.process(typeName, searchParameters.project, searchParameters.searchScope, Processor {
+            processed.add(it)
+            ret = processor.process(it)
+            ret
+        })
+        if (ret && searchParameters.isDeep) {
+            for (def in processed) {
+                ret = processInheritors(searchParameters, def.name, processor)
+                if (!ret) break
+            }
         }
-        return true
+        return ret
     }
 
     override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<LuaDocClassDef>): Boolean {
