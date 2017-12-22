@@ -428,7 +428,8 @@
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaClassInheritorsSearch" interface="com.intellij.util.QueryExecutor"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaAllClassesSearch" interface="com.intellij.util.QueryExecutor"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaOverridingMethodsSearch" interface="com.intellij.util.QueryExecutor"/>
-        <extensionPoint qualifiedName="com.tang.intellij.lua.luaFileResolver" interface="com.tang.intellij.lua.ext.LuaFileResolver"/>
+        <extensionPoint qualifiedName="com.tang.intellij.lua.luaFileResolver" interface="com.tang.intellij.lua.ext.ILuaFileResolver"/>
+        <extensionPoint qualifiedName="com.tang.intellij.lua.luaTypeInfer" interface="com.tang.intellij.lua.ext.ILuaTypeInfer"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.tang.intellij.lua">
@@ -439,5 +440,7 @@
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaSourcesRootFileResolver"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAdditionalResolver"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAbsoluteResolver"/>
+
+        <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer"/>
     </extensions>
 </idea-plugin>

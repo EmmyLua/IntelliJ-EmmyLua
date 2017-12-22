@@ -30,7 +30,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.SmartList;
-import com.tang.intellij.lua.ext.LuaFileResolver;
+import com.tang.intellij.lua.ext.ILuaFileResolver;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -89,7 +89,7 @@ public class LuaFileUtil {
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
         if (shortUrl == null)
             return null;
-        return LuaFileResolver.Companion.findLuaFile(project, shortUrl, extensions);
+        return ILuaFileResolver.Companion.findLuaFile(project, shortUrl, extensions);
     }
 
     @Nullable
