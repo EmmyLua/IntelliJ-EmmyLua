@@ -23,12 +23,19 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
+import com.tang.intellij.lua.ext.ILuaTypeInfer
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 
 fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
+    if (element == null)
+        return Ty.UNKNOWN
+    return ILuaTypeInfer.infer(element, context)
+}
+
+internal fun inferInner(element: LuaTypeGuessable, context: SearchContext): ITy {
     return when (element) {
         is LuaFuncBodyOwner -> element.infer(context)
         is LuaExpr -> inferExpr(element, context)
@@ -37,7 +44,6 @@ fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
         is LuaDocFieldDef -> element.infer()
         is LuaTableField -> element.infer(context)
         is LuaPsiFile -> inferFile(element, context)
-        null -> Ty.UNKNOWN
         else -> Ty.UNKNOWN
     }
 }
@@ -110,7 +116,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
     if (parent is LuaTableField) {
         val expr = PsiTreeUtil.findChildOfType(parent, LuaExpr::class.java)
         if (expr != null)
-            type = inferExpr(expr, context)
+            type = infer(expr, context)
     } else {
         val docTy = this.docTy
         if (docTy != null)
@@ -160,7 +166,7 @@ private fun LuaTableField.infer(context: SearchContext): ITy {
     //guess from value
     val valueExpr = PsiTreeUtil.getStubChildOfType(this, LuaExpr::class.java)
     if (valueExpr != null) {
-        return inferExpr(valueExpr, context)
+        return infer(valueExpr, context)
     }
     return Ty.UNKNOWN
 }

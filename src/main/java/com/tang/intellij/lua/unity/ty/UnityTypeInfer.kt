@@ -14,14 +14,30 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.ty
+package com.tang.intellij.lua.unity.ty
 
+import com.intellij.psi.PsiNamedElement
 import com.tang.intellij.lua.ext.ILuaTypeInfer
-import com.tang.intellij.lua.psi.LuaTypeGuessable
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TySerializedClass
 
-class LuaTypeInfer : ILuaTypeInfer {
+class UnityTypeInfer : ILuaTypeInfer {
     override fun inferType(target: LuaTypeGuessable, context: SearchContext): ITy {
-        return inferInner(target, context)
+        return when (target) {
+            is LuaCallExpr -> {
+                val name = (target.expr as? PsiNamedElement)?.name
+                if (name == "GetComponent") {
+                    val arg = target.argList.firstOrNull()
+                    if (arg is LuaLiteralExpr) {
+                        return TySerializedClass("UnityEngine.${arg.stringValue}")
+                    }
+                }
+                Ty.UNKNOWN
+            }
+            else -> Ty.UNKNOWN
+        }
     }
 }

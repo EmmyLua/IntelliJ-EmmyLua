@@ -36,9 +36,9 @@ fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
         is LuaCallExpr -> expr.infer(context)
         is LuaClosureExpr -> infer(expr, context)
         is LuaTableExpr -> TyTable(expr)
-        is LuaParenExpr -> inferExpr(expr.expr, context)
+        is LuaParenExpr -> infer(expr.expr, context)
         is LuaNameExpr -> expr.infer(context)
-        is LuaLiteralExpr -> expr.infer(context)
+        is LuaLiteralExpr -> expr.infer()
         is LuaIndexExpr -> expr.infer(context)
         null -> Ty.UNKNOWN
         else -> Ty.UNKNOWN
@@ -50,7 +50,7 @@ private fun LuaUnaryExpr.infer(context: SearchContext): ITy {
     val operator = if (stub != null) stub.opType else unaryOp.node.firstChildNode.elementType
 
     return when (operator) {
-        LuaTypes.MINUS -> inferExpr(expr, context) // Negative something
+        LuaTypes.MINUS -> infer(expr, context) // Negative something
         LuaTypes.GETN -> Ty.NUMBER // Table length is a number
         else -> Ty.UNKNOWN
     }
@@ -84,17 +84,17 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
 
 private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
     val lhs = binaryExpr.left
-    val lty = inferExpr(lhs, context)
+    val lty = infer(lhs, context)
     return if (operator == LuaTypes.OR) {
         val rhs = binaryExpr.right
-        if (rhs != null) lty.union(inferExpr(rhs, context)) else lty
+        if (rhs != null) lty.union(infer(rhs, context)) else lty
     } else lty
 }
 
 private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
     val lhs = binaryExpr.left
     // TODO: Search for operator overrides
-    return inferExpr(lhs, context)
+    return infer(lhs, context)
 }
 
 private fun LuaCallExpr.infer(context: SearchContext): ITy {
@@ -118,7 +118,7 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     }
 
     var ret: ITy = Ty.UNKNOWN
-    val ty = inferExpr(expr, context)//expr.guessTypeFromCache(context)
+    val ty = infer(expr, context)//expr.guessTypeFromCache(context)
     TyUnion.each(ty) {
         when(it) {
             is ITyFunction -> {
@@ -225,7 +225,7 @@ private fun isGlobal(nameExpr: LuaNameExpr):Boolean {
     return gs?.isGlobal ?: (resolveLocal(nameExpr, null) == null)
 }
 
-private fun LuaLiteralExpr.infer(context: SearchContext): ITy {
+private fun LuaLiteralExpr.infer(): ITy {
     return when (this.kind) {
         LuaLiteralKind.Bool -> Ty.BOOLEAN
         LuaLiteralKind.String -> Ty.STRING
