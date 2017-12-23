@@ -437,9 +437,10 @@
         <luaAllClassesSearch implementation="com.tang.intellij.lua.psi.search.LuaAllClassesSearchExecutor"/>
         <luaOverridingMethodsSearch implementation="com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearchExecutor"/>
 
-        <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaSourcesRootFileResolver"/>
-        <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAdditionalResolver"/>
-        <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAbsoluteResolver"/>
+        <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileSourcesRootResolver" id="base"/>
+        <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAdditionalResolver" id="additional"/>
+        <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAbsoluteResolver" id="absolute"/>
+        <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileFuzzyResolver" id="fuzzy"/>
 
         <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer"/>
     </extensions>

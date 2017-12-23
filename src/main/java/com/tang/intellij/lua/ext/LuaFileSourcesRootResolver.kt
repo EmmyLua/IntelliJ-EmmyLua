@@ -22,7 +22,7 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.tang.intellij.lua.psi.LuaFileUtil
 
-class LuaSourcesRootFileResolver : ILuaFileResolver {
+class LuaFileSourcesRootResolver : ILuaFileResolver {
     override fun find(project: Project, shortUrl: String, extNames: Array<String>): VirtualFile? {
         val modules = ModuleManager.getInstance(project).modules
         for (module in modules) {
