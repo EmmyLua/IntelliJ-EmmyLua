@@ -32,7 +32,7 @@ import com.tang.intellij.lua.psi.LuaLocalFuncDef
 import com.tang.intellij.lua.psi.LuaPsiTreeUtilEx
 import com.tang.intellij.lua.psi.LuaVisitor
 
-class LocalNameHidesPrevious : LocalInspectionTool() {
+class LocalNameShadowed : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor {
         return object : LuaVisitor() {
 
@@ -40,7 +40,7 @@ class LocalNameHidesPrevious : LocalInspectionTool() {
                 LuaPsiTreeUtilEx.walkUpNameDef(namedElement, Processor{ nameDef ->
                     val psi = if (namedElement is PsiNameIdentifierOwner) namedElement.nameIdentifier else namedElement
                     if (psi != null && namedElement.name == nameDef.name) {
-                        holder.registerProblem(psi, "Local name hides previous", object : RefactoringQuickFix {
+                        holder.registerProblem(psi, "Local name shadowed", object : RefactoringQuickFix {
                             override fun getHandler(): RefactoringActionHandler {
                                 return RefactoringActionHandlerFactory.getInstance().createRenameHandler()
                             }

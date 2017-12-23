@@ -360,10 +360,10 @@
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.ArrayIndexZero"/>
         <localInspection
-                displayName="Local name hides previous"
+                displayName="Local name shadowed"
                 enabledByDefault="true"
                 groupName="Lua"
-                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameHidesPrevious"/>
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameShadowed"/>
         <localInspection
                 displayName="Match function signature"
                 enabledByDefault="false"
