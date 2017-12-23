@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger
 
 /**
  *
  * Created by tangzx on 2017/5/7.
  */
-public interface IRemoteConfiguration {
-    int getPort();
+interface IRemoteConfiguration {
+    val port: Int
 }
