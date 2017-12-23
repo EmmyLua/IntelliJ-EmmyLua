@@ -187,7 +187,7 @@ abstract class TyClass(override val className: String,
         fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
             val g = TySerializedClass(getGlobalTypeName(nameExpr), nameExpr.name, null, null, TyFlags.GLOBAL)
             if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
-                return TySerializedClass(nameExpr.text).union(g)
+                return TySerializedClass(nameExpr.name).union(g)
             return g
         }
     }
