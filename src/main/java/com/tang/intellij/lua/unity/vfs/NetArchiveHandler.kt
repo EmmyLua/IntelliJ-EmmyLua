@@ -63,6 +63,8 @@ private val TypeRef.isValid: Boolean get() {
         return false
     if (!LuaRefactoringUtil.isLuaIdentifier(ns))
         return false
+    if (name.startsWith('<'))
+        return false
     for (attribute in this.customAttributes) {
         if (obsoleteAttrSet.contains(attribute.typeRef.name)) {
             return false
