@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.psi.search
 
 import com.intellij.openapi.project.DumbService
-import com.intellij.openapi.util.Ref
 import com.intellij.util.Processor
 import com.intellij.util.QueryExecutor
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
@@ -29,8 +28,15 @@ import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex
  */
 class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassInheritorsSearch.SearchParameters> {
 
-    private fun processInheritors(searchParameters: LuaClassInheritorsSearch.SearchParameters, typeName: String, processor: Processor<LuaDocClassDef>): Boolean {
+    private fun processInheritors(searchParameters: LuaClassInheritorsSearch.SearchParameters,
+                                  typeName: String,
+                                  processedNames: MutableSet<String>,
+                                  processor: Processor<LuaDocClassDef>): Boolean {
         var ret = true
+        // recursion guard!!
+        if (!processedNames.add(typeName))
+            return ret
+
         val processed = mutableListOf<LuaDocClassDef>()
         LuaSuperClassIndex.process(typeName, searchParameters.project, searchParameters.searchScope, Processor {
             processed.add(it)
@@ -39,7 +45,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassI
         })
         if (ret && searchParameters.isDeep) {
             for (def in processed) {
-                ret = processInheritors(searchParameters, def.name, processor)
+                ret = processInheritors(searchParameters, def.name, processedNames, processor)
                 if (!ret) break
             }
         }
@@ -47,8 +53,10 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassI
     }
 
     override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<LuaDocClassDef>): Boolean {
-        val ref = Ref.create<Boolean>()
-        DumbService.getInstance(searchParameters.project).runReadActionInSmartMode { ref.set(processInheritors(searchParameters, searchParameters.typeName, processor)) }
-        return ref.get()
+        var ref = true
+        DumbService.getInstance(searchParameters.project).runReadActionInSmartMode {
+            ref = processInheritors(searchParameters, searchParameters.typeName, mutableSetOf(), processor)
+        }
+        return ref
     }
 }
