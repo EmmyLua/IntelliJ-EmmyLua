@@ -58,7 +58,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                 addTy(psi.guessType(SearchContext(psi.project)) as ITyFunction)
             }
             is LuaTypeGuessable -> {
-                val type = psi.guessTypeFromCache(SearchContext(psi.project))
+                val type = psi.guessType(SearchContext(psi.project))
                 var isFn = false
                 TyUnion.each(type) {
                     if (it is ITyFunction) {

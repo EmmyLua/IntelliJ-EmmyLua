@@ -155,7 +155,7 @@ fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): 
             type = TySerializedClass(stub.className)
         } else {
             val expr = classMethodDef.classMethodName.expr
-            val ty = expr.guessTypeFromCache(ctx)
+            val ty = expr.guessType(ctx)
             val perfect = TyUnion.getPerfectClass(ty)
             if (perfect is ITyClass)
                 type = perfect
@@ -203,7 +203,7 @@ fun guessParentType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass
  */
 fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
     val prefix = callExpr.firstChild as LuaExpr
-    return prefix.guessTypeFromCache(context)
+    return prefix.guessType(context)
 }
 
 /**
@@ -279,12 +279,12 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
     context.index = 0
     if (exprList.isEmpty())
         return Ty.UNKNOWN
-    return exprList[index].guessTypeFromCache(context)
+    return exprList[index].guessType(context)
 }
 
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
     val expr = PsiTreeUtil.getStubChildOfType(indexExpr, LuaExpr::class.java)
-    return expr?.guessTypeFromCache(context) ?: Ty.UNKNOWN
+    return expr?.guessType(context) ?: Ty.UNKNOWN
 }
 
 fun getNameIdentifier(indexExpr: LuaIndexExpr): PsiElement? {
@@ -543,7 +543,7 @@ fun guessType(tableField: LuaTableField, context: SearchContext): ITy {
     //guess from value
     val valueExpr = PsiTreeUtil.getStubChildOfType(tableField, LuaExpr::class.java)
     if (valueExpr != null) {
-        return valueExpr.guessTypeFromCache(context)
+        return valueExpr.guessType(context)
     }
     return Ty.UNKNOWN
 }

@@ -42,7 +42,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         if (element != null) {
             when (element) {
                 is LuaTypeGuessable -> {
-                    val ty = element.guessTypeFromCache(SearchContext(element.project))
+                    val ty = element.guessType(SearchContext(element.project))
                     return buildString {
                         renderTy(this, ty)
                     }

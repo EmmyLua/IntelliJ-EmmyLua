@@ -17,10 +17,8 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
-import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
@@ -194,7 +192,7 @@ internal fun resolveType(nameDef: LuaNameDef, context: SearchContext): ITy {
     } else if (nameDef.parent is LuaTableField) {
         val field = nameDef.parent as LuaTableField
         val expr = PsiTreeUtil.findChildOfType(field, LuaExpr::class.java)
-        if (expr != null) type = expr.guessTypeFromCache(context)
+        if (expr != null) type = expr.guessType(context)
     } else {
         val docTy = nameDef.docTy
         if (docTy != null)
@@ -291,7 +289,7 @@ fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchContext): ITy
                 if (args is LuaListArgs) {
                     val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
                     if (argExpr != null) {
-                        val set = argExpr.guessTypeFromCache(context)
+                        val set = argExpr.guessType(context)
                         val tyArray = TyUnion.find(set, ITyArray::class.java)
                         if (tyArray != null)
                             return tyArray.base
@@ -368,18 +366,4 @@ fun resolveRequireFile(pathString: String?, project: Project): LuaPsiFile? {
             return psiFile
     }
     return null
-}
-
-private val GUESS_FROM_CACHE_KEY = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("lua.ty.guess_from_cache")
-
-fun LuaTypeGuessable.guessTypeFromCache(searchContext: SearchContext): ITy {
-    //todo: 缓存有BUG，可能一直是旧的？
-    /*if (searchContext.isDumb)
-        return Ty.UNKNOWN
-    val ty = CachedValuesManager.getManager(searchContext.project).getParameterizedCachedValue(this, GUESS_FROM_CACHE_KEY, { ctx ->
-        val ty = guessType(ctx)
-        CachedValueProvider.Result.create(ty, this)
-    }, false, searchContext)
-    return ty ?: Ty.UNKNOWN*/
-    return this.guessType(searchContext)
 }

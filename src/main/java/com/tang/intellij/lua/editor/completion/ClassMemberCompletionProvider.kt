@@ -63,7 +63,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                 LuaPsiTreeUtilEx.walkUpNameDef(indexExpr, Processor {
                     val txt = it.name
                     if (it is LuaTypeGuessable && txt != null && prefixName != txt && matcher.prefixMatches(txt)) {
-                        val type = it.guessTypeFromCache(searchContext)
+                        val type = it.guessType(searchContext)
                         if (!Ty.isInvalid(prefixType)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher("$prefixName*$postfixName")

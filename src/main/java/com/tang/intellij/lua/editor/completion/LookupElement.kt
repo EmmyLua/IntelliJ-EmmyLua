@@ -24,7 +24,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaPsiElement
-import com.tang.intellij.lua.psi.guessTypeFromCache
+import com.tang.intellij.lua.psi.guessType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -86,7 +86,7 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bol
     }
 
     val ty: ITy by lazy {
-        field.guessTypeFromCache(SearchContext(field.project))
+        field.guessType(SearchContext(field.project))
     }
 
     private fun lazyInit() {

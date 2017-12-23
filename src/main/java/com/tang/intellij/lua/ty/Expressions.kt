@@ -118,7 +118,7 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     }
 
     var ret: ITy = Ty.UNKNOWN
-    val ty = infer(expr, context)//expr.guessTypeFromCache(context)
+    val ty = infer(expr, context)//expr.guessType(context)
     TyUnion.each(ty) {
         when(it) {
             is ITyFunction -> {
@@ -214,7 +214,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
             }
             return type
         }
-        is LuaTypeGuessable -> return def.guessTypeFromCache(context)
+        is LuaTypeGuessable -> return def.guessType(context)
         else -> return Ty.UNKNOWN
     }
 }
@@ -284,7 +284,7 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
     var set:ITy = Ty.UNKNOWN
 
     LuaClassMemberIndex.processAll(type, fieldName, context, Processor {
-        set = set.union(it.guessTypeFromCache(context))
+        set = set.union(it.guessType(context))
         true
     })
 
