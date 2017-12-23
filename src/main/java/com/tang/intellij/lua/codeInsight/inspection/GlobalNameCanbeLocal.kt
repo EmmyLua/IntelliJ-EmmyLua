@@ -32,14 +32,18 @@ class GlobalNameCanbeLocal : LocalInspectionTool() {
         return object : LuaVisitor() {
             override fun visitNameExpr(o: LuaNameExpr) {
                 val stat = o.assignStat
-                if (stat != null) {
+                if (stat != null && o.moduleName == null) {
                     val name = o.name
                     val resolve = resolveInFile(name, o, SearchContext(o.project))
                     if (resolve == null) {
                         val scope = GlobalSearchScope.allScope(o.project)
                         val searchScope = scope.intersectWith(GlobalSearchScope.notScope(GlobalSearchScope.fileScope(o.containingFile)))
                         val query = ReferencesSearch.search(o, searchScope)
-                        if (query.findFirst() == null) {
+                        var canLocal = query.findFirst() == null
+                        if (canLocal) {
+                            canLocal = o.reference?.resolve() == null
+                        }
+                        if (canLocal) {
                             holder.registerProblem(o, "Global name \"$name\" can be local", object : LocalQuickFix {
                                 override fun getFamilyName() = "append \"local\""
 
