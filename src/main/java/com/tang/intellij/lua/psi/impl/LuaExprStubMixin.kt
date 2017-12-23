@@ -36,4 +36,8 @@ abstract class LuaExprStubMixin<T: LuaExprStub<*>> : StubBasedPsiElementBase<T>,
     override fun getReferences(): Array<PsiReference> {
         return ReferenceProvidersRegistry.getReferencesFromProviders(this, PsiReferenceService.Hints.NO_HINTS)
     }
+
+    override fun getReference(): PsiReference? {
+        return references.firstOrNull()
+    }
 }
