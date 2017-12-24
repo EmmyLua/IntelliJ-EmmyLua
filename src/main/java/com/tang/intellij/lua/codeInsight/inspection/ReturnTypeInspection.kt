@@ -19,6 +19,7 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -30,6 +31,8 @@ class ReturnTypeInspection : StrictInspection() {
             object : LuaVisitor() {
                 override fun visitReturnStat(o: LuaReturnStat) {
                     super.visitReturnStat(o)
+                    if (o.parent is PsiFile)
+                        return
 
                     val context = SearchContext(o.project)
 
