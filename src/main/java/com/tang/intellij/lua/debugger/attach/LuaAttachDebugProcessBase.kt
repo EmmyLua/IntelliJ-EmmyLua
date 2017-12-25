@@ -131,7 +131,13 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
 
     override fun handle(message: LuaAttachMessage) {
         when (message) {
-            is DMLoadScript -> with(ApplicationManager.getApplication()) { invokeLater { runWriteAction { onLoadScript(message) } }}
+            is DMLoadScript -> with(ApplicationManager.getApplication()) { invokeLater { runWriteAction {
+                try {
+                    onLoadScript(message)
+                } finally {
+                    bridge.sendDone()
+                }
+            } }}
             is DMBreak -> onBreak(message)
             is DMException -> message.print()
             is DMMessage -> message.print()
@@ -184,6 +190,14 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     }
 
     private fun onLoadScript(proto: DMLoadScript) {
+        // remove exist
+        for (entry in loadedScriptMap) {
+            if (entry.value.name == proto.fileName) {
+                loadedScriptMap.remove(entry.key)
+                break
+            }
+        }
+
         var file = findFile(proto.fileName)
         if (file == null) {
             if (proto.state != CodeState.Unavailable) {
@@ -223,7 +237,6 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             }
             print(": ${proto.fileName}\n", ConsoleViewContentType.SYSTEM_OUTPUT)
         }
-        bridge.sendDone()
     }
 
     private fun createMemoryFile(dm: DMLoadScript): VirtualFile {
