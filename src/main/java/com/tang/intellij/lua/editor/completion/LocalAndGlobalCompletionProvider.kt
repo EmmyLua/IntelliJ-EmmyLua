@@ -67,15 +67,13 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
                     }
                 }
                 if (!isFn) {
-                    val cls = TyUnion.getPerfectClass(type)
-                    if (cls != null) {
-                        var icon = LuaIcons.LOCAL_VAR
-                        if (psi is LuaParamNameDef)
-                            icon = LuaIcons.PARAMETER
+                    val perfectTy = TyUnion.getPerfectClass(type) ?: type
+                    var icon = LuaIcons.LOCAL_VAR
+                    if (psi is LuaParamNameDef)
+                        icon = LuaIcons.PARAMETER
 
-                        val elementBuilder = LuaTypeGuessableLookupElement(name, psi, cls, false, icon)
-                        session.resultSet.addElement(elementBuilder)
-                    }
+                    val elementBuilder = LuaTypeGuessableLookupElement(name, psi, perfectTy, false, icon)
+                    session.resultSet.addElement(elementBuilder)
                 }
             }
         }
