@@ -16,10 +16,22 @@
 
 package com.tang.intellij.lua.editor.completion
 
+import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.completion.PrioritizedLookupElement
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.psi.LuaClassField
+import com.tang.intellij.lua.psi.LuaTableExpr
+import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.shouldBe
 
-class TableCompletionProvider : LuaCompletionProvider() {
+class TableCompletionProvider : ClassMemberCompletionProvider() {
 
     companion object {
         private val metaMethodNames = mapOf(
@@ -43,14 +55,42 @@ class TableCompletionProvider : LuaCompletionProvider() {
         )
     }
 
-    override fun addCompletions(session: CompletionSession) {
-        val completionResultSet = session.resultSet
-
+    override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
         metaMethodNames.forEach {
             val b = LookupElementBuilder.create(it.key)
                     .withTypeText(it.value)
                     .withIcon(LuaIcons.META_METHOD)
             completionResultSet.addElement(b)
+        }
+
+        val table = PsiTreeUtil.getParentOfType(completionParameters.position, LuaTableExpr::class.java)
+        if (table != null) {
+            val project = table.project
+            val prefixMatcher = completionResultSet.prefixMatcher
+            val ty = table.shouldBe(SearchContext(project))
+            TyUnion.each(ty) { luaType->
+                if (luaType is ITyClass) {
+                    val context = SearchContext(project)
+                    luaType.lazyInit(context)
+                    luaType.processMembers(context) { curType, member ->
+                        member.name?.let {
+                            if (prefixMatcher.prefixMatches(it)) {
+                                val className = curType.displayName
+                                if (member is LuaClassField) {
+                                    addField(completionResultSet, curType === luaType, className, member, object : HandlerProcessor() {
+                                        override fun process(element: LuaLookupElement): LookupElement {
+                                            element.itemText = element.itemText + " = "
+                                            element.lookupString = element.lookupString + " = "
+
+                                            return PrioritizedLookupElement.withPriority(element, 10.0)
+                                        }
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
