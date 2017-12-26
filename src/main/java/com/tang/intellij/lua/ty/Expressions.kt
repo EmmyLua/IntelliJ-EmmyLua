@@ -72,9 +72,8 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
             LuaTypes.LE, LuaTypes.EQ, LuaTypes.LT, LuaTypes.NE, LuaTypes.GE, LuaTypes.GT -> Ty.BOOLEAN
         //and, or
             LuaTypes.AND, LuaTypes.OR -> guessAndOrType(this, operator, context)
-        //&, <<, |, >>, ~, ^
+        //&, <<, |, >>, ~, ^,    +, -, *, /, //, %
             LuaTypes.BIT_AND, LuaTypes.BIT_LTLT, LuaTypes.BIT_OR, LuaTypes.BIT_RTRT, LuaTypes.BIT_TILDE, LuaTypes.EXP,
-                //+, -, *, /, //, %
             LuaTypes.PLUS, LuaTypes.MINUS, LuaTypes.MULT, LuaTypes.DIV, LuaTypes.DOUBLE_DIV, LuaTypes.MOD -> guessBinaryOpType(this, operator, context)
             else -> Ty.UNKNOWN
         }
@@ -191,21 +190,6 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
                     }
                 }
             }
-            /*val stat = def.assignStat
-            if (stat != null) {
-                val comment = stat.comment
-                //guess from comment
-                if (comment != null)
-                    type = comment.guessType(context)
-                //guess from value expr
-                if (Ty.isInvalid(type)) {
-                    val exprList = stat.valueExprList
-                    if (exprList != null) {
-                        context.index = stat.getIndexFor(def)
-                        type = exprList.guessTypeAt(context)
-                    }
-                }
-            }*/
 
             //Global
             if (isGlobal(def)) {
