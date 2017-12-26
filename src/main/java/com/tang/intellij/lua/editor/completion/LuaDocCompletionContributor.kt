@@ -31,8 +31,6 @@ import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
-import com.tang.intellij.lua.psi.LuaTableField
-import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.ITyClass
@@ -146,47 +144,9 @@ class LuaDocCompletionContributor : CompletionContributor() {
                 completionResultSet.stopHere()
             }
         })
-
-        extend(CompletionType.BASIC, SHOW_META_METHOD, object : CompletionProvider<CompletionParameters>() {
-            override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
-                metaMethodNames.forEach {
-                    val b = LookupElementBuilder.create(it.key)
-                            .withTypeText(it.value)
-                            .withIcon(LuaIcons.META_METHOD)
-                    completionResultSet.addElement(b)
-                }
-            }
-        })
     }
 
     companion object {
-
-        private val metaMethodNames = mapOf(
-                "__add" to "a + b",
-                "__sub" to "a - b",
-                "__mul" to "a * b",
-                "__div" to "a / b",
-                "__mod" to "a % b",
-                "__pow" to "a ^ b",
-                "__unm" to "-a",
-                "__concat" to "a .. b",
-                "__len" to "#a",
-                "__eq" to "a == a",
-                "__lt" to "a < b",
-                "__le" to "a <= b",
-                "__index" to "Meta method",
-                "__newindex" to "Meta method",
-                "__call" to "Meta method",
-                "__tostring" to "Meta method",
-                "__metatable" to "Meta method"
-        )
-
-        private val SHOW_META_METHOD = psiElement().andOr(
-                psiElement().withParent(
-                    psiElement(LuaTypes.NAME_EXPR).withParent(LuaTableField::class.java)
-                ),
-                psiElement(LuaTypes.ID).withParent(LuaTableField::class.java)
-        )
 
         // 在 @ 之后提示 param class type ...
         private val SHOW_DOC_TAG = psiElement().afterLeaf(

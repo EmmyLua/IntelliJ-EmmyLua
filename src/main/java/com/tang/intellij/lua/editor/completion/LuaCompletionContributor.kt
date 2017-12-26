@@ -65,6 +65,8 @@ class LuaCompletionContributor : CompletionContributor() {
         })
 
         extend(CompletionType.BASIC, psiElement(LuaTypes.ID).withParent(LuaNameDef::class.java), SuggestLocalNameProvider())
+
+        extend(CompletionType.BASIC, IN_TABLE_FIELD, TableCompletionProvider())
     }
 
     override fun fillCompletionVariants(parameters: CompletionParameters, result: CompletionResultSet) {
@@ -129,6 +131,13 @@ class LuaCompletionContributor : CompletionContributor() {
                 )
 
         private val GOTO = psiElement(LuaTypes.ID).withParent(LuaGotoStat::class.java)
+
+        private val IN_TABLE_FIELD = psiElement().andOr(
+                psiElement().withParent(
+                        psiElement(LuaTypes.NAME_EXPR).withParent(LuaTableField::class.java)
+                ),
+                psiElement(LuaTypes.ID).withParent(LuaTableField::class.java)
+        )
 
         private fun suggestWordsInFile(parameters: CompletionParameters) {
             val session = CompletionSession[parameters]!!
