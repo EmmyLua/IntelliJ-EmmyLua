@@ -230,7 +230,7 @@ private fun LuaLiteralExpr.infer(): ITy {
         LuaLiteralKind.Bool -> Ty.BOOLEAN
         LuaLiteralKind.String -> Ty.STRING
         LuaLiteralKind.Number -> Ty.NUMBER
-        LuaLiteralKind.Nil -> Ty.NIL
+        //LuaLiteralKind.Nil -> Ty.NIL
         else -> Ty.UNKNOWN
     }
 }
