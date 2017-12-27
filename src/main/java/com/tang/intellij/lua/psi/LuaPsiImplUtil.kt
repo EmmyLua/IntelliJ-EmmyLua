@@ -269,14 +269,25 @@ fun isFunctionCall(callExpr: LuaCallExpr): Boolean {
 }
 
 fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
-    //todo tuple
-    //local a, b = getValues()
-    //local a, b, c = getValues(), 1
     val exprList = list.exprStubList
-    val index = if (exprList.size > context.index) context.index else 0
-    if (exprList.isEmpty())
-        return Ty.UNKNOWN
-    return exprList[index].guessType(context)
+
+    val expr = exprList.getOrNull(context.index) ?: exprList.lastOrNull()
+    if (expr != null) {
+        //local function getValues12() return 1, 2 end
+        //local function getValues34() return 3, 4 end
+        //local a, b = getValues12() -- a = 1, b = 2
+        //local a, b, c = getValues12(), 3, 4 --a = 1, b = 3, c =  4
+        //local a, b, c = getValues12(), getValue34() --a = 1, b = 3, c =  4
+        if (exprList.size > 1) {
+            val nameSize = context.index + 1
+            if (nameSize > exprList.size) {
+                val valueSize = exprList.size
+                context.index = nameSize - valueSize
+            } else context.index = 0
+        }
+        return expr.guessType(context)
+    }
+    return Ty.UNKNOWN
 }
 
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
