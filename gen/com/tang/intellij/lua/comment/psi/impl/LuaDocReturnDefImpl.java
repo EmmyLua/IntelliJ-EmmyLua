@@ -44,4 +44,9 @@ public class LuaDocReturnDefImpl extends ASTWrapperPsiElement implements LuaDocR
     return LuaDocPsiImplUtilKt.resolveTypeAt(this, index);
   }
 
+  @NotNull
+  public ITy getType() {
+    return LuaDocPsiImplUtilKt.getType(this);
+  }
+
 }

@@ -35,6 +35,7 @@ enum class TyKind {
     Generic,
     Nil,
     Void,
+    Tuple,
 }
 enum class TyPrimitiveKind {
     String,
@@ -195,6 +196,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     stream.writeByte(ty.params.size)
                     ty.params.forEach { serialize(it, stream) }
                 }
+                is TyTuple -> {
+                    stream.writeByte(ty.list.size)
+                    ty.list.forEach { serialize(it, stream) }
+                }
             }
         }
 
@@ -242,6 +247,12 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 TyKind.Nil -> NIL
                 TyKind.Void -> VOID
+                TyKind.Tuple -> {
+                    val size = stream.readByte().toInt()
+                    val list = mutableListOf<ITy>()
+                    for (i in 0 until size) list.add(deserialize(stream))
+                    TyTuple(list)
+                }
                 else -> TyUnknown()
             }
         }
@@ -434,4 +445,10 @@ class TyVoid : Ty(TyKind.Void) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return false
     }
+}
+
+class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
+    override val displayName: String
+        get() = "Tuple"
+
 }

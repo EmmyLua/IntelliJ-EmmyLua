@@ -17,4 +17,7 @@ public interface LuaDocReturnDef extends LuaDocPsiElement {
   @NotNull
   ITy resolveTypeAt(int index);
 
+  @NotNull
+  ITy getType();
+
 }

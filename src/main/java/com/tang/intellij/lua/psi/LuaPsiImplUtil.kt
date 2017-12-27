@@ -269,11 +269,11 @@ fun isFunctionCall(callExpr: LuaCallExpr): Boolean {
 }
 
 fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
-    //if (context.forStore)
-    //    return Ty.UNKNOWN
+    //todo tuple
+    //local a, b = getValues()
+    //local a, b, c = getValues(), 1
     val exprList = list.exprStubList
     val index = if (exprList.size > context.index) context.index else 0
-    context.index = 0
     if (exprList.isEmpty())
         return Ty.UNKNOWN
     return exprList[index].guessType(context)

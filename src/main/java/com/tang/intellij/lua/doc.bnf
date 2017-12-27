@@ -164,7 +164,7 @@ param_def ::= TAG_PARAM OPTIONAL? param_name_ref ty comment_string? {
 type_list ::= ty(',' ty)*
 return_def ::= TAG_RETURN type_list comment_string? {
     pin = 1
-    methods = [resolveTypeAt]
+    methods = [resolveTypeAt getType]
 }
 
 class_name_ref ::= ID {

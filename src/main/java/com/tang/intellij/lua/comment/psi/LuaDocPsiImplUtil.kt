@@ -128,6 +128,18 @@ fun resolveTypeAt(returnDef: LuaDocReturnDef, index: Int): ITy {
     return Ty.UNKNOWN
 }
 
+fun getType(returnDef: LuaDocReturnDef): ITy {
+    val tyList = returnDef.typeList?.tyList
+    if (tyList != null && tyList.isNotEmpty()) {
+        val tupleList = mutableListOf<ITy>()
+        tyList.forEach {
+            tupleList.add(it.getType())
+        }
+        return TyTuple(tupleList)
+    }
+    return Ty.VOID
+}
+
 /**
  * 优化：从stub中取名字
  * @param classDef LuaDocClassDef

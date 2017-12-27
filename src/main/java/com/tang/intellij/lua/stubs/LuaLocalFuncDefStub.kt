@@ -44,7 +44,7 @@ class LuaLocalFuncDefElementType
     }
 
     override fun createStub(def: LuaLocalFuncDef, parentStub: StubElement<*>?): LuaLocalFuncDefStub {
-        val retDocTy = def.comment?.returnDef?.resolveTypeAt(0)
+        val retDocTy = def.comment?.returnDef?.type
         val params = def.params
         val overloads = def.overloads
         return LuaLocalFuncDefStub(def.name!!,

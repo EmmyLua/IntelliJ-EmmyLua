@@ -52,7 +52,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
 
         val isStatic = methodName.dot != null
         val visibility = methodDef.visibility
-        val retDocTy = methodDef.comment?.returnDef?.resolveTypeAt(0)
+        val retDocTy = methodDef.comment?.returnDef?.type
         val params = methodDef.params
         val overloads = methodDef.overloads
 
