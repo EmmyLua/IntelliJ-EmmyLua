@@ -203,6 +203,17 @@ object LuaPsiTreeUtilEx {
     }
 
     fun processChildren(element: PsiElement?, processor: Processor<PsiElement>) {
+        if (element is STUB_PSI) {
+            val stub = element.stub
+            if (stub != null) {
+                for (childrenStub in stub.childrenStubs) {
+                    if (!processor.process(childrenStub.psi))
+                        break
+                }
+                return
+            }
+        }
+
         var child = element?.firstChild
         while (child != null) {
             if (!processor.process(child)) {

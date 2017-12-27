@@ -202,8 +202,7 @@ fun guessParentType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass
  * @return LuaType
  */
 fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
-    val prefix = callExpr.firstChild as LuaExpr
-    return prefix.guessType(context)
+    return callExpr.expr.guessType(context)
 }
 
 /**
@@ -245,10 +244,8 @@ fun getFirstStringArg(callExpr: LuaCallExpr): PsiElement? {
         is LuaListArgs -> args.exprList.let { list ->
             if (list.isNotEmpty() && list[0] is LuaLiteralExpr) {
                 val valueExpr = list[0] as LuaLiteralExpr
-                val node = valueExpr.firstChild
-                if (node.node.elementType === LuaTypes.STRING) {
+                if (valueExpr.kind == LuaLiteralKind.String)
                     path = valueExpr
-                }
             }
         }
     }

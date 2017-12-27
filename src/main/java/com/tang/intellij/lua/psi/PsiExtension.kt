@@ -254,20 +254,10 @@ val LuaIndexExpr.prefixExpr: LuaExpr get() {
     return firstChild as LuaExpr
 }
 
-val LuaIndexExpr.assignStat: LuaAssignStat? get() {
-    val p1 = parent
-    if (p1 is LuaVarList) {
-        val p2 = p1.parent
-        if (p2 is LuaAssignStat)
-            return p2
-    }
-    return null
-}
-
 val LuaExpr.assignStat: LuaAssignStat? get() {
-    val p1 = parent
+    val p1 = PsiTreeUtil.getStubOrPsiParent(this)
     if (p1 is LuaVarList) {
-        val p2 = p1.parent
+        val p2 = PsiTreeUtil.getStubOrPsiParent(p1)
         if (p2 is LuaAssignStat)
             return p2
     }
