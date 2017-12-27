@@ -92,45 +92,6 @@ public class LuaFileUtil {
         return ILuaFileResolver.Companion.findLuaFile(project, shortUrl, extensions);
     }
 
-    @Nullable
-    public static VirtualFile findFile(String shortUrl, String root) {
-        for (String ext : extensions) {
-            String fixedURL = shortUrl;
-            if (shortUrl.endsWith(ext)) { //aa.bb.lua -> aa.bb
-                fixedURL = shortUrl.substring(0, shortUrl.length() - ext.length());
-            }
-
-            //将.转为/，但不处理 ..
-            if (!fixedURL.contains("/")) {
-                //aa.bb -> aa/bb.lua
-                fixedURL = fixedURL.replaceAll("\\.", "/");
-            }
-
-            fixedURL = fixedURL + ext;
-
-            VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(root + "/" + fixedURL);
-            if (file != null && !file.isDirectory()) {
-                return file;
-            }
-        }
-        return null;
-    }
-
-    public static VirtualFile[] getPackages(Project project, String shortUrl) {
-        Module[] modules = ModuleManager.getInstance(project).getModules();
-        SmartList<VirtualFile> list = new SmartList<>();
-        for (Module module : modules) {
-            String[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRootUrls();
-            for (String sourceRoot : sourceRoots) {
-                VirtualFile file = VirtualFileManager.getInstance().findFileByUrl(sourceRoot + "/" + shortUrl);
-                if (file != null) {
-                    list.add(file);
-                }
-            }
-        }
-        return list.toArray(new VirtualFile[list.size()]);
-    }
-
     public static String getShortPath(Project project, VirtualFile file) {
         return VfsUtil.urlToPath(getShortUrl(project, file));
     }

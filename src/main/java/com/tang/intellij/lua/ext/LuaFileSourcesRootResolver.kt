@@ -20,7 +20,7 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
-import com.tang.intellij.lua.psi.LuaFileUtil
+import com.intellij.openapi.vfs.VirtualFileManager
 
 class LuaFileSourcesRootResolver : ILuaFileResolver {
     override fun find(project: Project, shortUrl: String, extNames: Array<String>): VirtualFile? {
@@ -28,15 +28,39 @@ class LuaFileSourcesRootResolver : ILuaFileResolver {
         for (module in modules) {
             val moduleRootManager = ModuleRootManager.getInstance(module)
             val sourceRoots = moduleRootManager.sourceRootUrls
-            //相对路径
+            //sources root
             for (sourceRoot in sourceRoots) {
-                val file = LuaFileUtil.findFile(shortUrl, sourceRoot)
+                val file = findFile(shortUrl, sourceRoot, extNames)
                 if (file != null) return file
             }
+            //content root
             val contentRoots = moduleRootManager.contentRootUrls
             for (root in contentRoots) {
-                val file = LuaFileUtil.findFile(shortUrl, root)
+                val file = findFile(shortUrl, root, extNames)
                 if (file != null) return file
+            }
+        }
+        return null
+    }
+
+    private fun findFile(shortUrl: String, root: String, extensions: Array<String>): VirtualFile? {
+        for (ext in extensions) {
+            var fixedURL = shortUrl
+            if (shortUrl.endsWith(ext)) { //aa.bb.lua -> aa.bb
+                fixedURL = shortUrl.substring(0, shortUrl.length - ext.length)
+            }
+
+            //将.转为/，但不处理 ..
+            if (!fixedURL.contains("/")) {
+                //aa.bb -> aa/bb
+                fixedURL = fixedURL.replace("\\.".toRegex(), "/")
+            }
+
+            fixedURL += ext
+
+            val file = VirtualFileManager.getInstance().findFileByUrl(root + "/" + fixedURL)
+            if (file != null && !file.isDirectory) {
+                return file
             }
         }
         return null
