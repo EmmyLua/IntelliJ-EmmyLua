@@ -45,7 +45,7 @@ class GlobalNameCanbeLocal : LocalInspectionTool() {
                         }
                         if (canLocal) {
                             holder.registerProblem(o, "Global name \"$name\" can be local", object : LocalQuickFix {
-                                override fun getFamilyName() = "append \"local\""
+                                override fun getFamilyName() = "Append \"local\""
 
                                 override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
                                     val element = LuaElementFactory.createWith(project, "local ${stat.text}")
