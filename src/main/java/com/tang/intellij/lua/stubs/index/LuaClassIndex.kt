@@ -19,9 +19,9 @@ package com.tang.intellij.lua.stubs.index
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StringStubIndexExtension
-import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.Processor
+import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.search.LuaPredefinedScope
@@ -61,17 +61,8 @@ class LuaClassIndex : StringStubIndexExtension<LuaDocClassDef>() {
         }
 
         fun process(key: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaDocClassDef>): Boolean {
-            var ret = true
-            StubIndex.getInstance().processElements(KEY,
-                    key,
-                    project,
-                    scope,
-                    LuaDocClassDef::class.java,
-                    {
-                        ret = processor.process(it)
-                        ret
-                    })
-            return ret
+            val collection = instance.get(key, project, scope)
+            return ContainerUtil.process(collection, processor)
         }
 
         fun processKeys(project: Project, processor: Processor<String>) {

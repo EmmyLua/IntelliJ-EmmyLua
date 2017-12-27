@@ -22,6 +22,7 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.IntStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
+import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaClassMethod
@@ -41,17 +42,8 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
         fun process(key: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             if (context.isDumb)
                 return false
-            var ret = true
-            StubIndex.getInstance().processElements(StubKeys.CLASS_MEMBER,
-                    key.hashCode(),
-                    context.project,
-                    context.getScope(),
-                    LuaClassMember::class.java,
-                    {
-                        ret = processor.process(it)
-                        ret
-                    })
-            return ret
+            val all = LuaClassMemberIndex.instance.get(key.hashCode(), context.project, context.getScope())
+            return ContainerUtil.process(all, processor)
         }
 
         fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {

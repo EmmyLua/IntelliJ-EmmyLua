@@ -14,6 +14,7 @@ import com.intellij.psi.stubs.StringStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.Processor
+import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 
 /**
@@ -29,12 +30,8 @@ class LuaSuperClassIndex : StringStubIndexExtension<LuaDocClassDef>() {
         val instance = LuaSuperClassIndex()
 
         fun process(s: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaDocClassDef>): Boolean {
-            var ret = true
-            StubIndex.getInstance().processElements(KEY, s, project, scope, LuaDocClassDef::class.java, {
-                ret = processor.process(it)
-                ret
-            })
-            return ret
+            val c = StubIndex.getElements(KEY, s, project, scope, LuaDocClassDef::class.java)
+            return ContainerUtil.process(c, processor)
         }
     }
 }
