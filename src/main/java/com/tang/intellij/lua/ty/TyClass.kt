@@ -72,7 +72,7 @@ abstract class TyClass(override val className: String,
     private var _lazyInitialized: Boolean = false
 
     override fun equals(other: Any?): Boolean {
-        return other is ITyClass && other.className == className
+        return other is ITyClass && other.className == className && other.flags == flags
     }
 
     override fun hashCode(): Int {
@@ -152,6 +152,7 @@ abstract class TyClass(override val className: String,
     }
 
     override fun getSuperClass(context: SearchContext): ITy? {
+        lazyInit(context)
         val clsName = superClassName
         if (clsName != null) {
             return Ty.getBuiltin(clsName) ?: LuaClassIndex.find(clsName, context)?.type
@@ -185,9 +186,10 @@ abstract class TyClass(override val className: String,
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
-            val g = TySerializedClass(getGlobalTypeName(nameExpr), nameExpr.name, null, null, TyFlags.GLOBAL)
+            val name = nameExpr.name
+            val g = TySerializedClass(getGlobalTypeName(nameExpr), name, null, null, TyFlags.GLOBAL)
             if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
-                return TySerializedClass(nameExpr.name).union(g)
+                return TySerializedClass(name, name, null, null, TyFlags.GLOBAL).union(g)
             return g
         }
     }

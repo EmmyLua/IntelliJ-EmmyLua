@@ -381,10 +381,13 @@ class TyUnion : Ty(TyKind.Union) {
         fun getPerfectClass(ty: ITy): ITyClass? {
             var tc: ITyClass? = null
             var anonymous: ITyClass? = null
+            var global: ITyClass? = null
             process(ty) {
                 if (it is ITyClass) {
                     if (it.isAnonymous)
                         anonymous = it
+                    else if (it.isGlobal)
+                        global = it
                     else {
                         tc = it
                         return@process false
@@ -392,7 +395,7 @@ class TyUnion : Ty(TyKind.Union) {
                 }
                 true
             }
-            return tc ?: anonymous
+            return tc ?: global ?: anonymous
         }
     }
 }
