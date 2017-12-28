@@ -18,6 +18,7 @@ package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
@@ -105,6 +106,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         val context = SearchContext(project)
         luaType.lazyInit(context)
         luaType.processMembers(context) { curType, member ->
+            ProgressManager.checkCanceled()
             member.name?.let {
                 if (prefixMatcher.prefixMatches(it) && curType.isVisibleInScope(project, contextTy, member.visibility)) {
                     val className = curType.displayName

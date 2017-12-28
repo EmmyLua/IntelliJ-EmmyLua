@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.colors.CodeInsightColors
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.editor.markup.SeparatorPlacement
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
@@ -62,6 +63,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                 var superType = type.getSuperClass(context)
 
                 while (superType != null && superType is TyClass) {
+                    ProgressManager.checkCanceled()
                     val superTypeName = superType.className
                     val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
                     if (superMethod != null) {
@@ -127,6 +129,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                 if (resolve != null) {
                     var cur: PsiElement? = element
                     while (cur != null) {
+                        ProgressManager.checkCanceled()
                         val bodyOwner = PsiTreeUtil.getParentOfType(cur, LuaFuncBodyOwner::class.java)
                         if (bodyOwner === resolve) {
                             result.add(LineMarkerInfo<PsiElement>(element,
@@ -166,6 +169,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
 
     override fun collectSlowLineMarkers(list: List<PsiElement>, collection: MutableCollection<LineMarkerInfo<*>>) {
         for (element in list) {
+            ProgressManager.checkCanceled()
             collectNavigationMarkers(element, collection)
         }
     }
