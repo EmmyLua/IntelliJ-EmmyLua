@@ -52,7 +52,7 @@ class TyFlags {
     }
 }
 
-interface ITy {
+interface ITy : Comparable<ITy> {
     val kind: TyKind
 
     val displayName: String
@@ -75,6 +75,24 @@ val ITy.isGlobal: Boolean
 
 val ITy.isAnonymous: Boolean
     get() = hasFlag(TyFlags.ANONYMOUS)
+
+private val ITy.worth: Float get() {
+    var value = 1.0f
+    when(this) {
+        is ITyClass -> {
+            if (this.isAnonymous)
+                value = 0.2f
+            else if (this.isGlobal)
+                value = 0.5f
+            else
+                value = 9f
+        }
+        is ITyArray, is ITyGeneric -> value = 8f
+        is TyPrimitive -> value = 7f
+        is ITyFunction -> value = 6f
+    }
+    return value
+}
 
 abstract class Ty(override val kind: TyKind) : ITy {
 
@@ -121,6 +139,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun getSuperClass(context: SearchContext): ITy? {
         return null
+    }
+
+    override fun compareTo(other: ITy): Int {
+        return other.worth.compareTo(worth)
     }
 
     companion object {
@@ -354,23 +376,13 @@ class TyUnion : Ty(TyKind.Union) {
         }
 
         fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
-            val anonymous = mutableListOf<ITy>()
-            val globals = mutableListOf<ITy>()
-            val others = mutableListOf<ITy>()
-            each(ty) {
-                when {
-                    it.isGlobal -> globals.add(it)
-                    it.isAnonymous -> anonymous.add(it)
-                    else -> others.add(it)
+            if (ty is TyUnion) {
+                val list = ty.childSet.sorted()
+                for (iTy in list) {
+                    if (!process(iTy))
+                        break
                 }
-            }
-            if (others.isNotEmpty()) {
-                for (cls in others)
-                    if (!process(cls)) break
-            } else {
-                for (cls in globals)
-                    if (!process(cls)) break
-            }
+            } else process(ty)
         }
 
         fun union(t1: ITy, t2: ITy): ITy {

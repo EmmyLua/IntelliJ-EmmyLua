@@ -24,7 +24,6 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaPsiElement
-import com.tang.intellij.lua.psi.guessType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -48,7 +47,7 @@ open class LuaTypeGuessableLookupElement(name: String, val psi: LuaPsiElement, p
 
     override fun getTypeText(): String? {
         if (typeString == null) {
-            typeString = type.createTypeString()
+            typeString = type.displayName
             if (typeString == null) {
                 typeString = Constants.WORD_ANY
             }
@@ -110,7 +109,7 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bol
         }
 
         icon = field.visibility.warpIcon(icon)
-        typeText = ty.createTypeString()
+        typeText = ty.displayName
     }
 
     override fun renderElement(presentation: LookupElementPresentation?) {
@@ -128,7 +127,7 @@ class TyFunctionLookupElement(name: String, val psi: LuaPsiElement, signature: I
             list.add(it.name)
         }
         itemText = lookupString + "(${list.joinToString(", ")})"
-        typeText = signature.returnTy.createTypeString()
+        typeText = signature.returnTy.displayName
     }
 
     /**
