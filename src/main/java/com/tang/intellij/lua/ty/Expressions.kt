@@ -82,12 +82,15 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
 }
 
 private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
+    val rhs = binaryExpr.right
+    //and
+    if (operator == LuaTypes.AND)
+        return infer(rhs, context)
+
+    //or
     val lhs = binaryExpr.left
     val lty = infer(lhs, context)
-    return if (operator == LuaTypes.OR) {
-        val rhs = binaryExpr.right
-        if (rhs != null) lty.union(infer(rhs, context)) else lty
-    } else lty
+    return if (rhs != null) lty.union(infer(rhs, context)) else lty
 }
 
 private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
