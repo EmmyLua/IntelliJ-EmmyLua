@@ -77,19 +77,19 @@ val ITy.isAnonymous: Boolean
     get() = hasFlag(TyFlags.ANONYMOUS)
 
 private val ITy.worth: Float get() {
-    var value = 1.0f
+    var value = 10f
     when(this) {
         is ITyClass -> {
-            if (this.isAnonymous)
-                value = 0.2f
-            else if (this.isGlobal)
-                value = 0.5f
-            else
-                value = 9f
+            value = when {
+                this is TyTable -> 9f
+                this.isAnonymous -> 2f
+                this.isGlobal -> 5f
+                else -> 90f
+            }
         }
-        is ITyArray, is ITyGeneric -> value = 8f
-        is TyPrimitive -> value = 7f
-        is ITyFunction -> value = 6f
+        is ITyArray, is ITyGeneric -> value = 80f
+        is TyPrimitive -> value = 70f
+        is ITyFunction -> value = 60f
     }
     return value
 }
