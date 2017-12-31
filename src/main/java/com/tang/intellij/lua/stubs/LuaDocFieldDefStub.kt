@@ -31,7 +31,6 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
-import java.io.IOException
 
 /**
 
@@ -43,17 +42,27 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldD
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val element = node.psi as LuaDocFieldDef
+        if (element.nameIdentifier == null)
+            return false
+        if (element.classNameRef != null)
+            return true
         val comment = LuaCommentUtil.findContainer(element)
-        return comment.classDef != null && element.nameIdentifier != null
+        return comment.classDef != null
     }
 
     override fun createStub(fieldDef: LuaDocFieldDef, stubElement: StubElement<*>): LuaDocFieldDefStub {
-        val comment = LuaCommentUtil.findContainer(fieldDef)
         val name = fieldDef.name!!
-        val classDef = comment.classDef
         var className: String? = null
-        if (classDef != null) {
-            className = classDef.name
+
+        val classRef = fieldDef.classNameRef
+        if (classRef != null) {
+            className = classRef.id.text
+        } else {
+            val comment = LuaCommentUtil.findContainer(fieldDef)
+            val classDef = comment.classDef
+            if (classDef != null) {
+                className = classDef.name
+            }
         }
 
         return LuaDocFieldDefStubImpl(stubElement,

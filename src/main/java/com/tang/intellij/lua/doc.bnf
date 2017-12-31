@@ -120,7 +120,7 @@ union_ty ::= ty ('|' ty)+ {
 }
 access_modifier ::= PRIVATE | PUBLIC | PROTECTED | TAG_PRIVATE | TAG_PUBLIC | TAG_PROTECTED
 
-field_def ::= TAG_FIELD access_modifier? ID ty comment_string? {
+field_def ::= TAG_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"

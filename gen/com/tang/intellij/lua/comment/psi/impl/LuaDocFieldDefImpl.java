@@ -49,6 +49,12 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocFieldDefSt
 
   @Override
   @Nullable
+  public LuaDocClassNameRef getClassNameRef() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocClassNameRef.class);
+  }
+
+  @Override
+  @Nullable
   public LuaDocCommentString getCommentString() {
     return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
   }
