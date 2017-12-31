@@ -123,7 +123,7 @@ fun createType(string: String): IElementType {
         "RETURN_STAT" -> LuaElementTypes.RETURN_STAT
         "DO_STAT" -> LuaElementTypes.DO_STAT
         "IF_STAT" -> LuaElementTypes.IF_STAT
-        "CALL_STAT" -> LuaElementTypes.CALL_STAT
+        "EXPR_STAT" -> LuaElementTypes.EXPR_STAT
 
         "UNARY_EXPR" -> LuaElementTypes.UNARY_EXPR
         "BINARY_EXPR" -> LuaElementTypes.BINARY_EXPR

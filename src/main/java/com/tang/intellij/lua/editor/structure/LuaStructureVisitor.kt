@@ -179,10 +179,10 @@ class LuaStructureVisitor : LuaVisitor() {
         addChild(LuaGlobalFuncElement(o))
     }
 
-    override fun visitCallStat(o: LuaCallStat) {
-        val callExpr = o.expr as LuaCallExpr
+    override fun visitExprStat(o: LuaExprStat) {
+        val callExpr = o.expr as? LuaCallExpr
 
-        val args = callExpr.args as? LuaListArgs
+        val args = callExpr?.args as? LuaListArgs
 
         args?.exprList?.forEach{ arg ->
             if (arg is LuaClosureExpr) {

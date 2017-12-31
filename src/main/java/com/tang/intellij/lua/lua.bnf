@@ -126,7 +126,6 @@ fake statement ::= () {
     implements = "com.tang.intellij.lua.psi.LuaCommentOwner"
     methods = [getComment]
 }
-fake exprStat ::= expr
 private stat_impl ::=
     doStat |
     whileStat |
@@ -139,8 +138,7 @@ private stat_impl ::=
     labelStat |
     gotoStat |
     assignStat |
-    callStat |
-    incompleteStat {
+    exprStat {
         recoverWhile = stat_recover
     }
 private stat_recover ::= !(ID
@@ -231,13 +229,10 @@ gotoStat ::= 'goto' ID {
     ]
 }
 private defStat ::= classMethodDef | funcDef | localFuncDef | localDef
-callStat ::= funcCallExpr {
-    extends = exprStat
-    methods = [getExpr]
+exprStat ::= expr {
     mixin = "com.tang.intellij.lua.psi.impl.LuaStatMixin<com.tang.intellij.lua.stubs.LuaPlaceholderStub>"
     stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
-incompleteStat ::= expr { extends = exprStat }
 
 funcDef ::= 'function' ID funcBody {
     pin = 1

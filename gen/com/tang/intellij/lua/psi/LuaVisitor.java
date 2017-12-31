@@ -6,8 +6,8 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.tang.intellij.lua.stubs.LuaExprStubElement;
 import com.tang.intellij.lua.stubs.LuaNameExprStub;
-import com.tang.intellij.lua.stubs.LuaUnaryExprStub;
 import com.tang.intellij.lua.stubs.LuaTableExprStub;
+import com.tang.intellij.lua.stubs.LuaUnaryExprStub;
 import com.tang.intellij.lua.stubs.LuaBinaryExprStub;
 import com.tang.intellij.lua.stubs.LuaLiteralExprStub;
 import com.tang.intellij.lua.stubs.LuaIndexExprStub;
@@ -43,10 +43,6 @@ public class LuaVisitor extends PsiElementVisitor {
 
   public void visitCallExpr(@NotNull LuaCallExpr o) {
     visitExpr(o);
-  }
-
-  public void visitCallStat(@NotNull LuaCallStat o) {
-    visitExprStat(o);
   }
 
   public void visitClassMethodDef(@NotNull LuaClassMethodDef o) {
@@ -113,10 +109,6 @@ public class LuaVisitor extends PsiElementVisitor {
   public void visitIfStat(@NotNull LuaIfStat o) {
     visitStatement(o);
     // visitIndentRange(o);
-  }
-
-  public void visitIncompleteStat(@NotNull LuaIncompleteStat o) {
-    visitExprStat(o);
   }
 
   public void visitIndexExpr(@NotNull LuaIndexExpr o) {

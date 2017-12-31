@@ -52,8 +52,10 @@ class LuaAnnotator : Annotator {
 
     internal inner class LuaElementVisitor : LuaVisitor() {
 
-        override fun visitIncompleteStat(o: LuaIncompleteStat) {
-            myHolder!!.createErrorAnnotation(o, "syntax error")
+        override fun visitExprStat(o: LuaExprStat) {
+            if (o.expr !is LuaCallExpr) {
+                myHolder!!.createErrorAnnotation(o, "syntax error")
+            } else super.visitExprStat(o)
         }
 
         override fun visitLocalFuncDef(o: LuaLocalFuncDef) {

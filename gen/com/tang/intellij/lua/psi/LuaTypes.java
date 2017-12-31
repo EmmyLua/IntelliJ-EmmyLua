@@ -16,20 +16,19 @@ public interface LuaTypes {
   IElementType BLOCK = LuaParserDefinitionKt.createType("BLOCK");
   IElementType BREAK_STAT = LuaParserDefinitionKt.createType("BREAK_STAT");
   IElementType CALL_EXPR = LuaParserDefinitionKt.createType("CALL_EXPR");
-  IElementType CALL_STAT = LuaParserDefinitionKt.createType("CALL_STAT");
   IElementType CLASS_METHOD_DEF = LuaParserDefinitionKt.createType("CLASS_METHOD_DEF");
   IElementType CLASS_METHOD_NAME = LuaParserDefinitionKt.createType("CLASS_METHOD_NAME");
   IElementType CLOSURE_EXPR = LuaParserDefinitionKt.createType("CLOSURE_EXPR");
   IElementType DO_STAT = LuaParserDefinitionKt.createType("DO_STAT");
   IElementType EXPR = LuaParserDefinitionKt.createType("EXPR");
   IElementType EXPR_LIST = LuaParserDefinitionKt.createType("EXPR_LIST");
+  IElementType EXPR_STAT = LuaParserDefinitionKt.createType("EXPR_STAT");
   IElementType FOR_A_STAT = LuaParserDefinitionKt.createType("FOR_A_STAT");
   IElementType FOR_B_STAT = LuaParserDefinitionKt.createType("FOR_B_STAT");
   IElementType FUNC_BODY = LuaParserDefinitionKt.createType("FUNC_BODY");
   IElementType FUNC_DEF = LuaParserDefinitionKt.createType("FUNC_DEF");
   IElementType GOTO_STAT = LuaParserDefinitionKt.createType("GOTO_STAT");
   IElementType IF_STAT = LuaParserDefinitionKt.createType("IF_STAT");
-  IElementType INCOMPLETE_STAT = LuaParserDefinitionKt.createType("INCOMPLETE_STAT");
   IElementType INDEX_EXPR = LuaParserDefinitionKt.createType("INDEX_EXPR");
   IElementType LABEL_STAT = LuaParserDefinitionKt.createType("LABEL_STAT");
   IElementType LIST_ARGS = LuaParserDefinitionKt.createType("LIST_ARGS");
@@ -141,9 +140,6 @@ public interface LuaTypes {
       else if (type == CALL_EXPR) {
         return new LuaCallExprImpl(node);
       }
-      else if (type == CALL_STAT) {
-        return new LuaCallStatImpl(node);
-      }
       else if (type == CLASS_METHOD_DEF) {
         return new LuaClassMethodDefImpl(node);
       }
@@ -162,6 +158,9 @@ public interface LuaTypes {
       else if (type == EXPR_LIST) {
         return new LuaExprListImpl(node);
       }
+      else if (type == EXPR_STAT) {
+        return new LuaExprStatImpl(node);
+      }
       else if (type == FOR_A_STAT) {
         return new LuaForAStatImpl(node);
       }
@@ -179,9 +178,6 @@ public interface LuaTypes {
       }
       else if (type == IF_STAT) {
         return new LuaIfStatImpl(node);
-      }
-      else if (type == INCOMPLETE_STAT) {
-        return new LuaIncompleteStatImpl(node);
       }
       else if (type == INDEX_EXPR) {
         return new LuaIndexExprImpl(node);

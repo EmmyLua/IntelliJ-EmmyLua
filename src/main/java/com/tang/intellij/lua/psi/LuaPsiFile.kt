@@ -61,9 +61,9 @@ class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvi
                     val name = comment.moduleName
                     if (name != null) return name
                 }
-                if (child is LuaCallStat) { // module("name")
-                    val callExpr = child.expr as LuaCallExpr
-                    val expr = callExpr.expr
+                if (child is LuaExprStat) { // module("name")
+                    val callExpr = child.expr as? LuaCallExpr
+                    val expr = callExpr?.expr
                     if (expr is LuaNameExpr && expr.textMatches(Constants.WORD_MODULE)) {
                         val stringArg = callExpr.firstStringArg
                         if (stringArg != null)

@@ -8,12 +8,23 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
+import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 import com.tang.intellij.lua.psi.*;
+import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.IElementType;
 
-public class LuaExprStatImpl extends LuaStatementImpl implements LuaExprStat {
+public class LuaExprStatImpl extends LuaStatMixin<LuaPlaceholderStub> implements LuaExprStat {
+
+  public LuaExprStatImpl(LuaPlaceholderStub stub, IStubElementType<?, ?> nodeType) {
+    super(stub, nodeType);
+  }
 
   public LuaExprStatImpl(ASTNode node) {
     super(node);
+  }
+
+  public LuaExprStatImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaVisitor visitor) {
@@ -28,7 +39,7 @@ public class LuaExprStatImpl extends LuaStatementImpl implements LuaExprStat {
   @Override
   @NotNull
   public LuaExpr getExpr() {
-    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaExpr.class));
+    return notNullChild(PsiTreeUtil.getStubChildOfType(this, LuaExpr.class));
   }
 
 }

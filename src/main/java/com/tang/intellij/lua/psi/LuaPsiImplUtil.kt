@@ -671,6 +671,6 @@ fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
     return getVisibility(classMethodDef as LuaClassMember)
 }
 
-fun getExpr(callStat: LuaCallStat): LuaExpr {
-    return PsiTreeUtil.getStubChildOfType(callStat, LuaExpr::class.java)!!
+fun getExpr(exprStat: LuaExprStat): LuaExpr {
+    return PsiTreeUtil.getStubChildOfType(exprStat, LuaExpr::class.java)!!
 }

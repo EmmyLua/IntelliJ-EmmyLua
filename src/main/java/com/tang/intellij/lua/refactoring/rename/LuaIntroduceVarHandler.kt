@@ -106,7 +106,7 @@ class LuaIntroduceVarHandler : RefactoringActionHandler {
             var localDef = LuaElementFactory.createWith(operation.project, "local var = " + element.text)
 
             if (isInline(commonParent, operation)) {
-                if (element is LuaCallExpr && element.parent is LuaCallStat) element = element.parent
+                if (element is LuaCallExpr && element.parent is LuaExprStat) element = element.parent
 
                 localDef = element.replace(localDef)
                 val nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef::class.java)!!
