@@ -353,12 +353,9 @@ stringExpr ::= STRING {
     elementType = literalExpr
 }
 
-valueExpr ::= primaryExpr | closureExpr
-
 private varExpr ::= primaryExpr
 
-//expr ::= (unaryExpr | valueExpr) binaryExpr?
-expr ::= <<parseExpr primaryExpr>> {
+expr ::= <<parseExpr primaryExpr closureExpr>> {
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
     stubClass = "com.tang.intellij.lua.stubs.LuaExprStub"
     implements = [
@@ -438,8 +435,6 @@ private suffixExpr ::= indexExpr | callExpr
 private prefixExpr ::= parenExpr | nameExpr | literalExpr | tableExpr
 // prefixExpr | callExpr | indexExpr
 private primaryExpr ::= prefixExpr (suffixExpr*)
-// callExpr
-private funcCallExpr ::= primaryExpr <<checkType 'CALL_EXPR'>>
 
 closureExpr ::= 'function' funcBody {
     pin = 2

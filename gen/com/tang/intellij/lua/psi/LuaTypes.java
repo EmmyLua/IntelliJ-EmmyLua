@@ -49,7 +49,6 @@ public interface LuaTypes {
   IElementType TABLE_FIELD_SEP = LuaParserDefinitionKt.createType("TABLE_FIELD_SEP");
   IElementType UNARY_EXPR = LuaParserDefinitionKt.createType("UNARY_EXPR");
   IElementType UNARY_OP = LuaParserDefinitionKt.createType("UNARY_OP");
-  IElementType VALUE_EXPR = LuaParserDefinitionKt.createType("VALUE_EXPR");
   IElementType VAR_LIST = LuaParserDefinitionKt.createType("VAR_LIST");
   IElementType WHILE_STAT = LuaParserDefinitionKt.createType("WHILE_STAT");
 

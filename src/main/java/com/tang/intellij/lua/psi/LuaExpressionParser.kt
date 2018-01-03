@@ -17,9 +17,8 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.lang.PsiBuilder
-import com.intellij.lang.parser.GeneratedParserUtilBase.*
+import com.intellij.lang.parser.GeneratedParserUtilBase.Parser
 import com.intellij.psi.tree.TokenSet
-import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaExpressionParser {
@@ -53,10 +52,12 @@ object LuaExpressionParser {
         T_VALUE(TokenSet.EMPTY)
     }
 
-    private var primaryExprParser: Parser? = null
+    private lateinit var primaryExprParser: Parser
+    private lateinit var closureExprParser: Parser
 
-    fun parse(builder: PsiBuilder, l:Int, valueExprParser: Parser): Boolean {
+    fun parse(builder: PsiBuilder, l:Int, valueExprParser: Parser, closureExprParser: Parser): Boolean {
         this.primaryExprParser = valueExprParser
+        this.closureExprParser = closureExprParser
         return parseExpr(builder, ExprType.T_OR, l) != null
     }
 
@@ -118,12 +119,9 @@ object LuaExpressionParser {
     }
 
     private fun parseValue(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
-        var r: Boolean
-        val m = enter_section_(b, l, _COLLAPSE_, VALUE_EXPR, "<value expr>")
-        r = primaryExprParser?.parse(b, l + 1) ?: false
-        if (!r) r = LuaParser.closureExpr(b, l + 1)
-        exit_section_(b, l, m, r, false, null)
-        return if (r) m else null
+        var r = primaryExprParser.parse(b, l + 1)
+        r = r || closureExprParser.parse(b, l + 1)
+        return if (r) b.latestDoneMarker as PsiBuilder.Marker else null
     }
 
     private fun error(builder: PsiBuilder, message: String) {
