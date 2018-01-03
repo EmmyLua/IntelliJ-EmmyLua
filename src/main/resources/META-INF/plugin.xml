@@ -162,6 +162,7 @@
 
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
+        <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaRegionFoldingBuilder"/>
         <lang.braceMatcher language="Lua" implementationClass="com.tang.intellij.lua.braces.LuaBraceMatcher"/>
         <lang.syntaxHighlighterFactory language="Lua" implementationClass="com.tang.intellij.lua.highlighting.LuaSyntaxHighlighterFactory"/>
         <lang.parserDefinition language="Lua" implementationClass="com.tang.intellij.lua.lang.LuaParserDefinition"/>

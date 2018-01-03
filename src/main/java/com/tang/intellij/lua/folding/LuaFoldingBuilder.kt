@@ -125,9 +125,7 @@ class LuaFoldingBuilder : FoldingBuilderEx() {
         return false
     }
 
-    override fun isCollapsedByDefault(astNode: ASTNode): Boolean {
-        return astNode.elementType === LuaTypes.REGION
-    }
+    override fun isCollapsedByDefault(astNode: ASTNode) = false
 
     companion object {
 
