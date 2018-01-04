@@ -387,7 +387,7 @@
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.AssignTypeInspection"/>
         <localInspection
                 displayName="Global name can be local"
-                enabledByDefault="true"
+                enabledByDefault="false"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.GlobalNameCanbeLocal"/>
     </extensions>
