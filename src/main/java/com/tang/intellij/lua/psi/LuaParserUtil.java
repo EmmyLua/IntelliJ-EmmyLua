@@ -183,9 +183,9 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
         else if (begin == FUNCTION) {
             return matchEnd(advanced, builder, level, TokenSet.EMPTY, END_SET);
         }
-        else if (BRACE_L_SET.contains(begin)) {
-            return matchBrace(advanced, builder, level, getRBrace(begin));
-        }
+//        else if (BRACE_L_SET.contains(begin)) {
+//            return matchBrace(advanced, builder, level, getRBrace(begin));
+//        }
         return false;
     }
 
@@ -235,9 +235,9 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             }
 
             while (!skips.contains(type)) {
-                if (BRACE_R_SET.contains(type)) {
-                    return false;
-                }
+//                if (BRACE_R_SET.contains(type)) {
+//                    return false;
+//                }
                 if (types.contains(type)) {
                     if (level != 0)
                         builder.advanceLexer();
