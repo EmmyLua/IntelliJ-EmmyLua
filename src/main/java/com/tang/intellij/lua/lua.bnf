@@ -414,7 +414,7 @@ args ::= listArgs | singleArg {
     stubClass = 'com.tang.intellij.lua.stubs.LuaPlaceholderStub'
 }
 singleArg ::= tableExpr | stringExpr { extends = args }
-private arg_expr_list ::= (expr ',')* (expr |& ')')
+private arg_expr_list ::= (expr ',')* (expr |& ')') { pin = 1 }
 listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }
 
 left callExpr ::= args {

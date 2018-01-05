@@ -176,12 +176,13 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (expr ',')* (expr |& ')')
   static boolean arg_expr_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arg_expr_list")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
     r = arg_expr_list_0(b, l + 1);
+    p = r; // pin = 1
     r = r && arg_expr_list_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   // (expr ',')*
