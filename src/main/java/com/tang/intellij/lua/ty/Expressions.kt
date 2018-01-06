@@ -161,8 +161,28 @@ private fun LuaNameExpr.infer(context: SearchContext): ITy {
             type = type.union(set)
         }
 
+        /**
+         * fixme : optimize it.
+         * function xx:method()
+         *     self.name = '123'
+         * end
+         *
+         * https://github.com/EmmyLua/IntelliJ-EmmyLua/issues/93
+         * the type of 'self' should be same of 'xx'
+         */
         if (Ty.isInvalid(type)) {
-            type = type.union(getType(context, this))
+            if (name == Constants.WORD_SELF) {
+                val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaClassMethodDef::class.java)
+                if (methodDef != null && !methodDef.isStatic) {
+                    val methodName = methodDef.classMethodName
+                    val expr = methodName.expr
+                    type = expr.guessType(context)
+                }
+            }
+        }
+
+        if (Ty.isInvalid(type)) {
+            type = getType(context, this)
         }
 
         type
