@@ -70,6 +70,17 @@
 
     <change-notes><![CDATA[
 
+    <strong>1.2.2</strong>
+    <ul>
+        <li>[IMPROVE]improved performance when opening files</li>
+        <li>[NEW]settings : 'recognize global name as type'</li>
+        <li>[NEW]settings : additional sources root</li>
+        <li>[NEW]new inspection : global name can be local(disabled by default)</li>
+        <li>[NEW]read write access detector</li>
+        <li>fix bug #87 #88 #93</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
+
     <strong>1.2.1</strong>
     <ul>
         <li>[IMPROVE]faster attach debugger</li>
@@ -79,7 +90,7 @@
         <li>[IMPROVE]improve formatting</li>
         <li>[IMPROVE]highlight unary && binary expression range</li>
         <li>[NEW]now support use .net dll as lib to provide lua apis (useful for unity developers)</li>
-        <li>fix bug #72 #43 #79 #81 #83 </li>
+        <li>fix bug #43 #72 #79 #81 #83 #86</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
 
