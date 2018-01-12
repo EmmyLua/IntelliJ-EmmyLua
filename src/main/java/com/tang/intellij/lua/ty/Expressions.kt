@@ -74,7 +74,7 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
             LuaTypes.AND, LuaTypes.OR -> guessAndOrType(this, operator, context)
         //&, <<, |, >>, ~, ^,    +, -, *, /, //, %
             LuaTypes.BIT_AND, LuaTypes.BIT_LTLT, LuaTypes.BIT_OR, LuaTypes.BIT_RTRT, LuaTypes.BIT_TILDE, LuaTypes.EXP,
-            LuaTypes.PLUS, LuaTypes.MINUS, LuaTypes.MULT, LuaTypes.DIV, LuaTypes.DOUBLE_DIV, LuaTypes.MOD -> guessBinaryOpType(this, operator, context)
+            LuaTypes.PLUS, LuaTypes.MINUS, LuaTypes.MULT, LuaTypes.DIV, LuaTypes.DOUBLE_DIV, LuaTypes.MOD -> guessBinaryOpType(this, context)
             else -> Ty.UNKNOWN
         }
     }
@@ -93,7 +93,7 @@ private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, c
     return if (rhs != null) lty.union(infer(rhs, context)) else lty
 }
 
-private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
+private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, context:SearchContext): ITy {
     val lhs = binaryExpr.left
     // TODO: Search for operator overrides
     return infer(lhs, context)
