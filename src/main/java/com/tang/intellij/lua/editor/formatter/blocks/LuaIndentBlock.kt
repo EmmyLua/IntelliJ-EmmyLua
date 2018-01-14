@@ -31,22 +31,11 @@ open class LuaIndentBlock(psi: LuaIndentRange, wrap: Wrap?, alignment: Alignment
 
     private val space = Spacing.createSpacing(1, 1, 0, true, 1)
 
-    private fun isSimpleBlockLookPrev(child2: LuaScriptBlock): Boolean {
-        val prev = child2.prevBlock
-        if (prev == null || set.contains(prev.elementType))
-            return true
-        val pp = prev.prevBlock
-        if (pp != null && set.contains(pp.elementType)) {
-            return true
-        }
-        return false
-    }
-
-    private fun isSimpleBlockLookNext(child1: LuaScriptBlock): Boolean {
-        val next = child1.nextBlock
+    private fun isSimpleBlock(current: LuaScriptBlock, getNext: (c:LuaScriptBlock) -> LuaScriptBlock?): Boolean {
+        val next = getNext(current)
         if (next == null || set.contains(next.elementType))
             return true
-        val nn = next.nextBlock
+        val nn = getNext(next)
         if (nn != null && set.contains(nn.elementType)) {
             return true
         }
@@ -56,12 +45,12 @@ open class LuaIndentBlock(psi: LuaIndentRange, wrap: Wrap?, alignment: Alignment
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
         if (ctx.settings.KEEP_SIMPLE_BLOCKS_IN_ONE_LINE) {
             if (child2 is LuaScriptBlock) {
-                if (set.contains(child2.elementType) && isSimpleBlockLookPrev(child2)) {
+                if (set.contains(child2.elementType) && isSimpleBlock(child2, { it.prevBlock })) {
                     return space
                 }
             }
             if (child1 is LuaScriptBlock) {
-                if (set.contains(child1.elementType) && isSimpleBlockLookNext(child1)) {
+                if (set.contains(child1.elementType) && isSimpleBlock(child1, { it.nextBlock })) {
                     return space
                 }
             }
