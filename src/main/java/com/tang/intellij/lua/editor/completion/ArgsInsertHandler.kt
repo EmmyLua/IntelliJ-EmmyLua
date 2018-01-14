@@ -24,8 +24,11 @@ import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.psi.PsiFile
 import com.intellij.psi.TokenType
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.project.LuaSettings
+import com.tang.intellij.lua.psi.LuaExpr
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.LuaTypes
 
@@ -51,6 +54,7 @@ abstract class ArgsInsertHandler : InsertHandler<LookupElement> {
         if (element != null) {
             val ex = editor as EditorEx
             val iterator = ex.highlighter.createIterator(startOffset)
+            var prevIteratorEnd = iterator.end
             iterator.advance()
             if (!iterator.atEnd()) {
                 var tokenType = iterator.tokenType
@@ -58,15 +62,29 @@ abstract class ArgsInsertHandler : InsertHandler<LookupElement> {
                     iterator.advance()
                     if (iterator.atEnd())
                         break
+                    prevIteratorEnd = iterator.end
                     tokenType = iterator.tokenType
                 }
+                //check : lookup-string<caret>expr()
                 if (tokenType === LuaTypes.LPAREN) {
-                    needAppendPar = false
+                    needAppendPar = prevIteratorEnd != insertionContext.tailOffset
                 }
             }
         }
 
         if (needAppendPar) {
+            // lookup-string<caret>expr() -> lookup-string(expr())
+            val expr = findWarpExpr(insertionContext.file, startOffset)
+            if (expr != null) {
+                val exprNode = expr.node
+                val endOffset = exprNode.startOffset + exprNode.textLength
+                if (endOffset > insertionContext.selectionEndOffset) {
+                    editor.document.insertString(insertionContext.selectionEndOffset, "(")
+                    editor.document.insertString(endOffset + 1, ")")
+                    editor.caretModel.moveToOffset(endOffset + 2)
+                    return
+                }
+            }
             if (autoInsertParameters) {
                 val paramNameDefList = getParams()
                 val manager = TemplateManager.getInstance(insertionContext.project)
@@ -83,6 +101,17 @@ abstract class ArgsInsertHandler : InsertHandler<LookupElement> {
                 }
             }
         }
+    }
+
+    private fun findWarpExpr(file: PsiFile, offset: Int): LuaExpr? {
+        var expr = PsiTreeUtil.findElementOfClassAtOffset(file, offset, LuaExpr::class.java, true)
+        while (expr != null) {
+            val parent = expr.parent
+            if (parent is LuaExpr && parent.node.startOffset == offset) {
+                expr = parent
+            } else break
+        }
+        return expr
     }
 
     protected open fun createTemplate(manager: TemplateManager, paramNameDefList: Array<LuaParamInfo>): Template {
