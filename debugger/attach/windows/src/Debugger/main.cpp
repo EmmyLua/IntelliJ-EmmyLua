@@ -102,5 +102,5 @@ int main(int argc, char** argv)
 		auto help = options.help();
 		printf("%s", help.c_str());
 	}
-	return (int)code;
+	return static_cast<int>(code);
 }

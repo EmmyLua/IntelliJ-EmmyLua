@@ -23,7 +23,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef DEBUG_FRONTEND_H
 #define DEBUG_FRONTEND_H
 
-#include <windows.h>
+#include <Windows.h>
 
 #include "Channel.h"
 #include "Protocol.h"

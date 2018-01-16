@@ -103,14 +103,18 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
     }
 
     protected fun connect(port: Int) {
-        socket = Socket()
-        socket.tcpNoDelay = true
-        socket.connect(InetSocketAddress("localhost", port))
-        writer = DataOutputStream(socket.getOutputStream())
+        try {
+            socket = Socket()
+            socket.tcpNoDelay = true
+            socket.connect(InetSocketAddress("localhost", port))
+            writer = DataOutputStream(socket.getOutputStream())
 
-        ApplicationManager.getApplication().executeOnPooledThread {
-            send(DMReqInitialize("", emmyLua!!))
-            processPack()
+            ApplicationManager.getApplication().executeOnPooledThread {
+                send(DMReqInitialize("", emmyLua!!))
+                processPack()
+            }
+        } catch (e: Exception) {
+            process.error(e.message!!)
         }
     }
 

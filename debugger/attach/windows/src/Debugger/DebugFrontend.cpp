@@ -24,11 +24,11 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include "StlUtility.h"
 #include "Utility.h"
 
-#include <Windows.h>
-#include <assert.h>
-#include <imagehlp.h>
 #include <iostream>
-#include <psapi.h>
+#include <Windows.h>
+#include <ImageHlp.h>
+#include <cassert>
+#include <Psapi.h>
 
 DebugFrontend* DebugFrontend::s_instance = nullptr;
 
@@ -121,6 +121,7 @@ ErrorCode DebugFrontend::Start(
 	ErrorCode code = InitializeBackend(symbolsDirectory);
     if (code != ErrorCode::OK)
     {
+		MessageEvent("The backend can't be initialized", MessageType_Error);
         Stop(true);
         return code;
     }
@@ -145,7 +146,7 @@ ErrorCode DebugFrontend::Attach(unsigned int processId, const char* symbolsDirec
 
     if (m_process == nullptr)
     {
-        MessageEvent("Error: The process could not be opened", MessageType_Error);
+        MessageEvent("The process could not be opened", MessageType_Error);
         m_processId = 0;
         return ErrorCode::CAN_NOT_OPEN_PROCESS;
     }
@@ -153,6 +154,7 @@ ErrorCode DebugFrontend::Attach(unsigned int processId, const char* symbolsDirec
 	ErrorCode code = InitializeBackend(symbolsDirectory);
     if (code != ErrorCode::OK)
     {
+		MessageEvent("Backend couldn't be initialized", MessageType_Error);
         CloseHandle(m_process);
         m_process   = nullptr;
         m_processId = 0;
@@ -171,10 +173,11 @@ ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 
     if (GetIsBeingDebugged(m_processId))
     {
-        //MessageEvent("Error: The process cannot be debugged because it contains hooks from a previous session", MessageType_Error);
+        MessageEvent("The process already attached.");
         return ErrorCode::OK;//ALREADY_ATTACHED
     }
 
+	MessageEvent("Initialize backend ...");
 	// Handshake channel
 	char handshakeChannelName[256];
 	_snprintf(handshakeChannelName, 256, "Decoda.Handshake.%x", m_processId);
@@ -188,7 +191,7 @@ ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
     // inside the process's memory space.
     if (!InjectDll(m_processId, "LuaInject.dll"))
     {
-        //MessageEvent("Error: LuaInject.dll could not be loaded into the process", MessageType_Error);
+        MessageEvent("LuaInject.dll could not be loaded into the process", MessageType_Error);
         return ErrorCode::INJECT_ERROR;
     }
 
@@ -198,7 +201,7 @@ ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
     // Read the initialization function from the event channel.
     if (!ProcessInitialization(handshakeChannel, symbolsDirectory))
     {
-        //MessageEvent("Error: Backend couldn't be initialized", MessageType_Error);
+        MessageEvent("Backend couldn't be initialized", MessageType_Error);
         return ErrorCode::BACKEND_INIT_ERROR;
     }
 
@@ -298,6 +301,7 @@ void DebugFrontend::Stop(bool kill)
 
 bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 {
+	MessageEvent("Start inject dll ...");
     bool success = true;
 
     // Get the absolute path to the DLL.
@@ -306,6 +310,7 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
     
     if (!GetStartupDirectory(fullFileName, _MAX_PATH))
     {
+		MessageEvent("GetStartupDirectory = false");
         return false;
     }
 
@@ -315,6 +320,8 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 
     if (process == nullptr)
     {
+		MessageEvent("Failed to open process");
+		OutputError(GetLastError());
         return false;
 	}
 	DWORD exitCode;
@@ -331,6 +338,7 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 	void* remoteFileName = RemoteDup(process, fullFileName, strlen(fullFileName) + 1);
     if (!ExecuteRemoteKernelFuntion(process, "LoadLibraryA", remoteFileName, exitCode))
     {
+		MessageEvent("Failed to load library");
         success = false;
     }
     HMODULE dllHandle = reinterpret_cast<HMODULE>(exitCode);
@@ -369,6 +377,11 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
     {
         CloseHandle(process);
     }
+
+	if (success)
+	{
+		MessageEvent("Successfully inject dll!");
+	}
 
     return success;
 
@@ -465,24 +478,27 @@ bool DebugFrontend::GetStartupDirectory(char* path, int maxPathLength) const
 
 void DebugFrontend::MessageEvent(const std::string& message, MessageType type) const
 {
-
+	std::cout << message << std::endl;
 }
 
 bool DebugFrontend::ProcessInitialization(Channel& handshakeChannel, const char* symbolsDirectory)
 {
+	MessageEvent("Initialize handshake channel");
     unsigned int command;
 	handshakeChannel.ReadUInt32(command);
 
     if (command != EventId_Initialize)
     {
+		MessageEvent("Initialize handshake channel failed", MessageType_Error);
         return false;
     }
+	MessageEvent("Handshake ok");
 
 	uint64_t function;
 	handshakeChannel.ReadUint64(function);
 
+	MessageEvent("Initialize backend...");
     // Call the initializtion function.
-
     void* remoteSymbolsDirectory = RemoteDup(m_process, symbolsDirectory, strlen(symbolsDirectory) + 1);
     
     DWORD threadId;
@@ -490,6 +506,8 @@ bool DebugFrontend::ProcessInitialization(Channel& handshakeChannel, const char*
 
     if (thread == nullptr)
     {
+		MessageEvent("Failed to initialize backend 1");
+		OutputError(GetLastError());
         return false;
     }
 
@@ -498,6 +516,14 @@ bool DebugFrontend::ProcessInitialization(Channel& handshakeChannel, const char*
     GetExitCodeThread(thread, &exitCode);
     
     CloseHandle(thread);
+
+	if (exitCode == 0)
+	{
+		MessageEvent("Failed to initialize backend 2");
+	} else
+	{
+		MessageEvent("Initialize backend successful!");
+	}
 
 	return exitCode != 0;
 }
