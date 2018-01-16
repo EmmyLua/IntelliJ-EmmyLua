@@ -69,18 +69,19 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
 
             }
             ErrorCode.INJECT_ERROR -> {
-                process.println("Error: LuaInject.dll could not be loaded into the process", ConsoleViewContentType.ERROR_OUTPUT)
+                process.error("Error: LuaInject.dll could not be loaded into the process")
                 process.stop()
             }
             ErrorCode.BACKEND_INIT_ERROR -> {
-                process.println("Error: Backend couldn't be initialized", ConsoleViewContentType.ERROR_OUTPUT)
+                process.error("Error: Backend couldn't be initialized")
                 process.stop()
             }
             ErrorCode.CAN_NOT_OPEN_PROCESS -> {
-                process.println("Error: The process could not be opened", ConsoleViewContentType.ERROR_OUTPUT)
+                process.error("Error: The process could not be opened")
                 process.stop()
             }
             else -> {
+                process.error("Error: Unknown error")
                 process.stop()
             }
         }
