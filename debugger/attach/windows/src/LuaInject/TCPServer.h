@@ -29,7 +29,7 @@ friend class DebugClient;
 public:
 	DebugServer();
 	~DebugServer();
-	bool startup(int port, DebugServerListener* listener);
+	bool startup(u_short port, DebugServerListener* listener);
 	void stop();
 	void disConnectAll();
 	DWORD connectionProc();

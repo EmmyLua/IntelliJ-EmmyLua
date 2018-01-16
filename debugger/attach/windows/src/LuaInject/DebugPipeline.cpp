@@ -39,7 +39,8 @@ void ChannelPipeline::Destroy()
 bool SocketPipeline::Initialize()
 {
 	DWORD processId = GetCurrentProcessId();
-	return server.startup(processId, this);
+	u_short port = processId;
+	return server.startup(port, this);
 }
 
 bool SocketPipeline::IsAttached()

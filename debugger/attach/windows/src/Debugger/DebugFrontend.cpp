@@ -127,7 +127,8 @@ ErrorCode DebugFrontend::Start(
     }
 
 	//tell IDEA debugger connect
-	std::cout << "port:" << m_processId << std::endl;
+	u_short port = m_processId;
+	std::cout << "port:" << port << std::endl;
     return ErrorCode::OK;
 }
 
@@ -162,7 +163,8 @@ ErrorCode DebugFrontend::Attach(unsigned int processId, const char* symbolsDirec
     }
 
 	//tell IDEA debugger connect
-	std::cout << "port:" << m_processId << std::endl;
+	u_short port = m_processId;
+	std::cout << "port:" << port << std::endl;
     return ErrorCode::OK;
 
 }

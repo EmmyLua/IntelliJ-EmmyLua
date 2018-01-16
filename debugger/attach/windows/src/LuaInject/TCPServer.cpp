@@ -24,7 +24,7 @@ DebugServer::~DebugServer()
 	delete m_stream;
 }
 
-bool DebugServer::startup(int port, DebugServerListener* listener)
+bool DebugServer::startup(u_short port, DebugServerListener* listener)
 {
 	m_port = port;
 	m_listener = listener;
