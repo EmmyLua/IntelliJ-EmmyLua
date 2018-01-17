@@ -2511,6 +2511,9 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, HANDLE hProces
 	}
 
 	//printf("Examining '%s'\n", moduleName);
+#ifdef VERBOSE
+	DebugBackend::Get().Message(MessageType_Normal, "[B]Scan module : '%s'", moduleName);
+#endif
 	
 	stdext::hash_map<std::string, DWORD64> symbols;
 
@@ -2530,6 +2533,14 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, HANDLE hProces
 					uint64_t addr = (uint64_t)(hModule);
 					addr += pSymbol->Address.VA - pe.qwBaseAddress;
 					symbols[pSymbol->Name] = addr;
+#ifdef VERBOSE
+					DebugBackend::Get().Message(MessageType_Normal, "\t[B]Lua symbol : '%s'", name);
+#endif
+				}
+				else {
+#ifdef VERBOSE
+					DebugBackend::Get().Message(MessageType_Normal, "\t[B]Symbol : '%s'", name);
+#endif
 				}
 			}
 		}
@@ -2785,7 +2796,7 @@ void HookLoadLibrary()
 
 bool InstallLuaHooker(HINSTANCE hInstance, const char* symbolsDirectory)
 {
-
+	DebugBackend::Get().Message("[B]Install hooker");
 	// Load the dbghelp functions. We have to do this dynamically since the
 	// older version of dbghelp that ships with Windows doesn't successfully
 	// load the symbols from PDBs. We can't simply include our new DLL since

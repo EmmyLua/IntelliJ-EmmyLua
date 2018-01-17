@@ -199,7 +199,8 @@ public:
     /**
      * Sends a text message to the front end.
      */
-    void Message(const char* message, MessageType type = MessageType_Normal) const;
+	void Message(const char* message, MessageType type = MessageType_Normal) const;
+	void Message(MessageType type, const char* fmt, ...) const;
 
     /**
      * Ignores the specified exception whenever it occurs.

@@ -480,7 +480,7 @@ bool DebugFrontend::GetStartupDirectory(char* path, int maxPathLength) const
 
 void DebugFrontend::MessageEvent(const std::string& message, MessageType type) const
 {
-	std::cout << message << std::endl;
+	std::cout << "[F]" << message << std::endl;
 }
 
 bool DebugFrontend::ProcessInitialization(Channel& handshakeChannel, const char* symbolsDirectory)
