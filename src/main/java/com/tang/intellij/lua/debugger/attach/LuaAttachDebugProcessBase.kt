@@ -203,8 +203,9 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             if (proto.state != CodeState.Unavailable) {
                 file = createMemoryFile(proto)
                 print("[✔] Load memory file : ", ConsoleViewContentType.SYSTEM_OUTPUT)
+                val virtualFile = file
                 session.consoleView.printHyperlink(proto.fileName) {
-                    FileEditorManager.getInstance(it).openFile(file, true)
+                    FileEditorManager.getInstance(it).openFile(virtualFile, true)
                 }
                 print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
             }
@@ -214,8 +215,9 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
                 file.state = proto.state
             }
             print("[✔] File was loaded :", ConsoleViewContentType.SYSTEM_OUTPUT)
+            val virtualFile = file
             session.consoleView.printHyperlink(proto.fileName) {
-                FileEditorManager.getInstance(it).openFile(file, true)
+                FileEditorManager.getInstance(it).openFile(virtualFile, true)
             }
             print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
         }
