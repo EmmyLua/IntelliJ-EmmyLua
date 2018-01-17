@@ -101,22 +101,22 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ReferencePath>$(ReferencePath)</ReferencePath>
-    <IncludePath>../DriverShared;$(IncludePath)</IncludePath>
+    <IncludePath>$(NETFXKitsDir)Include\um;..\DriverShared;$(IncludePath)</IncludePath>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ReferencePath>G:\Git\decoda-master\src\Public;$(ReferencePath)</ReferencePath>
-    <IncludePath>../DriverShared;$(IncludePath)</IncludePath>
+    <IncludePath>$(NETFXKitsDir)Include\um;..\DriverShared;$(IncludePath)</IncludePath>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='netfx4-Debug|x64'">
     <IncludePath>G:\Git\decoda-master\src\DriverShared;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>../DriverShared;$(IncludePath)</IncludePath>
+    <IncludePath>$(NETFXKitsDir)Include\um;..\DriverShared;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>../DriverShared;$(IncludePath)</IncludePath>
+    <IncludePath>$(NETFXKitsDir)Include\um;..\DriverShared;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
