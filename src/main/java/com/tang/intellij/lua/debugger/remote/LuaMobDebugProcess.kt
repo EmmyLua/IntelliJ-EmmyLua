@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.debugger.remote
 
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -116,7 +117,10 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
 
     override fun onConnect(client: MobClient) {
         mobClient = client
-        registeredBreakpoints.forEach { t, _ -> sendBreakpoint(client, t) }
+        processBreakpoint(Processor { bp ->
+            bp.sourcePosition?.let { sendBreakpoint(client, it) }
+            true
+        })
         client.addCommand("RUN")
     }
 

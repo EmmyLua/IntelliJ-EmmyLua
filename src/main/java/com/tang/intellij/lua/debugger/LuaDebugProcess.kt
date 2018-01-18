@@ -21,8 +21,11 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.Processor
+import com.intellij.util.containers.ContainerUtil
 import com.intellij.xdebugger.XDebugProcess
 import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties
@@ -30,14 +33,12 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.frame.XSuspendContext
 import com.intellij.xdebugger.impl.XDebugSessionImpl
 import com.intellij.xdebugger.impl.actions.XDebuggerActions
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  *
  * Created by tangzx on 2017/5/1.
  */
 abstract class LuaDebugProcess protected constructor(session: XDebugSession) : XDebugProcess(session), DebugLogger {
-    protected var registeredBreakpoints: MutableMap<XSourcePosition, XLineBreakpoint<*>> = ConcurrentHashMap()
 
     override fun sessionInitialized() {
         super.sessionInitialized()
@@ -83,34 +84,44 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
             override fun registerBreakpoint(breakpoint: XLineBreakpoint<XBreakpointProperties<*>>) {
                 val sourcePosition = breakpoint.sourcePosition
                 if (sourcePosition != null) {
-                    this@LuaDebugProcess.registerBreakpoint(sourcePosition, breakpoint)
+                    registerBreakpoint(sourcePosition, breakpoint)
                 }
             }
 
             override fun unregisterBreakpoint(breakpoint: XLineBreakpoint<XBreakpointProperties<*>>, temporary: Boolean) {
                 val sourcePosition = breakpoint.sourcePosition
                 if (sourcePosition != null) {
-                    this@LuaDebugProcess.unregisterBreakpoint(sourcePosition, breakpoint)
+                    unregisterBreakpoint(sourcePosition, breakpoint)
                 }
             }
         })
     }
 
+    protected fun processBreakpoint(processor: Processor<XLineBreakpoint<*>>) {
+        ApplicationManager.getApplication().runReadAction {
+            val breakpoints = XDebuggerManager.getInstance(session.project)
+                    .breakpointManager
+                    .getBreakpoints(LuaLineBreakpointType::class.java)
+            ContainerUtil.process(breakpoints, processor)
+        }
+    }
+
     protected open fun registerBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
-        registeredBreakpoints.put(sourcePosition, breakpoint)
     }
 
     protected open fun unregisterBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
-        registeredBreakpoints.remove(sourcePosition)
     }
 
     private fun getBreakpoint(file: VirtualFile, line: Int): XLineBreakpoint<*>? {
-        for (pos in registeredBreakpoints.keys) {
-            if (file == pos.file && line == pos.line) {
-                return registeredBreakpoints[pos]
+        var bp:XLineBreakpoint<*>? = null
+        processBreakpoint(Processor {
+            val pos = it.sourcePosition
+            if (file == pos?.file && line == pos.line) {
+                bp = it
             }
-        }
-        return null
+            true
+        })
+        return bp
     }
 
     fun setStack(stack: LuaExecutionStack) {

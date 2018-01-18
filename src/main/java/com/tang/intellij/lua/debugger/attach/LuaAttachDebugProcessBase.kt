@@ -28,6 +28,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.PathUtil
+import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.XSourcePosition
@@ -226,12 +227,15 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             val script = LoadedScript(file, proto.index, proto.fileName, proto.state)
             loadedScriptMap.put(proto.index, script)
 
-            for (pos in registeredBreakpoints.keys) {
-                if (LuaFileUtil.fileEquals(file, pos.file)) {
-                    val breakpoint = registeredBreakpoints[pos]!!
-                    bridge.addBreakpoint(proto.index, breakpoint)
+            processBreakpoint(Processor {
+                val pos = it.sourcePosition
+                if (pos != null) {
+                    if (LuaFileUtil.fileEquals(file, pos.file)) {
+                        bridge.addBreakpoint(proto.index, it)
+                    }
                 }
-            }
+                true
+            })
         } else {
             print("[✘] File not found ", ConsoleViewContentType.SYSTEM_OUTPUT)
             session.consoleView.printHyperlink("[TRY MEMORY FILE]") {
