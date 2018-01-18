@@ -48,19 +48,29 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
 
         fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
             val key = "$className*$fieldName"
-            if (process(key, context, processor) && deep) {
-                // from supper
+            if (!process(key, context, processor))
+                return false
+
+            if (deep) {
                 val classDef = LuaClassIndex.find(className, context)
                 if (classDef != null) {
                     val type = classDef.type
+                    // from alias
+                    type.lazyInit(context)
+                    val notFound = type.processAlias(Processor {
+                        process(it, fieldName, context, processor, false)
+                    })
+                    if (!notFound)
+                        return false
+
+                    // from supper
                     val superClassName = type.superClassName
                     if (superClassName != null && superClassName != className) {
                         return process(superClassName, fieldName, context, processor)
                     }
                 }
-                return true
             }
-            return false
+            return true
         }
 
         fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
@@ -90,18 +100,13 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
         }
 
         fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>) {
-            if (process(type.className, fieldName, context, processor)) {
-                type.lazyInit(context)
-                type.eachAlias(Processor {
-                    process(it, fieldName, context, processor)
-                })
-            }
+            process(type.className, fieldName, context, processor)
         }
 
         fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {
             if (process(type.className, context, processor)) {
                 type.lazyInit(context)
-                type.eachAlias(Processor {
+                type.processAlias(Processor {
                     process(it, context, processor)
                 })
             }

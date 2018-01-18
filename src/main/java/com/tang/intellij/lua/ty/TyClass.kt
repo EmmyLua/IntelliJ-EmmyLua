@@ -34,7 +34,7 @@ interface ITyClass : ITy {
     val varName: String
     var superClassName: String?
     var aliasName: String?
-    fun eachAlias(processor: Processor<String>)
+    fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean = true)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
@@ -79,12 +79,13 @@ abstract class TyClass(override val className: String,
         return className.hashCode()
     }
 
-    override fun eachAlias(processor: Processor<String>) {
+    override fun processAlias(processor: Processor<String>): Boolean {
         val alias = aliasName
-        if (alias != null)
-            processor.process(alias)
+        if (alias != null && !processor.process(alias))
+            return false
         if (!isGlobal && !isAnonymous && LuaSettings.instance.isRecognizeGlobalNameAsType)
-            processor.process(getGlobalTypeName(className))
+            return processor.process(getGlobalTypeName(className))
+        return true
     }
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
@@ -94,7 +95,7 @@ abstract class TyClass(override val className: String,
         val memberIndex = LuaClassMemberIndex.instance
         val list = memberIndex.get(clazzName.hashCode(), project, LuaPredefinedScope(project))
 
-        eachAlias(Processor { alias ->
+        processAlias(Processor { alias ->
             val classMembers = memberIndex.get(alias.hashCode(), project, LuaPredefinedScope(project))
             list.addAll(classMembers)
         })
