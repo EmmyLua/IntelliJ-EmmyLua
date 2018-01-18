@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaInject", "src\LuaInject.vcxproj", "{CB19A08F-478F-4AB2-8E62-602AFE298F77}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "emmy.backend", "src\emmy.backend.vcxproj", "{CB19A08F-478F-4AB2-8E62-602AFE298F77}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared", "src\Shared.vcxproj", "{2CD198E9-319C-48FB-85DC-AE3427A05BD2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Debugger", "src\Debugger.vcxproj", "{944F0195-406B-4E4A-9E10-BF0CC4793E0A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "emmy.tool", "src\emmy.tool.vcxproj", "{944F0195-406B-4E4A-9E10-BF0CC4793E0A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "src\Lua.vcxproj", "{891ED13A-BFEC-4A53-997A-A10434FC6BC9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EasyHookDll", "src\EasyHookDll\EasyHookDll.vcxproj", "{D087E484-DBC9-4A2E-8368-C1D0E524994D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Arch", "src\Arch.vcxproj", "{D7E515CE-C077-435B-85CD-EB1AF45DB2B3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "emmy.arch", "src\emmy.arch.vcxproj", "{D7E515CE-C077-435B-85CD-EB1AF45DB2B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

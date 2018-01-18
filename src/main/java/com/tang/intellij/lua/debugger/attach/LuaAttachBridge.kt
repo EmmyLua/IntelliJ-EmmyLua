@@ -65,7 +65,7 @@ class LuaAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSession
         try {
             if (pluginVirtualDirectory != null) {
                 // check arch
-                val archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/Arch.exe")
+                val archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/emmy.arch.exe")
                 val processBuilder = ProcessBuilder(archExe!!)
                 val isX86: Boolean
                 val archChecker = processBuilder.command(archExe, "arch", "-pid", pid).start()
@@ -76,7 +76,7 @@ class LuaAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSession
                 val archType = if (isX86) "x86" else "x64"
                 process.println(LuaBundle.message("run.attach.start_info", processInfo.executableName, pid, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
                 // attach debugger
-                val exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/Debugger.exe", archType))
+                val exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/emmy.tool.exe", archType))
 
                 val commandLine = GeneralCommandLine(exe!!)
                 commandLine.addParameters("-m", "attach", "-p", pid, "-e", emmyLua)

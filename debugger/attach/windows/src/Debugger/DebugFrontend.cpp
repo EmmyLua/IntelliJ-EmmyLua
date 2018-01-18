@@ -30,6 +30,8 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <cassert>
 #include <Psapi.h>
 
+#define DBG_BACKEND_DLL "emmy.backend.dll"
+
 DebugFrontend* DebugFrontend::s_instance = nullptr;
 
 DebugFrontend& DebugFrontend::Get()
@@ -191,9 +193,9 @@ ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 
     // Inject our debugger DLL into the process so that we can monitor from
     // inside the process's memory space.
-    if (!InjectDll(m_processId, "LuaInject.dll"))
+    if (!InjectDll(m_processId, DBG_BACKEND_DLL))
     {
-        MessageEvent("LuaInject.dll could not be loaded into the process", MessageType_Error);
+        MessageEvent("emmy.backend.dll could not be loaded into the process", MessageType_Error);
         return ErrorCode::INJECT_ERROR;
     }
 
@@ -392,7 +394,7 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 bool DebugFrontend::GetIsBeingDebugged(DWORD processId) const
 {
 
-    LPCSTR moduleFileName = "LuaInject.dll";
+    LPCSTR moduleFileName = DBG_BACKEND_DLL;
 
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
 

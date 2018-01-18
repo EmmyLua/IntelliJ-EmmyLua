@@ -69,7 +69,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
 
             }
             ErrorCode.INJECT_ERROR -> {
-                process.error("Error: LuaInject.dll could not be loaded into the process")
+                process.error("Error: emmy.backend.dll could not be loaded into the process")
                 process.stop()
             }
             ErrorCode.BACKEND_INIT_ERROR -> {
