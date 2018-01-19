@@ -21,10 +21,11 @@ import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiDocumentManager
+import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
-import com.tang.intellij.lua.psi.LuaExpr
+import com.tang.intellij.lua.psi.*
 
 /**
  *
@@ -36,8 +37,26 @@ abstract class LuaDebuggerEvaluator : XDebuggerEvaluator() {
         PsiDocumentManager.getInstance(project).commitAndRunReadAction {
             try {
                 val file = PsiDocumentManager.getInstance(project).getPsiFile(document) ?: return@commitAndRunReadAction
-                val expr = PsiTreeUtil.findElementOfClassAtOffset(file, offset, LuaExpr::class.java, false)
-                currentRange = expr?.textRange
+                if (currentRange == null) {
+                    val ele = file.findElementAt(offset)
+                    if (ele != null && ele.node.elementType == LuaTypes.ID) {
+                        val parent = ele.parent
+                        when (parent) {
+                            is LuaClassMethodName,
+                            is PsiNameIdentifierOwner -> currentRange = parent.textRange
+                        }
+                    }
+                }
+
+                if (currentRange == null) {
+                    val expr = PsiTreeUtil.findElementOfClassAtOffset(file, offset, LuaExpr::class.java, false)
+                    currentRange = when (expr) {
+                        is LuaCallExpr,
+                        is LuaClosureExpr,
+                        is LuaLiteralExpr -> null
+                        else -> expr?.textRange
+                    }
+                }
             } catch (ignored: IndexNotReadyException) {
             }
         }
