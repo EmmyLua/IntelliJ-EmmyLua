@@ -68,6 +68,8 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .around(UNARY_OP).none()
                 .around(ASSIGN).lineBreakOrForceSpace(false, settings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
+                .around(LBRACK).none() // [
+                .before(RBRACK).none() // ]
                 .before(SEMI).spaces(0)
     }
 
