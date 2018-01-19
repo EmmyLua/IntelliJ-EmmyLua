@@ -17,11 +17,13 @@
 package com.tang.intellij.lua.editor
 
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiReference
 import com.intellij.psi.codeStyle.NameUtil
 import com.intellij.psi.codeStyle.SuggestedNameInfo
+import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.refactoring.rename.NameSuggestionProvider
-import com.tang.intellij.lua.psi.LuaTypeGuessable
-import com.tang.intellij.lua.psi.guessType
+import com.intellij.util.Processor
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import java.util.*
@@ -60,10 +62,51 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
         }
     }
 
-    override fun getSuggestedNames(psiElement: PsiElement, nameSuggestionContext: PsiElement?, set: MutableSet<String>): SuggestedNameInfo? {
-        if (psiElement is LuaTypeGuessable) {
-            val context = SearchContext(psiElement.getProject())
-            val type = psiElement.guessType(context)
+    //逆向
+    private fun getNames(ref: PsiReference, set: MutableSet<String>) {
+        val ele = ref.element
+        val p1 = ele.parent
+        if (ele is LuaExpr) {
+            when (p1) {
+                is LuaListArgs -> {
+                    //call(var)
+                    val paramIndex = p1.getIndexFor(ele)
+                    val p2 = p1.parent as? LuaCallExpr
+                    if (p2 != null) {
+                        val ty = p2.guessParentType(SearchContext(ele.project))
+                        TyUnion.each(ty) {
+                            if (it is ITyFunction) {
+                                it.process(Processor { sig ->
+                                    sig.params.getOrNull(paramIndex)?.let {
+                                        set.add(it.name)
+                                    }
+                                    return@Processor false
+                                })
+                            }
+                        }
+                    }
+                }
+                is LuaExprList -> {
+                    //xxx = var
+                    val p2 = p1.parent as? LuaAssignStat
+                    val valueList = p2?.valueExprList?.exprList
+                    if (valueList != null) {
+                        val index = valueList.indexOf(ele)
+                        val varExpr = p2.getExprAt(index)
+                        if (varExpr is LuaIndexExpr) varExpr.name?.let { set.add(it) }
+                    }
+                }
+            }
+        }
+    }
+
+    override fun getSuggestedNames(psi: PsiElement, nameSuggestionContext: PsiElement?, set: MutableSet<String>): SuggestedNameInfo? {
+        val search = ReferencesSearch.search(psi, psi.useScope)
+        search.forEach { getNames(it, set) }
+
+        if (psi is LuaTypeGuessable) {
+            val context = SearchContext(psi.getProject())
+            val type = psi.guessType(context)
             if (!Ty.isInvalid(type)) {
                 val names = HashSet<String>()
 
