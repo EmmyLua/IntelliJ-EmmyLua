@@ -20,6 +20,7 @@ import com.intellij.formatting.Alignment
 import com.intellij.formatting.ChildAttributes
 import com.intellij.formatting.Indent
 import com.intellij.formatting.Wrap
+import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.editor.formatter.LuaFormatContext
 import com.tang.intellij.lua.psi.LuaTableExpr
@@ -36,6 +37,8 @@ class LuaTableBlock(psi: LuaTableExpr, wrap: Wrap?, alignment: Alignment?, inden
     override fun buildChild(child: PsiElement, indent: Indent?): LuaScriptBlock {
         if (child is LuaTableField) {
             return LuaTableFieldBlock(assignAlign, child, null, childAlign, Indent.getNormalIndent(), ctx)
+        } else if (child is PsiComment) {
+            return LuaScriptBlock(child, null, null, Indent.getNormalIndent(), ctx)
         }
         return super.buildChild(child, indent)
     }
