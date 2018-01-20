@@ -139,7 +139,7 @@ fun getPresentation(classMethodDef: LuaClassMethodDef): ItemPresentation {
     }
 }
 
-private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITyClass, SearchContext>>("GET_CLASS_METHOD")
+private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("GET_CLASS_METHOD")
 
 /**
  * 寻找对应的类
@@ -150,9 +150,11 @@ private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITyClass, Sea
 fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITy {
     return CachedValuesManager.getManager(classMethodDef.project).getParameterizedCachedValue(classMethodDef, GET_CLASS_METHOD, { ctx ->
         val stub = classMethodDef.stub
-        var type: ITyClass? = null
+        var type: ITy = Ty.UNKNOWN
         if (stub != null) {
-            type = TySerializedClass(stub.className)
+            stub.classNames.forEach {
+               type = type.union(TySerializedClass(it))
+            }
         } else {
             val expr = classMethodDef.classMethodName.expr
             val ty = expr.guessType(ctx)

@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs
 
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.ty.FunSignature
 import com.tang.intellij.lua.ty.IFunSignature
@@ -65,4 +66,18 @@ fun StubOutputStream.writeTyNullable(ty: ITy?) {
     writeBoolean(ty != null)
     if (ty != null)
         Ty.serialize(ty, this)
+}
+
+fun StubOutputStream.writeNames(names: Array<String>) {
+    writeInt(names.size)
+    names.forEach { writeName(it) }
+}
+
+fun StubInputStream.readNames(): Array<String> {
+    val list = mutableListOf<String>()
+    val size = readInt()
+    for (i in 0 until size) {
+        list.add(StringRef.toString(readName()))
+    }
+    return list.toTypedArray()
 }

@@ -26,7 +26,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyFunction
+import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.TyUnion
 
 /**
@@ -43,12 +43,15 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val methodName = methodDef.classMethodName
         val id = methodDef.nameIdentifier
         val expr = methodName.expr
-        var clazzName = expr.text
-        val searchContext = SearchContext(methodDef.project, methodDef.containingFile, true)
+        val classNameSet = mutableSetOf<String>()
+        classNameSet.add(expr.text)
 
-        val type = TyUnion.getPerfectClass(expr.guessType(searchContext))
-        if (type != null)
-            clazzName = type.className
+        val searchContext = SearchContext(methodDef.project, methodDef.containingFile, true)
+        val ty = expr.guessType(searchContext)
+        TyUnion.each(ty) {
+            if (it is ITyClass)
+                classNameSet.add(it.className)
+        }
 
         val isStatic = methodName.dot != null
         val visibility = methodDef.visibility
@@ -57,7 +60,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val overloads = methodDef.overloads
 
         return LuaClassMethodStubImpl(id.text,
-                clazzName,
+                classNameSet.toTypedArray(),
                 isStatic,
                 visibility,
                 retDocTy,
@@ -73,7 +76,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
     }
 
     override fun serialize(stub: LuaClassMethodStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeName(stub.className)
+        stubOutputStream.writeNames(stub.classNames)
         stubOutputStream.writeName(stub.name)
 
         // is static ?
@@ -86,7 +89,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaClassMethodStub {
-        val className = stubInputStream.readName()
+        val classNames = stubInputStream.readNames()
         val shortName = stubInputStream.readName()
         val isStatic = stubInputStream.readBoolean()
         val visibility = stubInputStream.readByte()
@@ -94,7 +97,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val params = stubInputStream.readParamInfoArray()
         val overloads = stubInputStream.readSignatures()
         return LuaClassMethodStubImpl(StringRef.toString(shortName),
-                StringRef.toString(className),
+                classNames,
                 isStatic,
                 Visibility.get(visibility.toInt()),
                 retDocTy,
@@ -104,17 +107,18 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
     }
 
     override fun indexStub(luaClassMethodStub: LuaClassMethodStub, indexSink: IndexSink) {
-        val className = luaClassMethodStub.className
+        val classNames = luaClassMethodStub.classNames
         val shortName = luaClassMethodStub.name
-
-        LuaClassMemberIndex.indexStub(indexSink, className, shortName)
+        classNames.forEach {
+            LuaClassMemberIndex.indexStub(indexSink, it, shortName)
+        }
         indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
     }
 }
 
 interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClassMemberStub<LuaClassMethodDef> {
 
-    val className: String
+    val classNames: Array<String>
 
     val name: String
 
@@ -122,7 +126,7 @@ interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClass
 }
 
 class LuaClassMethodStubImpl(override val name: String,
-                             override val className: String,
+                             override val classNames: Array<String>,
                              override val isStatic: Boolean,
                              override val visibility: Visibility,
                              override val returnDocTy: ITy?,
