@@ -99,6 +99,7 @@ internal fun renderComment(sb: StringBuilder, comment: LuaComment?) {
                             renderTypeUnion(if (index != 0) ", " else null, null, sb, luaDocTy)
                             sb.append(" ")
                         }
+                        renderCommentString(null, null, sb, child.commentString)
                         sb.append("<br>")
                     }
                 }
