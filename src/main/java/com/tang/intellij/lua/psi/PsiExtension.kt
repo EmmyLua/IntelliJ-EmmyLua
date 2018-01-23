@@ -86,7 +86,7 @@ fun LuaAssignStat.getIndexFor(psi: LuaExpr): Int {
 
 fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     val list = this.varExprList.exprList
-    return list[index]
+    return list.getOrNull(index)
 }
 
 fun LuaListArgs.getIndexFor(psi: LuaExpr): Int {
@@ -107,7 +107,7 @@ val LuaExprList.exprStubList: List<LuaExpr> get() {
 }
 
 fun LuaExprList.getExprAt(idx: Int): LuaExpr? {
-    return exprStubList[idx]
+    return exprStubList.getOrNull(idx)
 }
 
 fun LuaParametersOwner.getIndexFor(paramNameDef: LuaParamNameDef): Int {
