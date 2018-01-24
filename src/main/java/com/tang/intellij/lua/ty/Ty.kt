@@ -361,8 +361,10 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun process(ty: ITy, process: (ITy) -> Boolean) {
             if (ty is TyUnion) {
-                for (child in ty.childSet.toTypedArray()) {
-                    if (!process(child))
+                // why nullable ???
+                val arr: Array<ITy?> = ty.childSet.toTypedArray()
+                for (child in arr) {
+                    if (child != null && !process(child))
                         break
                 }
             } else process(ty)
