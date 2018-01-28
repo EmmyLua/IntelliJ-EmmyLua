@@ -221,6 +221,9 @@
         <highlightVisitor implementation="com.tang.intellij.lua.codeInsight.LuaRainbowVisitor"/>
         <highlightUsagesHandlerFactory implementation="com.tang.intellij.lua.codeInsight.highlighting.LuaHighlightUsagesHandlerFactory"/>
         <readWriteAccessDetector implementation="com.tang.intellij.lua.codeInsight.LuaReadWriteAccessDetector"/>
+        
+        <!--hierarchy-->
+        <callHierarchyProvider language="Lua" implementationClass="com.tang.intellij.lua.hierarchy.call.LuaCallHierarchyProvider"/>
 
         <!--editor handlers-->
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterAfterUnmatchedBraceHandler" />
@@ -415,6 +418,10 @@
     </project-components>
 
     <actions>
+        <group id="LuaCallHierarchyPopupMenu">
+            <reference ref="EditSource"/>
+        </group>
+        
         <action class="com.tang.intellij.lua.actions.CreateLuaFileAction"
                 text="Lua File"
                 id="lua.newFile">
