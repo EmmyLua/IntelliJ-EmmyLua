@@ -53,7 +53,7 @@ class EvaluatorCommand(expr: String, getChildren: Boolean, private val callback:
                 dataBuffer.append(data.substring(0, index + 12))
                 val code = dataBuffer.toString()
                 handleLines++
-                ApplicationManager.getApplication().runReadAction { callback.onResult(code) }
+                onResult(code)
                 index + 12
             } else {
                 dataBuffer.append(data)
@@ -61,6 +61,14 @@ class EvaluatorCommand(expr: String, getChildren: Boolean, private val callback:
             }
         }
         return super.handle(data)
+    }
+
+    private fun onResult(code: String) {
+        try {
+            ApplicationManager.getApplication().runReadAction { callback.onResult(code) }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun handle(index: Int, data: String) {

@@ -87,10 +87,10 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
                     bf.clear()
                 }
             }
-        } catch (e: Exception) {
-
-        } finally {
+        } catch (e: IOException) {
             onSocketClosed()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
