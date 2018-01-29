@@ -22,6 +22,7 @@ import com.intellij.util.TimeoutUtil
 import com.intellij.util.io.BaseOutputReader
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand
+import java.io.BufferedInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStreamWriter
@@ -76,7 +77,21 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
     private val stringBuffer = StringBuffer(2048)
 
     init {
-        debugReader = LuaDebugReader(socket.getInputStream(), Charset.forName("UTF-8"))
+        val receive = 1024 * 320
+        socket.receiveBufferSize = receive
+        //debugReader = LuaDebugReader(socket.getInputStream(), Charset.forName("UTF-8"))
+        ApplicationManager.getApplication().executeOnPooledThread {
+            val input = BufferedInputStream(socket.getInputStream())
+            val bytes = ByteArray(receive)
+            var readSize: Int
+
+            while (!isStopped) {
+                readSize = input.read(bytes, 0, bytes.size)
+                if (readSize > 0) {
+                    onResp(String(bytes, 0, readSize))
+                }
+            }
+        }
 
         ApplicationManager.getApplication().executeOnPooledThread {
             try {
