@@ -18,107 +18,80 @@ package com.tang.intellij.lua.debugger.remote
 
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.util.TimeoutUtil
-import com.intellij.util.io.BaseOutputReader
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand
-import java.io.BufferedInputStream
 import java.io.IOException
-import java.io.InputStream
 import java.io.OutputStreamWriter
-import java.net.Socket
+import java.nio.ByteBuffer
+import java.nio.channels.SocketChannel
 import java.nio.charset.Charset
 import java.util.*
-import java.util.concurrent.Future
 import java.util.regex.Pattern
 
-class MobClient(val socket: Socket, val listener: MobServerListener) {
-    inner class LuaDebugReader(inputStream: InputStream, charset: Charset) : BaseOutputReader(inputStream, charset) {
-        init {
-            start(javaClass.name)
-        }
-
-        override fun doRun() {
-            try {
-                while (true) {
-                    val read = readAvailableBlocking()
-
-                    if (!read) {
-                        break
-                    } else {
-                        if (isStopped) {
-                            break
-                        }
-
-                        TimeoutUtil.sleep(mySleepingPolicy.getTimeToSleep(true).toLong())
-                    }
-                }
-            } catch (e: Exception) {
-                //e.printStackTrace()
-            } finally {
-                onSocketClosed()
-            }
-        }
-
-        override fun onTextAvailable(s: String) {
-            onResp(s)
-        }
-
-        override fun executeOnPooledThread(runnable: Runnable): Future<*> {
-            return ApplicationManager.getApplication().executeOnPooledThread(runnable)
-        }
-    }
+class MobClient(private val socketChannel: SocketChannel, private val listener: MobServerListener) {
 
     private var isStopped: Boolean = false
     private val commands = LinkedList<DebugCommand>()
-    private var debugReader: LuaDebugReader? = null
     private var currentCommandWaitForResp: DebugCommand? = null
     private var streamWriter: OutputStreamWriter? = null
-    private val stringBuffer = StringBuffer(2048)
+    private val stringBuffer = StringBuffer(1024 * 1024)
+    private val socket = socketChannel.socket()
+    private val receiveBufferSize = 1024 * 1024
 
     init {
-        val receive = 1024 * 320
-        socket.receiveBufferSize = receive
-        //debugReader = LuaDebugReader(socket.getInputStream(), Charset.forName("UTF-8"))
+        socket.receiveBufferSize = receiveBufferSize
         ApplicationManager.getApplication().executeOnPooledThread {
-            val input = BufferedInputStream(socket.getInputStream())
-            val bytes = ByteArray(receive)
-            var readSize: Int
-
-            while (!isStopped) {
-                readSize = input.read(bytes, 0, bytes.size)
-                if (readSize > 0) {
-                    onResp(String(bytes, 0, readSize))
-                }
-            }
+            doReceive()
         }
 
         ApplicationManager.getApplication().executeOnPooledThread {
-            try {
-                streamWriter = OutputStreamWriter(socket.getOutputStream(), Charset.forName("UTF-8"))
+            doSend()
+        }
+    }
 
-                while (socket.isConnected) {
-                    if (isStopped) break
+    private fun doSend() {
+        try {
+            streamWriter = OutputStreamWriter(socket.getOutputStream(), Charset.forName("UTF-8"))
 
-                    var command: DebugCommand
-                    while (commands.size > 0 && currentCommandWaitForResp == null) {
-                        if (currentCommandWaitForResp == null) {
-                            command = commands.poll()
-                            command.setDebugProcess(listener.process)
-                            command.write(this)
-                            streamWriter!!.write("\n")
-                            streamWriter!!.flush()
-                            if (command.requireRespLines > 0)
-                                currentCommandWaitForResp = command
-                        }
+            while (socket.isConnected) {
+                if (isStopped) break
+
+                var command: DebugCommand
+                while (commands.size > 0 && currentCommandWaitForResp == null) {
+                    if (currentCommandWaitForResp == null) {
+                        command = commands.poll()
+                        command.setDebugProcess(listener.process)
+                        command.write(this)
+                        streamWriter!!.write("\n")
+                        streamWriter!!.flush()
+                        if (command.requireRespLines > 0)
+                            currentCommandWaitForResp = command
                     }
-                    Thread.sleep(5)
                 }
-            } catch (e: Exception) {
-                //e.printStackTrace()
-            } finally {
-                listener.println("Disconnected.", ConsoleViewContentType.SYSTEM_OUTPUT)
+                Thread.sleep(5)
             }
+        } catch (e: Exception) {
+
+        }  finally {
+            listener.println("Disconnected.", ConsoleViewContentType.SYSTEM_OUTPUT)
+        }
+    }
+
+    private fun doReceive() {
+        try {
+            var readSize: Int
+            val bf = ByteBuffer.allocate(receiveBufferSize)
+            while (!isStopped) {
+                readSize = socketChannel.read(bf)
+                if (readSize > 0) {
+                    onResp(String(bf.array(), 0, readSize))
+                    bf.clear()
+                }
+            }
+        } catch (e: Exception) {
+
+        } finally {
+            onSocketClosed()
         }
     }
 
@@ -162,7 +135,6 @@ class MobClient(val socket: Socket, val listener: MobServerListener) {
 
         isStopped = true
         currentCommandWaitForResp = null
-        debugReader?.stop()
         try {
             socket.close()
         } catch (ignored: Exception) {}

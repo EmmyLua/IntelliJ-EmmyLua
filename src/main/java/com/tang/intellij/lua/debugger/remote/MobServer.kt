@@ -19,7 +19,8 @@ package com.tang.intellij.lua.debugger.remote
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.tang.intellij.lua.debugger.DebugLogger
 import java.io.IOException
-import java.net.ServerSocket
+import java.net.InetSocketAddress
+import java.nio.channels.ServerSocketChannel
 
 interface MobServerListener : DebugLogger {
     fun onConnect(client: MobClient)
@@ -29,7 +30,7 @@ interface MobServerListener : DebugLogger {
 }
 
 class MobServer(private val listener: MobServerListener) : Runnable {
-    private var server: ServerSocket? = null
+    private var server: ServerSocketChannel? = null
     private var client: MobClient? = null
     private var port: Int = 0
     private var isStopped: Boolean = false
@@ -38,7 +39,8 @@ class MobServer(private val listener: MobServerListener) : Runnable {
     fun start(port: Int) {
         this.port = port
         if (server == null)
-            server = ServerSocket(port)
+            server = ServerSocketChannel.open()
+        server?.bind(InetSocketAddress(port))
         val thread = Thread(this)
         thread.start()
     }
