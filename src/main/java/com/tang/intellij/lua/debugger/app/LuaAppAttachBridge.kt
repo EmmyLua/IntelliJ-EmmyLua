@@ -20,6 +20,7 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
+import com.intellij.execution.process.ProcessOutputTypes
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.util.Key
 import com.intellij.xdebugger.XDebugSession
@@ -47,6 +48,9 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
         }
 
         override fun onTextAvailable(processEvent: ProcessEvent, key: Key<*>) {
+            if (key == ProcessOutputTypes.SYSTEM)
+                return
+
             val text = processEvent.text
             if (text.startsWith("port:")) {
                 val reg = Regex("port:(\\d+)")
