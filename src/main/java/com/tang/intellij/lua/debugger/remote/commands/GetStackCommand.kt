@@ -62,14 +62,10 @@ class GetStackCommand : DefaultCommand("STACK", 1) {
             return
         }
 
-        val pattern = Pattern.compile("(\\d+) (\\w+) (.+)")
-        val matcher = pattern.matcher(data)
-        if (matcher.find()) {
-            //String status = matcher.group(1);//200
-            //String statusName = matcher.group(2);//OK
-            val stackCode = matcher.group(3)
-            val standardGlobals = JsePlatform.debugGlobals()
-            val code = standardGlobals.load(stackCode)
+        if (data.startsWith("200 OK")) {
+            val stackCode = data.substring(6)
+            val standardGlobals = JsePlatform.standardGlobals()
+            val code = standardGlobals.load(limitStringSize(stackCode))
             val function = code.checkfunction()
             val value = function.call()
 

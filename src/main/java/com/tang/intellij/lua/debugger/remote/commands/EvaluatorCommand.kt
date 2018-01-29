@@ -25,6 +25,7 @@ import java.util.regex.Pattern
  */
 class EvaluatorCommand(expr: String, getChildren: Boolean, private val callback: Callback) : DefaultCommand("EXEC " + expr, 2) {
     private var dataLen: Int = 0
+    private val dataBuffer = StringBuffer()
 
     interface Callback {
         fun onResult(data: String)
@@ -48,14 +49,16 @@ class EvaluatorCommand(expr: String, getChildren: Boolean, private val callback:
     override fun handle(data: String): Int {
         if (dataLen != 0) {
             val index = data.indexOf("return _;end")
-            if (index > 0) {
+            return if (index > 0) {
+                dataBuffer.append(data.substring(0, index + 12))
+                val code = dataBuffer.toString()
                 handleLines++
-                dataLen = index + 12
-                val res = data.substring(0, dataLen)
-                ApplicationManager.getApplication().runReadAction { callback.onResult(res) }
-                return dataLen
+                ApplicationManager.getApplication().runReadAction { callback.onResult(code) }
+                index + 12
+            } else {
+                dataBuffer.append(data)
+                data.length
             }
-            return 0
         }
         return super.handle(data)
     }

@@ -34,7 +34,6 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
     private val commands = LinkedList<DebugCommand>()
     private var currentCommandWaitForResp: DebugCommand? = null
     private var streamWriter: OutputStreamWriter? = null
-    private val stringBuffer = StringBuffer(1024 * 1024)
     private val socket = socketChannel.socket()
     private val receiveBufferSize = 1024 * 1024
 
@@ -96,16 +95,14 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
     }
 
     private fun onResp(data: String) {
-        if (currentCommandWaitForResp != null) {
-            stringBuffer.append(data)
-            val eat = currentCommandWaitForResp!!.handle(stringBuffer.toString())
+        val cmd = currentCommandWaitForResp
+        if (cmd != null) {
+            val eat = cmd.handle(data)
             if (eat > 0) {
-                stringBuffer.delete(0, eat)
-                if (currentCommandWaitForResp!!.isFinished())
+                if (cmd.isFinished())
                     currentCommandWaitForResp = null
+                return
             }
-        } else {
-            stringBuffer.setLength(0)
         }
 
         val pattern = Pattern.compile("(\\d+) (\\w+)( (.+))?")
