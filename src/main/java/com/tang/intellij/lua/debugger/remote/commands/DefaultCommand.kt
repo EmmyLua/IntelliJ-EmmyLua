@@ -83,7 +83,7 @@ open class DefaultCommand @JvmOverloads constructor(private val commandline: Str
                 var prev = 0
                 rangeList.forEach { range ->
                     append(code.substring(prev, range.start + limit))
-                    append("...(Emmy : striped size = ${range.end - range.start - limit})")
+                    append("...(Emmy : stripped size = ${range.end - range.start - limit})")
                     prev = range.end - 1
                 }
                 append(code.substring(prev))
