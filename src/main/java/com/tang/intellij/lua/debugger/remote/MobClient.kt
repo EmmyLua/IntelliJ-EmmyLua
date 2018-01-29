@@ -60,11 +60,11 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
                 while (commands.size > 0 && currentCommandWaitForResp == null) {
                     if (currentCommandWaitForResp == null) {
                         command = commands.poll()
-                        command.setDebugProcess(listener.process)
+                        command.debugProcess = listener.process
                         command.write(this)
                         streamWriter!!.write("\n")
                         streamWriter!!.flush()
-                        if (command.requireRespLines > 0)
+                        if (command.getRequireRespLines() > 0)
                             currentCommandWaitForResp = command
                     }
                 }
@@ -101,7 +101,7 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
             val eat = currentCommandWaitForResp!!.handle(stringBuffer.toString())
             if (eat > 0) {
                 stringBuffer.delete(0, eat)
-                if (currentCommandWaitForResp!!.isFinished)
+                if (currentCommandWaitForResp!!.isFinished())
                     currentCommandWaitForResp = null
             }
         } else {

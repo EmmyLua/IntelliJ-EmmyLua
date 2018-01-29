@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger.remote.commands;
+package com.tang.intellij.lua.debugger.remote.commands
 
-import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess;
-import com.tang.intellij.lua.debugger.remote.MobClient;
-
-import java.io.IOException;
+import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess
+import com.tang.intellij.lua.debugger.remote.MobClient
 
 /**
  * Remote Debug Command
  * Created by tangzx on 2016/12/31.
  */
-public abstract class DebugCommand {
+abstract class DebugCommand {
 
-    LuaMobDebugProcess debugProcess;
+    lateinit var debugProcess: LuaMobDebugProcess
 
-    public void setDebugProcess(LuaMobDebugProcess process) {
-        debugProcess = process;
-    }
+    abstract fun isFinished(): Boolean
 
-    public abstract void write(MobClient writer) throws IOException;
-    public abstract int handle(String data);
-    public abstract int getRequireRespLines();
-    public abstract boolean isFinished();
+    abstract fun getRequireRespLines(): Int
+
+    abstract fun write(writer: MobClient)
+
+    abstract fun handle(data: String): Int
 }
