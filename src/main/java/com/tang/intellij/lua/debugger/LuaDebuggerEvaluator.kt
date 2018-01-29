@@ -42,6 +42,8 @@ abstract class LuaDebuggerEvaluator : XDebuggerEvaluator() {
                     if (ele != null && ele.node.elementType == LuaTypes.ID) {
                         val parent = ele.parent
                         when (parent) {
+                            is LuaFuncDef,
+                            is LuaLocalFuncDef -> currentRange = ele.textRange
                             is LuaClassMethodName,
                             is PsiNameIdentifierOwner -> currentRange = parent.textRange
                         }
