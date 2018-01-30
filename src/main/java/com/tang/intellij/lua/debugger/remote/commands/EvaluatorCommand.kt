@@ -23,7 +23,7 @@ import java.util.regex.Pattern
  *
  * Created by tangzx on 2017/1/1.
  */
-class EvaluatorCommand(expr: String, getChildren: Boolean, private val callback: Callback) : DefaultCommand("EXEC " + expr, 2) {
+class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCommand("EXEC " + expr, 2) {
     private var dataLen: Int = 0
     private val dataBuffer = StringBuffer()
 
@@ -31,7 +31,7 @@ class EvaluatorCommand(expr: String, getChildren: Boolean, private val callback:
         fun onResult(data: String)
     }
 
-    private fun createExpr(chunk: String, getChildren: Boolean): String {
+    /*private fun createExpr(chunk: String, getChildren: Boolean): String {
         val serFN = "local function se(o, children) " +
                 "if type(o) == 'string' then return { nil, o, 'string' } " +
                 "elseif type(o) == 'number' then return { nil, o, 'number' } " +
@@ -44,7 +44,7 @@ class EvaluatorCommand(expr: String, getChildren: Boolean, private val callback:
                 "end end "
         val exec = String.format("local function exec() %s end local data = exec() return se(data, %b)", chunk, getChildren)
         return serFN + exec
-    }
+    }*/
 
     override fun handle(data: String): Int {
         if (dataLen != 0) {
