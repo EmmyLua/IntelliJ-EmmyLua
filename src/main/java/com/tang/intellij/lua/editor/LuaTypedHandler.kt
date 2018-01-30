@@ -24,6 +24,7 @@ import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.LuaFuncBody
+import com.tang.intellij.lua.psi.LuaTypes
 
 /**
 
@@ -36,6 +37,13 @@ class LuaTypedHandler : TypedHandlerDelegate() {
             if (charTyped == ':' || charTyped == '@') {
                 AutoPopupController.getInstance(project).autoPopupMemberLookup(editor, null)
                 return TypedHandlerDelegate.Result.STOP
+            }
+            if (charTyped == '.') {
+                val element = file.findElementAt(editor.caretModel.offset - 1)
+                when (element?.node?.elementType) {
+                    LuaTypes.DOT,
+                    LuaTypes.SHORT_COMMENT -> return TypedHandlerDelegate.Result.STOP
+                }
             }
         }
         return super.checkAutoPopup(charTyped, project, editor, file)
