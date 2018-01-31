@@ -19,36 +19,36 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LuaInject\DebugBackend.cpp" />
-    <ClCompile Include="LuaInject\DebugHelp.cpp" />
-    <ClCompile Include="LuaInject\DebugMessage.cpp" />
-    <ClCompile Include="LuaInject\DebugPipeline.cpp" />
-    <ClCompile Include="LuaInject\Emmy.cpp" />
-    <ClCompile Include="LuaInject\endian.cpp" />
-    <ClCompile Include="LuaInject\LuaCheckStack.cpp" />
-    <ClCompile Include="LuaInject\LuaDll.cpp" />
-    <ClCompile Include="LuaInject\DllMain.cpp" />
-    <ClCompile Include="LuaInject\LuaProfiler.cpp" />
-    <ClCompile Include="LuaInject\StackNode.cpp" />
-    <ClCompile Include="LuaInject\Stream.cpp" />
-    <ClCompile Include="LuaInject\TCPServer.cpp" />
+    <ClCompile Include="emmy.backend\DebugBackend.cpp" />
+    <ClCompile Include="emmy.backend\DebugHelp.cpp" />
+    <ClCompile Include="emmy.backend\DebugMessage.cpp" />
+    <ClCompile Include="emmy.backend\DebugPipeline.cpp" />
+    <ClCompile Include="emmy.backend\Emmy.cpp" />
+    <ClCompile Include="emmy.backend\endian.cpp" />
+    <ClCompile Include="emmy.backend\LuaCheckStack.cpp" />
+    <ClCompile Include="emmy.backend\LuaDll.cpp" />
+    <ClCompile Include="emmy.backend\DllMain.cpp" />
+    <ClCompile Include="emmy.backend\LuaProfiler.cpp" />
+    <ClCompile Include="emmy.backend\StackNode.cpp" />
+    <ClCompile Include="emmy.backend\Stream.cpp" />
+    <ClCompile Include="emmy.backend\TCPServer.cpp" />
     <ClCompile Include="third-party\libpe\libpe\htable.cpp" />
     <ClCompile Include="third-party\libpe\libpe\libpe.cpp" />
     <ClCompile Include="third-party\libpe\libpe\llist.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LuaInject\DebugBackend.h" />
-    <ClInclude Include="LuaInject\DebugHelp.h" />
-    <ClInclude Include="LuaInject\DebugMessage.h" />
-    <ClInclude Include="LuaInject\DebugPipeline.h" />
-    <ClInclude Include="LuaInject\endian.h" />
-    <ClInclude Include="LuaInject\LuaCheckStack.h" />
-    <ClInclude Include="LuaInject\LuaDll.h" />
-    <ClInclude Include="LuaInject\LuaProfiler.h" />
-    <ClInclude Include="LuaInject\LuaTypes.h" />
-    <ClInclude Include="LuaInject\StackNode.h" />
-    <ClInclude Include="LuaInject\Stream.h" />
-    <ClInclude Include="LuaInject\TCPServer.h" />
+    <ClInclude Include="emmy.backend\DebugBackend.h" />
+    <ClInclude Include="emmy.backend\DebugHelp.h" />
+    <ClInclude Include="emmy.backend\DebugMessage.h" />
+    <ClInclude Include="emmy.backend\DebugPipeline.h" />
+    <ClInclude Include="emmy.backend\endian.h" />
+    <ClInclude Include="emmy.backend\LuaCheckStack.h" />
+    <ClInclude Include="emmy.backend\LuaDll.h" />
+    <ClInclude Include="emmy.backend\LuaProfiler.h" />
+    <ClInclude Include="emmy.backend\LuaTypes.h" />
+    <ClInclude Include="emmy.backend\StackNode.h" />
+    <ClInclude Include="emmy.backend\Stream.h" />
+    <ClInclude Include="emmy.backend\TCPServer.h" />
     <ClInclude Include="third-party\libpe\libpe\htable.h" />
     <ClInclude Include="third-party\libpe\libpe\libpe.h" />
     <ClInclude Include="third-party\libpe\libpe\llist.h" />
@@ -116,7 +116,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
+    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;emmy.backend;EasyHookDll;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetExt>.dll</TargetExt>
     <OutDir>$(SolutionDir)Build\$(Configuration)\x86\</OutDir>
@@ -124,7 +124,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
+    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;emmy.backend;EasyHookDll;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\x64\</OutDir>
     <IntDir>$(SolutionDir)Build\$(Configuration)\x64\Temp\$(ProjectName)</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>
@@ -134,12 +134,12 @@
     <OutDir>$(SolutionDir)Build\$(Configuration)\x86</OutDir>
     <IntDir>$(SolutionDir)Build\$(Configuration)\x86\Temp\$(ProjectName)</IntDir>
     <TargetExt>.dll</TargetExt>
-    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
+    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;emmy.backend;EasyHookDll;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;LuaInject;EasyHookDll;$(IncludePath)</IncludePath>
+    <IncludePath>third-party\libpe\libpe;..\libs\LuaPlus\include;Shared;emmy.backend;EasyHookDll;$(IncludePath)</IncludePath>
     <OutDir>$(SolutionDir)Build\$(Configuration)\x64\</OutDir>
     <IntDir>$(SolutionDir)Build\$(Configuration)\x64\Temp\$(ProjectName)</IntDir>
     <LibraryPath>$(LibraryPath)</LibraryPath>

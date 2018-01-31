@@ -172,12 +172,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Debugger\DebugFrontend.cpp" />
-    <ClCompile Include="Debugger\main.cpp" />
+    <ClCompile Include="emmy.tool\DebugFrontend.cpp" />
+    <ClCompile Include="emmy.tool\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Debugger\cxxopts.hpp" />
-    <ClInclude Include="Debugger\DebugFrontend.h" />
+    <ClInclude Include="emmy.tool\cxxopts.hpp" />
+    <ClInclude Include="emmy.tool\DebugFrontend.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Shared.vcxproj">

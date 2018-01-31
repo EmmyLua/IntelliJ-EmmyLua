@@ -15,18 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Debugger\DebugFrontend.cpp">
+    <ClCompile Include="tool\DebugFrontend.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
-    <ClCompile Include="Debugger\main.cpp">
+    <ClCompile Include="tool\main.cpp">
       <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Debugger\DebugFrontend.h">
+    <ClInclude Include="tool\DebugFrontend.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Debugger\cxxopts.hpp">
+    <ClInclude Include="tool\cxxopts.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
