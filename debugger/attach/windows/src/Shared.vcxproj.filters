@@ -1,69 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
+    <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="资源文件">
+    <Filter Include="Header Files\Shared">
+      <UniqueIdentifier>{b70f581a-6163-49fd-a466-048a8795a474}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\Shared">
-      <UniqueIdentifier>{b70f581a-6163-49fd-a466-048a8795a474}</UniqueIdentifier>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shared\Channel.cpp">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\CriticalSection.cpp">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\CriticalSectionLock.cpp">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\CriticalSectionTryLock.cpp">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\StlUtility.cpp">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\Utility.cpp">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClCompile>
     <ClCompile Include="Shared\WindowUtility.cpp">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shared\Channel.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\CriticalSection.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\CriticalSectionLock.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\CriticalSectionTryLock.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Protocol.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\StlUtility.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\Utility.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
     <ClInclude Include="Shared\WindowUtility.h">
-      <Filter>头文件\Shared</Filter>
+      <Filter>Header Files\Shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,120 +1,117 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="源文件">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="头文件">
+    <Filter Include="Header Files">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="资源文件">
+    <Filter Include="Header Files\libpe">
+      <UniqueIdentifier>{aba42253-f24f-4941-8583-38b6fede3899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="头文件\LuaInject">
-      <UniqueIdentifier>{8dc70348-780f-409a-aeae-08b0ed7ccdb5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="头文件\libpe">
-      <UniqueIdentifier>{aba42253-f24f-4941-8583-38b6fede3899}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="LuaInject\DebugBackend.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\DebugHelp.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\LuaCheckStack.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\LuaDll.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\DllMain.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\DebugPipeline.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\TCPServer.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\Stream.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\DebugMessage.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\endian.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\LuaProfiler.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaInject\StackNode.cpp">
-      <Filter>头文件\LuaInject</Filter>
-    </ClCompile>
     <ClCompile Include="third-party\libpe\libpe\htable.cpp">
-      <Filter>头文件\libpe</Filter>
+      <Filter>Header Files\libpe</Filter>
     </ClCompile>
     <ClCompile Include="third-party\libpe\libpe\libpe.cpp">
-      <Filter>头文件\libpe</Filter>
+      <Filter>Header Files\libpe</Filter>
     </ClCompile>
     <ClCompile Include="third-party\libpe\libpe\llist.cpp">
-      <Filter>头文件\libpe</Filter>
+      <Filter>Header Files\libpe</Filter>
     </ClCompile>
-    <ClCompile Include="LuaInject\Emmy.cpp">
-      <Filter>头文件\LuaInject</Filter>
+    <ClCompile Include="emmy.backend\DebugBackend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\DebugHelp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\DebugMessage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\DebugPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\DllMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\Emmy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\endian.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\LuaCheckStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\LuaDll.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\LuaProfiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\StackNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\Stream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="emmy.backend\TCPServer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LuaInject\DebugBackend.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\DebugHelp.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\LuaCheckStack.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\LuaDll.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\LuaTypes.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\DebugPipeline.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\TCPServer.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\Stream.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\DebugMessage.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\endian.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\LuaProfiler.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
-    <ClInclude Include="LuaInject\StackNode.h">
-      <Filter>头文件\LuaInject</Filter>
-    </ClInclude>
     <ClInclude Include="third-party\libpe\libpe\htable.h">
-      <Filter>头文件\libpe</Filter>
+      <Filter>Header Files\libpe</Filter>
     </ClInclude>
     <ClInclude Include="third-party\libpe\libpe\libpe.h">
-      <Filter>头文件\libpe</Filter>
+      <Filter>Header Files\libpe</Filter>
     </ClInclude>
     <ClInclude Include="third-party\libpe\libpe\llist.h">
-      <Filter>头文件\libpe</Filter>
+      <Filter>Header Files\libpe</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\DebugBackend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\DebugHelp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\DebugMessage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\DebugPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\endian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\LuaCheckStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\LuaDll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\LuaProfiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\LuaTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\StackNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\Stream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\TCPServer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
