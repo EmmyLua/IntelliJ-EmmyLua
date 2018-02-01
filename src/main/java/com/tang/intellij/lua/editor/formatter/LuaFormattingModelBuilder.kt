@@ -70,6 +70,8 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
                 .around(LBRACK).none() // [
                 .before(RBRACK).none() // ]
+                .after(LPAREN).none() // no spaces after (
+                .before(RPAREN).none() // no spaces before )
                 .before(SEMI).spaces(0)
     }
 
