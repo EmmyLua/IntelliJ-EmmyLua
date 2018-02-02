@@ -56,10 +56,11 @@ class LuaRTable(name: String) : LuaRValue(name) {
                 append(name)
                 for (i in properties.indices.reversed()) {
                     val parentName = properties[i]
-                    if (parentName.startsWith("["))
-                        append(parentName)
-                    else
-                        append(String.format("[\"%s\"]", parentName))
+                    when {
+                        parentName.startsWith("[") -> append(parentName)
+                        parentName.matches("[0-9]+".toRegex()) -> append("[$parentName]")
+                        else -> append(String.format("[\"%s\"]", parentName))
+                    }
                 }
             }
         }

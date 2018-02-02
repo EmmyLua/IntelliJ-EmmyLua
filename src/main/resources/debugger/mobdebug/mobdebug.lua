@@ -19,7 +19,7 @@ end)("os")
 
 local mobdebug = {
   _NAME = "mobdebug",
-  _VERSION = "0.641",
+  _VERSION = "0.70",
   _COPYRIGHT = "Paul Kulchenko",
   _DESCRIPTION = "Mobile Remote Debugger for the Lua programming language",
   port = os and os.getenv and tonumber((os.getenv("MOBDEBUG_PORT"))) or 8172,
@@ -130,11 +130,12 @@ end
 local function q(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])','%%%1') end
 
 local serpent = (function() ---- include Serpent module for serialization
-local n, v = "serpent", 0.285 -- (C) 2012-15 Paul Kulchenko; MIT License
+local n, v = "serpent", "0.30" -- (C) 2012-17 Paul Kulchenko; MIT License
 local c, d = "Paul Kulchenko", "Lua serializer and pretty printer"
 local snum = {[tostring(1/0)]='1/0 --[[math.huge]]',[tostring(-1/0)]='-1/0 --[[-math.huge]]',[tostring(0/0)]='0/0'}
 local badtype = {thread = true, userdata = true, cdata = true}
 local getmetatable = debug and debug.getmetatable or getmetatable
+local pairs = function(t) return next, t end -- avoid using __pairs in Lua 5.2+
 local keyword, globals, G = {}, {}, (_G or _ENV)
 for _,k in ipairs({'and', 'break', 'do', 'else', 'elseif', 'end', 'false',
   'for', 'function', 'goto', 'if', 'in', 'local', 'nil', 'not', 'or', 'repeat',
@@ -147,6 +148,7 @@ local function s(t, opts)
   local name, indent, fatal, maxnum = opts.name, opts.indent, opts.fatal, opts.maxnum
   local sparse, custom, huge = opts.sparse, opts.custom, not opts.nohuge
   local space, maxl = (opts.compact and '' or ' '), (opts.maxlevel or math.huge)
+  local maxlen, metatostring = tonumber(opts.maxlength), opts.metatostring
   local iname, comm = '_'..(name or ''), opts.comment and (tonumber(opts.comment) or math.huge)
   local numformat = opts.numformat or "%.17g"
   local seen, sref, syms, symn = {}, {'local '..iname..'={}'}, {}, 0
@@ -181,15 +183,20 @@ local function s(t, opts)
       sref[#sref+1] = spath..space..'='..space..seen[t]
       return tag..'nil'..comment('ref', level) end
     -- protect from those cases where __tostring may fail
-    if type(mt) == 'table' and pcall(function() return mt.__tostring and mt.__tostring(t) end)
-    and (rawget(mt, '__serialize') or rawget(mt, '__tostring')) then -- knows how to serialize itself
-      seen[t] = insref or spath
-      if rawget(mt, '__serialize') then t = mt.__serialize(t) else t = tostring(t) end
-      ttype = type(t) end -- new value falls through to be serialized
+    if type(mt) == 'table' then
+      local to, tr = pcall(function() return mt.__tostring(t) end)
+      local so, sr = pcall(function() return mt.__serialize(t) end)
+      if (opts.metatostring ~= false and to or so) then -- knows how to serialize itself
+        seen[t] = insref or spath
+        t = so and sr or tr
+        ttype = type(t)
+      end -- new value falls through to be serialized
+    end
     if ttype == "table" then
-      if level >= maxl then return tag..'{}'..comment('max', level) end
+      if level >= maxl then return tag..'{}'..comment('maxlvl', level) end
       seen[t] = insref or spath
       if next(t) == nil then return tag..'{}'..comment(t, level) end -- table empty
+      if maxlen and maxlen < 0 then return tag..'{}'..comment('maxlen', level) end
       local maxn, o, out = math.min(#t, maxnum or #t), {}, {}
       for key = 1, maxn do o[key] = key end
       if not maxnum or #o < maxnum then
@@ -215,21 +222,25 @@ local function s(t, opts)
           sref[#sref] = path..space..'='..space..tostring(seen[value] or val2str(value,nil,indent,path))
         else
           out[#out+1] = val2str(value,key,indent,insref,seen[t],plainindex,level+1)
+          if maxlen then
+            maxlen = maxlen - #out[#out]
+            if maxlen < 0 then break end
+          end
         end
       end
       local prefix = string.rep(indent or '', level)
       local head = indent and '{\n'..prefix..indent or '{'
       local body = table.concat(out, ','..(indent and '\n'..prefix..indent or space))
       local tail = indent and "\n"..prefix..'}' or '}'
-      return (custom and custom(tag,head,body,tail) or tag..head..body..tail)..comment(t, level)
+      return (custom and custom(tag,head,body,tail,level) or tag..head..body..tail)..comment(t, level)
     elseif badtype[ttype] then
       seen[t] = insref or spath
       return tag..globerr(t, level)
     elseif ttype == 'function' then
       seen[t] = insref or spath
+      if opts.nocode then return tag.."function() --[[..skipped..]] end"..comment(t, level) end
       local ok, res = pcall(string.dump, t)
-      local func = ok and ((opts.nocode and "function() --[[..skipped..]] end" or
-        "((loadstring or load)("..safestr(res)..",'@serialized'))")..comment(t, level))
+      local func = ok and "((loadstring or load)("..safestr(res)..",'@serialized'))"..comment(t, level)
       return tag..(func or globerr(t, level))
     else return tag..safestr(t) end -- handle all other types
   end
@@ -286,7 +297,9 @@ local function stack(start)
     while true do
       local name, value = debug.getlocal(f, i)
       if not name then break end
-      if string.sub(name, 1, 1) ~= '(' then locals[name] = {value, tostring(value)} end
+      if string.sub(name, 1, 1) ~= '(' then
+        locals[name] = {value, select(2,pcall(tostring,value))}
+      end
       i = i + 1
     end
     -- get varargs (these use negative indices)
@@ -295,7 +308,7 @@ local function stack(start)
       local name, value = debug.getlocal(f, -i)
       -- `not name` should be enough, but LuaJIT 2.0.0 incorrectly reports `(*temporary)` names here
       if not name or name ~= "(*vararg)" then break end
-      locals[name:gsub("%)$"," "..i..")")] = {value, tostring(value)}
+      locals[name:gsub("%)$"," "..i..")")] = {value, select(2,pcall(tostring,value))}
       i = i + 1
     end
     -- get upvalues
@@ -304,7 +317,7 @@ local function stack(start)
     while func do -- check for func as it may be nil for tail calls
       local name, value = debug.getupvalue(func, i)
       if not name then break end
-      ups[name] = {value, tostring(value)}
+      ups[name] = {value, select(2,pcall(tostring,value))}
       i = i + 1
     end
     return locals, ups
@@ -395,9 +408,12 @@ local function restore_vars(vars)
   end
 end
 
-local function capture_vars(level)
-  local vars = {}
-  local func = debug.getinfo(level or 3, "f").func
+local function capture_vars(level, thread)
+  level = (level or 0)+2 -- add two levels for this and debug calls
+  local func = (thread and debug.getinfo(thread, level, "f") or debug.getinfo(level, "f") or {}).func
+  if not func then return {} end
+
+  local vars = {['...'] = {}}
   local i = 1
   while true do
     local name, value = debug.getupvalue(func, i)
@@ -407,9 +423,28 @@ local function capture_vars(level)
   end
   i = 1
   while true do
-    local name, value = debug.getlocal(level or 3, i)
+    local name, value
+    if thread then
+      name, value = debug.getlocal(thread, level, i)
+    else
+      name, value = debug.getlocal(level, i)
+    end
     if not name then break end
     if string.sub(name, 1, 1) ~= '(' then vars[name] = value end
+    i = i + 1
+  end
+  -- get varargs (these use negative indices)
+  i = 1
+  while true do
+    local name, value
+    if thread then
+      name, value = debug.getlocal(thread, level, -i)
+    else
+      name, value = debug.getlocal(level, -i)
+    end
+    -- `not name` should be enough, but LuaJIT 2.0.0 incorrectly reports `(*temporary)` names here
+    if not name or name ~= "(*vararg)" then break end
+    vars['...'][i] = value
     i = i + 1
   end
   -- returned 'vars' table plays a dual role: (1) it captures local values
@@ -517,7 +552,7 @@ local function normalize_path(file)
     file, n = file:gsub("[^/]+/%.%./", "", 1)
   until n == 0
   -- there may still be a leading up-dir reference left (as `/../` or `../`); remove it
-  return (file:gsub("%.%./", "", 1))
+  return (file:gsub("^(/?)%.%./", "%1"))
 end
 
 local function debug_hook(event, line)
@@ -629,7 +664,7 @@ local function debug_hook(event, line)
 
     local vars, status, res
     if (watchescnt > 0) then
-      vars = capture_vars()
+      vars = capture_vars(1)
       for index, value in pairs(watches) do
         setfenv(value, vars)
         local ok, fired = pcall(value)
@@ -651,21 +686,17 @@ local function debug_hook(event, line)
       or is_pending(server))
 
     if getin then
-      vars = vars or capture_vars()
+      vars = vars or capture_vars(1)
       step_into = false
       step_over = false
       status, res = cororesume(coro_debugger, events.BREAK, vars, file, line)
     end
 
     -- handle 'stack' command that provides stack() information to the debugger
-    if status and res == 'stack' then
-      while status and res == 'stack' do
-        -- resume with the stack trace and variables
-        if vars then restore_vars(vars) end -- restore vars so they are reflected in stack values
-        -- this may fail if __tostring method fails at run-time
-        local ok, snapshot = pcall(stack, 4)
-        status, res = cororesume(coro_debugger, ok and events.STACK or events.BREAK, snapshot, file, line)
-      end
+    while status and res == 'stack' do
+      -- resume with the stack trace and variables
+      if vars then restore_vars(vars) end -- restore vars so they are reflected in stack values
+      status, res = cororesume(coro_debugger, events.STACK, stack(3), file, line)
     end
 
     -- need to recheck once more as resume after 'stack' command may
@@ -688,12 +719,16 @@ local function debug_hook(event, line)
   end
 end
 
-local function stringify_results(status, ...)
+local function stringify_results(params, status, ...)
   if not status then return status, ... end -- on error report as it
+
+  params = params or {}
+  if params.nocode == nil then params.nocode = true end
+  if params.comment == nil then params.comment = 1 end
 
   local t = {...}
   for i,v in pairs(t) do -- stringify each of the returned values
-    local ok, res = pcall(mobdebug.line, v, {nocode = true, comment = 1})
+    local ok, res = pcall(mobdebug.line, v, params)
     t[i] = ok and res or ("%q"):format(res):gsub("\010","n"):gsub("\026","\\026")
   end
   -- stringify table with all returned values
@@ -789,13 +824,22 @@ local function debugger_loop(sev, svars, sfile, sline)
         server:send("400 Bad Request\n")
       end
     elseif command == "EXEC" then
+      -- extract any optional parameters
+      local params = string.match(line, "--%s*(%b{})%s*$")
       local _, _, chunk = string.find(line, "^[A-Z]+%s+(.+)$")
       if chunk then
         local func, res = mobdebug.loadstring(chunk)
         local status
         if func then
-          setfenv(func, eval_env)
-          status, res = stringify_results(pcall(func))
+          local pfunc = params and loadstring("return "..params) -- use internal function
+          params = pfunc and pfunc()
+          params = (type(params) == "table" and params or {})
+          local stack = tonumber(params.stack)
+          -- if the requested stack frame is not the current one, then use a new capture
+          -- with a specific stack frame: `capture_vars(0, coro_debugee)`
+          local env = stack and coro_debugee and capture_vars(stack-1, coro_debugee) or eval_env
+          setfenv(func, env)
+          status, res = stringify_results(params, pcall(func, unpack(env['...'] or {})))
         end
         if status then
           if mobdebug.onscratch then mobdebug.onscratch(res) end
@@ -955,7 +999,16 @@ local function debugger_loop(sev, svars, sfile, sline)
         server:send("401 Error in Execution " .. tostring(#vars) .. "\n")
         server:send(vars)
       else
-        local ok, res = pcall(mobdebug.dump, vars, {nocode = true, sparse = false})
+        local params = string.match(line, "--%s*(%b{})%s*$")
+        local pfunc = params and loadstring("return "..params) -- use internal function
+        params = pfunc and pfunc()
+        params = (type(params) == "table" and params or {})
+        if params.nocode == nil then params.nocode = true end
+        if params.sparse == nil then params.sparse = false end
+        -- take into account additional levels for the stack frames and data management
+        if tonumber(params.maxlevel) then params.maxlevel = tonumber(params.maxlevel)+4 end
+
+        local ok, res = pcall(mobdebug.dump, vars, params)
         if ok then
           server:send("200 OK " .. tostring(res) .. "\n")
         else
@@ -1034,27 +1087,31 @@ local function start(controller_host, controller_port)
     -- start from 16th frame, which is sufficiently large for this check.
     stack_level = stack_depth(16)
 
-    -- provide our own traceback function to report the error remotely
-    do
+    -- provide our own traceback function to report errors remotely
+    -- but only under Lua 5.1/LuaJIT as it's not called under Lua 5.2+
+    -- (http://lua-users.org/lists/lua-l/2016-05/msg00297.html)
+    local function f() return function()end end
+    if f() ~= f() then -- Lua 5.1 or LuaJIT
       local dtraceback = debug.traceback
       debug.traceback = function (...)
         if select('#', ...) >= 1 then
-          local err, lvl = ...
-          if err and type(err) ~= 'thread' then
-            local trace = dtraceback(err, (lvl or 2)+1)
-            if genv.print == iobase.print then -- no remote redirect
-              return trace
-            else
-              genv.print(trace) -- report the error remotely
-              return -- don't report locally to avoid double reporting
-            end
+          local thr, err, lvl = ...
+          if type(thr) ~= 'thread' then err, lvl = thr, err end
+          local trace = dtraceback(err, (lvl or 1)+1)
+          if genv.print == iobase.print then -- no remote redirect
+            return trace
+          else
+            genv.print(trace) -- report the error remotely
+            return -- don't report locally to avoid double reporting
           end
         end
         -- direct call to debug.traceback: return the original.
         -- debug.traceback(nil, level) doesn't work in Lua 5.1
         -- (http://lua-users.org/lists/lua-l/2011-06/msg00574.html), so
         -- simply remove first frame from the stack trace
-        return (dtraceback(...):gsub("(stack traceback:\n)[^\n]*\n", "%1"))
+        local tb = dtraceback("", 2) -- skip debugger frames
+        -- if the string is returned, then remove the first new line as it's not needed
+        return type(tb) == "string" and tb:gsub("^\n","") or tb
       end
     end
     coro_debugger = corocreate(debugger_loop)
@@ -1116,14 +1173,14 @@ local function controller(controller_host, controller_port, scratchpad)
           -- check if the debugging is done (coro_debugger is nil)
           if not coro_debugger then break end
           -- resume once more to clear the response the debugger wants to send
-          -- need to use capture_vars(2) as three would be the level of
-          -- the caller for controller(), but because of the tail call,
-          -- the caller may not exist;
+          -- need to use capture_vars(0) to capture only two (default) level,
+          -- as even though there is controller() call, because of the tail call,
+          -- the caller may not exist for it;
           -- This is not entirely safe as the user may see the local
           -- variable from console, but they will be reset anyway.
           -- This functionality is used when scratchpad is paused to
           -- gain access to remote console to modify global variables.
-          local status, err = cororesume(coro_debugger, events.RESTART, capture_vars(2))
+          local status, err = cororesume(coro_debugger, events.RESTART, capture_vars(0))
           if not status or status and err == "exit" then break end
         end
       end
@@ -1439,7 +1496,8 @@ local function handle(params, client, options)
   elseif command == "suspend" then
     client:send("SUSPEND\n")
   elseif command == "stack" then
-    client:send("STACK\n")
+    local opts = string.match(params, "^[a-z]+%s+(.+)$")
+    client:send("STACK" .. (opts and " "..opts or "") .."\n")
     local resp = client:receive()
     local _, _, status, res = string.find(resp, "^(%d+)%s+%w+%s+(.+)%s*$")
     if status == "200" then

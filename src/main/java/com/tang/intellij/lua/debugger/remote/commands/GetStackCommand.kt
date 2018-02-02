@@ -65,7 +65,8 @@ class GetStackCommand : DefaultCommand("STACK --{maxlevel=0}", 1) {
         if (data.startsWith("200 OK")) {
             val stackCode = data.substring(6)
             val standardGlobals = JsePlatform.standardGlobals()
-            val code = standardGlobals.load(limitStringSize(stackCode))
+            val strippedCode = limitStringSize(stackCode)
+            val code = standardGlobals.load(strippedCode)
             val function = code.checkfunction()
             val value = function.call()
 
