@@ -31,7 +31,7 @@ import java.util.regex.Pattern
  *
  * Created by tangzx on 2016/12/31.
  */
-class GetStackCommand : DefaultCommand("STACK", 1) {
+class GetStackCommand : DefaultCommand("STACK --{maxlevel=0}", 1) {
 
     private var hasError: Boolean = false
     private var errorDataLen: Int = 0

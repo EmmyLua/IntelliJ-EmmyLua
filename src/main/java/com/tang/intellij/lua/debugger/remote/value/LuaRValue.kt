@@ -32,6 +32,8 @@ abstract class LuaRValue(name: String) : XNamedValue(name) {
 
     protected abstract fun parse(data: LuaValue, desc: String)
 
+    var parent: LuaRValue? = null
+
     override fun computeSourcePosition(xNavigable: XNavigatable) {
         LuaXValue.computeSourcePosition(xNavigable, name, session)
     }
