@@ -47,7 +47,7 @@ public class LuaMobDebuggerEvaluator extends LuaDebuggerEvaluator {
             String code2Str = code.get(1).toString();
             LuaValue code2 = standardGlobals.load(String.format("local _=%s return _", code2Str));
 
-            LuaRValue value = LuaRValue.create(s, code2.call(), s, process.getSession());
+            LuaRValue value = LuaRValue.Companion.create(s, code2.call(), s, process.getSession());
 
             xEvaluationCallback.evaluated(value);
         });
