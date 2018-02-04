@@ -60,7 +60,7 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
 
     private fun listProcesses() {
         processMap.clear()
-        val archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/emmy.arch.exe")
+        val archExe = LuaFileUtil.getArchExeFile()
         val commandLine = GeneralCommandLine(archExe)
         //commandLine.charset = Charset.forName("UTF-8")
         commandLine.addParameters("list_processes")

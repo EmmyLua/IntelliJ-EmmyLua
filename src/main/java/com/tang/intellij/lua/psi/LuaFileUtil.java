@@ -96,7 +96,7 @@ public class LuaFileUtil {
         return VfsUtil.urlToPath(getShortUrl(project, file));
     }
 
-    public static String getShortUrl(Project project, VirtualFile file) {
+    private static String getShortUrl(Project project, VirtualFile file) {
         String fileFullUrl = file.getUrl();
         String fileShortUrl = fileFullUrl;
 
@@ -115,7 +115,7 @@ public class LuaFileUtil {
     }
 
     @Nullable
-    public static VirtualFile getSourceRoot(Project project, VirtualFile file) {
+    private static VirtualFile getSourceRoot(Project project, VirtualFile file) {
         String fileFullUrl = file.getUrl();
 
         Module[] modules = ModuleManager.getInstance(project).getModules();
@@ -183,5 +183,10 @@ public class LuaFileUtil {
 
     public static boolean isStdLibFile(@NotNull VirtualFile file, Project project) {
         return file.getUserData(PREDEFINED_KEY) != null || FileIndexFacade.getInstance(project).isInLibraryClasses(file);
+    }
+
+    @Nullable
+    public static String getArchExeFile() {
+        return getPluginVirtualFile("debugger/windows/x86/emmy.arch.exe");
     }
 }

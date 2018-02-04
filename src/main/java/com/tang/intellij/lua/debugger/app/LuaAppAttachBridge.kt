@@ -71,7 +71,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
                 }
 
                 // check arch
-                val archExe = LuaFileUtil.getPluginVirtualFile("debugger/windows/emmy.arch.exe")
+                val archExe = LuaFileUtil.getArchExeFile()
                 val processBuilder = ProcessBuilder(archExe!!)
                 val isX86: Boolean
                 val archChecker = processBuilder.command(archExe, "arch", "-file", program).start()
