@@ -5,6 +5,7 @@ apply plugin: 'visual-studio'
 
 def WINDOWS_KITS100 = "C:/Program Files (x86)/Windows Kits/10"
 def WINDOWS_KITS81 = "C:/Program Files (x86)/Windows Kits/8.1"
+def WINDOWS_KITS_NETFXSDK = "C:/Program Files (x86)/Windows Kits/NETFXSDK/4.6.1"
 def VS140COMNTOOLS = System.env['VS140COMNTOOLS']
 def VS140COMNTOOLS_VC = "${VS140COMNTOOLS}/../../VC"
 
@@ -26,18 +27,18 @@ model {
 }
 model {
     components {
-        arch(NativeExecutableSpec) {
+        'emmy.arch.exe'(NativeExecutableSpec) {
             sources {
                 cpp {
                     source {
-                        srcDir "src/arch/"
+                        srcDir "src/emmy.arch/"
                         include "*.cpp"
                     }
                     lib library:"Shared", linkage: 'static'
                 }
             }
             binaries.all {
-                linker.args "user32.lib", "imagehlp.lib"
+                linker.args "user32.lib", "imagehlp.lib", "Shell32.lib"
             }
         }
         EasyHook(NativeLibrarySpec) {
@@ -104,13 +105,13 @@ model {
                 }
             }
             binaries.all {
-                linker.args "user32.lib", "imagehlp.lib"
+                linker.args "user32.lib", "imagehlp.lib", "Shell32.lib"
             }
         }
-        Debugger(NativeExecutableSpec) {
+        'emmy.tool.exe'(NativeExecutableSpec) {
             sources.cpp {
                 source {
-                    srcDir "src/Debugger/"
+                    srcDir "src/emmy.tool/"
                     include "*.cpp"
                 }
                 lib library:"Shared", linkage: 'static'
@@ -119,10 +120,10 @@ model {
                 linker.args "user32.lib", "imagehlp.lib", "Advapi32.lib"
             }
         }
-        LuaInject(NativeLibrarySpec) {
+        'emmy.backend.dll'(NativeLibrarySpec) {
             sources.cpp {
                 source {
-                    srcDir "src/LuaInject"
+                    srcDir "src/emmy.backend"
                     srcDir "src/third-party/libpe/libpe"
                     include "*.cpp"
                 }
@@ -148,6 +149,7 @@ model {
                         srcDir "${VS140COMNTOOLS_VC}/atlmfc/include"
                         srcDir "${WINDOWS_KITS100}/Include/10.0.10240.0/ucrt"
                         srcDir "${WINDOWS_KITS81}/Include/shared"
+                        srcDir "${WINDOWS_KITS_NETFXSDK}/Include/um"
                     }
                 }
                 c {
@@ -155,6 +157,7 @@ model {
                         srcDir "${VS140COMNTOOLS_VC}/atlmfc/include"
                         srcDir "${WINDOWS_KITS100}/Include/10.0.10240.0/ucrt"
                         srcDir "${WINDOWS_KITS81}/Include/shared"
+                        srcDir "${WINDOWS_KITS_NETFXSDK}/Include/um"
                     }
                 }
             }
@@ -165,9 +168,11 @@ model {
         all {
             if (targetPlatform == platforms.x86) {
                 linker.args "/LIBPATH:${WINDOWS_KITS100}/Lib/10.0.10240.0/ucrt/x86"
+                linker.args "/LIBPATH:${WINDOWS_KITS81}/Lib/winv6.3/um/x86"
                 linker.args "/LIBPATH:${VS140COMNTOOLS_VC}/atlmfc/lib"
             } else {
                 linker.args "/LIBPATH:${WINDOWS_KITS100}/Lib/10.0.10240.0/ucrt/x64"
+                linker.args "/LIBPATH:${WINDOWS_KITS81}/Lib/winv6.3/um/x64"
                 linker.args "/LIBPATH:${VS140COMNTOOLS_VC}/atlmfc/lib/amd64"
             }
             cppCompiler.args "/EHsc"
@@ -196,30 +201,17 @@ model {
 
 task buildProduct (dependsOn:build) {
     doLast {
-        def x64Set = [
-            linkDebuggerX64DebugExecutable,
-            //linkArchX64DebugExecutable,
-            linkEasyHookX64DebugSharedLibrary,
-            linkLuaInjectX64DebugSharedLibrary]
-        x64Set.each {
-            def link = it
-            copy {
-                from link.outputs
-                into '/build/x64'
-                include '*.dll', '*.exe'
-            }
-        }
-        def x86Set = [
-            linkDebuggerX86DebugExecutable,
-            //linkArchX86DebugExecutable,
-            linkEasyHookX86DebugSharedLibrary,
-            linkLuaInjectX86DebugSharedLibrary]
-        x86Set.each {
-            def link = it
-            copy {
-                from link.outputs
-                into '/build/x86'
-                include '*.dll', '*.exe'
+        ['86', '64'].each { arch->
+            [
+                tasks["linkEmmy.arch.exeX${arch}ReleaseExecutable"],
+                tasks["linkEmmy.tool.exeX${arch}ReleaseExecutable"],
+                tasks["linkEmmy.backend.dllX${arch}ReleaseSharedLibrary"]
+            ].each { link ->
+                copy {
+                    from link.outputs
+                    into "/build/x${arch}"
+                    include "*.dll", "*.exe"
+                }
             }
         }
     }

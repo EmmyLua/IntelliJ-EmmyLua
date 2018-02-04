@@ -34,6 +34,7 @@ sourceSets {
 intellij {
 	type 'IU'
 	updateSinceUntilBuild false
+    downloadSources false
 	localPath System.env['IDEA_HOME']
 }
 
