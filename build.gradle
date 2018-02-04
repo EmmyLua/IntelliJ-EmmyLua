@@ -45,7 +45,7 @@ task copyAttachDebugger(dependsOn:["debugger:attach:windows:buildProduct"], type
     destinationDir file("${RES_DIR}/debugger/windows")
 }
 
-//buildPlugin.dependsOn(copyAttachDebugger)
+buildPlugin.dependsOn(copyAttachDebugger)
 buildPlugin.from(fileTree(dir:"${RES_DIR}", includes:['debugger/**'])) {
     into "/${project.name}/classes/"
 }
