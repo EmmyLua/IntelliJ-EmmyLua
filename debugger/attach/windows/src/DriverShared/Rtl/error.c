@@ -33,13 +33,13 @@ EASYHOOK_NT_EXPORT RtlGetLastError()
     return LastErrorCode;
 }
 
-PWCHAR RtlGetLastErrorString()
+PWCHAR EASYHOOK_API RtlGetLastErrorString()
 {
     return LastError;
 }
 
 #ifndef DRIVER
-PWCHAR RtlGetLastErrorStringCopy()
+PWCHAR EASYHOOK_API RtlGetLastErrorStringCopy()
 {
     // https://easyhook.codeplex.com/workitem/24958
     ULONG len = (ULONG)(wcslen(LastError)+1)*sizeof(TCHAR);
