@@ -65,6 +65,7 @@ model {
                         srcDir "src/EasyHookDll"
                     }
                 }
+                binaries.withType(StaticLibraryBinarySpec) { buildable = false }
                 binaries.all {
                     cppCompiler.define "_UNICODE"
                     cppCompiler.define "UNICODE"
@@ -104,6 +105,7 @@ model {
                     }
                 }
             }
+            binaries.withType(SharedLibraryBinarySpec) { buildable = false }
             binaries.all {
                 linker.args "user32.lib", "imagehlp.lib", "Shell32.lib"
             }
@@ -134,6 +136,7 @@ model {
                 lib library:"Shared", linkage: 'static'
                 lib library:"EasyHook", linkage: 'shared'
             }
+            binaries.withType(StaticLibraryBinarySpec) { buildable = false }
             binaries.all {
                 linker.args "/LIBPATH:src/libs/dbghelp/lib"
                 linker.args "dbghelp.lib", "Psapi.lib", "Shell32.lib"
