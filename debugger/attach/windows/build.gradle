@@ -146,18 +146,24 @@ model {
             sources {
                 cpp {
                     exportedHeaders {
+                        srcDir "${WINDOWS_KITS_NETFXSDK}/Include/um"
+                        srcDir "${VS140COMNTOOLS_VC}/include"
                         srcDir "${VS140COMNTOOLS_VC}/atlmfc/include"
                         srcDir "${WINDOWS_KITS100}/Include/10.0.10240.0/ucrt"
+                        srcDir "${WINDOWS_KITS81}/Include/um"
                         srcDir "${WINDOWS_KITS81}/Include/shared"
-                        srcDir "${WINDOWS_KITS_NETFXSDK}/Include/um"
+                        srcDir "${WINDOWS_KITS81}/Include/winrt"
                     }
                 }
                 c {
                     exportedHeaders {
+                        srcDir "${WINDOWS_KITS_NETFXSDK}/Include/um"
+                        srcDir "${VS140COMNTOOLS_VC}/include"
                         srcDir "${VS140COMNTOOLS_VC}/atlmfc/include"
                         srcDir "${WINDOWS_KITS100}/Include/10.0.10240.0/ucrt"
+                        srcDir "${WINDOWS_KITS81}/Include/um"
                         srcDir "${WINDOWS_KITS81}/Include/shared"
-                        srcDir "${WINDOWS_KITS_NETFXSDK}/Include/um"
+                        srcDir "${WINDOWS_KITS81}/Include/winrt"
                     }
                 }
             }
