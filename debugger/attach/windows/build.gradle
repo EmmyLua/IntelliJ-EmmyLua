@@ -214,7 +214,8 @@ task buildProduct (dependsOn:build) {
             [
                 tasks["linkEmmy.arch.exeX${arch}ReleaseExecutable"],
                 tasks["linkEmmy.tool.exeX${arch}ReleaseExecutable"],
-                tasks["linkEmmy.backend.dllX${arch}ReleaseSharedLibrary"]
+                tasks["linkEmmy.backend.dllX${arch}ReleaseSharedLibrary"],
+                tasks["linkEasyHookX${arch}ReleaseSharedLibrary"]
             ].each { link ->
                 copy {
                     from link.outputs
