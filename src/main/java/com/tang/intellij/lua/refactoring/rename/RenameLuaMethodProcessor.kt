@@ -31,9 +31,9 @@ class RenameLuaMethodProcessor : RenamePsiElementProcessor() {
         return psiElement is LuaClassMethod
     }
 
-    override fun prepareRenaming(element: PsiElement, newName: String, allRenames: MutableMap<PsiElement, String>?, scope: SearchScope?) {
+    override fun prepareRenaming(element: PsiElement, newName: String, allRenames: MutableMap<PsiElement, String>, scope: SearchScope) {
         val methodDef = element as LuaClassMethod
         val search = LuaOverridingMethodsSearch.search(methodDef)
-        search.forEach { methodDef1 -> allRenames!!.put(methodDef1, newName) }
+        search.forEach { methodDef1 -> allRenames[methodDef1] = newName }
     }
 }
