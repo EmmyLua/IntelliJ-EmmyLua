@@ -41,6 +41,22 @@ class TestModule : LuaTestBase() {
         assertTrue(elementStrings!!.contains("name"))
     }
 
+    fun `test module field completion`() {
+        fileTreeFromText("""
+             --- moduleA.lua
+             ---@module TypeA
+             module("TypeA")
+
+             name = "a"
+
+             --[[caret]]
+        """).createAndOpenFileWithCaretMarker()
+
+        FileDocumentManager.getInstance().saveAllDocuments()
+        myFixture.completeBasic()
+        val elementStrings = myFixture.lookupElementStrings
+        assertTrue(elementStrings!!.contains("name"))
+    }
 
     fun `test module members visibility`() {
         fileTreeFromText("""
