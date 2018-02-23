@@ -80,21 +80,34 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
             // OverridenMethod
             val search = LuaOverridingMethodsSearch.search(methodDef)
             if (search.findFirst() != null) {
-                result.add(LineMarkerInfo(methodDef,
-                        element.textRange,
+                val id = element.id
+                result.add(LineMarkerInfo(id,
+                        id.textRange,
                         AllIcons.Gutter.OverridenMethod,
                         Pass.LINE_MARKERS,
                         null,
-                        //overridingMethodTooltipProvider,
-                        overridingMethodNavigator,
+                        object : LuaLineMarkerNavigator<PsiElement, LuaClassMethod>() {
+
+                            override fun getTitle(elt: PsiElement)
+                                    = "Choose Overriding Method of ${element.name}"
+
+                            override fun search(elt: PsiElement)
+                                    = LuaOverridingMethodsSearch.search(methodDef)
+                        },
                         GutterIconRenderer.Alignment.CENTER))
             }
 
             //line separator
             if (daemonSettings.SHOW_METHOD_SEPARATORS) {
                 //todo : module file method
-                val startOffset = methodDef.node.startOffset
-                val lineSeparator = LineMarkerInfo(element, TextRange(startOffset, startOffset), null, Pass.LINE_MARKERS, null, null, GutterIconRenderer.Alignment.RIGHT)
+                val anchor = PsiTreeUtil.firstChild(methodDef)
+                val lineSeparator = LineMarkerInfo(anchor,
+                        anchor.textRange,
+                        null,
+                        Pass.LINE_MARKERS,
+                        null,
+                        null,
+                        GutterIconRenderer.Alignment.RIGHT)
                 lineSeparator.separatorColor = colorsManager.globalScheme.getColor(CodeInsightColors.METHOD_SEPARATORS_COLOR)
                 lineSeparator.separatorPlacement = SeparatorPlacement.TOP
                 result.add(lineSeparator)
@@ -104,18 +117,27 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
             val project = element.getProject()
             val query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.className)
             if (query.findFirst() != null) {
-                result.add(LineMarkerInfo(element,
-                        element.textRange,
+                val id = element.id
+                result.add(LineMarkerInfo(id,
+                        id.textRange,
                         AllIcons.Gutter.OverridenMethod,
                         Pass.LINE_MARKERS,
-                        subclassTooltipProvider,
-                        subclassNavigator,
+                        Function<PsiElement, String> { element.name },
+                        object : LuaLineMarkerNavigator<PsiElement, LuaDocClassDef>() {
+                            override fun getTitle(elt: PsiElement)
+                                    = "Choose Subclass of ${element.name}"
+
+                            override fun search(elt: PsiElement): Query<LuaDocClassDef> {
+                                return LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, element.name)
+                            }
+                        },
                         GutterIconRenderer.Alignment.CENTER))
             }
 
             // class 标记
-            val startOffset = element.getTextOffset()
-            val classIcon = LineMarkerInfo<PsiElement>(element,
+            val id = element.id
+            val startOffset = id.textOffset
+            val classIcon = LineMarkerInfo(id,
                     TextRange(startOffset, startOffset),
                     LuaIcons.CLASS,
                     Pass.LINE_MARKERS, null, null,
@@ -132,11 +154,13 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                         ProgressManager.checkCanceled()
                         val bodyOwner = PsiTreeUtil.getParentOfType(cur, LuaFuncBodyOwner::class.java)
                         if (bodyOwner === resolve) {
-                            result.add(LineMarkerInfo<PsiElement>(element,
-                                    element.getTextRange(),
+                            val anchor = PsiTreeUtil.firstChild(element)
+                            result.add(LineMarkerInfo<PsiElement>(anchor,
+                                    anchor.textRange,
                                     AllIcons.Gutter.RecursiveMethod,
                                     Pass.LINE_MARKERS,
-                                    FunctionUtil.constant("Recursive call"), null,
+                                    FunctionUtil.constant("Recursive call"),
+                                    null,
                                     GutterIconRenderer.Alignment.CENTER))
                             break
                         }
@@ -171,39 +195,6 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
         for (element in list) {
             ProgressManager.checkCanceled()
             collectNavigationMarkers(element, collection)
-        }
-    }
-
-    companion object {
-
-        private val overridingMethodTooltipProvider = Function<LuaClassMethod, String> {
-            val query = LuaOverridingMethodsSearch.search(it)
-            buildString {
-                append("Is overridden in<br>")
-                val all = query.findAll()
-                all.forEach { append("${it.name}<br>") }
-            }
-        }
-
-        private val overridingMethodNavigator = object : LuaLineMarkerNavigator<LuaClassMethod, LuaClassMethod>() {
-
-            override fun getTitle(elt: LuaClassMethod)
-                    = "Choose Overriding Method of ${elt.name}"
-
-            override fun search(elt: LuaClassMethod)
-                    = LuaOverridingMethodsSearch.search(elt)
-        }
-
-        private val subclassTooltipProvider = Function<LuaDocClassDef, String> { it.name }
-
-        private val subclassNavigator = object : LuaLineMarkerNavigator<LuaDocClassDef, LuaDocClassDef>() {
-            override fun getTitle(elt: LuaDocClassDef)
-                    = "Choose Subclass of ${elt.name}"
-
-            override fun search(elt: LuaDocClassDef): Query<LuaDocClassDef> {
-                val project = elt.project
-                return LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, elt.name)
-            }
         }
     }
 }
