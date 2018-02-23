@@ -92,14 +92,14 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                          handlerProcessor: HandlerProcessor?) {
         TyUnion.each(prefixType) { luaType ->
             if (luaType is ITyClass)
-                addClass(contextTy, luaType, project, isColon, completionResultSet, prefixMatcher, handlerProcessor)
+                addClass(contextTy, luaType, project, !isColon, completionResultSet, prefixMatcher, handlerProcessor)
         }
     }
 
     protected fun addClass(contextTy: ITy,
                            luaType:ITyClass,
                            project: Project,
-                           isColon:Boolean,
+                           showFields:Boolean,
                            completionResultSet: CompletionResultSet,
                            prefixMatcher: PrefixMatcher,
                            handlerProcessor: HandlerProcessor?) {
@@ -110,7 +110,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
             member.name?.let {
                 if (prefixMatcher.prefixMatches(it) && curType.isVisibleInScope(project, contextTy, member.visibility)) {
                     val className = curType.displayName
-                    if (member is LuaClassField && !isColon) {
+                    if (member is LuaClassField && showFields) {
                         addField(completionResultSet, curType === luaType, className, member, handlerProcessor)
                     } else if (member is LuaClassMethod) {
                         addMethod(completionResultSet, curType === luaType, className, member, handlerProcessor)

@@ -114,7 +114,7 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         //global
         val project = cur.project
         if (has(GLOBAL_FUN) || has(GLOBAL_VAR)) {
-            addClass(TyClass.G, TyClass.G, project, false, completionResultSet, completionResultSet.prefixMatcher, null)
+            addClass(TyClass.G, TyClass.G, project, true, completionResultSet, completionResultSet.prefixMatcher, null)
         }
         //key words
         if (has(KEY_WORDS)) {

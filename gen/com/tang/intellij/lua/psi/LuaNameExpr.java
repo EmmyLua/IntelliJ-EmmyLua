@@ -10,7 +10,7 @@ import com.tang.intellij.lua.stubs.LuaNameExprStub;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
 
-public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, LuaExprStubElement<LuaNameExprStub> {
+public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, LuaExprStubElement<LuaNameExprStub>, LuaModuleClassField {
 
   @NotNull
   PsiElement getId();

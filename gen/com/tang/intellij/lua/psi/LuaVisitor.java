@@ -154,6 +154,7 @@ public class LuaVisitor extends PsiElementVisitor {
     visitExpr(o);
     // visitPsiNameIdentifierOwner(o);
     // visitExprStubElement(o);
+    // visitModuleClassField(o);
   }
 
   public void visitNameList(@NotNull LuaNameList o) {

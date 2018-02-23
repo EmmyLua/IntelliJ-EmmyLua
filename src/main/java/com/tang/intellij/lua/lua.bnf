@@ -536,6 +536,7 @@ nameExpr ::= ID {
         "com.tang.intellij.lua.psi.LuaPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
         "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaNameExprStub>"
+        "com.tang.intellij.lua.psi.LuaModuleClassField"
     ]
     methods = [
         setName
