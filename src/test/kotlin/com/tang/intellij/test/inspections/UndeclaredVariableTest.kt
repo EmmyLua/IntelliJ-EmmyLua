@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/*
 package com.tang.intellij.test.inspections
 
 import com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection
@@ -24,4 +25,4 @@ class UndeclaredVariableTest : LuaInspectionsTestBase(UndeclaredVariableInspecti
          print(<warning>MyUndeclaredVariable</warning>)
     """)
 
-}
+}*/

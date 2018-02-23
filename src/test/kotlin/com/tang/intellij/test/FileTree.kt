@@ -19,7 +19,7 @@ package com.tang.intellij.test/*
  * found in the LICENSE file.
  */
 
-import com.intellij.openapi.application.runWriteAction
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -65,8 +65,7 @@ interface FileTreeBuilder {
     fun dir(name: String, builder: FileTreeBuilder.() -> Unit)
     fun file(name: String, code: String)
 
-    fun rust(name: String, @Language("Lua") code: String) = file(name, code)
-    fun toml(name: String, @Language("TOML") code: String) = file(name, code)
+    fun lua(name: String, @Language("Lua") code: String) = file(name, code)
 }
 
 class FileTree(private val rootDirectory: Entry.Directory) {
@@ -91,7 +90,7 @@ class FileTree(private val rootDirectory: Entry.Directory) {
             }
         }
 
-        runWriteAction {
+        ApplicationManager.getApplication().runWriteAction {
             go(rootDirectory, directory)
             fullyRefreshDirectory(directory)
         }
