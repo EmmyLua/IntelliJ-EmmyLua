@@ -44,7 +44,6 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val id = methodDef.nameIdentifier
         val expr = methodName.expr
         val classNameSet = mutableSetOf<String>()
-        classNameSet.add(expr.text)
 
         val searchContext = SearchContext(methodDef.project, methodDef.containingFile, true)
         val ty = expr.guessType(searchContext)
@@ -52,6 +51,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
             if (it is ITyClass)
                 classNameSet.add(it.className)
         }
+        if (classNameSet.isEmpty()) classNameSet.add(expr.text)
 
         val isStatic = methodName.dot != null
         val visibility = methodDef.visibility
