@@ -28,7 +28,7 @@ import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl
 import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 
@@ -97,7 +97,7 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldD
 
         LuaClassMemberIndex.indexStub(indexSink, className, stub.name)
 
-        indexSink.occurrence(LuaShortNameIndex.KEY, stub.name)
+        indexSink.occurrence(StubKeys.SHORT_NAME, stub.name)
     }
 }
 

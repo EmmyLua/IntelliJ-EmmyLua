@@ -19,7 +19,6 @@ package com.tang.intellij.lua.stubs.index
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StringStubIndexExtension
-import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
@@ -37,12 +36,9 @@ class LuaClassIndex : StringStubIndexExtension<LuaDocClassDef>() {
         return LuaLanguage.INDEX_VERSION
     }
 
-    override fun getKey() = KEY
+    override fun getKey() = StubKeys.CLASS
 
     companion object {
-
-        val KEY = StubIndexKey.createIndexKey<String, LuaDocClassDef>("lua.index.class")
-
         val instance = LuaClassIndex()
 
         fun find(name: String, context: SearchContext): LuaDocClassDef? {

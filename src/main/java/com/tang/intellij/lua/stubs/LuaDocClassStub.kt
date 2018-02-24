@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -26,9 +25,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocClassDefImpl
 import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.aliasName
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
-import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
-import com.tang.intellij.lua.stubs.index.LuaSuperClassIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TySerializedClass
 
@@ -68,12 +65,12 @@ class LuaDocClassType : LuaStubElementType<LuaDocClassStub, LuaDocClassDef>("DOC
 
     override fun indexStub(luaDocClassStub: LuaDocClassStub, indexSink: IndexSink) {
         val classType = luaDocClassStub.classType
-        indexSink.occurrence(LuaClassIndex.KEY, classType.className)
-        indexSink.occurrence<NavigatablePsiElement, String>(LuaShortNameIndex.KEY, classType.className)
+        indexSink.occurrence(StubKeys.CLASS, classType.className)
+        indexSink.occurrence(StubKeys.SHORT_NAME, classType.className)
 
         val superClassName = classType.superClassName
         if (superClassName != null) {
-            indexSink.occurrence(LuaSuperClassIndex.KEY, superClassName)
+            indexSink.occurrence(StubKeys.SUPER_CLASS, superClassName)
         }
     }
 }

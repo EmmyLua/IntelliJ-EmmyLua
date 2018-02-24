@@ -23,7 +23,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaFuncDefImpl
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
 
@@ -91,7 +91,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
 
         LuaClassMemberIndex.indexStub(indexSink, moduleName, name)
 
-        indexSink.occurrence(LuaShortNameIndex.KEY, name)
+        indexSink.occurrence(StubKeys.SHORT_NAME, name)
     }
 }
 

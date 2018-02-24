@@ -29,7 +29,7 @@ import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
 class LuaSymbolNavigationContributor : ChooseByNameContributor {
     override fun getNames(project: Project, b: Boolean): Array<String> {
         val nameSet = mutableSetOf<String>()
-        LuaShortNameIndex.getInstance().processAllKeys(project) { s ->
+        LuaShortNameIndex.instance.processAllKeys(project) { s ->
             nameSet.add(s)
             true
         }

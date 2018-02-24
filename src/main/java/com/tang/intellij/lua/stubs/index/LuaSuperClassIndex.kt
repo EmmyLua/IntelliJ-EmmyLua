@@ -12,7 +12,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StringStubIndexExtension
 import com.intellij.psi.stubs.StubIndex
-import com.intellij.psi.stubs.StubIndexKey
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
@@ -22,15 +21,13 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef
  * Created by TangZX on 2017/3/29.
  */
 class LuaSuperClassIndex : StringStubIndexExtension<LuaDocClassDef>() {
-    override fun getKey() = KEY
+    override fun getKey() = StubKeys.SUPER_CLASS
 
     companion object {
-        val KEY = StubIndexKey.createIndexKey<String, LuaDocClassDef>("lua.index.super_class")
-
         val instance = LuaSuperClassIndex()
 
         fun process(s: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaDocClassDef>): Boolean {
-            val c = StubIndex.getElements(KEY, s, project, scope, LuaDocClassDef::class.java)
+            val c = StubIndex.getElements(StubKeys.SUPER_CLASS, s, project, scope, LuaDocClassDef::class.java)
             return ContainerUtil.process(c, processor)
         }
     }

@@ -23,7 +23,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITyClass
@@ -112,7 +112,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         classNames.forEach {
             LuaClassMemberIndex.indexStub(indexSink, it, shortName)
         }
-        indexSink.occurrence(LuaShortNameIndex.KEY, shortName)
+        indexSink.occurrence(StubKeys.SHORT_NAME, shortName)
     }
 }
 

@@ -27,7 +27,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.ITy
 
 /**
@@ -89,7 +89,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
 
             LuaClassMemberIndex.indexStub(indexSink, module, luaNameStub.name)
 
-            indexSink.occurrence(LuaShortNameIndex.KEY, luaNameStub.name)
+            indexSink.occurrence(StubKeys.SHORT_NAME, luaNameStub.name)
         }
     }
 }

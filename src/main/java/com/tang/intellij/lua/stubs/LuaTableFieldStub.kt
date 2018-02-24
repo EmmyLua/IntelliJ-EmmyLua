@@ -27,7 +27,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.stubs.index.LuaShortNameIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.TyUnion
 import com.tang.intellij.lua.ty.getTableTypeName
@@ -93,7 +93,7 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
         if (fieldName != null && typeName != null) {
             LuaClassMemberIndex.indexStub(indexSink, typeName, fieldName)
 
-            indexSink.occurrence(LuaShortNameIndex.KEY, fieldName)
+            indexSink.occurrence(StubKeys.SHORT_NAME, fieldName)
         }
     }
 }
