@@ -31,6 +31,11 @@ sourceSets {
     }
 }
 
+// Appveyor CI
+if (System.env['APPVEYOR']) {
+    version = System.env['APPVEYOR_BUILD_VERSION']
+}
+
 intellij {
 	type 'IU'
 	updateSinceUntilBuild false
