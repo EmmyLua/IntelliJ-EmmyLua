@@ -31,8 +31,8 @@ class LuaHierarchyNodeDescriptor(parentDescriptor: HierarchyNodeDescriptor?, ele
 
     override fun navigate(requestFocus: Boolean) {
         val element = psiElement
-        if (element is Navigatable && (element as Navigatable).canNavigate()) {
-            (element as Navigatable).navigate(requestFocus)
+        if (element is Navigatable && element.canNavigate()) {
+            element.navigate(requestFocus)
         }
     }
 
