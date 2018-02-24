@@ -87,13 +87,11 @@ object LuaExpressionParser {
                 opMarker.done(BINARY_OP)
 
                 val right = parseExpr(builder, next, l + 1)
+                if (right == null) error(builder, "Expression expected")
                 //save
                 result = result.precede()
                 result.done(BINARY_EXPR)
-                if (right == null) {
-                    error(builder, "Expression expected")
-                    break
-                }
+                if (right == null) break
             } else break
         }
         return result
