@@ -52,7 +52,18 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     var program = if (SystemInfoRt.isWindows) "lua.exe" else "lua"
     var file: String? = null
     var parameters: String? = null
-    var debuggerType: DebuggerType? = DebuggerType.Attach
+
+    private var _debuggerType = DebuggerType.Attach
+
+    var debuggerType: DebuggerType
+        get() {
+            if (!SystemInfoRt.isWindows && _debuggerType == DebuggerType.Attach)
+                _debuggerType = DebuggerType.Mob
+            return _debuggerType
+        }
+        set(value) {
+            _debuggerType = value
+        }
 
     private var _workingDir: String? = null
 
@@ -77,7 +88,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
         JDOMExternalizerUtil.writeField(element, "program", program)
         JDOMExternalizerUtil.writeField(element, "file", file)
         JDOMExternalizerUtil.writeField(element, "workingDir", workingDir)
-        JDOMExternalizerUtil.writeField(element, "debuggerType", debuggerType!!.value().toString())
+        JDOMExternalizerUtil.writeField(element, "debuggerType", debuggerType.value().toString())
         JDOMExternalizerUtil.writeField(element, "params", parameters)
     }
 
