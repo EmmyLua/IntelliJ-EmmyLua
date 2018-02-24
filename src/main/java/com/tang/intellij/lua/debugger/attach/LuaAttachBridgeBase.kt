@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.process.OSProcessHandler
-import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
@@ -28,6 +27,7 @@ import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.InetSocketAddress
 import java.net.Socket
+import java.net.SocketException
 import java.util.*
 
 /**
@@ -81,7 +81,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
                 process.stop()
             }
             else -> {
-                process.error("Error: Unknown error")
+                //process.error("Error: Unknown error")
                 process.stop()
             }
         }
@@ -134,9 +134,10 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
                 }
                 handleMsg(bytes)
             }
+        } catch (e: SocketException) {
+            session.stop()
         } catch (e: Exception) {
             e.printStackTrace()
-            println("----------> " + e.stackTrace)
             session.stop()
         }
     }
