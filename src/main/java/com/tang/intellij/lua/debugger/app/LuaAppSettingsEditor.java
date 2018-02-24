@@ -22,7 +22,6 @@ import com.intellij.execution.configuration.EnvironmentVariablesTextFieldWithBro
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -31,6 +30,7 @@ import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.ui.HoverHyperlinkLabel;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.RawCommandLineEditor;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.TextFieldCompletionProvider;
 import com.intellij.util.textCompletion.TextFieldWithCompletion;
 import com.tang.intellij.lua.debugger.DebuggerType;
@@ -41,6 +41,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
+import java.nio.charset.Charset;
+import java.util.Objects;
+import java.util.SortedMap;
 
 /**
  *
@@ -55,6 +58,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
     private RawCommandLineEditor parameters;
     private HoverHyperlinkLabel mobdebugLink;
     private EnvironmentVariablesTextFieldWithBrowseButton myEnvironments;
+    private JComboBox<String> outputCharset;
     private Project project;
 
     LuaAppSettingsEditor(Project project) {
@@ -77,6 +81,12 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
             mobdebugLink.setVisible(debuggerType == DebuggerType.Mob);
             fireEditorStateChanged();
         });
+
+        // output charset
+        SortedMap<String, Charset> charsetSortedMap = Charset.availableCharsets();
+        DefaultComboBoxModel<String> outputCharsetModel = new DefaultComboBoxModel<>(ArrayUtil.toStringArray(charsetSortedMap.keySet()));
+        outputCharset.setModel(outputCharsetModel);
+        outputCharset.addItemListener(e -> fireEditorStateChanged());
     }
 
     @Override
@@ -88,16 +98,18 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         parameters.setText(luaAppRunConfiguration.getParameters());
         myEnvironments.setEnvs(luaAppRunConfiguration.getEnvs());
         mobdebugLink.setVisible(luaAppRunConfiguration.getDebuggerType() == DebuggerType.Mob);
+        outputCharset.setSelectedItem(luaAppRunConfiguration.getCharset());
     }
 
     @Override
-    protected void applyEditorTo(@NotNull LuaAppRunConfiguration luaAppRunConfiguration) throws ConfigurationException {
+    protected void applyEditorTo(@NotNull LuaAppRunConfiguration luaAppRunConfiguration) {
         luaAppRunConfiguration.setProgram(myProgram.getText());
         luaAppRunConfiguration.setWorkingDir(myWorkingDir.getText());
         luaAppRunConfiguration.setFile(myFile.getText());
-        luaAppRunConfiguration.setDebuggerType((DebuggerType) myDebugger.getSelectedItem());
+        luaAppRunConfiguration.setDebuggerType((DebuggerType) Objects.requireNonNull(myDebugger.getSelectedItem()));
         luaAppRunConfiguration.setParameters(parameters.getText());
         luaAppRunConfiguration.setEnvs(myEnvironments.getEnvs());
+        luaAppRunConfiguration.setCharset((String) Objects.requireNonNull(outputCharset.getSelectedItem()));
     }
 
     @NotNull

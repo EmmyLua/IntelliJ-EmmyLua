@@ -52,6 +52,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     var program = if (SystemInfoRt.isWindows) "lua.exe" else "lua"
     var file: String? = null
     var parameters: String? = null
+    var charset: String = "UTF-8"
 
     private var _debuggerType = DebuggerType.Attach
 
@@ -90,6 +91,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
         JDOMExternalizerUtil.writeField(element, "workingDir", workingDir)
         JDOMExternalizerUtil.writeField(element, "debuggerType", debuggerType.value().toString())
         JDOMExternalizerUtil.writeField(element, "params", parameters)
+        JDOMExternalizerUtil.writeField(element, "charset", charset)
     }
 
     @Throws(InvalidDataException::class)
@@ -106,6 +108,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
             this.debuggerType = DebuggerType.valueOf(Integer.parseInt(debuggerType))
 
         parameters = JDOMExternalizerUtil.readField(element, "params")
+        charset = JDOMExternalizerUtil.readField(element, "charset") ?: "UTF-8"
     }
 
     override val port = 8172
@@ -153,7 +156,6 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
             return null
         }
 
-    @Throws(RuntimeConfigurationException::class)
     override fun checkConfiguration() {
         super.checkConfiguration()
         val program = program
@@ -173,7 +175,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
         commandLine.withEnvironment(envs)
         commandLine.addParameters(*params)
         commandLine.setWorkDirectory(workingDir)
-        commandLine.charset = Charset.forName("UTF-8")
+        commandLine.charset = Charset.forName(charset)
         return commandLine
     }
 }
