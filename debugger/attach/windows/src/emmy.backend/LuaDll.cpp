@@ -2509,7 +2509,15 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, HANDLE hProces
 			}
 		}
 	}
-
+	// skip emmy modules
+	{
+		static const char* emmyModules[] = { "dbghelp.dll", "EasyHook.dll", "emmy.backend.dll" };
+		std::string module_path = modulePath;
+		for (const char * emmyModuleName : emmyModules) {
+			if (strcmp(moduleName, emmyModuleName) == 0)
+				return;
+		}
+	}
 	//printf("Examining '%s'\n", moduleName);
 #ifdef VERBOSE
 	DebugBackend::Get().Message(MessageType_Normal, "[B]Scan module : '%s'", moduleName);
