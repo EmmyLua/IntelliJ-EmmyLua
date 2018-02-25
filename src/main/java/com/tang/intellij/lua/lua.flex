@@ -54,7 +54,7 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
-ID=[A-Za-z_][A-Za-z0-9_]*
+ID=[:jletter:] [:jletterdigit:]*
 
 //Number
 n=[0-9]+
