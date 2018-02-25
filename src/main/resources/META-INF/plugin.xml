@@ -466,5 +466,6 @@
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileFuzzyResolver" id="fuzzy"/>
 
         <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer"/>
+        <luaTypeInfer implementation="com.tang.intellij.lua.unity.ty.UnityTypeInfer"/>
     </extensions>
 </idea-plugin>
