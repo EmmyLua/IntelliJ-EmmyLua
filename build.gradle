@@ -55,3 +55,9 @@ buildPlugin.dependsOn(copyAttachDebugger)
 buildPlugin.from(fileTree(dir:"${RES_DIR}", includes:['debugger/**'])) {
     into "/${project.name}/classes/"
 }
+
+publishPlugin {
+    username System.env['JETBRAINS_USERNAME']
+    password System.env['JETBRAINS_PASSWORD']
+    channels 'EAP'
+}
