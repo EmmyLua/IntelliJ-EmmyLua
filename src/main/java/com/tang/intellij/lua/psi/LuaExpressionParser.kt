@@ -107,10 +107,10 @@ object LuaExpressionParser {
             opMarker.done(UNARY_OP)
 
             val right = parseUnary(b, ops, next, l)
-            m.done(UNARY_EXPR)
             if (right == null) {
                 error(b, "Expression expected")
             }
+            m.done(UNARY_EXPR)
             return m
         }
         return parseExpr(b, next, l)
