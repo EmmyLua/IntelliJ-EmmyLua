@@ -158,11 +158,11 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
 
-  [^] { return TokenType.BAD_CHARACTER; }
+  [^]                         { return TokenType.BAD_CHARACTER; }
 }
 
 <xSHEBANG> {
-    [^\r\n]* { yybegin(YYINITIAL);return SHEBANG_CONTENT; }
+    [^\r\n]*                  { yybegin(YYINITIAL); return SHEBANG_CONTENT; }
 }
 
 <xCOMMENT> {

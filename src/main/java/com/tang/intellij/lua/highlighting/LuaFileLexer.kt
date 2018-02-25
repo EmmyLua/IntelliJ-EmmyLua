@@ -23,6 +23,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.tang.intellij.lua.comment.lexer.LuaDocLexerAdapter
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
+import com.tang.intellij.lua.lexer.LuaRegionLexer
 import com.tang.intellij.lua.lexer._LuaStringLexer
 import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.LuaTypes
@@ -41,5 +42,7 @@ internal class LuaFileLexer : LayeredLexer(LuaLexerAdapter()) {
 
         val stringLexer = MergingLexerAdapter(FlexAdapter(_LuaStringLexer()), TokenSet.create(LuaTypes.STRING))
         registerSelfStoppingLayer(stringLexer, arrayOf(LuaTypes.STRING), IElementType.EMPTY_ARRAY)
+
+        registerSelfStoppingLayer(LuaRegionLexer(), arrayOf(LuaTypes.REGION, LuaTypes.ENDREGION), IElementType.EMPTY_ARRAY)
     }
 }

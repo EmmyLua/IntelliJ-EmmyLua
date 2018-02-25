@@ -25,6 +25,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.tang.intellij.lua.comment.psi.LuaDocTokenType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
+import com.tang.intellij.lua.psi.LuaRegionTypes
 import com.tang.intellij.lua.psi.LuaStringTypes
 import com.tang.intellij.lua.psi.LuaTypes
 import java.util.*
@@ -132,6 +133,11 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
             fillMap(ourMap1, LuaHighlightingData.NUMBER, LuaTypes.NUMBER)
             fillMap(ourMap1, LuaHighlightingData.STRING, LuaTypes.STRING)
             fillMap(ourMap1, PRIMITIVE_TYPE_SET, LuaHighlightingData.PRIMITIVE_TYPE)
+
+            //region
+            fillMap(ourMap1, LuaHighlightingData.REGION_HEADER, LuaRegionTypes.REGION_START)
+            fillMap(ourMap1, LuaHighlightingData.REGION_DESC, LuaRegionTypes.REGION_DESC)
+            fillMap(ourMap1, LuaHighlightingData.REGION_HEADER, LuaRegionTypes.REGION_END)
         }
     }
 }

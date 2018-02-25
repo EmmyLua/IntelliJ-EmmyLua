@@ -44,26 +44,32 @@ class LuaColorSettingsPage : ColorSettingsPage {
     }
 
     override fun getDemoText(): String {
-        return "---@class <docClassName>Emmy</docClassName>\n" +
-                "local <localVar>var</localVar> = {} -- a short comment\n" +
-                "local <localVar>a</localVar>, <localVar>b</localVar>, <localVar>c</localVar> = <primitive>true</primitive>, <primitive>false</primitive>, <primitive>nil</primitive>\n" +
-                "--- doc comment\n" +
-                "---@param <docTagValue>par1</docTagValue> <docClassNameRef>Par1Type</docClassNameRef> @comments\n" +
-                "function var:<method>fun</method>(<parameter>par1</parameter>, <parameter>par2</parameter>)\n" +
-                "   <std>print</std>('hello')\n" +
-                "   return <self>self</self>.<field>len</field> + 2\n" +
-                "end\n\n" +
-                "---@overload <docKeyword>fun</docKeyword>(name:<docClassNameRef>string</docClassNameRef>):<docClassNameRef>Emmy</docClassNameRef>\n" +
-                "function var.<staticMethod>staticFun</staticMethod>()\n" +
-                "end\n\n" +
-                "---@return <docClassNameRef>Emmy</docClassNameRef>\n" +
-                "function <globalFunction>findEmmy</globalFunction>()\n" +
-                "   return \"string\" .. <upValue>var</upValue>\n" +
-                "end\n" +
-                "\n" +
-                "<globalVar>globalVar</globalVar> = {\n" +
-                "   <field>property</field> = value\n" +
-                "}\n"
+        return """
+            ---@class <docClassName>Emmy</docClassName>
+            local <localVar>var</localVar> = {} -- a short comment
+            local <localVar>a</localVar>, <localVar>b</localVar>, <localVar>c</localVar> = <primitive>true</primitive>, <primitive>false</primitive>, <primitive>nil</primitive>
+            <regionHeader>--region</regionHeader> <regionDesc>my class members region</regionDesc>
+            --- doc comment
+            ---@param <docTagValue>par1</docTagValue> <docClassNameRef>Par1Type</docClassNameRef> @comments
+            function var:<method>fun</method>(<parameter>par1</parameter>, <parameter>par2</parameter>)
+               <std>print</std>('hello')
+               return <self>self</self>.<field>len</field> + 2
+            end
+
+            ---@overload <docKeyword>fun</docKeyword>(name:<docClassNameRef>string</docClassNameRef>):<docClassNameRef>Emmy</docClassNameRef>
+            function var.<staticMethod>staticFun</staticMethod>()
+            end
+            <regionHeader>--endregion</regionHeader> <regionDesc>end my class members region</regionDesc>
+
+            ---@return <docClassNameRef>Emmy</docClassNameRef>
+            function <globalFunction>findEmmy</globalFunction>()
+               return "string" .. <upValue>var</upValue>
+            end
+
+            <globalVar>globalVar</globalVar> = {
+               <field>property</field> = value
+            }
+        """.trimIndent()
     }
 
     override fun getAdditionalHighlightingTagToDescriptorMap(): Map<String, TextAttributesKey> {
@@ -108,6 +114,8 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 AttributesDescriptor("Comments//EmmyDoc//Class name", LuaHighlightingData.CLASS_NAME),
                 AttributesDescriptor("Comments//EmmyDoc//Class name reference", LuaHighlightingData.CLASS_REFERENCE),
                 AttributesDescriptor("Comments//EmmyDoc//Keyword", LuaHighlightingData.DOC_KEYWORD),
+                AttributesDescriptor("Region//Region Header", LuaHighlightingData.REGION_HEADER),
+                AttributesDescriptor("Region//Region Description", LuaHighlightingData.REGION_DESC),
                 AttributesDescriptor("Class Members//Field", LuaHighlightingData.FIELD),
                 AttributesDescriptor("Class Members//Instance method", LuaHighlightingData.INSTANCE_METHOD),
                 AttributesDescriptor("Class Members//Static method", LuaHighlightingData.STATIC_METHOD),
@@ -117,22 +125,24 @@ class LuaColorSettingsPage : ColorSettingsPage {
         private val ourTags: MutableMap<String, TextAttributesKey> = RainbowHighlighter.createRainbowHLM()
 
         init {
-            ourTags.put("parameter", LuaHighlightingData.PARAMETER)
-            ourTags.put("docTag", LuaHighlightingData.DOC_COMMENT_TAG)
-            ourTags.put("docTagValue", LuaHighlightingData.DOC_COMMENT_TAG_VALUE)
-            ourTags.put("docClassName", LuaHighlightingData.CLASS_NAME)
-            ourTags.put("docClassNameRef", LuaHighlightingData.CLASS_REFERENCE)
-            ourTags.put("docKeyword", LuaHighlightingData.DOC_KEYWORD)
-            ourTags.put("localVar", LuaHighlightingData.LOCAL_VAR)
-            ourTags.put("globalVar", LuaHighlightingData.GLOBAL_VAR)
-            ourTags.put("globalFunction", LuaHighlightingData.GLOBAL_FUNCTION)
-            ourTags.put("field", LuaHighlightingData.FIELD)
-            ourTags.put("method", LuaHighlightingData.INSTANCE_METHOD)
-            ourTags.put("staticMethod", LuaHighlightingData.STATIC_METHOD)
-            ourTags.put("upValue", LuaHighlightingData.UP_VALUE)
-            ourTags.put("std", LuaHighlightingData.STD_API)
-            ourTags.put("self", LuaHighlightingData.SELF)
-            ourTags.put("primitive", LuaHighlightingData.PRIMITIVE_TYPE)
+            ourTags["parameter"] = LuaHighlightingData.PARAMETER
+            ourTags["docTag"] = LuaHighlightingData.DOC_COMMENT_TAG
+            ourTags["docTagValue"] = LuaHighlightingData.DOC_COMMENT_TAG_VALUE
+            ourTags["docClassName"] = LuaHighlightingData.CLASS_NAME
+            ourTags["docClassNameRef"] = LuaHighlightingData.CLASS_REFERENCE
+            ourTags["docKeyword"] = LuaHighlightingData.DOC_KEYWORD
+            ourTags["localVar"] = LuaHighlightingData.LOCAL_VAR
+            ourTags["globalVar"] = LuaHighlightingData.GLOBAL_VAR
+            ourTags["globalFunction"] = LuaHighlightingData.GLOBAL_FUNCTION
+            ourTags["field"] = LuaHighlightingData.FIELD
+            ourTags["method"] = LuaHighlightingData.INSTANCE_METHOD
+            ourTags["staticMethod"] = LuaHighlightingData.STATIC_METHOD
+            ourTags["upValue"] = LuaHighlightingData.UP_VALUE
+            ourTags["std"] = LuaHighlightingData.STD_API
+            ourTags["self"] = LuaHighlightingData.SELF
+            ourTags["primitive"] = LuaHighlightingData.PRIMITIVE_TYPE
+            ourTags["regionHeader"] = LuaHighlightingData.REGION_HEADER
+            ourTags["regionDesc"] = LuaHighlightingData.REGION_DESC
         }
     }
 }

@@ -18,4 +18,9 @@
             <option name="FOREGROUND" value="D700FF"/>
         </value>
     </option>
+    <option name="LUA_REGION_DESC">
+        <value>
+            <option name="FOREGROUND" value="0088FF"/>
+        </value>
+    </option>
 </list>
