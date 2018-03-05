@@ -89,6 +89,8 @@ DOC_DASHES = --+
     "<"                        { return LT; }
     "("                        { return LPAREN; }
     ")"                        { return RPAREN; }
+    "{"                        { return LCURLY; }
+    "}"                        { return RCURLY; }
     "[]"                       { return ARR; }
     "fun"                      { return FUN; }
     "optional"                 { return OPTIONAL; }

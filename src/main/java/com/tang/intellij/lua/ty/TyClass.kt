@@ -21,6 +21,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTableTy
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
@@ -266,5 +267,19 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         // Empty list is a table, but subtype of all lists
         return super.subTypeOf(other, context) || other == Ty.TABLE || (other is TyArray && table.tableFieldList.size == 0)
+    }
+}
+
+class TyDocTable(private val tbl: LuaDocTableTy) : TyClass("doc table") {
+    override fun doLazyInit(searchContext: SearchContext) {}
+
+    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
+        tbl.tableFieldList.forEach {
+            processor(this, it)
+        }
+    }
+
+    override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        return tbl.tableFieldList.firstOrNull { it.name == name }
     }
 }

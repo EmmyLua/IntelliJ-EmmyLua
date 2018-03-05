@@ -264,3 +264,24 @@ fun getReference(see: LuaDocSeeRefTag): PsiReference? {
     if (see.id == null) return null
     return LuaDocSeeReference(see)
 }
+
+fun getType(tbl: LuaDocTableTy): ITy {
+    return TyDocTable(tbl)
+}
+
+fun guessParentType(f: LuaDocTableField, context: SearchContext): ITy {
+    val p = f.parent as LuaDocTableTy
+    return p.getType()
+}
+
+fun getVisibility(f: LuaDocTableField): Visibility {
+    return Visibility.PUBLIC
+}
+
+fun getNameIdentifier(f: LuaDocTableField): PsiElement? {
+    return f.id
+}
+
+fun guessType(f:LuaDocTableField, context: SearchContext): ITy {
+    return f.ty?.getType() ?: Ty.UNKNOWN
+}

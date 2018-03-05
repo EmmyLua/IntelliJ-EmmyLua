@@ -45,6 +45,8 @@
         LT = "<"
         LPAREN = "("
         RPAREN = ")"
+        LCURLY = "{"
+        RCURLY = "}"
         ARR = '[]'
         FUN = 'fun'
         TAG_NAME = 'TAG_NAME'
@@ -85,7 +87,7 @@ private doc_item ::= '@' (param_def
     | tag_def
     | access_modifier)
 
-ty ::= union_ty | function_ty | generic_ty | arr_ty | general_ty | par_ty {
+ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
 }
 
@@ -96,6 +98,30 @@ general_ty ::= class_name_ref {
     methods = [getType]
 }
 par_ty ::= '(' ty ')' {
+    pin = 1
+    methods = [getType]
+}
+
+private fieldList ::= (tableField (',' tableField)* (',')?)?
+
+private tableField2 ::= ID ':' ty { pin = 1 }
+
+tableField ::= tableField2 {
+    implements = [
+        "com.tang.intellij.lua.psi.LuaClassField"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
+    methods = [
+        guessParentType
+        getVisibility
+        setName
+        getName
+        getNameIdentifier
+        guessType
+    ]
+}
+
+table_ty ::= '{' fieldList '}' {
     pin = 1
     methods = [getType]
 }
