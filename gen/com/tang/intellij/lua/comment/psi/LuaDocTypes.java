@@ -26,6 +26,7 @@ public interface LuaDocTypes {
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
   IElementType RETURN_DEF = LuaParserDefinitionKt.createDocType("RETURN_DEF");
   IElementType SEE_REF_TAG = LuaParserDefinitionKt.createDocType("SEE_REF_TAG");
+  IElementType TABLE_DEF = LuaParserDefinitionKt.createDocType("TABLE_DEF");
   IElementType TABLE_FIELD = LuaParserDefinitionKt.createDocType("TABLE_FIELD");
   IElementType TABLE_TY = LuaParserDefinitionKt.createDocType("TABLE_TY");
   IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
@@ -124,6 +125,9 @@ public interface LuaDocTypes {
       }
       else if (type == SEE_REF_TAG) {
         return new LuaDocSeeRefTagImpl(node);
+      }
+      else if (type == TABLE_DEF) {
+        return new LuaDocTableDefImpl(node);
       }
       else if (type == TABLE_FIELD) {
         return new LuaDocTableFieldImpl(node);

@@ -9,7 +9,7 @@ import com.tang.intellij.lua.ty.ITy;
 public interface LuaDocTableTy extends LuaDocTy {
 
   @NotNull
-  List<LuaDocTableField> getTableFieldList();
+  LuaDocTableDef getTableDef();
 
   @NotNull
   ITy getType();

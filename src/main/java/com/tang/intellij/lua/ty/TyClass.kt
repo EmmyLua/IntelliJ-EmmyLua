@@ -21,7 +21,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.comment.psi.LuaDocTableTy
+import com.tang.intellij.lua.comment.psi.LuaDocTableDef
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
@@ -270,8 +270,20 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     }
 }
 
-class TyDocTable(private val tbl: LuaDocTableTy) : TyClass("doc table") {
+fun getDocTableTypeName(table: LuaDocTableDef): String {
+    val stub = table.stub
+    if (stub != null)
+        return stub.className
+
+    val fileName = table.containingFile.name
+    return "$fileName@${table.node.startOffset}"
+}
+
+class TyDocTable(private val tbl: LuaDocTableDef) : TyClass(getDocTableTypeName(tbl)) {
     override fun doLazyInit(searchContext: SearchContext) {}
+
+    override val displayName: String
+        get() = "{ }"
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         tbl.tableFieldList.forEach {

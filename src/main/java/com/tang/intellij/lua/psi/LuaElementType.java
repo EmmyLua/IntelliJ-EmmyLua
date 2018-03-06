@@ -72,6 +72,8 @@ public class LuaElementType extends IElementType {
     public static LuaStubElementType CLASS_FIELD_DEF = new LuaDocClassFieldType();
     public static LuaStubElementType TYPE_DEF = new LuaDocTypeDefType();
     public static LuaStubElementType CLASS_DEF = new LuaDocClassType();
+    public static LuaStubElementType DOC_TABLE_DEF = new LuaDocTableDefType();
+    public static LuaStubElementType DOC_TABLE_FIELD_DEF = new LuaDocTableFieldDefType();
     public static IStubElementType TABLE = new LuaTableExprType();
     public static IStubElementType TABLE_FIELD = new LuaTableFieldType();
     public static IStubElementType INDEX = new LuaIndexExprType();
@@ -85,7 +87,7 @@ public class LuaElementType extends IElementType {
         }
 
         @Override
-        public ASTNode parseContents(ASTNode chameleon) {
+        public ASTNode parseContents(@NotNull ASTNode chameleon) {
             Project project = chameleon.getPsi().getProject();
             PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
                     project,

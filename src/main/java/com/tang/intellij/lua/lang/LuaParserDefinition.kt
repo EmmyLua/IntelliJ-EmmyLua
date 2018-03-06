@@ -76,6 +76,8 @@ class LuaParserDefinition : ParserDefinition {
     override fun createElement(node: ASTNode): PsiElement {
         val type = node.elementType
         return if (type is LuaDocElementType
+                || type === LuaElementType.DOC_TABLE_DEF
+                || type === LuaElementType.DOC_TABLE_FIELD_DEF
                 || type === LuaElementType.CLASS_DEF
                 || type === LuaElementType.CLASS_FIELD_DEF
                 || type === LuaElementType.TYPE_DEF) {
@@ -140,6 +142,8 @@ fun createDocType(string: String): IElementType {
     return when (string) {
         "CLASS_DEF" -> LuaElementType.CLASS_DEF
         "FIELD_DEF" -> LuaElementType.CLASS_FIELD_DEF
+        "TABLE_DEF" -> LuaElementType.DOC_TABLE_DEF
+        "TABLE_FIELD" -> LuaElementType.DOC_TABLE_FIELD_DEF
         else -> if ("TYPE_DEF" == string) LuaElementType.TYPE_DEF else LuaDocElementType(string)
     }
 

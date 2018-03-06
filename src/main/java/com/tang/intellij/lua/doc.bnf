@@ -119,10 +119,15 @@ tableField ::= tableField2 {
         getNameIdentifier
         guessType
     ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTableFieldDefStub"
 }
 
-table_ty ::= '{' fieldList '}' {
+table_def ::= '{' fieldList '}' {
     pin = 1
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTableDefStub"
+}
+
+table_ty ::= table_def {
     methods = [getType]
 }
 

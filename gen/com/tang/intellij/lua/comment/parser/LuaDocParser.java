@@ -62,6 +62,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == TABLE_FIELD) {
       r = tableField(b, 0);
     }
+    else if (t == TABLE_DEF) {
+      r = table_def(b, 0);
+    }
     else if (t == TAG_DEF) {
       r = tag_def(b, 0);
     }
@@ -661,6 +664,21 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // '{' fieldList '}'
+  public static boolean table_def(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "table_def")) return false;
+    if (!nextTokenIs(b, LCURLY)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, TABLE_DEF, null);
+    r = consumeToken(b, LCURLY);
+    p = r; // pin = 1
+    r = r && report_error_(b, fieldList(b, l + 1));
+    r = p && consumeToken(b, RCURLY) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // TAG_NAME tag_value? comment_string?
   public static boolean tag_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_def")) return false;
@@ -844,18 +862,15 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '{' fieldList '}'
+  // table_def
   public static boolean table_ty(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "table_ty")) return false;
     if (!nextTokenIsSmart(b, LCURLY)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, TABLE_TY, null);
-    r = consumeTokenSmart(b, LCURLY);
-    p = r; // pin = 1
-    r = r && report_error_(b, fieldList(b, l + 1));
-    r = p && consumeToken(b, RCURLY) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = table_def(b, l + 1);
+    exit_section_(b, m, TABLE_TY, r);
+    return r;
   }
 
   // '<' generic_param_list '>'

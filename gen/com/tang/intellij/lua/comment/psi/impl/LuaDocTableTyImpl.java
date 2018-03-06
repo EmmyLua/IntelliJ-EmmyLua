@@ -28,8 +28,8 @@ public class LuaDocTableTyImpl extends LuaDocTyImpl implements LuaDocTableTy {
 
   @Override
   @NotNull
-  public List<LuaDocTableField> getTableFieldList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTableField.class);
+  public LuaDocTableDef getTableDef() {
+    return notNullChild(PsiTreeUtil.getChildOfType(this, LuaDocTableDef.class));
   }
 
   @NotNull
