@@ -138,7 +138,7 @@ fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): 
         var type: ITy = Ty.UNKNOWN
         if (stub != null) {
             stub.classNames.forEach {
-               type = type.union(TySerializedClass(it))
+               type = type.union(createSerializedClass(it))
             }
         } else {
             val expr = classMethodDef.classMethodName.expr

@@ -179,19 +179,19 @@ abstract class TyClass(override val className: String,
 
     companion object {
         // for _G
-        val G: TyClass = TySerializedClass(Constants.WORD_G)
+        val G: TyClass = createSerializedClass(Constants.WORD_G)
 
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
             val stub = nameDef.stub
             val tyName = stub?.anonymousType ?: getAnonymousType(nameDef)
-            return TySerializedClass(tyName, nameDef.name, null, null, TyFlags.ANONYMOUS)
+            return createSerializedClass(tyName, nameDef.name, null, null, TyFlags.ANONYMOUS)
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
             val name = nameExpr.name
-            val g = TySerializedClass(getGlobalTypeName(nameExpr), name, null, null, TyFlags.GLOBAL)
+            val g = createSerializedClass(getGlobalTypeName(nameExpr), name, null, null, TyFlags.GLOBAL)
             if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
-                return TySerializedClass(name, name, null, null, TyFlags.GLOBAL).union(g)
+                return createSerializedClass(name, name, null, null, TyFlags.GLOBAL).union(g)
             return g
         }
     }
@@ -223,6 +223,22 @@ open class TySerializedClass(name: String,
 
 //todo Lazy class ty
 class TyLazyClass(name: String) : TySerializedClass(name)
+
+fun createSerializedClass(name: String,
+                          varName: String = name,
+                          supper: String? = null,
+                          alias: String? = null,
+                          flags: Int = 0): TyClass {
+    val list = name.split("|")
+    if (list.size == 3) {
+        val type = list[0].toInt()
+        if (type == 10) {
+            return TySerializedDocTable(name)
+        }
+    }
+
+    return TySerializedClass(name, varName, supper, alias, flags)
+}
 
 fun getTableTypeName(table: LuaTableExpr): String {
     val stub = table.stub
@@ -258,7 +274,7 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     }
 
     override val displayName: String
-        get() = "table"
+        get() = "{ }"
 
     override fun toString(): String = displayName
 
@@ -276,14 +292,14 @@ fun getDocTableTypeName(table: LuaDocTableDef): String {
         return stub.className
 
     val fileName = table.containingFile.name
-    return "$fileName@${table.node.startOffset}"
+    return "10|$fileName|${table.node.startOffset}"
 }
 
 class TyDocTable(private val tbl: LuaDocTableDef) : TyClass(getDocTableTypeName(tbl)) {
     override fun doLazyInit(searchContext: SearchContext) {}
 
     override val displayName: String
-        get() = "{ }"
+        get() = "@{ }"
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         tbl.tableFieldList.forEach {
@@ -294,4 +310,9 @@ class TyDocTable(private val tbl: LuaDocTableDef) : TyClass(getDocTableTypeName(
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
         return tbl.tableFieldList.firstOrNull { it.name == name }
     }
+}
+
+class TySerializedDocTable(name: String) : TySerializedClass(name) {
+    override val displayName: String
+        get() = "@{ }"
 }

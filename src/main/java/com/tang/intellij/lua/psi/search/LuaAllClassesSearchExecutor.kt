@@ -21,7 +21,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.util.Processor
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.TySerializedClass
+import com.tang.intellij.lua.ty.createSerializedClass
 
 /**
  *
@@ -32,7 +32,7 @@ class LuaAllClassesSearchExecutor : QueryExecutorBase<ITyClass, LuaAllClassesSea
         DumbService.getInstance(searchParameters.project).runReadActionInSmartMode {
             LuaClassIndex.instance.processAllKeys(searchParameters.project) { typeName ->
                 //todo no TySerializedClass
-                processor.process(TySerializedClass(typeName))
+                processor.process(createSerializedClass(typeName))
             }
         }
     }

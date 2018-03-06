@@ -24,7 +24,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TySerializedClass
+import com.tang.intellij.lua.ty.createSerializedClass
 
 class UnityTypeInfer : ILuaTypeInfer {
     override fun inferType(target: LuaTypeGuessable, context: SearchContext): ITy {
@@ -38,7 +38,7 @@ class UnityTypeInfer : ILuaTypeInfer {
                         var ty:ITy = Ty.UNKNOWN
                         LuaClassIndex.processKeys(context.project, Processor {
                             if (it.endsWith(shortName)) {
-                                ty = TySerializedClass(it)
+                                ty = createSerializedClass(it)
                             }
                             true
                         })
