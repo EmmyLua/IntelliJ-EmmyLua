@@ -27,7 +27,7 @@ import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.aliasName
 import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TySerializedClass
+import com.tang.intellij.lua.ty.createSerializedClass
 
 /**
 
@@ -90,7 +90,7 @@ class LuaDocClassStubImpl(override val className: String,
 
     override val classType: TyClass
         get() {
-            val luaType = TySerializedClass(className, className, superClassName)
+            val luaType = createSerializedClass(className, className, superClassName)
             luaType.aliasName = aliasName
             return luaType
         }

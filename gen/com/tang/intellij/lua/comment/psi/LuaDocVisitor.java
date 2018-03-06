@@ -3,8 +3,8 @@ package com.tang.intellij.lua.comment.psi;
 
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.psi.PsiNameIdentifierOwner;
 import com.tang.intellij.lua.psi.LuaClassField;
+import com.intellij.psi.PsiNameIdentifierOwner;
 
 public class LuaDocVisitor extends PsiElementVisitor {
 
@@ -76,6 +76,19 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitSeeRefTag(@NotNull LuaDocSeeRefTag o) {
     visitPsiElement(o);
+  }
+
+  public void visitTableField(@NotNull LuaDocTableField o) {
+    visitLuaClassField(o);
+    // visitPsiNameIdentifierOwner(o);
+  }
+
+  public void visitTableDef(@NotNull LuaDocTableDef o) {
+    visitPsiElement(o);
+  }
+
+  public void visitTableTy(@NotNull LuaDocTableTy o) {
+    visitTy(o);
   }
 
   public void visitTagDef(@NotNull LuaDocTagDef o) {

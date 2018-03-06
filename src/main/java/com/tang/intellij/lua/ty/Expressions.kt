@@ -196,7 +196,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
             //todo stub.module -> ty
             val stub = def.stub
             stub?.module?.let {
-                val memberType = TySerializedClass(it).findMemberType(def.name, context)
+                val memberType = createSerializedClass(it).findMemberType(def.name, context)
                 if (memberType != null && !Ty.isInvalid(memberType))
                     return memberType
             }

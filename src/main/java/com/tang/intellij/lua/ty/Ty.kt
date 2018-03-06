@@ -243,7 +243,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     val varName = stream.readName()
                     val superName = stream.readName()
                     val aliasName = stream.readName()
-                    TySerializedClass(StringRef.toString(className),
+                    createSerializedClass(StringRef.toString(className),
                             StringRef.toString(varName),
                             StringRef.toString(superName),
                             StringRef.toString(aliasName),

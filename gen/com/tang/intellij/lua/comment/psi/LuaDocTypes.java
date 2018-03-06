@@ -26,6 +26,9 @@ public interface LuaDocTypes {
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
   IElementType RETURN_DEF = LuaParserDefinitionKt.createDocType("RETURN_DEF");
   IElementType SEE_REF_TAG = LuaParserDefinitionKt.createDocType("SEE_REF_TAG");
+  IElementType TABLE_DEF = LuaParserDefinitionKt.createDocType("TABLE_DEF");
+  IElementType TABLE_FIELD = LuaParserDefinitionKt.createDocType("TABLE_FIELD");
+  IElementType TABLE_TY = LuaParserDefinitionKt.createDocType("TABLE_TY");
   IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
   IElementType TAG_VALUE = LuaParserDefinitionKt.createDocType("TAG_VALUE");
   IElementType TY = LuaParserDefinitionKt.createDocType("TY");
@@ -42,6 +45,7 @@ public interface LuaDocTypes {
   IElementType FUN = new LuaDocTokenType("fun");
   IElementType GT = new LuaDocTokenType(">");
   IElementType ID = new LuaDocTokenType("ID");
+  IElementType LCURLY = new LuaDocTokenType("{");
   IElementType LPAREN = new LuaDocTokenType("(");
   IElementType LT = new LuaDocTokenType("<");
   IElementType OPTIONAL = new LuaDocTokenType("optional");
@@ -49,6 +53,7 @@ public interface LuaDocTypes {
   IElementType PRIVATE = new LuaDocTokenType("PRIVATE");
   IElementType PROTECTED = new LuaDocTokenType("PROTECTED");
   IElementType PUBLIC = new LuaDocTokenType("PUBLIC");
+  IElementType RCURLY = new LuaDocTokenType("}");
   IElementType RPAREN = new LuaDocTokenType(")");
   IElementType SHARP = new LuaDocTokenType("#");
   IElementType STRING = new LuaDocTokenType("STRING");
@@ -120,6 +125,15 @@ public interface LuaDocTypes {
       }
       else if (type == SEE_REF_TAG) {
         return new LuaDocSeeRefTagImpl(node);
+      }
+      else if (type == TABLE_DEF) {
+        return new LuaDocTableDefImpl(node);
+      }
+      else if (type == TABLE_FIELD) {
+        return new LuaDocTableFieldImpl(node);
+      }
+      else if (type == TABLE_TY) {
+        return new LuaDocTableTyImpl(node);
       }
       else if (type == TAG_DEF) {
         return new LuaDocTagDefImpl(node);

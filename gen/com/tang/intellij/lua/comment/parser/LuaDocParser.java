@@ -59,6 +59,12 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == SEE_REF_TAG) {
       r = see_ref_tag(b, 0);
     }
+    else if (t == TABLE_FIELD) {
+      r = tableField(b, 0);
+    }
+    else if (t == TABLE_DEF) {
+      r = table_def(b, 0);
+    }
     else if (t == TAG_DEF) {
       r = tag_def(b, 0);
     }
@@ -86,7 +92,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(ARR_TY, FUNCTION_TY, GENERAL_TY, GENERIC_TY,
-      PAR_TY, TY, UNION_TY),
+      PAR_TY, TABLE_TY, TY, UNION_TY),
   };
 
   /* ********************************************************** */
@@ -298,6 +304,56 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = access_modifier(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // (tableField (',' tableField)* (',')?)?
+  static boolean fieldList(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fieldList")) return false;
+    fieldList_0(b, l + 1);
+    return true;
+  }
+
+  // tableField (',' tableField)* (',')?
+  private static boolean fieldList_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fieldList_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = tableField(b, l + 1);
+    r = r && fieldList_0_1(b, l + 1);
+    r = r && fieldList_0_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (',' tableField)*
+  private static boolean fieldList_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fieldList_0_1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!fieldList_0_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "fieldList_0_1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
+  }
+
+  // ',' tableField
+  private static boolean fieldList_0_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fieldList_0_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && tableField(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // (',')?
+  private static boolean fieldList_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "fieldList_0_2")) return false;
+    consumeToken(b, COMMA);
+    return true;
   }
 
   /* ********************************************************** */
@@ -582,6 +638,47 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // tableField2
+  public static boolean tableField(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableField")) return false;
+    if (!nextTokenIs(b, ID)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = tableField2(b, l + 1);
+    exit_section_(b, m, TABLE_FIELD, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ID ':' ty
+  static boolean tableField2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableField2")) return false;
+    if (!nextTokenIs(b, ID)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeTokens(b, 1, ID, EXTENDS);
+    p = r; // pin = 1
+    r = r && ty(b, l + 1, -1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
+  // '{' fieldList '}'
+  public static boolean table_def(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "table_def")) return false;
+    if (!nextTokenIs(b, LCURLY)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, TABLE_DEF, null);
+    r = consumeToken(b, LCURLY);
+    p = r; // pin = 1
+    r = r && report_error_(b, fieldList(b, l + 1));
+    r = p && consumeToken(b, RCURLY) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // TAG_NAME tag_value? comment_string?
   public static boolean tag_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_def")) return false;
@@ -684,16 +781,18 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // Operator priority table:
   // 0: N_ARY(union_ty)
   // 1: ATOM(function_ty)
-  // 2: POSTFIX(generic_ty)
-  // 3: POSTFIX(arr_ty)
-  // 4: ATOM(general_ty)
-  // 5: ATOM(par_ty)
+  // 2: ATOM(table_ty)
+  // 3: POSTFIX(generic_ty)
+  // 4: POSTFIX(arr_ty)
+  // 5: ATOM(general_ty)
+  // 6: ATOM(par_ty)
   public static boolean ty(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "ty")) return false;
     addVariant(b, "<ty>");
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, "<ty>");
     r = function_ty(b, l + 1);
+    if (!r) r = table_ty(b, l + 1);
     if (!r) r = general_ty(b, l + 1);
     if (!r) r = par_ty(b, l + 1);
     p = r;
@@ -714,11 +813,11 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
         }
         exit_section_(b, l, m, UNION_TY, r, true, null);
       }
-      else if (g < 2 && leftMarkerIs(b, GENERAL_TY) && generic_ty_0(b, l + 1)) {
+      else if (g < 3 && leftMarkerIs(b, GENERAL_TY) && generic_ty_0(b, l + 1)) {
         r = true;
         exit_section_(b, l, m, GENERIC_TY, r, true, null);
       }
-      else if (g < 3 && consumeTokenSmart(b, ARR)) {
+      else if (g < 4 && consumeTokenSmart(b, ARR)) {
         r = true;
         exit_section_(b, l, m, ARR_TY, r, true, null);
       }
@@ -760,6 +859,17 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = consumeTokenSmart(b, EXTENDS);
     r = r && type_list(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // table_def
+  public static boolean table_ty(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "table_ty")) return false;
+    if (!nextTokenIsSmart(b, LCURLY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = table_def(b, l + 1);
+    exit_section_(b, m, TABLE_TY, r);
     return r;
   }
 

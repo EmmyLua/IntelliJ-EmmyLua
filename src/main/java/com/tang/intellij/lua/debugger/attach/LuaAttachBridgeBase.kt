@@ -40,7 +40,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
     private var protoHandler: ProtoHandler? = null
     private var evalIdCounter = 0
     private val callbackMap = HashMap<Int, EvalInfo>()
-    private lateinit var socket: Socket
+    private var socket = Socket()
 
     protected val emmyLua: String?
         get() = LuaFileUtil.getPluginVirtualFile("debugger/Emmy.lua")
@@ -175,7 +175,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
         val info = EvalInfo()
         info.callback = callback
         info.expr = expr
-        callbackMap.put(id, info)
+        callbackMap[id] = info
         send(DMReqEvaluate(L, id, stack, depth, expr))
     }
 
