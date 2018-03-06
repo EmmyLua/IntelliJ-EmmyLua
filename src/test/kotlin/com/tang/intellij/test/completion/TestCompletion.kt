@@ -26,12 +26,12 @@ import java.util.*
  *
  * Created by tangzx on 2017/4/23.
  */
-class TestCompletion : LuaTestBase() {
+open class TestCompletion : LuaTestBase() {
     override fun getTestDataPath(): String {
         return "src/test/resources/completion"
     }
 
-    private fun doTest(code: String, action: (lookupStrings:List<String>) -> Unit) {
+    fun doTest(code: String, action: (lookupStrings:List<String>) -> Unit) {
         fileTreeFromText(code).createAndOpenFileWithCaretMarker()
 
         FileDocumentManager.getInstance().saveAllDocuments()

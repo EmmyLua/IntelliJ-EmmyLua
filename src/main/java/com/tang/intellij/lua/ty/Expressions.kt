@@ -122,14 +122,26 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     var ret: ITy = Ty.UNKNOWN
     val ty = infer(expr, context)//expr.guessType(context)
     TyUnion.each(ty) {
-        when(it) {
+        when (it) {
             is ITyFunction -> {
                 it.process(Processor { sig ->
-                    ret = ret.union(sig.returnTy)
+                    val returnTy = sig.returnTy
+                    val targetTy = if (returnTy is TyTuple) {
+                        if (context.guessTuple())
+                            returnTy
+                        else returnTy.list.getOrNull(context.index)
+                    } else {
+                        if (context.guessTuple() || context.index == 0)
+                            returnTy
+                        else null
+                    }
+
+                    if (targetTy != null)
+                        ret = ret.union(targetTy)
                     true
                 })
             }
-        //constructor : Class table __call
+            //constructor : Class table __call
             is ITyClass -> ret = ret.union(it)
         }
     }
