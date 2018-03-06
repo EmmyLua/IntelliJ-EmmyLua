@@ -463,7 +463,7 @@ class TyVoid : Ty(TyKind.Void) {
 
 class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
     override val displayName: String
-        get() = "Tuple"
+        get() = "(${list.joinToString(", ")})"
 
     val size: Int get() {
         return list.size

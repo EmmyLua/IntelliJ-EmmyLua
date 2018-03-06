@@ -93,12 +93,13 @@ internal fun renderComment(sb: StringBuilder, comment: LuaComment?) {
                 is LuaDocReturnDef -> {
                     val typeList = child.typeList
                     if (typeList != null) {
-                        sb.append("<li><b>return</b>: ")
+                        sb.append("<li><b>return</b>: (")
                         val list = typeList.tyList
                         list.forEachIndexed { index, luaDocTy ->
                             renderTypeUnion(if (index != 0) ", " else null, null, sb, luaDocTy)
                             sb.append(" ")
                         }
+                        sb.append(")")
                         renderCommentString(null, null, sb, child.commentString)
                         sb.append("<br>")
                     }
