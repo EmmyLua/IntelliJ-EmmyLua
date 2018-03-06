@@ -18,6 +18,8 @@ package com.tang.intellij.test.completion
 
 import com.tang.intellij.test.LuaTestBase
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.tang.intellij.test.fileTreeFromText
 import java.util.*
 
 /**
@@ -27,6 +29,16 @@ import java.util.*
 class TestCompletion : LuaTestBase() {
     override fun getTestDataPath(): String {
         return "src/test/resources/completion"
+    }
+
+    private fun doTest(code: String, action: (lookupStrings:List<String>) -> Unit) {
+        fileTreeFromText(code).createAndOpenFileWithCaretMarker()
+
+        FileDocumentManager.getInstance().saveAllDocuments()
+        myFixture.completeBasic()
+        val strings = myFixture.lookupElementStrings
+        assertNotNull(strings)
+        action(strings!!)
     }
 
     fun testLocalCompletion() {
@@ -129,11 +141,33 @@ class TestCompletion : LuaTestBase() {
     }
 
     fun testAnonymous() {
-        myFixture.configureByFiles("testAnonymous.lua")
-        myFixture.complete(CompletionType.BASIC)
-        val strings = myFixture.lookupElementStrings
+        doTest("""
+            --- testAnonymous.lua
 
-        assertNotNull(strings)
-        assertTrue(strings!!.contains("pp"))
+            local function test()
+                local v = xx()
+                v.pp = 123
+                return v
+            end
+            local v = test()
+            v.--[[caret]]
+        """, {
+            assertTrue(it.contains("pp"))
+        })
+    }
+
+    fun `test doc table 1`() {
+        doTest("""
+             --- doc_table_test_A.lua
+
+             ---@return { name:string, value:number }
+             function getData() end
+
+             --- doc_table_test_B.lua
+             local a = getData()
+             a.--[[caret]]
+        """, {
+            assertTrue(it.contains("name"))
+        })
     }
 }

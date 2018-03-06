@@ -127,9 +127,9 @@ class FileTree(private val rootDirectory: Entry.Directory) {
 }
 
 class TestProject(
-    private val project: Project,
-    val root: VirtualFile,
-    val filesWithCaret: List<String>
+        private val project: Project,
+        private val root: VirtualFile,
+        private val filesWithCaret: List<String>
 ) {
     val fileWithCaret: String get() = filesWithCaret.singleOrNull()!!
 
