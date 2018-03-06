@@ -110,6 +110,17 @@ fun LuaExprList.getExprAt(idx: Int): LuaExpr? {
     return exprStubList.getOrNull(idx)
 }
 
+fun LuaExprList.guessType(context: SearchContext):ITy {
+    val exprList = exprStubList
+    return if (exprList.size == 1)
+        exprList.first().guessType(context)
+    else {
+        val list = mutableListOf<ITy>()
+        exprList.forEach { list.add(it.guessType(context)) }
+        TyTuple(list)
+    }
+}
+
 fun LuaParametersOwner.getIndexFor(paramNameDef: LuaParamNameDef): Int {
     val list = this.paramNameDefList
     if (list != null) {

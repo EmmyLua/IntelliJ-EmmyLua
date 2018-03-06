@@ -34,7 +34,13 @@ class SearchContext(val project: Project, private val currentFile: PsiFile? = nu
     /**
      * 用于有多返回值的索引设定
      */
-    var index: Int = 0
+    var index: Int = -1
+
+    fun resetIndex() {
+        index = -1
+    }
+
+    fun guessTuple() = index < 0
 
     private var scope: GlobalSearchScope? = null
 

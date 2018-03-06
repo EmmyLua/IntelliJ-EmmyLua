@@ -34,7 +34,6 @@ import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaIcons
@@ -376,57 +375,7 @@ fun getParamNameDefList(forAStat: LuaForAStat): List<LuaParamNameDef> {
 }
 
 fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
-    if (owner is StubBasedPsiElementBase<*>) {
-        val stub = owner.stub
-        if (stub is LuaFuncBodyOwnerStub<*>) {
-            return stub.guessReturnTy(searchContext)
-        }
-    }
-
-    return guessReturnTypeInner(owner, searchContext)
-}
-
-private fun guessReturnTypeInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
-    if (owner is LuaCommentOwner) {
-        val comment = LuaCommentUtil.findComment(owner)
-        if (comment != null) {
-            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
-            if (returnDef != null) {
-                return returnDef.resolveTypeAt(searchContext.index)
-            }
-        }
-    }
-
-    //infer from return stat
-    return recursionGuard(owner, Computable {
-        var type: ITy = Ty.VOID
-        owner.acceptChildren(object : LuaRecursiveVisitor() {
-            override fun visitReturnStat(o: LuaReturnStat) {
-                val guessReturnType = guessReturnType(o, searchContext.index, searchContext)
-                TyUnion.each(guessReturnType) {
-                    /**
-                     * 注意，不能排除anonymous
-                     * local function test()
-                     *      local v = xxx()
-                     *      v.yyy = zzz
-                     *      return v
-                     * end
-                     *
-                     * local r = test()
-                     *
-                     * type of r is an anonymous ty
-                     */
-                    type = type.union(it)
-                }
-            }
-
-            override fun visitFuncBodyOwner(o: LuaFuncBodyOwner) { }
-
-            override fun visitClosureExpr(o: LuaClosureExpr) { }
-        })
-        CachedValueProvider.Result.create(type, owner)
-        type
-    }) ?: Ty.UNKNOWN
+    return inferReturnTy(owner, searchContext)
 }
 
 fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {
@@ -624,7 +573,10 @@ fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchConte
         val returnExpr = returnStat.exprList
         if (returnExpr != null) {
             context.index = index
-            return returnExpr.guessTypeAt(context)
+            return if (context.guessTuple())
+                returnExpr.guessType(context)
+            else
+                returnExpr.guessTypeAt(context)
         }
     }
     return Ty.UNKNOWN

@@ -465,4 +465,7 @@ class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
     override val displayName: String
         get() = "Tuple"
 
+    val size: Int get() {
+        return list.size
+    }
 }

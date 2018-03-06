@@ -66,7 +66,8 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
         if (comment != null) {
             val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
             if (returnDef != null) {
-                return returnDef.resolveTypeAt(searchContext.index)
+                //return returnDef.resolveTypeAt(searchContext.index)
+                return returnDef.type
             }
         }
     }
