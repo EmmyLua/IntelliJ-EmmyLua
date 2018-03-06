@@ -25,6 +25,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyTuple
 
 class ReturnTypeInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
@@ -35,24 +36,20 @@ class ReturnTypeInspection : StrictInspection() {
                         return
 
                     val context = SearchContext(o.project)
-
-                    val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java)
-                    var abstractTypes = if (bodyOwner is LuaClassMethodDef) {
+                    val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java) ?: return
+                    val abstractType = if (bodyOwner is LuaClassMethodDef) {
                         guessSuperReturnTypes(bodyOwner, context)
                     } else {
-                        if (bodyOwner == null) {
-                            myHolder.registerProblem(o, "Return statement needs to be in function.")
-                        }
-                        val comment = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
-                        comment?.typeList?.tyList?.map { it.getType() } ?: listOf()
+                        val returnDef = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
+                        returnDef?.type
                     }
-
-                    val concreteValues = o.exprList?.exprList ?: listOf()
-                    val concreteTypes = concreteValues.map { expr -> expr.guessType(context) }
+                    val concreteType = guessReturnType(o, -1, context)
+                    var abstractTypes = toList(abstractType)
+                    val concreteTypes = toList(concreteType)
 
                     // Extend expected types with nil until the same amount as given types
                     if (abstractTypes.size < concreteTypes.size) {
-                        abstractTypes += List(concreteTypes.size - abstractTypes.size, { Ty.NIL })
+                        abstractTypes += List(concreteTypes.size - abstractTypes.size, { Ty.UNKNOWN })
                     }
 
                     // Check number
@@ -63,16 +60,26 @@ class ReturnTypeInspection : StrictInspection() {
                             myHolder.registerProblem(o.lastChild, "Incorrect number of return values. Expected %s but found %s.".format(abstractTypes.size, concreteTypes.size))
                         }
                     } else {
-                        for (i in 0 until concreteValues.size) {
+                        for (i in 0 until concreteTypes.size) {
                             if (!concreteTypes[i].subTypeOf(abstractTypes[i], context)) {
-                                myHolder.registerProblem(concreteValues[i], "Type mismatch. Expected: '%s' Found: '%s'".format(abstractTypes[i], concreteTypes[i]))
+                                val abstractString = abstractTypes.joinToString(", ") { it.displayName }
+                                val concreteString = concreteTypes.joinToString(", ") { it.displayName }
+                                myHolder.registerProblem(o, "Type mismatch. Expected: '$abstractString' Found: '$concreteString'")
+                                break
                             }
                         }
                     }
                 }
 
-                private fun guessSuperReturnTypes(function: LuaClassMethodDef, context: SearchContext): List<ITy> {
-                    var types = listOf<ITy>()
+                private fun toList(type: ITy?): List<ITy> {
+                    return when (type) {
+                        is TyTuple -> type.list
+                        is ITy -> listOf(type)
+                        else -> emptyList()
+                    }
+                }
+
+                private fun guessSuperReturnTypes(function: LuaClassMethodDef, context: SearchContext): ITy? {
                     val comment = function.comment
                     if (comment != null) {
                         if (comment.isOverride()) {
@@ -80,43 +87,41 @@ class ReturnTypeInspection : StrictInspection() {
                             val superClass = function.guessClassType(context)
                             val superMember = superClass?.findSuperMember(function.name ?: "", context)
                             if (superMember is LuaClassMethodDef) {
-                                val typeDef = superMember.comment?.returnDef?.typeList?.tyList ?: listOf()
-                                types = typeDef.map { ty -> ty.getType() }
+                                return superMember.guessReturnType(context)
                             }
                         } else {
-                            val funcTypes = comment.returnDef?.typeList?.tyList ?: listOf()
-                            types = funcTypes.map { ty -> ty.getType() }
+                            return comment.returnDef?.type
                         }
                     }
-                    return types
+                    return null
                 }
 
                 override fun visitFuncBody(o: LuaFuncBody) {
                     super.visitFuncBody(o)
 
-                    // Ignore empty functions -- Definitions
-                    if (o.children.size < 2) return
-                    if (o.children[1].children.isEmpty()) return
-
-                    // Find function definition
-                    val context = SearchContext(o.project)
-                    val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java)
-
-                    val types = if (bodyOwner is LuaClassMethodDef) {
-                        guessSuperReturnTypes(bodyOwner, context)
-                    } else {
-                        if (bodyOwner == null) {
-                            myHolder.registerProblem(o, "Return statement needs to be in function.")
-                        }
-                        val comment = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
-                        comment?.typeList?.tyList?.map { it.getType() } ?: listOf()
-                    }
-
                     // If some return type is defined, we require at least one return type
-                    val returns = PsiTreeUtil.findChildOfType(o, LuaReturnStat::class.java)
+                    val returnStat = PsiTreeUtil.findChildOfType(o, LuaReturnStat::class.java)
 
-                    if (!types.isEmpty() && types[0] != Ty.NIL && returns == null) {
-                        myHolder.registerProblem(o, "Return type '%s' specified but no return values found.".format(types.joinToString(",")))
+                    if (returnStat == null) {
+                        // Find function definition
+                        val context = SearchContext(o.project)
+                        val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java)
+
+                        val type = if (bodyOwner is LuaClassMethodDef) {
+                            guessSuperReturnTypes(bodyOwner, context)
+                        } else {
+                            /*if (bodyOwner == null) {
+                                myHolder.registerProblem(o, "Return statement needs to be in function.")
+                            }*/
+                            val returnDef = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
+                            returnDef?.type
+                        }
+
+                        val types = toList(type)
+
+                        if (types.isNotEmpty()) {
+                            myHolder.registerProblem(o, "Return type '%s' specified but no return values found.".format(types.joinToString(",")))
+                        }
                     }
                 }
             }
