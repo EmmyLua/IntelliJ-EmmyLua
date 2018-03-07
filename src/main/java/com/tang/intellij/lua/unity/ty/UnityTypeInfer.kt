@@ -31,7 +31,7 @@ class UnityTypeInfer : ILuaTypeInfer {
         return when (target) {
             is LuaCallExpr -> {
                 val name = (target.expr as? PsiNamedElement)?.name
-                if (name == "GetComponent") {
+                if (name == "GetComponent" && !context.isDumb) {
                     val arg = target.argList.firstOrNull()
                     if (arg is LuaLiteralExpr) {
                         val shortName = arg.stringValue
@@ -39,6 +39,7 @@ class UnityTypeInfer : ILuaTypeInfer {
                         LuaClassIndex.processKeys(context.project, Processor {
                             if (it.endsWith(shortName)) {
                                 ty = createSerializedClass(it)
+                                return@Processor false
                             }
                             true
                         })
