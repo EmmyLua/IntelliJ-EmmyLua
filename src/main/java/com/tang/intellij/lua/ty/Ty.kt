@@ -46,9 +46,9 @@ enum class TyPrimitiveKind {
 }
 class TyFlags {
     companion object {
-        val ANONYMOUS = 0x1
-        val GLOBAL = 0x2
-        val SELF_FUNCTION = 0x4 // xxx.method()
+        const val ANONYMOUS = 0x1
+        const val GLOBAL = 0x2
+        const val SELF_FUNCTION = 0x4 // xxx.method()
     }
 }
 
@@ -96,7 +96,7 @@ private val ITy.worth: Float get() {
 
 abstract class Ty(override val kind: TyKind) : ITy {
 
-    override final var flags: Int = 0
+    final override var flags: Int = 0
 
     fun addFlag(flag: Int) {
         flags = flags or flag
