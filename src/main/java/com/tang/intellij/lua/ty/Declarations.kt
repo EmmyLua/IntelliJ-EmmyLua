@@ -321,7 +321,11 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 val args = p2.args
                 if (args is LuaListArgs) {
                     val closureIndex = args.getIndexFor(paramOwner)
-                    val paramTy = type.mainSignature.getParamTy(closureIndex)
+                    var sig = type.mainSignature
+                    val substitutor = p2.createSubstitutor(sig, context)
+                    if (substitutor != null) sig = sig.substitute(substitutor)
+
+                    val paramTy = sig.getParamTy(closureIndex)
                     if (paramTy is ITyFunction) {
                         val paramIndex = paramOwner.getIndexFor(paramNameDef)
                         return paramTy.mainSignature.getParamTy(paramIndex)

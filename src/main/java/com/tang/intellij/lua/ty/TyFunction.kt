@@ -119,7 +119,8 @@ class FunSignature(override val selfCall: Boolean,
     }
 
     override fun substitute(substitutor: ITySubstitutor): IFunSignature {
-        return FunSignature(selfCall, returnTy.substitute(substitutor), params)
+        val list = params.map { it.substitute(substitutor) }
+        return FunSignature(selfCall, returnTy.substitute(substitutor), list.toTypedArray())
     }
 }
 

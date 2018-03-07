@@ -99,8 +99,7 @@ private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, context:SearchContext)
     return infer(lhs, context)
 }
 
-private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy? {
-    var resultSig = sig
+fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): ITySubstitutor? {
     if (sig.isGeneric()) {
         val list = this.argList.map { it.guessType(context.clone()) }
         val map = mutableMapOf<String, ITy>()
@@ -116,11 +115,20 @@ private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext):
                 }
             }
         }
-        resultSig = sig.substitute(object : TySubstitutor() {
+        return object : TySubstitutor() {
             override fun substitute(clazz: ITyClass): ITy {
                 return map.getOrElse(clazz.className, { clazz })
             }
-        })
+        }
+    }
+    return null
+}
+
+private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy? {
+    var resultSig = sig
+    val substitutor = createSubstitutor(sig, context)
+    if (substitutor != null) {
+        resultSig = sig.substitute(substitutor)
     }
     val returnTy = resultSig.returnTy
     return if (returnTy is TyTuple) {

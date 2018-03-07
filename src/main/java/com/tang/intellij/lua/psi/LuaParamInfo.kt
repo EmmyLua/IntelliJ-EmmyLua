@@ -20,6 +20,7 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITySubstitutor
 import com.tang.intellij.lua.ty.Ty
 
 import java.io.IOException
@@ -42,6 +43,14 @@ class LuaParamInfo {
 
     override fun hashCode(): Int {
         return ty.hashCode()
+    }
+
+    fun substitute(substitutor: ITySubstitutor): LuaParamInfo {
+        val pi = LuaParamInfo()
+        pi.isVarArgs = isVarArgs
+        pi.name = name
+        pi.ty = ty.substitute(substitutor)
+        return pi
     }
 
     companion object {
