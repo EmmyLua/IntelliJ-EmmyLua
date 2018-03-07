@@ -20,7 +20,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.search.SearchContext
 
-class TyParameter(val name:String) : Ty(TyKind.GenericParam) {
+class TyParameter(val name:String, val base: ITy? = null) : Ty(TyKind.GenericParam) {
     override val displayName: String
         get() = "<$name>"
 
