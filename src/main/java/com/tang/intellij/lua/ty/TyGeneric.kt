@@ -25,7 +25,7 @@ interface IGenericDef {
     val base: String?
 }
 
-class TyGenericParam(val name:String) : Ty(TyKind.GenericParam) {
+class TyParameter(val name:String) : Ty(TyKind.GenericParam) {
     override val displayName: String
         get() = "<$name>"
 }
