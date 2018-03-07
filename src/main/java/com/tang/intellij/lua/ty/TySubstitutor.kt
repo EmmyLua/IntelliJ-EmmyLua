@@ -20,9 +20,12 @@ interface ITySubstitutor {
     fun substitute(function: ITyFunction): ITy
     fun substitute(clazz: ITyClass): ITy
     fun substitute(generic: ITyGeneric): ITy
+    fun substitute(ty: ITy): ITy
 }
 
 open class TySubstitutor : ITySubstitutor {
+    override fun substitute(ty: ITy) = ty
+
     override fun substitute(clazz: ITyClass): ITy {
         return clazz
     }

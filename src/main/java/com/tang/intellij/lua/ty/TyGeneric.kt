@@ -60,10 +60,6 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
                 && params.indices.all({ i -> params[i].subTypeOf(other.params[i], context) }) // Params need to be subtypes
 
     }
-
-    override fun substitute(substitutor: ITySubstitutor): ITy {
-        return substitutor.substitute(this)
-    }
 }
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {

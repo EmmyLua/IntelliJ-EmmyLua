@@ -148,6 +148,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return other.worth.compareTo(worth)
     }
 
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        return substitutor.substitute(this)
+    }
+
     companion object {
 
         val UNKNOWN = TyUnknown()
@@ -292,8 +296,6 @@ class TyPrimitive(val primitiveKind: TyPrimitiveKind, override val displayName: 
     override fun hashCode(): Int {
         return primitiveKind.hashCode()
     }
-
-    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 interface ITyArray : ITy {
@@ -455,8 +457,6 @@ class TyUnknown : Ty(TyKind.Unknown) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return true
     }
-
-    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 class TyNil : Ty(TyKind.Nil) {
@@ -467,8 +467,6 @@ class TyNil : Ty(TyKind.Nil) {
 
         return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
     }
-
-    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 class TyVoid : Ty(TyKind.Void) {
@@ -478,8 +476,6 @@ class TyVoid : Ty(TyKind.Void) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return false
     }
-
-    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
