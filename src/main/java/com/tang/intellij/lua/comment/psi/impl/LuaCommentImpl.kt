@@ -26,8 +26,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.*
 
 /**
  * Created by Tangzx on 2016/11/21.
@@ -144,6 +143,27 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
             elem = elem.nextSibling
         }
         return false
+    }
+
+    override fun createSubstitutor(): ITySubstitutor? {
+        val list = findTags(LuaDocGenericDef::class.java) ?: return null
+        val map = mutableMapOf<String, String>()
+        for (def in list) {
+            val name = def.name
+            if (name != null) {
+                val base = def.classNameRef?.text
+                if (base != null) map[name] = base
+            }
+        }
+        return object : TySubstitutor() {
+            override fun substitute(clazz: ITyClass): ITy {
+                val base = map[clazz.className]
+                if (base != null) {
+                    return TySerializedClass(clazz.className, clazz.className, base)
+                }
+                return super.substitute(clazz)
+            }
+        }
     }
 
     override fun toString(): String {

@@ -21,6 +21,7 @@ import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITySubstitutor
 
 /**
  * Created by Tangzx on 2016/11/21.
@@ -38,4 +39,5 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     val returnDef: LuaDocReturnDef?
     fun guessType(context: SearchContext): ITy
     fun isOverride(): Boolean
+    fun createSubstitutor(): ITySubstitutor?
 }

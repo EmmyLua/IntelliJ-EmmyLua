@@ -26,6 +26,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
@@ -108,7 +109,13 @@ fun getVisibility(fieldDef: LuaDocFieldDef): Visibility {
  * @return 类型集合
  */
 fun getType(paramDec: LuaDocParamDef): ITy {
-    return paramDec.ty?.getType() ?: return Ty.UNKNOWN
+    val type = paramDec.ty?.getType()
+    if (type != null) {
+        val substitutor = LuaCommentUtil.findContainer(paramDec).createSubstitutor()
+        if (substitutor != null)
+            return type.substitute(substitutor)
+    }
+    return type ?: Ty.UNKNOWN
 }
 
 /**
