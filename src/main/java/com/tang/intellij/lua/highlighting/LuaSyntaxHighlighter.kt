@@ -95,7 +95,8 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
                 LuaDocTypes.TAG_PRIVATE,
                 LuaDocTypes.TAG_PROTECTED,
                 LuaDocTypes.TAG_PUBLIC,
-                LuaDocTypes.TAG_SEE
+                LuaDocTypes.TAG_SEE,
+                LuaDocTypes.TAG_GENERIC
         )
         private val DOC_KEYWORD_TOKENS = TokenSet.create(
                 LuaDocTypes.FUN

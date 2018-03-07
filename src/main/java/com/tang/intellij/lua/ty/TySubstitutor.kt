@@ -17,5 +17,23 @@
 package com.tang.intellij.lua.ty
 
 interface ITySubstitutor {
-    fun substitute(parameter: TyParameter): ITy
+    fun substitute(function: ITyFunction): ITy
+    fun substitute(clazz: ITyClass): ITy
+    fun substitute(generic: ITyGeneric): ITy
+}
+
+open class TySubstitutor : ITySubstitutor {
+    override fun substitute(clazz: ITyClass): ITy {
+        return clazz
+    }
+
+    override fun substitute(generic: ITyGeneric): ITy {
+        return generic
+    }
+
+    override fun substitute(function: ITyFunction): ITy {
+        return TySerializedFunction(function.mainSignature.substitute(this),
+                function.signatures.map { it.substitute(this) }.toTypedArray(),
+                function.flags)
+    }
 }

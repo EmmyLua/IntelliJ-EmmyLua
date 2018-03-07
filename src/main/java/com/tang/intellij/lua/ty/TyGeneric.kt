@@ -20,20 +20,12 @@ import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.search.SearchContext
 
-interface IGenericDef {
-    val name: String
-    val base: String?
-}
-
 class TyParameter(val name:String) : Ty(TyKind.GenericParam) {
     override val displayName: String
         get() = "<$name>"
-}
 
-data class GenericDef(
-        override val name: String,
-        override val base: String?
-) : IGenericDef
+    override fun substitute(substitutor: ITySubstitutor) = this
+}
 
 interface ITyGeneric : ITy {
     val params: Array<ITy>
@@ -67,6 +59,10 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
                 && params.size == other.params.size // Equal amount of params
                 && params.indices.all({ i -> params[i].subTypeOf(other.params[i], context) }) // Params need to be subtypes
 
+    }
+
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        return substitutor.substitute(this)
     }
 }
 

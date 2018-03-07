@@ -35,8 +35,8 @@ interface IFunSignature {
     val params: Array<LuaParamInfo>
     val displayName: String
     val paramSignature: String
-    val genericDefList: List<IGenericDef>
-    fun configGeneric(types: List<ITy>)
+    val tyParameters: List<TyParameter>
+    fun substitute(substitutor: ITySubstitutor): IFunSignature
 }
 
 fun IFunSignature.getParamTy(index: Int): ITy {
@@ -49,12 +49,12 @@ fun IFunSignature.hasVarArgs(): Boolean {
     return params.lastOrNull()?.isVarArgs ?: false
 }
 
-fun IFunSignature.isGeneric() = genericDefList.isNotEmpty()
+fun IFunSignature.isGeneric() = tyParameters.isNotEmpty()
 
 class FunSignature(override val selfCall: Boolean,
                    override val returnTy: ITy,
                    override val params: Array<LuaParamInfo>,
-                   override val genericDefList: List<IGenericDef> = emptyList()
+                   override val tyParameters: List<TyParameter> = emptyList()
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
@@ -118,8 +118,8 @@ class FunSignature(override val selfCall: Boolean,
         return "(" + list.joinToString(", ") + ")"
     }
 
-    override fun configGeneric(types: List<ITy>) {
-
+    override fun substitute(substitutor: ITySubstitutor): IFunSignature {
+        return FunSignature(selfCall, returnTy.substitute(substitutor), params)
     }
 }
 
@@ -185,6 +185,10 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
         }
         return false
     }
+
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        return substitutor.substitute(this)
+    }
 }
 
 class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
@@ -209,9 +213,10 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
         }
 
         val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
-        val list = genericDefList?.map { GenericDef(it.name!!, null) }
+        val list = mutableListOf<TyParameter>()
+        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name)) } }
 
-        FunSignature(selfCall, returnTy, psi.params, list ?: emptyList())
+        FunSignature(selfCall, returnTy, psi.params, list)
     }
 
     override val signatures: Array<IFunSignature> by lazy {

@@ -100,11 +100,29 @@ private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, context:SearchContext)
 }
 
 private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy? {
-    val returnTy = sig.returnTy
+    var resultSig = sig
     if (sig.isGeneric()) {
         val list = this.argList.map { it.guessType(context.clone()) }
-        sig.configGeneric(list)
+        val map = mutableMapOf<String, ITy>()
+        sig.params.forEach {
+            val ty = it.ty
+            if (ty is ITyClass) {
+                for (i in 0 until sig.tyParameters.size) {
+                    val parameter = sig.tyParameters[i]
+                    if (parameter.name == ty.className) {
+                        map[parameter.name] = list.getOrElse(i, { Ty.UNKNOWN })
+                        break
+                    }
+                }
+            }
+        }
+        resultSig = sig.substitute(object : TySubstitutor() {
+            override fun substitute(clazz: ITyClass): ITy {
+                return map.getOrElse(clazz.className, { clazz })
+            }
+        })
     }
+    val returnTy = resultSig.returnTy
     return if (returnTy is TyTuple) {
         if (context.guessTuple())
             returnTy

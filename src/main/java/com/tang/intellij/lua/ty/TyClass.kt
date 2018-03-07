@@ -177,6 +177,10 @@ abstract class TyClass(override val className: String,
         return false
     }
 
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        return substitutor.substitute(this)
+    }
+
     companion object {
         // for _G
         val G: TyClass = createSerializedClass(Constants.WORD_G)

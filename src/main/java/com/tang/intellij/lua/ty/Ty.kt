@@ -67,6 +67,8 @@ interface ITy : Comparable<ITy> {
     fun subTypeOf(other: ITy, context: SearchContext): Boolean
 
     fun getSuperClass(context: SearchContext): ITy?
+
+    fun substitute(substitutor: ITySubstitutor): ITy
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -290,6 +292,8 @@ class TyPrimitive(val primitiveKind: TyPrimitiveKind, override val displayName: 
     override fun hashCode(): Int {
         return primitiveKind.hashCode()
     }
+
+    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 interface ITyArray : ITy {
@@ -310,6 +314,10 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return super.subTypeOf(other, context) || (other is TyArray && base.subTypeOf(other.base, context)) || other == Ty.TABLE
+    }
+
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        return TyArray(base.substitute(substitutor))
     }
 }
 
@@ -343,6 +351,12 @@ class TyUnion : Ty(TyKind.Union) {
 
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return super.subTypeOf(other, context) || childSet.any { type -> type.subTypeOf(other, context) }
+    }
+
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        val u = TyUnion()
+        childSet.forEach { u.childSet.add(it.substitute(substitutor)) }
+        return u
     }
 
     companion object {
@@ -441,6 +455,8 @@ class TyUnknown : Ty(TyKind.Unknown) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return true
     }
+
+    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 class TyNil : Ty(TyKind.Nil) {
@@ -451,6 +467,8 @@ class TyNil : Ty(TyKind.Nil) {
 
         return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
     }
+
+    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 class TyVoid : Ty(TyKind.Void) {
@@ -460,6 +478,8 @@ class TyVoid : Ty(TyKind.Void) {
     override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
         return false
     }
+
+    override fun substitute(substitutor: ITySubstitutor) = this
 }
 
 class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
@@ -468,5 +488,10 @@ class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
 
     val size: Int get() {
         return list.size
+    }
+
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        val list = list.map { it.substitute(substitutor) }
+        return TyTuple(list)
     }
 }
