@@ -99,6 +99,23 @@ private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, context:SearchContext)
     return infer(lhs, context)
 }
 
+private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy? {
+    val returnTy = sig.returnTy
+    if (sig.isGeneric()) {
+        val list = this.argList.map { it.guessType(context.clone()) }
+        sig.configGeneric(list)
+    }
+    return if (returnTy is TyTuple) {
+        if (context.guessTuple())
+            returnTy
+        else returnTy.list.getOrNull(context.index)
+    } else {
+        if (context.guessTuple() || context.index == 0)
+            returnTy
+        else null
+    }
+}
+
 private fun LuaCallExpr.infer(context: SearchContext): ITy {
     val luaCallExpr = this
     // xxx()
@@ -125,16 +142,7 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
         when (it) {
             is ITyFunction -> {
                 it.process(Processor { sig ->
-                    val returnTy = sig.returnTy
-                    val targetTy = if (returnTy is TyTuple) {
-                        if (context.guessTuple())
-                            returnTy
-                        else returnTy.list.getOrNull(context.index)
-                    } else {
-                        if (context.guessTuple() || context.index == 0)
-                            returnTy
-                        else null
-                    }
+                    val targetTy = getReturnTy(sig, context)
 
                     if (targetTy != null)
                         ret = ret.union(targetTy)

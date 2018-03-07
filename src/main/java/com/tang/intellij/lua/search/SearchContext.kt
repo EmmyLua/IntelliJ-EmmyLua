@@ -57,6 +57,8 @@ class SearchContext(val project: Project, private val currentFile: PsiFile? = nu
 
     val isDumb: Boolean
         get() = DumbService.isDumb(project) || currentFile != null
+
+    fun clone() = SearchContext(project, currentFile)
 }
 
 class LuaPredefinedScope : AdditionalIndexedRootsScope {

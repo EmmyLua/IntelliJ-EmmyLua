@@ -20,6 +20,8 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
+import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.overloads
@@ -33,6 +35,8 @@ interface IFunSignature {
     val params: Array<LuaParamInfo>
     val displayName: String
     val paramSignature: String
+    val genericDefList: List<IGenericDef>
+    fun configGeneric(types: List<ITy>)
 }
 
 fun IFunSignature.getParamTy(index: Int): ITy {
@@ -45,7 +49,13 @@ fun IFunSignature.hasVarArgs(): Boolean {
     return params.lastOrNull()?.isVarArgs ?: false
 }
 
-class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, override val params: Array<LuaParamInfo>) : IFunSignature {
+fun IFunSignature.isGeneric() = genericDefList.isNotEmpty()
+
+class FunSignature(override val selfCall: Boolean,
+                   override val returnTy: ITy,
+                   override val params: Array<LuaParamInfo>,
+                   override val genericDefList: List<IGenericDef> = emptyList()
+) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
             return params.indices.none { params[it] != other.params.getOrNull(it) }
@@ -106,6 +116,10 @@ class FunSignature(override val selfCall: Boolean, override val returnTy: ITy, o
             list[i] = lpi.name
         }
         return "(" + list.joinToString(", ") + ")"
+    }
+
+    override fun configGeneric(types: List<ITy>) {
+
     }
 }
 
@@ -193,7 +207,11 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
         if (returnTy is TyPsiFunction && returnTy.psi == psi) {
            returnTy = Ty.UNKNOWN
         }
-        FunSignature(selfCall, returnTy, psi.params)
+
+        val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
+        val list = genericDefList?.map { GenericDef(it.name!!, null) }
+
+        FunSignature(selfCall, returnTy, psi.params, list ?: emptyList())
     }
 
     override val signatures: Array<IFunSignature> by lazy {
