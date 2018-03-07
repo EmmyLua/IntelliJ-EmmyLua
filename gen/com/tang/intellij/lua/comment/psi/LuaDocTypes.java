@@ -18,6 +18,7 @@ public interface LuaDocTypes {
   IElementType FUNCTION_PARAM = LuaParserDefinitionKt.createDocType("FUNCTION_PARAM");
   IElementType FUNCTION_TY = LuaParserDefinitionKt.createDocType("FUNCTION_TY");
   IElementType GENERAL_TY = LuaParserDefinitionKt.createDocType("GENERAL_TY");
+  IElementType GENERIC_DEF = LuaParserDefinitionKt.createDocType("GENERIC_DEF");
   IElementType GENERIC_TY = LuaParserDefinitionKt.createDocType("GENERIC_TY");
   IElementType LAN_DEF = LuaParserDefinitionKt.createDocType("LAN_DEF");
   IElementType OVERLOAD_DEF = LuaParserDefinitionKt.createDocType("OVERLOAD_DEF");
@@ -60,6 +61,7 @@ public interface LuaDocTypes {
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
   IElementType TAG_CLASS = new LuaDocTokenType("class");
   IElementType TAG_FIELD = new LuaDocTokenType("field");
+  IElementType TAG_GENERIC = new LuaDocTokenType("generic");
   IElementType TAG_LANGUAGE = new LuaDocTokenType("language");
   IElementType TAG_MODULE = new LuaDocTokenType("module");
   IElementType TAG_NAME = new LuaDocTokenType("TAG_NAME");
@@ -101,6 +103,9 @@ public interface LuaDocTypes {
       }
       else if (type == GENERAL_TY) {
         return new LuaDocGeneralTyImpl(node);
+      }
+      else if (type == GENERIC_DEF) {
+        return new LuaDocGenericDefImpl(node);
       }
       else if (type == GENERIC_TY) {
         return new LuaDocGenericTyImpl(node);

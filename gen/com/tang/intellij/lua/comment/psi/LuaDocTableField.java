@@ -29,7 +29,7 @@ public interface LuaDocTableField extends LuaClassField, PsiNameIdentifierOwner,
   @NotNull
   PsiElement setName(String newName);
 
-  @Nullable
+  @NotNull
   String getName();
 
   @Nullable

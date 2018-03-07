@@ -69,6 +69,7 @@
         TAG_OVERLOAD = 'overload'
         TAG_MODULE = 'module'
         TAG_SEE = 'see'
+        TAG_GENERIC = 'generic'
   ]
 }
 
@@ -85,7 +86,8 @@ private doc_item ::= '@' (param_def
     | overload_def
     | see_ref_tag
     | tag_def
-    | access_modifier)
+    | access_modifier
+    | generic_def)
 
 ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
@@ -241,5 +243,19 @@ see_ref_tag ::= TAG_SEE class_name_ref (SHARP ID)? {
     pin = 1
     methods = [
         getReference
+    ]
+}
+
+generic_def ::= TAG_GENERIC ID (EXTENDS class_name_ref)? {
+    pin = 1
+    implements = [
+        "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+    ]
+    methods = [
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
     ]
 }

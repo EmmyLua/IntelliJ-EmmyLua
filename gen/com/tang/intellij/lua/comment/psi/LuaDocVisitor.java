@@ -46,6 +46,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
+  public void visitGenericDef(@NotNull LuaDocGenericDef o) {
+    visitPsiNameIdentifierOwner(o);
+  }
+
   public void visitGenericTy(@NotNull LuaDocGenericTy o) {
     visitTy(o);
   }
@@ -121,6 +125,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitType(@NotNull LuaDocType o) {
     visitPsiElement(o);
+  }
+
+  public void visitPsiNameIdentifierOwner(@NotNull PsiNameIdentifierOwner o) {
+    visitElement(o);
   }
 
   public void visitPsiElement(@NotNull LuaDocPsiElement o) {

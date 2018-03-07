@@ -292,3 +292,7 @@ fun guessType(f:LuaDocTableField, context: SearchContext): ITy {
     val ty = if (stub != null) stub.docTy else f.ty?.getType()
     return ty ?: Ty.UNKNOWN
 }
+
+fun getNameIdentifier(g: LuaDocGenericDef): PsiElement? {
+    return g.id
+}

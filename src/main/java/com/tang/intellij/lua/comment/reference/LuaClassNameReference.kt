@@ -20,7 +20,9 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
@@ -45,6 +47,12 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
 
     override fun resolve(): PsiElement? {
         val name = myElement.text
+        // generic ?
+        val comment = LuaCommentUtil.findContainer(myElement)
+        for (genericDef in comment.findTags(LuaDocGenericDef::class.java)) {
+            if (genericDef.name == name)
+                return genericDef
+        }
         return LuaClassIndex.find(name, myElement.project, LuaPredefinedScope(myElement.project))
     }
 
