@@ -17,10 +17,9 @@
 package com.tang.intellij.test.completion
 
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.tang.intellij.test.LuaTestBase
 import com.tang.intellij.test.fileTreeFromText
 
-class TestModule : LuaTestBase() {
+class TestModule : TestCompletionBase() {
 
     fun `test module type`() {
         fileTreeFromText("""

@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.test.completion
+package com.tang.intellij.test.generic
 
-class TestTuple : TestCompletionBase() {
+import com.tang.intellij.test.completion.TestCompletionBase
 
-    fun `test tuple 1`() {
+class GenericTest : TestCompletionBase() {
+
+    fun `test generic 1`() {
         doTest("""
-            --- test_tuple_1.lua
+            --- test_generic_1.lua
 
-            ---@class Type1
-            local obj = { name = "name" }
-
-            ---@return number, Type1
-            local function getTuple()
+            ---@generic T
+            ---@param p1 T
+            ---@param func fun(value: T):void
+            local function test(p1, func)
             end
 
-            local a, b = getTuple()
-            b.--[[caret]]
+            test(io.open(), function(value)
+                value.--[[caret]]
+            end)
         """) {
-            assertTrue(it.contains("name"))
+            assertTrue(it.contains("write"))
         }
     }
+
 }

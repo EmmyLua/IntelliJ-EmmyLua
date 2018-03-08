@@ -16,23 +16,22 @@
 
 package com.tang.intellij.test.completion
 
-class TestTuple : TestCompletionBase() {
+import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.tang.intellij.test.LuaTestBase
+import com.tang.intellij.test.fileTreeFromText
 
-    fun `test tuple 1`() {
-        doTest("""
-            --- test_tuple_1.lua
+abstract class TestCompletionBase : LuaTestBase() {
+    override fun getTestDataPath(): String {
+        return "src/test/resources/completion"
+    }
 
-            ---@class Type1
-            local obj = { name = "name" }
+    fun doTest(code: String, action: (lookupStrings:List<String>) -> Unit) {
+        fileTreeFromText(code).createAndOpenFileWithCaretMarker()
 
-            ---@return number, Type1
-            local function getTuple()
-            end
-
-            local a, b = getTuple()
-            b.--[[caret]]
-        """) {
-            assertTrue(it.contains("name"))
-        }
+        FileDocumentManager.getInstance().saveAllDocuments()
+        myFixture.completeBasic()
+        val strings = myFixture.lookupElementStrings
+        assertNotNull(strings)
+        action(strings!!)
     }
 }

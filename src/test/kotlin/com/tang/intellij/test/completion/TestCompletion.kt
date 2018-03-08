@@ -16,30 +16,14 @@
 
 package com.tang.intellij.test.completion
 
-import com.tang.intellij.test.LuaTestBase
 import com.intellij.codeInsight.completion.CompletionType
-import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.tang.intellij.test.fileTreeFromText
 import java.util.*
 
 /**
  *
  * Created by tangzx on 2017/4/23.
  */
-open class TestCompletion : LuaTestBase() {
-    override fun getTestDataPath(): String {
-        return "src/test/resources/completion"
-    }
-
-    fun doTest(code: String, action: (lookupStrings:List<String>) -> Unit) {
-        fileTreeFromText(code).createAndOpenFileWithCaretMarker()
-
-        FileDocumentManager.getInstance().saveAllDocuments()
-        myFixture.completeBasic()
-        val strings = myFixture.lookupElementStrings
-        assertNotNull(strings)
-        action(strings!!)
-    }
+class TestCompletion : TestCompletionBase() {
 
     fun testLocalCompletion() {
         myFixture.configureByFiles("testCompletion.lua")
