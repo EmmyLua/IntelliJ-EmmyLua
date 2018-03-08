@@ -99,6 +99,7 @@ DOC_DASHES = --+
     "protected"                { yybegin(xTAG); return PROTECTED; }
     "public"                   { yybegin(xTAG); return PUBLIC; }
     {ID}                       { return ID; }
+    "..."                      { return ID; } //varargs
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 

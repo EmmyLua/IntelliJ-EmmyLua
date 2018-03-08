@@ -110,6 +110,7 @@ private tableField2 ::= ID ':' ty { pin = 1 }
 
 tableField ::= tableField2 {
     implements = [
+        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.tang.intellij.lua.psi.LuaClassField"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]

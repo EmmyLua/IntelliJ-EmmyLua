@@ -83,7 +83,8 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitTableField(@NotNull LuaDocTableField o) {
-    visitLuaClassField(o);
+    visitPsiElement(o);
+    // visitLuaClassField(o);
     // visitPsiNameIdentifierOwner(o);
   }
 

@@ -12,7 +12,7 @@ import com.tang.intellij.lua.psi.Visibility;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaDocTableField extends LuaClassField, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocTableFieldDefStub> {
+public interface LuaDocTableField extends LuaDocPsiElement, LuaClassField, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocTableFieldDefStub> {
 
   @Nullable
   LuaDocTy getTy();
