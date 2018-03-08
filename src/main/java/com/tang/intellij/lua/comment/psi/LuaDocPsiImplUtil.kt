@@ -138,11 +138,8 @@ fun resolveTypeAt(returnDef: LuaDocReturnDef, index: Int): ITy {
 fun getType(returnDef: LuaDocReturnDef): ITy {
     val tyList = returnDef.typeList?.tyList
     if (tyList != null && tyList.isNotEmpty()) {
-        val tupleList = mutableListOf<ITy>()
-        tyList.forEach {
-            tupleList.add(it.getType())
-        }
-        return TyTuple(tupleList)
+        val tupleList = tyList.map { it.getType() }
+        return if (tupleList.size == 1) tupleList.first() else TyTuple(tupleList)
     }
     return Ty.VOID
 }
