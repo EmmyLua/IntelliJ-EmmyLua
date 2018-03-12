@@ -90,10 +90,10 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                          completionResultSet: CompletionResultSet,
                          prefixMatcher: PrefixMatcher,
                          handlerProcessor: HandlerProcessor?) {
-        TyUnion.each(prefixType) { luaType ->
-            if (luaType is ITyClass)
-                addClass(contextTy, luaType, project, !isColon, completionResultSet, prefixMatcher, handlerProcessor)
-        }
+        prefixType.eachClassForCompletion(Processor { luaType ->
+            addClass(contextTy, luaType, project, !isColon, completionResultSet, prefixMatcher, handlerProcessor)
+            true
+        })
     }
 
     protected fun addClass(contextTy: ITy,

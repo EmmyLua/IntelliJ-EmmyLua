@@ -321,11 +321,11 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         val propName = indexExpr.name
         if (propName != null) {
             val prefixType = indexExpr.guessParentType(context)
-            TyUnion.each(prefixType) {
-                if (it is TyClass) {
-                    result = result.union(guessFieldType(propName, it, context))
-                }
-            }
+
+            prefixType.eachClassForCompletion(Processor {
+                result = result.union(guessFieldType(propName, it, context))
+                true
+            })
         }
         result
     })

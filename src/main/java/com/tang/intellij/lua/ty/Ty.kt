@@ -18,6 +18,8 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.Processor
+import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.project.LuaSettings
@@ -95,6 +97,22 @@ private val ITy.worth: Float get() {
         is ITyFunction -> value = 60f
     }
     return value
+}
+
+fun ITy.eachClassForCompletion(fn: Processor<ITyClass>) {
+    when (this) {
+        is ITyClass -> fn.process(this)
+        is TyUnion -> {
+            ContainerUtil.process(getChildTypes()) {
+                if (it is ITyClass && !fn.process(it))
+                    return@process false
+                true
+            }
+        }
+        is TyTuple -> {
+            (list.firstOrNull() as? ITyClass)?.let(fn::process)
+        }
+    }
 }
 
 abstract class Ty(override val kind: TyKind) : ITy {

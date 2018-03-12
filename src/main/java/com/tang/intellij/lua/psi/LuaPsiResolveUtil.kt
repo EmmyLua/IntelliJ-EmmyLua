@@ -24,8 +24,7 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.eachClassForCompletion
 
 internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): LuaFuncBodyOwner? {
     var ret:LuaFuncBodyOwner? = null
@@ -171,14 +170,12 @@ fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
     val type = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
-    TyUnion.process(type) { ty ->
-        if (ty is TyClass) {
-            ret = ty.findMember(idString, context)
-            if (ret != null)
-                return@process false
-        }
+    type.eachClassForCompletion(Processor { ty ->
+        ret = ty.findMember(idString, context)
+        if (ret != null)
+            return@Processor false
         true
-    }
+    })
     return ret
 }
 
