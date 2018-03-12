@@ -71,6 +71,8 @@ interface ITy : Comparable<ITy> {
     fun getSuperClass(context: SearchContext): ITy?
 
     fun substitute(substitutor: ITySubstitutor): ITy
+
+    fun eachTopClass(fn: Processor<ITyClass>)
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -97,22 +99,6 @@ private val ITy.worth: Float get() {
         is ITyFunction -> value = 60f
     }
     return value
-}
-
-fun ITy.eachClassForCompletion(fn: Processor<ITyClass>) {
-    when (this) {
-        is ITyClass -> fn.process(this)
-        is TyUnion -> {
-            ContainerUtil.process(getChildTypes()) {
-                if (it is ITyClass && !fn.process(it))
-                    return@process false
-                true
-            }
-        }
-        is TyTuple -> {
-            (list.firstOrNull() as? ITyClass)?.let(fn::process)
-        }
-    }
 }
 
 abstract class Ty(override val kind: TyKind) : ITy {
@@ -168,6 +154,22 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
         return substitutor.substitute(this)
+    }
+
+    override fun eachTopClass(fn: Processor<ITyClass>) {
+        when (this) {
+            is ITyClass -> fn.process(this)
+            is TyUnion -> {
+                ContainerUtil.process(getChildTypes()) {
+                    if (it is ITyClass && !fn.process(it))
+                        return@process false
+                    true
+                }
+            }
+            is TyTuple -> {
+                list.firstOrNull()?.eachTopClass(fn)
+            }
+        }
     }
 
     companion object {

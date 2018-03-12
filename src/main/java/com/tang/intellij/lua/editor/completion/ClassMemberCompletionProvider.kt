@@ -90,7 +90,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                          completionResultSet: CompletionResultSet,
                          prefixMatcher: PrefixMatcher,
                          handlerProcessor: HandlerProcessor?) {
-        prefixType.eachClassForCompletion(Processor { luaType ->
+        prefixType.eachTopClass(Processor { luaType ->
             addClass(contextTy, luaType, project, !isColon, completionResultSet, prefixMatcher, handlerProcessor)
             true
         })

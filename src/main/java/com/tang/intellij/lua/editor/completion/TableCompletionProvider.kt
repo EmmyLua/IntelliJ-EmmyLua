@@ -28,7 +28,6 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.eachClassForCompletion
 import com.tang.intellij.lua.ty.shouldBe
 
 class TableCompletionProvider : ClassMemberCompletionProvider() {
@@ -68,7 +67,7 @@ class TableCompletionProvider : ClassMemberCompletionProvider() {
             val project = table.project
             val prefixMatcher = completionResultSet.prefixMatcher
             val ty = table.shouldBe(SearchContext(project))
-            ty.eachClassForCompletion(Processor { luaType ->
+            ty.eachTopClass(Processor { luaType ->
                 val context = SearchContext(project)
                 luaType.lazyInit(context)
                 luaType.processMembers(context) { curType, member ->

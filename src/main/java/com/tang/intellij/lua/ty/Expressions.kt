@@ -322,7 +322,7 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         if (propName != null) {
             val prefixType = indexExpr.guessParentType(context)
 
-            prefixType.eachClassForCompletion(Processor {
+            prefixType.eachTopClass(Processor {
                 result = result.union(guessFieldType(propName, it, context))
                 true
             })
