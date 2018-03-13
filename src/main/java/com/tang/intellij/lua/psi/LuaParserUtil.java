@@ -257,4 +257,8 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
     public static boolean parseExpr(PsiBuilder b, int l, Parser primaryExprParser, Parser closureExprParser) {
         return LuaExpressionParser.INSTANCE.parse(b, l, primaryExprParser, closureExprParser);
     }
+
+    public static boolean parseTableFieldList(PsiBuilder b, int l) {
+        return LuaDeclarationParser.INSTANCE.parseTableFieldList(b, l);
+    }
 }
