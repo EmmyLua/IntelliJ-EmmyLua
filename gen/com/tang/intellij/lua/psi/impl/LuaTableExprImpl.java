@@ -37,21 +37,14 @@ public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr 
     else super.accept(visitor);
   }
 
-  @Override
-  @NotNull
-  public List<LuaTableField> getTableFieldList() {
-    return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaTableField.class);
-  }
-
-  @Override
-  @NotNull
-  public List<LuaTableFieldSep> getTableFieldSepList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaTableFieldSep.class);
-  }
-
   @Nullable
   public LuaTableField findField(String fieldName) {
     return LuaPsiImplUtilKt.findField(this, fieldName);
+  }
+
+  @NotNull
+  public List<LuaTableField> getTableFieldList() {
+    return LuaPsiImplUtilKt.getTableFieldList(this);
   }
 
 }

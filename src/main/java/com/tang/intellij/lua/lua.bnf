@@ -463,7 +463,10 @@ private parList_recover ::= !(')'|'in')
 
 tableExpr ::= '{' fieldList '}' {
     pin = 1
-    methods = [findField toString]
+    methods = [
+        findField
+        getTableFieldList
+    ]
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
         "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaTableExprStub>"

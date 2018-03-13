@@ -363,6 +363,10 @@ fun findField(table: LuaTableExpr, fieldName: String): LuaTableField? {
     return table.tableFieldList.firstOrNull { fieldName == it.name }
 }
 
+fun getTableFieldList(table: LuaTableExpr): List<LuaTableField> {
+    return PsiTreeUtil.getStubChildrenOfTypeAsList(table, LuaTableField::class.java)
+}
+
 fun getParamNameDefList(funcBodyOwner: LuaFuncBodyOwner): List<LuaParamNameDef> {
     val funcBody = funcBodyOwner.funcBody
     return funcBody?.paramNameDefList ?: emptyList()

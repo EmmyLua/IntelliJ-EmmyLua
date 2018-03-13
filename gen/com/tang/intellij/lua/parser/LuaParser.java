@@ -543,36 +543,36 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (expr ',')* expr
+  // expr (',' expr)*
   public static boolean exprList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "exprList")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, EXPR_LIST, "<expr list>");
-    r = exprList_0(b, l + 1);
-    r = r && expr(b, l + 1);
+    r = expr(b, l + 1);
+    r = r && exprList_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // (expr ',')*
-  private static boolean exprList_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "exprList_0")) return false;
+  // (',' expr)*
+  private static boolean exprList_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "exprList_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!exprList_0_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "exprList_0", c)) break;
+      if (!exprList_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "exprList_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
-  // expr ','
-  private static boolean exprList_0_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "exprList_0_0")) return false;
+  // ',' expr
+  private static boolean exprList_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "exprList_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = expr(b, l + 1);
-    r = r && consumeToken(b, COMMA);
+    r = consumeToken(b, COMMA);
+    r = r && expr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -590,63 +590,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
+  // <<parseTableFieldList>>
   static boolean fieldList(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fieldList")) return false;
-    fieldList_0(b, l + 1);
-    return true;
-  }
-
-  // tableField (tableFieldSep tableField)* (tableFieldSep)?
-  private static boolean fieldList_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fieldList_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = tableField(b, l + 1);
-    r = r && fieldList_0_1(b, l + 1);
-    r = r && fieldList_0_2(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (tableFieldSep tableField)*
-  private static boolean fieldList_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fieldList_0_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!fieldList_0_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "fieldList_0_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // tableFieldSep tableField
-  private static boolean fieldList_0_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fieldList_0_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = tableFieldSep(b, l + 1);
-    r = r && tableField(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // (tableFieldSep)?
-  private static boolean fieldList_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fieldList_0_2")) return false;
-    fieldList_0_2_0(b, l + 1);
-    return true;
-  }
-
-  // (tableFieldSep)
-  private static boolean fieldList_0_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "fieldList_0_2_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = tableFieldSep(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
+    return parseTableFieldList(b, l + 1);
   }
 
   /* ********************************************************** */
@@ -1214,15 +1160,15 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // parenExpr | nameExpr | literalExpr | tableExpr
+  // parenExpr | nameExpr | tableExpr | literalExpr
   static boolean prefixExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefixExpr")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = parenExpr(b, l + 1);
     if (!r) r = nameExpr(b, l + 1);
-    if (!r) r = literalExpr(b, l + 1);
     if (!r) r = tableExpr(b, l + 1);
+    if (!r) r = literalExpr(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1575,9 +1521,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // primaryExpr
+  // <<parsePrimaryExpr>>
   static boolean varExpr(PsiBuilder b, int l) {
-    return primaryExpr(b, l + 1);
+    return parsePrimaryExpr(b, l + 1);
   }
 
   /* ********************************************************** */
@@ -1585,7 +1531,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
   public static boolean varList(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "varList")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, VAR_LIST, "<var list>");
+    Marker m = enter_section_(b, l, _COLLAPSE_, VAR_LIST, "<var list>");
     r = varExpr(b, l + 1);
     r = r && varList_1(b, l + 1);
     exit_section_(b, l, m, r, false, null);

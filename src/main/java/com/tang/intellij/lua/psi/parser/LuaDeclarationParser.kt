@@ -66,25 +66,22 @@ object LuaDeclarationParser {
                 b.advanceLexer()
                 if (b.tokenType == ASSIGN) {
                     b.advanceLexer()
-                    if (!LuaParser.expr(b, l + 1)) {
+                    if (LuaExpressionParser.parseExpr(b, l + 1) == null) {
                         b.error("Expression expected")
                     }
                     m.done(TABLE_FIELD)
                     return m
                 }
-                m.done(NAME_EXPR)
-                val tf = m.precede()
-                tf.done(TABLE_FIELD)
-                return tf
+                m.rollbackTo()
             }
-            else -> {
-                val m = b.mark()
-                val expr = LuaExpressionParser.parseExpr(b, l + 1)
-                if (expr != null) {
-                    m.done(TABLE_FIELD)
-                    return m
-                } else m.drop()
-            }
+        }
+
+        // expr
+        val expr = LuaExpressionParser.parseExpr(b, l + 1)
+        if (expr != null) {
+            val m = expr.precede()
+            m.done(TABLE_FIELD)
+            return m
         }
         return null
     }

@@ -202,7 +202,6 @@ object LuaExpressionParser {
                 b.advanceLexer()
                 val expr = parseExpr(b, l + 1)
                 if (expr != null) {
-                    b.advanceLexer()
                     if (b.tokenType == RPAREN) {
                         b.advanceLexer()
                     } else error(b, "')' expected")
