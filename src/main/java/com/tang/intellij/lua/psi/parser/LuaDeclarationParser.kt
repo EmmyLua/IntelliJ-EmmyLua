@@ -49,18 +49,21 @@ object LuaDeclarationParser {
                 val m = b.mark()
                 b.advanceLexer()
                 val expr = LuaExpressionParser.parseExpr(b, l + 1)
-                if (expr != null) {
-                    if (b.tokenType == RBRACK) {
-                        b.advanceLexer()
-                        if (b.tokenType == ASSIGN) {
-                            b.advanceLexer()
-                            if (LuaExpressionParser.parseExpr(b, l + 1) == null)
-                                b.error("Expression expected")
-                        } else b.error("'=' expected")
-                    } else b.error("']' expected")
-                } else b.error("Expression expected")
-                m.done(TABLE_FIELD)
+                if (expr == null)
+                    b.error("Expression expected")
 
+                if (b.tokenType == RBRACK) {
+                    b.advanceLexer()
+                } else b.error("']' expected")
+
+                if (b.tokenType == ASSIGN) {
+                    b.advanceLexer()
+                } else b.error("'=' expected")
+
+                if (LuaExpressionParser.parseExpr(b, l + 1) == null)
+                    b.error("Expression expected")
+
+                m.done(TABLE_FIELD)
                 return m
             }
             ID -> { // ID '=' expr

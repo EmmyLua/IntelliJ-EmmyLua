@@ -145,11 +145,12 @@ object LuaExpressionParser {
                 b.advanceLexer()
 
                 val expr = parseExpr(b, l + 1)
-                if (expr != null) {
-                    if (b.tokenType == RBRACK)
-                        b.advanceLexer()
-                    else error(b, "']' expected")
-                } else error(b, "Expression expected")
+                if (expr == null)
+                    error(b, "Expression expected")
+
+                if (b.tokenType == RBRACK)
+                    b.advanceLexer()
+                else error(b, "']' expected")
 
                 val m = prefix.precede()
                 m.done(INDEX_EXPR)
@@ -201,11 +202,12 @@ object LuaExpressionParser {
                 val m = b.mark()
                 b.advanceLexer()
                 val expr = parseExpr(b, l + 1)
-                if (expr != null) {
-                    if (b.tokenType == RPAREN) {
-                        b.advanceLexer()
-                    } else error(b, "')' expected")
-                } else error(b, "Expression expected")
+                if (expr == null)
+                    error(b, "Expression expected")
+
+                if (b.tokenType == RPAREN) {
+                    b.advanceLexer()
+                } else error(b, "')' expected")
 
                 m.done(PAREN_EXPR)
                 return m
