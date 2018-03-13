@@ -247,7 +247,7 @@ object LuaExpressionParser {
         return null
     }
 
-    private fun parseExprList(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+    fun parseExprList(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
         val expr = parseExpr(b, l)
         while (expr != null) {
             if (b.tokenType == COMMA) {
