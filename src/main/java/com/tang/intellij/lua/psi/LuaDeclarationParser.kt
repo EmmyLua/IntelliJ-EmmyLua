@@ -79,8 +79,8 @@ object LuaDeclarationParser {
             }
             else -> {
                 val m = b.mark()
-                val expr = LuaParser.expr(b, l + 1)
-                if (expr) {
+                val expr = LuaExpressionParser.parseExpr(b, l + 1)
+                if (expr != null) {
                     m.done(TABLE_FIELD)
                     return m
                 } else m.drop()

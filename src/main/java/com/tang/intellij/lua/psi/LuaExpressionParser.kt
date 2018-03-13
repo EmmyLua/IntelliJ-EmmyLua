@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.lang.PsiBuilder
-import com.intellij.lang.parser.GeneratedParserUtilBase.Parser
 import com.intellij.psi.tree.TokenSet
 import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaTypes.*
@@ -53,13 +52,8 @@ object LuaExpressionParser {
         T_VALUE(TokenSet.EMPTY)
     }
 
-    private lateinit var primaryExprParser: Parser
-    private lateinit var closureExprParser: Parser
-
-    fun parse(builder: PsiBuilder, l:Int, valueExprParser: Parser, closureExprParser: Parser): Boolean {
-        this.primaryExprParser = valueExprParser
-        this.closureExprParser = closureExprParser
-        return parseExpr(builder, ExprType.T_OR, l) != null
+    fun parseExpr(builder: PsiBuilder, l:Int): PsiBuilder.Marker? {
+        return parseExpr(builder, ExprType.T_OR, l)
     }
 
     private fun parseExpr(builder: PsiBuilder, type: ExprType, l:Int): PsiBuilder.Marker? = when (type) {
@@ -126,15 +120,11 @@ object LuaExpressionParser {
     }
 
     fun parsePrimaryExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
-        val prefix = parsePrefixExpr(b, l + 1)
-        if (prefix != null) {
-            val index = parseIndexExpr(prefix, b, l + 1)
-            if (index != null)
-                return index
-
-            val call = parseCallExpr(prefix, b, l + 1)
-            if (call != null)
-                return call
+        var prefix = parsePrefixExpr(b, l + 1)
+        while (prefix != null) {
+            val suffix = parseIndexExpr(prefix, b, l + 1) ?: parseCallExpr(prefix, b, l + 1)
+            if (suffix == null) break
+            else prefix = suffix
         }
         return prefix
     }
@@ -153,7 +143,7 @@ object LuaExpressionParser {
             LBRACK -> {
                 b.advanceLexer()
 
-                val expr = parseExpr(b, ExprType.T_OR, l + 1)
+                val expr = parseExpr(b, l + 1)
                 if (expr != null) {
                     if (b.tokenType == RBRACK)
                         b.advanceLexer()
@@ -169,17 +159,39 @@ object LuaExpressionParser {
     }
 
     private fun parseCallExpr(prefix: PsiBuilder.Marker, b: PsiBuilder, l: Int): PsiBuilder.Marker? {
-        if (b.tokenType == LPAREN) { // listArgs ::= '(' (arg_expr_list)? ')'
-            b.advanceLexer()
+        when (b.tokenType) {
+            LPAREN -> { // listArgs ::= '(' (arg_expr_list)? ')'
+                b.advanceLexer()
 
-            // todo: arg_expr_list
+                val listArgs = b.mark()
+                parseExprList(b, l + 1)
+                listArgs.done(LIST_ARGS)
 
-            val m = prefix.precede()
-            m.done(CALL_EXPR)
-            return m
-        } else {
+                if (b.tokenType == RPAREN)
+                    b.advanceLexer()
+                else error(b, "')' expected")
+
+                val m = prefix.precede()
+                m.done(CALL_EXPR)
+                return m
+            }
+            STRING -> { // singleArg ::= tableExpr | stringExpr
+                val stringExpr = b.mark()
+                b.advanceLexer()
+                stringExpr.done(LITERAL_EXPR)
+                stringExpr.precede().done(SINGLE_ARG)
+
+                val m = prefix.precede()
+                m.done(CALL_EXPR)
+                return m
+            }
+            LCURLY -> {
+                val tableExpr = parseTableExpr(b, l)
+                tableExpr?.precede()?.done(SINGLE_ARG)
+                return tableExpr
+            }
+            else -> return null
         }
-        return null
     }
 
     private fun parsePrefixExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
@@ -187,7 +199,7 @@ object LuaExpressionParser {
             LPAREN -> { // parenExpr ::= '(' expr ')'
                 val m = b.mark()
                 b.advanceLexer()
-                val expr = parseExpr(b, ExprType.T_OR, l + 1)
+                val expr = parseExpr(b, l + 1)
                 if (expr != null) {
                     b.advanceLexer()
                     if (b.tokenType == RPAREN) {
@@ -211,21 +223,38 @@ object LuaExpressionParser {
                 return m
             }
             LCURLY -> { // table expr
-                val m = b.mark()
-                b.advanceLexer()
-
-                LuaDeclarationParser.parseTableFieldList(b, l)
-
-                if (b.tokenType == RCURLY)
-                    b.advanceLexer()
-                else
-                    error(b, "'}' expected")
-
-                m.done(TABLE_EXPR)
-                return m
+                return parseTableExpr(b, l)
             }
         }
         return null
+    }
+
+    private fun parseTableExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        if (b.tokenType == LCURLY) {
+            val m = b.mark()
+            b.advanceLexer()
+
+            LuaDeclarationParser.parseTableFieldList(b, l)
+
+            if (b.tokenType == RCURLY) b.advanceLexer()
+            else error(b, "'}' expected")
+
+            m.done(TABLE_EXPR)
+            return m
+        }
+        return null
+    }
+
+    private fun parseExprList(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        val expr = parseExpr(b, l)
+        while (expr != null) {
+            if (b.tokenType == COMMA) {
+                b.advanceLexer()
+                val next = parseExpr(b, l)
+                if (next == null) error(b, "Expression expected")
+            } else break
+        }
+        return expr
     }
 
     private fun error(builder: PsiBuilder, message: String) {
