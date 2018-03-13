@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
-import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaDeclarationParser {
@@ -49,17 +48,20 @@ object LuaDeclarationParser {
             LBRACK -> { // '[' expr ']' '=' expr
                 val m = b.mark()
                 b.advanceLexer()
-                val expr = LuaParser.expr(b, l + 1)
-                if (expr && b.tokenType == RBRACK) {
-                    b.advanceLexer()
-                    if (b.tokenType == ASSIGN) {
+                val expr = LuaExpressionParser.parseExpr(b, l + 1)
+                if (expr != null) {
+                    if (b.tokenType == RBRACK) {
                         b.advanceLexer()
-                        if (LuaParser.expr(b, l + 1)) {
-                            m.done(TABLE_FIELD)
-                            return m
-                        }
-                    }
-                }
+                        if (b.tokenType == ASSIGN) {
+                            b.advanceLexer()
+                            if (LuaExpressionParser.parseExpr(b, l + 1) == null)
+                                b.error("Expression expected")
+                        } else b.error("'=' expected")
+                    } else b.error("']' expected")
+                } else b.error("Expression expected")
+                m.done(TABLE_FIELD)
+
+                return m
             }
             ID -> { // ID '=' expr
                 val m = b.mark()
