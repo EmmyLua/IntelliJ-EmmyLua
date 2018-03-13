@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.parser.GeneratedParserUtilBase.Parser
 import com.intellij.psi.tree.TokenSet
+import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaExpressionParser {
@@ -117,9 +118,114 @@ object LuaExpressionParser {
     }
 
     private fun parseValue(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
-        var r = primaryExprParser.parse(b, l + 1)
-        r = r || closureExprParser.parse(b, l + 1)
+        val pri = parsePrimaryExpr(b, l + 1)
+        if (pri != null)
+            return pri
+        val r = LuaParser.closureExpr(b, l + 1)
         return if (r) b.latestDoneMarker as PsiBuilder.Marker else null
+    }
+
+    fun parsePrimaryExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        val prefix = parsePrefixExpr(b, l + 1)
+        if (prefix != null) {
+            val index = parseIndexExpr(prefix, b, l + 1)
+            if (index != null)
+                return index
+
+            val call = parseCallExpr(prefix, b, l + 1)
+            if (call != null)
+                return call
+        }
+        return prefix
+    }
+
+    private fun parseIndexExpr(prefix: PsiBuilder.Marker, b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        when (b.tokenType) {
+            DOT, COLON -> { // left indexExpr ::= '[' expr ']' | '.' ID | ':' ID
+                b.advanceLexer()
+                if (b.tokenType == ID) {
+                    b.advanceLexer()
+                } else error(b, "ID expected")
+                val m = prefix.precede()
+                m.done(INDEX_EXPR)
+                return m
+            }
+            LBRACK -> {
+                b.advanceLexer()
+
+                val expr = parseExpr(b, ExprType.T_OR, l + 1)
+                if (expr != null) {
+                    if (b.tokenType == RBRACK)
+                        b.advanceLexer()
+                    else error(b, "']' expected")
+                } else error(b, "Expression expected")
+
+                val m = prefix.precede()
+                m.done(INDEX_EXPR)
+                return m
+            }
+        }
+        return null
+    }
+
+    private fun parseCallExpr(prefix: PsiBuilder.Marker, b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        if (b.tokenType == LPAREN) { // listArgs ::= '(' (arg_expr_list)? ')'
+            b.advanceLexer()
+
+            // todo: arg_expr_list
+
+            val m = prefix.precede()
+            m.done(CALL_EXPR)
+            return m
+        } else {
+        }
+        return null
+    }
+
+    private fun parsePrefixExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        when (b.tokenType) {
+            LPAREN -> { // parenExpr ::= '(' expr ')'
+                val m = b.mark()
+                b.advanceLexer()
+                val expr = parseExpr(b, ExprType.T_OR, l + 1)
+                if (expr != null) {
+                    b.advanceLexer()
+                    if (b.tokenType == RPAREN) {
+                        b.advanceLexer()
+                    } else error(b, "')' expected")
+                } else error(b, "Expression expected")
+
+                m.done(PAREN_EXPR)
+                return m
+            }
+            ID -> { // nameExpr ::= ID
+                val m = b.mark()
+                b.advanceLexer()
+                m.done(NAME_EXPR)
+                return m
+            }
+            NUMBER, STRING, NIL, TRUE, FALSE, ELLIPSIS -> { //literalExpr ::= nil | false | true | NUMBER | STRING | "..."
+                val m = b.mark()
+                b.advanceLexer()
+                m.done(LITERAL_EXPR)
+                return m
+            }
+            LCURLY -> { // table expr
+                val m = b.mark()
+                b.advanceLexer()
+
+                LuaDeclarationParser.parseTableFieldList(b, l)
+
+                if (b.tokenType == RCURLY)
+                    b.advanceLexer()
+                else
+                    error(b, "'}' expected")
+
+                m.done(TABLE_EXPR)
+                return m
+            }
+        }
+        return null
     }
 
     private fun error(builder: PsiBuilder, message: String) {
