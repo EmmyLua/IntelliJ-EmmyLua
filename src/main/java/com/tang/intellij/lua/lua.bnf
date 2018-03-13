@@ -336,7 +336,7 @@ returnStat ::= return exprList? {
 breakStat ::= break
 private lastStat ::= returnStat | breakStat
 
-exprList ::= (expr ',')* expr {
+exprList ::= expr (',' expr)* {
     methods = [guessTypeAt]
     stubClass = "com.tang.intellij.lua.stubs.LuaPlaceholderStub"
 }
