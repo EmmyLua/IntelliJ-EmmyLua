@@ -25,6 +25,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.tang.intellij.lua.psi.parser.LuaDeclarationParser;
+import com.tang.intellij.lua.psi.parser.LuaExpressionParser;
 
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 

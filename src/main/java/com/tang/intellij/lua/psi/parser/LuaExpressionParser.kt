@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi
+package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.TokenSet
@@ -122,7 +122,8 @@ object LuaExpressionParser {
     fun parsePrimaryExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
         var prefix = parsePrefixExpr(b, l + 1)
         while (prefix != null) {
-            val suffix = parseIndexExpr(prefix, b, l + 1) ?: parseCallExpr(prefix, b, l + 1)
+            val suffix = parseIndexExpr(prefix, b, l + 1)
+                    ?: parseCallExpr(prefix, b, l + 1)
             if (suffix == null) break
             else prefix = suffix
         }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi
+package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
 import com.tang.intellij.lua.parser.LuaParser
