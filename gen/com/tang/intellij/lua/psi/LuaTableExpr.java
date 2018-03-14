@@ -9,10 +9,13 @@ import com.tang.intellij.lua.stubs.LuaTableExprStub;
 
 public interface LuaTableExpr extends LuaExpr, LuaIndentRange, LuaExprStubElement<LuaTableExprStub> {
 
-  @Nullable
-  LuaTableField findField(String fieldName);
-
   @NotNull
   List<LuaTableField> getTableFieldList();
+
+  @NotNull
+  List<LuaTableFieldSep> getTableFieldSepList();
+
+  @Nullable
+  LuaTableField findField(String fieldName);
 
 }

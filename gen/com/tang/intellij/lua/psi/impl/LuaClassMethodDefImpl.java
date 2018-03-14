@@ -73,7 +73,7 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
     return LuaPsiImplUtilKt.getParamNameDefList(this);
   }
 
-  @NotNull
+  @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtilKt.getNameIdentifier(this);
   }

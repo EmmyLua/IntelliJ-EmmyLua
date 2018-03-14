@@ -31,7 +31,7 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
-  @NotNull
+  @Nullable
   PsiElement getNameIdentifier();
 
   @NotNull

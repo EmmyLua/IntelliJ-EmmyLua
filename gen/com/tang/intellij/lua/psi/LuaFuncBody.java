@@ -12,7 +12,7 @@ public interface LuaFuncBody extends LuaIndentRange, StubBasedPsiElement<LuaPlac
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 
-  @NotNull
+  @Nullable
   PsiElement getRparen();
 
   @Nullable

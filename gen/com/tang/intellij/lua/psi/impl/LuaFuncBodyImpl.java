@@ -44,9 +44,9 @@ public class LuaFuncBodyImpl extends StubBasedPsiElementBase<LuaPlaceholderStub>
   }
 
   @Override
-  @NotNull
+  @Nullable
   public PsiElement getRparen() {
-    return notNullChild(findChildByType(RPAREN));
+    return findChildByType(RPAREN);
   }
 
   @Override

@@ -44,9 +44,9 @@ public class LuaClassMethodNameImpl extends StubBasedPsiElementBase<LuaPlacehold
   }
 
   @Override
-  @NotNull
+  @Nullable
   public PsiElement getId() {
-    return notNullChild(findChildByType(ID));
+    return findChildByType(ID);
   }
 
   @Override

@@ -7,19 +7,4 @@ import com.intellij.psi.PsiElement;
 
 public interface LuaBlock extends LuaPsiElement {
 
-  @NotNull
-  List<LuaClassMethodDef> getClassMethodDefList();
-
-  @NotNull
-  List<LuaFuncDef> getFuncDefList();
-
-  @NotNull
-  List<LuaLocalDef> getLocalDefList();
-
-  @NotNull
-  List<LuaLocalFuncDef> getLocalFuncDefList();
-
-  @NotNull
-  List<LuaStatement> getStatementList();
-
 }

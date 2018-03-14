@@ -12,7 +12,7 @@ public interface LuaClassMethodName extends LuaPsiElement, StubBasedPsiElement<L
   @NotNull
   LuaExpr getExpr();
 
-  @NotNull
+  @Nullable
   PsiElement getId();
 
   @Nullable
