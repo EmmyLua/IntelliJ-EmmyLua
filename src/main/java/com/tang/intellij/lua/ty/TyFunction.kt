@@ -213,11 +213,11 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
            returnTy = Ty.UNKNOWN
         }
 
-        val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
+        /*val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
         val list = mutableListOf<TyParameter>()
-        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
+        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }*/
 
-        FunSignature(selfCall, returnTy, psi.params, list)
+        FunSignature(selfCall, returnTy, psi.params)
     }
 
     override val signatures: Array<IFunSignature> by lazy {
