@@ -40,6 +40,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
                     parseLocal(b, l)
             }
             FOR -> parseForStatement(b, l)
+            FUNCTION -> parseFunctionStatement(b, l)
             else -> null
         }
     }
@@ -264,6 +265,45 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         b.advanceLexer()
         expectError(b, ID) { "ID" }
         m.done(GOTO_STAT)
+        return m
+    }
+
+    private fun parseFunctionStatement(b: PsiBuilder, l: Int): PsiBuilder.Marker {
+        val m = b.mark()
+        b.advanceLexer() // function
+        var type = FUNC_DEF
+
+        if (b.tokenType == ID) {
+            val ahead = b.lookAhead(1)
+            if (ahead == LPAREN) {
+                type = FUNC_DEF
+                b.advanceLexer() // ID
+            } else {
+                type = CLASS_METHOD_DEF
+                // name expr
+                val nameExpr = b.mark()
+                b.advanceLexer()
+                nameExpr.done(NAME_EXPR)
+
+                var c = nameExpr
+                // .ID
+                while (b.tokenType == DOT || b.tokenType == COLON) {
+                    b.advanceLexer()
+                    expectError(b, ID) { "ID" }
+                    val next = b.tokenType
+                    if (next == DOT || next == COLON) {
+                        c = c.precede()
+                        c.done(INDEX_EXPR)
+                    } else break
+                }
+                // .ID | :ID
+                c = c.precede()
+                c.done(CLASS_METHOD_NAME)
+            }
+        } else b.error("ID expected")
+
+        parseFuncBody(b, l + 1)
+        m.done(type)
         return m
     }
 }
