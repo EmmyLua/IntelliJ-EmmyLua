@@ -28,10 +28,12 @@ internal fun expectError(builder: PsiBuilder, expectedType: IElementType, errorP
     return false
 }
 
-internal fun expect(builder: PsiBuilder, expectedType: IElementType) {
+internal fun expect(builder: PsiBuilder, expectedType: IElementType): Boolean {
     if (builder.tokenType === expectedType) {
         builder.advanceLexer()
+        return true
     }
+    return false
 }
 
 internal fun expectExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
