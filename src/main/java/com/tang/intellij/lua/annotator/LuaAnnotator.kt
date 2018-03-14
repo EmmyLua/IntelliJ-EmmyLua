@@ -113,7 +113,8 @@ class LuaAnnotator : Annotator {
         }
 
         override fun visitClassMethodName(o: LuaClassMethodName) {
-            val annotation = createInfoAnnotation(o.id)
+            val id = o.id ?: return
+            val annotation = createInfoAnnotation(id)
             if (o.dot != null) {
                 annotation.textAttributes = LuaHighlightingData.STATIC_METHOD
             } else {

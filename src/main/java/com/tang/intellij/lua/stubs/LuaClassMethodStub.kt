@@ -59,7 +59,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val params = methodDef.params
         val overloads = methodDef.overloads
 
-        return LuaClassMethodStubImpl(id.text,
+        return LuaClassMethodStubImpl(id?.text ?: "",
                 classNameSet.toTypedArray(),
                 isStatic,
                 visibility,

@@ -83,7 +83,7 @@ fun getComment(declaration: LuaCommentOwner): LuaComment? {
     return LuaCommentUtil.findComment(declaration)
 }
 
-fun getNameIdentifier(classMethodDef: LuaClassMethodDef): PsiElement {
+fun getNameIdentifier(classMethodDef: LuaClassMethodDef): PsiElement? {
     return classMethodDef.classMethodName.id
 }
 

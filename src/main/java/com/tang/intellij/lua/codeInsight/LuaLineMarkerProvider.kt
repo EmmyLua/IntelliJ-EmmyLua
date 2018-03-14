@@ -58,7 +58,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
 
             //OverridingMethod
             val classMethodNameId = element.id
-            if (type != null) {
+            if (type != null && classMethodNameId != null) {
                 val methodName = methodDef.name!!
                 var superType = type.getSuperClass(context)
 
@@ -79,10 +79,9 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
 
             // OverridenMethod
             val search = LuaOverridingMethodsSearch.search(methodDef)
-            if (search.findFirst() != null) {
-                val id = element.id
-                result.add(LineMarkerInfo(id,
-                        id.textRange,
+            if (search.findFirst() != null && classMethodNameId != null) {
+                result.add(LineMarkerInfo(classMethodNameId,
+                        classMethodNameId.textRange,
                         AllIcons.Gutter.OverridenMethod,
                         Pass.LINE_MARKERS,
                         null,

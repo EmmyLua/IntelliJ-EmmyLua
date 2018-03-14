@@ -263,7 +263,7 @@ private checkFuncPrefix ::= ID ('.' | ':') ID
 
 left funcPrefixRef ::= '.' <<repeat checkFuncPrefix 1>> ID { extends = indexExpr elementType = indexExpr }
 classMethodName ::=  nameExpr (funcPrefixRef)* (('.' ID) | (':' ID)) {
-    pin = 3
+    pin = 1
     methods = [
         dot = 'DOT'
         colon = 'COLON'
