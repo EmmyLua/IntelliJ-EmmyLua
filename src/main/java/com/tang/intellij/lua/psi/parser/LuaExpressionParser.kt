@@ -18,7 +18,6 @@ package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.TokenSet
-import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaExpressionParser {
@@ -115,8 +114,7 @@ object LuaExpressionParser {
         val pri = parsePrimaryExpr(b, l + 1)
         if (pri != null)
             return pri
-        val r = LuaParser.closureExpr(b, l + 1)
-        return if (r) b.latestDoneMarker as PsiBuilder.Marker else null
+        return parseClosureExpr(b, l + 1)
     }
 
     fun parsePrimaryExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
@@ -128,6 +126,19 @@ object LuaExpressionParser {
             else prefix = suffix
         }
         return prefix
+    }
+
+    private fun parseClosureExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        if (b.tokenType == FUNCTION) {
+            val m = b.mark()
+            b.advanceLexer()
+
+            LuaStatementParser.parseFuncBody(b, l + 1)
+
+            m.done(CLOSURE_EXPR)
+            return m
+        }
+        return null
     }
 
     private fun parseIndexExpr(prefix: PsiBuilder.Marker, b: PsiBuilder, l: Int): PsiBuilder.Marker? {

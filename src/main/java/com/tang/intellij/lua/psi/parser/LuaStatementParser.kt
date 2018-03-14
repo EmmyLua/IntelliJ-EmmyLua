@@ -18,6 +18,7 @@ package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.parser.GeneratedParserUtilBase
+import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaParserUtil
 import com.tang.intellij.lua.psi.LuaTypes.*
@@ -49,7 +50,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         expectError(b, END) { "'end'" } // end
 
-        done(m, DO_STAT)
+        doneStat(b, m, DO_STAT)
         return m
     }
 
@@ -82,7 +83,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         }
 
         expectError(b, END) { "'end'" }
-        m.done(IF_STAT)
+        doneStat(b, m, IF_STAT)
         return m
     }
 
@@ -100,7 +101,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         expectError(b, END) { "'end'" } // end
 
-        done(m, WHILE_STAT)
+        doneStat(b, m, WHILE_STAT)
         return m
     }
 
@@ -116,7 +117,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         expectExpr(b, l + 1) // expr
 
-        done(m, REPEAT_STAT)
+        doneStat(b, m, REPEAT_STAT)
         return m
     }
 
@@ -129,7 +130,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         expectError(b, DOUBLE_COLON) { "'::'" } // ::
 
-        done(m, LABEL_STAT)
+        doneStat(b, m, LABEL_STAT)
         return m
     }
 
@@ -164,7 +165,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         LuaParserUtil.lazyBlock(b, l) // block
         expectError(b, END) { "'end'" } // do
 
-        done(m, type)
+        doneStat(b, m, type)
         return m
     }
 
@@ -196,7 +197,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         val m = b.mark()
         b.advanceLexer()
 
-        done(m, BREAK_STAT)
+        doneStat(b, m, BREAK_STAT)
         return m
     }
 
@@ -206,7 +207,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         expectExprList(b, l, false)
 
-        done(m, RETURN_STAT)
+        doneStat(b, m, RETURN_STAT)
         return m
     }
 
@@ -226,7 +227,24 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         parseFuncBody(b, l)
 
-        done(m, LOCAL_FUNC_DEF)
+        doneStat(b, m, LOCAL_FUNC_DEF)
+        return m
+    }
+
+    private fun parseNameList(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+        var m = b.mark()
+        if (expectError(b, ID, { "ID" })) {
+            m.done(NAME_DEF)
+            while (b.tokenType == COMMA) {
+                b.advanceLexer()
+                val nameDef = b.mark()
+                expectError(b, ID, { "ID" })
+                nameDef.done(NAME_DEF)
+            }
+            m = m.precede()
+        }
+
+        m.done(NAME_LIST)
         return m
     }
 
@@ -234,8 +252,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         val m = b.mark()
         b.advanceLexer() // local
 
-        if (!LuaParser.nameList(b, l))
-            b.error("ID expected")
+        parseNameList(b, l)
 
         if (b.tokenType == ASSIGN) {
             b.advanceLexer()
@@ -246,11 +263,11 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             exprList.done(EXPR_LIST)
         }
 
-        done(m, LOCAL_DEF)
+        doneStat(b, m, LOCAL_DEF)
         return m
     }
 
-    private fun parseFuncBody(b: PsiBuilder, l: Int): PsiBuilder.Marker {
+    fun parseFuncBody(b: PsiBuilder, l: Int): PsiBuilder.Marker {
         val m = b.mark()
         expectError(b, LPAREN) { "'('" }
 
@@ -283,7 +300,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         val m = b.mark()
         b.advanceLexer()
         expectError(b, ID) { "ID" }
-        done(m, GOTO_STAT)
+        doneStat(b, m, GOTO_STAT)
         return m
     }
 
@@ -322,7 +339,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         } else b.error("ID expected")
 
         parseFuncBody(b, l + 1)
-        done(m, type)
+        doneStat(b, m, type)
         return m
     }
 
@@ -357,16 +374,21 @@ object LuaStatementParser : GeneratedParserUtilBase() {
                     if (isAssignment) {
                         expectExprList(b, l + 1)
                         val m = c.precede()
-                        done(m, ASSIGN_STAT)
+                        doneStat(b, m, ASSIGN_STAT)
                         return m
                     }
                 }
             }
 
             val m = expr.precede()
-            done(m, EXPR_STAT)
+            doneStat(b, m, EXPR_STAT)
             return m
         }
         return null
+    }
+
+    private fun doneStat(b:PsiBuilder, m: PsiBuilder.Marker, type: IElementType) {
+        expect(b, SEMI)
+        done(m, type)
     }
 }
