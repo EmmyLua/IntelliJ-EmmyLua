@@ -174,15 +174,14 @@ object LuaExpressionParser {
     private fun parseCallExpr(prefix: PsiBuilder.Marker, b: PsiBuilder, l: Int): PsiBuilder.Marker? {
         when (b.tokenType) {
             LPAREN -> { // listArgs ::= '(' (arg_expr_list)? ')'
-                b.advanceLexer()
 
                 val listArgs = b.mark()
+                b.advanceLexer()
                 parseExprList(b, l + 1)
-                listArgs.done(LIST_ARGS)
-
                 if (b.tokenType == RPAREN)
                     b.advanceLexer()
                 else error(b, "')' expected")
+                listArgs.done(LIST_ARGS)
 
                 val m = prefix.precede()
                 m.done(CALL_EXPR)
