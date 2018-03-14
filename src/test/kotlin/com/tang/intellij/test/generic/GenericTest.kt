@@ -21,6 +21,7 @@ import com.tang.intellij.test.completion.TestCompletionBase
 class GenericTest : TestCompletionBase() {
 
     fun `test generic 1`() {
+        myFixture.configureByFile("class.lua")
         doTest("""
             --- test_generic_1.lua
 
@@ -30,11 +31,11 @@ class GenericTest : TestCompletionBase() {
             local function test(p1, func)
             end
 
-            test(io.open(), function(value)
+            test(emmy, function(value)
                 value.--[[caret]]
             end)
         """) {
-            assertTrue(it.contains("write"))
+            assertTrue(it.contains("sayHello"))
         }
     }
 
