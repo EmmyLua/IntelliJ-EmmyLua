@@ -21,6 +21,7 @@ import com.intellij.lang.parser.GeneratedParserUtilBase
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaParserUtil
+import com.tang.intellij.lua.psi.LuaParserUtil.MY_RIGHT_COMMENT_BINDER
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaStatementParser : GeneratedParserUtilBase() {
@@ -245,7 +246,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             exprList.done(EXPR_LIST)
         }
 
-        done(m, LOCAL_DEF)
+        done(m, LOCAL_DEF, true)
         return m
     }
 
@@ -261,6 +262,10 @@ object LuaStatementParser : GeneratedParserUtilBase() {
                     b.error("ID or '...' expected")
                 }
             } else break
+        }
+        // (...)
+        if (def == null) {
+            expect(b, ELLIPSIS)
         }
 
         expectError(b, RPAREN) { "')'" }
@@ -352,7 +357,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
                     if (isAssignment) {
                         expectExprList(b, l + 1)
                         val m = c.precede()
-                        done(m, ASSIGN_STAT)
+                        done(m, ASSIGN_STAT, true)
                         return m
                     }
                 }
@@ -365,8 +370,9 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         return null
     }
 
-    private fun done(m: PsiBuilder.Marker, type: IElementType) {
+    private fun done(m: PsiBuilder.Marker, type: IElementType, rightBinder: Boolean = false) {
         m.done(type)
-        m.setCustomEdgeTokenBinders(LuaParserUtil.MY_LEFT_COMMENT_BINDER, null)
+        val rb = if (rightBinder) MY_RIGHT_COMMENT_BINDER else null
+        m.setCustomEdgeTokenBinders(LuaParserUtil.MY_LEFT_COMMENT_BINDER, rb)
     }
 }

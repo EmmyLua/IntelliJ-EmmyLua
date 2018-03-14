@@ -190,7 +190,10 @@ object LuaExpressionParser {
             LCURLY -> {
                 val tableExpr = parseTableExpr(b, l)
                 tableExpr?.precede()?.done(SINGLE_ARG)
-                return tableExpr
+
+                val m = prefix.precede()
+                m.done(CALL_EXPR)
+                return m
             }
             else -> return null
         }
