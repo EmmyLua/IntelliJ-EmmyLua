@@ -146,7 +146,7 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
     }
 
     override fun createSubstitutor(): ITySubstitutor? {
-        val list = findTags(LuaDocGenericDef::class.java) ?: return null
+        val list = findTags(LuaDocGenericDef::class.java)
         val map = mutableMapOf<String, String>()
         for (def in list) {
             val name = def.name

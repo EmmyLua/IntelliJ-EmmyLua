@@ -19,7 +19,6 @@ package com.tang.intellij.lua.psi.parser
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.parser.GeneratedParserUtilBase
 import com.intellij.psi.tree.IElementType
-import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaParserUtil
 import com.tang.intellij.lua.psi.LuaTypes.*
 
@@ -231,7 +230,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         return m
     }
 
-    private fun parseNameList(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+    private fun parseNameList(b: PsiBuilder): PsiBuilder.Marker? {
         var m = b.mark()
         if (expectError(b, ID, { "ID" })) {
             m.done(NAME_DEF)
@@ -252,7 +251,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         val m = b.mark()
         b.advanceLexer() // local
 
-        parseNameList(b, l)
+        parseNameList(b)
 
         if (b.tokenType == ASSIGN) {
             b.advanceLexer()
