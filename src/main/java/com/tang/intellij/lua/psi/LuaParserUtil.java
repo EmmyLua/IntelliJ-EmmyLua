@@ -25,7 +25,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.tang.intellij.lua.psi.parser.LuaDeclarationParser;
 import com.tang.intellij.lua.psi.parser.LuaExpressionParser;
 import com.tang.intellij.lua.psi.parser.LuaStatementParser;
 
@@ -259,14 +258,6 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
 
     public static boolean parseExpr(PsiBuilder b, int l) {
         return LuaExpressionParser.INSTANCE.parseExpr(b, l) != null;
-    }
-
-    public static boolean parseTableFieldList(PsiBuilder b, int l) {
-        return LuaDeclarationParser.INSTANCE.parseTableFieldList(b, l);
-    }
-
-    public static boolean parsePrimaryExpr(PsiBuilder b, int l) {
-        return LuaExpressionParser.INSTANCE.parsePrimaryExpr(b, l) != null;
     }
 
     public static boolean parseStatement(PsiBuilder b, int l) {
