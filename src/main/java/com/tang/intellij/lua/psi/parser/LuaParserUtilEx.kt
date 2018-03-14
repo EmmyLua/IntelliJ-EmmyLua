@@ -41,12 +41,12 @@ internal fun expectExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
     return expr
 }
 
-internal fun expectExprList(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+internal fun expectExprList(b: PsiBuilder, l: Int, error: Boolean = true): PsiBuilder.Marker? {
     val firstExpr = LuaExpressionParser.parseExprList(b, l)
     if (firstExpr != null) {
         val m = firstExpr.precede()
         m.done(EXPR_LIST)
         return m
-    } else b.error("Expression expected")
+    } else if (error) b.error("Expression expected")
     return null
 }

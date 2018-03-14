@@ -31,6 +31,8 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             REPEAT -> parseRepeatStatement(b, l)
             DOUBLE_COLON -> parseLabelStatement(b, l)
             GOTO -> parseGotoStatement(b, l)
+            BREAK -> parseBreakStatement(b, l)
+            RETURN -> parseReturnStatement(b, l)
             LOCAL -> {
                 if (b.lookAhead(1) == FUNCTION)
                     parseLocalFunction(b, l)
@@ -194,10 +196,21 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         return nameCount
     }
 
-    private fun parseFo1rStatement(b: PsiBuilder, l: Int): PsiBuilder.Marker {
+    private fun parseBreakStatement(b: PsiBuilder, l: Int): PsiBuilder.Marker {
         val m = b.mark()
         b.advanceLexer()
 
+        m.done(BREAK_STAT)
+        return m
+    }
+
+    private fun parseReturnStatement(b: PsiBuilder, l: Int): PsiBuilder.Marker {
+        val m = b.mark()
+        b.advanceLexer()
+
+        expectExprList(b, l, false)
+
+        m.done(RETURN_STAT)
         return m
     }
 
