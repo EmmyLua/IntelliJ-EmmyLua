@@ -18,7 +18,10 @@ package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
-import com.tang.intellij.lua.psi.LuaTypes.EXPR_LIST
+import com.intellij.psi.tree.TokenSet
+import com.tang.intellij.lua.psi.LuaParserUtil.MY_LEFT_COMMENT_BINDER
+import com.tang.intellij.lua.psi.LuaParserUtil.MY_RIGHT_COMMENT_BINDER
+import com.tang.intellij.lua.psi.LuaTypes.*
 
 internal fun expectError(builder: PsiBuilder, expectedType: IElementType, errorProvider: () -> String): Boolean {
     if (builder.tokenType === expectedType) {
@@ -51,4 +54,40 @@ internal fun expectExprList(b: PsiBuilder, l: Int, error: Boolean = true): PsiBu
         return m
     } else if (error) b.error("Expression expected")
     return null
+}
+
+private val L_BINDERS = TokenSet.create(
+        LOCAL_DEF,
+        ASSIGN_STAT,
+        TABLE_FIELD,
+
+        FUNC_DEF,
+        CLASS_METHOD_DEF,
+        LOCAL_FUNC_DEF,
+
+        ASSIGN_STAT,
+        BREAK_STAT,
+        DO_STAT,
+        EXPR_STAT,
+        FOR_A_STAT,
+        FOR_B_STAT,
+        GOTO_STAT,
+        IF_STAT,
+        LABEL_STAT,
+        REPEAT_STAT,
+        RETURN_STAT,
+        WHILE_STAT
+)
+
+private val R_BINDERS = TokenSet.create(
+        LOCAL_DEF,
+        ASSIGN_STAT,
+        TABLE_FIELD
+)
+
+internal fun done(m: PsiBuilder.Marker, type: IElementType) {
+    m.done(type)
+    val l = if (L_BINDERS.contains(type)) MY_LEFT_COMMENT_BINDER else null
+    val r = if (R_BINDERS.contains(type)) MY_RIGHT_COMMENT_BINDER else null
+    m.setCustomEdgeTokenBinders(l, r)
 }

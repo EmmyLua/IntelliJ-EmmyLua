@@ -18,10 +18,8 @@ package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.lang.parser.GeneratedParserUtilBase
-import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.parser.LuaParser
 import com.tang.intellij.lua.psi.LuaParserUtil
-import com.tang.intellij.lua.psi.LuaParserUtil.MY_RIGHT_COMMENT_BINDER
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaStatementParser : GeneratedParserUtilBase() {
@@ -246,7 +244,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             exprList.done(EXPR_LIST)
         }
 
-        done(m, LOCAL_DEF, true)
+        done(m, LOCAL_DEF)
         return m
     }
 
@@ -357,7 +355,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
                     if (isAssignment) {
                         expectExprList(b, l + 1)
                         val m = c.precede()
-                        done(m, ASSIGN_STAT, true)
+                        done(m, ASSIGN_STAT)
                         return m
                     }
                 }
@@ -368,11 +366,5 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             return m
         }
         return null
-    }
-
-    private fun done(m: PsiBuilder.Marker, type: IElementType, rightBinder: Boolean = false) {
-        m.done(type)
-        val rb = if (rightBinder) MY_RIGHT_COMMENT_BINDER else null
-        m.setCustomEdgeTokenBinders(LuaParserUtil.MY_LEFT_COMMENT_BINDER, rb)
     }
 }
