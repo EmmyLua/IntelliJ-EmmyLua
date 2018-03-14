@@ -145,7 +145,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
         b.advanceLexer() // for
 
         val nameCount = expectParamNameOrList(b)
-        val type = if (nameCount > 1) { // forBStat
+        val type = if (nameCount > 1 || b.tokenType == IN) { // forBStat
             expectError(b, IN) { "'in'" }
             expectExprList(b, l)
 
