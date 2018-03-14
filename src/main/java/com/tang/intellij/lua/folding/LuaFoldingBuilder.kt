@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.folding
 
 import com.intellij.lang.ASTNode
-import com.intellij.lang.folding.FoldingBuilder
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.lang.folding.NamedFoldingDescriptor
@@ -27,9 +26,6 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiRecursiveElementVisitor
 import com.intellij.psi.PsiWhiteSpace
-import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.psi.LuaBlock
-import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.psi.LuaTypes
 
 /**
@@ -52,8 +48,8 @@ class LuaFoldingBuilder : FoldingBuilderEx() {
         psiElement.accept(object : PsiRecursiveElementVisitor() {
             override fun visitElement(element: PsiElement) {
                 val node = element.node
-                when(element) {
-                    is LuaBlock -> {
+                when(node.elementType) {
+                    LuaTypes.BLOCK -> {
                         val prev = node.treePrev//element.prevSibling
                         val next = node.treeNext//element.nextSibling
                         if (prev != null && next != null) {
@@ -66,12 +62,12 @@ class LuaFoldingBuilder : FoldingBuilderEx() {
                             }
                         }
                     }
-                    is LuaTableExpr -> {
+                    LuaTypes.TABLE_EXPR -> {
                         val textRange = node.textRange
                         if (document.getLineNumber(textRange.startOffset) != document.getLineNumber(textRange.endOffset))
                             list.add(FoldingDescriptor(node, textRange))
                     }
-                    is LuaComment -> {
+                    LuaTypes.BLOCK_COMMENT, LuaTypes.DOC_COMMENT, LuaTypes.STRING -> {
                         val textRange = node.textRange
                         if (document.getLineNumber(textRange.startOffset) != document.getLineNumber(textRange.endOffset))
                             list.add(FoldingDescriptor(node, textRange))
@@ -87,12 +83,14 @@ class LuaFoldingBuilder : FoldingBuilderEx() {
         return when(type) {
             LuaTypes.BLOCK -> HOLDER_TEXT
             LuaTypes.DOC_COMMENT -> "/** ... */"
+            LuaTypes.BLOCK_COMMENT -> "--[[ ... ]]"
             LuaTypes.TABLE_EXPR -> "{ ... }"
+            LuaTypes.STRING -> "[[ ... ]]"
             else -> null
         }
     }
 
-    private fun addOneLineMethodFolding(descriptors: MutableList<FoldingDescriptor>, block: LuaBlock, range: TextRange, prev: ASTNode, next: ASTNode): Boolean {
+    private fun addOneLineMethodFolding(descriptors: MutableList<FoldingDescriptor>, block: PsiElement, range: TextRange, prev: ASTNode, next: ASTNode): Boolean {
         val children = block.children
         if (children.isEmpty()) return false
 
@@ -129,6 +127,6 @@ class LuaFoldingBuilder : FoldingBuilderEx() {
 
     companion object {
 
-        private val HOLDER_TEXT = "..."
+        private const val HOLDER_TEXT = "..."
     }
 }
