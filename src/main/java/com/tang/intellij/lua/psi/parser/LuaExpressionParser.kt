@@ -144,24 +144,18 @@ object LuaExpressionParser {
     private fun parseIndexExpr(prefix: PsiBuilder.Marker, b: PsiBuilder, l: Int): PsiBuilder.Marker? {
         when (b.tokenType) {
             DOT, COLON -> { // left indexExpr ::= '[' expr ']' | '.' ID | ':' ID
-                b.advanceLexer()
-                if (b.tokenType == ID) {
-                    b.advanceLexer()
-                } else error(b, "ID expected")
+                b.advanceLexer() // . or :
+                expectError(b, ID) { "ID" }
                 val m = prefix.precede()
                 m.done(INDEX_EXPR)
                 return m
             }
             LBRACK -> {
-                b.advanceLexer()
+                b.advanceLexer() // [
 
-                val expr = parseExpr(b, l + 1)
-                if (expr == null)
-                    error(b, "Expression expected")
+                expectExpr(b, l + 1) // expr
 
-                if (b.tokenType == RBRACK)
-                    b.advanceLexer()
-                else error(b, "']' expected")
+                expectError(b, RBRACK) { "']'" } // ]
 
                 val m = prefix.precede()
                 m.done(INDEX_EXPR)
@@ -176,11 +170,9 @@ object LuaExpressionParser {
             LPAREN -> { // listArgs ::= '(' (arg_expr_list)? ')'
 
                 val listArgs = b.mark()
-                b.advanceLexer()
+                b.advanceLexer() // (
                 parseExprList(b, l + 1)
-                if (b.tokenType == RPAREN)
-                    b.advanceLexer()
-                else error(b, "')' expected")
+                expectError(b, RPAREN) { "')'" }
                 listArgs.done(LIST_ARGS)
 
                 val m = prefix.precede()
@@ -213,14 +205,11 @@ object LuaExpressionParser {
         when (b.tokenType) {
             LPAREN -> { // parenExpr ::= '(' expr ')'
                 val m = b.mark()
-                b.advanceLexer()
-                val expr = parseExpr(b, l + 1)
-                if (expr == null)
-                    error(b, "Expression expected")
+                b.advanceLexer() // (
 
-                if (b.tokenType == RPAREN) {
-                    b.advanceLexer()
-                } else error(b, "')' expected")
+                expectExpr(b, l + 1) // expr
+
+                expectError(b, RPAREN) { "')'" } // )
 
                 m.done(PAREN_EXPR)
                 return m
@@ -251,8 +240,7 @@ object LuaExpressionParser {
 
             parseTableFieldList(b, l)
 
-            if (b.tokenType == RCURLY) b.advanceLexer()
-            else error(b, "'}' expected")
+            expectError(b, RCURLY) { "'}'" }
 
             m.done(TABLE_EXPR)
             return m
@@ -288,20 +276,14 @@ object LuaExpressionParser {
             LBRACK -> { // '[' expr ']' '=' expr
                 val m = b.mark()
                 b.advanceLexer()
-                val expr = LuaExpressionParser.parseExpr(b, l + 1)
-                if (expr == null)
-                    b.error("Expression expected")
 
-                if (b.tokenType == RBRACK) {
-                    b.advanceLexer()
-                } else b.error("']' expected")
+                expectExpr(b, l + 1) // expr
 
-                if (b.tokenType == ASSIGN) {
-                    b.advanceLexer()
-                } else b.error("'=' expected")
+                expectError(b, RBRACK) { "']'" }
 
-                if (LuaExpressionParser.parseExpr(b, l + 1) == null)
-                    b.error("Expression expected")
+                expectError(b, ASSIGN) { "'='" }
+
+                expectExpr(b, l + 1) // expr
 
                 m.done(TABLE_FIELD)
                 return m
@@ -310,10 +292,8 @@ object LuaExpressionParser {
                 val m = b.mark()
                 b.advanceLexer()
                 if (b.tokenType == ASSIGN) {
-                    b.advanceLexer()
-                    if (LuaExpressionParser.parseExpr(b, l + 1) == null) {
-                        b.error("Expression expected")
-                    }
+                    b.advanceLexer() // =
+                    expectExpr(b, l + 1) // expr
                     m.done(TABLE_FIELD)
                     return m
                 }
@@ -335,9 +315,8 @@ object LuaExpressionParser {
         val expr = parseExpr(b, l)
         while (expr != null) {
             if (b.tokenType == COMMA) {
-                b.advanceLexer()
-                val next = parseExpr(b, l)
-                if (next == null) error(b, "Expression expected")
+                b.advanceLexer() // ,
+                expectExpr(b, l + 1) // expr
             } else break
         }
         return expr
