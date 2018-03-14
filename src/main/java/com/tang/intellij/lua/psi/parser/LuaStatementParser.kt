@@ -292,7 +292,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         if (b.tokenType == ID) {
             val ahead = b.lookAhead(1)
-            if (ahead == LPAREN) {
+            if (ahead != DOT && ahead != COLON) {
                 type = FUNC_DEF
                 b.advanceLexer() // ID
             } else {
