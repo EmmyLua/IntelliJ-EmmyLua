@@ -119,8 +119,8 @@ luaFile ::= shebang_line? stat_semi*
 
 shebang_line ::= SHEBANG SHEBANG_CONTENT
 
-private stat_semi ::= stat_impl ';'?
-block ::= stat_semi* (lastStat ';'?)?
+private stat_semi ::= <<parseStatement>>
+block ::= stat_semi*
 
 fake statement ::= () {
     implements = "com.tang.intellij.lua.psi.LuaCommentOwner"
@@ -353,9 +353,9 @@ stringExpr ::= STRING {
     elementType = literalExpr
 }
 
-private varExpr ::= <<parsePrimaryExpr>>//primaryExpr
+private varExpr ::= primaryExpr
 
-expr ::= <<parseExpr primaryExpr closureExpr>> {
+expr ::= <<parseExpr>> {
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
     stubClass = "com.tang.intellij.lua.stubs.LuaExprStub"
     implements = [
@@ -447,7 +447,7 @@ closureExpr ::= 'function' funcBody {
 }
 
 funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
-    pin = 3
+    pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
     ]
@@ -465,7 +465,6 @@ tableExpr ::= '{' fieldList '}' {
     pin = 1
     methods = [
         findField
-        getTableFieldList
     ]
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
@@ -474,7 +473,7 @@ tableExpr ::= '{' fieldList '}' {
     mixin = "com.tang.intellij.lua.psi.impl.LuaTableExprMixin"
 }
 
-private fieldList ::= <<parseTableFieldList>>// (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
+private fieldList ::= (tableField (tableFieldSep tableField)* (tableFieldSep)?)?
 
 private tableField1 ::= '[' expr ']' '=' expr { pin = 1 }
 private tableField2 ::= ID '=' expr { pin = 2 }
