@@ -33,12 +33,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             GOTO -> parseGotoStatement(b)
             BREAK -> parseBreakStatement(b)
             RETURN -> parseReturnStatement(b, l)
-            LOCAL -> {
-                if (b.lookAhead(1) == FUNCTION)
-                    parseLocalFunction(b, l)
-                else
-                    parseLocal(b, l)
-            }
+            LOCAL -> parseLocalDef(b, l)
             FOR -> parseForStatement(b, l)
             FUNCTION -> parseFunctionStatement(b, l)
             else -> parseOtherStatement(b, l)
@@ -213,6 +208,13 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
         done(m, RETURN_STAT)
         return m
+    }
+
+    private fun parseLocalDef(b: PsiBuilder, l: Int): PsiBuilder.Marker {
+        return if (b.lookAhead(1) == FUNCTION)
+            parseLocalFunction(b, l)
+        else
+            parseLocal(b, l)
     }
 
     private fun parseLocalFunction(b: PsiBuilder, l: Int): PsiBuilder.Marker {
