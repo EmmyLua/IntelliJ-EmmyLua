@@ -17,7 +17,11 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.LuaCommentUtil
@@ -282,7 +286,14 @@ val LuaNameExpr.docTy: ITy? get() {
     return assignStat?.comment?.ty
 }
 
-val LuaTableField.shouldCreateStub: Boolean get() {
+private val KEY_SHOULD_CREATE_STUB = Key.create<CachedValue<Boolean>>("lua.should_create_stub")
+
+val LuaTableField.shouldCreateStub: Boolean get() =
+    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB, {
+        CachedValueProvider.Result.create(innerShouldCreateStub, this)
+    })
+
+private val LuaTableField.innerShouldCreateStub: Boolean get() {
     if (id == null && idExpr == null)
         return false
     if (name == null)
@@ -293,7 +304,12 @@ val LuaTableField.shouldCreateStub: Boolean get() {
     return tableExpr.shouldCreateStub
 }
 
-val LuaTableExpr.shouldCreateStub: Boolean get() {
+val LuaTableExpr.shouldCreateStub: Boolean get() =
+    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB, {
+        CachedValueProvider.Result.create(innerShouldCreateStub, this)
+    })
+
+private val LuaTableExpr.innerShouldCreateStub: Boolean get() {
     val pt = parent
     return when (pt) {
         is LuaTableField -> pt.shouldCreateStub
