@@ -389,7 +389,9 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
     private fun parseEmptyStatement(b: PsiBuilder): PsiBuilder.Marker? {
         val m = b.mark()
-        b.advanceLexer() // ;
+        while (b.tokenType == SEMI) {
+            b.advanceLexer() // ;
+        }
         done(m, EMPTY_STAT)
         return m
     }
