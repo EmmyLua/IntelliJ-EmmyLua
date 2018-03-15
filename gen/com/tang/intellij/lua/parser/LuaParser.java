@@ -57,6 +57,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
     else if (t == DO_STAT) {
       r = doStat(b, 0);
     }
+    else if (t == EMPTY_STAT) {
+      r = emptyStat(b, 0);
+    }
     else if (t == EXPR) {
       r = expr(b, 0);
     }
@@ -167,9 +170,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
     create_token_set_(BINARY_EXPR, CALL_EXPR, CLOSURE_EXPR, EXPR,
       INDEX_EXPR, LITERAL_EXPR, NAME_EXPR, PAREN_EXPR,
       TABLE_EXPR, UNARY_EXPR),
-    create_token_set_(ASSIGN_STAT, BREAK_STAT, DO_STAT, EXPR_STAT,
-      FOR_A_STAT, FOR_B_STAT, GOTO_STAT, IF_STAT,
-      LABEL_STAT, REPEAT_STAT, RETURN_STAT, WHILE_STAT),
+    create_token_set_(ASSIGN_STAT, BREAK_STAT, DO_STAT, EMPTY_STAT,
+      EXPR_STAT, FOR_A_STAT, FOR_B_STAT, GOTO_STAT,
+      IF_STAT, LABEL_STAT, REPEAT_STAT, RETURN_STAT,
+      WHILE_STAT),
   };
 
   /* ********************************************************** */
@@ -496,6 +500,19 @@ public class LuaParser implements PsiParser, LightPsiParser {
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  /* ********************************************************** */
+  // ';'
+  public static boolean emptyStat(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "emptyStat")) return false;
+    if (!nextTokenIs(b, SEMI)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, SEMI);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
+    exit_section_(b, m, EMPTY_STAT, r);
+    return r;
   }
 
   /* ********************************************************** */
@@ -1282,7 +1299,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // doStat |
+  // emptyStat |
+  //     doStat |
   //     whileStat |
   //     repeatStat |
   //     ifStat |
@@ -1298,7 +1316,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "stat_impl")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_);
-    r = doStat(b, l + 1);
+    r = emptyStat(b, l + 1);
+    if (!r) r = doStat(b, l + 1);
     if (!r) r = whileStat(b, l + 1);
     if (!r) r = repeatStat(b, l + 1);
     if (!r) r = ifStat(b, l + 1);

@@ -66,6 +66,10 @@ public class LuaVisitor extends PsiElementVisitor {
     // visitIndentRange(o);
   }
 
+  public void visitEmptyStat(@NotNull LuaEmptyStat o) {
+    visitStatement(o);
+  }
+
   public void visitExpr(@NotNull LuaExpr o) {
     visitTypeGuessable(o);
   }

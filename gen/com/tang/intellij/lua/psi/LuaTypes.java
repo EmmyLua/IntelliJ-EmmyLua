@@ -20,6 +20,7 @@ public interface LuaTypes {
   IElementType CLASS_METHOD_NAME = LuaParserDefinitionKt.createType("CLASS_METHOD_NAME");
   IElementType CLOSURE_EXPR = LuaParserDefinitionKt.createType("CLOSURE_EXPR");
   IElementType DO_STAT = LuaParserDefinitionKt.createType("DO_STAT");
+  IElementType EMPTY_STAT = LuaParserDefinitionKt.createType("EMPTY_STAT");
   IElementType EXPR = LuaParserDefinitionKt.createType("EXPR");
   IElementType EXPR_LIST = LuaParserDefinitionKt.createType("EXPR_LIST");
   IElementType EXPR_STAT = LuaParserDefinitionKt.createType("EXPR_STAT");
@@ -150,6 +151,9 @@ public interface LuaTypes {
       }
       else if (type == DO_STAT) {
         return new LuaDoStatImpl(node);
+      }
+      else if (type == EMPTY_STAT) {
+        return new LuaEmptyStatImpl(node);
       }
       else if (type == EXPR) {
         return new LuaExprImpl(node);

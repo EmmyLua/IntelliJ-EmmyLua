@@ -127,6 +127,7 @@ fake statement ::= () {
     methods = [getComment]
 }
 private stat_impl ::=
+    emptyStat |
     doStat |
     whileStat |
     repeatStat |
@@ -146,6 +147,8 @@ private stat_recover ::= !(ID
     | 'local' | 'do' | 'while' | 'repeat' | 'function' | 'if' | 'for' | 'return' | break
     | nil | true | false | STRING | NUMBER | '::' | 'goto'
     | unaryOp)
+
+emptyStat ::= ';'
 
 varList ::= varExpr (',' varExpr)* {
     extends = exprList

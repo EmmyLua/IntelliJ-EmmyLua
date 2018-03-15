@@ -36,6 +36,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             LOCAL -> parseLocalDef(b, l)
             FOR -> parseForStatement(b, l)
             FUNCTION -> parseFunctionStatement(b, l)
+            SEMI -> parseEmptyStatement(b)
             else -> parseOtherStatement(b, l)
         }
     }
@@ -384,6 +385,13 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             return m
         }
         return null
+    }
+
+    private fun parseEmptyStatement(b: PsiBuilder): PsiBuilder.Marker? {
+        val m = b.mark()
+        b.advanceLexer() // ;
+        done(m, EMPTY_STAT)
+        return m
     }
 
     private fun doneStat(b:PsiBuilder, m: PsiBuilder.Marker, type: IElementType) {
