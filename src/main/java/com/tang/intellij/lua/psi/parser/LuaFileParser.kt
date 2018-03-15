@@ -31,46 +31,45 @@ class LuaFileParser : PsiParser, LightPsiParser {
     }
 
     override fun parseLight(type: IElementType, b: PsiBuilder) {
+        val m = b.mark()
         when (type) {
             FILE -> parseFile(b, 0)
             BLOCK -> parseBlock(b, 0)
             else -> assert(false)
         }
+
+        if (!b.eof()) { // eat more
+            val error = b.mark()
+            b.advanceLexer()
+            error.error("syntax error")
+
+            while (!b.eof()) {
+                b.advanceLexer()
+            }
+        }
+        m.done(type)
     }
 
     companion object {
         private fun parseFile(b: PsiBuilder, l: Int) {
-            val m = b.mark()
             // SHEBANG
             if (b.tokenType == SHEBANG)
                 parseShebang(b)
 
-            parseStatements(b, l + 1)
-
-            if (!b.eof()) {
-                val error = b.mark()
-                while (!b.eof()) {
-                    b.advanceLexer()
-                }
-                error.error("syntax error")
-            }
-            m.done(FILE)
+            parseStatements(b, l)
         }
 
         private fun parseShebang(b: PsiBuilder, error: Boolean = false): PsiBuilder.Marker {
             val shebang = b.mark()
             b.advanceLexer() // #!
-            expectError(b, SHEBANG_CONTENT) { "SHEBANG_CONTENT" }
+            expectError(b, SHEBANG_CONTENT) { "shebang content expected" }
             shebang.done(SHEBANG_LINE)
             if (error) shebang.precede().error("shebang unexpected")
             return shebang
         }
 
-        private fun parseBlock(b: PsiBuilder, l: Int): PsiBuilder.Marker {
-            val m = b.mark()
+        private fun parseBlock(b: PsiBuilder, l: Int) {
             parseStatements(b, l)
-            m.done(BLOCK)
-            return m
         }
 
         private fun parseStatements(b: PsiBuilder, l: Int) {
