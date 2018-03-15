@@ -16,6 +16,7 @@
 
 package com.tang.intellij.test.generic
 
+/*
 import com.tang.intellij.test.completion.TestCompletionBase
 
 class GenericTest : TestCompletionBase() {
@@ -39,4 +40,4 @@ class GenericTest : TestCompletionBase() {
         }
     }
 
-}
+}*/
