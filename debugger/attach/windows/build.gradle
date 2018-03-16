@@ -71,6 +71,8 @@ model {
                     cppCompiler.define "UNICODE"
                     cppCompiler.define "EASYHOOK_EXPORTS"
                     cCompiler.define "EASYHOOK_EXPORTS"
+                    cppCompiler.args "/Gz"
+                    cCompiler.args "/Gz"
                     if (targetPlatform == platforms.x86) {
                         linker.args "Aux_ulib_x86.lib"
                     } else {
@@ -200,10 +202,8 @@ model {
             }
         }
         withType(SharedLibraryBinarySpec) {
-            //if (toolChain in VisualCpp) {
-                cppCompiler.define "_WINDLL"
-                cppCompiler.define "DLL_EXPORT"
-            //}
+            cppCompiler.define "_WINDLL"
+            cppCompiler.define "DLL_EXPORT"
         }
     }
 }
