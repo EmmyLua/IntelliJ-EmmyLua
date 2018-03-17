@@ -264,10 +264,10 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
         val exprList = paramOwner.exprList
         val callExpr = PsiTreeUtil.findChildOfType(exprList, LuaCallExpr::class.java)
         val expr = callExpr?.expr
-        if (expr != null) {
+        if (expr is LuaNameExpr) {
             val paramIndex = paramOwner.getIndexFor(paramNameDef)
             // ipairs
-            if (expr.text == Constants.WORD_IPAIRS) {
+            if (expr.name == Constants.WORD_IPAIRS) {
                 if (paramIndex == 0)
                     return Ty.NUMBER
 
@@ -286,7 +286,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 }
             }
             // pairs
-            if (expr.text == Constants.WORD_PAIRS) {
+            if (expr.name == Constants.WORD_PAIRS) {
                 val args = callExpr.args
                 if (args is LuaListArgs) {
                     val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
@@ -303,6 +303,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
             }
         }
     }
+    // for param = 1, 2 do end
+    if (paramOwner is LuaForAStat)
+        return Ty.NUMBER
     /**
      * ---@param processor fun(p1:TYPE):void
      * local function test(processor)
