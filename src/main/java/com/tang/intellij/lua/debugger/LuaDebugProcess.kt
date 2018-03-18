@@ -20,6 +20,7 @@ import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
@@ -51,16 +52,20 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
         topToolbar.remove(actionManager.getAction(XDebuggerActions.FORCE_STEP_INTO))
     }
 
-    override fun print(text: String, type: ConsoleViewContentType) {
-        session.consoleView.print(text, type)
+    override fun print(text: String, consoleType: LogConsoleType, contentType: ConsoleViewContentType) {
+        session.consoleView.print(text, contentType)
     }
 
-    override fun println(text: String, type: ConsoleViewContentType) {
-        session.consoleView.print(text + "\n", type)
+    override fun println(text: String, consoleType: LogConsoleType, contentType: ConsoleViewContentType) {
+        print(text + "\n", consoleType, contentType)
     }
 
-    override fun error(text: String) {
-        session.consoleView.print(text + "\n", ConsoleViewContentType.ERROR_OUTPUT)
+    override fun error(text: String, consoleType: LogConsoleType) {
+        print(text + "\n", consoleType, ConsoleViewContentType.ERROR_OUTPUT)
+    }
+
+    override fun printHyperlink(text: String, consoleType: LogConsoleType, handler: (project: Project) -> Unit) {
+        session.consoleView.printHyperlink(text, handler)
     }
 
     override fun resume(context: XSuspendContext?) {

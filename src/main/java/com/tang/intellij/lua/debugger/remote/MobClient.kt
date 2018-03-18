@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.remote
 
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
+import com.tang.intellij.lua.debugger.LogConsoleType
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand
 import java.io.IOException
@@ -72,7 +73,7 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
         } catch (e: Exception) {
 
         }  finally {
-            listener.println("Disconnected.", ConsoleViewContentType.SYSTEM_OUTPUT)
+            listener.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
     }
 

@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.remote
 
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.tang.intellij.lua.debugger.DebugLogger
+import com.tang.intellij.lua.debugger.LogConsoleType
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.channels.ServerSocketChannel
@@ -59,7 +60,7 @@ class MobServer(private val listener: MobServerListener) : Runnable {
                         accept.close()
                     } catch (e: Exception) {}
                 } else {
-                    listener.println("Connected.", ConsoleViewContentType.SYSTEM_OUTPUT)
+                    listener.println("Connected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
                     client = MobClient(accept, listener)
                     listener.onConnect(client!!)
                 }

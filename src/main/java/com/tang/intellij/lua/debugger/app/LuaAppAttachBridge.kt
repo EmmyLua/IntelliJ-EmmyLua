@@ -25,7 +25,11 @@ import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.util.Key
 import com.intellij.xdebugger.XDebugSession
 import com.tang.intellij.lua.LuaBundle
-import com.tang.intellij.lua.debugger.attach.*
+import com.tang.intellij.lua.debugger.LogConsoleType
+import com.tang.intellij.lua.debugger.attach.DebugMessageId
+import com.tang.intellij.lua.debugger.attach.LuaAttachBridgeBase
+import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
+import com.tang.intellij.lua.debugger.attach.LuaAttachMessage
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.nio.charset.Charset
 
@@ -83,7 +87,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
                 isX86 = exitValue == 1
 
                 val archType = if (isX86) "x86" else "x64"
-                process.println(LuaBundle.message("run.attach.launch_info", program, archType), ConsoleViewContentType.SYSTEM_OUTPUT)
+                process.println(LuaBundle.message("run.attach.launch_info", program, archType), LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
                 // attach debugger
                 val exe = LuaFileUtil.getPluginVirtualFile(String.format("debugger/windows/%s/emmy.tool.exe", archType))
 
@@ -102,7 +106,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
                 handler!!.startNotify()
             }
         } catch (e: Exception) {
-            process.error(e.message!!)
+            process.error(e.message!!, LogConsoleType.EMMY)
             session.stop()
         }
     }

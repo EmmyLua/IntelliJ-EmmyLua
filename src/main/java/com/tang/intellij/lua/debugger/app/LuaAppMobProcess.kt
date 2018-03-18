@@ -26,6 +26,7 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.Key
 import com.intellij.xdebugger.XDebugSession
+import com.tang.intellij.lua.debugger.LogConsoleType
 import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess
 import com.tang.intellij.lua.psi.LuaFileUtil
 
@@ -74,7 +75,7 @@ internal class LuaAppMobProcess(session: XDebugSession) : LuaMobDebugProcess(ses
 
                 override fun onTextAvailable(processEvent: ProcessEvent, key: Key<*>) {
                     if (key === ProcessOutputTypes.STDOUT) {
-                        print(processEvent.text, ConsoleViewContentType.NORMAL_OUTPUT)
+                        print(processEvent.text, LogConsoleType.NORMAL, ConsoleViewContentType.NORMAL_OUTPUT)
                     } else if (key === ProcessOutputTypes.STDERR) {
                         error(processEvent.text)
                     }

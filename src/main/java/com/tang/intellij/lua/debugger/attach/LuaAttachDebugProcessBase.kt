@@ -17,6 +17,9 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.debugger.ui.DebuggerContentInfo
+import com.intellij.execution.filters.TextConsoleBuilderFactory
+import com.intellij.execution.runners.RunContentBuilder
+import com.intellij.execution.ui.ConsoleView
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunnerLayoutUi
 import com.intellij.execution.ui.layout.PlaceInGrid
@@ -26,6 +29,7 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.PathUtil
 import com.intellij.util.Processor
@@ -36,6 +40,7 @@ import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
 import com.intellij.xdebugger.frame.XSuspendContext
 import com.intellij.xdebugger.ui.XDebugTabLayouter
+import com.tang.intellij.lua.debugger.LogConsoleType
 import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.debugger.attach.vfs.MemoryDataVirtualFile
@@ -59,6 +64,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     private lateinit var profilerPanel: ProfilerPanel
     private var toggleProfiler: Boolean = false
     private val memoryFileSystem = MemoryFileSystem.instance
+    private var emmyConsole: ConsoleView? = null
 
     init {
         session.setPauseActionSupported(false)
@@ -203,29 +209,29 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         if (file == null) {
             if (proto.state != CodeState.Unavailable) {
                 file = createMemoryFile(proto)
-                print("[✔] Load memory file : ", ConsoleViewContentType.SYSTEM_OUTPUT)
+                print("[✔] Load memory file : ", LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
                 val virtualFile = file
-                session.consoleView.printHyperlink(proto.fileName) {
+                printHyperlink(proto.fileName, LogConsoleType.EMMY) {
                     FileEditorManager.getInstance(it).openFile(virtualFile, true)
                 }
-                print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
+                print("\n", LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
             }
         } else {
             if (file is MemoryDataVirtualFile) {
                 file.setBinaryContent(proto.source.toByteArray())
                 file.state = proto.state
             }
-            print("[✔] File was loaded :", ConsoleViewContentType.SYSTEM_OUTPUT)
+            print("[✔] File was loaded :", LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
             val virtualFile = file
-            session.consoleView.printHyperlink(proto.fileName) {
+            printHyperlink(proto.fileName, LogConsoleType.EMMY) {
                 FileEditorManager.getInstance(it).openFile(virtualFile, true)
             }
-            print("\n", ConsoleViewContentType.SYSTEM_OUTPUT)
+            print("\n", LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
 
         if (file != null) {
             val script = LoadedScript(file, proto.index, proto.fileName, proto.state)
-            loadedScriptMap.put(proto.index, script)
+            loadedScriptMap[proto.index] = script
 
             processBreakpoint(Processor {
                 val pos = it.sourcePosition
@@ -237,11 +243,11 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
                 true
             })
         } else {
-            print("[✘] File not found ", ConsoleViewContentType.SYSTEM_OUTPUT)
-            session.consoleView.printHyperlink("[TRY MEMORY FILE]") {
+            print("[✘] File not found ", LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
+            printHyperlink("[TRY MEMORY FILE]", LogConsoleType.EMMY) {
                 bridge.send(DMReqReloadScript(proto.index))
             }
-            print(": ${proto.fileName}\n", ConsoleViewContentType.SYSTEM_OUTPUT)
+            print(": ${proto.fileName}\n", LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
     }
 
@@ -301,6 +307,13 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
                 createVMPanel(ui)
                 createMemoryFilesPanel(ui)
                 createProfilerPanel(ui)
+
+                val console = TextConsoleBuilderFactory.getInstance().createBuilder(session.project).console
+                val consoleContent = this.registerConsoleContent(ui, console)
+                // ui.addContent(consoleContent)
+                consoleContent.displayName = "emmy.log"
+                RunContentBuilder.addAdditionalConsoleEditorActions(console, consoleContent)
+                emmyConsole = console
             }
         }
     }
@@ -324,5 +337,19 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         val content = ui.createContent(DebuggerContentInfo.FRAME_CONTENT, profilerPanel, "Profiler", AllIcons.Debugger.Frame, null)
         content.isCloseable = false
         ui.addContent(content, 0, PlaceInGrid.left, false)
+    }
+
+    override fun print(text: String, consoleType: LogConsoleType, contentType: ConsoleViewContentType) {
+        if (consoleType == LogConsoleType.EMMY)
+            emmyConsole?.print(text, contentType)
+        else
+            super.print(text, consoleType, contentType)
+    }
+
+    override fun printHyperlink(text: String, consoleType: LogConsoleType, handler: (project: Project) -> Unit) {
+        if (consoleType == LogConsoleType.EMMY)
+            emmyConsole?.printHyperlink(text, handler)
+        else
+            super.printHyperlink(text, consoleType, handler)
     }
 }

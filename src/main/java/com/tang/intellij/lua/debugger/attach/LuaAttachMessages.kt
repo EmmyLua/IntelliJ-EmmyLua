@@ -22,6 +22,7 @@ import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValueChildrenList
 import com.intellij.xdebugger.impl.XSourcePositionImpl
+import com.tang.intellij.lua.debugger.LogConsoleType
 import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.attach.value.*
 import java.io.DataInputStream
@@ -183,7 +184,7 @@ class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
             Warning -> ConsoleViewContentType.LOG_WARNING_OUTPUT
             else -> ConsoleViewContentType.NORMAL_OUTPUT
         }
-        process.println(message, contentType)
+        process.println(message, LogConsoleType.EMMY, contentType)
     }
 }
 
@@ -197,7 +198,7 @@ class DMException : LuaAttachMessage(DebugMessageId.Exception) {
     }
 
     fun print() {
-        process.println(message, ConsoleViewContentType.ERROR_OUTPUT)
+        process.error(message, LogConsoleType.NORMAL)
     }
 }
 

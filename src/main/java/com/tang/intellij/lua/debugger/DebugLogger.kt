@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger
 
-import com.intellij.execution.ui.ConsoleViewContentType;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.openapi.project.Project
 
 /**
  * console logger
  * Created by tangzx on 2017/5/1.
  */
-public interface DebugLogger {
-    void print(@NotNull String text, @NotNull ConsoleViewContentType type);
-    void println(@NotNull String text, @NotNull ConsoleViewContentType type);
-    void error(@NotNull String text);
+interface DebugLogger {
+    fun print(text: String, consoleType: LogConsoleType, contentType: ConsoleViewContentType)
+    fun println(text: String, consoleType: LogConsoleType, contentType: ConsoleViewContentType)
+    fun printHyperlink(text: String, consoleType: LogConsoleType, handler: (project: Project) -> Unit)
+    fun error(text: String, consoleType: LogConsoleType = LogConsoleType.EMMY)
+}
+
+enum class LogConsoleType {
+    EMMY, NORMAL
 }
