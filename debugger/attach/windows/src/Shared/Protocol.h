@@ -28,6 +28,8 @@ enum MessageType
     MessageType_Normal          = 0,
     MessageType_Warning         = 1,
     MessageType_Error           = 2,
+	MessageType_Stdout			= 3,
+	MessageType_Stderr			= 4,
 };
 
 enum CodeState

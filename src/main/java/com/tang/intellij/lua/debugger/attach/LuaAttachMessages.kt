@@ -162,9 +162,11 @@ class DMReqInitialize(private val symbolsDirectory: String, private val emmyLuaF
 class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
 
     companion object {
-        val Normal = 0
-        val Warning = 1
-        val Error = 2
+        const val Normal = 0
+        const val Warning = 1
+        const val Error = 2
+        const val Stdout = 3
+        const val Stderr = 4
     }
 
     lateinit var message: String
@@ -175,16 +177,17 @@ class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
     override fun read(stream: DataInputStream) {
         super.read(stream)
         type = stream.readInt()
-        message = stream.readString()
+        message = stream.readString().replace("\r\n", "\n")
     }
 
     fun print() {
-        val contentType =  when (type) {
-            Error -> ConsoleViewContentType.ERROR_OUTPUT
-            Warning -> ConsoleViewContentType.LOG_WARNING_OUTPUT
-            else -> ConsoleViewContentType.NORMAL_OUTPUT
+        when (type) {
+            Error -> process.println(message, LogConsoleType.EMMY, ConsoleViewContentType.ERROR_OUTPUT)
+            Warning -> process.println(message, LogConsoleType.EMMY, ConsoleViewContentType.LOG_WARNING_OUTPUT)
+            Stdout -> process.print(message, LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+            Stderr -> process.print(message, LogConsoleType.NORMAL, ConsoleViewContentType.ERROR_OUTPUT)
+            else -> process.println(message, LogConsoleType.EMMY, ConsoleViewContentType.NORMAL_OUTPUT)
         }
-        process.println(message, LogConsoleType.EMMY, contentType)
     }
 }
 
