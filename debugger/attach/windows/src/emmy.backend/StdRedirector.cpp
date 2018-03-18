@@ -31,7 +31,7 @@ void StdRedirector::redirect(const std::function<void(const char*, int)>& handle
 		perror("Can't _dup2 stdout");
 		return;
 	}
-
+	setvbuf(stdout, nullptr, _IONBF, 0);
 	std::thread thread([this, handler]()
 	{
 		char buf[1024] = { 0 };

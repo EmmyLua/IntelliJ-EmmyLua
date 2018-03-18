@@ -116,6 +116,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.SetBreakpoint -> DMSetBreakpoint()
                 DebugMessageId.RespEvaluate -> DMRespEvaluate()
                 DebugMessageId.RespProfilerData -> DMRespProfilerData()
+                DebugMessageId.LoadError,
                 DebugMessageId.RespInitialize,
                 DebugMessageId.RespProfilerBegin,
                 DebugMessageId.RespProfilerEnd,

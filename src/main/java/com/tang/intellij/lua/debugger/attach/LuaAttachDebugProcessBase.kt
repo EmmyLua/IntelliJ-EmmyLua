@@ -370,7 +370,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             }
 
             override fun sendUserInput(input: String) {
-                bridge.send(DMStdin(input))
+                bridge.send(DMStdin(input.replace("\n", "\r\n")))
             }
         }
         return object : ConsoleViewImpl(project, GlobalSearchScope.allScope(project), false, state, true) {
