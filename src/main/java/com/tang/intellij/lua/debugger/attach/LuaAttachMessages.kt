@@ -84,6 +84,8 @@ enum class DebugMessageId
 
     ReqReloadScript,
     RespReloadScript,
+
+    ReqStdin,
 }
 
 open class LuaAttachMessage(val id: DebugMessageId) {
@@ -375,5 +377,12 @@ class DMReqReloadScript(private val index: Int) : LuaAttachMessage(DebugMessageI
     override fun write(stream: DataOutputStream) {
         super.write(stream)
         stream.writeInt(index)
+    }
+}
+
+class DMStdin(private val text: String) : LuaAttachMessage(DebugMessageId.ReqStdin) {
+    override fun write(stream: DataOutputStream) {
+        super.write(stream)
+        stream.writeString(text)
     }
 }

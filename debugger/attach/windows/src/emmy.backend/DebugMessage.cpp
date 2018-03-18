@@ -206,3 +206,13 @@ void DMReqReloadScript::Read(ByteInputStream* stream)
 	DebugMessage::Read(stream);
 	index = stream->ReadUInt32();
 }
+
+DMReqStdin::DMReqStdin() : DebugMessage(DebugMessageId::ReqStdin)
+{
+}
+
+void DMReqStdin::Read(ByteInputStream* stream)
+{
+	DebugMessage::Read(stream);
+	stream->ReadString(this->text);
+}

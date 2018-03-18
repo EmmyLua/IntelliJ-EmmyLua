@@ -18,9 +18,13 @@ package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.debugger.ui.DebuggerContentInfo
 import com.intellij.execution.filters.TextConsoleBuilderFactory
+import com.intellij.execution.impl.ConsoleState
+import com.intellij.execution.impl.ConsoleViewImpl
+import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.RunContentBuilder
 import com.intellij.execution.ui.ConsoleView
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.execution.ui.ExecutionConsole
 import com.intellij.execution.ui.RunnerLayoutUi
 import com.intellij.execution.ui.layout.PlaceInGrid
 import com.intellij.icons.AllIcons
@@ -31,6 +35,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.PathUtil
 import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
@@ -351,5 +356,25 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             emmyConsole?.printHyperlink(text, handler)
         else
             super.printHyperlink(text, consoleType, handler)
+    }
+
+    override fun createConsole(): ExecutionConsole {
+        val project = session.project
+        val state = object : ConsoleState.NotStartedStated() {
+            override fun attachTo(viewImpl: ConsoleViewImpl, handler: ProcessHandler?): ConsoleState {
+                return this
+            }
+
+            override fun isRunning(): Boolean {
+                return true
+            }
+
+            override fun sendUserInput(input: String) {
+                bridge.send(DMStdin(input))
+            }
+        }
+        return object : ConsoleViewImpl(project, GlobalSearchScope.allScope(project), false, state, true) {
+
+        }
     }
 }

@@ -82,6 +82,9 @@ void SocketPipeline::handleStream(ByteInputStream * stream)
 	case DebugMessageId::ReqReloadScript:
 		msg = new DMReqReloadScript();
 		break;
+	case DebugMessageId::ReqStdin:
+		msg = new DMReqStdin();
+		break;
 	case DebugMessageId::Detach:
 	case DebugMessageId::Break:
 	case DebugMessageId::LoadDone:

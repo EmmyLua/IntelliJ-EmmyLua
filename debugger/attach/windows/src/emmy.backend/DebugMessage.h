@@ -51,6 +51,8 @@ enum class DebugMessageId
 
 	ReqReloadScript,
 	RespReloadScript,
+
+	ReqStdin,
 };
 
 class DebugMessage
@@ -234,4 +236,12 @@ public:
 	void Read(ByteInputStream* stream) override;
 
 	size_t index;
+};
+
+class DMReqStdin : public DebugMessage
+{
+public:
+	DMReqStdin();
+	void Read(ByteInputStream* stream) override;
+	std::string text;
 };
