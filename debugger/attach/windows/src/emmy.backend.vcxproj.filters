@@ -66,6 +66,9 @@
     <ClCompile Include="emmy.backend\TCPServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="emmy.backend\StdRedirector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="third-party\libpe\libpe\htable.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="emmy.backend\TCPServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="emmy.backend\StdRedirector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

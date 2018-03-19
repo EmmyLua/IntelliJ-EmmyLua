@@ -141,7 +141,7 @@ model {
             binaries.withType(StaticLibraryBinarySpec) { buildable = false }
             binaries.all {
                 linker.args "/LIBPATH:src/libs/dbghelp/lib"
-                linker.args "dbghelp.lib", "Psapi.lib", "Shell32.lib"
+                linker.args "dbghelp.lib", "Psapi.lib", "Shell32.lib", "user32.lib"
             }
         }
 

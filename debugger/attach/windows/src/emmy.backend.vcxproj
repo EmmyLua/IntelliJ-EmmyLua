@@ -30,6 +30,7 @@
     <ClCompile Include="emmy.backend\DllMain.cpp" />
     <ClCompile Include="emmy.backend\LuaProfiler.cpp" />
     <ClCompile Include="emmy.backend\StackNode.cpp" />
+    <ClCompile Include="emmy.backend\StdRedirector.cpp" />
     <ClCompile Include="emmy.backend\Stream.cpp" />
     <ClCompile Include="emmy.backend\TCPServer.cpp" />
     <ClCompile Include="third-party\libpe\libpe\htable.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="emmy.backend\LuaProfiler.h" />
     <ClInclude Include="emmy.backend\LuaTypes.h" />
     <ClInclude Include="emmy.backend\StackNode.h" />
+    <ClInclude Include="emmy.backend\StdRedirector.h" />
     <ClInclude Include="emmy.backend\Stream.h" />
     <ClInclude Include="emmy.backend\TCPServer.h" />
     <ClInclude Include="third-party\libpe\libpe\htable.h" />
