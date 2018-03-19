@@ -366,7 +366,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             }
 
             override fun isRunning(): Boolean {
-                return true
+                return !session.isStopped
             }
 
             override fun sendUserInput(input: String) {
