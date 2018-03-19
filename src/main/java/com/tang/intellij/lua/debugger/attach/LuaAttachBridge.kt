@@ -55,7 +55,7 @@ class LuaAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSession
                     connect(p)
                 }
             }
-            process.print(processEvent.text, LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+            process.print(processEvent.text, LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
     }
 
