@@ -1,6 +1,7 @@
 #ifndef UTILITY_H
 #define UTILITY_H
-#include <windows.h>
+#include <Windows.h>
+#include <string>
 
 struct ExeInfo
 {
@@ -17,5 +18,9 @@ bool GetExeInfo(LPCSTR fileName, ExeInfo&info);
 
 // 获取当前主窗口
 HWND GetCurrentWnd();
+
+std::wstring CharToWchar(const char* c, size_t m_encode = CP_ACP);
+
+std::string WcharToChar(const wchar_t* wp, size_t m_encode = CP_ACP);
 
 #endif

@@ -1,5 +1,5 @@
 #include "Utility.h"
-#include <imagehlp.h>
+#include <ImageHlp.h>
 
 HWND g_wnd;
 
@@ -31,7 +31,7 @@ HWND GetCurrentWnd()
 bool GetExeInfo(LPCSTR fileName, ExeInfo&info)
 {
 	LOADED_IMAGE loadedImage;
-	if (!MapAndLoad(const_cast<PSTR>(fileName), NULL, &loadedImage, FALSE, TRUE))
+	if (!MapAndLoad(const_cast<PSTR>(fileName), nullptr, &loadedImage, FALSE, TRUE))
 	{
 		return false;
 	}
@@ -55,4 +55,26 @@ bool GetExeInfo(LPCSTR fileName, ExeInfo&info)
 	UnMapAndLoad(&loadedImage);
 
 	return true;
+}
+
+std::wstring CharToWchar(const char* c, size_t m_encode)
+{
+	int len = MultiByteToWideChar(m_encode, 0, c, strlen(c), nullptr, 0);
+	wchar_t*    m_wchar = new wchar_t[len + 1];
+	MultiByteToWideChar(m_encode, 0, c, strlen(c), m_wchar, len);
+	m_wchar[len] = '\0';
+	std::wstring str = m_wchar;
+	delete[] m_wchar;
+	return str;
+}
+
+std::string WcharToChar(const wchar_t* wp, size_t m_encode)
+{
+	int len = WideCharToMultiByte(m_encode, 0, wp, wcslen(wp), nullptr, 0, nullptr, nullptr);
+	char    *m_char = new char[len + 1];
+	WideCharToMultiByte(m_encode, 0, wp, wcslen(wp), m_char, len, nullptr, nullptr);
+	m_char[len] = '\0';
+	std::string str = m_char;
+	delete[] m_char;
+	return str;
 }

@@ -27,6 +27,7 @@ import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.attach.value.*
 import java.io.DataInputStream
 import java.io.DataOutputStream
+import java.nio.charset.Charset
 
 enum class ErrorCode
 {
@@ -134,8 +135,9 @@ open class LuaAttachMessage(val id: DebugMessageId) {
 }
 
 fun DataOutputStream.writeString(s: String) {
-    writeInt(s.length)
-    write(s.toByteArray())
+    val array = s.toByteArray(Charset.forName("GBK"))
+    writeInt(array.size)
+    write(array)
 }
 
 fun DataOutputStream.writeSize(size: Long) {
@@ -146,7 +148,7 @@ fun DataInputStream.readString(): String {
     val len = this.readInt()
     val bytes = ByteArray(len)
     this.read(bytes)
-    return String(bytes)
+    return String(bytes, Charset.forName("GBK"))
 }
 
 fun DataInputStream.readSize(): Long {
