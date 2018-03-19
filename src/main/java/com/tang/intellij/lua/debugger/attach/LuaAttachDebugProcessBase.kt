@@ -312,15 +312,21 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
                 createVMPanel(ui)
                 createMemoryFilesPanel(ui)
                 createProfilerPanel(ui)
-
-                val console = TextConsoleBuilderFactory.getInstance().createBuilder(session.project).console
-                val consoleContent = this.registerConsoleContent(ui, console)
-                // ui.addContent(consoleContent)
-                consoleContent.displayName = "emmy.log"
-                RunContentBuilder.addAdditionalConsoleEditorActions(console, consoleContent)
-                emmyConsole = console
+                createEmmyConsole(ui)
             }
         }
+    }
+
+    private fun createEmmyConsole(ui: RunnerLayoutUi) {
+        val console = TextConsoleBuilderFactory.getInstance().createBuilder(session.project).console
+        val name = "Emmy.log"
+        val consoleContent = ui.createContent(name, console.component, name, AllIcons.Debugger.Console_log, null)
+        consoleContent.isCloseable = false
+        consoleContent.isPinnable = false
+        consoleContent.displayName = name
+        ui.addContent(consoleContent, 2, PlaceInGrid.center, false)
+        RunContentBuilder.addAdditionalConsoleEditorActions(console, consoleContent)
+        emmyConsole = console
     }
 
     private fun createVMPanel(ui: RunnerLayoutUi) {
