@@ -59,6 +59,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
     private HoverHyperlinkLabel mobdebugLink;
     private EnvironmentVariablesTextFieldWithBrowseButton myEnvironments;
     private JComboBox<String> outputCharset;
+    private JCheckBox showConsoleWindowCheckBox;
     private Project project;
 
     LuaAppSettingsEditor(Project project) {
@@ -79,6 +80,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         myDebugger.addItemListener(e -> {
             DebuggerType debuggerType = (DebuggerType) myDebugger.getSelectedItem();
             mobdebugLink.setVisible(debuggerType == DebuggerType.Mob);
+            showConsoleWindowCheckBox.setVisible(debuggerType == DebuggerType.Attach);
             fireEditorStateChanged();
         });
 
@@ -99,6 +101,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         myEnvironments.setEnvs(luaAppRunConfiguration.getEnvs());
         mobdebugLink.setVisible(luaAppRunConfiguration.getDebuggerType() == DebuggerType.Mob);
         outputCharset.setSelectedItem(luaAppRunConfiguration.getCharset());
+        showConsoleWindowCheckBox.setSelected(luaAppRunConfiguration.getShowConsole());
     }
 
     @Override
@@ -110,6 +113,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
         luaAppRunConfiguration.setParameters(parameters.getText());
         luaAppRunConfiguration.setEnvs(myEnvironments.getEnvs());
         luaAppRunConfiguration.setCharset((String) Objects.requireNonNull(outputCharset.getSelectedItem()));
+        luaAppRunConfiguration.setShowConsole(showConsoleWindowCheckBox.isSelected());
     }
 
     @NotNull

@@ -53,6 +53,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     var file: String? = null
     var parameters: String? = null
     var charset: String = "UTF-8"
+    var showConsole = true
 
     private var _debuggerType = DebuggerType.Attach
 
@@ -92,6 +93,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
         JDOMExternalizerUtil.writeField(element, "debuggerType", debuggerType.value().toString())
         JDOMExternalizerUtil.writeField(element, "params", parameters)
         JDOMExternalizerUtil.writeField(element, "charset", charset)
+        JDOMExternalizerUtil.writeField(element, "showConsole", if (showConsole) "true" else "false")
     }
 
     @Throws(InvalidDataException::class)
@@ -109,6 +111,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
 
         parameters = JDOMExternalizerUtil.readField(element, "params")
         charset = JDOMExternalizerUtil.readField(element, "charset") ?: "UTF-8"
+        showConsole = JDOMExternalizerUtil.readField(element, "showConsole") == "true"
     }
 
     override val port = 8172

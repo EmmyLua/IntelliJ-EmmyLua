@@ -94,7 +94,11 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
                 val commandLine = GeneralCommandLine(exe!!)
                 commandLine.withEnvironment(configuration.envs)
                 commandLine.charset = Charset.forName("UTF-8")
-                commandLine.addParameters("-m", "run", "-c", program, "-e", emmyLua, "-w", workingDir)
+                commandLine.addParameters("-m", "run",
+                        "--cmd", program,
+                        "-e", emmyLua,
+                        "-w", workingDir,
+                        "--console", if (configuration.showConsole) "true" else "false")
                 val args = configuration.parametersArray
                 val argString = args.joinToString(" ")
                 if (!argString.isEmpty()) {

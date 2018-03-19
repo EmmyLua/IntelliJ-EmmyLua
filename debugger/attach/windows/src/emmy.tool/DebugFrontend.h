@@ -60,7 +60,13 @@ public:
     /**
      * Starts a new process that will be debugged.
      */
-	ErrorCode Start(const char* command, const char* commandArguments, const char* currentDirectory, const char* symbolsDirectory, bool debug, bool startBroken);
+	ErrorCode Start(const char* command,
+		const char* commandArguments,
+		const char* currentDirectory,
+		const char* symbolsDirectory,
+		bool debug,
+		bool console,
+		bool startBroken);
 
 	void Resume();
 
@@ -152,7 +158,11 @@ private:
      * Starts up a process and runs it until the entry point of the executable (i.e. runs
      * the windows startup code and suspends execution at the beginning of the real code)
      */
-    bool StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandLine, LPCSTR directory, PROCESS_INFORMATION& processInfo);
+    bool StartProcessAndRunToEntry(LPCSTR exeFileName,
+		LPSTR commandLine,
+		LPCSTR directory,
+		PROCESS_INFORMATION& processInfo,
+		bool console);
 
     /**
      * Outputs the error message for Win32 error code.

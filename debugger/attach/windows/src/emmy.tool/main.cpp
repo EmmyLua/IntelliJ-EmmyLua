@@ -47,7 +47,7 @@ void mainLoop() {
 int main(int argc, char** argv)
 {
 	ErrorCode code = ErrorCode::OK;
-
+	//::MessageBox(NULL, "Wait for debugger.", "EmmyLua", MB_OK);
 	cxxopts::Options options("EmmyLua", "EmmyLua Debugger");
 	options.add_options()
 		("m,mode", "debug model attach/run", cxxopts::value<std::string>())
@@ -56,6 +56,7 @@ int main(int argc, char** argv)
 		("c,cmd", "command line", cxxopts::value<std::string>())
 		("a,args", "args", cxxopts::value<std::string>())
 		("d,debug", "is debug", cxxopts::value<bool>())
+		("console", "show console window", cxxopts::value<std::string>())
 		("w,workdir", "working directory", cxxopts::value<std::string>())
 		("e,emmy", "emmy lua", cxxopts::value<std::string>());
 	options.parse(argc, argv);
@@ -84,6 +85,10 @@ int main(int argc, char** argv)
 			if (options.count("d")) {
 				debug = options["d"].as<bool>();
 			}
+			bool console = false;
+			if (options.count("console")) {
+				console = options["console"].as<std::string>() == "true";
+			}
 			//working dir
 			std::string wd;
 			if (options.count("w")) {
@@ -91,7 +96,13 @@ int main(int argc, char** argv)
 			}
 
 			if (!cmd.empty()) {
-				code = inst.Start(cmd.c_str(), args.c_str(), wd.c_str(), "", debug, false);
+				code = inst.Start(cmd.c_str(),
+					args.c_str(),
+					wd.c_str(),
+					"",
+					debug,
+					console,
+					false);
 				if (code == ErrorCode::OK) {
 					mainLoop();
 				}

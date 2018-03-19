@@ -67,6 +67,7 @@ ErrorCode DebugFrontend::Start(
 	const char* currentDirectory,
 	const char* symbolsDirectory,
 	bool debug,
+	bool console,
 	bool startBroken)
 {
 
@@ -89,7 +90,7 @@ ErrorCode DebugFrontend::Start(
 
     if (debug)
     {
-        if (!StartProcessAndRunToEntry(command, commandLine, directory.c_str(), processInfo))
+        if (!StartProcessAndRunToEntry(command, commandLine, directory.c_str(), processInfo, console))
         {
             return ErrorCode::UNKNOWN;
         }
@@ -604,7 +605,11 @@ void DebugFrontend::SetBreakpoint(HANDLE hProcess, LPVOID entryPoint, bool set, 
 
 }
 
-bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandLine, LPCSTR directory, PROCESS_INFORMATION& processInfo)
+bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName,
+	LPSTR commandLine,
+	LPCSTR directory,
+	PROCESS_INFORMATION& processInfo,
+	bool console)
 {
 
     STARTUPINFO startUpInfo = { 0 };
@@ -617,13 +622,11 @@ bool DebugFrontend::StartProcessAndRunToEntry(LPCSTR exeFileName, LPSTR commandL
         return false;
     }
 
-    /*if (!info.i386)
-    {
-        MessageEvent("Error: Debugging 64-bit applications is not supported", MessageType_Error);
-        return false;
-    }*/
-
-	DWORD flags = DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS | CREATE_NO_WINDOW;// CREATE_NEW_CONSOLE;
+	DWORD flags = DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS ;
+	if (console)
+		flags |= CREATE_NEW_CONSOLE;
+	else
+		flags |= CREATE_NO_WINDOW;
 
     if (!CreateProcess(nullptr, commandLine, nullptr, nullptr, TRUE, flags, nullptr, directory, &startUpInfo, &processInfo))
     {
