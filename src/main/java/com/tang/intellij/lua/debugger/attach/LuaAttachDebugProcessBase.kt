@@ -155,6 +155,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             is DMException -> message.print()
             is DMMessage -> message.print()
             is DMRespProfilerData -> onProfilerData(message)
+            is DMLoadError -> onLoadError(message)
             else -> {
                 when (message.id) {
                     DebugMessageId.SessionEnd -> {
@@ -255,6 +256,10 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             }
             print(": ${proto.fileName}\n", LogConsoleType.EMMY, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
+    }
+
+    private fun onLoadError(proto: DMLoadError) {
+        error(proto.message, LogConsoleType.NORMAL)
     }
 
     private fun createMemoryFile(dm: DMLoadScript): VirtualFile {

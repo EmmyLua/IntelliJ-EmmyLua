@@ -117,7 +117,7 @@ open class LuaAttachMessage(val id: DebugMessageId) {
                 DebugMessageId.SetBreakpoint -> DMSetBreakpoint()
                 DebugMessageId.RespEvaluate -> DMRespEvaluate()
                 DebugMessageId.RespProfilerData -> DMRespProfilerData()
-                DebugMessageId.LoadError,
+                DebugMessageId.LoadError -> DMLoadError()
                 DebugMessageId.RespInitialize,
                 DebugMessageId.RespProfilerBegin,
                 DebugMessageId.RespProfilerEnd,
@@ -231,6 +231,14 @@ class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
 
         val stateCode = stream.readByte()
         this.state = CodeState.values().find { it.ordinal.toByte() == stateCode } ?: CodeState.Normal
+    }
+}
+
+class DMLoadError : LuaAttachMessage(DebugMessageId.LoadError) {
+    var message: String = ""
+    override fun read(stream: DataInputStream) {
+        super.read(stream)
+        message = stream.readString()
     }
 }
 
