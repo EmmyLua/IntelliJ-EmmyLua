@@ -27,13 +27,13 @@ import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 class LuaAppAttachProcess(session: XDebugSession) : LuaAttachDebugProcessBase(session) {
 
     override fun startBridge(): LuaAttachBridgeBase {
-        val configuration = (session.runProfile as LuaAppRunConfiguration?)!!
-        val workingDir = configuration.workingDir
+        val configuration = session.runProfile as LuaAppRunConfiguration
 
         val bridge = LuaAppAttachBridge(this, session)
         this.bridge = bridge
         bridge.setProtoHandler(this)
-        bridge.launch(configuration.program, workingDir, configuration)
+        bridge.launch(configuration.program, configuration)
+        this.emmyInputEnabled = !configuration.showConsole
         return bridge
     }
 }

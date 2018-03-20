@@ -41,6 +41,10 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
     private var evalIdCounter = 0
     private val callbackMap = HashMap<Int, EvalInfo>()
     private var socket = Socket()
+    /**
+     * capture stdin & stdout
+     */
+    var captureStd: Boolean = false
 
     protected val emmyLua: String?
         get() = LuaFileUtil.getPluginVirtualFile("debugger/Emmy.lua")
@@ -111,7 +115,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
             writer = DataOutputStream(socket.getOutputStream())
 
             ApplicationManager.getApplication().executeOnPooledThread {
-                send(DMReqInitialize("", emmyLua!!))
+                send(DMReqInitialize("", emmyLua!!, captureStd))
                 processPack()
             }
         } catch (e: Exception) {

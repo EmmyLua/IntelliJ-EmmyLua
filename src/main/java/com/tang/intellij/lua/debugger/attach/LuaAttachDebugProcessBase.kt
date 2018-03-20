@@ -69,6 +69,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     private lateinit var profilerPanel: ProfilerPanel
     private var toggleProfiler: Boolean = false
     private val memoryFileSystem = MemoryFileSystem.instance
+    protected var emmyInputEnabled: Boolean = false
     private var emmyConsole: ConsoleView? = null
 
     init {
@@ -372,7 +373,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             }
 
             override fun isRunning(): Boolean {
-                return !session.isStopped
+                return emmyInputEnabled && !session.isStopped
             }
 
             override fun sendUserInput(input: String) {

@@ -66,8 +66,10 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
         }
     }
 
-    fun launch(program: String, workingDir: String?, configuration: LuaAppRunConfiguration) {
+    fun launch(program: String, configuration: LuaAppRunConfiguration) {
+        this.captureStd = !configuration.showConsole
         val pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory()
+        val workingDir = configuration.workingDir
         try {
             if (pluginVirtualDirectory != null) {
                 if (workingDir == null || workingDir.isEmpty()) {
