@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.ui.ConsoleViewContentType
+import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.util.PathUtil
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.frame.XStackFrame
@@ -134,8 +135,8 @@ open class LuaAttachMessage(val id: DebugMessageId) {
     }
 }
 
-fun DataOutputStream.writeString(s: String) {
-    val array = s.toByteArray(Charset.forName("GBK"))
+fun DataOutputStream.writeString(s: String, charset: Charset = Charset.defaultCharset()) {
+    val array = s.toByteArray(charset)
     writeInt(array.size)
     write(array)
 }
@@ -148,7 +149,9 @@ fun DataInputStream.readString(): String {
     val len = this.readInt()
     val bytes = ByteArray(len)
     this.read(bytes)
-    return String(bytes, Charset.forName("GBK"))
+
+    val charset = CharsetToolkit(bytes).guessEncoding(bytes.size)
+    return String(bytes, charset)
 }
 
 fun DataInputStream.readSize(): Long {
@@ -397,6 +400,6 @@ class DMReqReloadScript(private val index: Int) : LuaAttachMessage(DebugMessageI
 class DMStdin(private val text: String) : LuaAttachMessage(DebugMessageId.ReqStdin) {
     override fun write(stream: DataOutputStream) {
         super.write(stream)
-        stream.writeString(text)
+        stream.writeString(text, Charset.forName("GBK"))
     }
 }
