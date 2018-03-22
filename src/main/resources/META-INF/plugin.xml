@@ -17,7 +17,7 @@
 <idea-plugin>
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.2.0</version>
+    <version>1.2.3</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
@@ -78,8 +78,8 @@
         <li>[IMPROVE]improved remote debugger performance & compatible with mobdebug.lua v0.70</li>
         <li>[IMPROVE]new settings : stdout charset for run configuration</li>
         <li>[IMPROVE]new settings : hide/show console window for debug configuration(WIN32)</li>
-        <li>[NEW]add `Emmy.log` console for attach debugger logs</li>
-        <li>[NEW]lua call hierarchy(Ctrl+Alt+H) (Contribution from @LiamYao)</li>
+        <li>[NEW]add `Emmy.log` console for attaching debugger logs</li>
+        <li>[NEW]lua call hierarchy(Ctrl+Alt+H) (by @LiamYao)</li>
         <li>[NEW]region highlighting & color settings</li>
         <li>[NEW]new type : doc table type, ---@type { name:string, value:{ size:number } }</li>
         <li>[NEW]folding for --[[multi-line comments]] && [[multi-line strings]]</li>
