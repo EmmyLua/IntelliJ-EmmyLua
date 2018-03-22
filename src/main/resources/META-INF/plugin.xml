@@ -69,6 +69,24 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.2.3</strong>
+    <ul>
+        <li>Compatible with IDEA2018.1</li>
+        <li>[IMPROVE]improved parsing performance</li>
+        <li>[IMPROVE]improved formatting</li>
+        <li>[IMPROVE]more annotation infos</li>
+        <li>[IMPROVE]improved remote debugger performance & compatible with mobdebug.lua v0.70</li>
+        <li>[IMPROVE]new settings : stdout charset for run configuration</li>
+        <li>[IMPROVE]new settings : hide/show console window for debug configuration(WIN32)</li>
+        <li>[NEW]add `Emmy.log` console for attach debugger logs</li>
+        <li>[NEW]lua call hierarchy(Ctrl+Alt+H) (Contribution from @LiamYao)</li>
+        <li>[NEW]region highlighting & color settings</li>
+        <li>[NEW]new type : doc table type, ---@type { name:string, value:{ size:number } }</li>
+        <li>[NEW]folding for --[[multi-line comments]] && [[multi-line strings]]</li>
+        <li>unicode identifier support</li>
+        <li>fix bugs</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
 
     <strong>1.2.2</strong>
     <ul>
@@ -106,28 +124,6 @@
         <li>[IMPROVE] Name suggestion</li>
         <li>[IMPROVE] Variable name suggestion/completion</li>
         <li>[FIX] Bug #54 #55 #63 #66 #69</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-
-
-    <strong>1.1.9</strong>
-    <ul>
-        <li>[UPDATE] Compatible with IDEA 2017.3(173)</li>
-        <li>[NEW] Add new annotation: @overload, used for mark overload functions (@optional is obsolete)</li>
-        <li>[NEW] Add new annotation: @language, used for inject language to lua string</li>
-        <li>[NEW] Add new inspection: Show warning for duplicated local declaration</li>
-        <li>[NEW] Show method separators</li>
-        <li>[NEW] Show local variable type hints</li>
-        <li>[NEW] Show parameter type hints</li>
-        <li>[NEW] Show function return type hints</li>
-        <li>[NEW] Add new postfix template "if_not"</li>
-        <li>[IMPROVE] Infer type from constructor call (settings/Languages.../EmmyLua)</li>
-        <li>[IMPROVE] Add auto completion and references for label(Lua 5.3)</li>
-        <li>[IMPROVE] You can toggle on/off 'smart enter' (settings/Languages.../EmmyLua)</li>
-        <li>[IMPROVE] You can toggle on/off 'show words in file' (settings/Languages.../EmmyLua)</li>
-        <li>[FIX] Support forward declaration local-function</li>
-        <li>[FIX] Crash when type --[ at EOF</li>
-        <li>[FIX] Fix some bugs</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
     ]]>
