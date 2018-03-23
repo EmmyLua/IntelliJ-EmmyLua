@@ -97,58 +97,25 @@ object LuaPsiTreeUtilEx {
      * @param processor 处理器
      */
     private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaAssignStat>?) {
-        var continueSearch = true
-
         var curr: PsiElement = element
         do {
-            val next: PsiElement? = curr.prevSibling
-            var isParent = false
-            if (next == null) {
-                curr = curr.parent
-                isParent = true
-            } else
-                curr = next
-
-            if (curr is LuaLocalDef) {
-                // 跳过类似
-                // local name = name //skip
-                if (!curr.node.textRange.contains(element.node.textRange)) {
+            curr = curr.prevSibling ?: curr.parent
+            val continueSearch = when (curr) {
+                is LuaLocalDef -> if (!curr.node.textRange.contains(element.node.textRange)) {
                     val nameList = curr.nameList
-                    continueSearch = resolveInNameList(nameList, processor)
-                }
-            } else if (curr is LuaLocalFuncDef) {
-                continueSearch = processor.process(curr)
-            } else if (curr is LuaAssignStat && nameExprProcessor != null) {
-                continueSearch = nameExprProcessor.process(curr)
-            } else if (isParent) {
-                when (curr) {
-                    is LuaFuncBody -> continueSearch = resolveInFuncBody(curr, processor)
-                    is LuaForAStat -> continueSearch = processor.process(curr.paramNameDef)
-                    is LuaForBStat -> continueSearch = resolveInNameList(curr.paramNameDefList, processor)
-                }
+                    resolveInNameList(nameList, processor)
+                } else true
+                is LuaParamNameDef -> processor.process(curr)
+                is LuaLocalFuncDef -> processor.process(curr)
+                is LuaAssignStat -> nameExprProcessor?.process(curr) ?: true
+                else -> true
             }
         } while (continueSearch && curr !is PsiFile)
-    }
-
-    private fun resolveInFuncBody(funcBody: LuaFuncBody, processor: Processor<PsiNamedElement>): Boolean {
-        for (parDef in funcBody.paramNameDefList) {
-            if (!processor.process(parDef)) return false
-        }
-        return true
     }
 
     private fun resolveInNameList(nameList: LuaNameList?, processor: Processor<PsiNamedElement>): Boolean {
         if (nameList != null) {
             for (nameDef in nameList.nameDefList) {
-                if (!processor.process(nameDef)) return false
-            }
-        }
-        return true
-    }
-
-    private fun resolveInNameList(nameList: List<LuaParamNameDef>?, processor: Processor<PsiNamedElement>): Boolean {
-        if (nameList != null) {
-            for (nameDef in nameList) {
                 if (!processor.process(nameDef)) return false
             }
         }
