@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
@@ -61,9 +62,10 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiE
     return element
 }
 
+private val key = Key.create<PsiElement>("lua.resolve.cache")
+
 fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
-    var lastName: LuaNameExpr? = null
 
     //local/param
     LuaPsiTreeUtilEx.walkUpNameDef(pin, Processor { nameDef ->
@@ -73,15 +75,20 @@ fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): Psi
         }
         true
     }, Processor {
-        if (refName == it.name) {
-            lastName = it
-            return@Processor false
+        for (expr in it.varExprList.exprList) {
+            if (expr is LuaNameExpr && expr != pin) {
+                if (expr.name == refName) {
+                    val resolve = key.get(expr)
+                    if (resolve == null) {
+                        ret = resolveInFile(refName, expr, context) ?: expr
+                        expr.putUserData(key, ret)
+                    } else ret = resolve
+                    return@Processor false
+                }
+            }
         }
         true
     })
-
-    if (ret == null)
-        ret = lastName
 
     if (ret == null && refName == Constants.WORD_SELF) {
         val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(pin, LuaClassMethodDef::class.java)

@@ -51,7 +51,7 @@ object LuaPsiTreeUtilEx {
         }
     }
 
-    fun walkUpNameDef(psi: PsiElement?, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaNameExpr>? = null) {
+    fun walkUpNameDef(psi: PsiElement?, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaAssignStat>? = null) {
         if (psi == null) return
 
         var continueSearch = true
@@ -96,7 +96,7 @@ object LuaPsiTreeUtilEx {
      * @param element 当前搜索起点
      * @param processor 处理器
      */
-    private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaNameExpr>?) {
+    private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaAssignStat>?) {
         var continueSearch = true
 
         var curr: PsiElement = element
@@ -119,12 +119,7 @@ object LuaPsiTreeUtilEx {
             } else if (curr is LuaLocalFuncDef) {
                 continueSearch = processor.process(curr)
             } else if (curr is LuaAssignStat && nameExprProcessor != null) {
-                for (expr in curr.varExprList.exprList) {
-                    if (expr is LuaNameExpr && expr != element) {
-                        if (!nameExprProcessor.process(expr))
-                            break
-                    }
-                }
+                continueSearch = nameExprProcessor.process(curr)
             } else if (isParent) {
                 when (curr) {
                     is LuaFuncBody -> continueSearch = resolveInFuncBody(curr, processor)
