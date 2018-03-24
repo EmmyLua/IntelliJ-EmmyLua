@@ -53,9 +53,9 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
     return ret
 }
 
-fun resolveLocal(ref: LuaNameExpr, context: SearchContext?) = resolveLocal(ref.name, ref, context)
+fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
-fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext?): PsiElement? {
+fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext? = null): PsiElement? {
     val element = resolveInFile(refName, ref, context)
     if (element is LuaNameExpr)
         return null

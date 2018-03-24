@@ -318,20 +318,14 @@ private val LuaTableExpr.innerShouldCreateStub: Boolean get() {
     }
 }
 
-val LuaFuncDef.forwardDeclaration: PsiElement? get() {
-    val refName = name
-    if (refName != null) {
-        return resolveLocal(refName, this, SearchContext(project))
-    }
-    return null
-}
+private val KEY_FORWARD = Key.create<CachedValue<PsiElement>>("lua.lua_func_def.forward")
 
-val LuaFuncDef.isGlobal: Boolean get() {
-    if (forwardDeclaration != null)
-        return false
-    if (moduleName != null)
-        return false
-    return true
+val LuaFuncDef.forwardDeclaration: PsiElement? get() {
+    return CachedValuesManager.getCachedValue(this, KEY_FORWARD, {
+        val refName = name
+        val ret = if (refName == null) null else resolveLocal(refName, this)
+        CachedValueProvider.Result.create(ret, this)
+    })
 }
 
 val LuaCallExpr.argList: List<LuaExpr> get() {
