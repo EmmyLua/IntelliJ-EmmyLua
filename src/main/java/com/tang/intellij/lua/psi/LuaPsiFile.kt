@@ -18,9 +18,13 @@ package com.tang.intellij.lua.psi
 
 import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaFileType
@@ -46,8 +50,14 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
     val moduleName: String?
         get() {
             val stub = stub as? LuaFileStub
-            return if (stub != null) stub.module else findModuleName()
+            return if (stub != null) stub.module else findCachedModuleName()
         }
+
+    private fun findCachedModuleName(): String? {
+        return CachedValuesManager.getCachedValue(this, KEY_CACHED_MODULE_NAME, {
+            CachedValueProvider.Result.create(findModuleName(), this)
+        })
+    }
 
     private fun findModuleName():String? {
         var child: PsiElement? = firstChild
@@ -74,5 +84,9 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
             child = child.nextSibling
         }
         return null
+    }
+
+    companion object {
+        private val KEY_CACHED_MODULE_NAME = Key.create<CachedValue<String?>>("lua.file.module.name")
     }
 }
