@@ -45,3 +45,15 @@ QQ交流群：`29850775`
 | Lua Profiler                         |    ✔     |
 | ... .etc                             |          |
 
+## Build environment requirements
+
+- Visual Studio 2015
+- JDK 1.8
+- Setup environment variables as following:
+
+        JAVA_HOME="path to JDK 1.8"
+        IDEA_HOME="path to IDEA 172+"
+        
+## Building
+
+  `./gradlew buildPlugin`
