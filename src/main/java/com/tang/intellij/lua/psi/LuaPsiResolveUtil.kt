@@ -20,6 +20,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
+import com.intellij.psi.util.CachedValue
+import com.intellij.psi.util.CachedValueProvider
+import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
@@ -55,11 +58,14 @@ internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): Lua
 
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
+private val KEY_RESOLVE = Key.create<CachedValue<PsiElement>>("lua.resolve.cache.resolveLocal")
+
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext? = null): PsiElement? {
-    val element = resolveInFile(refName, ref, context)
-    if (element is LuaNameExpr)
-        return null
-    return element
+    return CachedValuesManager.getCachedValue(ref, KEY_RESOLVE, {
+        val element = resolveInFile(refName, ref, context)
+        val r = if (element is LuaNameExpr) null else element
+        CachedValueProvider.Result.create(r, ref)
+    })
 }
 
 private val key = Key.create<PsiElement>("lua.resolve.cache")

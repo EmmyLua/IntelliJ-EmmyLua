@@ -62,6 +62,13 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
                     return LuaFileStub(file, file.moduleName)
                 return super.createStubForFile(file)
             }
+
+            override fun buildStubTree(file: PsiFile): StubElement<*> {
+                val t = System.currentTimeMillis()
+                val tree = super.buildStubTree(file)
+                println("===>${System.currentTimeMillis()-t}")
+                return tree
+            }
         }
     }
 
