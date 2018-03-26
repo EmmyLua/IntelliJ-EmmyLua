@@ -68,27 +68,25 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext? = null
     })
 }
 
-private val key = Key.create<PsiElement>("lua.resolve.cache")
+private val KEY_RESOLVE_CACHE = Key.create<PsiElement>("lua.resolve.cache")
 
 fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
 
     //local/param
     LuaPsiTreeUtilEx.walkUpNameDef(pin, Processor { nameDef ->
-        if (refName == nameDef.name) {
+        if (refName == nameDef.name)
             ret = nameDef
-            return@Processor false
-        }
-        true
+        ret == null
     }, Processor {
         for (expr in it.varExprList.exprList) {
-            if (expr is LuaNameExpr && expr != pin) {
+            if (expr is LuaNameExpr) {
                 if (expr.name == refName) {
-                    val resolve = key.get(expr)
-                    if (resolve == null) {
-                        ret = resolveInFile(refName, expr, context) ?: expr
-                        expr.putUserData(key, ret)
-                    } else ret = resolve
+                    ret = KEY_RESOLVE_CACHE.get(expr)
+                    if (ret == null) {
+                        ret = resolveInFile(refName, it, context) ?: expr
+                        expr.putUserData(KEY_RESOLVE_CACHE, ret)
+                    }
                     return@Processor false
                 }
             }
