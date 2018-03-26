@@ -99,12 +99,17 @@ object LuaPsiTreeUtilEx {
     private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaAssignStat>?) {
         var curr: PsiElement = element
         do {
-            curr = curr.prevSibling ?: curr.parent
-            val continueSearch = when (curr) {
-                is LuaLocalDef -> if (!curr.node.textRange.contains(element.node.textRange)) {
-                    val nameList = curr.nameList
-                    resolveInNameList(nameList, processor)
-                } else true
+            var continueSearch = true
+            val prev = curr.prevSibling
+            if (prev == null) {
+                curr = curr.parent
+                if (curr is LuaLocalDef) {
+                    continue
+                }
+            } else curr = prev
+
+            continueSearch = when (curr) {
+                is LuaLocalDef -> resolveInNameList(curr.nameList, processor)
                 is LuaParamNameDef -> processor.process(curr)
                 is LuaLocalFuncDef -> processor.process(curr)
                 is LuaAssignStat -> nameExprProcessor?.process(curr) ?: true
