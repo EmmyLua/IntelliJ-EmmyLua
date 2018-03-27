@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.codeInsight
 
+import com.intellij.codeInsight.hints.HintInfo
 import com.intellij.codeInsight.hints.InlayInfo
 import com.intellij.codeInsight.hints.InlayParameterHintsProvider
 import com.intellij.codeInsight.hints.Option
@@ -121,7 +122,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         return list
     }
 
-    override fun getHintInfo(psiElement: PsiElement) = null
+    override fun getHintInfo(psiElement: PsiElement): HintInfo? = null
 
     override fun getDefaultBlackList(): Set<String> {
         return HashSet()
@@ -135,8 +136,8 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
 
     override fun getInlayPresentation(inlayText: String): String {
         if (inlayText.startsWith(TYPE_INFO_PREFIX)) {
-            return ":${inlayText.substring(TYPE_INFO_PREFIX.length)}"
+            return " : ${inlayText.substring(TYPE_INFO_PREFIX.length)}"
         }
-        return "$inlayText:"
+        return "$inlayText : "
     }
 }
