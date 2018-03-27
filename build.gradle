@@ -14,50 +14,50 @@
  * limitations under the License.
  */
 plugins {
-  id 'org.jetbrains.intellij' version "0.2.9"
-  id "org.jetbrains.kotlin.jvm" version "1.1.2-2"
+	id 'org.jetbrains.intellij' version "0.2.18"
+	id "org.jetbrains.kotlin.jvm" version "1.2.31"
 }
 
 dependencies {
-	compile fileTree(dir:"libs", includes:["*.jar"])
+	compile fileTree(dir: "libs", includes: ["*.jar"])
 }
 
 sourceSets {
-    main {
-        java.srcDirs 'gen'
-        resources {
-            exclude "debugger/**"
-        }
-    }
+	main {
+		java.srcDirs 'gen'
+		resources {
+			exclude "debugger/**"
+		}
+	}
 }
 
 // Appveyor CI
 if (System.env['APPVEYOR']) {
-    version = System.env['APPVEYOR_BUILD_VERSION']
+	version = System.env['APPVEYOR_BUILD_VERSION']
 }
 
 intellij {
 	type 'IU'
 	updateSinceUntilBuild false
-    downloadSources false
-    version = "IC-173.4127.27"
+	downloadSources false
+	version = "IC-173.4127.27"
 	localPath System.env['IDEA_HOME']
 }
 
 def RES_DIR = "src/main/resources"
 
-task copyAttachDebugger(dependsOn:["debugger:attach:windows:buildProduct"], type:Copy) {
-    from(fileTree(dir:'debugger/attach/windows/build/', includes:['x64/**', 'x86/**']))
-    destinationDir file("${RES_DIR}/debugger/windows")
+task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], type: Copy) {
+	from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
+	destinationDir file("${RES_DIR}/debugger/windows")
 }
 
 buildPlugin.dependsOn(copyAttachDebugger)
-buildPlugin.from(fileTree(dir:"${RES_DIR}", includes:['debugger/**'])) {
-    into "/${project.name}/classes/"
+buildPlugin.from(fileTree(dir: "${RES_DIR}", includes: ['debugger/**'])) {
+	into "/${project.name}/classes/"
 }
 
 publishPlugin {
-    username System.env['JETBRAINS_USERNAME']
-    password System.env['JETBRAINS_PASSWORD']
-    channels 'EAP'
+	username System.env['JETBRAINS_USERNAME']
+	password System.env['JETBRAINS_PASSWORD']
+	channels 'EAP'
 }
