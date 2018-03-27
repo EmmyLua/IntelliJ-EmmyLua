@@ -43,7 +43,7 @@ class LuaModuleType : ModuleType<LuaModuleBuilder>(MODULE_TYPE) {
     override fun isMarkInnerSupportedFor(type: JpsModuleSourceRootType<*>?) = true
 
     companion object {
-        val MODULE_TYPE = "LUA_MODULE"
+        const val MODULE_TYPE = "LUA_MODULE"
 
         val instance: LuaModuleType
             get() = ModuleTypeManager.getInstance().findByID(MODULE_TYPE) as LuaModuleType

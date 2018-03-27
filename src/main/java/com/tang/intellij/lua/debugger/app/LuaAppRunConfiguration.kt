@@ -49,22 +49,17 @@ import java.util.*
 class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     : LuaRunConfiguration(project, factory), IRemoteConfiguration {
 
-    var program = if (SystemInfoRt.isWindows) "lua.exe" else "lua"
+    var program = PathEnvironmentVariableUtil.findInPath("lua")?.absolutePath ?: if (SystemInfoRt.isWindows) "lua.exe" else "lua"
     var file: String? = null
     var parameters: String? = null
     var charset: String = "UTF-8"
     var showConsole = true
 
-    private var _debuggerType = DebuggerType.Attach
-
-    var debuggerType: DebuggerType
+    var debuggerType: DebuggerType = DebuggerType.Attach
         get() {
-            if (!SystemInfoRt.isWindows && _debuggerType == DebuggerType.Attach)
-                _debuggerType = DebuggerType.Mob
-            return _debuggerType
-        }
-        set(value) {
-            _debuggerType = value
+            if (!SystemInfoRt.isWindows && field == DebuggerType.Attach)
+                field = DebuggerType.Mob
+            return field
         }
 
     private var _workingDir: String? = null
@@ -99,15 +94,12 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     @Throws(InvalidDataException::class)
     override fun readExternal(element: Element) {
         super.readExternal(element)
-        val program = JDOMExternalizerUtil.readField(element, "program")
-        if (program != null)
-            this.program = program
+        JDOMExternalizerUtil.readField(element, "program")?.let { program = it }
         file = JDOMExternalizerUtil.readField(element, "file")
         workingDir = JDOMExternalizerUtil.readField(element, "workingDir")
 
-        val debuggerType = JDOMExternalizerUtil.readField(element, "debuggerType")
-        if (debuggerType != null)
-            this.debuggerType = DebuggerType.valueOf(Integer.parseInt(debuggerType))
+        JDOMExternalizerUtil.readField(element, "debuggerType")
+            ?.let { debuggerType = DebuggerType.valueOf(Integer.parseInt(it)) }
 
         parameters = JDOMExternalizerUtil.readField(element, "params")
         charset = JDOMExternalizerUtil.readField(element, "charset") ?: "UTF-8"
@@ -122,7 +114,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     val parametersArray: Array<String>
         get() {
             val list = ArrayList<String>()
-            if (parameters != null && !parameters!!.isEmpty()) {
+            if (false == parameters?.isEmpty()) {
                 val strings = ParametersListUtil.parseToArray(parameters!!)
                 list.addAll(Arrays.asList(*strings))
             }
@@ -172,13 +164,9 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
         }
     }
 
-    override fun createCommandLine(): GeneralCommandLine? {
-        val commandLine = GeneralCommandLine().withExePath(program)
-        val params = parametersArray
-        commandLine.withEnvironment(envs)
-        commandLine.addParameters(*params)
-        commandLine.setWorkDirectory(workingDir)
-        commandLine.charset = Charset.forName(charset)
-        return commandLine
-    }
+    override fun createCommandLine() = GeneralCommandLine().withExePath(program)
+        .withEnvironment(envs)
+        .withParameters(*parametersArray)
+        .withWorkDirectory(workingDir)
+        .withCharset(Charset.forName(charset))
 }

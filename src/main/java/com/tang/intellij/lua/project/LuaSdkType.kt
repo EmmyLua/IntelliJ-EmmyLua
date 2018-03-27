@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.project
 
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.openapi.projectRoots.*
 import com.tang.intellij.lua.lang.LuaIcons
 import org.jdom.Element
@@ -28,7 +29,7 @@ import javax.swing.Icon
  */
 class LuaSdkType : SdkType("Lua SDK") {
 
-    override fun suggestHomePath() = "C:/"
+    override fun suggestHomePath() = PathEnvironmentVariableUtil.findInPath("lua")?.parent
 
     override fun isValidSdkHome(s: String) = true
 
