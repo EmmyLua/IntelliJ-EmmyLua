@@ -42,6 +42,7 @@
               <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
+              <labelFor value="63b06"/>
               <text resource-bundle="LuaBundle" key="ui.settings.constructor_names"/>
             </properties>
           </component>
@@ -101,7 +102,7 @@
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Show words in file"/>
+              <text value="Show &amp;words in file"/>
             </properties>
           </component>
           <component id="366e9" class="javax.swing.JCheckBox" binding="recognizeGlobalNameAsCheckBox" default-binding="true">

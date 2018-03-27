@@ -47,8 +47,8 @@ class RegionSurrounder : Surrounder {
         val startLineNumber = document.getLineNumber(firstTextRange.startOffset)
         val startIndent = document.getText(TextRange(document.getLineStartOffset(startLineNumber), firstTextRange.startOffset))
 
-        val endString = "\n" + startIndent + "--endregion"
-        val startString = "--region description\n" + startIndent
+        val endString = "\n$startIndent--endregion"
+        val startString = "--region description\n$startIndent"
         document.insertString(lastTextRange.endOffset, endString)
         document.insertString(firstTextRange.startOffset, startString)
 

@@ -41,13 +41,13 @@ object LuaElementFactory {
     }
 
     fun createLiteral(project: Project, value: String): LuaLiteralExpr {
-        val content = "local a = " + value
+        val content = "local a = $value"
         val file = createFile(project, content)
         return PsiTreeUtil.findChildOfType(file, LuaLiteralExpr::class.java)!!
     }
 
     fun createName(project: Project, name: String): PsiElement {
-        val element = createWith(project, name + " = 1")
+        val element = createWith(project, "$name = 1")
         return PsiTreeUtil.findChildOfType(element, LuaNameExpr::class.java)!!
     }
 

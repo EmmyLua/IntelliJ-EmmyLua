@@ -135,11 +135,11 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
 
     companion object {
 
-        private val LOCAL_VAR = 1
-        private val LOCAL_FUN = 2
-        private val GLOBAL_VAR = 4
-        private val GLOBAL_FUN = 8
-        private val KEY_WORDS = 16
+        private const val LOCAL_VAR = 1
+        private const val LOCAL_FUN = 2
+        private const val GLOBAL_VAR = 4
+        private const val GLOBAL_FUN = 8
+        private const val KEY_WORDS = 16
 
         @JvmStatic val ALL = LOCAL_VAR or LOCAL_FUN or GLOBAL_VAR or GLOBAL_FUN or KEY_WORDS
         @JvmStatic val VARS = LOCAL_VAR or GLOBAL_VAR

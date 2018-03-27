@@ -23,8 +23,8 @@ import com.intellij.openapi.vfs.ex.dummy.DummyFileSystem
 class MemoryFileSystem : DummyFileSystem() {
 
     companion object {
-        val PROTOCOL = "lua-dummy"
-        private val ROOT = "root"
+        const val PROTOCOL = "lua-dummy"
+        private const val ROOT = "root"
 
         val instance: MemoryFileSystem
             get() {
@@ -48,10 +48,10 @@ class MemoryFileSystem : DummyFileSystem() {
         for (i in 0 until list.size - 1) {
             val dirName = list[i]
             val subDir = dir.findChild(dirName)
-            if (subDir is MemoryVirtualFileDirectory) {
-                dir = subDir
+            dir = if (subDir is MemoryVirtualFileDirectory) {
+                subDir
             } else {
-                dir = createChildDirectory(requestor, dir, dirName)
+                createChildDirectory(requestor, dir, dirName)
             }
         }
         val child = MemoryDataVirtualFile(list.last(), dir)

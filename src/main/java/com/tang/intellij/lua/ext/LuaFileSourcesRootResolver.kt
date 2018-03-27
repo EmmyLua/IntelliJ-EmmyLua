@@ -58,7 +58,7 @@ class LuaFileSourcesRootResolver : ILuaFileResolver {
 
             fixedURL += ext
 
-            val file = VirtualFileManager.getInstance().findFileByUrl(root + "/" + fixedURL)
+            val file = VirtualFileManager.getInstance().findFileByUrl("$root/$fixedURL")
             if (file != null && !file.isDirectory) {
                 return file
             }

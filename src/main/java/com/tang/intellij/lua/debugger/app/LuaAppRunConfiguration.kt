@@ -49,7 +49,8 @@ import java.util.*
 class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     : LuaRunConfiguration(project, factory), IRemoteConfiguration {
 
-    var program = PathEnvironmentVariableUtil.findInPath("lua")?.absolutePath ?: if (SystemInfoRt.isWindows) "lua.exe" else "lua"
+    var program = PathEnvironmentVariableUtil.findInPath("lua")?.absolutePath
+            ?: if (SystemInfoRt.isWindows) "lua.exe" else "lua"
     var file: String? = null
     var parameters: String? = null
     var charset: String = "UTF-8"
@@ -61,8 +62,6 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
                 field = DebuggerType.Mob
             return field
         }
-
-    private var _workingDir: String? = null
 
     override fun getValidModules(): Collection<Module> {
         return emptyList()
@@ -99,7 +98,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
         workingDir = JDOMExternalizerUtil.readField(element, "workingDir")
 
         JDOMExternalizerUtil.readField(element, "debuggerType")
-            ?.let { debuggerType = DebuggerType.valueOf(Integer.parseInt(it)) }
+                ?.let { debuggerType = DebuggerType.valueOf(Integer.parseInt(it)) }
 
         parameters = JDOMExternalizerUtil.readField(element, "params")
         charset = JDOMExternalizerUtil.readField(element, "charset") ?: "UTF-8"
@@ -125,16 +124,15 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
             return list.toTypedArray()
         }
 
-    var workingDir: String? get() {
-        val wd = _workingDir
-        if (wd == null || wd.isEmpty()) {
-            _workingDir = defaultWorkingDir
-            return defaultWorkingDir
+    var workingDir: String? = null
+        get() {
+            val wd = field
+            if (wd == null || wd.isEmpty()) {
+                field = defaultWorkingDir
+                return defaultWorkingDir
+            }
+            return wd
         }
-        return wd
-    } set(value) {
-        _workingDir = value
-    }
 
     private val defaultWorkingDir: String?
         get() {
@@ -165,8 +163,8 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     }
 
     override fun createCommandLine() = GeneralCommandLine().withExePath(program)
-        .withEnvironment(envs)
-        .withParameters(*parametersArray)
-        .withWorkDirectory(workingDir)
-        .withCharset(Charset.forName(charset))
+            .withEnvironment(envs)
+            .withParameters(*parametersArray)
+            .withWorkDirectory(workingDir)
+            .withCharset(Charset.forName(charset))
 }

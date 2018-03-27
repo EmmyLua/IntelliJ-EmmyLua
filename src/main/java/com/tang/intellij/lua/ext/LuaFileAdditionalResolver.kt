@@ -27,7 +27,7 @@ class LuaFileAdditionalResolver : ILuaFileResolver {
         val sourcesRoot = LuaSettings.instance.additionalSourcesRoot
         for (sr in sourcesRoot) {
             for (ext in extNames) {
-                val path = sr + "/" + shortUrl + ext
+                val path = "$sr/$shortUrl$ext"
                 val file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(path))
                 if (file != null && !file.isDirectory) {
                     return file

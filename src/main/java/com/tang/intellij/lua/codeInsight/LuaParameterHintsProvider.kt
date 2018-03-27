@@ -46,7 +46,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         private val FUNCTION_HINT = Option("lua.hints.show_function_type",
                 "Show function return type hints",
                 false)
-        private val TYPE_INFO_PREFIX = "@TYPE@"
+        private const val TYPE_INFO_PREFIX = "@TYPE@"
         private var EXPR_HINT = arrayOf(LuaLiteralExpr::class.java,
                 LuaBinaryExpr::class.java,
                 LuaUnaryExpr::class.java,

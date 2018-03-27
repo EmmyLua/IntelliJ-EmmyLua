@@ -32,7 +32,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 data class ProcessDetailInfo(var pid: Int = 0, var path: String = "", var title: String = "")
 
-private val MAX_DISPLAY_LEN = 60
+private const val MAX_DISPLAY_LEN = 60
 
 internal fun getDisplayName(processInfo: ProcessInfo, detailInfo: ProcessDetailInfo): String {
     val s = if (detailInfo.title.isNotEmpty())
