@@ -57,11 +57,11 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
     }
 
     override fun println(text: String, consoleType: LogConsoleType, contentType: ConsoleViewContentType) {
-        print(text + "\n", consoleType, contentType)
+        print("$text\n", consoleType, contentType)
     }
 
     override fun error(text: String, consoleType: LogConsoleType) {
-        print(text + "\n", consoleType, ConsoleViewContentType.ERROR_OUTPUT)
+        print("$text\n", consoleType, ConsoleViewContentType.ERROR_OUTPUT)
     }
 
     override fun printHyperlink(text: String, consoleType: LogConsoleType, handler: (project: Project) -> Unit) {

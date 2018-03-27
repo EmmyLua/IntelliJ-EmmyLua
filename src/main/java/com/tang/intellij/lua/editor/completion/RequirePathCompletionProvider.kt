@@ -67,7 +67,7 @@ class RequirePathCompletionProvider : CompletionProvider<CompletionParameters>()
                 continue
 
             val fileName = FileUtil.getNameWithoutExtension(child.name)
-            val newPath = if (pck == null) fileName else pck + "." + fileName
+            val newPath = if (pck == null) fileName else "$pck.$fileName"
 
             if (child.isDirectory) {
 
@@ -103,6 +103,6 @@ class RequirePathCompletionProvider : CompletionProvider<CompletionParameters>()
 
     companion object {
 
-        internal val PATH_SPLITTER = '.'
+        internal const val PATH_SPLITTER = '.'
     }
 }

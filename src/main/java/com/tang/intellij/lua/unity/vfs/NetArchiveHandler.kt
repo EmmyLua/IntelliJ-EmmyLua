@@ -104,7 +104,7 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
 
         val map = mutableMapOf<String, EntryInfo>()
         val rootEntry = createRootEntry()
-        map.put("", rootEntry)
+        map[""] = rootEntry
         val f = Facile.load(this.file.path)
         f.assembly.allTypes.forEach {
             if (it.isValid) {
@@ -119,7 +119,7 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
                                 val code = "$qua = {}".toByteArray()
                                 val fileName = "$qua.ns.lua"
                                 nsMap[fileName] = code
-                                map.put(fileName, EntryInfo(fileName, false, code.size.toLong(), DEFAULT_TIMESTAMP, rootEntry))
+                                map[fileName] = EntryInfo(fileName, false, code.size.toLong(), DEFAULT_TIMESTAMP, rootEntry)
                             }
                         }
                     }
@@ -128,8 +128,8 @@ class NetArchiveHandler(path: String) : ArchiveHandler(path) {
                 val code = decode(it).toByteArray()
                 val fileName = if (ns.isNullOrEmpty()) "${it.name}.lua" else "$ns.${it.name}.lua"
                 val entry = EntryInfo(fileName, false, code.size.toLong(), DEFAULT_TIMESTAMP, rootEntry)
-                map.put(fileName, entry)
-                typeMap.put(fileName, TypeData(it, code))
+                map[fileName] = entry
+                typeMap[fileName] = TypeData(it, code)
             }
         }
         return map

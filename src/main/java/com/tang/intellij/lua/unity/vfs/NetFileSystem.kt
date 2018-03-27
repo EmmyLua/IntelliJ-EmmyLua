@@ -24,8 +24,8 @@ import com.intellij.openapi.vfs.newvfs.VfsImplUtil
 
 class NetFileSystem : ArchiveFileSystem() {
     companion object {
-        val PROTOCOL = "dll"
-        val DLL_SEPARATOR = "!/"
+        const val PROTOCOL = "dll"
+        const val DLL_SEPARATOR = "!/"
 
         val instance: NetFileSystem
             get() =
@@ -56,7 +56,7 @@ class NetFileSystem : ArchiveFileSystem() {
 
     override fun extractRootPath(path: String): String {
         val separatorIndex = path.indexOf(DLL_SEPARATOR)
-        assert(separatorIndex >= 0) { "Path passed to JarFileSystem must have jar separator '!/': " + path }
+        assert(separatorIndex >= 0) { "Path passed to JarFileSystem must have jar separator '!/': $path" }
         return path.substring(0, separatorIndex + DLL_SEPARATOR.length)
     }
 

@@ -25,6 +25,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.SystemInfoRt;
 import com.intellij.ui.HoverHyperlinkLabel;
@@ -52,7 +53,7 @@ import java.util.SortedMap;
 public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration> {
     private TextFieldWithBrowseButton myProgram;
     private JPanel myPanel;
-    private JComboBox<DebuggerType> myDebugger;
+    private ComboBox<DebuggerType> myDebugger;
     private TextFieldWithCompletion myFile;
     private TextFieldWithBrowseButton myWorkingDir;
     private RawCommandLineEditor parameters;

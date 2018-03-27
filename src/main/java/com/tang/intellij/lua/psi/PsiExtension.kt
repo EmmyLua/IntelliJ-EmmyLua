@@ -127,19 +127,13 @@ fun LuaExprList.guessType(context: SearchContext):ITy {
 
 fun LuaParametersOwner.getIndexFor(paramNameDef: LuaParamNameDef): Int {
     val list = this.paramNameDefList
-    if (list != null) {
-        list.indices
-                .filter { list[it].name == paramNameDef.name }
-                .forEach { return it }
-    }
+    list?.indices?.filter { list[it].name == paramNameDef.name }?.forEach { return it }
     return 0
 }
 
 fun LuaLocalDef.getExprFor(nameDef: LuaNameDef): LuaExpr? {
-    val nameList = this.nameList
-    nameList ?: return null
-    val exprList = this.exprList
-    exprList ?: return null
+    val nameList = this.nameList ?: return null
+    val exprList = this.exprList ?: return null
 
     var next = nameList.firstChild
     var idx = 0
@@ -254,7 +248,7 @@ val LuaDocClassDef.aliasName: String? get() {
 
 val LuaIndexExpr.brack: Boolean get() {
     val stub = stub
-    return if (stub != null) stub.brack else lbrack != null
+    return stub?.brack ?: (lbrack != null)
 }
 
 val LuaIndexExpr.docTy: ITy? get() {
