@@ -18,7 +18,8 @@
           <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Parameters:"/>
+          <labelFor value="30b37"/>
+          <text value="&amp;Parameters:"/>
         </properties>
       </component>
       <component id="d96a3" class="javax.swing.JLabel">
@@ -61,7 +62,8 @@
           <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Working directory:"/>
+          <labelFor value="b7f34"/>
+          <text value="&amp;Working directory:"/>
         </properties>
       </component>
       <component id="70e93" class="com.intellij.openapi.ui.TextFieldWithBrowseButton" binding="myProgram">
@@ -77,7 +79,8 @@
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Lua executable:"/>
+          <labelFor value="70e93"/>
+          <text value="&amp;Program:"/>
         </properties>
       </component>
       <component id="30b37" class="com.intellij.ui.RawCommandLineEditor" binding="parameters">
@@ -111,10 +114,11 @@
           <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Output charset:"/>
+          <labelFor value="1e5f2"/>
+          <text value="&amp;Output charset:"/>
         </properties>
       </component>
-      <component id="b3196" class="javax.swing.JComboBox" binding="outputCharset">
+      <component id="1e5f2" class="com.intellij.openapi.ui.ComboBox" binding="outputCharset">
         <constraints>
           <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
