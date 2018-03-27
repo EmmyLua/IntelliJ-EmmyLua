@@ -26,7 +26,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
  *
  * Created by Administrator on 2017/6/12.
  */
-@State(name = "LuaSettings", storages = arrayOf(Storage("emmy.xml")))
+@State(name = "LuaSettings", storages = [(Storage("emmy.xml"))])
 class LuaSettings : PersistentStateComponent<LuaSettings> {
     var constructorNames: Array<String> = arrayOf("new", "get")
 

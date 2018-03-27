@@ -44,6 +44,6 @@ class StdSDK : ApplicationComponent {
     override fun getComponentName() = "StdSDK"
 
     companion object {
-        private val NAME = "Lua"
+        private const val NAME = "Lua"
     }
 }
