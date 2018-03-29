@@ -294,16 +294,19 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         // xxx[yyy] as an array element?
         if (indexExpr.brack) {
             val tySet = indexExpr.guessParentType(context)
+            var ty: ITy = Ty.UNKNOWN
 
             // Type[]
-            val array = TyUnion.find(tySet, ITyArray::class.java)
-            if (array != null)
-                return@Computable array.base
+            TyUnion.each(tySet) {
+                if (it is ITyArray) ty = ty.union(it.base)
+            }
+            if (ty !is TyUnknown) return@Computable ty
 
             // table<number, Type>
-            val table = TyUnion.find(tySet, ITyGeneric::class.java)
-            if (table != null)
-                return@Computable table.getParamTy(1)
+            TyUnion.each(tySet) {
+                if (it is ITyGeneric) ty = ty.union(it.getParamTy(1))
+            }
+            if (ty !is TyUnknown) return@Computable ty
         }
 
         //from @type annotation
