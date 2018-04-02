@@ -23,6 +23,8 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.psi.*;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -45,8 +47,8 @@ public class SimplifyLocalAssignment extends LocalInspectionTool {
                     List<LuaExpr> list = exprList.getExprList();
                     if (list.size() == 1) {
                         LuaExpr expr = list.get(0);
-                        if (expr instanceof LuaLiteralExpr && "nil".equals(expr.getText())) {
-                            holder.registerProblem(o, "Local assignment can be simplified", new Fix());
+                        if (expr instanceof LuaLiteralExpr && Constants.WORD_NIL.equals(expr.getText())) {
+                            holder.registerProblem(expr, "Local assignment can be simplified", new Fix());
                         }
                     }
                 }
@@ -65,7 +67,8 @@ public class SimplifyLocalAssignment extends LocalInspectionTool {
 
         @Override
         public void applyFix(@NotNull Project project, @NotNull ProblemDescriptor problemDescriptor) {
-            LuaLocalDef localDef = (LuaLocalDef) problemDescriptor.getEndElement();
+            LuaLocalDef localDef = PsiTreeUtil.getParentOfType(problemDescriptor.getEndElement(), LuaLocalDef.class);
+            assert localDef != null;
             LuaNameList nameList = localDef.getNameList();
 
             assert nameList != null;
