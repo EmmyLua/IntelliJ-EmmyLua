@@ -18,6 +18,8 @@ package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.TokenSet
+import com.tang.intellij.lua.psi.LuaParserUtil.MY_LEFT_COMMENT_BINDER
+import com.tang.intellij.lua.psi.LuaParserUtil.MY_RIGHT_COMMENT_BINDER
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaExpressionParser {
@@ -286,6 +288,7 @@ object LuaExpressionParser {
                 expectExpr(b, l + 1) // expr
 
                 m.done(TABLE_FIELD)
+                m.setCustomEdgeTokenBinders(MY_LEFT_COMMENT_BINDER, MY_RIGHT_COMMENT_BINDER)
                 return m
             }
             ID -> { // ID '=' expr
@@ -295,6 +298,7 @@ object LuaExpressionParser {
                     b.advanceLexer() // =
                     expectExpr(b, l + 1) // expr
                     m.done(TABLE_FIELD)
+                    m.setCustomEdgeTokenBinders(MY_LEFT_COMMENT_BINDER, MY_RIGHT_COMMENT_BINDER)
                     return m
                 }
                 m.rollbackTo()
@@ -306,6 +310,7 @@ object LuaExpressionParser {
         if (expr != null) {
             val m = expr.precede()
             m.done(TABLE_FIELD)
+            m.setCustomEdgeTokenBinders(MY_LEFT_COMMENT_BINDER, MY_RIGHT_COMMENT_BINDER)
             return m
         }
         return null
