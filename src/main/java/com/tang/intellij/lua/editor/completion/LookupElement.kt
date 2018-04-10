@@ -119,12 +119,19 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bol
     }
 }
 
-class TyFunctionLookupElement(name: String, val psi: LuaPsiElement, signature: IFunSignature, bold: Boolean, val ty: ITyFunction, icon: Icon)
-    : LuaLookupElement(name, bold, icon) {
+class TyFunctionLookupElement(name: String,
+                              val psi: LuaPsiElement,
+                              signature: IFunSignature,
+                              bold: Boolean,
+                              colonStyle: Boolean,
+                              val ty: ITyFunction,
+                              icon: Icon
+) : LuaLookupElement(name, bold, icon) {
     init {
         val list = mutableListOf<String>()
-        signature.params.forEach {
-            list.add(it.name)
+        signature.processArgs(null, colonStyle) { _, param ->
+            list.add(param.name)
+            true
         }
         itemText = lookupString + "(${list.joinToString(", ")})"
         typeText = signature.returnTy.displayName

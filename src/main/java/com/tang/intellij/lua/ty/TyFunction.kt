@@ -36,15 +36,15 @@ interface IFunSignature {
     fun substitute(substitutor: ITySubstitutor): IFunSignature
 }
 
-fun IFunSignature.processParams(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
+fun IFunSignature.processArgs(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     val expr = callExpr.expr
     val thisTy = if (expr is LuaIndexExpr) {
         expr.guessType(SearchContext(expr.project))
     } else null
-    processParams(thisTy, callExpr.isMethodCall, processor)
+    processArgs(thisTy, callExpr.isMethodCall, processor)
 }
 
-fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
+fun IFunSignature.processArgs(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     var index = 0
     var pIndex = 0
     if (colonStyle && !selfCall) {
@@ -57,6 +57,27 @@ fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (i
     for (i in pIndex until params.size) {
         if (!processor(index++, params[i])) return
     }
+}
+
+fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
+    var index = 0
+    if (selfCall) {
+        val pi = LuaParamInfo(Constants.WORD_SELF, thisTy ?: Ty.UNKNOWN)
+        if (!processor(index++, pi)) return
+    }
+
+    for (i in 0 until params.size) {
+        if (!processor(index++, params[i])) return
+    }
+}
+
+fun IFunSignature.getFirstParam(thisTy: ITy?, colonStyle: Boolean): LuaParamInfo? {
+    var pi: LuaParamInfo? = null
+    processParams(thisTy, colonStyle) { _, paramInfo ->
+        pi = paramInfo
+        false
+    }
+    return pi
 }
 
 fun IFunSignature.getParamTy(index: Int): ITy {

@@ -99,7 +99,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
     protected fun addClass(contextTy: ITy,
                            luaType:ITyClass,
                            project: Project,
-                           showFields:Boolean,
+                           dotStyle:Boolean,
                            completionResultSet: CompletionResultSet,
                            prefixMatcher: PrefixMatcher,
                            handlerProcessor: HandlerProcessor?) {
@@ -107,14 +107,15 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         luaType.lazyInit(context)
         luaType.processMembers(context) { curType, member ->
             ProgressManager.checkCanceled()
+            val bold = curType == luaType
             member.name?.let {
                 if (prefixMatcher.prefixMatches(it) && curType.isVisibleInScope(project, contextTy, member.visibility)) {
                     val className = curType.displayName
-                    if (member is LuaClassField && showFields) {
-                        addField(completionResultSet, curType === luaType, className, member, handlerProcessor)
-                    } else if (member is LuaClassMethod) {
-                        addMethod(completionResultSet, curType === luaType, className, member, handlerProcessor)
-                    }
+                    val type = member.guessType(SearchContext(project))
+                    if (type is ITyFunction) {
+                        addFunction(completionResultSet, bold, dotStyle, className, member, type, curType, luaType, handlerProcessor)
+                    } else if (member is LuaClassField)
+                        addField(completionResultSet, bold, className, member, handlerProcessor)
                 }
             }
         }
@@ -144,6 +145,45 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         }
     }
 
+    protected fun addFunction(completionResultSet: CompletionResultSet,
+                              bold: Boolean,
+                              dotStyle: Boolean,
+                              clazzName: String,
+                              classMember: LuaClassMember,
+                              fnTy: ITyFunction,
+                              thisType: ITyClass,
+                              callType: ITyClass,
+                              handlerProcessor: HandlerProcessor?) {
+        val name = classMember.name
+        if (name != null) {
+            fnTy.process(Processor {
+
+                val firstParam = it.getFirstParam(thisType, !dotStyle)
+                if (!dotStyle) {
+                    if (firstParam == null) return@Processor true
+                    if (!callType.subTypeOf(firstParam.ty, SearchContext(classMember.project)))
+                        return@Processor true
+                }
+
+                val lookupString = handlerProcessor?.processLookupString(name) ?: name
+                val element = TyFunctionLookupElement(lookupString,
+                        classMember,
+                        it,
+                        bold,
+                        !dotStyle,
+                        fnTy,
+                        classMember.visibility.warpIcon(LuaIcons.CLASS_METHOD))
+                element.handler = SignatureInsertHandler(it)
+                if (!fnTy.isSelfCall) element.setItemTextUnderlined(true)
+                element.setTailText("  [$clazzName]")
+
+                val ele = handlerProcessor?.process(element) ?: element
+                completionResultSet.addElement(ele)
+                true
+            })
+        }
+    }
+
     protected fun addMethod(completionResultSet: CompletionResultSet,
                             bold: Boolean,
                             clazzName: String,
@@ -154,7 +194,13 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
             val ty = classMethod.guessType(SearchContext(classMethod.project)) as ITyFunction
             ty.process(Processor {
                 val lookupString = handlerProcessor?.processLookupString(methodName) ?: methodName
-                val element = TyFunctionLookupElement(lookupString, classMethod, it, bold, ty, classMethod.visibility.warpIcon(LuaIcons.CLASS_METHOD))
+                val element = TyFunctionLookupElement(lookupString,
+                        classMethod,
+                        it,
+                        bold,
+                        false,
+                        ty,
+                        classMethod.visibility.warpIcon(LuaIcons.CLASS_METHOD))
                 element.handler = SignatureInsertHandler(it)
                 if (!ty.isSelfCall) element.setItemTextUnderlined(true)
                 element.setTailText("  [$clazzName]")
