@@ -23,10 +23,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
 import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef
-import com.tang.intellij.lua.psi.LuaExpr
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaNameDef
-import com.tang.intellij.lua.psi.assignStat
+import com.tang.intellij.lua.psi.*
 
 class LuaReadWriteAccessDetector : ReadWriteAccessDetector() {
     override fun getReferenceAccess(element: PsiElement, reference: PsiReference): Access {
@@ -34,7 +31,7 @@ class LuaReadWriteAccessDetector : ReadWriteAccessDetector() {
     }
 
     override fun isReadWriteAccessible(element: PsiElement): Boolean {
-        return true
+        return element is LuaPsiElement
     }
 
     override fun getExpressionAccess(element: PsiElement): Access {
@@ -55,6 +52,6 @@ class LuaReadWriteAccessDetector : ReadWriteAccessDetector() {
     }
 
     override fun isDeclarationWriteAccess(element: PsiElement): Boolean {
-        return true
+        return element is LuaPsiElement
     }
 }
