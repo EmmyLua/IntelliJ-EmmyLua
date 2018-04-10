@@ -22,7 +22,6 @@ import com.intellij.codeInsight.hints.InlayParameterHintsProvider
 import com.intellij.codeInsight.hints.Option
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
@@ -70,27 +69,17 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
 
             // 是否是 inst:method() 被用为 inst.method(self) 形式
             val isInstanceMethodUsedAsStaticMethod = ty.isSelfCall && callExpr.isStaticMethodCall
-            val isStaticMethodUsedAsInstanceMethod = !ty.isSelfCall && !callExpr.isStaticMethodCall
-            var paramIndex = 0
-            var argIndex = 0
             val sig = ty.findPerfectSignature(if (isInstanceMethodUsedAsStaticMethod) exprList.size - 1 else exprList.size)
-            val parameters: Array<LuaParamInfo> = sig.params
-            val paramCount = parameters.size
 
-            if (isStaticMethodUsedAsInstanceMethod)
-                paramIndex = 1
-            else if (isInstanceMethodUsedAsStaticMethod && !exprList.isEmpty()) {
-                val expr = exprList[argIndex++]
-                list.add(InlayInfo(Constants.WORD_SELF, expr.node.startOffset))
-            }
-
-            while (argIndex < exprList.size && paramIndex < paramCount) {
-                val expr = exprList[argIndex]
-
-                if (PsiTreeUtil.instanceOf(expr, *EXPR_HINT))
-                    list.add(InlayInfo(parameters[paramIndex].name, expr.node.startOffset))
-                paramIndex++
-                argIndex++
+            sig.processParams(null, callExpr.isMethodCall) { index, paramInfo ->
+                val expr = exprList.getOrNull(index) ?: return@processParams false
+                val show =
+                if (index == 0 && isInstanceMethodUsedAsStaticMethod) {
+                    true
+                } else PsiTreeUtil.instanceOf(expr, *EXPR_HINT)
+                if (show)
+                    list.add(InlayInfo(paramInfo.name, expr.node.startOffset))
+                true
             }
         }
         else if (psi is LuaParamNameDef) {

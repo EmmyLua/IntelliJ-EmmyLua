@@ -19,12 +19,9 @@ package com.tang.intellij.lua.ty
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
-import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
-import com.tang.intellij.lua.psi.LuaCommentOwner
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner
-import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.psi.overloads
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.readParamInfoArray
 import com.tang.intellij.lua.stubs.writeParamInfoArray
@@ -37,6 +34,29 @@ interface IFunSignature {
     val paramSignature: String
     val tyParameters: List<TyParameter>
     fun substitute(substitutor: ITySubstitutor): IFunSignature
+}
+
+fun IFunSignature.processParams(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
+    val expr = callExpr.expr
+    val thisTy = if (expr is LuaIndexExpr) {
+        expr.guessType(SearchContext(expr.project))
+    } else null
+    processParams(thisTy, callExpr.isMethodCall, processor)
+}
+
+fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
+    var index = 0
+    var pIndex = 0
+    if (colonStyle && !selfCall) {
+        pIndex++
+    } else if (selfCall) {
+        val pi = LuaParamInfo(Constants.WORD_SELF, thisTy ?: Ty.UNKNOWN)
+        if (!processor(index++, pi)) return
+    }
+
+    for (i in pIndex until params.size) {
+        if (!processor(index++, params[i])) return
+    }
 }
 
 fun IFunSignature.getParamTy(index: Int): ITy {

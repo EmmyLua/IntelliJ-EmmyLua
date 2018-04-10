@@ -36,6 +36,13 @@ class LuaParamInfo {
     var name: String = ""
     var ty: ITy = Ty.UNKNOWN
 
+    constructor(name: String, ty: ITy) {
+        this.name = name
+        this.ty = ty
+    }
+
+    constructor()
+
     override fun equals(other: Any?): Boolean {
         //only check ty
         return other is LuaParamInfo && other.ty == ty
