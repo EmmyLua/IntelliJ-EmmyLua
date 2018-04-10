@@ -258,7 +258,7 @@ fun getAnonymousType(nameDef: LuaNameDef): String {
 }
 
 fun getGlobalTypeName(text: String): String {
-    return if (text == Constants.WORD_G) text else "__$text"
+    return if (text == Constants.WORD_G) text else "$$text"
 }
 
 fun getGlobalTypeName(nameExpr: LuaNameExpr): String {
