@@ -19,6 +19,7 @@ package com.tang.intellij.lua.annotator
 import com.intellij.lang.annotation.Annotation
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.searches.ReferencesSearch
@@ -40,6 +41,7 @@ class LuaAnnotator : Annotator {
 
     companion object {
         private val STD_MARKER = Key.create<Boolean>("lua.std.marker")
+        private val UPVALUE = HighlightSeverity("UPVALUE", HighlightSeverity.INFORMATION.myVal + 1)
     }
 
     override fun annotate(psiElement: PsiElement, annotationHolder: AnnotationHolder) {
@@ -190,8 +192,8 @@ class LuaAnnotator : Annotator {
         private fun checkUpValue(o: LuaNameExpr) {
             val upValue = isUpValue(o, SearchContext(o.project))
             if (upValue) {
-                val annotation = createInfoAnnotation(o, "Up-value \"${o.name}\"")
-                annotation.textAttributes = LuaHighlightingData.UP_VALUE
+                val annotation = myHolder?.createAnnotation(UPVALUE, o.textRange, "Up-value \"${o.name}\"")
+                annotation?.textAttributes = LuaHighlightingData.UP_VALUE
             }
         }
 
