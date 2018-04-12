@@ -45,6 +45,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox nilStrict;
     private JCheckBox recognizeGlobalNameAsCheckBox;
     private LuaAdditionalSourcesRootPanel additionalRoots;
+    private JCheckBox enableGenericCheckBox;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -56,6 +57,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         nilStrict.setSelected(settings.isNilStrict());
         recognizeGlobalNameAsCheckBox.setSelected(settings.isRecognizeGlobalNameAsType());
         additionalRoots.setRoots(settings.getAdditionalSourcesRoot());
+        enableGenericCheckBox.setEnabled(settings.getEnableGeneric());
     }
 
     @NotNull
@@ -85,11 +87,12 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
                 settings.isEnforceTypeSafety() != enforceTypeSafety.isSelected() ||
                 settings.isNilStrict() != nilStrict.isSelected() ||
                 settings.isRecognizeGlobalNameAsType() != recognizeGlobalNameAsCheckBox.isSelected() ||
+                settings.getEnableGeneric() != enableGenericCheckBox.isSelected() ||
                 !ArrayUtil.equals(settings.getAdditionalSourcesRoot(), additionalRoots.getRoots(), String::compareTo);
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         settings.setConstructorNamesString(constructorNames.getText());
         constructorNames.setText(settings.getConstructorNamesString());
         settings.setStrictDoc(strictDoc.isSelected());
@@ -99,6 +102,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setNilStrict(nilStrict.isSelected());
         settings.setRecognizeGlobalNameAsType(recognizeGlobalNameAsCheckBox.isSelected());
         settings.setAdditionalSourcesRoot(additionalRoots.getRoots());
+        settings.setEnableGeneric(enableGenericCheckBox.isSelected());
 
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             DaemonCodeAnalyzer.getInstance(project).restart();

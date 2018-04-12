@@ -23,6 +23,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
@@ -146,6 +147,9 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
     }
 
     override fun createSubstitutor(): ITySubstitutor? {
+        if (!LuaSettings.instance.enableGeneric)
+            return null
+
         val list = findTags(LuaDocGenericDef::class.java)
         val map = mutableMapOf<String, String>()
         for (def in list) {

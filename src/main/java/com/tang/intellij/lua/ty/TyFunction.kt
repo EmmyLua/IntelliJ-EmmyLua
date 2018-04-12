@@ -21,6 +21,8 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.readParamInfoArray
@@ -254,9 +256,12 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
            returnTy = Ty.UNKNOWN
         }
 
-        /*val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
-        val list = mutableListOf<TyParameter>()
-        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }*/
+        //TODO: cause reparse psi !
+        if (LuaSettings.instance.enableGeneric) {
+            val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
+            val list = mutableListOf<TyParameter>()
+            genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
+        }
 
         FunSignature(selfCall, returnTy, psi.params)
     }
