@@ -113,7 +113,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                     val className = curType.displayName
                     val type = member.guessType(SearchContext(project))
                     if (type is ITyFunction) {
-                        addFunction(completionResultSet, bold, dotStyle, className, member, type, curType, luaType, handlerProcessor)
+                        addFunction(completionResultSet, bold, !dotStyle, className, member, type, curType, luaType, handlerProcessor)
                     } else if (member is LuaClassField)
                         addField(completionResultSet, bold, className, member, handlerProcessor)
                 }
@@ -147,7 +147,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
 
     protected fun addFunction(completionResultSet: CompletionResultSet,
                               bold: Boolean,
-                              dotStyle: Boolean,
+                              isColonStyle: Boolean,
                               clazzName: String,
                               classMember: LuaClassMember,
                               fnTy: ITyFunction,
@@ -158,8 +158,8 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         if (name != null) {
             fnTy.process(Processor {
 
-                val firstParam = it.getFirstParam(thisType, !dotStyle)
-                if (!dotStyle) {
+                val firstParam = it.getFirstParam(thisType, isColonStyle)
+                if (isColonStyle) {
                     if (firstParam == null) return@Processor true
                     if (!callType.subTypeOf(firstParam.ty, SearchContext(classMember.project)))
                         return@Processor true
@@ -170,10 +170,10 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                         classMember,
                         it,
                         bold,
-                        !dotStyle,
+                        isColonStyle,
                         fnTy,
                         classMember.visibility.warpIcon(LuaIcons.CLASS_METHOD))
-                element.handler = SignatureInsertHandler(it)
+                element.handler = SignatureInsertHandler(it, isColonStyle)
                 if (!fnTy.isSelfCall) element.setItemTextUnderlined(true)
                 element.setTailText("  [$clazzName]")
 

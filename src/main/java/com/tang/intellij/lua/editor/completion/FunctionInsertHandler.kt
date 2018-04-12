@@ -18,11 +18,17 @@ package com.tang.intellij.lua.editor.completion
 
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.ty.IFunSignature
+import com.tang.intellij.lua.ty.processArgs
 
-/*class FunctionInsertHandler(val ty: ITyFunction) : ArgsInsertHandler() {
-    override fun getParams(): Array<LuaParamInfo> = ty.params
-}*/
+class SignatureInsertHandler(val sig: IFunSignature, private val isColonStyle: Boolean = false) : ArgsInsertHandler() {
 
-class SignatureInsertHandler(val sig: IFunSignature) : ArgsInsertHandler() {
-    override fun getParams(): Array<LuaParamInfo> = sig.params
+    private val myParams: Array<LuaParamInfo> by lazy {
+        val list = mutableListOf<LuaParamInfo>()
+        sig.processArgs(null, isColonStyle) { _, param ->
+            list.add(param)
+        }
+        list.toTypedArray()
+    }
+
+    override fun getParams(): Array<LuaParamInfo> = myParams
 }
