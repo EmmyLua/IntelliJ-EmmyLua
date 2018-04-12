@@ -28,6 +28,12 @@ import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
+enum class MemberCompletionMode {
+    Dot,    // self.xxx
+    Colon,  // self:xxx()
+    All     // self.xxx && self:xxx()
+}
+
 /**
 
  * Created by tangzx on 2016/12/25.
@@ -90,8 +96,9 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                          completionResultSet: CompletionResultSet,
                          prefixMatcher: PrefixMatcher,
                          handlerProcessor: HandlerProcessor?) {
+        val mode = if (isColon) MemberCompletionMode.Colon else MemberCompletionMode.Dot
         prefixType.eachTopClass(Processor { luaType ->
-            addClass(contextTy, luaType, project, !isColon, completionResultSet, prefixMatcher, handlerProcessor)
+            addClass(contextTy, luaType, project, mode, completionResultSet, prefixMatcher, handlerProcessor)
             true
         })
     }
@@ -99,7 +106,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
     protected fun addClass(contextTy: ITy,
                            luaType:ITyClass,
                            project: Project,
-                           dotStyle:Boolean,
+                           completionMode:MemberCompletionMode,
                            completionResultSet: CompletionResultSet,
                            prefixMatcher: PrefixMatcher,
                            handlerProcessor: HandlerProcessor?) {
@@ -107,18 +114,34 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         luaType.lazyInit(context)
         luaType.processMembers(context) { curType, member ->
             ProgressManager.checkCanceled()
-            val bold = curType == luaType
             member.name?.let {
                 if (prefixMatcher.prefixMatches(it) && curType.isVisibleInScope(project, contextTy, member.visibility)) {
-                    val className = curType.displayName
-                    val type = member.guessType(SearchContext(project))
-                    if (type is ITyFunction) {
-                        addFunction(completionResultSet, bold, !dotStyle, className, member, type, curType, luaType, handlerProcessor)
-                    } else if (member is LuaClassField)
-                        addField(completionResultSet, bold, className, member, handlerProcessor)
+                    addMember(completionResultSet,
+                            member,
+                            curType,
+                            luaType,
+                            completionMode,
+                            project,
+                            handlerProcessor)
                 }
             }
         }
+    }
+
+    protected fun addMember(completionResultSet: CompletionResultSet,
+                            member: LuaClassMember,
+                            thisType: ITyClass,
+                            callType: ITyClass,
+                            completionMode: MemberCompletionMode,
+                            project: Project,
+                            handlerProcessor: HandlerProcessor?) {
+        val type = member.guessType(SearchContext(project))
+        val bold = thisType == callType
+        val className = thisType.className
+        if (type is ITyFunction) {
+            addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, type, thisType, callType, handlerProcessor)
+        } else if (member is LuaClassField && completionMode != MemberCompletionMode.Colon)
+            addField(completionResultSet, bold, className, member, handlerProcessor)
     }
 
     protected fun addField(completionResultSet: CompletionResultSet,
@@ -145,15 +168,15 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
         }
     }
 
-    protected fun addFunction(completionResultSet: CompletionResultSet,
-                              bold: Boolean,
-                              isColonStyle: Boolean,
-                              clazzName: String,
-                              classMember: LuaClassMember,
-                              fnTy: ITyFunction,
-                              thisType: ITyClass,
-                              callType: ITyClass,
-                              handlerProcessor: HandlerProcessor?) {
+    private fun addFunction(completionResultSet: CompletionResultSet,
+                            bold: Boolean,
+                            isColonStyle: Boolean,
+                            clazzName: String,
+                            classMember: LuaClassMember,
+                            fnTy: ITyFunction,
+                            thisType: ITyClass,
+                            callType: ITyClass,
+                            handlerProcessor: HandlerProcessor?) {
         val name = classMember.name
         if (name != null) {
             fnTy.process(Processor {
@@ -174,35 +197,11 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                         fnTy,
                         classMember.visibility.warpIcon(LuaIcons.CLASS_METHOD))
                 element.handler = SignatureInsertHandler(it, isColonStyle)
-                if (!fnTy.isSelfCall) element.setItemTextUnderlined(true)
-                element.setTailText("  [$clazzName]")
 
-                val ele = handlerProcessor?.process(element) ?: element
-                completionResultSet.addElement(ele)
-                true
-            })
-        }
-    }
+                // looks like static
+                if (!isColonStyle)
+                    element.setItemTextUnderlined(true)
 
-    protected fun addMethod(completionResultSet: CompletionResultSet,
-                            bold: Boolean,
-                            clazzName: String,
-                            classMethod: LuaClassMethod,
-                            handlerProcessor: HandlerProcessor?) {
-        val methodName = classMethod.name
-        if (methodName != null) {
-            val ty = classMethod.guessType(SearchContext(classMethod.project)) as ITyFunction
-            ty.process(Processor {
-                val lookupString = handlerProcessor?.processLookupString(methodName) ?: methodName
-                val element = TyFunctionLookupElement(lookupString,
-                        classMethod,
-                        it,
-                        bold,
-                        false,
-                        ty,
-                        classMethod.visibility.warpIcon(LuaIcons.CLASS_METHOD))
-                element.handler = SignatureInsertHandler(it)
-                if (!ty.isSelfCall) element.setItemTextUnderlined(true)
                 element.setTailText("  [$clazzName]")
 
                 val ele = handlerProcessor?.process(element) ?: element

@@ -49,7 +49,7 @@ fun IFunSignature.processArgs(thisTy: ITy?, colonStyle: Boolean, processor: (ind
     var pIndex = 0
     if (colonStyle && !selfCall) {
         pIndex++
-    } else if (selfCall) {
+    } else if (!colonStyle && selfCall) {
         val pi = LuaParamInfo(Constants.WORD_SELF, thisTy ?: Ty.UNKNOWN)
         if (!processor(index++, pi)) return
     }

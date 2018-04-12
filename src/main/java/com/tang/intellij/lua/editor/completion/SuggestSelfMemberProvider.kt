@@ -43,20 +43,32 @@ class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
                 type.processMembers(searchContext) { curType, member ->
                     if (curType.isVisibleInScope(project, contextTy, member.visibility)) {
                         if (member is LuaClassField) {
-                            addField(completionResultSet, curType === type, curType.className, member, object : HandlerProcessor() {
-                                override fun process(element: LuaLookupElement): LookupElement {
-                                    element.lookupString = "self.${member.name}"
-                                    return element
-                                }
-                            })
+                            addMember(completionResultSet,
+                                    member,
+                                    curType,
+                                    type,
+                                    MemberCompletionMode.All,
+                                    project,
+                                    object : HandlerProcessor() {
+                                        override fun process(element: LuaLookupElement): LookupElement {
+                                            element.lookupString = "self.${member.name}"
+                                            return element
+                                        }
+                                    })
                         } else if (member is LuaClassMethod) {
-                            addMethod(completionResultSet, curType === type, curType.className, member,  object : HandlerProcessor() {
-                                override fun process(element: LuaLookupElement): LookupElement { return element }
+                            addMember(completionResultSet,
+                                    member,
+                                    curType,
+                                    type,
+                                    MemberCompletionMode.Colon,
+                                    project,
+                                    object : HandlerProcessor() {
+                                        override fun process(element: LuaLookupElement): LookupElement { return element }
 
-                                override fun processLookupString(lookupString: String): String {
-                                    return "self:${member.name}"
-                                }
-                            })
+                                        override fun processLookupString(lookupString: String): String {
+                                            return "self:${member.name}"
+                                        }
+                                    })
                         }
                     }
                 }
