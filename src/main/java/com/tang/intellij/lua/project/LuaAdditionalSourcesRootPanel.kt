@@ -37,7 +37,7 @@ class LuaAdditionalSourcesRootPanel : JPanel(BorderLayout()) {
                 .setEditAction { editPath() }
                 .setRemoveAction { removePath() }
                 .createPanel(), BorderLayout.CENTER)
-        border = IdeBorderFactory.createTitledBorder("lua additional sources root", false)
+        border = IdeBorderFactory.createTitledBorder("Lua additional sources root", false)
     }
 
     var roots: Array<String> get() {
