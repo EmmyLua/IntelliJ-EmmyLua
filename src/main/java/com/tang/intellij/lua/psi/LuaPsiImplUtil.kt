@@ -393,25 +393,15 @@ fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {
 }
 
 private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo> {
-    var comment: LuaComment? = null
-    if (funcBodyOwner is LuaCommentOwner) {
-        comment = LuaCommentUtil.findComment(funcBodyOwner)
-    }
-
     val paramNameList = funcBodyOwner.paramNameDefList
     if (paramNameList != null) {
         val list = mutableListOf<LuaParamInfo>()
         for (i in paramNameList.indices) {
             val paramInfo = LuaParamInfo()
-            val paramName = paramNameList[i].text
+            val paramNameDef = paramNameList[i]
+            val paramName = paramNameDef.text
             paramInfo.name = paramName
-            // param types
-            if (comment != null) {
-                val paramDef = comment.getParamDef(paramName)
-                if (paramDef != null) {
-                    paramInfo.ty = paramDef.type
-                }
-            }
+            paramInfo.ty = paramNameDef.guessType(SearchContext(funcBodyOwner.project))
             list.add(paramInfo)
         }
         //check varArgs
