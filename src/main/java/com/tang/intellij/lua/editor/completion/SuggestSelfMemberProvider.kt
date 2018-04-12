@@ -21,8 +21,13 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaClassMember
+import com.tang.intellij.lua.psi.LuaClassMethodDef
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil
+import com.tang.intellij.lua.psi.guessClassType
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.isVisibleInScope
 
 /**
@@ -42,34 +47,19 @@ class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
                 val contextTy = LuaPsiTreeUtil.findContextClass(position)
                 type.processMembers(searchContext) { curType, member ->
                     if (curType.isVisibleInScope(project, contextTy, member.visibility)) {
-                        if (member is LuaClassField) {
-                            addMember(completionResultSet,
-                                    member,
-                                    curType,
-                                    type,
-                                    MemberCompletionMode.All,
-                                    project,
-                                    object : HandlerProcessor() {
-                                        override fun process(element: LuaLookupElement): LookupElement {
-                                            element.lookupString = "self.${member.name}"
-                                            return element
-                                        }
-                                    })
-                        } else if (member is LuaClassMethod) {
-                            addMember(completionResultSet,
-                                    member,
-                                    curType,
-                                    type,
-                                    MemberCompletionMode.Colon,
-                                    project,
-                                    object : HandlerProcessor() {
-                                        override fun process(element: LuaLookupElement): LookupElement { return element }
+                        addMember(completionResultSet,
+                                member,
+                                curType,
+                                type,
+                                MemberCompletionMode.Colon,
+                                project,
+                                object : HandlerProcessor() {
+                                    override fun process(element: LuaLookupElement, member: LuaClassMember, memberTy: ITy?): LookupElement { return element }
 
-                                        override fun processLookupString(lookupString: String): String {
-                                            return "self:${member.name}"
-                                        }
-                                    })
-                        }
+                                    override fun processLookupString(lookupString: String, member: LuaClassMember, memberTy: ITy?): String {
+                                        return if (memberTy is ITyFunction) "self:${member.name}" else "self.${member.name}"
+                                    }
+                                })
                     }
                 }
             }

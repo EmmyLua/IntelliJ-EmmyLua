@@ -26,8 +26,10 @@ import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
+import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.shouldBe
 
 class TableCompletionProvider : ClassMemberCompletionProvider() {
@@ -76,7 +78,7 @@ class TableCompletionProvider : ClassMemberCompletionProvider() {
                             val className = curType.displayName
                             if (member is LuaClassField) {
                                 addField(completionResultSet, curType === luaType, className, member, object : HandlerProcessor() {
-                                    override fun process(element: LuaLookupElement): LookupElement {
+                                    override fun process(element: LuaLookupElement, member: LuaClassMember, memberTy: ITy?): LookupElement {
                                         element.itemText = element.itemText + " = "
                                         element.lookupString = element.lookupString + " = "
 

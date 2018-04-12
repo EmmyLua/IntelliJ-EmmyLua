@@ -40,8 +40,8 @@ enum class MemberCompletionMode {
  */
 open class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>() {
     protected abstract class HandlerProcessor {
-        open fun processLookupString(lookupString: String): String = lookupString
-        abstract fun process(element: LuaLookupElement): LookupElement
+        open fun processLookupString(lookupString: String, member: LuaClassMember, memberTy: ITy?): String = lookupString
+        abstract fun process(element: LuaLookupElement, member: LuaClassMember, memberTy: ITy?): LookupElement
     }
 
     override fun addCompletions(completionParameters: CompletionParameters,
@@ -75,7 +75,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher("$prefixName*$postfixName")
                             complete(isColon, project, contextTy, type, resultSet, prefixMatcher, object : HandlerProcessor() {
-                                override fun process(element: LuaLookupElement): LookupElement {
+                                override fun process(element: LuaLookupElement, member: LuaClassMember, memberTy: ITy?): LookupElement {
                                     element.itemText = txt + colon + element.itemText
                                     element.lookupString = txt + colon + element.lookupString
                                     return PrioritizedLookupElement.withPriority(element, -2.0)
@@ -163,7 +163,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
             }
             element.setTailText("  [$clazzName]")
 
-            val ele = handlerProcessor?.process(element) ?: element
+            val ele = handlerProcessor?.process(element, field, null) ?: element
             completionResultSet.addElement(ele)
         }
     }
@@ -188,7 +188,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                         return@Processor true
                 }
 
-                val lookupString = handlerProcessor?.processLookupString(name) ?: name
+                val lookupString = handlerProcessor?.processLookupString(name, classMember, fnTy) ?: name
                 val element = TyFunctionLookupElement(lookupString,
                         classMember,
                         it,
@@ -204,7 +204,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
 
                 element.setTailText("  [$clazzName]")
 
-                val ele = handlerProcessor?.process(element) ?: element
+                val ele = handlerProcessor?.process(element, classMember, fnTy) ?: element
                 completionResultSet.addElement(ele)
                 true
             })
