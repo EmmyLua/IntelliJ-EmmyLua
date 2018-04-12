@@ -66,7 +66,7 @@ interface ITy : Comparable<ITy> {
 
     fun createTypeString(): String
 
-    fun subTypeOf(other: ITy, context: SearchContext): Boolean
+    fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
 
     fun getSuperClass(context: SearchContext): ITy?
 
@@ -133,12 +133,12 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return list.joinToString("|")
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         // Everything is subset of any
-        if (other.kind == TyKind.Unknown) return true
+        if (other.kind == TyKind.Unknown) return !strict
 
         // Handle unions, subtype if subtype of any of the union components.
-        if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context) })
+        if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context, strict) })
 
         // Classes are equal
         return this == other
@@ -334,8 +334,8 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
         return displayName.hashCode()
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return super.subTypeOf(other, context) || (other is TyArray && base.subTypeOf(other.base, context)) || other == Ty.TABLE
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.subTypeOf(other, context, strict) || (other is TyArray && base.subTypeOf(other.base, context, strict)) || other == Ty.TABLE
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
@@ -371,8 +371,8 @@ class TyUnion : Ty(TyKind.Union) {
         return childSet.add(ty)
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return super.subTypeOf(other, context) || childSet.any { type -> type.subTypeOf(other, context) }
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.subTypeOf(other, context, strict) || childSet.any { type -> type.subTypeOf(other, context, strict) }
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
@@ -474,8 +474,8 @@ class TyUnknown : Ty(TyKind.Unknown) {
         return Constants.WORD_ANY.hashCode()
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        return true
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return !strict
     }
 }
 
@@ -483,9 +483,9 @@ class TyNil : Ty(TyKind.Nil) {
     override val displayName: String
         get() = Constants.WORD_NIL
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
 
-        return super.subTypeOf(other, context) || other is TyNil || !LuaSettings.instance.isNilStrict
+        return super.subTypeOf(other, context, strict) || other is TyNil || !LuaSettings.instance.isNilStrict
     }
 }
 
@@ -493,7 +493,7 @@ class TyVoid : Ty(TyKind.Void) {
     override val displayName: String
         get() = Constants.WORD_VOID
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return false
     }
 }

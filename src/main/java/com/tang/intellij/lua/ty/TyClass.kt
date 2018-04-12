@@ -162,8 +162,8 @@ abstract class TyClass(override val className: String,
         return null
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
-        if (super.subTypeOf(other, context)) return true
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (super.subTypeOf(other, context, strict)) return true
 
         // Lazy init for superclass
         this.doLazyInit(context)
@@ -284,9 +284,9 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
 
     override fun doLazyInit(searchContext: SearchContext) = Unit
 
-    override fun subTypeOf(other: ITy, context: SearchContext): Boolean {
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         // Empty list is a table, but subtype of all lists
-        return super.subTypeOf(other, context) || other == Ty.TABLE || (other is TyArray && table.tableFieldList.size == 0)
+        return super.subTypeOf(other, context, strict) || other == Ty.TABLE || (other is TyArray && table.tableFieldList.size == 0)
     }
 }
 

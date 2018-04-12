@@ -61,7 +61,7 @@ class AssignTypeInspection : StrictInspection() {
                                 if (parent is TyClass) {
                                     val fieldType = parent.findMemberType(name, searchContext) ?: Ty.NIL
 
-                                    if (!valueType.subTypeOf(fieldType, searchContext)) {
+                                    if (!valueType.subTypeOf(fieldType, searchContext, false)) {
                                         myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                     }
                                 }
@@ -70,7 +70,7 @@ class AssignTypeInspection : StrictInspection() {
                                 if (o.comment == null) {
                                     val fieldType = field.guessType(searchContext)
 
-                                    if (!valueType.subTypeOf(fieldType, searchContext)) {
+                                    if (!valueType.subTypeOf(fieldType, searchContext, false)) {
                                         myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                     }
                                 }

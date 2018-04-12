@@ -184,7 +184,7 @@ open class ClassMemberCompletionProvider : CompletionProvider<CompletionParamete
                 val firstParam = it.getFirstParam(thisType, isColonStyle)
                 if (isColonStyle) {
                     if (firstParam == null) return@Processor true
-                    if (!callType.subTypeOf(firstParam.ty, SearchContext(classMember.project)))
+                    if (!callType.subTypeOf(firstParam.ty, SearchContext(classMember.project), true))
                         return@Processor true
                 }
 

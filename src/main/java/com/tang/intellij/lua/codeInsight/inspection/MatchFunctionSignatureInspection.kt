@@ -110,7 +110,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                             val concreteType = concreteTypes[i]
                             val abstractType = abstractParams[i].ty
 
-                            if (!concreteType.subTypeOf(abstractType, searchContext)) {
+                            if (!concreteType.subTypeOf(abstractType, searchContext, false)) {
                                 myHolder.registerProblem(concreteParams[i], "Type mismatch. Required: '%s' Found: '%s'".format(abstractType.displayName, concreteType.displayName))
                             }
                         }
@@ -136,7 +136,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                         val concreteType = concreteTypes[i]
                         val abstractType = signature.getParamTy(i)
 
-                        if (concreteType.subTypeOf(abstractType, searchContext)) {
+                        if (concreteType.subTypeOf(abstractType, searchContext, false)) {
                             matchScore++
                         }
                     }
