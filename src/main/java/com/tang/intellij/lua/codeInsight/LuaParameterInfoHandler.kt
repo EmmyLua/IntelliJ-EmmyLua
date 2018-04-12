@@ -25,17 +25,15 @@ import com.tang.intellij.lua.psi.LuaCallExpr
 import com.tang.intellij.lua.psi.LuaListArgs
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.IFunSignature
-import com.tang.intellij.lua.ty.ITyFunction
-import com.tang.intellij.lua.ty.TyUnion
-import com.tang.intellij.lua.ty.process
-import java.util.*
+import com.tang.intellij.lua.ty.*
+
+data class ParameterInfoType(val sig: IFunSignature, val isColonStyle: Boolean)
 
 /**
  *
  * Created by tangzx on 2016/12/25.
  */
-class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
+class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, ParameterInfoType> {
     override fun couldShowInLookup(): Boolean {
         return false
     }
@@ -44,7 +42,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
         return emptyArray()
     }
 
-    override fun getParametersForDocumentation(o: IFunSignature, parameterInfoContext: ParameterInfoContext): Array<Any>? {
+    override fun getParametersForDocumentation(o: ParameterInfoType, parameterInfoContext: ParameterInfoContext): Array<Any>? {
         return emptyArray()
     }
 
@@ -53,13 +51,14 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
         val luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.offset, LuaArgs::class.java, false)
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
+            val isColonStyle = callExpr.isMethodCall
             val type = callExpr.guessParentType(SearchContext(context.project))
-            val list = mutableListOf<IFunSignature>()
+            val list = mutableListOf<ParameterInfoType>()
             TyUnion.each(type) { ty ->
                 if (ty is ITyFunction) {
                     ty.process(Processor {
-                        if (it.params.isNotEmpty()) {
-                            list.add(it)
+                        if ((it.selfCall && !isColonStyle) || it.params.isNotEmpty()) {
+                            list.add(ParameterInfoType(it, isColonStyle))
                         }
                         true
                     })
@@ -94,37 +93,27 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, IFunSignature> {
         return true
     }
 
-    override fun updateUI(o: IFunSignature?, context: ParameterInfoUIContext) {
+    override fun updateUI(o: ParameterInfoType?, context: ParameterInfoUIContext) {
         if (o == null)
             return
-        val params = o.params
-        if (params.isNotEmpty()) {
-            val sb = StringBuilder()
-            val index = context.currentParameterIndex
-            var start = 0
-            var end = 0
 
-            for (i in params.indices) {
-                val paramInfo = params[i]
-                if (i > 0)
-                    sb.append(", ")
-                if (i == index)
-                    start = sb.length
-                sb.append(paramInfo.name)
-
-                val typeNames = ArrayList<String>()
-                TyUnion.each(paramInfo.ty) {
-                    typeNames.add(it.createTypeString())
-                }
-                sb.append(":")
-                sb.append(typeNames.joinToString("|"))
-
-                if (i == index)
-                    end = sb.length
+        val index = context.currentParameterIndex
+        var start = 0
+        var end = 0
+        val str = buildString {
+            o.sig.processArgs(null, o.isColonStyle) { idx, pi ->
+                if (idx > 0) append(", ")
+                if (idx == index) start = length
+                append(pi.name)
+                append(":")
+                append(pi.ty.displayName)
+                if (idx == index) end = length
+                true
             }
-
+        }
+        if (str.isNotEmpty()) {
             context.setupUIComponentPresentation(
-                    sb.toString(),
+                    str,
                     start,
                     end,
                     false,
