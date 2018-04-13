@@ -21,6 +21,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
+import com.tang.intellij.lua.LuaBundle
 import java.awt.BorderLayout
 import javax.swing.DefaultListModel
 import javax.swing.JPanel
@@ -37,7 +38,7 @@ class LuaAdditionalSourcesRootPanel : JPanel(BorderLayout()) {
                 .setEditAction { editPath() }
                 .setRemoveAction { removePath() }
                 .createPanel(), BorderLayout.CENTER)
-        border = IdeBorderFactory.createTitledBorder("Lua additional sources root", false)
+        border = IdeBorderFactory.createTitledBorder(LuaBundle.message("ui.settings.additional_root"), false)
     }
 
     var roots: Array<String> get() {

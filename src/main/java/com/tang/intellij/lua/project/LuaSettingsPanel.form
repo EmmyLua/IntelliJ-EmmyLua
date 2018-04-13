@@ -67,7 +67,7 @@
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Enable generic"/>
+              <text resource-bundle="LuaBundle" key="ui.settings.enable_generic"/>
             </properties>
           </component>
         </children>
@@ -110,7 +110,7 @@
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Show &amp;words in file"/>
+              <text resource-bundle="LuaBundle" key="ui.settings.show_words"/>
             </properties>
           </component>
           <component id="366e9" class="javax.swing.JCheckBox" binding="recognizeGlobalNameAsCheckBox" default-binding="true">
@@ -145,7 +145,7 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="Type safety"/>
+                  <text resource-bundle="LuaBundle" key="ui.settings.type_safety"/>
                 </properties>
               </component>
               <component id="a138e" class="javax.swing.JSeparator">
@@ -161,7 +161,7 @@
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Enforce type safety"/>
+              <text resource-bundle="LuaBundle" key="ui.settings.enforce_type_safety"/>
             </properties>
           </component>
           <component id="4e504" class="javax.swing.JCheckBox" binding="nilStrict">
@@ -169,7 +169,7 @@
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="Strict nil checks"/>
+              <text resource-bundle="LuaBundle" key="ui.settings.strict_nil_checks"/>
             </properties>
           </component>
         </children>

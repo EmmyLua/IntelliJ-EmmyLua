@@ -25,6 +25,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.HoverHyperlinkLabel;
 import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.RawCommandLineEditor;
+import com.tang.intellij.lua.LuaBundle;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -74,21 +75,20 @@ public class LuaCheckSettingsPanel implements SearchableConfigurable, Configurab
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
         settings.setLuaCheck(myLuaCheck.getText());
-        //String[] params = ParametersListUtil.parseToArray(myCmdLine.getText());
         settings.setLuaCheckArgs(myCmdLine.getText());
     }
 
     private void createUIComponents() {
-        luaCheckReleasePageLink = new HoverHyperlinkLabel("Download LuaCheck");
+        luaCheckReleasePageLink = new HoverHyperlinkLabel(LuaBundle.message("ui.luacheck.download"));
         luaCheckReleasePageLink.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(HyperlinkEvent hyperlinkEvent) {
                 BrowserUtil.browse("https://github.com/mpeterv/luacheck/releases");
             }
         });
-        commandLineOptionsLink = new HoverHyperlinkLabel("Command line options");
+        commandLineOptionsLink = new HoverHyperlinkLabel(LuaBundle.message("ui.luacheck.command_line_options"));
         commandLineOptionsLink.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(HyperlinkEvent hyperlinkEvent) {
