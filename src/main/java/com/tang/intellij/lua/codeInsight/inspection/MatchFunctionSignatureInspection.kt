@@ -53,13 +53,27 @@ class MatchFunctionSignatureInspection : StrictInspection() {
 
                     if (type is TyPsiFunction) {
                         val givenParams = o.argList
-                        val givenTypes = givenParams.map { param -> param.guessType(searchContext) }
+                        val givenTypes = mutableListOf<ITy>()
+                        for ((i, param) in givenParams.withIndex()) {
+                            val paramType = param.guessType(searchContext)
+                            if (paramType is TyTuple) {
+                                if (i == givenParams.lastIndex) {
+                                    givenTypes.addAll(paramType.list)
+                                }
+                                else {
+                                    givenTypes.add(paramType.list.first())
+                                }
+                            }
+                            else {
+                                givenTypes.add(paramType)
+                            }
+                        }
                         //find the perfect one.
                         var perfectSig: IFunSignature? = null
                         var perfectMatchNum = -1
                         var fullMatch = false
                         type.process(Processor { sig ->
-                            val pair = matchCallSignature(givenParams, givenTypes, sig, searchContext)
+                            val pair = matchCallSignature(givenTypes, sig, searchContext)
                             if (pair.second > perfectMatchNum) {
                                 perfectSig = sig
                                 perfectMatchNum = pair.second
@@ -90,6 +104,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     val sigParamSize = if (hasVarArgs) signature.params.size - 1 else signature.params.size
 
                     // Check if number of arguments match
+                    // 代码明确填写的实参过多
                     if (concreteParams.size > sigParamSize) {
                         if (!hasVarArgs) {
                             val signatureString = abstractParams.joinToString(", ", transform = { param -> param.ty.displayName })
@@ -98,8 +113,9 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                             }
                         }
                     }
-                    else if (concreteParams.size < sigParamSize) {
-                        for (i in concreteParams.size until sigParamSize) {
+                    // 实参过少
+                    else if (concreteTypes.size < sigParamSize) {
+                        for (i in concreteTypes.size until sigParamSize) {
                             myHolder.registerProblem(call.lastChild.lastChild, "Missing argument: %s: %s".format(abstractParams[i].name, abstractParams[i].ty.displayName))
                         }
                     }
@@ -118,15 +134,15 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                 }
 
                 // Evaluate if concrete function parameters match abstract function parameters.
-                private fun matchCallSignature(concreteParams: List<LuaExpr>, concreteTypes: List<ITy>, signature: IFunSignature, searchContext: SearchContext): Pair<Boolean, Int> {
+                private fun matchCallSignature(concreteTypes: List<ITy>, signature: IFunSignature, searchContext: SearchContext): Pair<Boolean, Int> {
                     val hasVarArgs = signature.hasVarArgs()
                     val sigParamSize = if (hasVarArgs) signature.params.size - 1 else signature.params.size
 
                     // Check if number of arguments matches
                     if (hasVarArgs) {
-                        if (concreteParams.size < sigParamSize)
+                        if (concreteTypes.size < sigParamSize)
                             return Pair(false, 0)
-                    } else if (concreteParams.size != sigParamSize)
+                    } else if (concreteTypes.size != sigParamSize)
                         return Pair(false, 0)
 
                     var matchScore = 0
