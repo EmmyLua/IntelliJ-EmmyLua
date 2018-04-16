@@ -25,7 +25,7 @@ import com.tang.intellij.lua.psi.*
 class UnreachableStatement : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
-                override fun visitPsiElement(o: LuaPsiElement) {
+                override fun visitStatement(o: LuaStatement) {
                     var sibling = o.prevSibling
                     var found = false
                     while (sibling != null && !found) {
@@ -45,7 +45,7 @@ class UnreachableStatement : LocalInspectionTool() {
                         sibling = sibling.prevSibling
                     }
 
-                    if (!found) super.visitPsiElement(o)
+                    if (!found) super.visitStatement(o)
                 }
             }
 }
