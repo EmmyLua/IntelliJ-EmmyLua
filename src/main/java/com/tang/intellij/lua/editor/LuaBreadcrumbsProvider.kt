@@ -48,6 +48,7 @@ class LuaBreadcrumbsProvider : BreadcrumbsProvider {
                         when (parent2) {
                             is LuaClassMethodDef -> "${parent2.classMethodName.text}${parent2.paramSignature}"
                             is LuaClosureExpr -> "function${parent2.paramSignature}"
+                            is LuaFuncDef -> "function${parent2.paramSignature}"
                             is LuaLocalFuncDef -> "local function ${parent2.name}"
                             else -> "<?>"
                         }
