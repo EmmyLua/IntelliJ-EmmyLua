@@ -238,8 +238,9 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             while (b.tokenType == COMMA) {
                 b.advanceLexer()
                 val nameDef = b.mark()
-                expectError(b, ID, { "ID" })
-                nameDef.done(NAME_DEF)
+                if (expectError(b, ID, { "ID" }))
+                    nameDef.done(NAME_DEF)
+                else nameDef.drop()
             }
             m = m.precede()
         }
