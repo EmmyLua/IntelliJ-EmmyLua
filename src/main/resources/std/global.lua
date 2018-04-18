@@ -16,8 +16,10 @@
 --- Issues an error when the value of its argument `v` is false (i.e.,
 --- nil or false); otherwise, returns all its arguments. `message` is an error
 --- message; when absent, it defaults to "assertion failed!"
+---@overload fun(v:any):any
 ---@param v any
 ---@param message string
+---@return any
 function assert(v, message) end
 
 ---
