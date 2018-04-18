@@ -11,10 +11,7 @@ package com.tang.intellij.lua.stubs
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.ext.recursionGuard
-import com.tang.intellij.lua.psi.LuaClosureExpr
-import com.tang.intellij.lua.psi.LuaFuncBodyOwner
-import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.psi.LuaReturnStat
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
@@ -34,12 +31,15 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
         val psi = stub.psi
         return recursionGuard(stub, Computable {
             val ty = when (psi) {
-                is LuaFuncBodyOwner,
-                is LuaClosureExpr -> { null }
                 is LuaReturnStat -> {
                     psi.exprList?.guessTypeAt(context)
                 }
-                else -> {
+                is LuaDoStat,
+                is LuaWhileStat,
+                is LuaIfStat,
+                is LuaForAStat,
+                is LuaForBStat,
+                is LuaRepeatStat -> {
                     var ret: ITy? = null
                     for (childrenStub in stub.childrenStubs) {
                         ret = walkStub(childrenStub, context)
@@ -48,6 +48,7 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
                     }
                     ret
                 }
+                else -> null
             }
             ty
         })

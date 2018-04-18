@@ -95,9 +95,14 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
                 }
             }
 
-            override fun visitFuncBodyOwner(o: LuaFuncBodyOwner) { }
-
-            override fun visitClosureExpr(o: LuaClosureExpr) { }
+            override fun visitExprStat(o: LuaExprStat) {}
+            override fun visitLabelStat(o: LuaLabelStat) {}
+            override fun visitAssignStat(o: LuaAssignStat) {}
+            override fun visitGotoStat(o: LuaGotoStat) {}
+            override fun visitClassMethodDef(o: LuaClassMethodDef) {}
+            override fun visitFuncDef(o: LuaFuncDef) {}
+            override fun visitLocalDef(o: LuaLocalDef) {}
+            override fun visitLocalFuncDef(o: LuaLocalFuncDef) {}
         })
         CachedValueProvider.Result.create(type, owner)
         type
