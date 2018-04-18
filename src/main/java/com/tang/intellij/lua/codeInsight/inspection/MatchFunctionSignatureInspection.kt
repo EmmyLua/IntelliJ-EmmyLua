@@ -19,6 +19,7 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.PsiErrorElement
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -115,8 +116,11 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     }
                     // 实参过少
                     else if (concreteTypes.size < sigParamSize) {
+                        val last = call.lastChild.lastChild
+                        if (last is PsiErrorElement)
+                            return
                         for (i in concreteTypes.size until sigParamSize) {
-                            myHolder.registerProblem(call.lastChild.lastChild, "Missing argument: %s: %s".format(abstractParams[i].name, abstractParams[i].ty.displayName))
+                            myHolder.registerProblem(last, "Missing argument: %s: %s".format(abstractParams[i].name, abstractParams[i].ty.displayName))
                         }
                     }
                     else {
