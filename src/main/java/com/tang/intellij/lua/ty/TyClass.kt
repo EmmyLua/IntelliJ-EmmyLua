@@ -163,6 +163,8 @@ abstract class TyClass(override val className: String,
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        // class extends table
+        if (other == Ty.TABLE) return true
         if (super.subTypeOf(other, context, strict)) return true
 
         // Lazy init for superclass
