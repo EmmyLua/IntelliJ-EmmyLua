@@ -260,7 +260,7 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
 
         object : FunSignatureBase(selfCall, psi.params) {
             override val returnTy: ITy by lazy {
-                var returnTy = psi.guessReturnType(searchContext)
+                var returnTy = psi.guessReturnType(SearchContext(psi.project))
                 /**
                  * todo optimize this bug solution
                  * local function test()
