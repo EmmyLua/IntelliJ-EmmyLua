@@ -102,7 +102,7 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bol
 
 class TyFunctionLookupElement(name: String,
                               val psi: LuaPsiElement,
-                              signature: IFunSignature,
+                              private val signature: IFunSignature,
                               bold: Boolean,
                               colonStyle: Boolean,
                               val ty: ITyFunction,
@@ -132,6 +132,10 @@ class TyFunctionLookupElement(name: String,
     }
 
     override fun getItemText() = lazyItemText
+
+    override fun hashCode(): Int {
+        return super.hashCode() * 31 * (signature.params.size + 1)
+    }
 
     /**
      * https://github.com/tangzx/IntelliJ-EmmyLua/issues/54

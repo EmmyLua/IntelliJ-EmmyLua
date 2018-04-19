@@ -162,7 +162,7 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
     public boolean equals(Object obj) {
         if (obj instanceof LuaLookupElement) {
             LuaLookupElement element = (LuaLookupElement) obj;
-            return element.getItemText().equals(getItemText());
+            return element.hashCode() == hashCode();
         }
         return super.equals(obj);
     }
