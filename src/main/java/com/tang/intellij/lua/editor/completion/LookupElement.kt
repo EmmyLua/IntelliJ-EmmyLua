@@ -108,7 +108,7 @@ class TyFunctionLookupElement(name: String,
                               val ty: ITyFunction,
                               icon: Icon
 ) : LuaLookupElement(name, bold, icon) {
-    init {
+    /*init {
         val list = mutableListOf<String>()
         signature.processArgs(null, colonStyle) { _, param ->
             list.add(param.name)
@@ -116,7 +116,22 @@ class TyFunctionLookupElement(name: String,
         }
         itemText = lookupString + "(${list.joinToString(", ")})"
         typeText = signature.returnTy.displayName
+    }*/
+
+    private val lazyTypeText by lazy { signature.returnTy.displayName }
+
+    override fun getTypeText() = lazyTypeText
+
+    private val lazyItemText by lazy {
+        val list = mutableListOf<String>()
+        signature.processArgs(null, colonStyle) { _, param ->
+            list.add(param.name)
+            true
+        }
+        "$lookupString(${list.joinToString(", ")})"
     }
+
+    override fun getItemText() = lazyItemText
 
     /**
      * https://github.com/tangzx/IntelliJ-EmmyLua/issues/54

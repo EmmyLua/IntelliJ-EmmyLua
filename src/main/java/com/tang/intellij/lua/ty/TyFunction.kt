@@ -94,10 +94,9 @@ fun IFunSignature.hasVarArgs(): Boolean {
 
 fun IFunSignature.isGeneric() = tyParameters.isNotEmpty()
 
-class FunSignature(override val selfCall: Boolean,
-                   override val returnTy: ITy,
-                   override val params: Array<LuaParamInfo>,
-                   override val tyParameters: List<TyParameter> = emptyList()
+abstract class FunSignatureBase(override val selfCall: Boolean,
+                                override val params: Array<LuaParamInfo>,
+                                override val tyParameters: List<TyParameter> = emptyList()
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
@@ -107,12 +106,41 @@ class FunSignature(override val selfCall: Boolean,
     }
 
     override fun hashCode(): Int {
-        var code = returnTy.hashCode()
+        var code = 0//returnTy.hashCode()
         params.forEach {
             code += it.ty.hashCode() * 31
         }
         return code
     }
+
+    override val displayName: String by lazy {
+        val paramSB = mutableListOf<String>()
+        params.forEach {
+            paramSB.add(it.name + ":" + it.ty.displayName)
+        }
+        "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
+    }
+
+    override val paramSignature: String get() {
+        val list = arrayOfNulls<String>(params.size)
+        for (i in params.indices) {
+            val lpi = params[i]
+            list[i] = lpi.name
+        }
+        return "(" + list.joinToString(", ") + ")"
+    }
+
+    override fun substitute(substitutor: ITySubstitutor): IFunSignature {
+        val list = params.map { it.substitute(substitutor) }
+        return FunSignature(selfCall, returnTy.substitute(substitutor), list.toTypedArray())
+    }
+}
+
+class FunSignature(selfCall: Boolean,
+                   override val returnTy: ITy,
+                   params: Array<LuaParamInfo>,
+                   tyParameters: List<TyParameter> = emptyList()
+) : FunSignatureBase(selfCall, params, tyParameters) {
 
     companion object {
         private fun initParams(func: LuaDocFunctionTy): Array<LuaParamInfo> {
@@ -142,28 +170,6 @@ class FunSignature(override val selfCall: Boolean,
             val params = stream.readParamInfoArray()
             return FunSignature(selfCall, ret, params)
         }
-    }
-
-    override val displayName: String by lazy {
-        val paramSB = mutableListOf<String>()
-        params.forEach {
-            paramSB.add(it.name + ":" + it.ty.displayName)
-        }
-        "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
-    }
-
-    override val paramSignature: String get() {
-        val list = arrayOfNulls<String>(params.size)
-        for (i in params.indices) {
-            val lpi = params[i]
-            list[i] = lpi.name
-        }
-        return "(" + list.joinToString(", ") + ")"
-    }
-
-    override fun substitute(substitutor: ITySubstitutor): IFunSignature {
-        val list = params.map { it.substitute(substitutor) }
-        return FunSignature(selfCall, returnTy.substitute(substitutor), list.toTypedArray())
     }
 }
 
@@ -244,17 +250,6 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
     }
 
     override val mainSignature: IFunSignature by lazy {
-        var returnTy = psi.guessReturnType(searchContext)
-        /**
-         * todo optimize this bug solution
-         * local function test()
-         *      return test
-         * end
-         * -- will crash after type `test`
-         */
-        if (returnTy is TyPsiFunction && returnTy.psi == psi) {
-           returnTy = Ty.UNKNOWN
-        }
 
         //TODO: cause reparse psi !
         if (LuaSettings.instance.enableGeneric) {
@@ -263,7 +258,23 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
             genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
         }
 
-        FunSignature(selfCall, returnTy, psi.params)
+        object : FunSignatureBase(selfCall, psi.params) {
+            override val returnTy: ITy by lazy {
+                var returnTy = psi.guessReturnType(searchContext)
+                /**
+                 * todo optimize this bug solution
+                 * local function test()
+                 *      return test
+                 * end
+                 * -- will crash after type `test`
+                 */
+                if (returnTy is TyPsiFunction && returnTy.psi == psi) {
+                    returnTy = Ty.UNKNOWN
+                }
+
+                returnTy
+            }
+        }
     }
 
     override val signatures: Array<IFunSignature> by lazy {
