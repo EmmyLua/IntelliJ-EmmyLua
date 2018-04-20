@@ -1,6 +1,6 @@
 --
 -- MobDebug -- Lua remote debugger
--- Copyright 2011-15 Paul Kulchenko
+-- Copyright 2011-18 Paul Kulchenko
 -- Based on RemDebug 1.0 Copyright Kepler Project 2005
 --
 
@@ -19,7 +19,7 @@ end)("os")
 
 local mobdebug = {
   _NAME = "mobdebug",
-  _VERSION = "0.70",
+  _VERSION = "0.703",
   _COPYRIGHT = "Paul Kulchenko",
   _DESCRIPTION = "Mobile Remote Debugger for the Lua programming language",
   port = os and os.getenv and tonumber((os.getenv("MOBDEBUG_PORT"))) or 8172,
@@ -130,7 +130,7 @@ end
 local function q(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])','%%%1') end
 
 local serpent = (function() ---- include Serpent module for serialization
-local n, v = "serpent", "0.30" -- (C) 2012-17 Paul Kulchenko; MIT License
+local n, v = "serpent", "0.301" -- (C) 2012-17 Paul Kulchenko; MIT License
 local c, d = "Paul Kulchenko", "Lua serializer and pretty printer"
 local snum = {[tostring(1/0)]='1/0 --[[math.huge]]',[tostring(-1/0)]='-1/0 --[[-math.huge]]',[tostring(0/0)]='0/0'}
 local badtype = {thread = true, userdata = true, cdata = true}
@@ -183,10 +183,10 @@ local function s(t, opts)
       sref[#sref+1] = spath..space..'='..space..seen[t]
       return tag..'nil'..comment('ref', level) end
     -- protect from those cases where __tostring may fail
-    if type(mt) == 'table' then
+    if type(mt) == 'table' and metatostring ~= false then
       local to, tr = pcall(function() return mt.__tostring(t) end)
       local so, sr = pcall(function() return mt.__serialize(t) end)
-      if (opts.metatostring ~= false and to or so) then -- knows how to serialize itself
+      if (to or so) then -- knows how to serialize itself
         seen[t] = insref or spath
         t = so and sr or tr
         ttype = type(t)
@@ -1163,8 +1163,12 @@ local function controller(controller_host, controller_port, scratchpad)
       if abort then
         if tostring(abort) == 'exit' then break end
       else
-        if status then -- normal execution is done
-          break
+        if status then -- no errors
+          if corostatus(coro_debugee) == "suspended" then
+            -- the script called `coroutine.yield` in the "main" thread
+            error("attempt to yield from the main thread", 3)
+          end
+          break -- normal execution is done
         elseif err and not string.find(tostring(err), deferror) then
           -- report the error back
           -- err is not necessarily a string, so convert to string to report
@@ -1401,9 +1405,9 @@ local function handle(params, client, options)
       elseif command == "reload" then
         client:send("LOAD 0 -\n")
       elseif command == "loadstring" then
-        local _, _, _, file, lines = string.find(exp, "^([\"'])(.-)%1%s+(.+)")
+        local _, _, _, file, lines = string.find(exp, "^([\"'])(.-)%1%s(.+)")
         if not file then
-           _, _, file, lines = string.find(exp, "^(%S+)%s+(.+)")
+           _, _, file, lines = string.find(exp, "^(%S+)%s(.+)")
         end
         client:send("LOAD " .. tostring(#lines) .. " " .. file .. "\n")
         client:send(lines)
