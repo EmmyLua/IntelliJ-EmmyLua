@@ -42,6 +42,7 @@ class MatchFunctionSignatureTest : LuaInspectionsTestBase(MatchFunctionSignature
         end
         test(1<warning>)</warning>
     """)
+
     fun testMultiReturn() = checkByText("""
         local function ret_nn()
             return 1, 2
@@ -57,5 +58,18 @@ class MatchFunctionSignatureTest : LuaInspectionsTestBase(MatchFunctionSignature
         acp_nn(<warning>ret_sn()</warning>)
         acp_nn(ret_nn(), 1)
         acp_nn(<warning>ret_sn()</warning>, 1)
+    """)
+
+    fun testParentIndex() = checkByText("""
+        local dummy, A = 1, {}
+        ---@return number, string
+        function A.a()
+            return 1, "1"
+        end
+        ---@param n number
+        ---@param s string
+        local function acp_ns(n, s) end
+
+        acp_ns(A.a())
     """)
 }
