@@ -323,7 +323,10 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         //from other class member
         val propName = indexExpr.name
         if (propName != null) {
+            // 查找 parent 定义时不应该影响当前index
+            val saveIdx = context.index
             val prefixType = indexExpr.guessParentType(context)
+            context.index = saveIdx
 
             prefixType.eachTopClass(Processor {
                 result = result.union(guessFieldType(propName, it, context))
