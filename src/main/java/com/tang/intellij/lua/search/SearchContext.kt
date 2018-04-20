@@ -34,10 +34,16 @@ class SearchContext(val project: Project, private val currentFile: PsiFile? = nu
     /**
      * 用于有多返回值的索引设定
      */
-    var index: Int = -1
+    val index: Int get() = myIndex
 
-    fun resetIndex() {
-        index = -1
+    private var myIndex: Int = -1
+
+    fun <T> withIndex(index: Int, action: () -> T): T {
+        val savedIndex = this.index
+        myIndex = index
+        val ret = action()
+        myIndex = savedIndex
+        return ret
     }
 
     fun guessTuple() = index < 0

@@ -136,8 +136,9 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
-                    context.index = localDef.getIndexFor(this)
-                    type = exprList.guessTypeAt(context)
+                    type = context.withIndex(localDef.getIndexFor(this)) {
+                        exprList.guessTypeAt(context)
+                    }
                 }
             }
 

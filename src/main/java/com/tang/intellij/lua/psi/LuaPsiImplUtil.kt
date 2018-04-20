@@ -264,14 +264,15 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
         //local a, b = getValues12() -- a = 1, b = 2
         //local a, b, c = getValues12(), 3, 4 --a = 1, b = 3, c =  4
         //local a, b, c = getValues12(), getValue34() --a = 1, b = 3, c =  4
+        var index = -1
         if (exprList.size > 1) {
             val nameSize = context.index + 1
-            if (nameSize > exprList.size) {
+            index = if (nameSize > exprList.size) {
                 val valueSize = exprList.size
-                context.index = nameSize - valueSize
-            } else context.index = 0
+                nameSize - valueSize
+            } else 0
         }
-        return expr.guessType(context)
+        return context.withIndex(index) { expr.guessType(context) }
     }
     return Ty.UNKNOWN
 }
@@ -353,8 +354,9 @@ fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
     var ret: ITy = Ty.UNKNOWN
     val assignStat = indexExpr.assignStat
     if (assignStat != null) {
-        context.index = assignStat.getIndexFor(indexExpr)
-        ret = assignStat.valueExprList?.guessTypeAt(context) ?: Ty.UNKNOWN
+        ret = context.withIndex(assignStat.getIndexFor(indexExpr)) {
+            assignStat.valueExprList?.guessTypeAt(context) ?: Ty.UNKNOWN
+        }
     }
     return ret
 }
@@ -576,11 +578,12 @@ fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchConte
     if (returnStat != null) {
         val returnExpr = returnStat.exprList
         if (returnExpr != null) {
-            context.index = index
-            return if (context.guessTuple())
-                returnExpr.guessType(context)
-            else
-                returnExpr.guessTypeAt(context)
+            return context.withIndex(index) {
+                if (context.guessTuple())
+                    returnExpr.guessType(context)
+                else
+                    returnExpr.guessTypeAt(context)
+            }
         }
     }
     return Ty.UNKNOWN
