@@ -16,13 +16,10 @@
 
 package com.tang.intellij.lua.editor.completion
 
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
@@ -55,8 +52,9 @@ class TableCompletionProvider : ClassMemberCompletionProvider() {
                 "__metatable" to "Meta method"
         )
     }
-
-    override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
+    override fun addCompletions(session: CompletionSession) {
+        val completionParameters = session.parameters
+        val completionResultSet = session.resultSet
         metaMethodNames.forEach {
             val b = LookupElementBuilder.create(it.key)
                     .withTypeText(it.value)

@@ -17,20 +17,17 @@
 package com.tang.intellij.lua.editor.completion
 
 import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionProvider
 import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyLazyClass
 
@@ -38,8 +35,10 @@ import com.tang.intellij.lua.ty.TyLazyClass
  * override supper
  * Created by tangzx on 2016/12/25.
  */
-class OverrideCompletionProvider : CompletionProvider<CompletionParameters>() {
-    override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
+class OverrideCompletionProvider : LuaCompletionProvider() {
+    override fun addCompletions(session: CompletionSession) {
+        val completionParameters = session.parameters
+        val completionResultSet = session.resultSet
         val id = completionParameters.position
         val methodDef = PsiTreeUtil.getParentOfType(id, LuaClassMethodDef::class.java)
         if (methodDef != null) {

@@ -16,11 +16,8 @@
 
 package com.tang.intellij.lua.editor.completion
 
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.tree.TokenSet
-import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
@@ -33,7 +30,7 @@ import com.tang.intellij.lua.ty.*
  * suggest local/global vars and functions
  * Created by TangZX on 2017/4/11.
  */
-class LocalAndGlobalCompletionProvider internal constructor(private val mask: Int) : ClassMemberCompletionProvider() {
+class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompletionProvider() {
 
     private fun has(flag: Int): Boolean {
         return mask and flag == flag
@@ -78,8 +75,9 @@ class LocalAndGlobalCompletionProvider internal constructor(private val mask: In
         }
     }
 
-    override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
-        val session = completionParameters.editor.getUserData(CompletionSession.KEY)!!
+    override fun addCompletions(session: CompletionSession) {
+        val completionParameters = session.parameters
+        val completionResultSet = session.resultSet
         val cur = completionParameters.position
         val nameExpr = cur.parent
 

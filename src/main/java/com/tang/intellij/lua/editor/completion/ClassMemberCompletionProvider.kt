@@ -20,7 +20,6 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
-import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
@@ -38,15 +37,16 @@ enum class MemberCompletionMode {
 
  * Created by tangzx on 2016/12/25.
  */
-open class ClassMemberCompletionProvider : CompletionProvider<CompletionParameters>() {
+open class ClassMemberCompletionProvider : LuaCompletionProvider() {
     protected abstract class HandlerProcessor {
         open fun processLookupString(lookupString: String, member: LuaClassMember, memberTy: ITy?): String = lookupString
         abstract fun process(element: LuaLookupElement, member: LuaClassMember, memberTy: ITy?): LookupElement
     }
 
-    override fun addCompletions(completionParameters: CompletionParameters,
-                                processingContext: ProcessingContext,
-                                completionResultSet: CompletionResultSet) {
+    override fun addCompletions(session: CompletionSession) {
+        val completionParameters = session.parameters
+        val completionResultSet = session.resultSet
+
         val psi = completionParameters.position
         val indexExpr = psi.parent
 

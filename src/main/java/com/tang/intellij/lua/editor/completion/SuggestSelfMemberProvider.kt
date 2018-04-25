@@ -16,11 +16,8 @@
 
 package com.tang.intellij.lua.editor.completion
 
-import com.intellij.codeInsight.completion.CompletionParameters
-import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
@@ -35,9 +32,9 @@ import com.tang.intellij.lua.ty.isVisibleInScope
  * Created by TangZX on 2017/4/11.
  */
 class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
-    override fun addCompletions(completionParameters: CompletionParameters,
-                                processingContext: ProcessingContext,
-                                completionResultSet: CompletionResultSet) {
+    override fun addCompletions(session: CompletionSession) {
+        val completionParameters = session.parameters
+        val completionResultSet = session.resultSet
         val position = completionParameters.position
         val methodDef = PsiTreeUtil.getParentOfType(position, LuaClassMethodDef::class.java)
         if (methodDef != null && !methodDef.isStatic) {

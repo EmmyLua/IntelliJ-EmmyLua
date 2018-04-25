@@ -25,7 +25,6 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.ProcessingContext
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
@@ -34,9 +33,10 @@ import com.tang.intellij.lua.lang.type.LuaString
  *
  * Created by tangzx on 2016/12/25.
  */
-class RequirePathCompletionProvider : CompletionProvider<CompletionParameters>() {
-
-    override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
+class RequirePathCompletionProvider : LuaCompletionProvider() {
+    override fun addCompletions(session: CompletionSession) {
+        val completionParameters = session.parameters
+        val completionResultSet = session.resultSet
         val file = completionParameters.originalFile
         val cur = file.findElementAt(completionParameters.offset - 1)
         if (cur != null) {
