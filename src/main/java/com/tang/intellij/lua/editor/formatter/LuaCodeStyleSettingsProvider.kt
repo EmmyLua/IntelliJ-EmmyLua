@@ -38,7 +38,7 @@ class LuaCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
             override fun createPanel(codeStyleSettings: CodeStyleSettings): CodeStyleAbstractPanel {
                 val language = LuaLanguage.INSTANCE
                 val currentSettings = currentSettings
-                return object : TabbedLanguageCodeStylePanel(language, currentSettings, settings) {
+                return object : TabbedLanguageCodeStylePanel(language, currentSettings, codeStyleSettings) {
                     override fun initTabs(styleSettings: CodeStyleSettings) {
                         //super.initTabs(styleSettings);
                         addIndentOptionsTab(styleSettings)
