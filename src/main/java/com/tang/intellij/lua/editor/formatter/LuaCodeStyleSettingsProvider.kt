@@ -31,7 +31,7 @@ import com.tang.intellij.lua.lang.LuaLanguage
  */
 class LuaCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
     override fun createSettingsPage(settings: CodeStyleSettings, originalSettings: CodeStyleSettings): Configurable {
-        return object : CodeStyleAbstractConfigurable(settings, originalSettings, "Lua") {
+        return object : CodeStyleAbstractConfigurable(settings, originalSettings, "EmmyLua") {
 
             override fun getHelpTopic() = "reference.settingsdialog.codestyle.lua"
 
@@ -51,7 +51,7 @@ class LuaCodeStyleSettingsProvider : CodeStyleSettingsProvider() {
         }
     }
 
-    override fun getConfigurableDisplayName() = LuaLanguage.INSTANCE.id
+    override fun getConfigurableDisplayName() = LuaLanguage.INSTANCE.displayName
 
     override fun createCustomSettings(settings: CodeStyleSettings?): CustomCodeStyleSettings? {
         return LuaCodeStyleSettings(settings)

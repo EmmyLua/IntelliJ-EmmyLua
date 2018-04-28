@@ -34,7 +34,9 @@ import com.tang.intellij.lua.psi.LuaTypes.*
  */
 class LuaFormattingModelBuilder : FormattingModelBuilder {
     override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
-        val ctx = LuaFormatContext(settings, settings.getCustomSettings(LuaCodeStyleSettings::class.java), createSpaceBuilder(settings))
+        val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
+        val luaSettings = settings.getCustomSettings(LuaCodeStyleSettings::class.java)
+        val ctx = LuaFormatContext(commonSettings, luaSettings, createSpaceBuilder(settings))
         return FormattingModelProvider.createFormattingModelForPsiFile(element.containingFile,
                 LuaScriptBlock(element,
                         Wrap.createWrap(WrapType.NONE, false),
@@ -46,6 +48,7 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
 
     private fun createSpaceBuilder(settings: CodeStyleSettings): SpacingBuilder {
         val luaCodeStyleSettings = settings.getCustomSettings(LuaCodeStyleSettings::class.java)
+        val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
 
         return SpacingBuilder(settings, LuaLanguage.INSTANCE)
                 .before(END).lineBreakInCode()
@@ -54,8 +57,8 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .around(ELSE).lineBreakInCode()
                 .before(ELSEIF).lineBreakInCode()
                 .after(LOCAL).spaces(1) //local<SPACE>
-                .before(COMMA).spaces(if (settings.SPACE_BEFORE_COMMA) 1 else 0)
-                .after(COMMA).spaces(if (settings.SPACE_AFTER_COMMA) 1 else 0) //,<SPACE>
+                .before(COMMA).spaces(if (commonSettings.SPACE_BEFORE_COMMA) 1 else 0)
+                .after(COMMA).spaces(if (commonSettings.SPACE_AFTER_COMMA) 1 else 0) //,<SPACE>
                 .between(LCURLY, TABLE_FIELD).spaces(1) // {<SPACE>1, 2 }
                 .between(TABLE_FIELD, RCURLY).spaces(1) // { 1, 2<SPACE>}
                 .before(TABLE_FIELD_SEP).none() // { 1<SPACE>, 2 }
@@ -64,9 +67,9 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .afterInside(RPAREN, FUNC_BODY).lineBreakInCode()
                 .between(FUNCTION, FUNC_BODY).none()
                 .between(FUNCTION, NAME_DEF).spaces(1) //function<SPACE>name()
-                .around(BINARY_OP).spaces(if (settings.SPACE_AROUND_ASSIGNMENT_OPERATORS) 1 else 0)
+                .around(BINARY_OP).spaces(if (commonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS) 1 else 0)
                 .around(UNARY_OP).none()
-                .around(ASSIGN).lineBreakOrForceSpace(false, settings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
+                .around(ASSIGN).lineBreakOrForceSpace(false, commonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
                 .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
                 .around(LBRACK).none() // [
                 .before(RBRACK).none() // ]

@@ -21,7 +21,7 @@ import com.intellij.application.options.IndentOptionsEditor
 import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SPACES_OTHER
-import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.WRAPPING_FIELDS_VARIABLES_GROUPS
+import com.intellij.psi.codeStyle.CommonCodeStyleSettings
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
 import com.tang.intellij.lua.lang.LuaLanguage
 
@@ -38,6 +38,12 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
 
     override fun getIndentOptionsEditor(): IndentOptionsEditor {
         return SmartIndentOptionsEditor()
+    }
+
+    override fun getDefaultCommonSettings(): CommonCodeStyleSettings {
+        val commonSettings = CommonCodeStyleSettings(language)
+        commonSettings.initIndentOptions()
+        return commonSettings
     }
 
     override fun customizeSettings(consumer: CodeStyleSettingsCustomizable, settingsType: LanguageCodeStyleSettingsProvider.SettingsType) {
