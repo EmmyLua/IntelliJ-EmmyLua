@@ -17,12 +17,12 @@
 <idea-plugin>
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
     Support for Lua programming language.<br>
-    <p><a href="https://github.com/EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://emmylua.github.io/donate.html">Donate</a> | <a href="https://emmylua.github.io/?plugin">Doc</a></p>
+    <p><a href="https://github.com/EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://emmylua.github.io/donate.html">Donate</a> | <a href="https://emmylua.github.io/?plugin">Doc</a> | <a href="https://github.com/EmmyLua/VSCode-EmmyLua">VSCode-EmmyLua</a></p>
     Features:
     <ul>
         <li>Syntax highlighting</li>
@@ -69,6 +69,14 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.2.4</strong>
+    <ul>
+        <li>[IMPROVE]improved class members completion</li>
+        <li>[FIX]code style can not saved</li>
+        <li>[FIX]fix target application crash when attach debugger attached</li>
+        <li>bug fix #121 #126 #129 #134 #135 #138 #141</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
     <strong>1.2.3</strong>
     <ul>
         <li>Compatible with IDEA2018.1</li>
@@ -109,21 +117,6 @@
         <li>[IMPROVE]highlight unary && binary expression range</li>
         <li>[NEW]now support use .net dll as lib to provide lua apis (useful for unity developers)</li>
         <li>fix bug #43 #72 #79 #81 #83 #86</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-
-    <strong>1.2.0</strong>
-    <ul>
-        <li>[NEW] Breadcrumbs info</li>
-        <li>[NEW] Spell checker support</li>
-        <li>[NEW] New inspection: Local name hides previous</li>
-        <li>[Experimental] Type checker. Settings - Editor - Inspections - Lua > Lint > Type safety (Contribution from @Perry van Wesel)</li>
-        <li>[IMPROVE] Performance optimization</li>
-        <li>[IMPROVE] Structure View (Contribution from @Marco Qualizza)</li>
-        <li>[IMPROVE] Emmydoc now supports markdown</li>
-        <li>[IMPROVE] Name suggestion</li>
-        <li>[IMPROVE] Variable name suggestion/completion</li>
-        <li>[FIX] Bug #54 #55 #63 #66 #69</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
     ]]>
