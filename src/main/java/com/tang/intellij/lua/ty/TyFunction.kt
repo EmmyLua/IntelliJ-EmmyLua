@@ -100,6 +100,8 @@ abstract class FunSignatureBase(override val selfCall: Boolean,
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
+            if (params.size != other.params.size)
+                return false
             return params.indices.none { params[it] != other.params.getOrNull(it) }
         }
         return false
