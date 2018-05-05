@@ -22,9 +22,12 @@ import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.StringEscapesTokenTypes
 import com.intellij.psi.tree.IElementType
-import com.intellij.psi.tree.TokenSet
 import com.tang.intellij.lua.comment.psi.LuaDocTokenType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
+import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.DOC_KEYWORD_TOKENS
+import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.DOC_TAG_TOKENS
+import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.KEYWORD_TOKENS
+import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.PRIMITIVE_TYPE_SET
 import com.tang.intellij.lua.psi.LuaRegionTypes
 import com.tang.intellij.lua.psi.LuaStringTypes
 import com.tang.intellij.lua.psi.LuaTypes
@@ -54,53 +57,7 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
 
     companion object {
 
-        val KEYWORD_TOKENS = TokenSet.create(
-                LuaTypes.AND,
-                LuaTypes.BREAK,
-                LuaTypes.DO,
-                LuaTypes.ELSE,
-                LuaTypes.ELSEIF,
-                LuaTypes.END,
-                LuaTypes.FOR,
-                LuaTypes.FUNCTION,
-                LuaTypes.IF,
-                LuaTypes.IN,
-                LuaTypes.LOCAL,
-                LuaTypes.NOT,
-                LuaTypes.OR,
-                LuaTypes.REPEAT,
-                LuaTypes.RETURN,
-                LuaTypes.THEN,
-                LuaTypes.UNTIL,
-                LuaTypes.WHILE,
 
-                //lua5.3
-                LuaTypes.DOUBLE_COLON,
-                LuaTypes.GOTO
-        )
-        val PRIMITIVE_TYPE_SET = TokenSet.create(
-                LuaTypes.FALSE,
-                LuaTypes.NIL,
-                LuaTypes.TRUE
-        )
-        val DOC_TAG_TOKENS = TokenSet.create(
-                LuaDocTypes.TAG_PARAM,
-                LuaDocTypes.TAG_RETURN,
-                LuaDocTypes.TAG_CLASS,
-                LuaDocTypes.TAG_MODULE,
-                LuaDocTypes.TAG_TYPE,
-                LuaDocTypes.TAG_FIELD,
-                LuaDocTypes.TAG_LANGUAGE,
-                LuaDocTypes.TAG_OVERLOAD,
-                LuaDocTypes.TAG_PRIVATE,
-                LuaDocTypes.TAG_PROTECTED,
-                LuaDocTypes.TAG_PUBLIC,
-                LuaDocTypes.TAG_SEE,
-                LuaDocTypes.TAG_GENERIC
-        )
-        private val DOC_KEYWORD_TOKENS = TokenSet.create(
-                LuaDocTypes.FUN
-        )
 
         private val ourMap1: Map<IElementType, TextAttributesKey>
         private val ourMap2: Map<IElementType, TextAttributesKey>

@@ -27,8 +27,8 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
 import com.tang.intellij.lua.search.SearchContext
@@ -43,7 +43,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
     init {
         extend(CompletionType.BASIC, SHOW_DOC_TAG, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
-                val set = LuaSyntaxHighlighter.DOC_TAG_TOKENS
+                val set = LuaParserDefinition.DOC_TAG_TOKENS
                 for (type in set.types) {
                     completionResultSet.addElement(LookupElementBuilder.create(type).withIcon(LuaIcons.ANNOTATION))
                 }

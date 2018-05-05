@@ -23,9 +23,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.tang.intellij.lua.editor.formatter.blocks.LuaScriptBlock
-import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaLanguage
-
+import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 /**
@@ -70,7 +69,7 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .around(BINARY_OP).spaces(if (commonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS) 1 else 0)
                 .around(UNARY_OP).none()
                 .around(ASSIGN).lineBreakOrForceSpace(false, commonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
-                .around(LuaSyntaxHighlighter.KEYWORD_TOKENS).spaces(1)
+                .around(LuaParserDefinition.KEYWORD_TOKENS).spaces(1)
                 .around(LBRACK).none() // [
                 .before(RBRACK).none() // ]
                 .after(LPAREN).none() // no spaces after (

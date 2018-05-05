@@ -20,8 +20,8 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.tree.TokenSet
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.highlighting.LuaSyntaxHighlighter
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
@@ -44,8 +44,7 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
                 LuaIcons.LOCAL_FUNCTION
 
             ty.process(Processor {
-                val le = TyFunctionLookupElement(name, psi, it, false, false, ty, icon)
-                le.handler = SignatureInsertHandler(it)
+                val le = LookupElementFactory.createFunctionLookupElement(name, psi, it, false, ty, icon)
                 session.resultSet.addElement(le)
                 true
             })
@@ -68,7 +67,7 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
                     if (psi is LuaParamNameDef)
                         icon = LuaIcons.PARAMETER
 
-                    val elementBuilder = LuaTypeGuessableLookupElement(name, psi, type, false, icon)
+                    val elementBuilder = LookupElementFactory.createGuessableLookupElement(name, psi, type, icon)
                     session.resultSet.addElement(elementBuilder)
                 }
             }
@@ -119,11 +118,9 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
             for (keyWordToken in KEYWORD_TOKENS.types) {
                 session.addWord(keyWordToken.toString())
 
-                completionResultSet.addElement(LookupElementBuilder.create(keyWordToken)
-                        .withInsertHandler(KeywordInsertHandler(keyWordToken))
-                )
+                completionResultSet.addElement(LookupElementFactory.createKeyWordLookupElement(keyWordToken))
             }
-            for (primitiveToken in LuaSyntaxHighlighter.PRIMITIVE_TYPE_SET.types) {
+            for (primitiveToken in LuaParserDefinition.PRIMITIVE_TYPE_SET.types) {
                 session.addWord(primitiveToken.toString())
                 completionResultSet.addElement(LookupElementBuilder.create(primitiveToken))
             }

@@ -16,14 +16,16 @@
 
 package com.tang.intellij.lua.editor.completion
 
-import com.intellij.codeInsight.completion.*
+import com.intellij.codeInsight.completion.CompletionInitializationContext
+import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.completion.PrefixMatcher
+import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
-import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
@@ -151,18 +153,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                            handlerProcessor: HandlerProcessor?) {
         val name = field.name
         if (name != null) {
-            val element = LuaFieldLookupElement(name, field, bold)
-            if (!LuaRefactoringUtil.isLuaIdentifier(name)) {
-                element.lookupString = "['$name']"
-                val baseHandler = element.handler
-                element.handler = InsertHandler<LookupElement> { insertionContext, lookupElement ->
-                    baseHandler.handleInsert(insertionContext, lookupElement)
-                    // remove '.'
-                    insertionContext.document.deleteString(insertionContext.startOffset - 1, insertionContext.startOffset)
-                }
-            }
-            element.setTailText("  [$clazzName]")
-
+            val element = LookupElementFactory.createFieldLookupElement(clazzName, name, field, bold)
             val ele = handlerProcessor?.process(element, field, null) ?: element
             completionResultSet.addElement(ele)
         }
@@ -189,21 +180,15 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                 }
 
                 val lookupString = handlerProcessor?.processLookupString(name, classMember, fnTy) ?: name
-                val element = TyFunctionLookupElement(lookupString,
+
+                val element = LookupElementFactory.createMethodLookupElement(clazzName,
+                        lookupString,
                         classMember,
                         it,
                         bold,
                         isColonStyle,
                         fnTy,
-                        classMember.visibility.warpIcon(LuaIcons.CLASS_METHOD))
-                element.handler = SignatureInsertHandler(it, isColonStyle)
-
-                // looks like static
-                if (!isColonStyle)
-                    element.setItemTextUnderlined(true)
-
-                element.setTailText("  [$clazzName]")
-
+                        LuaIcons.CLASS_METHOD)
                 val ele = handlerProcessor?.process(element, classMember, fnTy) ?: element
                 completionResultSet.addElement(ele)
                 true
