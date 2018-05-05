@@ -34,16 +34,12 @@ class CompletionSession(val parameters: CompletionParameters, val resultSet: Com
         return words.add(word)
     }
 
-    fun containsWord(word: String): Boolean {
-        return words.contains(word)
-    }
-
     companion object {
 
-        var KEY = Key.create<CompletionSession>("lua.CompletionSession")
+        val KEY = Key.create<CompletionSession>("lua.CompletionSession")
 
-        operator fun get(completionParameters: CompletionParameters): CompletionSession? {
-            return completionParameters.editor.getUserData(KEY)
+        operator fun get(completionParameters: CompletionParameters): CompletionSession {
+            return completionParameters.editor.getUserData(KEY)!!
         }
     }
 }

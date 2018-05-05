@@ -140,7 +140,7 @@ class LuaCompletionContributor : CompletionContributor() {
         )
 
         private fun suggestWordsInFile(parameters: CompletionParameters) {
-            val session = CompletionSession[parameters]!!
+            val session = CompletionSession[parameters]
             val originalPosition = parameters.originalPosition
             if (originalPosition != null)
                 session.addWord(originalPosition.text)

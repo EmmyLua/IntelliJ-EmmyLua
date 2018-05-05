@@ -102,7 +102,6 @@ class RequirePathCompletionProvider : LuaCompletionProvider() {
     }
 
     companion object {
-
-        internal const val PATH_SPLITTER = '.'
+        private const val PATH_SPLITTER = '.'
     }
 }
