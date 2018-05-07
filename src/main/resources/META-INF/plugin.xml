@@ -154,6 +154,7 @@
         <sdkType implementation="com.tang.intellij.lua.project.LuaSdkType"/>
         <library.type implementation="com.tang.intellij.lua.project.LuaLibraryType"/>
         <indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>
+        <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
 
         <!-- unity dll -->
         <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
