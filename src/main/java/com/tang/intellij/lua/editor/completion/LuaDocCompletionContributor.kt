@@ -20,7 +20,6 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.Language
 import com.intellij.patterns.PlatformPatterns.psiElement
-import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
 import com.intellij.util.Processor
@@ -149,10 +148,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
     companion object {
 
         // 在 @ 之后提示 param class type ...
-        private val SHOW_DOC_TAG = psiElement().afterLeaf(
-                psiElement().withText("@")
-                        .afterSiblingSkipping(psiElement().withElementType(TokenType.WHITE_SPACE), psiElement().withElementType(LuaDocTypes.DASHES))
-        )
+        private val SHOW_DOC_TAG = psiElement(LuaDocTypes.TAG_NAME)
 
         // 在 @param 之后提示方法的参数
         private val AFTER_PARAM = psiElement().withParent(LuaDocParamNameRef::class.java)
