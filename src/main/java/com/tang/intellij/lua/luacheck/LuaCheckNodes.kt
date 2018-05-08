@@ -19,8 +19,6 @@ package com.tang.intellij.lua.luacheck
 import com.intellij.icons.AllIcons
 import com.intellij.ide.projectView.PresentationData
 import com.intellij.ide.projectView.ViewSettings
-import com.intellij.ide.projectView.impl.nodes.PackageElement
-import com.intellij.ide.projectView.impl.nodes.PackageElementNode
 import com.intellij.ide.projectView.impl.nodes.PsiFileNode
 import com.intellij.ide.util.treeView.AbstractTreeNode
 import com.intellij.openapi.fileEditor.OpenFileDescriptor
@@ -28,7 +26,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 
 class LCRootNode(project: Project) : AbstractTreeNode<Any>(project, project) {
-    val myChildren: ArrayList<AbstractTreeNode<*>> = arrayListOf()
+    private val myChildren: ArrayList<AbstractTreeNode<*>> = arrayListOf()
     override fun getChildren() = myChildren
 
     override fun update(data: PresentationData) {
@@ -44,12 +42,8 @@ class LCRootNode(project: Project) : AbstractTreeNode<Any>(project, project) {
     }
 }
 
-class LCPackageNode(project: Project, pkg: PackageElement) : PackageElementNode(project, pkg, ViewSettings.DEFAULT) {
-    val myChildren: ArrayList<AbstractTreeNode<*>> = arrayListOf()
-}
-
 class LCPsiFileNode(project: Project, file: PsiFile) : PsiFileNode(project, file, ViewSettings.DEFAULT) {
-    val myChildren: ArrayList<AbstractTreeNode<*>> = arrayListOf()
+    private val myChildren: ArrayList<AbstractTreeNode<*>> = arrayListOf()
 
     override fun getChildrenImpl() = myChildren
 
