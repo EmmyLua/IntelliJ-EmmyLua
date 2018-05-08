@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.debugger.remote;
 
-import com.intellij.compiler.options.CompileStepBeforeRun;
 import com.intellij.execution.BeforeRunTask;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -42,7 +41,7 @@ public class LuaMobConfigurationFactory extends ConfigurationFactory {
 
     @Override
     public void configureBeforeRunTaskDefaults(Key<? extends BeforeRunTask> providerID, BeforeRunTask task) {
-        if (providerID == CompileStepBeforeRun.ID)
+        if ("Make".equals(providerID.toString()))
             task.setEnabled(false);
     }
 }
