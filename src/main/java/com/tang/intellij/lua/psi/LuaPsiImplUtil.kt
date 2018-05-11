@@ -350,23 +350,8 @@ fun setName(indexExpr: LuaIndexExpr, name: String): PsiElement {
     return indexExpr
 }
 
-fun guessValueType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
-    var ret: ITy = Ty.UNKNOWN
-    val assignStat = indexExpr.assignStat
-    if (assignStat != null) {
-        ret = context.withIndex(assignStat.getIndexFor(indexExpr)) {
-            assignStat.valueExprList?.guessTypeAt(context) ?: Ty.UNKNOWN
-        }
-    }
-    return ret
-}
-
 fun findField(table: LuaTableExpr, fieldName: String): LuaTableField? {
     return table.tableFieldList.firstOrNull { fieldName == it.name }
-}
-
-fun getTableFieldList(table: LuaTableExpr): List<LuaTableField> {
-    return PsiTreeUtil.getStubChildrenOfTypeAsList(table, LuaTableField::class.java)
 }
 
 fun getParamNameDefList(funcBodyOwner: LuaFuncBodyOwner): List<LuaParamNameDef> {

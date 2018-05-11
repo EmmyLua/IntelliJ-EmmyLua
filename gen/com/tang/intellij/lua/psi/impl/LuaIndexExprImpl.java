@@ -86,11 +86,6 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
-  @NotNull
-  public ITy guessValueType(SearchContext context) {
-    return LuaPsiImplUtilKt.guessValueType(this, context);
-  }
-
   @Override
   @Nullable
   public PsiElement getDot() {

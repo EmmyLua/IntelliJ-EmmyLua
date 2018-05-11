@@ -311,8 +311,12 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         // xxx.yyy = zzz
         //from value
         var result: ITy = Ty.UNKNOWN
-        val valueTy: ITy = indexExpr.guessValueType(context)
-        result = result.union(valueTy)
+        val assignStat = indexExpr.assignStat
+        if (assignStat != null) {
+            result = context.withIndex(assignStat.getIndexFor(indexExpr)) {
+                assignStat.valueExprList?.guessTypeAt(context) ?: Ty.UNKNOWN
+            }
+        }
 
         //from other class member
         val propName = indexExpr.name

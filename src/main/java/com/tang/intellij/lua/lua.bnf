@@ -399,7 +399,6 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         toString
 
         guessParentType
-        guessValueType
 
         dot = 'DOT'
         colon = 'COLON'

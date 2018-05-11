@@ -43,9 +43,6 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, LuaClassM
   @NotNull
   ITy guessParentType(SearchContext context);
 
-  @NotNull
-  ITy guessValueType(SearchContext context);
-
   @Nullable
   PsiElement getDot();
 
