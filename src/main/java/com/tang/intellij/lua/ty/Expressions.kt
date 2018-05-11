@@ -180,13 +180,6 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
         }
     }
 
-    //todo TyFunction
-    if (Ty.isInvalid(ret)) {
-        val bodyOwner = luaCallExpr.resolveFuncBodyOwner(context)
-        if (bodyOwner != null)
-            ret = inferReturnTy(bodyOwner, context)
-    }
-
     // xxx.new()
     if (expr is LuaIndexExpr) {
         val fnName = expr.name
