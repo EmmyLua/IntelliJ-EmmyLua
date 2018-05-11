@@ -26,8 +26,6 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.LuaPsiFile
-import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.Ty
 
 /**
 
@@ -61,13 +59,6 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
                 if (file is LuaPsiFile)
                     return LuaFileStub(file, file.moduleName)
                 return super.createStubForFile(file)
-            }
-
-            override fun buildStubTree(file: PsiFile): StubElement<*> {
-                val t = System.currentTimeMillis()
-                val tree = super.buildStubTree(file)
-                println("===>${System.currentTimeMillis()-t}")
-                return tree
             }
         }
     }
