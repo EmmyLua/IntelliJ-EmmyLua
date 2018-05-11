@@ -60,15 +60,17 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexExprStub {
         val stat = indexExpr.assignStat
         val docTy = stat?.comment?.docTy
-
-        val context = SearchContext(indexExpr.project, indexExpr.containingFile, true)
-        val ty = indexExpr.guessParentType(context)
         val classNameSet = mutableSetOf<String>()
-        TyUnion.each(ty) {
-            if (it is ITyClass)
-                classNameSet.add(it.className)
+
+        if (stat != null) {
+            val context = SearchContext(indexExpr.project, indexExpr.containingFile, true)
+            val ty = indexExpr.guessParentType(context)
+            TyUnion.each(ty) {
+                if (it is ITyClass)
+                    classNameSet.add(it.className)
+            }
+            context.forStore = false
         }
-        context.forStore = false
         val visibility = indexExpr.visibility
 
         return LuaIndexExprStubImpl(classNameSet.toTypedArray(),
