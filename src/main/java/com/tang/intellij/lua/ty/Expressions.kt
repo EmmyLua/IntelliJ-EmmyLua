@@ -285,6 +285,7 @@ private fun LuaLiteralExpr.infer(): ITy {
 private fun LuaIndexExpr.infer(context: SearchContext): ITy {
     val retTy = recursionGuard(this, Computable {
         val indexExpr = this
+        var parentTy: ITy? = null
         // xxx[yyy] as an array element?
         if (indexExpr.brack) {
             val tySet = indexExpr.guessParentType(context)
@@ -301,6 +302,8 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
                 if (it is ITyGeneric) ty = ty.union(it.getParamTy(1))
             }
             if (ty !is TyUnknown) return@Computable ty
+
+            parentTy = tySet
         }
 
         //from @type annotation
@@ -321,7 +324,7 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         //from other class member
         val propName = indexExpr.name
         if (propName != null) {
-            val prefixType = indexExpr.guessParentType(context)
+            val prefixType = parentTy ?: indexExpr.guessParentType(context)
 
             prefixType.eachTopClass(Processor {
                 result = result.union(guessFieldType(propName, it, context))
