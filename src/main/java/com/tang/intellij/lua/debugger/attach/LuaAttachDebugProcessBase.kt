@@ -53,6 +53,7 @@ import com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem
 import com.tang.intellij.lua.debugger.attach.vfs.MemoryVirtualFile
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaFileUtil
+import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -153,7 +154,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
             } }}
             is DMBreak -> onBreak(message)
             is DMException -> message.print()
-            is DMMessage -> message.print()
+            is DMMessage -> handleLogMessage(message)
             is DMRespProfilerData -> onProfilerData(message)
             is DMLoadError -> onLoadError(message)
             else -> {
@@ -175,6 +176,25 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
                     }
                 }
             }
+        }
+    }
+
+    private var stdoutIncompleteString = IncompleteString()
+    private var stderrIncompleteString = IncompleteString()
+
+    private fun handleLogMessage(message: DMMessage) {
+        when (message.type) {
+            DMMessage.Stdout -> {
+                stdoutIncompleteString.append(message.bytes)
+                val text = stdoutIncompleteString.decode(Charset.forName("UTF-8"))
+                print(text, LogConsoleType.NORMAL, ConsoleViewContentType.NORMAL_OUTPUT)
+            }
+            DMMessage.Stderr -> {
+                stderrIncompleteString.append(message.bytes)
+                val text = stderrIncompleteString.decode(Charset.forName("UTF-8"))
+                print(text, LogConsoleType.NORMAL, ConsoleViewContentType.ERROR_OUTPUT)
+            }
+            else -> message.print()
         }
     }
 
