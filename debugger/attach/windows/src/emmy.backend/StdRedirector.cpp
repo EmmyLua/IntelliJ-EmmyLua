@@ -8,7 +8,7 @@ StdRedirector::~StdRedirector()
 
 }
 
-void StdRedirector::redirect(const std::function<void(const char*, int)>& handler)
+void StdRedirector::redirect(const std::function<void(const char*, size_t)>& handler)
 {
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);

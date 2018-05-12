@@ -50,15 +50,24 @@ void DMLoadError::Write(ByteOutputStream* stream)
 	stream->WriteString(message);
 }
 
-DMMessage::DMMessage(MessageType type, const char* message): DebugMessage(DebugMessageId::Message), type(type), message(message)
+DMMessage::DMMessage(MessageType type, const char* message, size_t size): DebugMessage(DebugMessageId::Message), type(type)
 {
+	this->message = (char*) malloc(size);
+	memcpy(this->message, message, size);
+	this->messageSize = size;
+}
+
+DMMessage::~DMMessage()
+{
+	delete this->message;
 }
 
 void DMMessage::Write(ByteOutputStream* stream)
 {
 	DebugMessage::Write(stream);
 	stream->WriteUInt32(type);
-	stream->WriteString(message);
+	stream->WriteUInt32(this->messageSize);
+	stream->Write((void*)this->message, this->messageSize);
 }
 
 DMLoadScript::DMLoadScript(): DebugMessage(DebugMessageId::LoadScript), index(0), state(0)

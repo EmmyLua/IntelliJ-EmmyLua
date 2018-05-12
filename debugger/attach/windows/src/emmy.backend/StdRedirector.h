@@ -10,7 +10,7 @@ public:
 	StdRedirector(int target): m_target(target) {};
 	~StdRedirector();
 
-	void redirect(const std::function<void(const char*, int)>& handler);
+	void redirect(const std::function<void(const char*, size_t)>& handler);
 private:
 	int m_target;
 	HANDLE m_hChildStd_Rd = nullptr;

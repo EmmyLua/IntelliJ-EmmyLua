@@ -180,7 +180,9 @@ class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
         const val Stderr = 4
     }
 
-    lateinit var message: String
+    val message: String by lazy { String(bytes, Charset.forName("UTF-8")) }
+
+    lateinit var bytes: ByteArray
         private set
     var type: Int = 0
         private set
@@ -188,7 +190,8 @@ class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
     override fun read(stream: DataInputStream) {
         super.read(stream)
         type = stream.readInt()
-        message = stream.readString().replace("\r\n", "\n")
+        val len = stream.readInt()
+        bytes = stream.readBytes(len)
     }
 
     fun print() {

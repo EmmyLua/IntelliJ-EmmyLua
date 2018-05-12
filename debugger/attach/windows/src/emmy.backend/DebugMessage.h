@@ -105,12 +105,14 @@ public:
 class DMMessage : public DebugMessage
 {
 public:
-	DMMessage(MessageType type, const char* message);
+	DMMessage(MessageType type, const char* message, size_t size);
+	~DMMessage();
 
 	void Write(ByteOutputStream* stream) override;
 
 	MessageType type;
-	std::string message;
+	char* message;
+	size_t messageSize;
 };
 
 class DMLoadScript : public DebugMessage
