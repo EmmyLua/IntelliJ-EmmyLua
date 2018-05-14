@@ -3,25 +3,24 @@
 #include <io.h>
 #include <thread>
 
-StdRedirector::~StdRedirector()
-{
-
-}
-
 void StdRedirector::redirect(const std::function<void(const char*, size_t)>& handler)
 {
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 	saAttr.bInheritHandle = TRUE;
 	saAttr.lpSecurityDescriptor = nullptr;
-	bool s = CreatePipe(&m_hChildStd_Rd, &m_hChildStd_Wr, &saAttr, 0);
-	old = _dup(m_target);
+	
+	CreatePipe(&m_hChildStd_Rd, &m_hChildStd_Wr, &saAttr, 0);
+	
+	const auto old = _dup(m_target);
 	if (old == -1)
 	{
 		perror("_dup failure");
 		return;
 	}
-	stream = _open_osfhandle(reinterpret_cast<long>(m_hChildStd_Wr), 0);
+
+	const auto stream = _open_osfhandle(reinterpret_cast<long>(m_hChildStd_Wr), 0);
+	FILE* test = nullptr;
 	if (stream != -1)
 		test = _fdopen(stream, "wt");
 
@@ -32,6 +31,7 @@ void StdRedirector::redirect(const std::function<void(const char*, size_t)>& han
 		return;
 	}
 	setvbuf(stdout, nullptr, _IONBF, 0);
+
 	std::thread thread([this, handler]()
 	{
 		char buf[1024] = { 0 };
