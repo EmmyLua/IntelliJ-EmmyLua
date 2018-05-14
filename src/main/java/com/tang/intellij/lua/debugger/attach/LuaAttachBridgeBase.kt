@@ -17,9 +17,11 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.process.OSProcessHandler
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
+import com.tang.intellij.lua.debugger.LogConsoleType
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -139,9 +141,10 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
                 handleMsg(bytes)
             }
         } catch (e: SocketException) {
+            process.println("debugger disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
             session.stop()
         } catch (e: Exception) {
-            e.printStackTrace()
+            e.message?.let { process.error(it, LogConsoleType.NORMAL) }
             session.stop()
         }
     }

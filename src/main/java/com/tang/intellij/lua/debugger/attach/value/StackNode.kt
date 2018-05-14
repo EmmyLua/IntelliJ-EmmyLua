@@ -82,7 +82,7 @@ class EvalResultNode(L: Long, process: LuaAttachDebugProcessBase) : StackNodeCon
         super.read(stream)
         success = stream.readBoolean()
         if (!success)
-            error = stream.readString()
+            error = stream.readString(process.charset)
     }
 
     val value: LuaXValue get() {
@@ -105,7 +105,7 @@ class StackRootNode(L: Long, process: LuaAttachDebugProcessBase) : StackNodeCont
         super.read(stream)
         scriptIndex = stream.readInt()
         line = stream.readInt()
-        functionName = stream.readString()
+        functionName = stream.readString(process.charset)
     }
 
 }

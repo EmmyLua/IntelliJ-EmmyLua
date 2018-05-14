@@ -105,8 +105,8 @@ open class LuaXObjectValue(val id: StackNodeId, L: Long, process: LuaAttachDebug
     lateinit var data: String
 
     override fun read(stream: DataInputStream) {
-        name = stream.readString()
-        type = stream.readString()
-        data = stream.readString()
+        name = stream.readString(process.charset)
+        type = stream.readString(process.charset)
+        data = stream.readString(process.charset)
     }
 }

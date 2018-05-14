@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.ui.ConsoleViewContentType
-import com.intellij.openapi.vfs.CharsetToolkit
 import com.intellij.util.PathUtil
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.frame.XStackFrame
@@ -145,12 +144,11 @@ fun DataOutputStream.writeSize(size: Long) {
     writeLong(size)
 }
 
-fun DataInputStream.readString(): String {
+fun DataInputStream.readString(charset: Charset): String {
     val len = this.readInt()
     val bytes = ByteArray(len)
     this.read(bytes)
 
-    val charset = CharsetToolkit(bytes).guessEncoding(bytes.size)
     return String(bytes, charset)
 }
 
@@ -211,7 +209,7 @@ class DMException : LuaAttachMessage(DebugMessageId.Exception) {
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
-        message = stream.readString()
+        message = stream.readString(process.charset)
     }
 
     fun print() {
@@ -231,8 +229,8 @@ class DMLoadScript : LuaAttachMessage(DebugMessageId.LoadScript) {
 
     override fun read(stream: DataInputStream) {
         super.read(stream)
-        fileName = PathUtil.getCanonicalPath(stream.readString())
-        source = stream.readString()
+        fileName = PathUtil.getCanonicalPath(stream.readString(process.charset))
+        source = stream.readString(process.charset)
         index = stream.readInt()
 
         val stateCode = stream.readByte()
@@ -244,7 +242,7 @@ class DMLoadError : LuaAttachMessage(DebugMessageId.LoadError) {
     var message: String = ""
     override fun read(stream: DataInputStream) {
         super.read(stream)
-        message = stream.readString()
+        message = stream.readString(process.charset)
     }
 }
 
@@ -382,8 +380,8 @@ class DMRespProfilerData : LuaAttachMessage(DebugMessageId.RespProfilerData) {
         val size = stream.readInt()
         for (i in 0 until size) {
             val id = stream.readInt()
-            val file = PathUtil.getCanonicalPath(stream.readString())
-            val function = stream.readString()
+            val file = PathUtil.getCanonicalPath(stream.readString(process.charset))
+            val function = stream.readString(process.charset)
             val line = stream.readInt()
             val count = stream.readInt()
             val time = stream.readInt()
