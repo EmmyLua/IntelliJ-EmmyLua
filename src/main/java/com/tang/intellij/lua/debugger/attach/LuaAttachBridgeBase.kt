@@ -42,7 +42,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
     private val callbackMap = HashMap<Int, EvalInfo>()
     private var socket = Socket()
     /**
-     * capture stdin & stdout
+     * capture stderr & stdout
      */
     var captureStd: Boolean = false
 

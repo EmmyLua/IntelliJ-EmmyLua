@@ -180,7 +180,7 @@ class DMMessage : LuaAttachMessage(DebugMessageId.Message) {
         const val Stderr = 4
     }
 
-    val message: String by lazy { String(bytes, Charset.forName("UTF-8")) }
+    val message: String by lazy { String(bytes, process.charset) }
 
     lateinit var bytes: ByteArray
         private set

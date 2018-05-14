@@ -78,6 +78,11 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         editorsProvider = LuaDebuggerEditorsProvider()
     }
 
+    /**
+     * stdout/stderr
+     */
+    open val charset: Charset get() = Charset.forName("UTF-8")
+
     protected abstract fun startBridge(): LuaAttachBridgeBase
 
     override fun sessionInitialized() {
@@ -186,12 +191,12 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         when (message.type) {
             DMMessage.Stdout -> {
                 stdoutIncompleteString.append(message.bytes)
-                val text = stdoutIncompleteString.decode(Charset.forName("UTF-8"))
+                val text = stdoutIncompleteString.decode(charset)
                 print(text, LogConsoleType.NORMAL, ConsoleViewContentType.NORMAL_OUTPUT)
             }
             DMMessage.Stderr -> {
                 stderrIncompleteString.append(message.bytes)
-                val text = stderrIncompleteString.decode(Charset.forName("UTF-8"))
+                val text = stderrIncompleteString.decode(charset)
                 print(text, LogConsoleType.NORMAL, ConsoleViewContentType.ERROR_OUTPUT)
             }
             else -> message.print()

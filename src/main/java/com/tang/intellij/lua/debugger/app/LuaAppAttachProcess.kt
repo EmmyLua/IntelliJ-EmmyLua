@@ -19,6 +19,7 @@ package com.tang.intellij.lua.debugger.app
 import com.intellij.xdebugger.XDebugSession
 import com.tang.intellij.lua.debugger.attach.LuaAttachBridgeBase
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
+import java.nio.charset.Charset
 
 /**
  *
@@ -26,8 +27,14 @@ import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
  */
 class LuaAppAttachProcess(session: XDebugSession) : LuaAttachDebugProcessBase(session) {
 
+    private var _charset: Charset? = null
+
+    override val charset: Charset
+        get() = _charset ?: super.charset
+
     override fun startBridge(): LuaAttachBridgeBase {
         val configuration = session.runProfile as LuaAppRunConfiguration
+        _charset = Charset.forName(configuration.charset)
 
         val bridge = LuaAppAttachBridge(this, session)
         this.bridge = bridge
