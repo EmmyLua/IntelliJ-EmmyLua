@@ -52,3 +52,14 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD reason, LPVOID reserved)
     return TRUE;
 
 }
+
+MessageType messageTypes[5] = { MessageType_Normal, MessageType_Warning,MessageType_Error,MessageType_Stdout, MessageType_Stderr };
+
+extern "C" int __declspec(dllexport) Message(const char* message, int type) {
+	MessageType messageType = MessageType_Normal;
+	if (messageType >= 0 && messageType < sizeof(messageTypes) / sizeof(int)) {
+		messageType = messageTypes[type];
+	}
+	DebugBackend::Get().Message(message, messageType);
+	return TRUE;
+}
