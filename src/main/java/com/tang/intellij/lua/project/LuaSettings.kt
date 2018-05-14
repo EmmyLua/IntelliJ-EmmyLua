@@ -55,6 +55,11 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
      */
     var enableGeneric: Boolean = false
 
+    /**
+     * (KB)
+     */
+    var tooLargerFileThreshold = 50
+
     override fun getState(): LuaSettings? {
         return this
     }

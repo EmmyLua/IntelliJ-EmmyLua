@@ -29,6 +29,7 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaLanguage
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.stubs.LuaFileStub
 
 /**
@@ -39,6 +40,12 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
 
     override fun getFileType(): FileType {
         return LuaFileType.INSTANCE
+    }
+
+    val tooLarger: Boolean get() {
+        val fileLimit = LuaSettings.instance.tooLargerFileThreshold * 1024
+        val fileSize = viewProvider.virtualFile.length
+        return fileSize > fileLimit
     }
 
     override fun setName(name: String): PsiElement {

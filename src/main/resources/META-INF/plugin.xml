@@ -226,6 +226,7 @@
 
         <!--highlighting-->
         <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LuaAnnotator" />
+        <annotator language="Lua" implementationClass="com.tang.intellij.lua.annotator.LargerFileAnnotator"/>
         <problemFileHighlightFilter implementation="com.tang.intellij.lua.highlighting.LuaProblemFileHighlightFilter"/>
         <colorSettingsPage implementation="com.tang.intellij.lua.editor.LuaColorSettingsPage"/>
         <additionalTextAttributes scheme="Default" file="colorSchemes/Default.xml"/>

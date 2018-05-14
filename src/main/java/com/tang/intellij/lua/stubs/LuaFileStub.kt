@@ -55,10 +55,19 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
 
     override fun getBuilder(): StubBuilder {
         return object : DefaultStubBuilder() {
+
+            private var isTooLarger = false
+
             override fun createStubForFile(file: PsiFile): StubElement<*> {
-                if (file is LuaPsiFile)
+                if (file is LuaPsiFile){
+                    isTooLarger = file.tooLarger
                     return LuaFileStub(file, file.moduleName)
+                }
                 return super.createStubForFile(file)
+            }
+
+            override fun skipChildProcessingWhenBuildingStubs(parent: ASTNode, node: ASTNode): Boolean {
+                return isTooLarger
             }
         }
     }
