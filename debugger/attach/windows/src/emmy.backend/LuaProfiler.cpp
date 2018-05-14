@@ -1,4 +1,4 @@
-﻿#include <ctime>
+#include <ctime>
 #include "LuaProfiler.h"
 #include "DebugBackend.h"
 #include "LuaDll.h"

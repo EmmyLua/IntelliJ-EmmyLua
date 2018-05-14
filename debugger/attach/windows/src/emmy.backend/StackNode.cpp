@@ -1,4 +1,4 @@
-﻿#include "StackNode.h"
+#include "StackNode.h"
 #include "Stream.h"
 
 StackNode::StackNode(StackNodeId id): id(id)

@@ -1,4 +1,4 @@
-﻿#include "StdRedirector.h"
+#include "StdRedirector.h"
 #include <process.h>
 #include <io.h>
 #include <thread>

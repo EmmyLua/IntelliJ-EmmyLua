@@ -1,4 +1,4 @@
-﻿#include "DebugMessage.h"
+#include "DebugMessage.h"
 #include "Stream.h"
 #include "LuaProfiler.h"
 #include "StackNode.h"

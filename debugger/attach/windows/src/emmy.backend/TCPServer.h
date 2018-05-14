@@ -1,4 +1,4 @@
-﻿
+
 #ifndef LUA_DEBUG_SERVER_H
 #define LUA_DEBUG_SERVER_H
 

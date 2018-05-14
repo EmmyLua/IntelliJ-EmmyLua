@@ -1,4 +1,4 @@
-﻿#include "DebugBackend.h"
+#include "DebugBackend.h"
 #include "LuaDll.h"
 #include "StackNode.h"
 

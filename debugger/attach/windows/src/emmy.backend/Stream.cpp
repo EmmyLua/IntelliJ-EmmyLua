@@ -1,4 +1,4 @@
-﻿#include "Stream.h"
+#include "Stream.h"
 #include <cstdlib>
 #include <cassert>
 #include "endian.h"

@@ -1,4 +1,4 @@
-﻿#include "DebugPipeline.h"
+#include "DebugPipeline.h"
 #include "TCPServer.h"
 #include "Stream.h"
 #include "DebugMessage.h"

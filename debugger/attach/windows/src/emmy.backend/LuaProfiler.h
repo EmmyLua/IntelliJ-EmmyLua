@@ -1,4 +1,4 @@
-﻿#ifndef _LUA_PROFILER_H_
+#ifndef _LUA_PROFILER_H_
 #define _LUA_PROFILER_H_
 #include <string>
 #include <stack>

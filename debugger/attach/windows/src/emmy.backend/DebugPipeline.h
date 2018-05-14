@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Stream.h"
 #include "Channel.h"
 #include "TCPServer.h"
