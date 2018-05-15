@@ -142,8 +142,10 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
         val className = thisType.className
         if (type is ITyFunction) {
             addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, type, thisType, callType, handlerProcessor)
-        } else if (member is LuaClassField && completionMode != MemberCompletionMode.Colon)
-            addField(completionResultSet, bold, className, member, type, handlerProcessor)
+        } else if (member is LuaClassField) {
+            if (completionMode != MemberCompletionMode.Colon)
+                addField(completionResultSet, bold, className, member, type, handlerProcessor)
+        }
     }
 
     protected fun addField(completionResultSet: CompletionResultSet,
