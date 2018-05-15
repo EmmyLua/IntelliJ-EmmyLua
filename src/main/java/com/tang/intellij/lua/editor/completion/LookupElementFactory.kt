@@ -79,8 +79,9 @@ class LookupElementFactory {
         fun createFieldLookupElement(clazzName: String,
                                      name: String,
                                      field: LuaClassField,
+                                     type:ITy?,
                                      bold: Boolean): LuaLookupElement {
-            val element = LuaFieldLookupElement(name, field, bold)
+            val element = LuaFieldLookupElement(name, field, type, bold)
             if (!LuaRefactoringUtil.isLuaIdentifier(name)) {
                 element.lookupString = "['$name']"
                 val baseHandler = element.handler

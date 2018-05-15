@@ -143,17 +143,18 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
         if (type is ITyFunction) {
             addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, type, thisType, callType, handlerProcessor)
         } else if (member is LuaClassField && completionMode != MemberCompletionMode.Colon)
-            addField(completionResultSet, bold, className, member, handlerProcessor)
+            addField(completionResultSet, bold, className, member, type, handlerProcessor)
     }
 
     protected fun addField(completionResultSet: CompletionResultSet,
                            bold: Boolean,
                            clazzName: String,
                            field: LuaClassField,
+                           ty:ITy?,
                            handlerProcessor: HandlerProcessor?) {
         val name = field.name
         if (name != null) {
-            val element = LookupElementFactory.createFieldLookupElement(clazzName, name, field, bold)
+            val element = LookupElementFactory.createFieldLookupElement(clazzName, name, field, ty, bold)
             val ele = handlerProcessor?.process(element, field, null) ?: element
             completionResultSet.addElement(ele)
         }

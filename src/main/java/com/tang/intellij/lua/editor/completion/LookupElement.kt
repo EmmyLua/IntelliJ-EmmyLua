@@ -68,15 +68,14 @@ open class LuaTypeGuessableLookupElement(name: String, val psi: LuaPsiElement, p
     }
 }
 
-class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bold: Boolean)
+class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, val ty:ITy?, bold: Boolean)
     : LuaLookupElement(fieldName, bold, null), LuaDocumentationLookupElement {
 
     override fun getDocumentationElement(context: SearchContext): PsiElement? {
         if (field.isValid)
             return field
         else {
-            val ty = this.ty
-            val clazz = TyUnion.getPerfectClass(ty)
+            val clazz = TyUnion.getPerfectClass(type)
             if (clazz != null) {
                 return clazz.findMember(fieldName, context)
             }
@@ -84,13 +83,13 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, bol
         return null
     }
 
-    val ty: ITy by lazy {
-        field.guessType(SearchContext(field.project))
+    val type: ITy by lazy {
+        ty ?: field.guessType(SearchContext(field.project))
     }
 
     private fun lazyInit() {
         icon = field.visibility.warpIcon(LuaIcons.CLASS_FIELD)
-        typeText = ty.displayName
+        typeText = type.displayName
     }
 
     override fun renderElement(presentation: LookupElementPresentation?) {
