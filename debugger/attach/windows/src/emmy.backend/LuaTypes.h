@@ -6,8 +6,8 @@
 extern "C"
 {
 	// comes from luaconf.h, must match the configuration of the VM being debugged
-	// ×¢Òâ£ºÓĞµÄÈË»áÔÚ luaconf.h ÀïĞŞ¸ÄÕâ¸öÊıÖµ£¬ËùÒÔÕâÀïÖ±½Ó°ÑÕâ¸öÖµ¸Ä´óÒ»Ğ©£¬
-	// ÎªµÄÊÇ±£Ö¤lua_Debug½á¹¹ÌåµÄsize±ÈËŞÖ÷µÄ´ó£¬·ñÔò¿ÉÄÜi_ciÖµÒì³£
+	// æ³¨æ„ï¼šæœ‰çš„äººä¼šåœ¨ luaconf.h é‡Œä¿®æ”¹è¿™ä¸ªæ•°å€¼ï¼Œæ‰€ä»¥è¿™é‡Œç›´æ¥æŠŠè¿™ä¸ªå€¼æ”¹å¤§ä¸€äº›ï¼Œ
+	// ä¸ºçš„æ˜¯ä¿è¯lua_Debugç»“æ„ä½“çš„sizeæ¯”å®¿ä¸»çš„å¤§ï¼Œå¦åˆ™å¯èƒ½i_ciå€¼å¼‚å¸¸
 	#define LUA_IDSIZE 1024
 
 	// the lua_Debug structure changes between Lua 5.1 and Lua 5.2
