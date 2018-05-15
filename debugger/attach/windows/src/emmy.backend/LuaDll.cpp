@@ -36,6 +36,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 #include <hash_map>
 #include <hash_set>
 #include <shlobj.h>
+#include "Utility.h"
 
 #pragma warning(disable:4311)
 #pragma warning(disable:4302)
@@ -2012,6 +2013,52 @@ std::string GetApplicationDirectory()
 
 }
 
+VOID WINAPI OutputDebugStringA_intercept(
+	_In_opt_ LPCSTR lpOutputString) {
+	OutputDebugStringA(lpOutputString);
+
+	DebugBackend::Get().Message(lpOutputString, MessageType_Stdout);
+}
+
+VOID WINAPI OutputDebugStringW_intercept(
+	_In_opt_ LPCWSTR lpOutputString) {
+	OutputDebugStringW(lpOutputString);
+
+	std::string s = WcharToChar(lpOutputString);
+
+	DebugBackend::Get().Message(s.c_str(), MessageType_Stdout);
+}
+
+void HookOuputDebugString()
+{
+	// OutputDebugStringA
+	{
+		TRACED_HOOK_HANDLE      hHook = new HOOK_TRACE_INFO();
+		ULONG                   ACLEntries[1] = { 0 };
+		NTSTATUS status = LhInstallHook(
+			OutputDebugStringA,
+			OutputDebugStringA_intercept,
+			nullptr,
+			hHook);
+		//assert(status == 0);
+		status = LhSetExclusiveACL(ACLEntries, 0, hHook);
+		//assert(status == 0);
+	}
+	// OutputDebugStringW
+	{
+		TRACED_HOOK_HANDLE      hHook = new HOOK_TRACE_INFO();
+		ULONG                   ACLEntries[1] = { 0 };
+		NTSTATUS status = LhInstallHook(
+			OutputDebugStringW,
+			OutputDebugStringW_intercept,
+			nullptr,
+			hHook);
+		//assert(status == 0);
+		status = LhSetExclusiveACL(ACLEntries, 0, hHook);
+		//assert(status == 0);
+	}
+}
+
 #define GET_FUNCTION_OPTIONAL(function)																						\
 {																															\
     stdext::hash_map<std::string, DWORD64>::const_iterator iterator = symbols.find(#function);								\
@@ -2273,7 +2320,7 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 		DebugBackend::Get().Message("Debugger attached to process.");
 		g_loadedLuaFunctions = true;
 	}
-
+	HookOuputDebugString();
 	EnableIntercepts(api, true);
 	return true;
 
