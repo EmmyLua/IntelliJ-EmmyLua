@@ -18,7 +18,6 @@ package com.tang.intellij.lua.project;
 
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -29,6 +28,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.nio.charset.Charset;
+import java.util.Objects;
+import java.util.SortedMap;
 
 /**
  *
@@ -46,6 +48,9 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox recognizeGlobalNameAsCheckBox;
     private LuaAdditionalSourcesRootPanel additionalRoots;
     private JCheckBox enableGenericCheckBox;
+    private JCheckBox captureOutputDebugString;
+    private JCheckBox captureStd;
+    private JComboBox<String> defaultCharset;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -57,7 +62,15 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         nilStrict.setSelected(settings.isNilStrict());
         recognizeGlobalNameAsCheckBox.setSelected(settings.isRecognizeGlobalNameAsType());
         additionalRoots.setRoots(settings.getAdditionalSourcesRoot());
-        enableGenericCheckBox.setEnabled(settings.getEnableGeneric());
+        enableGenericCheckBox.setSelected(settings.getEnableGeneric());
+
+        captureStd.setSelected(settings.getAttachDebugCaptureStd());
+        captureOutputDebugString.setSelected(settings.getAttachDebugCaptureOutput());
+
+        SortedMap<String, Charset> charsetSortedMap = Charset.availableCharsets();
+        ComboBoxModel<String> outputCharsetModel = new DefaultComboBoxModel<>(ArrayUtil.toStringArray(charsetSortedMap.keySet()));
+        defaultCharset.setModel(outputCharsetModel);
+        defaultCharset.setSelectedItem(settings.getAttachDebugDefaultCharsetName());
     }
 
     @NotNull
@@ -88,6 +101,9 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
                 settings.isNilStrict() != nilStrict.isSelected() ||
                 settings.isRecognizeGlobalNameAsType() != recognizeGlobalNameAsCheckBox.isSelected() ||
                 settings.getEnableGeneric() != enableGenericCheckBox.isSelected() ||
+                settings.getAttachDebugCaptureOutput() != captureOutputDebugString.isSelected() ||
+                settings.getAttachDebugCaptureStd() != captureStd.isSelected() ||
+                settings.getAttachDebugDefaultCharsetName() != defaultCharset.getSelectedItem() ||
                 !ArrayUtil.equals(settings.getAdditionalSourcesRoot(), additionalRoots.getRoots(), String::compareTo);
     }
 
@@ -103,6 +119,9 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setRecognizeGlobalNameAsType(recognizeGlobalNameAsCheckBox.isSelected());
         settings.setAdditionalSourcesRoot(additionalRoots.getRoots());
         settings.setEnableGeneric(enableGenericCheckBox.isSelected());
+        settings.setAttachDebugCaptureOutput(captureOutputDebugString.isSelected());
+        settings.setAttachDebugCaptureStd(captureStd.isSelected());
+        settings.setAttachDebugDefaultCharsetName((String)Objects.requireNonNull(defaultCharset.getSelectedItem()));
 
         for (Project project : ProjectManager.getInstance().getOpenProjects()) {
             DaemonCodeAnalyzer.getInstance(project).restart();

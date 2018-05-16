@@ -21,6 +21,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil
+import java.nio.charset.Charset
 
 /**
  *
@@ -60,6 +61,12 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
      */
     var tooLargerFileThreshold = 50
 
+    var attachDebugDefaultCharsetName = "UTF-8"
+
+    var attachDebugCaptureStd = true
+
+    var attachDebugCaptureOutput = true
+
     override fun getState(): LuaSettings? {
         return this
     }
@@ -75,6 +82,10 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
         set(value) {
             constructorNames = value.split(";").map { it.trim() }.toTypedArray()
         }
+
+    val attachDebugDefaultCharset: Charset get() {
+        return Charset.forName(attachDebugDefaultCharsetName) ?: Charset.forName("UTF-8")
+    }
 
     companion object {
 

@@ -158,13 +158,15 @@ fun DataInputStream.readSize(): Long {
 
 class DMReqInitialize(private val symbolsDirectory: String,
                       private val emmyLuaFile: String,
-                      private val captureStd: Boolean = false)
+                      private val captureStd: Boolean = false,
+                      private val captureOutputDebugString: Boolean = true)
     : LuaAttachMessage(DebugMessageId.ReqInitialize) {
     override fun write(stream: DataOutputStream) {
         super.write(stream)
         stream.writeString(symbolsDirectory)
         stream.writeString(emmyLuaFile)
         stream.writeBoolean(captureStd)
+        stream.writeBoolean(captureOutputDebugString)
     }
 }
 

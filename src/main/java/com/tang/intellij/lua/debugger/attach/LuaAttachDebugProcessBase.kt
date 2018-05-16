@@ -52,6 +52,7 @@ import com.tang.intellij.lua.debugger.attach.vfs.MemoryDataVirtualFile
 import com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem
 import com.tang.intellij.lua.debugger.attach.vfs.MemoryVirtualFile
 import com.tang.intellij.lua.lang.LuaIcons
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.nio.charset.Charset
 import java.util.concurrent.ConcurrentHashMap
@@ -81,7 +82,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     /**
      * stdout/stderr
      */
-    open val charset: Charset get() = Charset.forName("UTF-8")
+    open val charset: Charset get() = LuaSettings.instance.attachDebugDefaultCharset
 
     protected abstract fun startBridge(): LuaAttachBridgeBase
 

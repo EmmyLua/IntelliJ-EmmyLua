@@ -22,6 +22,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.tang.intellij.lua.debugger.LogConsoleType
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -46,7 +47,9 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
     /**
      * capture stderr & stdout
      */
-    var captureStd: Boolean = false
+    var captureStd = LuaSettings.instance.attachDebugCaptureStd
+
+    var captureOutput = LuaSettings.instance.attachDebugCaptureOutput
 
     protected val emmyLua: String?
         get() = LuaFileUtil.getPluginVirtualFile("debugger/Emmy.lua")
@@ -117,7 +120,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
             writer = DataOutputStream(socket.getOutputStream())
 
             ApplicationManager.getApplication().executeOnPooledThread {
-                send(DMReqInitialize("", emmyLua!!, captureStd))
+                send(DMReqInitialize("", emmyLua!!, captureStd, captureOutput))
                 processPack()
             }
         } catch (e: Exception) {

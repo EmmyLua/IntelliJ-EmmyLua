@@ -196,4 +196,6 @@ const char* GetHookEventName(LAPI api, const lua_Debug* ar);
 void* CreateCFunction(LAPI api, void* function, void* worker);
 
 void FreeLuaDll();
+
+bool HookOuputDebugString();
 #endif

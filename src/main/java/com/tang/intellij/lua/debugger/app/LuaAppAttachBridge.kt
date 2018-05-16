@@ -67,7 +67,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
     }
 
     fun launch(program: String, configuration: LuaAppRunConfiguration) {
-        this.captureStd = !configuration.showConsole
+        //this.captureStd = !configuration.showConsole
         val pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory()
         val workingDir = configuration.workingDir
         try {

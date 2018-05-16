@@ -80,6 +80,7 @@ public:
 	std::string symbolsDirectory;
 	std::string emmyLuaFile;
 	bool captureStd;
+	bool captureOutputDebugString;
 };
 
 class DMException : public DebugMessage

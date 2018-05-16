@@ -2029,8 +2029,9 @@ VOID WINAPI OutputDebugStringW_intercept(
 	DebugBackend::Get().Message(s.c_str(), MessageType_Stdout);
 }
 
-void HookOuputDebugString()
+bool HookOuputDebugString()
 {
+	bool result;
 	// OutputDebugStringA
 	{
 		TRACED_HOOK_HANDLE      hHook = new HOOK_TRACE_INFO();
@@ -2040,9 +2041,8 @@ void HookOuputDebugString()
 			OutputDebugStringA_intercept,
 			nullptr,
 			hHook);
-		//assert(status == 0);
-		status = LhSetExclusiveACL(ACLEntries, 0, hHook);
-		//assert(status == 0);
+		result = status == 0;
+		result = result && LhSetExclusiveACL(ACLEntries, 0, hHook) == 0;
 	}
 	// OutputDebugStringW
 	{
@@ -2053,10 +2053,10 @@ void HookOuputDebugString()
 			OutputDebugStringW_intercept,
 			nullptr,
 			hHook);
-		//assert(status == 0);
-		status = LhSetExclusiveACL(ACLEntries, 0, hHook);
-		//assert(status == 0);
+		result = result && status == 0;
+		result = result && LhSetExclusiveACL(ACLEntries, 0, hHook) == 0;
 	}
+	return result;
 }
 
 #define GET_FUNCTION_OPTIONAL(function)																						\
@@ -2320,7 +2320,6 @@ bool LoadLuaFunctions(const char* moduleName, const stdext::hash_map<std::string
 		DebugBackend::Get().Message("Debugger attached to process.");
 		g_loadedLuaFunctions = true;
 	}
-	HookOuputDebugString();
 	EnableIntercepts(api, true);
 	return true;
 

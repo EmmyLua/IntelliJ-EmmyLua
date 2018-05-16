@@ -1238,10 +1238,12 @@ void DebugBackend::HandleMessage(DebugMessage* message)
 	{
 	case DebugMessageId::ReqInitialize:
 		{
-		extern HINSTANCE g_hInstance;
-		DMReqInitialize* init_emmy = static_cast<DMReqInitialize*>(message);
-		if (!m_hooked)
+		DMReqInitialize* init_emmy = dynamic_cast<DMReqInitialize*>(message);
+		if (!m_hooked) {
 			m_hooked = InstallLuaHooker(g_hInstance, init_emmy->emmyLuaFile.c_str());
+			if (m_hooked && init_emmy->captureOutputDebugString)
+				HookOuputDebugString();
+		}
 
 		if (m_hooked)
 		{

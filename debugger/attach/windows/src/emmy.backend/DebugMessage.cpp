@@ -18,7 +18,7 @@ void DebugMessage::Write(ByteOutputStream * stream)
 	stream->WriteUInt64(reinterpret_cast<uint64_t>(L));
 }
 
-DMReqInitialize::DMReqInitialize(): DebugMessage(DebugMessageId::ReqInitialize), captureStd(false)
+DMReqInitialize::DMReqInitialize(): DebugMessage(DebugMessageId::ReqInitialize), captureStd(false), captureOutputDebugString(false)
 {
 }
 
@@ -28,6 +28,7 @@ void DMReqInitialize::Read(ByteInputStream* stream)
 	stream->ReadString(symbolsDirectory);
 	stream->ReadString(emmyLuaFile);
 	captureStd = stream->ReadBool();
+	captureOutputDebugString = stream->ReadBool();
 }
 
 DMException::DMException(): DebugMessage(DebugMessageId::Exception)
