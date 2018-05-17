@@ -1,43 +1,43 @@
--- Copyright (c) 2017. tangzx(love.tangzx@qq.com)
+-- Copyright (c) 2018. tangzx(love.tangzx@qq.com)
 --
--- Licensed under the Apache License, Version 2.0 (the "License");
--- you may not use this file except in compliance with the License.
--- You may obtain a copy of the License at
+-- Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+-- use this file except in compliance with the License. You may obtain a copy of
+-- the License at
 --
 -- http://www.apache.org/licenses/LICENSE-2.0
 --
--- Unless required by applicable law or agreed to in writing, software
--- distributed under the License is distributed on an "AS IS" BASIS,
--- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
--- See the License for the specific language governing permissions and
--- limitations under the License.
+-- Unless required by applicable law or agreed to in writing, software 
+-- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
+-- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+-- License for the specific language governing permissions and limitations under
+-- the License.
 
+---@class table
 table = {}
 
 ---
---- Given an array where all elements are strings or numbers, returns
---- `table[i]..sep..table[i+1] ... sep..table[j]`. The default value for
+--- Given a list where all elements are strings or numbers, returns the string
+--- `list[i]..sep..list[i+1] ... sep..list[j]`. The default value for
 --- `sep` is the empty string, the default for `i` is 1, and the default for
---- `j` is the length of the table. If `i` is greater than `j`, returns the
---- empty string.
+--- `j` is #list. If `i` is greater than `j`, returns the empty string.
 ---@overload fun(t:table, sep:string):string
----@param t table
----@param sep string
----@param i number
----@param j number
+---@param list table
+---@param optional sep string
+---@param optional i number
+---@param optional j number
 ---@return string
-function table.concat(t, sep, i, j) end
+function table.concat(list, sep, i, j) end
 
 ---
---- Inserts element `value` at position `pos` in `table`, shifting up
---- other elements to open space, if necessary. The default value for `pos` is
---- `n+1`, where `n` is the length of the table (see §2.5.5), so that a call
---- `table.insert(t,x)` inserts `x` at the end of table `t`.
+--- Inserts element `value` at position `pos` in `list`, shifting up the
+--- elements to `list[pos]`, `list[pos+1]`, `···`, `list[#list]`. The default
+--- value for `pos` is ``#list+1`, so that a call `table.insert(t,x)`` inserts
+--- `x` at the end of list `t`.
 ---@overload fun(t:table, value:any):void
----@param t table
----@param pos number
+---@param list table
+---@param optional pos number
 ---@param value any
-function table.insert(t, pos, value) end
+function table.insert(list, pos, value) end
 
 ---
 --- Returns the largest positive numerical index of the given table, or
