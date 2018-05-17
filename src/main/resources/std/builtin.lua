@@ -1,16 +1,13 @@
---- builtin types
-
----@class _G
-_G = {}
+--- Built-in Types
 
 ---@class boolean
 
----@class number
-
----@class void
+---@class nil
 
 ---@class any
 
----@class table
+---@class function
 
 ---@class thread
+
+---@class userdata
