@@ -1,16 +1,16 @@
--- Copyright (c) 2017. tangzx(love.tangzx@qq.com)
+-- Copyright (c) 2018. tangzx(love.tangzx@qq.com)
 --
--- Licensed under the Apache License, Version 2.0 (the "License");
--- you may not use this file except in compliance with the License.
--- You may obtain a copy of the License at
+-- Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+-- use this file except in compliance with the License. You may obtain a copy of
+-- the License at
 --
 -- http://www.apache.org/licenses/LICENSE-2.0
 --
--- Unless required by applicable law or agreed to in writing, software
--- distributed under the License is distributed on an "AS IS" BASIS,
--- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
--- See the License for the specific language governing permissions and
--- limitations under the License.
+-- Unless required by applicable law or agreed to in writing, software 
+-- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
+-- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+-- License for the specific language governing permissions and limitations under
+-- the License.
 
 ---@class string
 string = {}
@@ -18,97 +18,121 @@ string = {}
 ---
 --- Returns the internal numerical codes of the characters `s[i]`, `s[i+1]`,
 --- ..., `s[j]`. The default value for `i` is 1; the default value for `j`
---- is `i`.
+--- is `i`. These indices are corrected following the same rules of function
+--- `string.sub`.
+---
 --- Note that numerical codes are not necessarily portable across platforms.
 ---@param s string
 ---@param optional i number
 ---@param optional j number
+---@return number
 function string.byte(s, i, j) end
 
 ---
 --- Receives zero or more integers. Returns a string with length equal to
 --- the number of arguments, in which each character has the internal numerical
 --- code equal to its corresponding argument.
+---
 --- Note that numerical codes are not necessarily portable across platforms.
 ---@return string
 function string.char(...) end
 
 ---
---- Returns a string containing a binary representation of the given
---- function, so that a later `loadstring` on this string returns a copy of
---- the function. `function` must be a Lua function without upvalues.
+--- Returns a string containing a binary representation (*a binary chunk*) of
+--- the given function, so that a later `load` on this string returns a
+--- copy of the function (but with new upvalues). If strip is a true value, the 
+--- binary representation may not include all debug information about the 
+--- function, to save space.
+---
+--- Functions with upvalues have only their number of upvalues saved. When (re)
+--- loaded, those upvalues receive fresh instances containing **nil**. (You can 
+--- use the debug library to serialize and reload the upvalues of a function in 
+--- a way adequate to your needs.)
 ---@param func fun()
-function string.dump(func) end
+---@param optional strip boolean
+---@return string
+function string.dump(func, strip) end
 
 ---
 --- Looks for the first match of `pattern` in the string `s`. If it finds a
 --- match, then `find` returns the indices of `s` where this occurrence starts
---- and ends; otherwise, it returns nil. A third, optional numerical argument
---- `init` specifies where to start the search; its default value is 1 and
---- can be negative. A value of true as a fourth, optional argument `plain`
---- turns off the pattern matching facilities, so the function does a plain
---- "find substring" operation, with no characters in `pattern` being considered
---- "magic". Note that if `plain` is given, then `init` must be given as well.
+--- and ends; otherwise, it returns **nil**. A third, optional numerical
+--- argument `init` specifies where to start the search; its default value is 1
+--- and can be negative. A value of **true** as a fourth, optional argument
+--- `plain` turns off the pattern matching facilities, so the function does a
+--- plain "find substring" operation, with no characters in `pattern` being
+--- considered "magic". Note that if `plain` is given, then `init` must be given
+--- as well.
+---
 --- If the pattern has captures, then in a successful match the captured values
 --- are also returned, after the two indices.
 ---@overload fun(s:string, pattern:string):number, number
 ---@overload fun(s:string, pattern:string, init:number):number, number
 ---@param s string
 ---@param pattern string
----@param init number
----@param plain boolean
+---@param optional init number
+---@param optional plain boolean
 ---@return number, number
 function string.find(s, pattern, init, plain) end
 
 ---
 --- Returns a formatted version of its variable number of arguments following
 --- the description given in its first argument (which must be a string). The
---- format string follows the same rules as the `printf` family of standard C
---- functions. The only differences are that the options/modifiers `*`, `l`,
---- `L`, `n`, `p`, and `h` are not supported and that there is an extra option,
---- `q`. The `q` option formats a string in a form suitable to be safely read
---- back by the Lua interpreter: the string is written between double quotes,
---- and all double quotes, newlines, embedded zeros, and backslashes in the
---- string are correctly escaped when written. For instance, the call
+--- format string follows the same rules as the ISO C function `sprintf`. The
+--- only differences are that the options/modifiers `*`, `h`, `L`, `l`, `n`, and
+--- `p` are not supported and that there is an extra option, `q`.
+---
+--- The `q` option formats booleans, nil, numbers, and strings in a way that the
+--- result is a valid constant in Lua source code. Booleans and nil are written
+--- in the obvious way (`true`, `false`, `nil`). Floats are written in
+--- hexadecimal, to preserve full precision. A string is written between double
+--- quotes, using escape sequences when necessary to ensure that it can safely
+--- be read back by the Lua interpreter. For instance, the call
 ---
 --- string.format('%q', 'a string with "quotes" and \n new line')
 ---
---- will produce the string:
+--- may produce the string:
 ---
 --- "a string with \"quotes\" and \
 --- new line"
 ---
---- The options `c`, `d`, `E`, `e`, `f`, `g`, `G`, `i`, `o`, `u`, `X`, and
---- `x` all expect a number as argument, whereas `q` and `s` expect a string.
---- This function does not accept string values containing embedded zeros,
---- except as arguments to the `q` option.
+--- The options `A`, `a`, `E`, `e`, `f`, `g`, `G` and `g` all expect a number as
+--- argument. Options `c`, `d`, `i`, `o`, `u`, `X`, and `x` expect an integer.
+---When Lua is compiled with a C89 compiler, options `A` and `a` (hexadecimal
+--- floats) do not support any modifier (flags, width, length).
+---
+--- Option `s` expects a string; if its argument is not a string, it is converted
+--- to one following the same rules of `tostring`. If the option has any
+--- modifier (flags, width, length), the string argument should not contain
+--- embedded zeros.
 ---@param formatstring string
 ---@return string
 function string.format(formatstring, ...) end
 
 ---
 --- Returns an iterator function that, each time it is called, returns the
---- next captures from `pattern` over string `s`. If `pattern` specifies no
+--- next captures from `pattern` over the string `s`. If `pattern` specifies no
 --- captures, then the whole match is produced in each call.
---- As an example, the following loop
+---
+--- As an example, the following loop will iterate over all the words from
+--- string s, printing one per line:
 ---
 --- s = "hello world from Lua"
 --- for w in string.gmatch(s, "%a+") do
---- print(w)
+---     print(w)
 --- end
 ---
---- will iterate over all the words from string `s`, printing one per line. The
---- next example collects all pairs `key=value` from the given string into
---- a table:
+--- The next example collects all pairs `key=value` from the given string into a
+--- table:
 ---
 --- t = {}
 --- s = "from=world, to=Lua"
 --- for k, v in string.gmatch(s, "(%w+)=(%w+)") do
---- t[k] = v
+---     t[k] = v
 --- end
 ---
---- For this function, a '`^`' at the start of a pattern does not work as an
---- anchor, as this would prevent the iteration.
+--- For this function, a caret '`^`' at the start of a pattern does not work as 
+--- an anchor, as this would prevent the iteration.
 ---@param s string
 ---@param pattern string
 function string.gmatch(s, pattern) end
@@ -149,8 +173,8 @@ function string.gmatch(s, pattern) end
 --- x = string.gsub("home = $HOME, user = $USER", "%$(%w+)", os.getenv)
 --- -- > x="home = /home/roberto, user = roberto"
 --- x = string.gsub("4+5 = $return 4+5$", "%$(.-)%$", function (s)
---- return loadstring(s)()
---- end)
+---         return loadstring(s)()
+---     end)
 --- -- > x="4+5 = 9"
 --- local t = {name="lua", version="5.1"}
 --- x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)
@@ -180,22 +204,45 @@ function string.lower(s) end
 ---
 --- Looks for the first *match* of `pattern` in the string `s`. If it
 --- finds one, then `match` returns the captures from the pattern; otherwise
---- it returns nil. If `pattern` specifies no captures, then the whole match
+--- it returns **nil**. If `pattern` specifies no captures, then the whole match
 --- is returned. A third, optional numerical argument `init` specifies where
 --- to start the search; its default value is 1 and can be negative.
 ---@overload fun(s:string, pattern:string):void
 ---@param s string
 ---@param pattern string
----@param init number
+---@param optional init number
 function string.match(s, pattern, init) end
 
 ---
+--- Returns a binary string containing the values `v1`, `v2`, etc. packed (that 
+--- is, serialized in binary form) according to the format string `fmt`.
+---@param fmt string
+---@param v1 string
+---@param v2 string
+---@return string
+function string.pack(fmt, v1, v2, ···) end
+
+---
+--- Returns the size of a string resulting from `string.pack` with the given 
+--- format. The format string cannot have the variable-length options '`s`' or 
+--- '`z`'
+---@param fmt string
+---@return string
+function string.packsize(fmt) end
+
+---
 --- Returns a string that is the concatenation of `n` copies of the string
---- `s`.
+--- `s` separated by the string `sep`. The default value for `sep` is the empty
+--- string (that is, no separator). Returns the empty string if n is not
+--- positive.
+---
+--- Note that it is very easy to exhaust the memory of your machine with a 
+--- single call to this function.
 ---@param s string
 ---@param n number
+---@param optional sep string
 ---@return string
-function string.rep(s, n) end
+function string.rep(s, n, sep) end
 
 ---
 --- Returns a string that is the string `s` reversed.
@@ -208,12 +255,29 @@ function string.reverse(s) end
 --- `j`; `i` and `j` can be negative. If `j` is absent, then it is assumed to
 --- be equal to -1 (which is the same as the string length). In particular,
 --- the call `string.sub(s,1,j)` returns a prefix of `s` with length `j`, and
---- `string.sub(s, -i)` returns a suffix of `s` with length `i`.
+--- `string.sub(s, -i)` (for a positive i) returns a suffix of `s` with length
+--- `i`.
+---
+--- If, after the translation of negative indices, `i` is less than 1, it is
+--- corrected to 1. If `j` is greater than the string length, it is corrected to
+--- that length. If, after these corrections, `i` is greater than `j`, the 
+--- function returns the empty string.
 ---@param s string
 ---@param i number
----@param j number
+---@param optional j number
 ---@return string
 function string.sub(s, i, j) end
+
+---
+--- Returns the values packed in string `s` according to the format string 
+--- `fmt`. An optional `pos` marks where to start reading in `s` (default is 1). 
+--- After the read values, this function also returns the index of the first 
+--- unread byte in `s`.
+---@param fmt string
+---@param s string
+---@param optional pos number
+---@return string
+function string.unpack(fmt, s, pos) end
 
 ---
 --- Receives a string and returns a copy of this string with all lowercase
@@ -221,4 +285,4 @@ function string.sub(s, i, j) end
 --- definition of what a lowercase letter is depends on the current locale.
 ---@param s string
 ---@return string
-function string.upper(s) return "" end
+function string.upper(s) end
