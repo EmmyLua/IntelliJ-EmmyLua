@@ -23,6 +23,7 @@ import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand
 import java.io.IOException
 import java.io.OutputStreamWriter
+import java.net.SocketException
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 import java.nio.charset.Charset
@@ -70,9 +71,11 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
                 }
                 Thread.sleep(5)
             }
+        } catch (e: SocketException) {
+            //e.message?.let { listener.error(it) }
         } catch (e: Exception) {
-
-        }  finally {
+            e.message?.let { listener.error(it) }
+        } finally {
             listener.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
     }
@@ -91,7 +94,7 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
         } catch (e: IOException) {
             onSocketClosed()
         } catch (e: Exception) {
-            e.printStackTrace()
+            e.message?.let { listener.error(it) }
         }
     }
 

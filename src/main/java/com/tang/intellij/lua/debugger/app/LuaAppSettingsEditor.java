@@ -59,7 +59,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
     private RawCommandLineEditor parameters;
     private HoverHyperlinkLabel mobdebugLink;
     private EnvironmentVariablesTextFieldWithBrowseButton myEnvironments;
-    private ComboBox outputCharset;
+    private ComboBox<String> outputCharset;
     private JCheckBox showConsoleWindowCheckBox;
     private Project project;
 
