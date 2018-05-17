@@ -59,7 +59,7 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     /**
      * (KB)
      */
-    var tooLargerFileThreshold = 50
+    var tooLargerFileThreshold = 1024
 
     var attachDebugDefaultCharsetName = "UTF-8"
 
