@@ -92,4 +92,15 @@ function table.remove(t, pos) end
 ---@return number
 function table.sort(t, comp) end
 
+---
+--- Returns the elements from the given list. This function is equivalent to
+---
+--- return `list[i]`, `list[i+1]`, `···`, `list[j]`
+--- By default, i is 1 and j is #list.
+---@param list table
+---@param optional i number
+---@param optional j number
+---@return number
+function table.unpack(list, i, j) end
+
 return table
