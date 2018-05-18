@@ -165,7 +165,7 @@ function os.setlocale(locale, category) end
 --- When called with a table, `os.time` also normalizes all the fields
 --- documented in the `os.date` function, so that they represent the same time
 --- as before the call but with values inside their valid ranges.
----@param table table
+---@param optional table table
 ---@return number
 function os.time(table) end
 
