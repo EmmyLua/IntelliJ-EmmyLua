@@ -1,18 +1,17 @@
 -- Copyright (c) 2018. tangzx(love.tangzx@qq.com)
 --
--- Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
 -- use this file except in compliance with the License. You may obtain a copy of
 -- the License at
 --
 -- http://www.apache.org/licenses/LICENSE-2.0
 --
--- Unless required by applicable law or agreed to in writing, software 
--- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
--- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+-- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 -- License for the specific language governing permissions and limitations under
 -- the License.
 
----@class string
 string = {}
 
 ---
@@ -40,15 +39,15 @@ function string.char(...) end
 ---
 --- Returns a string containing a binary representation (*a binary chunk*) of
 --- the given function, so that a later `load` on this string returns a
---- copy of the function (but with new upvalues). If strip is a true value, the 
---- binary representation may not include all debug information about the 
+--- copy of the function (but with new upvalues). If strip is a true value, the
+--- binary representation may not include all debug information about the
 --- function, to save space.
 ---
 --- Functions with upvalues have only their number of upvalues saved. When (re)
---- loaded, those upvalues receive fresh instances containing **nil**. (You can 
---- use the debug library to serialize and reload the upvalues of a function in 
+--- loaded, those upvalues receive fresh instances containing **nil**. (You can
+--- use the debug library to serialize and reload the upvalues of a function in
 --- a way adequate to your needs.)
----@param func fun()
+---@param func fun():number
 ---@param optional strip boolean
 ---@return string
 function string.dump(func, strip) end
@@ -66,13 +65,13 @@ function string.dump(func, strip) end
 ---
 --- If the pattern has captures, then in a successful match the captured values
 --- are also returned, after the two indices.
----@overload fun(s:string, pattern:string):number, number
----@overload fun(s:string, pattern:string, init:number):number, number
+---@overload fun(s:string, pattern:string):number|number
+---@overload fun(s:string, pattern:string, init:number):number|number
 ---@param s string
 ---@param pattern string
 ---@param optional init number
 ---@param optional plain boolean
----@return number, number
+---@return number|number|string
 function string.find(s, pattern, init, plain) end
 
 ---
@@ -101,10 +100,10 @@ function string.find(s, pattern, init, plain) end
 ---When Lua is compiled with a C89 compiler, options `A` and `a` (hexadecimal
 --- floats) do not support any modifier (flags, width, length).
 ---
---- Option `s` expects a string; if its argument is not a string, it is converted
---- to one following the same rules of `tostring`. If the option has any
---- modifier (flags, width, length), the string argument should not contain
---- embedded zeros.
+--- Option `s` expects a string; if its argument is not a string, it is
+--- converted to one following the same rules of `tostring`. If the option
+--- has any modifier (flags, width, length), the string argument should not
+--- contain embedded zeros.
 ---@param formatstring string
 ---@return string
 function string.format(formatstring, ...) end
@@ -131,10 +130,11 @@ function string.format(formatstring, ...) end
 ---     t[k] = v
 --- end
 ---
---- For this function, a caret '`^`' at the start of a pattern does not work as 
+--- For this function, a caret '`^`' at the start of a pattern does not work as
 --- an anchor, as this would prevent the iteration.
 ---@param s string
 ---@param pattern string
+---@return func():string
 function string.gmatch(s, pattern) end
 
 ---
@@ -179,11 +179,12 @@ function string.gmatch(s, pattern) end
 --- local t = {name="lua", version="5.1"}
 --- x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)
 --- -- > x="lua-5.1.tar.gz"
----@overload fun(s:string, pattern:string, repl:table|fun()):void
+---@overload fun(s:string, pattern:string, repl:string|fun()):nil
 ---@param s string
 ---@param pattern string
----@param repl table|fun()
----@param n number
+---@param repl string|fun()
+---@param optional n number
+---@return string|number
 function string.gsub(s, pattern, repl, n) end
 
 ---
@@ -211,10 +212,11 @@ function string.lower(s) end
 ---@param s string
 ---@param pattern string
 ---@param optional init number
+---@return any
 function string.match(s, pattern, init) end
 
 ---
---- Returns a binary string containing the values `v1`, `v2`, etc. packed (that 
+--- Returns a binary string containing the values `v1`, `v2`, etc. packed (that
 --- is, serialized in binary form) according to the format string `fmt`.
 ---@param fmt string
 ---@param v1 string
@@ -223,11 +225,11 @@ function string.match(s, pattern, init) end
 function string.pack(fmt, v1, v2, ···) end
 
 ---
---- Returns the size of a string resulting from `string.pack` with the given 
---- format. The format string cannot have the variable-length options '`s`' or 
+--- Returns the size of a string resulting from `string.pack` with the given
+--- format. The format string cannot have the variable-length options '`s`' or
 --- '`z`'
 ---@param fmt string
----@return string
+---@return number
 function string.packsize(fmt) end
 
 ---
@@ -236,7 +238,7 @@ function string.packsize(fmt) end
 --- string (that is, no separator). Returns the empty string if n is not
 --- positive.
 ---
---- Note that it is very easy to exhaust the memory of your machine with a 
+--- Note that it is very easy to exhaust the memory of your machine with a
 --- single call to this function.
 ---@param s string
 ---@param n number
@@ -260,7 +262,7 @@ function string.reverse(s) end
 ---
 --- If, after the translation of negative indices, `i` is less than 1, it is
 --- corrected to 1. If `j` is greater than the string length, it is corrected to
---- that length. If, after these corrections, `i` is greater than `j`, the 
+--- that length. If, after these corrections, `i` is greater than `j`, the
 --- function returns the empty string.
 ---@param s string
 ---@param i number
@@ -269,9 +271,9 @@ function string.reverse(s) end
 function string.sub(s, i, j) end
 
 ---
---- Returns the values packed in string `s` according to the format string 
---- `fmt`. An optional `pos` marks where to start reading in `s` (default is 1). 
---- After the read values, this function also returns the index of the first 
+--- Returns the values packed in string `s` according to the format string
+--- `fmt`. An optional `pos` marks where to start reading in `s` (default is 1).
+--- After the read values, this function also returns the index of the first
 --- unread byte in `s`.
 ---@param fmt string
 ---@param s string
