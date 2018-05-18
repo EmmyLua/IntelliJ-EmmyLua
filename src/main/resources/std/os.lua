@@ -1,14 +1,14 @@
 -- Copyright (c) 2018. tangzx(love.tangzx@qq.com)
 --
--- Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
 -- use this file except in compliance with the License. You may obtain a copy of
 -- the License at
 --
 -- http://www.apache.org/licenses/LICENSE-2.0
 --
--- Unless required by applicable law or agreed to in writing, software 
--- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
--- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+-- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 -- License for the specific language governing permissions and limitations under
 -- the License.
 
@@ -58,41 +58,42 @@ function os.clock() end
 function os.date(format, time) end
 
 ---
---- Returns the difference, in seconds, from time `t1` to time `t2`. (where the 
---- times are values returned by `os.time`). In POSIX, Windows, and some other 
+--- Returns the difference, in seconds, from time `t1` to time `t2`. (where the
+--- times are values returned by `os.time`). In POSIX, Windows, and some other
 --- systems, this value is exactly `t2`-`t1`.
----@param t2 string
----@param t1 string
+---@param t2 number
+---@param t1 number
 ---@return number
 function os.difftime(t2, t1) end
 
 ---
 --- This function is equivalent to the C function `system`. It passes `command`
 --- to be executed by an operating system shell. Its first result is **true** if
---- the command terminated successfully, or **nil** otherwise. After this first 
+--- the command terminated successfully, or **nil** otherwise. After this first
 --- result the function returns a string plus a number, as follows:
 ---
---- **"exit"**: the command terminated normally; the following number is the 
+--- **"exit"**: the command terminated normally; the following number is the
 --- exit status of the command.
---- **"signal"**: the command was terminated by a signal; the following number 
+--- **"signal"**: the command was terminated by a signal; the following number
 --- is the signal that terminated the command.
 ---
---- When called without a command, `os.execute` returns a boolean that is true 
+--- When called without a command, `os.execute` returns a boolean that is true
 --- if a shell is available.
 ---@param command string
----@return number
+---@return string|number
 function os.execute(command) end
 
 ---
 --- Calls the ISO C function `exit` to terminate the host program. If `code` is
 --- **true**, the returned status is `EXIT_SUCCESS`; if `code` is **false**, the
---- returned status is `EXIT_FAILURE`; if `code` is a number, the returned 
+--- returned status is `EXIT_FAILURE`; if `code` is a number, the returned
 --- status is this number. The default value for `code` is **true**.
 ---
 --- If the optional second argument `close` is true, closes the Lua state before
 --- exiting.
 ---@overload fun():number
----@param code number
+---@param optional code number
+---@param optional close boolean
 ---@return number
 function os.exit(code, close) end
 
@@ -108,16 +109,16 @@ function os.getenv(varname) end
 --- If this function fails, it returns **nil**, plus a string describing the
 --- error and the error code. Otherwise, it returns true.
 ---@param filename string
----@return any, string
+---@return any|string
 function os.remove(filename) end
 
 ---
 --- Renames the file or directory named `oldname` to `newname`. If this function
---- fails, it returns **nil**, plus a string describing the error and the error 
+--- fails, it returns **nil**, plus a string describing the error and the error
 --- code. Otherwise, it returns true.
 ---@param oldname string
 ---@param newname string
----@return any, string
+---@return any|string
 function os.rename(oldname, newname) end
 
 ---
@@ -137,9 +138,9 @@ function os.rename(oldname, newname) end
 ---
 --- This function may be not thread safe because of its reliance on C function
 --- `setlocale`.
----@overload fun(locale:string):void
+---@overload fun(locale:string):nil
 ---@param locale string
----@param category string
+---@param optional category string
 function os.setlocale(locale, category) end
 
 ---
@@ -161,8 +162,8 @@ function os.setlocale(locale, category) end
 --- meaning is not specified, and the number returned by `time` can be used only
 --- as an argument to `os.date` and `os.difftime`.
 ---
---- When called with a table, `os.time` also normalizes all the fields 
---- documented in the `os.date` function, so that they represent the same time 
+--- When called with a table, `os.time` also normalizes all the fields
+--- documented in the `os.date` function, so that they represent the same time
 --- as before the call but with values inside their valid ranges.
 ---@param table table
 ---@return number
