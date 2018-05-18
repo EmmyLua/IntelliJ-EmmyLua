@@ -1,14 +1,14 @@
 -- Copyright (c) 2018. tangzx(love.tangzx@qq.com)
 --
--- Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
 -- use this file except in compliance with the License. You may obtain a copy of
 -- the License at
 --
 -- http://www.apache.org/licenses/LICENSE-2.0
 --
--- Unless required by applicable law or agreed to in writing, software 
--- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
--- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+-- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 -- License for the specific language governing permissions and limitations under
 -- the License.
 
@@ -33,15 +33,15 @@ function math.acos(x) return 0 end
 ---@return number
 function math.asin(x) return 0 end
 
---- 
---- Returns the arc tangent of `y/x` (in radians), but uses the signs of both 
---- parameters to find the quadrant of the result. (It also handles correctly 
+---
+--- Returns the arc tangent of `y/x` (in radians), but uses the signs of both
+--- parameters to find the quadrant of the result. (It also handles correctly
 --- the case of `x` being zero.)
 ---
 --- The default value for `x` is 1, so that the call `math.atan(y)`` returns the
 --- arc tangent of `y`.
 ---@param y number
----@param x number
+---@param optional x number
 ---@return number
 function math.atan(y, x) return 0 end
 
@@ -88,15 +88,15 @@ function math.fmod(x, y) end
 math.huge = ""
 
 ---
---- Returns the logarithm of `x` in the given base. The default for `base` is 
+--- Returns the logarithm of `x` in the given base. The default for `base` is
 --- *e* (so that the function returns the natural logarithm of `x`).
 ---@param x number
----@param base number
+---@param optional base number
 ---@return number
 function math.log(x, base) end
 
 ---
---- Returns the argument with the maximum value, according to the Lua operator 
+--- Returns the argument with the maximum value, according to the Lua operator
 --- `<`. (integer/float)
 ---@param x number
 ---@return number
@@ -136,13 +136,13 @@ function math.rad(x) end
 
 ---
 --- When called without arguments, returns a pseudo-random float with uniform
---- distribution in the range *[0,1)*. When called with two integers `m` and 
---- `n`, `math.random` returns a pseudo-random integer with uniform distribution 
+--- distribution in the range *[0,1)*. When called with two integers `m` and
+--- `n`, `math.random` returns a pseudo-random integer with uniform distribution
 --- in the range *[m, n]*. The call `math.random(n)` is equivalent to `math
 --- .random`(1,n).
 ---@overload fun():number
----@param m number
----@param n number
+---@param optional m number
+---@param optional n number
 ---@return number
 function math.random(m, n) end
 
@@ -159,7 +159,7 @@ function math.randomseed(x) end
 function math.sin(x) return 0 end
 
 ---
---- Returns the square root of `x`. (You can also use the expression `x^0.5` to 
+--- Returns the square root of `x`. (You can also use the expression `x^0.5` to
 --- compute this value.)
 ---@param x number
 ---@return number
@@ -172,21 +172,21 @@ function math.sqrt(x) return 0 end
 function math.tan(x) return 0 end
 
 ---
---- If the value `x` is convertible to an integer, returns that integer. 
+--- If the value `x` is convertible to an integer, returns that integer.
 --- Otherwise, returns `nil`.
 ---@param x number
 ---@return number
 function math.tointeger(x) end
 
 ---
---- Returns "`integer`" if `x` is an integer, "`float`" if it is a float, or 
+--- Returns "`integer`" if `x` is an integer, "`float`" if it is a float, or
 --- **nil** if `x` is not a number.
 ---@param x number
 ---@return number
 function math.type(x) end
 
 ---
---- Returns a boolean, true if and only if integer `m` is below integer `n` when 
+--- Returns a boolean, true if and only if integer `m` is below integer `n` when
 --- they are compared as unsigned integers.
 ---@param m number
 ---@param n number
@@ -194,5 +194,3 @@ function math.type(x) end
 function math.ult(m, n) end
 
 return math
-
-
