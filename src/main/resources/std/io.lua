@@ -1,22 +1,23 @@
 -- Copyright (c) 2018. tangzx(love.tangzx@qq.com)
 --
--- Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
 -- use this file except in compliance with the License. You may obtain a copy of
 -- the License at
 --
 -- http://www.apache.org/licenses/LICENSE-2.0
 --
--- Unless required by applicable law or agreed to in writing, software 
--- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT 
--- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+-- WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 -- License for the specific language governing permissions and limitations under
 -- the License.
 
 io = {}
 
 ---
---- Equivalent to `file:close()`. Without a file, closes the default output file.
----@param file file
+--- Equivalent to `file:close()`. Without a file, closes the default output
+--- file.
+---@param optional file file
 function io.close(file) end
 
 ---
@@ -32,7 +33,7 @@ function io.flush() end
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
 ---@overload fun():number
----@param file string|file
+---@param optional file string|file
 ---@return number
 function io.input(file) end
 
@@ -49,28 +50,33 @@ function io.input(file) end
 ---
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
+---@param optional filename string|file
+---@return any
 function io.lines(filename, ...) end
 
 ---
 --- This function opens a file, in the mode specified in the string `mode`.  In
---- case of success, it returns a new file handle.
---- The `mode` string can be any of the following:
+--- case of success, it returns a new file handle. The `mode` string can be
+--- any of the following:
 ---
 --- "r": read mode (the default);
 --- "w": write mode;
 --- "a": append mode;
 --- "r+": update mode, all previous data is preserved;
 --- "w+": update mode, all previous data is erased;
---- "a+": append update mode, previous data is preserved, writing is only 
+--- "a+": append update mode, previous data is preserved, writing is only
 --- allowed at the end of file.
 ---
 --- The `mode` string can also have a '`b`' at the end, which is needed in
 --- some systems to open the file in binary mode.
----@return file
+---@param filename string|file
+---@param optional mode string
+---@return any
 function io.open(filename, mode) return file end
 
 ---
 --- Similar to `io.input`, but operates over the default output file.
+---@param optional file string|file
 function io.output(file) end
 
 ---
@@ -79,6 +85,9 @@ function io.output(file) end
 --- Starts program `prog` in a separated process and returns a file handle that
 --- you can use to read data from this program (if `mode` is "`r`", the default)
 --- or to write data to this program (if `mode` is "`w`").
+---@param prog string|file
+---@param optional mode string
+---@return any
 function io.popen(prog, mode) end
 
 ---
@@ -94,6 +103,8 @@ function io.tmpfile() end
 --- Checks whether `obj` is a valid file handle. Returns the string "`file`"
 --- if `obj` is an open file handle, "`closed file`" if `obj` is a closed file
 --- handle, or **nil** if `obj` is not a file handle.
+---@param obj string|file
+---@return file
 function io.type(obj) end
 
 ---
@@ -119,16 +130,16 @@ function file:flush() end
 
 ---
 --- Returns an iterator function that, each time it is called, reads the file
---- according to the given formats. When no format is given, uses "l" as a 
+--- according to the given formats. When no format is given, uses "l" as a
 --- default. As an example, the construction
 --- `for c in file:lines(1) do *body* end`
---- will iterate over all characters of the file, starting at the current 
---- position. Unlike `io.lines`, this function does not close the file when the 
+--- will iterate over all characters of the file, starting at the current
+--- position. Unlike `io.lines`, this function does not close the file when the
 --- loop ends.
 ---
---- In case of errors this function raises the error, instead of returning an 
+--- In case of errors this function raises the error, instead of returning an
 --- error code.
----@return fun():void
+---@return fun():nil
 function file:lines(...) end
 
 ---
@@ -152,7 +163,7 @@ function file:lines(...) end
 --- end of file. This is the default format.
 --- **"L"**: reads the next line keeping the end-of-line character (if present),
 --- returning **nil** on end of file;
---- *number*: reads a string with up to this number of bytes, returning **nil** 
+--- *number*: reads a string with up to this number of bytes, returning **nil**
 --- on end of file. If `number` is zero, it reads nothing and returns an
 --- empty string, or **nil** on end of file.
 function file:read(...) end
@@ -165,23 +176,23 @@ function file:read(...) end
 --- **"cur"**: base is current position;
 --- **"end"**: base is end of file;
 ---
---- In case of success, `seek` returns the final file position, measured in 
---- bytes from the beginning of the file. If `seek` fails, it returns **nil**, 
+--- In case of success, `seek` returns the final file position, measured in
+--- bytes from the beginning of the file. If `seek` fails, it returns **nil**,
 --- plus a string describing the error.
---- 
+---
 --- The default value for `whence` is "`cur`", and for `offset` is 0. Therefore,
 --- the call `file:seek()` returns the current file position, without changing
 --- it; the call `file:seek("set")` sets the position to the beginning of the
 --- file (and returns 0); and the call `file:seek("end")` sets the position
 --- to the end of the file, and returns its size.
----@param whence string
----@param offset number
+---@param optional whence string
+---@param optional offset number
 function file:seek(whence, offset) end
 
 ---
 --- Sets the buffering mode for an output file. There are three available
 --- modes:
---- **"no"**: no buffering; the result of any output operation appears 
+--- **"no"**: no buffering; the result of any output operation appears
 --- immediately.
 --- **"full"**: full buffering; output operation is performed only when the
 --- buffer is full (or when you explicitly `flush` the file (see `io.flush`)).
@@ -191,14 +202,14 @@ function file:seek(whence, offset) end
 --- For the last two cases, `size` specifies the size of the buffer, in
 --- bytes. The default is an appropriate size.
 ---@param mode string
----@param size number
+---@param optional size number
 function file:setvbuf(mode, size) end
 
 ---
 --- Writes the value of each of its arguments to the `file`. The arguments
 --- must be strings or numbers.
 ---
---- In case of success, this function returns `file`. Otherwise it returns 
+--- In case of success, this function returns `file`. Otherwise it returns
 --- **nil** plus a string describing the error.
 function file:write(...) end
 
