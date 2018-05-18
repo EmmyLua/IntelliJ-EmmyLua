@@ -17,7 +17,7 @@ coroutine = {}
 ---
 --- Creates a new coroutine, with body `f`. `f` must be a Lua function. Returns
 --- this new coroutine, an object with type `"thread"`.
----@param f thread
+---@param f fun():thread
 ---@return thread
 function coroutine.create(f) end
 
@@ -42,7 +42,7 @@ function coroutine.isyieldable() end
 --- `resume` returns **false** plus the error message.
 ---@param co thread
 ---@param optional val1 string
----@return boolean
+---@return boolean|any
 function coroutine.resume(co, val1, ...) end
 
 ---
@@ -75,4 +75,5 @@ function coroutine.wrap(f) end
 ---
 --- Suspends the execution of the calling coroutine. Any arguments to `yield`
 --- are passed as extra results to `resume`.
+---@return any
 function coroutine.yield(...) end
