@@ -26,9 +26,9 @@ public interface LuaCallExpr extends LuaExpr, StubBasedPsiElement<LuaExprStub> {
   @Nullable
   PsiElement getFirstStringArg();
 
-  boolean isStaticMethodCall();
+  boolean isMethodDotCall();
 
-  boolean isMethodCall();
+  boolean isMethodColonCall();
 
   boolean isFunctionCall();
 

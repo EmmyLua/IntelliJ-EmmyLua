@@ -51,13 +51,13 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, ParameterInfoType>
         val luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.offset, LuaArgs::class.java, false)
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
-            val isColonStyle = callExpr.isMethodCall
+            val isColonStyle = callExpr.isMethodColonCall
             val type = callExpr.guessParentType(SearchContext(context.project))
             val list = mutableListOf<ParameterInfoType>()
             TyUnion.each(type) { ty ->
                 if (ty is ITyFunction) {
                     ty.process(Processor {
-                        if ((it.selfCall && !isColonStyle) || it.params.isNotEmpty()) {
+                        if ((it.colonCall && !isColonStyle) || it.params.isNotEmpty()) {
                             list.add(ParameterInfoType(it, isColonStyle))
                         }
                         true

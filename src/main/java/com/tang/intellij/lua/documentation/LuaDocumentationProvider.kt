@@ -30,7 +30,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.ITyFunction
 import com.tang.intellij.lua.ty.TyFunction
 import com.tang.intellij.lua.ty.infer
-import com.tang.intellij.lua.ty.isSelfCall
+import com.tang.intellij.lua.ty.isColonCall
 
 /**
  * Documentation support
@@ -103,7 +103,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
             with(sb) {
                 when (ty) {
                     is TyFunction -> {
-                        append(if (ty.isSelfCall) ":" else ".")
+                        append(if (ty.isColonCall) ":" else ".")
                         append(classMember.name)
                         renderSignature(sb, ty.mainSignature)
                     }
