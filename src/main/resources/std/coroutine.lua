@@ -40,9 +40,10 @@ function coroutine.isyieldable() end
 --- values passed to `yield` (when the coroutine yields) or any values returned
 --- by the body function (when the coroutine terminates). If there is any error,
 --- `resume` returns **false** plus the error message.
+---@overload fun(co:thread):boolean|any
 ---@param co thread
----@param optional val1 string
----@return boolean|any
+---@param val1 string
+---@return thread|any
 function coroutine.resume(co, val1, ...) end
 
 ---
@@ -69,7 +70,7 @@ function coroutine.status(co) end
 --- the same values returned by `resume`, except the first
 --- boolean. In case of error, propagates the error.
 ---@param f fun():thread
----@return function
+---@return fun():any
 function coroutine.wrap(f) end
 
 ---
