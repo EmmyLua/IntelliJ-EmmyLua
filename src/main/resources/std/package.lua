@@ -111,7 +111,7 @@ package.preload = {}
 --- The third searcher looks for a loader as a C library, using the path given
 --- by the variable  package.cpath`. Again, the search is done as described in
 --- function `package.searchpath`. For instance, if the C path is the string
---- "`./?.so;./?.dll;/usr/local/?/init.so`"
+--- > "`./?.so;./?.dll;/usr/local/?/init.so`"
 --- the searcher for module foo will try to open the files ``./foo.so, ./foo
 --- .dll`, and ``/usr/local/foo/init.so`, in that order. Once it finds a C
 --- library, this searcher first uses a dynamic link facility to link the
@@ -133,7 +133,7 @@ package.preload = {}
 --- All searchers except the first one (preload) return as the extra value the
 --- file name where the module was found, as returned by `package.searchpath`.
 --- The first searcher returns no extra value.
-package.searchers = ""
+package.searchers = {}
 
 ---
 --- Searches for the given name in the given path.
@@ -145,23 +145,24 @@ package.searchers = ""
 --- separator, by default), and then tries to open the resulting file name.
 ---
 --- For instance, if the path is the string
---- "`./?.lua;./?.lc;/usr/local/?/init.lua`"
+--- > "`./?.lua;./?.lc;/usr/local/?/init.lua`"
 --- the search for the name `foo.a` will try to open the files `./foo/a.lua`,
 --- `./foo/a.lc`, and `/usr/local/foo/a/init.lua`, in that order.
 ---
 --- Returns the resulting name of the first file that it can open in read mode
 --- (after closing the file), or **nil** plus an error message if none succeeds.
 --- (This error message lists all file names it tried to open.)
+---@overload fun(name:string, path:string):string
 ---@param name string
 ---@param path string
----@param optional sep string
----@param optional rep string
+---@param sep string
+---@param rep string
 ---@return string
 function package.searchpath(name, path, sep, rep) end
 
 ---
 --- Loads the given module. The function starts by looking into the
---- `package.loaded` table to determine whether `modname` is already
+--- 'package.loaded' table to determine whether `modname` is already
 --- loaded. If it is, then `require` returns the value stored at
 --- `package.loaded[modname]`. Otherwise, it tries to find a *loader* for
 --- the module.
