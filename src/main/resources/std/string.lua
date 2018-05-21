@@ -92,8 +92,8 @@ function string.find(s, pattern, init, plain) end
 --- string.format('%q', 'a string with "quotes" and \n new line') may produce
 --- the string:
 ---
---- "a string with \"quotes\" and \
---- new line"
+--- > "a string with \"quotes\" and \
+--- > new line"
 ---
 --- The options `A`, `a`, `E`, `e`, `f`, `g`, `G` and `g` all expect a number as
 --- argument. Options `c`, `d`, `i`, `o`, `u`, `X`, and `x` expect an integer.
@@ -118,7 +118,7 @@ function string.format(formatstring, ...) end
 ---
 --- `s = "hello world from Lua"`
 --- `for w in string.gmatch(s, "%a+") do`
----     `print(w)`
+---  > `print(w)`
 --- `end`
 ---
 --- The next example collects all pairs `key=value` from the given string into a
@@ -127,7 +127,7 @@ function string.format(formatstring, ...) end
 --- `t = {}`
 ---  s = "from=world, to=Lua"`
 --- `for k, v in string.gmatch(s, "(%w+)=(%w+)") do`
----     `t[k] = v`
+---  > `t[k] = v`
 --- `end`
 ---
 --- For this function, a caret '`^`' at the start of a pattern does not work as
