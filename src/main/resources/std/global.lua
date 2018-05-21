@@ -19,7 +19,7 @@
 --- failed!"
 ---@overload fun(v:any):any
 ---@param v any
----@param optional message string
+---@param message string
 ---@return any
 function assert(v, message) end
 
@@ -50,8 +50,9 @@ function assert(v, message) end
 --- the major multiplier.
 --- **"isrunning"**: returns a boolean that tells whether the collector is
 --- running (i.e., not stopped).
----@param optional opt string
----@param optional arg string
+---@overload fun():any
+---@param opt string
+---@param arg string
 ---@return any
 function collectgarbage(opt, arg) end
 
@@ -61,7 +62,8 @@ function collectgarbage(opt, arg) end
 --- (`stdin`). Returns all values returned by the chunk. In case of errors,
 --- `dofile` propagates the error to its caller (that is, `dofile` does not run
 --- in protected mode).
----@param optional filename string
+---@overload fun():table
+---@param filename string
 ---@return table
 function dofile(filename) end
 
@@ -74,9 +76,9 @@ function dofile(filename) end
 --- `error` function was called. Level 2 points the error to where the function
 --- that called `error` was called; and so on. Passing a level 0 avoids the
 --- addition of error position information to the message.
----@overload fun(message:string):nil
+---@overload fun(message:string)
 ---@param message string
----@param optional level number
+---@param level number
 function error(message, level) end
 
 ---
@@ -96,7 +98,7 @@ function getmetatable(object) end
 ---
 --- Returns three values (an iterator function, the table `t`, and 0) so that
 --- the construction
---- `for i,v in ipairs(t) do *body* end`
+--- > `for i,v in ipairs(t) do` *body* `end`
 --- will iterate over the key–value pairs (1,`t[1]`), (2,`t[2]`), ..., up to
 --- the first absent index.
 ---@param t table
@@ -132,19 +134,20 @@ function ipairs(t) end
 ---
 --- Lua does not check the consistency of binary chunks. Maliciously crafted
 --- binary chunks can crash the interpreter.
----@overload fun(chunk:fun():string):nil
+---@overload fun(chunk:fun():string):any
 ---@param chunk fun():string
----@param optional chunkname string
----@param optional mode string
----@param optional env nay
+---@param chunkname string
+---@param mode string
+---@param env nay
 function load(chunk, chunkname, mode, env) end
 
 ---
 --- Similar to `load`, but gets the chunk from file `filename` or from the
 --- standard input, if no file name is given.
----@param optional filename string
----@param optional mode string
----@param optional env any
+---@overload fun()
+---@param filename string
+---@param mode string
+---@param env any
 function loadfile(filename, mode, env) end
 
 ---
@@ -164,8 +167,9 @@ function loadfile(filename, mode, env) end
 --- The behavior of `next` is undefined if, during the traversal, you assign
 --- any value to a non-existent field in the table. You may however modify
 --- existing fields. In particular, you may set existing fields to nil.
+---@overload fun(table:table):any
 ---@param table table
----@param optional index any
+---@param index any
 ---@return any
 function next(table, index) end
 
@@ -191,8 +195,9 @@ function pairs(t) end
 --- boolean), which is true if the call succeeds without errors. In such case,
 --- `pcall` also returns all results from the call, after this first result. In
 --- case of any error, `pcall` returns **false** plus the error message.
+---@overload fun(f:fun():any):boolean|table
 ---@param f fun():any
----@param optional arg1 table
+---@param arg1 table
 ---@return boolean|table
 function pcall(f, arg1, ...) end
 
@@ -265,10 +270,10 @@ function setmetatable(table, metatable) end
 --- represents 10, 'B' represents 11, and so forth, with 'Z' representing 35. If
 --- the string `e` is not a valid numeral in the given base, the function
 --- returns **nil**.
----@overload fun(e:any):number|string
----@param e any
+---@overload fun(e:string):any
+---@param e string
 ---@param base number
----@return number
+---@return any
 function tonumber(e, base) end
 
 ---
@@ -299,8 +304,8 @@ function type(v) end
 
 ---
 --- This function is similar to `pcall`, except that it sets a new message
--- handler `msgh`.
+--- handler `msgh`.
 ---@param f fun():any
 ---@param msgh fun():string
----@return boolean|any
-function xpcall(f, msgh, arg1, ···) end
+---@return any
+function xpcall(f, msgh, arg1, ...) end
