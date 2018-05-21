@@ -52,6 +52,7 @@ function os.clock() end
 ---
 --- On non-POSIX systems, this function may be not thread safe because of its
 --- reliance on C function `gmtime` and C function `localtime`.
+---@overload fun():string|table
 ---@param format string
 ---@param time number
 ---@return string|table
@@ -79,6 +80,7 @@ function os.difftime(t2, t1) end
 ---
 --- When called without a command, `os.execute` returns a boolean that is true
 --- if a shell is available.
+---@overload fun():string|number
 ---@param command string
 ---@return string|number
 function os.execute(command) end
@@ -92,8 +94,8 @@ function os.execute(command) end
 --- If the optional second argument `close` is true, closes the Lua state before
 --- exiting.
 ---@overload fun():number
----@param optional code number
----@param optional close boolean
+---@param code number
+---@param close boolean
 ---@return number
 function os.exit(code, close) end
 
@@ -109,7 +111,7 @@ function os.getenv(varname) end
 --- If this function fails, it returns **nil**, plus a string describing the
 --- error and the error code. Otherwise, it returns true.
 ---@param filename string
----@return any|string
+---@return nil|string
 function os.remove(filename) end
 
 ---
@@ -118,7 +120,7 @@ function os.remove(filename) end
 --- code. Otherwise, it returns true.
 ---@param oldname string
 ---@param newname string
----@return any|string
+---@return nil|string
 function os.rename(oldname, newname) end
 
 ---
@@ -138,9 +140,10 @@ function os.rename(oldname, newname) end
 ---
 --- This function may be not thread safe because of its reliance on C function
 --- `setlocale`.
----@overload fun(locale:string):nil
+---@overload fun(locale:string):string|nil
 ---@param locale string
----@param optional category string
+---@param category string
+---@return string|nil
 function os.setlocale(locale, category) end
 
 ---
@@ -165,7 +168,8 @@ function os.setlocale(locale, category) end
 --- When called with a table, `os.time` also normalizes all the fields
 --- documented in the `os.date` function, so that they represent the same time
 --- as before the call but with values inside their valid ranges.
----@param optional table table
+---@overload fun():number
+---@param table table
 ---@return number
 function os.time(table) end
 
