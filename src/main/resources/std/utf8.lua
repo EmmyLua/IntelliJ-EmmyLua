@@ -19,30 +19,31 @@ utf8 = {}
 --- UTF-8 byte sequence and returns a string with the concatenation of all
 --- these sequences.
 ---@return string
-function utf8.char(···) end
+function utf8.char(...) end
 
 ---
 --- The pattern (a string, not a function) "`[\0-\x7F\xC2-\xF4][\x80-\xBF]*`",
 --- which matches exactly one UTF-8 byte sequence, assuming that the subject
 --- is a valid UTF-8 string.
+---@type string
 utf8.charpattern = ""
 
 ---
 --- Returns values so that the construction
----
---- `for p, c in utf8.codes(s) do *body* end`
+--- `for p, c in utf8.codes(s) do body end`
 --- will iterate over all characters in string `s`, with `p` being the position
 --- (in bytes) and `c` the code point of each character. It raises an error if
 --- it meets any invalid byte sequence.
 ---@param s string
----@return fun(p:number, c:number):number
+---@return string
 function utf8.codes(s) end
 
 ---
---- Returns the codepoints (as integers) from all characters in s that start
+--- Returns the codepoints (as integers) from all characters in `s` that start
 --- between byte position `i` and `j` (both included). The default for `i` is
 --- 1  and for `j` is `i`. It raises an error if it meets any invalid byte
 --- sequence.
+---@overload fun(s:string):number
 ---@param s string
 ---@param i number
 ---@param j number
@@ -50,14 +51,15 @@ function utf8.codes(s) end
 function utf8.codepoint (s, i, j) end
 
 ---
---- Returns the number of UTF-8 characters in string s that start between
+--- Returns the number of UTF-8 characters in string `s` that start between
 --- positions `i` and `j` (both inclusive). The default for `i` is 1 and for
 --- `j` is -1. If it finds any invalid byte sequence, returns a false value
 --- plus the position of the first invalid byte.
+---@overload fun(s:string):number
 ---@param s string
 ---@param i number
 ---@param j number
----@return number|number
+---@return number
 function utf8.len(s, i, j) end
 
 ---
@@ -72,6 +74,7 @@ function utf8.len(s, i, j) end
 --- byte of `s`.
 ---
 --- This function assumes that `s` is a valid UTF-8 string.
+---@overload fun(s:string):number
 ---@param s string
 ---@param n number
 ---@param i number
