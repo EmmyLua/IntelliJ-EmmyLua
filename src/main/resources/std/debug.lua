@@ -29,7 +29,8 @@ function debug.debug() end
 --- Returns the current hook settings of the thread, as three values: the
 --- current hook function, the current hook mask, and the current hook count
 --- (as set by the `debug.sethook` function).
----@param optional thread thread
+---@overload fun():thread
+---@param thread thread
 ---@return thread
 function debug.gethook(thread) end
 
@@ -53,9 +54,10 @@ function debug.gethook(thread) end
 --- with a name for the current function, if a reasonable name can be found,
 --- and the expression `debug.getinfo(print)` returns a table with all available
 --- information about the `print` function.
----@param optional thread thread
----@param f fun():table
----@param optional what string
+---@overload fun(f:table):table
+---@param thread thread
+---@param f table
+---@param what string
 ---@return table
 function debug.getinfo(thread, f, what) end
 
@@ -79,11 +81,12 @@ function debug.getinfo(thread, f, what) end
 ---
 --- The parameter `f` may also be a function. In that case, `getlocal` returns
 --- only the name of function parameters.
----@param optional thread thread
----@param f fun():table
----@param local table
----@return string|any
-function debug.getlocal(thread, f, local) end
+---@overload fun(f:table, var:string):table
+---@param thread thread
+---@param f table
+---@param var string
+---@return table
+function debug.getlocal(thread, f, var) end
 
 ---
 --- Returns the metatable of the given `value` or **nil** if it does not have
@@ -104,9 +107,9 @@ function debug.getregistry() end
 ---
 --- Variable names starting with '(' (open parenthesis) represent variables with
 --- no known names (variables from chunks saved without debug information).
----@param f fun():number
+---@param f number
 ---@param up number
----@return string|any
+---@return table
 function debug.getupvalue(f, up) end
 
 ---
@@ -114,7 +117,7 @@ function debug.getupvalue(f, up) end
 --- **false** if the userdata does not have that value.
 ---@param u userdata
 ---@param n number
----@return userdata|boolean
+---@return boolean
 function debug.getuservalue(u, n) end
 
 ---
@@ -138,10 +141,11 @@ function debug.getuservalue(u, n) end
 --- call `getinfo` with level 2 to get more information about the running
 --- function (level 0 is the `getinfo` function, and level 1 is the hook
 --- function)
----@param optional thread thread
+---@overload fun(hook:fun():any, mask:any)
+---@param thread thread
 ---@param hook fun():any
 ---@param mask string
----@param optional count number
+---@param count number
 function debug.sethook(thread, hook, mask, count) end
 
 ---
@@ -151,12 +155,13 @@ function debug.sethook(thread, hook, mask, count) end
 --- raises an error when called with a `level` out of range. (You can call
 --- `getinfo` to check whether the level is valid.) Otherwise, it returns the
 --- name of the local variable.
----@param optional thread thread
+---@overload fun(level:number, var:string, value:any):string
+---@param thread thread
 ---@param level number
----@param local number
+---@param var string
 ---@param value any
 ---@return string
-function debug.setlocal(thread, level, local, value) end
+function debug.setlocal(thread, level, var, value) end
 
 ---
 --- Sets the metatable for the given `object` to the given `table` (which
@@ -170,7 +175,7 @@ function debug.setmetatable(value, table) end
 --- This function assigns the value `value` to the upvalue with index `up`
 --- of the function `f`. The function returns **nil** if there is no upvalue
 --- with the given index. Otherwise, it returns the name of the upvalue.
----@param f fun():number
+---@param f fun():any
 ---@param up number
 ---@param value any
 ---@return string
@@ -192,9 +197,10 @@ function debug.setuservalue(udata, value, n) end
 --- appended at the beginning of the traceback. An optional level number
 --- `tells` at which level to start the traceback (default is 1, the function
 --- c alling `traceback`).
----@param optional thread thread
----@param optional message string
----@param optional level number
+---@overload fun():string
+---@param thread thread
+---@param message string
+---@param level number
 ---@return string
 function debug.traceback(thread, message, level) end
 
