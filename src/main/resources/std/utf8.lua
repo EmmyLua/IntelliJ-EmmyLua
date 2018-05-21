@@ -30,7 +30,7 @@ utf8.charpattern = ""
 
 ---
 --- Returns values so that the construction
---- `for p, c in utf8.codes(s) do body end`
+--- > `for p, c in utf8.codes(s) do` *body* `end`
 --- will iterate over all characters in string `s`, with `p` being the position
 --- (in bytes) and `c` the code point of each character. It raises an error if
 --- it meets any invalid byte sequence.
