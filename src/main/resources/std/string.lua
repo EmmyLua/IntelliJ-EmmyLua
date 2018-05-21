@@ -21,9 +21,10 @@ string = {}
 --- `string.sub`.
 ---
 --- Note that numerical codes are not necessarily portable across platforms.
+---@overload fun(s:string):number
 ---@param s string
----@param optional i number
----@param optional j number
+---@param i number
+---@param j number
 ---@return number
 function string.byte(s, i, j) end
 
@@ -47,8 +48,9 @@ function string.char(...) end
 --- loaded, those upvalues receive fresh instances containing **nil**. (You can
 --- use the debug library to serialize and reload the upvalues of a function in
 --- a way adequate to your needs.)
----@param func fun():number
----@param optional strip boolean
+---@overload fun(func:fun()):string
+---@param func fun()
+---@param strip boolean
 ---@return string
 function string.dump(func, strip) end
 
@@ -65,12 +67,11 @@ function string.dump(func, strip) end
 ---
 --- If the pattern has captures, then in a successful match the captured values
 --- are also returned, after the two indices.
----@overload fun(s:string, pattern:string):number|number
----@overload fun(s:string, pattern:string, init:number):number|number
+---@overload fun(s:string, pattern:string):number|number|string
 ---@param s string
 ---@param pattern string
----@param optional init number
----@param optional plain boolean
+---@param init number
+---@param plain boolean
 ---@return number|number|string
 function string.find(s, pattern, init, plain) end
 
@@ -88,16 +89,15 @@ function string.find(s, pattern, init, plain) end
 --- quotes, using escape sequences when necessary to ensure that it can safely
 --- be read back by the Lua interpreter. For instance, the call
 ---
---- string.format('%q', 'a string with "quotes" and \n new line')
----
---- may produce the string:
+--- string.format('%q', 'a string with "quotes" and \n new line') may produce
+--- the string:
 ---
 --- "a string with \"quotes\" and \
 --- new line"
 ---
 --- The options `A`, `a`, `E`, `e`, `f`, `g`, `G` and `g` all expect a number as
 --- argument. Options `c`, `d`, `i`, `o`, `u`, `X`, and `x` expect an integer.
----When Lua is compiled with a C89 compiler, options `A` and `a` (hexadecimal
+--- When Lua is compiled with a C89 compiler, options `A` and `a` (hexadecimal
 --- floats) do not support any modifier (flags, width, length).
 ---
 --- Option `s` expects a string; if its argument is not a string, it is
@@ -114,34 +114,35 @@ function string.format(formatstring, ...) end
 --- captures, then the whole match is produced in each call.
 ---
 --- As an example, the following loop will iterate over all the words from
---- string s, printing one per line:
+--- string `s`, printing one per line:
 ---
---- s = "hello world from Lua"
---- for w in string.gmatch(s, "%a+") do
----     print(w)
---- end
+--- `s = "hello world from Lua"`
+--- `for w in string.gmatch(s, "%a+") do`
+---     `print(w)`
+--- `end`
 ---
 --- The next example collects all pairs `key=value` from the given string into a
 --- table:
 ---
---- t = {}
---- s = "from=world, to=Lua"
---- for k, v in string.gmatch(s, "(%w+)=(%w+)") do
----     t[k] = v
---- end
+--- `t = {}`
+---  s = "from=world, to=Lua"`
+--- `for k, v in string.gmatch(s, "(%w+)=(%w+)") do`
+---     `t[k] = v`
+--- `end`
 ---
 --- For this function, a caret '`^`' at the start of a pattern does not work as
 --- an anchor, as this would prevent the iteration.
 ---@param s string
 ---@param pattern string
----@return func():string
+---@return fun():string|table
 function string.gmatch(s, pattern) end
 
 ---
 --- Returns a copy of `s` in which all (or the first `n`, if given)
 --- occurrences of the `pattern` have been replaced by a replacement string
 --- specified by `repl`, which can be a string, a table, or a function. `gsub`
---- also returns, as its second value, the total number of matches that occurred.
+--- also returns, as its second value, the total number of matches that
+--- occurred.
 ---
 --- If `repl` is a string, then its value is used for replacement. The character
 --- `%` works as an escape character: any sequence in `repl` of the form `%n`,
@@ -164,26 +165,26 @@ function string.gmatch(s, pattern) end
 --- match is kept in the string).
 ---
 --- Here are some examples:
---- x = string.gsub("hello world", "(%w+)", "%1 %1")
---- -- > x="hello hello world world"
---- x = string.gsub("hello world", "%w+", "%0 %0", 1)
---- -- > x="hello hello world"
---- x = string.gsub("hello world from Lua", "(%w+)%s*(%w+)", "%2 %1")
---- -- > x="world hello Lua from"
---- x = string.gsub("home = $HOME, user = $USER", "%$(%w+)", os.getenv)
---- -- > x="home = /home/roberto, user = roberto"
---- x = string.gsub("4+5 = $return 4+5$", "%$(.-)%$", function (s)
----         return loadstring(s)()
----     end)
---- -- > x="4+5 = 9"
---- local t = {name="lua", version="5.1"}
---- x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)
---- -- > x="lua-5.1.tar.gz"
----@overload fun(s:string, pattern:string, repl:string|fun()):nil
+--- `x = string.gsub("hello world", "(%w+)", "%1 %1")`
+--- `-- > x="hello hello world world"`
+--- `x = string.gsub("hello world", "%w+", "%0 %0", 1)`
+--- `-- > x="hello hello world"`
+--- `x = string.gsub("hello world from Lua", "(%w+)%s*(%w+)", "%2 %1")`
+--- `-- > x="world hello Lua from"`
+--- `x = string.gsub("home = $HOME, user = $USER", "%$(%w+)", os.getenv)`
+--- `-- > x="home = /home/roberto, user = roberto"`
+--- `x = string.gsub("4+5 = $return 4+5$", "%$(.-)%$", function (s)`
+---  >> return loadstring(s)()
+---  > end)
+--- `-- > x="4+5 = 9"`
+--- `local t = {name="lua", version="5.1"}`
+--- `x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)`
+--- > x="lua-5.1.tar.gz"
+---@overload fun(s:string, pattern:string, repl:string|fun()):string|number
 ---@param s string
 ---@param pattern string
 ---@param repl string|fun()
----@param optional n number
+---@param n number
 ---@return string|number
 function string.gsub(s, pattern, repl, n) end
 
@@ -208,10 +209,10 @@ function string.lower(s) end
 --- it returns **nil**. If `pattern` specifies no captures, then the whole match
 --- is returned. A third, optional numerical argument `init` specifies where
 --- to start the search; its default value is 1 and can be negative.
----@overload fun(s:string, pattern:string):void
+---@overload fun(s:string, pattern:string):any
 ---@param s string
 ---@param pattern string
----@param optional init number
+---@param init number
 ---@return any
 function string.match(s, pattern, init) end
 
@@ -222,7 +223,7 @@ function string.match(s, pattern, init) end
 ---@param v1 string
 ---@param v2 string
 ---@return string
-function string.pack(fmt, v1, v2, ···) end
+function string.pack(fmt, v1, v2, ...) end
 
 ---
 --- Returns the size of a string resulting from `string.pack` with the given
@@ -240,9 +241,10 @@ function string.packsize(fmt) end
 ---
 --- Note that it is very easy to exhaust the memory of your machine with a
 --- single call to this function.
+---@overload fun(s:string, n:number):string
 ---@param s string
 ---@param n number
----@param optional sep string
+---@param sep string
 ---@return string
 function string.rep(s, n, sep) end
 
@@ -264,9 +266,10 @@ function string.reverse(s) end
 --- corrected to 1. If `j` is greater than the string length, it is corrected to
 --- that length. If, after these corrections, `i` is greater than `j`, the
 --- function returns the empty string.
+---@overload fun(s:string, i:number):string
 ---@param s string
 ---@param i number
----@param optional j number
+---@param j number
 ---@return string
 function string.sub(s, i, j) end
 
@@ -275,9 +278,10 @@ function string.sub(s, i, j) end
 --- `fmt`. An optional `pos` marks where to start reading in `s` (default is 1).
 --- After the read values, this function also returns the index of the first
 --- unread byte in `s`.
+---@overload fun(fmt:string, s:string):string
 ---@param fmt string
 ---@param s string
----@param optional pos number
+---@param pos number
 ---@return string
 function string.unpack(fmt, s, pos) end
 
