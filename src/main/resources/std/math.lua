@@ -39,8 +39,9 @@ function math.asin(x) return 0 end
 ---
 --- The default value for `x` is 1, so that the call `math.atan(y)`` returns the
 --- arc tangent of `y`.
+---@overload fun(y:number):number
 ---@param y number
----@param optional x number
+---@param x number
 ---@return number
 function math.atan(y, x) return 0 end
 
@@ -89,8 +90,9 @@ math.huge = ""
 ---
 --- Returns the logarithm of `x` in the given base. The default for `base` is
 --- *e* (so that the function returns the natural logarithm of `x`).
+---@overload fun(x:number):number
 ---@param x number
----@param optional base number
+---@param base number
 ---@return number
 function math.log(x, base) end
 
@@ -140,8 +142,8 @@ function math.rad(x) end
 --- in the range *[m, n]*. The call `math.random(n)` is equivalent to `math
 --- .random`(1,n).
 ---@overload fun():number
----@param optional m number
----@param optional n number
+---@param m number
+---@param n number
 ---@return number
 function math.random(m, n) end
 
