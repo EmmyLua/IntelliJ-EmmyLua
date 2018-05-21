@@ -17,7 +17,8 @@ io = {}
 ---
 --- Equivalent to `file:close()`. Without a file, closes the default output
 --- file.
----@param optional file file
+---@overload fun()
+---@param file file
 function io.close(file) end
 
 ---
@@ -33,7 +34,7 @@ function io.flush() end
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
 ---@overload fun():number
----@param optional file string|file
+---@param file file
 ---@return number
 function io.input(file) end
 
@@ -50,8 +51,9 @@ function io.input(file) end
 ---
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
----@param optional filename string|file
----@return any
+---@overload fun():any
+---@param filename string
+---@return fun():any
 function io.lines(filename, ...) end
 
 ---
@@ -59,24 +61,26 @@ function io.lines(filename, ...) end
 --- case of success, it returns a new file handle. The `mode` string can be
 --- any of the following:
 ---
---- "r": read mode (the default);
---- "w": write mode;
---- "a": append mode;
---- "r+": update mode, all previous data is preserved;
---- "w+": update mode, all previous data is erased;
---- "a+": append update mode, previous data is preserved, writing is only
+--- **"r"**: read mode (the default);
+--- **"w"**: write mode;
+--- **"a"**: append mode;
+--- **"r+"**: update mode, all previous data is preserved;
+--- **"w+"**: update mode, all previous data is erased;
+--- **"a+"**: append update mode, previous data is preserved, writing is only
 --- allowed at the end of file.
 ---
 --- The `mode` string can also have a '`b`' at the end, which is needed in
 --- some systems to open the file in binary mode.
----@param filename string|file
----@param optional mode string
----@return any
+---@overload fun(filename:string):file
+---@param filename string
+---@param mode string
+---@return file
 function io.open(filename, mode) return file end
 
 ---
 --- Similar to `io.input`, but operates over the default output file.
----@param optional file string|file
+---@overload fun()
+---@param file file
 function io.output(file) end
 
 ---
@@ -85,8 +89,9 @@ function io.output(file) end
 --- Starts program `prog` in a separated process and returns a file handle that
 --- you can use to read data from this program (if `mode` is "`r`", the default)
 --- or to write data to this program (if `mode` is "`w`").
----@param prog string|file
----@param optional mode string
+---@overload fun(prog:file):any
+---@param prog file
+---@param mode string
 ---@return any
 function io.popen(prog, mode) end
 
@@ -112,7 +117,6 @@ function io.type(obj) end
 function io.write(...) end
 
 --- File object
---- @class file
 local file = {}
 
 ---
@@ -139,7 +143,7 @@ function file:flush() end
 ---
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
----@return fun():nil
+---@return fun():any
 function file:lines(...) end
 
 ---
@@ -185,8 +189,9 @@ function file:read(...) end
 --- it; the call `file:seek("set")` sets the position to the beginning of the
 --- file (and returns 0); and the call `file:seek("end")` sets the position
 --- to the end of the file, and returns its size.
----@param optional whence string
----@param optional offset number
+---@overload fun()
+---@param whence string
+---@param offset number
 function file:seek(whence, offset) end
 
 ---
@@ -201,8 +206,9 @@ function file:seek(whence, offset) end
 ---
 --- For the last two cases, `size` specifies the size of the buffer, in
 --- bytes. The default is an appropriate size.
+---@overload fun(mode:string)
 ---@param mode string
----@param optional size number
+---@param size number
 function file:setvbuf(mode, size) end
 
 ---
