@@ -15,17 +15,6 @@
 
 local toluaDebugger = {}
 
-local function getMtAndTable(obj)
-	local mt = getmetatable(obj)
-	local tab
-	if tolua.getpeer and type(tolua.getpeer) == 'function' then
-		tab = tolua.getpeer(obj)
-	else
-		tab = mt[tolua.gettag]
-	end
-	return mt, tab
-end
-
 function toluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
     if ty == 'userdata' then
         if depth <= 1 then return nil end
@@ -82,10 +71,39 @@ function xluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAs
     end
 end
 
+local cocosLuaDebugger = {}
+function cocosLuaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
+    if ty == 'userdata' then
+        if depth <= 1 then return nil end
+        local mt, tab = getmetatable(obj), tolua.getpeer(obj)
+        if mt == nil then return nil end
+        local tableNode = cocosLuaDebugger.RawGetValueAsText(obj, depth, nil, false)
+        if tableNode == nil then return nil end
+
+        local propMap = {}
+        while mt ~= nil and tab ~= nil do
+            for property, _ in pairs(tab) do
+                if not propMap[property] then
+                    propMap[property] = true
+                    local key = cocosLuaDebugger.RawGetValueAsText(property, 0, nil, true)
+                    local value = cocosLuaDebugger.RawGetValueAsText(obj[property], depth - 1, nil, false)
+                    cocosLuaDebugger.AddChildNode(tableNode, key, value)
+                end
+            end
+            mt, tab = getmetatable(mt), tolua.getpeer(mt)
+        end
+        return tableNode
+    end
+end
+
 emmy = {}
 
 if tolua then
-    emmy = toluaDebugger
+	if not tolua.getpeer then
+		emmy = toluaDebugger
+	else
+		emmy = cocosLuaDebugger
+	end
 elseif xlua then
     emmy = xluaDebugger
 end
