@@ -63,3 +63,18 @@ QQ交流群：`29850775`
 ## Building
 
   `./gradlew buildPlugin`
+
+## Developed By
+
+[**@tangzx** 阿唐](https://github.com/tangzx)
+
+**Contributors**
+- [**@dsmgit** dsmgit](https://github.com/dsmgit)
+- [**@Perryvw** Perry van Wesel](https://github.com/Perryvw)
+- [**@mqualizz** Marco Qualizza](https://github.com/mqualizz)
+- [**@ice1000** Tesla Ice Zhang](https://github.com/ice1000)
+- [**@LiamYao** Yao](https://github.com/LiamYao)
+- [**@Dauch** Tyler Dauch](https://github.com/Dauch)
+- [**@jb574** jb574](https://github.com/jb574)
+- [**@KKKIIO** KKKIIO](https://github.com/KKKIIO)
+- [**@zj6882917** zj6882917](https://github.com/zj6882917)
