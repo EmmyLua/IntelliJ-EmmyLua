@@ -15,28 +15,36 @@
 
 local toluaDebugger = {}
 
+local function getMtAndTable(obj)
+	local mt = getmetatable(obj)
+	local tab
+	if tolua.getpeer and type(tolua.getpeer) == 'function' then
+		tab = tolua.getpeer(obj)
+	else
+		tab = mt[tolua.gettag]
+	end
+	return mt, tab
+end
+
 function toluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
     if ty == 'userdata' then
         if depth <= 1 then return nil end
-        local mt = getmetatable(obj)
+        local mt, tab = getMtAndTable(obj)
         if mt == nil then return nil end
         local tableNode = toluaDebugger.RawGetValueAsText(obj, depth, nil, false)
         if tableNode == nil then return nil end
 
         local propMap = {}
-        while mt ~= nil do
-            local getTab = mt[tolua.gettag]
-            if getTab then
-                for property, _ in pairs(getTab) do
-                    if not propMap[property] then
-                        propMap[property] = true
-                        local key = toluaDebugger.RawGetValueAsText(property, 0, nil, true)
-                        local value = toluaDebugger.RawGetValueAsText(obj[property], depth - 1, nil, false)
-                        toluaDebugger.AddChildNode(tableNode, key, value)
-                    end
+        while mt ~= nil and tab ~= nil do
+            for property, _ in pairs(tab) do
+                if not propMap[property] then
+                    propMap[property] = true
+                    local key = toluaDebugger.RawGetValueAsText(property, 0, nil, true)
+                    local value = toluaDebugger.RawGetValueAsText(obj[property], depth - 1, nil, false)
+                    toluaDebugger.AddChildNode(tableNode, key, value)
                 end
             end
-            mt = getmetatable(mt)
+            mt, tab = getMtAndTable(mt)
         end
         return tableNode
     end
