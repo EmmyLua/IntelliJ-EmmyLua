@@ -29,7 +29,7 @@ import com.tang.intellij.lua.stubs.readParamInfoArray
 import com.tang.intellij.lua.stubs.writeParamInfoArray
 
 interface IFunSignature {
-    val selfCall: Boolean
+    val colonCall: Boolean
     val returnTy: ITy
     val params: Array<LuaParamInfo>
     val displayName: String
@@ -43,15 +43,15 @@ fun IFunSignature.processArgs(callExpr: LuaCallExpr, processor: (index:Int, para
     val thisTy = if (expr is LuaIndexExpr) {
         expr.guessType(SearchContext(expr.project))
     } else null
-    processArgs(thisTy, callExpr.isMethodCall, processor)
+    processArgs(thisTy, callExpr.isMethodColonCall, processor)
 }
 
 fun IFunSignature.processArgs(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     var index = 0
     var pIndex = 0
-    if (colonStyle && !selfCall) {
+    if (colonStyle && !colonCall) {
         pIndex++
-    } else if (!colonStyle && selfCall) {
+    } else if (!colonStyle && colonCall) {
         val pi = LuaParamInfo(Constants.WORD_SELF, thisTy ?: Ty.UNKNOWN)
         if (!processor(index++, pi)) return
     }
@@ -63,7 +63,7 @@ fun IFunSignature.processArgs(thisTy: ITy?, colonStyle: Boolean, processor: (ind
 
 fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     var index = 0
-    if (selfCall) {
+    if (colonCall) {
         val pi = LuaParamInfo(Constants.WORD_SELF, thisTy ?: Ty.UNKNOWN)
         if (!processor(index++, pi)) return
     }
@@ -94,7 +94,7 @@ fun IFunSignature.hasVarArgs(): Boolean {
 
 fun IFunSignature.isGeneric() = tyParameters.isNotEmpty()
 
-abstract class FunSignatureBase(override val selfCall: Boolean,
+abstract class FunSignatureBase(override val colonCall: Boolean,
                                 override val params: Array<LuaParamInfo>,
                                 override val tyParameters: List<TyParameter> = emptyList()
 ) : IFunSignature {
@@ -134,15 +134,15 @@ abstract class FunSignatureBase(override val selfCall: Boolean,
 
     override fun substitute(substitutor: ITySubstitutor): IFunSignature {
         val list = params.map { it.substitute(substitutor) }
-        return FunSignature(selfCall, returnTy.substitute(substitutor), list.toTypedArray())
+        return FunSignature(colonCall, returnTy.substitute(substitutor), list.toTypedArray())
     }
 }
 
-class FunSignature(selfCall: Boolean,
+class FunSignature(colonCall: Boolean,
                    override val returnTy: ITy,
                    params: Array<LuaParamInfo>,
                    tyParameters: List<TyParameter> = emptyList()
-) : FunSignatureBase(selfCall, params, tyParameters) {
+) : FunSignatureBase(colonCall, params, tyParameters) {
 
     companion object {
         private fun initParams(func: LuaDocFunctionTy): Array<LuaParamInfo> {
@@ -156,21 +156,21 @@ class FunSignature(selfCall: Boolean,
             return list.toTypedArray()
         }
 
-        fun create(selfCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
-            return FunSignature(selfCall, functionTy.returnType, initParams(functionTy))
+        fun create(colonCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
+            return FunSignature(colonCall, functionTy.returnType, initParams(functionTy))
         }
 
         fun serialize(sig: IFunSignature, stream: StubOutputStream) {
-            stream.writeBoolean(sig.selfCall)
+            stream.writeBoolean(sig.colonCall)
             Ty.serialize(sig.returnTy, stream)
             stream.writeParamInfoArray(sig.params)
         }
 
         fun deserialize(stream: StubInputStream): IFunSignature {
-            val selfCall = stream.readBoolean()
+            val colonCall = stream.readBoolean()
             val ret = Ty.deserialize(stream)
             val params = stream.readParamInfoArray()
-            return FunSignature(selfCall, ret, params)
+            return FunSignature(colonCall, ret, params)
         }
     }
 }
@@ -180,7 +180,7 @@ interface ITyFunction : ITy {
     val signatures: Array<IFunSignature>
 }
 
-val ITyFunction.isSelfCall get() = hasFlag(TyFlags.SELF_FUNCTION)
+val ITyFunction.isColonCall get() = hasFlag(TyFlags.SELF_FUNCTION)
 
 fun ITyFunction.process(processor: Processor<IFunSignature>) {
     if (processor.process(mainSignature)) {
@@ -243,10 +243,10 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 }
 
-class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
+class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
     init {
         this.flags = flags
-        if (selfCall) {
+        if (colonCall) {
             this.flags = this.flags or TyFlags.SELF_FUNCTION
         }
     }
@@ -260,7 +260,7 @@ class TyPsiFunction(private val selfCall: Boolean, val psi: LuaFuncBodyOwner, se
             genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
         }
 
-        object : FunSignatureBase(selfCall, psi.params) {
+        object : FunSignatureBase(colonCall, psi.params) {
             override val returnTy: ITy by lazy {
                 var returnTy = psi.guessReturnType(SearchContext(psi.project))
                 /**

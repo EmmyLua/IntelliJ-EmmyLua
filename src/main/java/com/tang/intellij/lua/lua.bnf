@@ -425,8 +425,8 @@ left callExpr ::= args {
         resolveFuncBodyOwner
         getFirstStringArg
 
-        isStaticMethodCall
-        isMethodCall
+        isMethodDotCall
+        isMethodColonCall
         isFunctionCall
     ]
     stubClass = 'com.tang.intellij.lua.stubs.LuaExprStub'

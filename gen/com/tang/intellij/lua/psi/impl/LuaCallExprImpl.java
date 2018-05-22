@@ -66,12 +66,12 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
     return LuaPsiImplUtilKt.getFirstStringArg(this);
   }
 
-  public boolean isStaticMethodCall() {
-    return LuaPsiImplUtilKt.isStaticMethodCall(this);
+  public boolean isMethodDotCall() {
+    return LuaPsiImplUtilKt.isMethodDotCall(this);
   }
 
-  public boolean isMethodCall() {
-    return LuaPsiImplUtilKt.isMethodCall(this);
+  public boolean isMethodColonCall() {
+    return LuaPsiImplUtilKt.isMethodColonCall(this);
   }
 
   public boolean isFunctionCall() {

@@ -238,14 +238,14 @@ fun getFirstStringArg(callExpr: LuaCallExpr): PsiElement? {
     return path
 }
 
-fun isStaticMethodCall(callExpr: LuaCallExpr): Boolean {
+fun isMethodDotCall(callExpr: LuaCallExpr): Boolean {
     val expr = callExpr.expr
     if (expr is LuaNameExpr)
         return true
     return expr is LuaIndexExpr && expr.colon == null
 }
 
-fun isMethodCall(callExpr: LuaCallExpr): Boolean {
+fun isMethodColonCall(callExpr: LuaCallExpr): Boolean {
     val expr = callExpr.expr
     return expr is LuaIndexExpr && expr.colon != null
 }

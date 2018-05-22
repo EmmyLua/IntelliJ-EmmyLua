@@ -168,10 +168,11 @@ val LuaFuncBodyOwner.overloads: Array<IFunSignature> get() {
         val comment = comment
         if (comment != null) {
             val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocOverloadDef::class.java)
+            val colonCall = this is LuaClassMethodDef && !this.isStatic
             children.forEach {
                 val fty = it.functionTy
                 if (fty != null)
-                    list.add(FunSignature.create(false, fty))
+                    list.add(FunSignature.create(colonCall, fty))
             }
         }
     }
