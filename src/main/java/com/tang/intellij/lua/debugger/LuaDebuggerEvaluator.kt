@@ -66,12 +66,14 @@ abstract class LuaDebuggerEvaluator : XDebuggerEvaluator() {
     }
 
     override fun evaluate(express: String, xEvaluationCallback: XDebuggerEvaluator.XEvaluationCallback, xSourcePosition: XSourcePosition?) {
-        val lastDot = express.lastIndexOf('.')
-        val lastColon = express.lastIndexOf(':')
-        if (lastColon > lastDot)
-            eval("${express.substring(0, lastColon)}.${express.substring(lastColon + 1)}", xEvaluationCallback, xSourcePosition)
-        else
-            eval(express, xEvaluationCallback, xSourcePosition)
+        var expr = express.trim()
+        if (!expr.endsWith(')')) {
+            val lastDot = express.lastIndexOf('.')
+            val lastColon = express.lastIndexOf(':')
+            if (lastColon > lastDot) // a:xx -> a.xx
+                expr = expr.replaceRange(lastColon, lastColon + 1, ".")
+        }
+        eval(expr, xEvaluationCallback, xSourcePosition)
     }
 
     protected abstract fun eval(express: String, xEvaluationCallback: XDebuggerEvaluator.XEvaluationCallback, xSourcePosition: XSourcePosition?)
