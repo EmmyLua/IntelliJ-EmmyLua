@@ -74,6 +74,7 @@ QQ交流群：`29850775`
 - [**@mqualizz** Marco Qualizza](https://github.com/mqualizz)
 - [**@ice1000** Tesla Ice Zhang](https://github.com/ice1000)
 - [**@LiamYao** Yao](https://github.com/LiamYao)
+- [**@luchuanbaker** luchuanbaker](https://github.com/luchuanbaker)
 - [**@Dauch** Tyler Dauch](https://github.com/Dauch)
 - [**@jb574** jb574](https://github.com/jb574)
 - [**@KKKIIO** KKKIIO](https://github.com/KKKIIO)
