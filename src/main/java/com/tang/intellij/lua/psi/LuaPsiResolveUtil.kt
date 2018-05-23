@@ -143,7 +143,7 @@ fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
     var resolveResult = resolveInFile(nameExpr.name, nameExpr, context)
 
     //global
-    if (resolveResult == null) {
+    if (resolveResult == null || resolveResult is LuaNameExpr) {
         val refName = nameExpr.name
         val moduleName = nameExpr.moduleName ?: Constants.WORD_G
         LuaClassMemberIndex.process(moduleName, refName, context, Processor {
