@@ -29,6 +29,7 @@ void DMReqInitialize::Read(ByteInputStream* stream)
 	stream->ReadString(emmyLuaFile);
 	captureStd = stream->ReadBool();
 	captureOutputDebugString = stream->ReadBool();
+	stream->ReadString(outputCharset);
 }
 
 DMException::DMException(): DebugMessage(DebugMessageId::Exception)

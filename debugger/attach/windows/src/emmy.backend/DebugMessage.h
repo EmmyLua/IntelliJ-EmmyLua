@@ -81,6 +81,7 @@ public:
 	std::string emmyLuaFile;
 	bool captureStd;
 	bool captureOutputDebugString;
+	std::string outputCharset;
 };
 
 class DMException : public DebugMessage

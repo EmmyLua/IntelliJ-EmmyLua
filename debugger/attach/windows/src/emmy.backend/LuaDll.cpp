@@ -2024,7 +2024,7 @@ VOID WINAPI OutputDebugStringW_intercept(
 	_In_opt_ LPCWSTR lpOutputString) {
 	OutputDebugStringW(lpOutputString);
 
-	std::string s = WcharToChar(lpOutputString);
+	std::string s = WcharToChar(lpOutputString, DebugBackend::Get().GetOutputCP());
 
 	DebugBackend::Get().Message(s.c_str(), MessageType_Stdout);
 }

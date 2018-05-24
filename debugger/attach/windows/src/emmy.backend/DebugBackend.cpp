@@ -78,7 +78,7 @@ const char* MemoryReader(lua_State* L, void* data, size_t* size)
 
 BOOL inputStdin(const char* str)
 {
-	std::wstring s = CharToWchar(str);
+	std::wstring s = CharToWchar(str, DebugBackend::Get().GetOutputCP());
 
 	for (const wchar_t* p = s.c_str(); *p; ++p)
 	{
@@ -1232,6 +1232,11 @@ bool DebugBackend::GetIsAttached() const
 	return WaitForSingleObject(m_detachEvent, 0) != WAIT_OBJECT_0;
 }
 
+size_t DebugBackend::GetOutputCP()
+{
+	return m_outputCP;
+}
+
 void DebugBackend::HandleMessage(DebugMessage* message)
 {
 	switch (message->getId())
@@ -1277,6 +1282,13 @@ void DebugBackend::HandleMessage(DebugMessage* message)
 		}
 		m_mode = Mode_Continue;
 		m_emmyLuaFilePath = init_emmy->emmyLuaFile;
+
+		transform(init_emmy->outputCharset.begin(), init_emmy->outputCharset.end(), init_emmy->outputCharset.begin(), toupper);
+		if (init_emmy->outputCharset.compare("GBK") == 0) {
+			m_outputCP = CP_ACP;
+		} else {
+			m_outputCP = CP_UTF8;
+		}
 		m_profiler = false;
 		DebugMessage resp(DebugMessageId::RespInitialize);
 		m_debugPipeline->Send(&resp);

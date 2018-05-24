@@ -120,7 +120,7 @@ abstract class LuaAttachBridgeBase(val process: LuaAttachDebugProcessBase, val s
             writer = DataOutputStream(socket.getOutputStream())
 
             ApplicationManager.getApplication().executeOnPooledThread {
-                send(DMReqInitialize("", emmyLua!!, captureStd, captureOutput))
+                send(DMReqInitialize("", emmyLua!!, captureStd, captureOutput, process.charset))
                 processPack()
             }
         } catch (e: Exception) {
