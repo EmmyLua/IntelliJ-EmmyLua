@@ -283,6 +283,14 @@ val LuaNameExpr.docTy: ITy? get() {
 
 private val KEY_SHOULD_CREATE_STUB = Key.create<CachedValue<Boolean>>("lua.should_create_stub")
 
+// { field = valueExpr }
+// { valueExpr }
+// { ["field"] = valueExpr }
+val LuaTableField.valueExpr: LuaExpr? get() {
+    val list = PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaExpr::class.java)
+    return list.lastOrNull()
+}
+
 val LuaTableField.shouldCreateStub: Boolean get() =
     CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB, {
         CachedValueProvider.Result.create(innerShouldCreateStub, this)

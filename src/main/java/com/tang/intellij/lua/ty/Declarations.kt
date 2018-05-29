@@ -173,11 +173,8 @@ private fun LuaTableField.infer(context: SearchContext): ITy {
         return docTy
 
     //guess from value
-    val valueExpr = PsiTreeUtil.getStubChildOfType(this, LuaExpr::class.java)
-    if (valueExpr != null) {
-        return infer(valueExpr, context)
-    }
-    return Ty.UNKNOWN
+    val valueExpr = valueExpr
+    return if (valueExpr != null) infer(valueExpr, context) else Ty.UNKNOWN
 }
 
 private fun inferFile(file: LuaPsiFile, context: SearchContext): ITy {
