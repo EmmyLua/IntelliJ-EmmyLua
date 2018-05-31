@@ -31,6 +31,8 @@ sourceSets {
 	}
 }
 
+apply from: "patchs/patch.gradle"
+
 // Appveyor CI
 if (System.env['APPVEYOR']) {
 	version = System.env['APPVEYOR_BUILD_VERSION']

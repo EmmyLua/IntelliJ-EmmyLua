@@ -1,0 +1,34 @@
+def getRev() {
+	//Git Rev
+	def os = new ByteArrayOutputStream()
+	def e = exec {
+	    executable "git"
+	    args "rev-parse"
+	    args "HEAD"
+	    standardOutput = os
+	}
+	return os.toString().substring(0, 7)
+}
+
+def HEAD = getRev()
+
+def makePatch(v, rev) {
+	tasks.create(name:"patch_${v}") {
+		doLast {
+			exec {
+				executable "git"
+				args "reset", "HEAD", "--hard"
+			}
+			exec {
+				executable "git"
+				args "am", "patchs/172/0001-Revert-Compatible-with-IDEA2018.2.patch"
+			}
+			exec {
+				executable "git"
+				args "reset", rev
+			}
+		}
+	}
+}
+
+makePatch("173", "IC-173.4127.27", HEAD)
