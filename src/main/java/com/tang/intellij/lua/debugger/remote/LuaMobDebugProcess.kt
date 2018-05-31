@@ -118,11 +118,13 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
 
     override fun onConnect(client: MobClient) {
         mobClient = client
+        client.addCommand("DELB * 0")
         processBreakpoint(Processor { bp ->
             bp.sourcePosition?.let { sendBreakpoint(client, it) }
             true
         })
-        client.addCommand("RUN")
+        client.addCommand((GetStackCommand()))
+        //client.addCommand("RUN")
     }
 
     override val process: LuaMobDebugProcess
