@@ -134,7 +134,7 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
         for (topFrame in frames) {
             val sourcePosition = topFrame.sourcePosition
             if (sourcePosition != null) {
-                stack.topFrame = topFrame
+                stack.setTopFrame(topFrame)
                 val breakpoint = getBreakpoint(sourcePosition.file, sourcePosition.line)
                 if (breakpoint != null) {
                     ApplicationManager.getApplication().invokeLater {

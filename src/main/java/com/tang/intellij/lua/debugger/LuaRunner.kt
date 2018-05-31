@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.debugger;
+package com.tang.intellij.lua.debugger
 
-import com.intellij.execution.configurations.RunProfile;
-import com.intellij.execution.executors.DefaultDebugExecutor;
-import com.intellij.execution.executors.DefaultRunExecutor;
-import com.intellij.execution.runners.GenericProgramRunner;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.execution.configurations.RunProfile
+import com.intellij.execution.configurations.RunnerSettings
+import com.intellij.execution.executors.DefaultDebugExecutor
+import com.intellij.execution.executors.DefaultRunExecutor
+import com.intellij.execution.runners.GenericProgramRunner
 
 /**
  * lua runner
  * Created by tangzx on 2017/6/10.
  */
-public abstract class LuaRunner extends GenericProgramRunner {
-    @Override
-    public boolean canRun(@NotNull String executorId, @NotNull RunProfile runProfile) {
-        return DefaultDebugExecutor.EXECUTOR_ID.equals(executorId) || DefaultRunExecutor.EXECUTOR_ID.equals(executorId);
+abstract class LuaRunner : GenericProgramRunner<RunnerSettings>() {
+    override fun canRun(executorId: String, runProfile: RunProfile): Boolean {
+        return DefaultDebugExecutor.EXECUTOR_ID == executorId || DefaultRunExecutor.EXECUTOR_ID == executorId
     }
 }
