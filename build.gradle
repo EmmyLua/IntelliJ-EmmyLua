@@ -42,7 +42,7 @@ intellij {
 	type 'IU'
 	updateSinceUntilBuild false
 	downloadSources false
-	version = "IC-173.4127.27"
+	version = "IC-182.2371.4"
 	localPath System.env['IDEA_HOME']
 }
 
