@@ -11,9 +11,11 @@ def getRev() {
 }
 
 def HEAD = getRev()
-
-def makePatch(v, rev) {
-	tasks.create(name:"patch_${v}") {
+def PATCHS = [
+	"173" : ["patchs/173/0001-Revert-Compatible-with-IDEA2018.2.patch"]
+]
+def makePatch(v, ideaVer, patchs, rev) {
+	def patchTask = tasks.create(name:"patch_${v}") {
 		doLast {
 			exec {
 				executable "git"
@@ -21,7 +23,7 @@ def makePatch(v, rev) {
 			}
 			exec {
 				executable "git"
-				args "am", "patchs/172/0001-Revert-Compatible-with-IDEA2018.2.patch"
+				args = ["am"] + patchs
 			}
 			exec {
 				executable "git"
@@ -29,6 +31,18 @@ def makePatch(v, rev) {
 			}
 		}
 	}
+	tasks.create(name: "build_${v}", dependsOn:[patchTask]) {
+		finalizedBy buildPlugin
+		doLast {
+			intellij {
+				type 'IU'
+				updateSinceUntilBuild false
+				downloadSources false
+				version = ideaVer
+				localPath System.env['IDEA_HOME']
+			}
+		}
+	}
 }
 
-makePatch("173", "IC-173.4127.27", HEAD)
+makePatch("173", "IC-173.4127.27", PATCHS["173"], HEAD)
