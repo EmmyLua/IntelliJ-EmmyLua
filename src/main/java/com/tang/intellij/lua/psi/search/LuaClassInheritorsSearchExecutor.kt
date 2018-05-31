@@ -31,7 +31,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassI
     private fun processInheritors(searchParameters: LuaClassInheritorsSearch.SearchParameters,
                                   typeName: String,
                                   processedNames: MutableSet<String>,
-                                  processor: Processor<LuaDocClassDef>): Boolean {
+                                  processor: Processor<in LuaDocClassDef>): Boolean {
         var ret = true
         // recursion guard!!
         if (!processedNames.add(typeName))
@@ -52,7 +52,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassI
         return ret
     }
 
-    override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<LuaDocClassDef>): Boolean {
+    override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<in LuaDocClassDef>): Boolean {
         var ref = true
         DumbService.getInstance(searchParameters.project).runReadActionInSmartMode {
             ref = processInheritors(searchParameters, searchParameters.typeName, mutableSetOf(), processor)
