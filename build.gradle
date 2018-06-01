@@ -36,6 +36,14 @@ apply from: "patchs/patch.gradle"
 // Appveyor CI
 if (System.env['APPVEYOR']) {
 	version = System.env['APPVEYOR_BUILD_VERSION']
+	exec {
+		executable "git"
+		args "config", "--global", "user.email", "love.tangzx@qq.com"
+	}
+	exec {
+		executable "git"
+		args "config", "--global", "user.name", "tangzx"
+	}
 }
 
 intellij {
