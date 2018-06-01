@@ -31,6 +31,8 @@ sourceSets {
 	}
 }
 
+apply from: "patchs/patch.gradle"
+
 // Appveyor CI
 if (System.env['APPVEYOR']) {
 	version = System.env['APPVEYOR_BUILD_VERSION']
@@ -40,7 +42,7 @@ intellij {
 	type 'IU'
 	updateSinceUntilBuild false
 	downloadSources false
-	version = "IC-173.4127.27"
+	version = "IC-182.2371.4"
 	localPath System.env['IDEA_HOME']
 }
 

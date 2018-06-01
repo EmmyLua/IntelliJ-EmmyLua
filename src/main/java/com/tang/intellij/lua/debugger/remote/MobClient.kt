@@ -149,8 +149,8 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
         addCommand("DELB $file $line")
     }
 
-    fun addCommand(command: String) {
-        addCommand(DefaultCommand(command, 0))
+    fun addCommand(command: String, rl: Int = 1) {
+        addCommand(DefaultCommand(command, rl))
     }
 
     fun addCommand(command: DebugCommand) {

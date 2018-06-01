@@ -31,6 +31,7 @@ import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
 import com.tang.intellij.lua.debugger.remote.commands.GetStackCommand
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.IOException
+import java.net.BindException
 
 /**
 
@@ -49,13 +50,14 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
 
     override fun sessionInitialized() {
         super.sessionInitialized()
-
         try {
-            println("Start mobdebug server at port:" + runProfile.port, LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
-            println("Waiting for process connection...", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
             mobServer.start(runProfile.port)
-        } catch (e: IOException) {
-            e.printStackTrace()
+            println("Start mobdebug server at port:${runProfile.port}", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+            println("Waiting for process connection...", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+        } catch (e:BindException) {
+            error("Failed start mobdebug server at port:${runProfile.port}\n${e.message}")
+        } catch (e: Exception) {
+            e.message?.let { error(it) }
         }
     }
 
@@ -118,11 +120,13 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
 
     override fun onConnect(client: MobClient) {
         mobClient = client
+        client.addCommand("DELB * 0")
         processBreakpoint(Processor { bp ->
             bp.sourcePosition?.let { sendBreakpoint(client, it) }
             true
         })
-        client.addCommand("RUN")
+        client.addCommand((GetStackCommand()))
+        //client.addCommand("RUN")
     }
 
     override val process: LuaMobDebugProcess
