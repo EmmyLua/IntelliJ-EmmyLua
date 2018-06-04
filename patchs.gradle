@@ -1,0 +1,45 @@
+// Appveyor CI
+if (System.env['APPVEYOR']) {
+    version = System.env['APPVEYOR_BUILD_VERSION']
+    exec {
+        executable "git"
+        args "config", "--global", "user.email", "love.tangzx@qq.com"
+    }
+    exec {
+        executable "git"
+        args "config", "--global", "user.name", "tangzx"
+    }
+}
+
+def versions = [
+    "173": [
+        "ideaSDKVersion": "IC-173.4127.27",
+        "patchs": ["patchs/173/0001-Revert-Compatible-with-IDEA2018.2.patch"]
+    ],
+    "182": [
+        "ideaSDKVersion": "IC-182.2371.4",
+        "patchs": []
+    ]
+]
+
+ext {
+    getRev = {
+        def os = new ByteArrayOutputStream()
+        def e = exec {
+            executable "git"
+            args "rev-parse"
+            args "HEAD"
+            standardOutput = os
+        }
+        return os.toString().substring(0, 7)
+    }
+
+    setDefaultProperty = { name, defaultValue ->
+        if (!this.hasProperty(name))
+            ext[name] = defaultValue
+    }
+
+    getVersionCfg = { shortVer ->
+        return versions[shortVer]
+    }
+}
