@@ -7,8 +7,8 @@
 [![Join the chat at gitter](https://img.shields.io/badge/chat-on%20gitter-46BC99.svg?style=flat-square)](https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 [![加入QQ群](https://img.shields.io/badge/chat-QQ群-46BC99.svg?style=flat-square)](//shang.qq.com/wpa/qunwpa?idkey=f1acce081c45fbb5670ed5f880f7578df7a8b84caa5d2acec230ac957f0c1716)
 
-CI | Status
----|---
+Version | CI status
+--------|----------
 IDEA 172-181|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 IDEA 182-182|[![Build status](https://ci.appveyor.com/api/projects/status/xvahlg1ceiy16dxl?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua-7n83m)
 
