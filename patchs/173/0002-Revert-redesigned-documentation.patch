@@ -1,0 +1,484 @@
+From db8c9b4b5c4eee9f743c63b52fd031742e5723a4 Mon Sep 17 00:00:00 2001
+From: tangzx <272669294@qq.com>
+Date: Wed, 6 Jun 2018 18:31:51 +0800
+Subject: [PATCH] Revert "redesigned documentation"
+
+This reverts commit e9027fedca60bd885e1b2b378cc57949a6b88394.
+---
+ .../tang/intellij/lua/documentation/DocRenderer.kt | 202 ++++++++++-----------
+ .../lua/documentation/LuaDocumentationProvider.kt  | 106 +++++------
+ 2 files changed, 142 insertions(+), 166 deletions(-)
+
+diff --git a/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt b/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
+index 59876eb6..dc0db89f 100644
+--- a/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
++++ b/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
+@@ -20,48 +20,95 @@ import com.intellij.codeInsight.documentation.DocumentationManagerUtil
+ import com.intellij.psi.PsiElement
+ import com.tang.intellij.lua.comment.psi.*
+ import com.tang.intellij.lua.comment.psi.api.LuaComment
+-import com.tang.intellij.lua.ty.IFunSignature
+-import com.tang.intellij.lua.ty.ITy
+-import com.tang.intellij.lua.ty.ITyRenderer
++import com.tang.intellij.lua.ty.*
+ 
+-inline fun StringBuilder.wrap(prefix: String, postfix: String, crossinline body: () -> Unit) {
++internal inline fun StringBuilder.wrap(prefix: String, postfix: String, crossinline body: () -> Unit) {
+     this.append(prefix)
+     body()
+     this.append(postfix)
+ }
+ 
+-inline fun StringBuilder.wrapTag(tag: String, crossinline body: () -> Unit) {
++internal inline fun StringBuilder.wrapTag(tag: String, crossinline body: () -> Unit) {
+     wrap("<$tag>", "</$tag>", body)
+ }
+ 
+-private fun StringBuilder.appendClassLink(clazz: String) {
++internal fun StringBuilder.appendClassLink(clazz: String) {
+     DocumentationManagerUtil.createHyperlink(this, clazz, clazz, true)
+ }
+ 
+-fun renderTy(sb: StringBuilder, ty: ITy, tyRenderer: ITyRenderer) {
+-    tyRenderer.render(ty, sb)
++internal fun renderTy(sb: StringBuilder, ty: ITy) {
++    when (ty) {
++        is ITyClass -> {
++            sb.appendClassLink(ty.displayName)
++        }
++        is ITyFunction -> {
++            sb.append("fun")
++            renderSignature(sb, ty.mainSignature)
++        }
++        is ITyArray -> {
++            renderTy(sb, ty.base)
++            sb.append("[]")
++        }
++        is TyUnknown -> {
++            sb.append("any")
++        }
++        is TyUnion -> {
++            var idx = 0
++            TyUnion.eachPerfect(ty) {
++                if (idx++ != 0) sb.append("|")
++                renderTy(sb, it)
++                true
++            }
++        }
++        is TyPrimitive -> {
++            sb.appendClassLink(ty.displayName)
++        }
++        else -> {
++            sb.append(ty.createTypeString())
++        }
++    }
+ }
+ 
+-fun renderSignature(sb: StringBuilder, signature: IFunSignature, tyRenderer: ITyRenderer) {
+-    val sig = signature.params.map { "${it.name}: ${tyRenderer.render(it.ty)}" }
+-    sb.append("(${sig.joinToString(", <br>        ")}): ")
+-    tyRenderer.render(signature.returnTy, sb)
++internal fun renderSignature(sb: StringBuilder, sig: IFunSignature) {
++    sb.wrap("(", "): ") {
++        var idx = 0
++        sig.params.forEach {
++            if (idx++ != 0) sb.append(", ")
++            sb.append("${it.name}: ")
++            renderTy(sb, it.ty)
++        }
++    }
++    renderTy(sb, sig.returnTy)
+ }
+ 
+-fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRenderer) {
++internal fun renderComment(sb: StringBuilder, comment: LuaComment?) {
+     if (comment != null) {
+         var child: PsiElement? = comment.firstChild
+-
+-        sb.append("<div class='content'>")
+         while (child != null) {
+             when (child) {
+-                is LuaDocClassDef -> renderClassDef(sb, child, tyRenderer)
+-                is LuaDocTypeDef -> renderTypeDef(sb, child, tyRenderer)
+-                is LuaDocFieldDef -> {}
+-                is LuaDocSeeRefTag -> {}
+-                is LuaDocParamDef -> {}
+-                is LuaDocReturnDef -> {}
+-                is LuaDocOverloadDef -> {}
++                is LuaDocParamDef -> {
++                    renderDocParam(sb, child)
++                    sb.append("<br>")
++                }
++                is LuaDocReturnDef -> {
++                    val typeList = child.typeList
++                    if (typeList != null) {
++                        sb.append("<li><b>return</b>: (")
++                        val list = typeList.tyList
++                        list.forEachIndexed { index, luaDocTy ->
++                            renderTypeUnion(if (index != 0) ", " else null, null, sb, luaDocTy)
++                            sb.append(" ")
++                        }
++                        sb.append(")")
++                        renderCommentString(null, null, sb, child.commentString)
++                        sb.append("<br>")
++                    }
++                }
++                is LuaDocClassDef -> renderClassDef(sb, child)
++                is LuaDocFieldDef -> renderFieldDef(sb, child)
++                is LuaDocOverloadDef -> renderOverload(sb, child)
++                is LuaDocTypeDef -> renderTypeDef(sb, child)
++                is LuaDocSeeRefTag -> renderSee(sb, child)
+                 else -> {
+                     val elementType = child.node.elementType
+                     if (elementType === LuaDocTypes.STRING) {
+@@ -71,134 +118,71 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
+             }
+             child = child.nextSibling
+         }
+-        sb.append("</div>")
+-
+-        val sections = StringBuilder()
+-        sections.append("<table class='sections'>")
+-        //Fields
+-        val fields = comment.findTags(LuaDocFieldDef::class.java)
+-        renderTagList(sections, "Fields", fields) { renderFieldDef(sections, it, tyRenderer) }
+-        //Parameters
+-        val docParams = comment.findTags(LuaDocParamDef::class.java)
+-        renderTagList(sections, "Parameters", docParams) { renderDocParam(sections, it, tyRenderer) }
+-        //Returns
+-        val retTag = comment.findTag(LuaDocReturnDef::class.java)
+-        retTag?.let { renderTagList(sections, "Returns", listOf(retTag)) { renderReturn(sections, it, tyRenderer) } }
+-        //Overloads
+-        val overloads = comment.findTags(LuaDocOverloadDef::class.java)
+-        renderTagList(sections, "Overloads", overloads) { renderOverload(sections, it, tyRenderer) }
+-        //See
+-        val seeTags = comment.findTags(LuaDocSeeRefTag::class.java)
+-        renderTagList(sections, "See", seeTags) { renderSee(sections, it, tyRenderer) }
+-
+-        sb.append(sections.toString())
+-        sb.append("</table>")
+     }
+ }
+ 
+-private fun renderReturn(sb: StringBuilder, returnDef: LuaDocReturnDef, tyRenderer: ITyRenderer) {
+-    val typeList = returnDef.typeList
+-    if (typeList != null) {
+-        val list = typeList.tyList
+-        if (list.size > 1)
+-            sb.append("(")
+-        list.forEachIndexed { index, luaDocTy ->
+-            renderTypeUnion(if (index != 0) ", " else null, null, sb, luaDocTy, tyRenderer)
+-            sb.append(" ")
+-        }
+-        if (list.size > 1)
+-            sb.append(")")
+-        renderCommentString(" - ", null, sb, returnDef.commentString)
+-    }
+-}
+-
+-fun renderClassDef(sb: StringBuilder, def: LuaDocClassDef, tyRenderer: ITyRenderer) {
++internal fun renderClassDef(sb: StringBuilder, def: LuaDocClassDef) {
+     val cls = def.type
+-    sb.append("<pre>")
+     sb.append("class ")
+-    sb.wrapTag("b") { tyRenderer.render(cls, sb) }
++    sb.wrapTag("b") { sb.appendClassLink(cls.displayName) }
+     val superClassName = cls.superClassName
+     if (superClassName != null) {
+         sb.append(" : ")
+         sb.appendClassLink(superClassName)
+     }
+-    sb.append("</pre>")
+-    renderCommentString(" - ", null, sb, def.commentString)
++    renderCommentString("  ", null, sb, def.commentString)
++    sb.append("<br>")
+ }
+ 
+-private fun renderFieldDef(sb: StringBuilder, def: LuaDocFieldDef, tyRenderer: ITyRenderer) {
+-    sb.append("${def.name}: ")
+-    renderTypeUnion(null, null, sb, def.ty, tyRenderer)
+-    renderCommentString(" - ", null, sb, def.commentString)
+-}
+-
+-fun renderDefinition(sb: StringBuilder, block: () -> Unit) {
+-    sb.append("<div class='definition'><pre>")
+-    block()
+-    sb.append("</pre></div>")
+-}
+-
+-private fun <T : LuaDocPsiElement> renderTagList(sb: StringBuilder, name: String, tags: Collection<T>, block: (tag: T) -> Unit) {
+-    if (tags.isEmpty())
+-        return
+-    sb.wrapTag("tr") {
+-        sb.append("<td valign='top' class='section'><p>$name:</p></td>")
+-        sb.append("<td valign='top'>")
+-        for (tag in tags) {
+-            sb.wrapTag("p") {
+-                block(tag)
+-            }
+-        }
+-        sb.append("</td>")
+-    }
++internal fun renderFieldDef(sb: StringBuilder, def: LuaDocFieldDef) {
++    sb.append("<li><b>field</b> ${def.name}: ")
++    renderTypeUnion(null, null, sb, def.ty)
++    renderCommentString("  ", null, sb, def.commentString)
+ }
+ 
+-fun renderDocParam(sb: StringBuilder, child: LuaDocParamDef, tyRenderer: ITyRenderer, paramTitle: Boolean = false) {
++internal fun renderDocParam(sb: StringBuilder, child: LuaDocParamDef) {
+     val paramNameRef = child.paramNameRef
+     if (paramNameRef != null) {
+-        if (paramTitle)
+-            sb.append("<b>param</b> ")
+-        sb.append("<code>${paramNameRef.text}</code> : ")
+-        renderTypeUnion(null, null, sb, child.ty, tyRenderer)
+-        renderCommentString(" - ", null, sb, child.commentString)
++        sb.append("<li><b>param</b> ${paramNameRef.text}: ")
++        renderTypeUnion(null, null, sb, child.ty)
++        renderCommentString("  ", null, sb, child.commentString)
+     }
+ }
+ 
+-fun renderCommentString(prefix: String?, postfix: String?, sb: StringBuilder, child: LuaDocCommentString?) {
++internal fun renderCommentString(prefix: String?, postfix: String?, sb: StringBuilder, child: LuaDocCommentString?) {
+     child?.string?.text?.let {
+         if (prefix != null) sb.append(prefix)
+-        var html = markdownToHtml(it)
+-        if (html.startsWith("<p>"))
+-            html = html.substring(3, html.length - 4)
+-        sb.append(html)
++        sb.append(markdownToHtml(it))
+         if (postfix != null) sb.append(postfix)
+     }
+ }
+ 
+-private fun renderTypeUnion(prefix: String?, postfix: String?, sb: StringBuilder, type: LuaDocTy?, tyRenderer: ITyRenderer) {
++internal fun renderTypeUnion(prefix: String?, postfix: String?, sb: StringBuilder, type: LuaDocTy?) {
+     if (type != null) {
+         if (prefix != null) sb.append(prefix)
+ 
+         val ty = type.getType()
+-        renderTy(sb, ty, tyRenderer)
++        renderTy(sb, ty)
+ 
+         if (postfix != null) sb.append(postfix)
+     }
+ }
+ 
+-private fun renderOverload(sb: StringBuilder, overloadDef: LuaDocOverloadDef, tyRenderer: ITyRenderer) {
++internal fun renderOverload(sb: StringBuilder, overloadDef: LuaDocOverloadDef) {
+     overloadDef.functionTy?.getType()?.let {
+-        renderTy(sb, it, tyRenderer)
++        sb.append("<li><b>overload</b> ")
++        renderTy(sb, it)
+     }
+ }
+ 
+-private fun renderTypeDef(sb: StringBuilder, typeDef: LuaDocTypeDef, tyRenderer: ITyRenderer) {
+-    renderTy(sb, typeDef.type, tyRenderer)
++internal fun renderTypeDef(sb: StringBuilder, typeDef: LuaDocTypeDef) {
++    renderTy(sb, typeDef.type)
+ }
+ 
+-private fun renderSee(sb: StringBuilder, see: LuaDocSeeRefTag, tyRenderer: ITyRenderer) {
++internal fun renderSee(sb: StringBuilder, see: LuaDocSeeRefTag) {
++    sb.append("<li><b>see</b> ")
+     see.classNameRef?.resolveType()?.let {
+-        renderTy(sb, it, tyRenderer)
++        renderTy(sb, it)
+         see.id?.let {
+             sb.append("#${it.text}")
+         }
+diff --git a/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt b/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt
+index a9c39290..b148c47f 100644
+--- a/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt
++++ b/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt
+@@ -16,7 +16,6 @@
+ 
+ package com.tang.intellij.lua.documentation
+ 
+-import com.intellij.codeInsight.documentation.DocumentationManagerUtil
+ import com.intellij.lang.documentation.AbstractDocumentationProvider
+ import com.intellij.lang.documentation.DocumentationProvider
+ import com.intellij.psi.PsiElement
+@@ -28,7 +27,10 @@ import com.tang.intellij.lua.editor.completion.LuaDocumentationLookupElement
+ import com.tang.intellij.lua.psi.*
+ import com.tang.intellij.lua.search.SearchContext
+ import com.tang.intellij.lua.stubs.index.LuaClassIndex
+-import com.tang.intellij.lua.ty.*
++import com.tang.intellij.lua.ty.ITyFunction
++import com.tang.intellij.lua.ty.TyFunction
++import com.tang.intellij.lua.ty.infer
++import com.tang.intellij.lua.ty.isColonCall
+ 
+ /**
+  * Documentation support
+@@ -36,19 +38,13 @@ import com.tang.intellij.lua.ty.*
+  */
+ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationProvider {
+ 
+-    private val renderer: ITyRenderer = object: TyRenderer() {
+-        override fun renderType(t: String): String {
+-            return if (t.isNotEmpty()) buildString { DocumentationManagerUtil.createHyperlink(this, t, t, true) } else t
+-        }
+-    }
+-
+     override fun getQuickNavigateInfo(element: PsiElement?, originalElement: PsiElement?): String? {
+         if (element != null) {
+             when (element) {
+                 is LuaTypeGuessable -> {
+                     val ty = element.guessType(SearchContext(element.project))
+                     return buildString {
+-                        renderTy(this, ty, renderer)
++                        renderTy(this, ty)
+                     }
+                 }
+             }
+@@ -69,29 +65,27 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
+ 
+     override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? {
+         val sb = StringBuilder()
+-        val tyRenderer = renderer
+         when (element) {
+             is LuaParamNameDef -> renderParamNameDef(sb, element)
+-            is LuaDocClassDef -> renderClassDef(sb, element, tyRenderer)
++            is LuaDocClassDef -> renderClassDef(sb, element)
+             is LuaClassMember -> renderClassMember(sb, element)
+             is LuaNameDef -> { //local xx
+-
+-                renderDefinition(sb) {
+-                    sb.append("local <b>${element.name}</b>:")
++                sb.wrapTag("pre") {
++                    sb.append("local ${element.name}:")
+                     val ty = element.guessType(SearchContext(element.project))
+-                    renderTy(sb, ty, tyRenderer)
++                    renderTy(sb, ty)
+                 }
+ 
+                 val owner = PsiTreeUtil.getParentOfType(element, LuaCommentOwner::class.java)
+-                owner?.let { renderComment(sb, owner.comment, tyRenderer) }
++                owner?.let { renderComment(sb, owner.comment) }
+             }
+             is LuaLocalFuncDef -> {
+                 sb.wrapTag("pre") {
+-                    sb.append("local function <b>${element.name}</b>")
++                    sb.append("local function ${element.name}")
+                     val type = element.guessType(SearchContext(element.project)) as ITyFunction
+-                    renderSignature(sb, type.mainSignature, tyRenderer)
++                    renderSignature(sb, type.mainSignature)
+                 }
+-                renderComment(sb, element.comment, tyRenderer)
++                renderComment(sb, element.comment)
+             }
+         }
+         if (sb.isNotEmpty()) return sb.toString()
+@@ -102,55 +96,54 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
+         val context = SearchContext(classMember.project)
+         val parentType = classMember.guessClassType(context)
+         val ty = classMember.guessType(context)
+-        val tyRenderer = renderer
+ 
+-        renderDefinition(sb) {
+-            //base info
+-            if (parentType != null) {
+-                renderTy(sb, parentType, tyRenderer)
++        //base info
++        if (parentType != null) {
++            renderTy(sb, parentType)
++            with(sb) {
++                when (ty) {
++                    is TyFunction -> {
++                        append(if (ty.isColonCall) ":" else ".")
++                        append(classMember.name)
++                        renderSignature(sb, ty.mainSignature)
++                    }
++                    else -> {
++                        append(".${classMember.name}:")
++                        renderTy(sb, ty)
++                    }
++                }
++            }
++        } else {
++            //NameExpr
++            if (classMember is LuaNameExpr) {
++                val nameExpr: LuaNameExpr = classMember
+                 with(sb) {
++                    append(nameExpr.name)
+                     when (ty) {
+-                        is TyFunction -> {
+-                            append(if (ty.isColonCall) ":" else ".")
+-                            append(classMember.name)
+-                            renderSignature(sb, ty.mainSignature, tyRenderer)
+-                        }
++                        is TyFunction -> renderSignature(sb, ty.mainSignature)
+                         else -> {
+-                            append(".${classMember.name}:")
+-                            renderTy(sb, ty, tyRenderer)
++                            append(":")
++                            renderTy(sb, ty)
+                         }
+                     }
+                 }
+-            } else {
+-                //NameExpr
+-                if (classMember is LuaNameExpr) {
+-                    val nameExpr: LuaNameExpr = classMember
+-                    with(sb) {
+-                        append(nameExpr.name)
+-                        when (ty) {
+-                            is TyFunction -> renderSignature(sb, ty.mainSignature, tyRenderer)
+-                            else -> {
+-                                append(":")
+-                                renderTy(sb, ty, tyRenderer)
+-                            }
+-                        }
+-                    }
+ 
+-                    val stat = nameExpr.parent.parent // VAR_LIST ASSIGN_STAT
+-                    if (stat is LuaAssignStat) renderComment(sb, stat.comment, tyRenderer)
+-                }
++                val stat = nameExpr.parent.parent // VAR_LIST ASSIGN_STAT
++                if (stat is LuaAssignStat) renderComment(sb, stat.comment)
+             }
+         }
+ 
+         //comment content
+-        when (classMember) {
+-            is LuaCommentOwner -> renderComment(sb, classMember.comment, tyRenderer)
+-            is LuaDocFieldDef -> renderCommentString("  ", null, sb, classMember.commentString)
+-            is LuaIndexExpr -> {
++        if (classMember is LuaCommentOwner)
++            renderComment(sb, classMember.comment)
++        else {
++            if (classMember is LuaDocFieldDef)
++                renderCommentString("  ", null, sb, classMember.commentString)
++            else if (classMember is LuaIndexExpr) {
+                 val p1 = classMember.parent
+                 val p2 = p1.parent
+                 if (p1 is LuaVarList && p2 is LuaAssignStat) {
+-                    renderComment(sb, p2.comment, tyRenderer)
++                    renderComment(sb, p2.comment)
+                 }
+             }
+         }
+@@ -159,13 +152,12 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
+     private fun renderParamNameDef(sb: StringBuilder, paramNameDef: LuaParamNameDef) {
+         val owner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
+         val docParamDef = owner?.comment?.getParamDef(paramNameDef.name)
+-        val tyRenderer = renderer
+         if (docParamDef != null) {
+-            renderDocParam(sb, docParamDef, tyRenderer, true)
++            renderDocParam(sb, docParamDef)
+         } else {
+             val ty = infer(paramNameDef, SearchContext(paramNameDef.project))
+-            sb.append("<b>param</b> <code>${paramNameDef.name}</code> : ")
+-            renderTy(sb, ty, tyRenderer)
++            sb.append("<li><b>param</b> ${paramNameDef.name}:")
++            renderTy(sb, ty)
+         }
+     }
+ }
+-- 
+2.16.2.windows.1
+

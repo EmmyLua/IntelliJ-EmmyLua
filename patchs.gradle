@@ -14,7 +14,10 @@ if (System.env['APPVEYOR']) {
 def versions = [
     "173": [
         "ideaSDKVersion": "IC-173.4127.27",
-        "patchs": ["patchs/173/0001-Revert-Compatible-with-IDEA2018.2.patch"]
+        "patchs": [
+            "patchs/173/0002-Revert-redesigned-documentation.patch",
+            "patchs/173/0001-Revert-Compatible-with-IDEA2018.2.patch"
+        ]
     ],
     "182": [
         "ideaSDKVersion": "IC-182.2371.4",
