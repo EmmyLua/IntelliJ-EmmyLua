@@ -207,10 +207,6 @@ fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
 }
 
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
-    override val displayName: String
-        get() {
-            return mainSignature.displayName
-        }
 
     override fun equals(other: Any?): Boolean {
         if (other is ITyFunction) {
@@ -240,6 +236,10 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
         return substitutor.substitute(this)
+    }
+
+    override fun accept(visitor: ITyVisitor) {
+        visitor.visitFun(this)
     }
 }
 

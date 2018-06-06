@@ -21,8 +21,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.search.SearchContext
 
 class TyParameter(val name:String, val base: ITy? = null) : Ty(TyKind.GenericParam) {
-    override val displayName: String
-        get() = "<$name>"
 
     override fun substitute(substitutor: ITySubstitutor) = this
 }
@@ -37,11 +35,6 @@ interface ITyGeneric : ITy {
 }
 
 abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
-    override val displayName: String get() {
-        val list = mutableListOf<String>()
-        params.forEach { list.add(it.displayName) }
-        return "${base.displayName}<${list.joinToString(", ")}>"
-    }
 
     override fun equals(other: Any?): Boolean {
         return other is ITyGeneric && other.base == base && other.displayName == displayName

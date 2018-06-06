@@ -52,6 +52,7 @@ class TyFlags {
         const val ANONYMOUS = 0x1
         const val GLOBAL = 0x2
         const val SELF_FUNCTION = 0x4 // xxx.method()
+        const val ANONYMOUS_TABLE = 0x8 // local xx = {}, flag of this table `{}`
     }
 }
 
@@ -73,6 +74,10 @@ interface ITy : Comparable<ITy> {
     fun substitute(substitutor: ITySubstitutor): ITy
 
     fun eachTopClass(fn: Processor<ITyClass>)
+
+    fun accept(visitor: ITyVisitor)
+
+    fun acceptChildren(visitor: ITyVisitor)
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -105,8 +110,18 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     final override var flags: Int = 0
 
+    override val displayName: String
+        get() = TyRenderer.SIMPLE.render(this)
+
     fun addFlag(flag: Int) {
         flags = flags or flag
+    }
+
+    override fun accept(visitor: ITyVisitor) {
+        visitor.visitTy(this)
+    }
+
+    override fun acceptChildren(visitor: ITyVisitor) {
     }
 
     override fun union(ty: ITy): ITy {
@@ -323,8 +338,6 @@ interface ITyArray : ITy {
 }
 
 class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
-    override val displayName: String
-        get() = "${base.displayName}[]"
 
     override fun equals(other: Any?): Boolean {
         return other is ITyArray && base == other.base
@@ -341,20 +354,20 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override fun substitute(substitutor: ITySubstitutor): ITy {
         return TyArray(base.substitute(substitutor))
     }
+
+    override fun accept(visitor: ITyVisitor) {
+        visitor.visitArray(this)
+    }
+
+    override fun acceptChildren(visitor: ITyVisitor) {
+        base.accept(visitor)
+    }
 }
 
 class TyUnion : Ty(TyKind.Union) {
     private val childSet = mutableSetOf<ITy>()
-    fun getChildTypes() = childSet
 
-    override val displayName: String get() {
-        val list = mutableListOf<String>()
-        eachPerfect(this) {
-            list.add(it.displayName)
-            true
-        }
-        return list.joinToString("|")
-    }
+    fun getChildTypes() = childSet
 
     val size:Int
         get() = childSet.size
@@ -379,6 +392,14 @@ class TyUnion : Ty(TyKind.Union) {
         val u = TyUnion()
         childSet.forEach { u.childSet.add(it.substitute(substitutor)) }
         return u
+    }
+
+    override fun accept(visitor: ITyVisitor) {
+        visitor.visitUnion(this)
+    }
+
+    override fun acceptChildren(visitor: ITyVisitor) {
+        childSet.forEach { it.accept(visitor) }
     }
 
     companion object {
@@ -463,8 +484,6 @@ class TyUnion : Ty(TyKind.Union) {
 }
 
 class TyUnknown : Ty(TyKind.Unknown) {
-    override val displayName: String
-        get() = Constants.WORD_ANY
 
     override fun equals(other: Any?): Boolean {
         return other is TyUnknown
@@ -480,8 +499,6 @@ class TyUnknown : Ty(TyKind.Unknown) {
 }
 
 class TyNil : Ty(TyKind.Nil) {
-    override val displayName: String
-        get() = Constants.WORD_NIL
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
 
@@ -490,8 +507,6 @@ class TyNil : Ty(TyKind.Nil) {
 }
 
 class TyVoid : Ty(TyKind.Void) {
-    override val displayName: String
-        get() = Constants.WORD_VOID
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return false
@@ -499,8 +514,6 @@ class TyVoid : Ty(TyKind.Void) {
 }
 
 class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
-    override val displayName: String
-        get() = "(${list.joinToString(", ")})"
 
     val size: Int get() {
         return list.size
@@ -509,5 +522,13 @@ class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
     override fun substitute(substitutor: ITySubstitutor): ITy {
         val list = list.map { it.substitute(substitutor) }
         return TyTuple(list)
+    }
+
+    override fun accept(visitor: ITyVisitor) {
+        visitor.visitTuple(this)
+    }
+
+    override fun acceptChildren(visitor: ITyVisitor) {
+        list.forEach { it.accept(visitor) }
     }
 }
