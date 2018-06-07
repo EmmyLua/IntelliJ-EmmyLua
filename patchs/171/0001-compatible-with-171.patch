@@ -1,22 +1,24 @@
-From 491398c1a2ab1d8e9b8aaba981e807cedf82238a Mon Sep 17 00:00:00 2001
+From 2962ed0eb72378b5ffd9d290873d66e4b4159924 Mon Sep 17 00:00:00 2001
 From: tangzx <272669294@qq.com>
-Date: Sun, 11 Feb 2018 15:36:24 +0800
+Date: Thu, 7 Jun 2018 09:58:45 +0800
 Subject: [PATCH] compatible with 171
 
 ---
- .../intellij/lua/editor/LuaBreadcrumbsProvider.kt  | 86 ----------------------
- .../lua/project/LuaAdditionalSourcesRootPanel.kt   |  2 +-
+ .../intellij/lua/editor/LuaBreadcrumbsProvider.kt  | 87 ----------------------
+ .../project/EmmyLuaDirectoryProjectGenerator.kt    | 36 ---------
+ .../lua/project/LuaAdditionalSourcesRootPanel.kt   |  4 +-
  .../com/tang/intellij/lua/project/LuaModuleType.kt |  5 +-
- src/main/resources/META-INF/plugin.xml             |  1 -
- 4 files changed, 2 insertions(+), 92 deletions(-)
+ src/main/resources/META-INF/plugin.xml             |  2 -
+ 5 files changed, 3 insertions(+), 131 deletions(-)
  delete mode 100644 src/main/java/com/tang/intellij/lua/editor/LuaBreadcrumbsProvider.kt
+ delete mode 100644 src/main/java/com/tang/intellij/lua/project/EmmyLuaDirectoryProjectGenerator.kt
 
 diff --git a/src/main/java/com/tang/intellij/lua/editor/LuaBreadcrumbsProvider.kt b/src/main/java/com/tang/intellij/lua/editor/LuaBreadcrumbsProvider.kt
 deleted file mode 100644
-index 73d8bf0d..00000000
+index 76d62cf3..00000000
 --- a/src/main/java/com/tang/intellij/lua/editor/LuaBreadcrumbsProvider.kt
 +++ /dev/null
-@@ -1,86 +0,0 @@
+@@ -1,87 +0,0 @@
 -/*
 - * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
 - *
@@ -67,6 +69,7 @@ index 73d8bf0d..00000000
 -                        when (parent2) {
 -                            is LuaClassMethodDef -> "${parent2.classMethodName.text}${parent2.paramSignature}"
 -                            is LuaClosureExpr -> "function${parent2.paramSignature}"
+-                            is LuaFuncDef -> "function${parent2.paramSignature}"
 -                            is LuaLocalFuncDef -> "local function ${parent2.name}"
 -                            else -> "<?>"
 -                        }
@@ -104,21 +107,74 @@ index 73d8bf0d..00000000
 -
 -}
 \ No newline at end of file
+diff --git a/src/main/java/com/tang/intellij/lua/project/EmmyLuaDirectoryProjectGenerator.kt b/src/main/java/com/tang/intellij/lua/project/EmmyLuaDirectoryProjectGenerator.kt
+deleted file mode 100644
+index fe99da4d..00000000
+--- a/src/main/java/com/tang/intellij/lua/project/EmmyLuaDirectoryProjectGenerator.kt
++++ /dev/null
+@@ -1,36 +0,0 @@
+-/*
+- * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
+- *
+- * Licensed under the Apache License, Version 2.0 (the "License");
+- * you may not use this file except in compliance with the License.
+- * You may obtain a copy of the License at
+- *
+- * http://www.apache.org/licenses/LICENSE-2.0
+- *
+- * Unless required by applicable law or agreed to in writing, software
+- * distributed under the License is distributed on an "AS IS" BASIS,
+- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+- * See the License for the specific language governing permissions and
+- * limitations under the License.
+- */
+-
+-package com.tang.intellij.lua.project
+-
+-import com.intellij.openapi.module.Module
+-import com.intellij.openapi.project.Project
+-import com.intellij.openapi.vfs.VirtualFile
+-import com.intellij.platform.DirectoryProjectGeneratorBase
+-import com.tang.intellij.lua.lang.LuaIcons
+-import javax.swing.Icon
+-
+-class EmmyLuaDirectoryProjectGenerator : DirectoryProjectGeneratorBase<Any>() {
+-    override fun generateProject(project: Project, file: VirtualFile, p2: Any, module: Module) {
+-
+-    }
+-
+-    override fun getName(): String {
+-        return "EmmyLua"
+-    }
+-
+-    override fun getLogo(): Icon = LuaIcons.FILE
+-}
+\ No newline at end of file
 diff --git a/src/main/java/com/tang/intellij/lua/project/LuaAdditionalSourcesRootPanel.kt b/src/main/java/com/tang/intellij/lua/project/LuaAdditionalSourcesRootPanel.kt
-index 059b0cae..5800ef83 100644
+index 045a6518..f755a041 100644
 --- a/src/main/java/com/tang/intellij/lua/project/LuaAdditionalSourcesRootPanel.kt
 +++ b/src/main/java/com/tang/intellij/lua/project/LuaAdditionalSourcesRootPanel.kt
-@@ -28,7 +28,7 @@ import javax.swing.ListSelectionModel
+@@ -20,16 +20,16 @@ import com.intellij.openapi.fileChooser.FileChooser
+ import com.intellij.openapi.fileChooser.FileChooserDescriptor
+ import com.intellij.ui.IdeBorderFactory
+ import com.intellij.ui.ToolbarDecorator
+-import com.intellij.ui.components.JBList
+ import com.tang.intellij.lua.LuaBundle
+ import java.awt.BorderLayout
+ import javax.swing.DefaultListModel
++import javax.swing.JList
+ import javax.swing.JPanel
+ import javax.swing.ListSelectionModel
  
  class LuaAdditionalSourcesRootPanel : JPanel(BorderLayout()) {
      private val dataModel = DefaultListModel<String>()
 -    private val pathList = JBList(dataModel)
-+    private val pathList = JBList<String>(dataModel)
++    private val pathList = JList(dataModel)
      init {
          pathList.selectionMode = ListSelectionModel.SINGLE_SELECTION
  
 diff --git a/src/main/java/com/tang/intellij/lua/project/LuaModuleType.kt b/src/main/java/com/tang/intellij/lua/project/LuaModuleType.kt
-index 864ece09..1d2d36f7 100644
+index 5d79699b..9468e9f5 100644
 --- a/src/main/java/com/tang/intellij/lua/project/LuaModuleType.kt
 +++ b/src/main/java/com/tang/intellij/lua/project/LuaModuleType.kt
 @@ -27,10 +27,7 @@ import javax.swing.Icon
@@ -134,10 +190,18 @@ index 864ece09..1d2d36f7 100644
      override fun createModuleBuilder() = LuaModuleBuilder()
  
 diff --git a/src/main/resources/META-INF/plugin.xml b/src/main/resources/META-INF/plugin.xml
-index 4e65a43d..9c677eb8 100644
+index 0e91702c..9c1aeb52 100644
 --- a/src/main/resources/META-INF/plugin.xml
 +++ b/src/main/resources/META-INF/plugin.xml
-@@ -207,7 +207,6 @@
+@@ -154,7 +154,6 @@
+         <sdkType implementation="com.tang.intellij.lua.project.LuaSdkType"/>
+         <library.type implementation="com.tang.intellij.lua.project.LuaLibraryType"/>
+         <indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>
+-        <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
+ 
+         <!-- unity dll -->
+         <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
+@@ -197,7 +196,6 @@
          <!--navigate-->
          <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
          <gotoSymbolContributor implementation="com.tang.intellij.lua.editor.LuaSymbolNavigationContributor"/>
@@ -146,5 +210,5 @@ index 4e65a43d..9c677eb8 100644
          <!--completion-->
          <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaDocCompletionContributor"/>
 -- 
-2.15.1.windows.2
+2.16.2.windows.1
 
