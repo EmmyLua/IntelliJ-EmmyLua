@@ -296,17 +296,17 @@ fun getDocTableTypeName(table: LuaDocTableDef): String {
     return "10|$fileName|${table.node.startOffset}"
 }
 
-class TyDocTable(private val tbl: LuaDocTableDef) : TyClass(getDocTableTypeName(tbl)) {
+class TyDocTable(val table: LuaDocTableDef) : TyClass(getDocTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) {}
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
-        tbl.tableFieldList.forEach {
+        table.tableFieldList.forEach {
             processor(this, it)
         }
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
-        return tbl.tableFieldList.firstOrNull { it.name == name }
+        return table.tableFieldList.firstOrNull { it.name == name }
     }
 }
 
