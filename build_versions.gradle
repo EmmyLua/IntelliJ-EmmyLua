@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+//171
+task build_171(type: GradleBuild) {
+    tasks = ["buildPluginWithPatchs"]
+    buildFile = 'build.gradle'
+    startParameter.setProjectProperties([
+        "IDEA_VER": "171"
+    ])
+}
+
 //172 - 181
 task build_172(type: GradleBuild) {
     tasks = ["buildPluginWithPatchs"]
@@ -32,4 +41,4 @@ task build_182(type: GradleBuild) {
     ])
 }
 
-task buildAll(dependsOn: [build_182, build_172])
+task buildAll(dependsOn: [build_182, build_172, build_171])

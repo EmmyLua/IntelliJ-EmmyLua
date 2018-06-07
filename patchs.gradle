@@ -11,24 +11,32 @@ if (System.env['APPVEYOR']) {
     }
 }
 
-def versions = [
-    "172": [
-        ideaSDKVersion: "IC-172.4574.19",
-        sinceBuild: "172",
-        untilBuild: "181.*",
-        archiveName: "IntelliJ-EmmyLua-(172-181)",
-        patchs: [
-            "patchs/172/0002-Revert-redesigned-documentation.patch",
-            "patchs/172/0001-Revert-Compatible-with-IDEA2018.2.patch"
-        ]
-    ],
-    "182": [
-        ideaSDKVersion: "IC-182.2371.4",
-        sinceBuild: "182",
-        untilBuild: "182.*",
-        archiveName: "IntelliJ-EmmyLua-(182)",
-        patchs: []
-    ]
+def versions = [:]
+versions["182"] = [
+    ideaSDKVersion: "IC-182.2371.4",
+    sinceBuild: "182",
+    untilBuild: "182.*",
+    archiveName: "IntelliJ-EmmyLua-(182)",
+    patchs: []
+]
+versions["172"] = [
+    ideaSDKVersion: "IC-172.4574.19",
+    sinceBuild: "172",
+    untilBuild: "181.*",
+    archiveName: "IntelliJ-EmmyLua-(172-181)",
+    patchs: [
+        "patchs/172/0002-Revert-redesigned-documentation.patch",
+        "patchs/172/0001-Revert-Compatible-with-IDEA2018.2.patch"
+    ] + versions["182"].patchs
+]
+versions["171"] = [
+    ideaSDKVersion: "IC-171.4694.73",
+    sinceBuild: "171",
+    untilBuild: "171.*",
+    archiveName: "IntelliJ-EmmyLua-(171)",
+    patchs: [
+        "patchs/171/0001-compatible-with-171.patch"
+    ] + versions["172"].patchs
 ]
 
 ext {

@@ -80,11 +80,7 @@ task buildPluginWithPatchs() {
         if (cfg.patchs.size() > 0) {
             exec {
                 executable "git"
-                args = ["am"] + cfg.patchs
-            }
-            exec {
-                executable "git"
-                args "reset", rev
+                args = ["apply"] + cfg.patchs
             }
         }
     }
