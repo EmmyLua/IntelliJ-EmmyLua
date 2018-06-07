@@ -41,8 +41,19 @@ intellij {
     type 'IU'
     updateSinceUntilBuild false
     downloadSources false
-    version = cfg["ideaSDKVersion"]
+    version = cfg.ideaSDKVersion
     localPath System.env["IDEA_HOME_${IDEA_VER}"]
+}
+
+patchPluginXml {
+    sinceBuild cfg.sinceBuild
+    untilBuild cfg.untilBuild
+}
+
+publishPlugin {
+    username System.env['JETBRAINS_USERNAME']
+    password System.env['JETBRAINS_PASSWORD']
+    channels 'EAP'
 }
 
 def RES_DIR = "src/main/resources"
@@ -53,6 +64,7 @@ task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], typ
 }
 
 buildPlugin.dependsOn(copyAttachDebugger)
+buildPlugin.baseName = cfg.archiveName
 buildPlugin.from(fileTree(dir: "${RES_DIR}", includes: ['debugger/**'])) {
     into "/${project.name}/classes/"
 }
@@ -76,10 +88,4 @@ task buildPluginWithPatchs() {
             }
         }
     }
-}
-
-publishPlugin {
-    username System.env['JETBRAINS_USERNAME']
-    password System.env['JETBRAINS_PASSWORD']
-    channels 'EAP'
 }
