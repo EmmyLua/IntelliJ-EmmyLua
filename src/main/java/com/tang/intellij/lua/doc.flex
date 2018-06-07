@@ -76,6 +76,10 @@ DOC_DASHES = --+
     "public"                   { yybegin(xTAG); return TAG_PUBLIC; }
     "generic"                  { yybegin(xTAG); return TAG_GENERIC; }
     "see"                      { yybegin(xTAG); return TAG_SEE; }
+    "deprecated"               { yybegin(xTAG); return TAG_DEPRECATED; }
+    "author"                   { yybegin(xTAG); return TAG_AUTHOR; }
+    "version"                  { yybegin(xTAG); return TAG_VERSION; }
+    "since"                    { yybegin(xTAG); return TAG_SINCE; }
     {ID}                       { yybegin(xTAG); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }

@@ -30,6 +30,7 @@ import com.tang.intellij.lua.ty.ITySubstitutor
 interface LuaComment : PsiComment, LuaDocPsiElement {
     val owner: LuaCommentOwner?
     val moduleName: String?
+    val isDeprecated: Boolean
     fun <T : LuaDocPsiElement> findTag(t:Class<T>): T?
     fun <T : LuaDocPsiElement> findTags(t:Class<T>): Collection<T>
     fun getParamDef(name: String): LuaDocParamDef?

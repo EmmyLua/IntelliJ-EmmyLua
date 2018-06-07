@@ -26,6 +26,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (t == ACCESS_MODIFIER) {
       r = access_modifier(b, 0);
     }
+    else if (t == AUTHOR) {
+      r = author(b, 0);
+    }
     else if (t == CLASS_DEF) {
       r = class_def(b, 0);
     }
@@ -34,6 +37,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     }
     else if (t == COMMENT_STRING) {
       r = comment_string(b, 0);
+    }
+    else if (t == DEPRECATED) {
+      r = deprecated(b, 0);
     }
     else if (t == FIELD_DEF) {
       r = field_def(b, 0);
@@ -62,6 +68,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == SEE_REF_TAG) {
       r = see_ref_tag(b, 0);
     }
+    else if (t == SINCE) {
+      r = since(b, 0);
+    }
     else if (t == TABLE_FIELD) {
       r = tableField(b, 0);
     }
@@ -82,6 +91,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     }
     else if (t == TYPE_LIST) {
       r = type_list(b, 0);
+    }
+    else if (t == VERSION) {
+      r = version(b, 0);
     }
     else {
       r = parse_root_(t, b, 0);
@@ -135,6 +147,27 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = !consumeToken(b, DASHES);
     exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  /* ********************************************************** */
+  // TAG_AUTHOR comment_string?
+  public static boolean author(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "author")) return false;
+    if (!nextTokenIs(b, TAG_AUTHOR)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, AUTHOR, null);
+    r = consumeToken(b, TAG_AUTHOR);
+    p = r; // pin = 1
+    r = r && author_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // comment_string?
+  private static boolean author_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "author_1")) return false;
+    comment_string(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
@@ -229,6 +262,27 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // TAG_DEPRECATED comment_string?
+  public static boolean deprecated(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "deprecated")) return false;
+    if (!nextTokenIs(b, TAG_DEPRECATED)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, DEPRECATED, null);
+    r = consumeToken(b, TAG_DEPRECATED);
+    p = r; // pin = 1
+    r = r && deprecated_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // comment_string?
+  private static boolean deprecated_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "deprecated_1")) return false;
+    comment_string(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
   // (DASHES after_dash?)*
   static boolean doc(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc")) return false;
@@ -269,6 +323,10 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   //     | overload_def
   //     | see_ref_tag
   //     | tag_def
+  //     | deprecated
+  //     | since
+  //     | author
+  //     | version
   //     | access_modifier
   //     | generic_def)
   static boolean doc_item(PsiBuilder b, int l) {
@@ -291,6 +349,10 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   //     | overload_def
   //     | see_ref_tag
   //     | tag_def
+  //     | deprecated
+  //     | since
+  //     | author
+  //     | version
   //     | access_modifier
   //     | generic_def
   private static boolean doc_item_1(PsiBuilder b, int l) {
@@ -306,6 +368,10 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = overload_def(b, l + 1);
     if (!r) r = see_ref_tag(b, l + 1);
     if (!r) r = tag_def(b, l + 1);
+    if (!r) r = deprecated(b, l + 1);
+    if (!r) r = since(b, l + 1);
+    if (!r) r = author(b, l + 1);
+    if (!r) r = version(b, l + 1);
     if (!r) r = access_modifier(b, l + 1);
     if (!r) r = generic_def(b, l + 1);
     exit_section_(b, m, null, r);
@@ -676,6 +742,27 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // TAG_SINCE comment_string?
+  public static boolean since(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "since")) return false;
+    if (!nextTokenIs(b, TAG_SINCE)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, SINCE, null);
+    r = consumeToken(b, TAG_SINCE);
+    p = r; // pin = 1
+    r = r && since_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // comment_string?
+  private static boolean since_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "since_1")) return false;
+    comment_string(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
   // tableField2
   public static boolean tableField(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tableField")) return false;
@@ -812,6 +899,27 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = r && ty(b, l + 1, -1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // TAG_VERSION comment_string?
+  public static boolean version(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "version")) return false;
+    if (!nextTokenIs(b, TAG_VERSION)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, VERSION, null);
+    r = consumeToken(b, TAG_VERSION);
+    p = r; // pin = 1
+    r = r && version_1(b, l + 1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // comment_string?
+  private static boolean version_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "version_1")) return false;
+    comment_string(b, l + 1);
+    return true;
   }
 
   /* ********************************************************** */
