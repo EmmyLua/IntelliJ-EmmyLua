@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-task build_173(type: GradleBuild) {
+
+//172 - 181
+task build_172(type: GradleBuild) {
     tasks = ["buildPluginWithPatchs"]
     buildFile = 'build.gradle'
     startParameter.setProjectProperties([
-        "IDEA_VER": "173"
+        "IDEA_VER": "172"
     ])
 }
 
+//182 - ?
 task build_182(type: GradleBuild) {
     tasks = ["buildPluginWithPatchs"]
     buildFile = 'build.gradle'
@@ -29,4 +32,4 @@ task build_182(type: GradleBuild) {
     ])
 }
 
-task buildAll(dependsOn: [build_182, build_173])
+task buildAll(dependsOn: [build_182, build_172])
