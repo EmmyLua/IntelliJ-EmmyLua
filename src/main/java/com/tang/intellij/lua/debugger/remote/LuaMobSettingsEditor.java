@@ -16,11 +16,15 @@
 
 package com.tang.intellij.lua.debugger.remote;
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.ui.HoverHyperlinkLabel;
+import com.intellij.ui.HyperlinkAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 
 /**
  *
@@ -29,6 +33,7 @@ import javax.swing.*;
 public class LuaMobSettingsEditor extends SettingsEditor<LuaMobConfiguration> {
     private JTextField port;
     private JPanel myPanel;
+    private HoverHyperlinkLabel mobdebugLink;
 
     @Override
     protected void resetEditorFrom(@NotNull LuaMobConfiguration luaMobConfiguration) {
@@ -49,5 +54,15 @@ public class LuaMobSettingsEditor extends SettingsEditor<LuaMobConfiguration> {
     protected JComponent createEditor() {
         port.addActionListener(e -> LuaMobSettingsEditor.this.fireEditorStateChanged());
         return myPanel;
+    }
+
+    private void createUIComponents() {
+        mobdebugLink = new HoverHyperlinkLabel("Get mobdebug.lua 0.7+");
+        mobdebugLink.addHyperlinkListener(new HyperlinkAdapter() {
+            @Override
+            protected void hyperlinkActivated(HyperlinkEvent hyperlinkEvent) {
+                BrowserUtil.browse("https://github.com/pkulchenko/MobDebug/releases");
+            }
+        });
     }
 }
