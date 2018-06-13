@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url 'file:gradle/repo' }
-    }
-    dependencies {
-        classpath "org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.3.3"
-    }
-}
-
 plugins {
-    //id 'org.jetbrains.intellij' version "0.2.18"
+    id 'org.jetbrains.intellij' version "0.3.3"
     id "org.jetbrains.kotlin.jvm" version "1.2.31"
 }
 
@@ -41,7 +31,6 @@ sourceSets {
     }
 }
 
-apply plugin: "org.jetbrains.intellij"
 apply from: "patchs.gradle"
 setDefaultProperty("IDEA_VER", "182")
 
