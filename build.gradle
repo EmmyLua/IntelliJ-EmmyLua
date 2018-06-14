@@ -14,52 +14,74 @@
  * limitations under the License.
  */
 plugins {
-	id 'org.jetbrains.intellij' version "0.2.18"
-	id "org.jetbrains.kotlin.jvm" version "1.2.31"
+    id 'org.jetbrains.intellij' version "0.3.3"
+    id "org.jetbrains.kotlin.jvm" version "1.2.31"
 }
 
 dependencies {
-	compile fileTree(dir: "libs", includes: ["*.jar"])
+    compile fileTree(dir: "libs", includes: ["*.jar"])
 }
 
 sourceSets {
-	main {
-		java.srcDirs 'gen'
-		resources {
-			exclude "debugger/**"
-		}
-	}
+    main {
+        java.srcDirs 'gen'
+        resources {
+            exclude "debugger/**"
+        }
+    }
 }
 
-apply from: "patchs/patch.gradle"
+apply from: "patchs.gradle"
+setDefaultProperty("IDEA_VER", "182")
 
-// Appveyor CI
-if (System.env['APPVEYOR']) {
-	version = System.env['APPVEYOR_BUILD_VERSION']
-}
+def cfg = getVersionCfg(IDEA_VER)
+def rev = getRev()
 
 intellij {
-	type 'IU'
-	updateSinceUntilBuild false
-	downloadSources false
-	version = "IC-182.2371.4"
-	localPath System.env['IDEA_HOME']
+    type 'IU'
+    updateSinceUntilBuild false
+    downloadSources false
+    version = cfg.ideaSDKVersion
+    localPath System.env["IDEA_HOME_${IDEA_VER}"]
+}
+
+patchPluginXml {
+    sinceBuild cfg.sinceBuild
+    untilBuild cfg.untilBuild
+}
+
+publishPlugin {
+    username System.env['JETBRAINS_USERNAME']
+    password System.env['JETBRAINS_PASSWORD']
+    channels 'EAP'
 }
 
 def RES_DIR = "src/main/resources"
 
 task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], type: Copy) {
-	from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
-	destinationDir file("${RES_DIR}/debugger/windows")
+    from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
+    destinationDir file("${RES_DIR}/debugger/windows")
 }
 
 buildPlugin.dependsOn(copyAttachDebugger)
+buildPlugin.baseName = cfg.archiveName
 buildPlugin.from(fileTree(dir: "${RES_DIR}", includes: ['debugger/**'])) {
-	into "/${project.name}/classes/"
+    into "/${project.name}/classes/"
 }
 
-publishPlugin {
-	username System.env['JETBRAINS_USERNAME']
-	password System.env['JETBRAINS_PASSWORD']
-	channels 'EAP'
+// apply patchs before build plugin
+task buildPluginWithPatchs() {
+    finalizedBy buildPlugin
+    doLast {
+        exec {
+            executable "git"
+            args "reset", "HEAD", "--hard"
+        }
+        if (cfg.patchs.size() > 0) {
+            exec {
+                executable "git"
+                args = ["apply"] + cfg.patchs
+            }
+        }
+    }
 }

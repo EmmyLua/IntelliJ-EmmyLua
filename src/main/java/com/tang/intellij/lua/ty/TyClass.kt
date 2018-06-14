@@ -131,10 +131,8 @@ abstract class TyClass(override val className: String,
         return null
     }
 
-    override val displayName: String get() = when {
-        isAnonymous -> "$varName(Local)"
-        isGlobal -> "$varName(Global)"
-        else -> className
+    override fun accept(visitor: ITyVisitor) {
+        visitor.visitClass(this)
     }
 
     override fun lazyInit(searchContext: SearchContext) {
@@ -269,7 +267,7 @@ fun getGlobalTypeName(nameExpr: LuaNameExpr): String {
 
 class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     init {
-        this.flags = TyFlags.ANONYMOUS
+        this.flags = TyFlags.ANONYMOUS or TyFlags.ANONYMOUS_TABLE
     }
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
@@ -278,9 +276,6 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
         }
         super.processMembers(context, processor, deep)
     }
-
-    override val displayName: String
-        get() = "{ }"
 
     override fun toString(): String = displayName
 
@@ -301,24 +296,18 @@ fun getDocTableTypeName(table: LuaDocTableDef): String {
     return "10|$fileName|${table.node.startOffset}"
 }
 
-class TyDocTable(private val tbl: LuaDocTableDef) : TyClass(getDocTableTypeName(tbl)) {
+class TyDocTable(val table: LuaDocTableDef) : TyClass(getDocTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) {}
 
-    override val displayName: String
-        get() = "@{ }"
-
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
-        tbl.tableFieldList.forEach {
+        table.tableFieldList.forEach {
             processor(this, it)
         }
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
-        return tbl.tableFieldList.firstOrNull { it.name == name }
+        return table.tableFieldList.firstOrNull { it.name == name }
     }
 }
 
-class TySerializedDocTable(name: String) : TySerializedClass(name) {
-    override val displayName: String
-        get() = "@{ }"
-}
+class TySerializedDocTable(name: String) : TySerializedClass(name)

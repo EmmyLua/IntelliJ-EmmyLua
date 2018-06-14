@@ -125,4 +125,8 @@ open class LuaXTable(L: Long, process: LuaAttachDebugProcessBase)
         } else
             node.addChildren(childrenList!!, true)
     }
+
+    override fun toKeyString(): String {
+        return "[table]"
+    }
 }

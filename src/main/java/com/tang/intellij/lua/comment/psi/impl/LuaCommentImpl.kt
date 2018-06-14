@@ -65,6 +65,9 @@ class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaT
             return null
         }
 
+    override val isDeprecated: Boolean
+        get() = findTag(LuaDocDeprecated::class.java) != null
+
     override fun getParamDef(name: String): LuaDocParamDef? {
         var element: PsiElement? = firstChild
         while (element != null) {

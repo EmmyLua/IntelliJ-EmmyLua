@@ -149,11 +149,11 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
                 true,
                 true);
 
-        mobdebugLink = new HoverHyperlinkLabel("Get mobdebug.lua");
+        mobdebugLink = new HoverHyperlinkLabel("Get mobdebug.lua 0.7+");
         mobdebugLink.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(HyperlinkEvent hyperlinkEvent) {
-                BrowserUtil.browse("https://github.com/pkulchenko/MobDebug");
+                BrowserUtil.browse("https://github.com/pkulchenko/MobDebug/releases");
             }
         });
     }
