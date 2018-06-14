@@ -87,7 +87,16 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
             while (!isStopped) {
                 readSize = socketChannel.read(bf)
                 if (readSize > 0) {
-                    onResp(String(bf.array(), 0, readSize))
+                    var begin = 0
+                    for (i in 1..readSize+1)
+                        if (bf[i-1].toInt() == '\n'.toInt())
+                        {
+                            onResp(String(bf.array(), begin, i))
+                            begin = i
+                        }
+                    if (begin < readSize)
+                        onResp(String(bf.array(), begin, readSize))
+
                     bf.clear()
                 }
             }

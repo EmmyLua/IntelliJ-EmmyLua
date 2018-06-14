@@ -29,7 +29,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
  * Created by tangzx on 2017/3/29.
  */
 class LuaOverridingMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOverridingMethodsSearch.SearchParameters> {
-    override fun execute(searchParameters: LuaOverridingMethodsSearch.SearchParameters, processor: Processor<in LuaClassMethod>): Boolean {
+    override fun execute(searchParameters: LuaOverridingMethodsSearch.SearchParameters, processor: Processor<LuaClassMethod>): Boolean {
         val method = searchParameters.method
         val project = method.project
         val context = SearchContext(project)

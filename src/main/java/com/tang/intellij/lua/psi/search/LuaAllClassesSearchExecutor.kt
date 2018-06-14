@@ -28,7 +28,7 @@ import com.tang.intellij.lua.ty.createSerializedClass
  * Created by tangzx on 2017/3/29.
  */
 class LuaAllClassesSearchExecutor : QueryExecutorBase<ITyClass, LuaAllClassesSearch.SearchParameters>() {
-    override fun processQuery(searchParameters: LuaAllClassesSearch.SearchParameters, processor: Processor<in ITyClass>) {
+    override fun processQuery(searchParameters: LuaAllClassesSearch.SearchParameters, processor: Processor<ITyClass>) {
         DumbService.getInstance(searchParameters.project).runReadActionInSmartMode {
             LuaClassIndex.instance.processAllKeys(searchParameters.project) { typeName ->
                 //todo no TySerializedClass
