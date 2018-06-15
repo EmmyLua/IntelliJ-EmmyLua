@@ -56,7 +56,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         return super.getQuickNavigateInfo(element, originalElement)
     }
 
-    override fun getDocumentationElementForLookupItem(psiManager: PsiManager, obj: Any, element: PsiElement): PsiElement? {
+    override fun getDocumentationElementForLookupItem(psiManager: PsiManager, obj: Any, element: PsiElement?): PsiElement? {
         if (obj is LuaDocumentationLookupElement) {
             return obj.getDocumentationElement(SearchContext(psiManager.project))
         }
