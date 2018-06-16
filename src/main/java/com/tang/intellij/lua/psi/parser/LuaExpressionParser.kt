@@ -254,9 +254,12 @@ object LuaExpressionParser {
         val result = parseTableField(b, l)
         while (result != null) {
             val sep = parseTableSep(b)
+            val sepError = if (sep == null) b.mark() else null
+            sepError?.error(", or ; expected")
             val nextField = parseTableField(b, l)
-            if (sep == null || nextField == null)
-                break
+            if (nextField == null)
+                sepError?.drop()
+            nextField ?: break
         }
         return true
     }
