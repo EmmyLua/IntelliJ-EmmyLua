@@ -17,9 +17,8 @@
 package com.tang.intellij.lua.debugger.remote.commands
 
 import com.tang.intellij.lua.debugger.remote.MobClient
-import com.tang.intellij.lua.lexer.LuaLexer
+import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.psi.LuaTypes
-
 import java.io.IOException
 
 /**
@@ -64,7 +63,7 @@ open class DefaultCommand @JvmOverloads constructor(private val commandline: Str
     data class StringRange(val start: Int, val end: Int)
 
     protected fun limitStringSize(code: String, limit: Int = 1000): String {
-        val lex = LuaLexer()
+        val lex = LuaLexerAdapter()
         lex.start(code)
         val rangeList = mutableListOf<StringRange>()
         while (true) {

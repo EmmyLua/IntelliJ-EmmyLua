@@ -1,15 +1,19 @@
 package com.tang.intellij.lua.lexer;
 
 import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.lang.LuaLanguageLevel;
+
+import java.io.Reader;
+
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 %%
 
 %{
-    public _LuaLexer() {
-        this(null);
+    public _LuaLexer(LuaLanguageLevel level) {
+        this((Reader) null);
     }
 
     private int nBrackets = 0;
