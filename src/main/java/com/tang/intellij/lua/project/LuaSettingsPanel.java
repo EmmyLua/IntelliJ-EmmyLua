@@ -22,7 +22,9 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ArrayUtil;
+import com.tang.intellij.lua.lang.LuaLanguageLevel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +53,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox captureOutputDebugString;
     private JCheckBox captureStd;
     private JComboBox<String> defaultCharset;
+    private JComboBox<LuaLanguageLevel> languageLevel;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -71,6 +74,11 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         ComboBoxModel<String> outputCharsetModel = new DefaultComboBoxModel<>(ArrayUtil.toStringArray(charsetSortedMap.keySet()));
         defaultCharset.setModel(outputCharsetModel);
         defaultCharset.setSelectedItem(settings.getAttachDebugDefaultCharsetName());
+
+        //language level
+        ComboBoxModel<LuaLanguageLevel> lanLevelModel = new DefaultComboBoxModel<>(LuaLanguageLevel.values());
+        languageLevel.setModel(lanLevelModel);
+        lanLevelModel.setSelectedItem(settings.getLanguageLevel());
     }
 
     @NotNull
@@ -104,6 +112,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
                 settings.getAttachDebugCaptureOutput() != captureOutputDebugString.isSelected() ||
                 settings.getAttachDebugCaptureStd() != captureStd.isSelected() ||
                 settings.getAttachDebugDefaultCharsetName() != defaultCharset.getSelectedItem() ||
+                settings.getLanguageLevel() != languageLevel.getSelectedItem() ||
                 !ArrayUtil.equals(settings.getAdditionalSourcesRoot(), additionalRoots.getRoots(), String::compareTo);
     }
 
@@ -122,9 +131,14 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setAttachDebugCaptureOutput(captureOutputDebugString.isSelected());
         settings.setAttachDebugCaptureStd(captureStd.isSelected());
         settings.setAttachDebugDefaultCharsetName((String)Objects.requireNonNull(defaultCharset.getSelectedItem()));
-
-        for (Project project : ProjectManager.getInstance().getOpenProjects()) {
-            DaemonCodeAnalyzer.getInstance(project).restart();
+        LuaLanguageLevel selectedLevel = (LuaLanguageLevel) Objects.requireNonNull(languageLevel.getSelectedItem());
+        if (selectedLevel != settings.getLanguageLevel()) {
+            settings.setLanguageLevel(selectedLevel);
+            StubIndex.getInstance().forceRebuild(new Throwable("Lua language level changed."));
+        } else {
+            for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+                DaemonCodeAnalyzer.getInstance(project).restart();
+            }
         }
     }
 }
