@@ -22,7 +22,6 @@ import com.intellij.openapi.options.SearchableConfigurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.stubs.StubIndex;
 import com.intellij.util.ArrayUtil;
 import com.tang.intellij.lua.lang.LuaLanguageLevel;
 import org.jetbrains.annotations.Nls;
@@ -134,7 +133,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         LuaLanguageLevel selectedLevel = (LuaLanguageLevel) Objects.requireNonNull(languageLevel.getSelectedItem());
         if (selectedLevel != settings.getLanguageLevel()) {
             settings.setLanguageLevel(selectedLevel);
-            StubIndex.getInstance().forceRebuild(new Throwable("Lua language level changed."));
+            StdLibraryProvider.Companion.reload();
         } else {
             for (Project project : ProjectManager.getInstance().getOpenProjects()) {
                 DaemonCodeAnalyzer.getInstance(project).restart();
