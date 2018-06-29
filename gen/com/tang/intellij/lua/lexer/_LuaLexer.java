@@ -514,8 +514,10 @@ public class _LuaLexer implements FlexLexer {
   private boolean zzEOFDone;
 
   /* user code: */
+    private LuaLanguageLevel level;
     public _LuaLexer(LuaLanguageLevel level) {
         this((Reader) null);
+        this.level = level;
     }
 
     private int nBrackets = 0;
@@ -1081,7 +1083,7 @@ public class _LuaLexer implements FlexLexer {
             // fall through
           case 130: break;
           case 58: 
-            { return GOTO;
+            { if (level.getVersion() < LuaLanguageLevel.LUA53.getVersion()) return ID; else return GOTO;
             } 
             // fall through
           case 131: break;

@@ -12,8 +12,10 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 %%
 
 %{
+    private LuaLanguageLevel level;
     public _LuaLexer(LuaLanguageLevel level) {
         this((Reader) null);
+        this.level = level;
     }
 
     private int nBrackets = 0;
@@ -118,7 +120,7 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "true"                      { return TRUE; }
   "until"                     { return UNTIL; }
   "while"                     { return WHILE; }
-  "goto"                      { return GOTO; } //lua5.3
+  "goto"                      { if (level.getVersion() < LuaLanguageLevel.LUA53.getVersion()) return ID; else return GOTO; } //lua5.3
   "#!"                        { yybegin(xSHEBANG); return SHEBANG; }
   "..."                       { return ELLIPSIS; }
   ".."                        { return CONCAT; }
