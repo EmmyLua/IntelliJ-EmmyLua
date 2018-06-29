@@ -423,7 +423,7 @@
             <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
         </action>
         <action class="com.tang.intellij.lua.actions.CreateTutorialFileAction"
-                text="Lua Tutorial"
+                text="EmmyDoc Tutorial"
                 id="lua.newTutorial">
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="lua.newFile"/>
         </action>

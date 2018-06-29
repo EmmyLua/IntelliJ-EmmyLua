@@ -24,10 +24,10 @@ import com.tang.intellij.lua.lang.LuaIcons
 
 class CreateTutorialFileAction : CreateFileFromTemplateAction("CreateTutorialFile", "", LuaIcons.FILE) {
     override fun getActionName(directory: PsiDirectory, newName: String, templateName: String): String {
-        return "CreateTutorialFile"
+        return "EmmyDoc Tutorial"
     }
 
     override fun buildDialog(project: Project, directory: PsiDirectory, builder: CreateFileFromTemplateDialog.Builder) {
-        builder.setTitle("Lua Tutorial").addKind("Source File", LuaIcons.FILE, "Tutorial.lua")
+        builder.setTitle("EmmyDoc Tutorial").addKind("Source File", LuaIcons.FILE, "Tutorial.lua")
     }
 }
