@@ -231,6 +231,12 @@
         <lang.inspectionSuppressor language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaSuppressManager"/>
 
         <localInspection
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.DataFlowInspection"
+                displayName="DataFlow"
+                enabledByDefault="true"
+                level="ERROR"
+                groupName="Lua"/>
+        <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
                 displayName="Duplicate class"
                 enabledByDefault="true"
