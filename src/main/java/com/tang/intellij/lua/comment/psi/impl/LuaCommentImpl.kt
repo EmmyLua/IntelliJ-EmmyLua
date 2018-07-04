@@ -16,8 +16,9 @@
 
 package com.tang.intellij.lua.comment.psi.impl
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement
+import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
-import com.intellij.psi.impl.source.tree.LazyParseablePsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
@@ -33,7 +34,7 @@ import com.tang.intellij.lua.ty.*
  * Created by Tangzx on 2016/11/21.
  *
  */
-class LuaCommentImpl(charSequence: CharSequence?) : LazyParseablePsiElement(LuaTypes.DOC_COMMENT, charSequence), LuaComment {
+class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
     override fun <T : LuaDocPsiElement> findTag(t:Class<T>): T? {
         var element: PsiElement? = firstChild
         while (element != null) {
