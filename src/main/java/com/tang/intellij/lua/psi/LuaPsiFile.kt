@@ -60,6 +60,11 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
             return if (stub != null) stub.module else findCachedModuleName()
         }
 
+    /**
+     * Lua language version
+     */
+    val languageLevel = LuaSettings.instance.languageLevel
+
     private fun findCachedModuleName(): String? {
         return CachedValuesManager.getCachedValue(this, KEY_CACHED_MODULE_NAME, {
             CachedValueProvider.Result.create(findModuleName(), this)

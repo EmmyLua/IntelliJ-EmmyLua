@@ -208,9 +208,16 @@ val LuaLiteralExpr.kind: LuaLiteralKind get() {
     }
 }
 
+/**
+ * too larger to write to stub
+ */
+val LuaLiteralExpr.tooLargerString: Boolean get() {
+    return stub?.tooLargerString ?: (stringValue.length >= 1024 * 10)
+}
+
 val LuaLiteralExpr.stringValue: String get() {
     val stub = stub
-    if (stub != null)
+    if (stub != null && !stub.tooLargerString)
         return stub.string ?: ""
     val content = LuaString.getContent(text)
     return content.value

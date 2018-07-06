@@ -21,6 +21,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil
+import com.tang.intellij.lua.lang.LuaLanguageLevel
 import java.nio.charset.Charset
 
 /**
@@ -66,6 +67,11 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     var attachDebugCaptureStd = true
 
     var attachDebugCaptureOutput = true
+
+    /**
+     * Lua language level
+     */
+    var languageLevel = LuaLanguageLevel.LUA53
 
     override fun getState(): LuaSettings? {
         return this

@@ -264,7 +264,7 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
         //local a, b = getValues12() -- a = 1, b = 2
         //local a, b, c = getValues12(), 3, 4 --a = 1, b = 3, c =  4
         //local a, b, c = getValues12(), getValue34() --a = 1, b = 3, c =  4
-        var index = -1
+        var index = context.index
         if (exprList.size > 1) {
             val nameSize = context.index + 1
             index = if (nameSize > exprList.size) {

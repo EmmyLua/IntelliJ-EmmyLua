@@ -22,13 +22,15 @@ import com.intellij.lang.PsiBuilderFactory;
 import com.intellij.lang.PsiParser;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.stubs.IStubElementType;
+import com.intellij.psi.tree.CustomParsingType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.ILazyParseableElementType;
 import com.intellij.psi.tree.IReparseableElementType;
+import com.intellij.util.CharTable;
 import com.tang.intellij.lua.comment.lexer.LuaDocLexerAdapter;
 import com.tang.intellij.lua.comment.parser.LuaDocParser;
-import com.tang.intellij.lua.comment.psi.impl.LuaCommentImpl;
 import com.tang.intellij.lua.lang.LuaLanguage;
+import com.tang.intellij.lua.lang.LuaParserDefinition;
 import com.tang.intellij.lua.lexer.LuaLexerAdapter;
 import com.tang.intellij.lua.parser.LuaParser;
 import com.tang.intellij.lua.stubs.*;
@@ -44,26 +46,16 @@ public class LuaElementType extends IElementType {
         super(debugName, LuaLanguage.INSTANCE);
     }
 
-    public static ILazyParseableElementType DOC_COMMENT = new ILazyParseableElementType("DOC_COMMENT", LuaLanguage.INSTANCE) {
-
-        @Override
-        public ASTNode parseContents(ASTNode chameleon) {
-            Project project = chameleon.getPsi().getProject();
-            PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
-                    project,
-                    chameleon,
-                    new LuaDocLexerAdapter(),
-                    LuaLanguage.INSTANCE,
-                    chameleon.getChars());
-            PsiParser parser = new LuaDocParser();
-            ASTNode node = parser.parse(this, builder);
-            return node.getFirstChildNode();
-        }
-
+    public static CustomParsingType DOC_COMMENT = new CustomParsingType ("DOC_COMMENT", LuaLanguage.INSTANCE) {
         @NotNull
         @Override
-        public ASTNode createNode(CharSequence text) {
-            return new LuaCommentImpl(text);
+        public ASTNode parse(@NotNull CharSequence charSequence, @NotNull CharTable charTable) {
+            PsiParser parser = new LuaDocParser();
+            PsiBuilder builder = PsiBuilderFactory.getInstance().createBuilder(
+                    new LuaParserDefinition(),
+                    new LuaDocLexerAdapter(),
+                    charSequence);
+            return parser.parse(this, builder);
         }
     };
 

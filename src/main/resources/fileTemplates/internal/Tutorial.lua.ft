@@ -1,4 +1,4 @@
--- Tutorial for annotations
+-- Tutorial for EmmyDoc
 -- https://emmylua.github.io
 -- https://github.com/EmmyLua
 
@@ -6,8 +6,9 @@
 -- Tutorial for annotation "@class" and "@field"
 
 ---define a class
----@class Person
----@field public age number
+---**Markdown** is available for comment strings
+---@class Person @comment string goes here
+---@field public age number @age value
 ---@field weight number
 local Person = {}
 
@@ -16,7 +17,7 @@ function Person:sayHello()
 end
 
 ---define class Emmy
----@class Emmy : Person
+---@class Emmy : Person @`Emmy` inherited from `Person`
 local tbl = {
     name = "Emmy",
     ["*love daddy*"] = true

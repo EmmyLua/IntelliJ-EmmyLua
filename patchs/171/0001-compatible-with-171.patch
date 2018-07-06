@@ -193,10 +193,10 @@ diff --git a/src/main/resources/META-INF/plugin.xml b/src/main/resources/META-IN
 index 0e91702c..9c1aeb52 100644
 --- a/src/main/resources/META-INF/plugin.xml
 +++ b/src/main/resources/META-INF/plugin.xml
-@@ -154,7 +154,6 @@
-         <sdkType implementation="com.tang.intellij.lua.project.LuaSdkType"/>
+@@ -155,7 +155,6 @@
          <library.type implementation="com.tang.intellij.lua.project.LuaLibraryType"/>
-         <indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>
+         <!--<indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>-->
+         <additionalLibraryRootsProvider implementation="com.tang.intellij.lua.project.StdLibraryProvider"/>
 -        <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
  
          <!-- unity dll -->
