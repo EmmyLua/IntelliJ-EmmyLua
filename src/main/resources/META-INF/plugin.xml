@@ -376,6 +376,12 @@
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameShadowed"/>
         <localInspection
+                displayName="Lua language level"
+                enabledByDefault="true"
+                groupName="Lua"
+                level="ERROR"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LanguageLevelInspection"/>
+        <localInspection
                 displayName="Match function signature"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
