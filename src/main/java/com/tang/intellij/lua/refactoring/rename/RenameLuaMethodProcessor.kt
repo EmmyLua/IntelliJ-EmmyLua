@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.refactoring.rename
 
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.SearchScope
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
@@ -33,6 +34,15 @@ class RenameLuaMethodProcessor : RenamePsiElementProcessor() {
 
     override fun prepareRenaming(element: PsiElement, newName: String, allRenames: MutableMap<PsiElement, String>, scope: SearchScope) {
         val methodDef = element as LuaClassMethod
+
+        /**
+         * bug fix #167
+         * TODO: optimize this issue solution
+         * FIXME: the main reason is that `LuaNameExpr.infer` is suspended by `recursionGuard`
+         * suspended stack : rename -> ... -> LuaNameExpr.infer -> ... -> rebuild stub index -> ... -> LuaNameExpr.infer (suspended)
+         */
+        FileDocumentManager.getInstance().saveAllDocuments()
+
         val search = LuaOverridingMethodsSearch.search(methodDef)
         search.forEach { methodDef1 -> allRenames[methodDef1] = newName }
     }
