@@ -22,7 +22,7 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.psi.*
 
-class DeprecationInspection : LocalInspectionTool() {
+class LuaDeprecationInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean) = object : LuaVisitor() {
         override fun visitIndexExpr(o: LuaIndexExpr) {
             super.visitIndexExpr(o)

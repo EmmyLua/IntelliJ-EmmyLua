@@ -401,10 +401,10 @@
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.GlobalNameCanbeLocal"/>
         <localInspection
-                displayName="Lua Deprecation"
+                displayName="Lua deprecation"
                 enabledByDefault="true"
                 groupName="Lua"
-                implementationClass="com.tang.intellij.lua.codeInsight.inspection.DeprecationInspection"/>
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaDeprecationInspection"/>
     </extensions>
 
     <application-components>
