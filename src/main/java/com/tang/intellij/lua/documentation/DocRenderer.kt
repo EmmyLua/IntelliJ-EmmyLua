@@ -76,10 +76,10 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
         val sections = StringBuilder()
         sections.append("<table class='sections'>")
         //Tags
-        renderTagList(sections, "Version", "version", comment)
-        renderTagList(sections, "Author", "author", comment)
-        renderTagList(sections, "Since", "Since", comment)
-        renderTagList(sections, "Deprecated", "deprecated", comment)
+        renderTagList(sections, "Version", comment)
+        renderTagList(sections, "Author", comment)
+        renderTagList(sections, "Since", comment)
+        renderTagList(sections, "Deprecated", comment)
         //Fields
         val fields = comment.findTags(LuaDocFieldDef::class.java)
         renderTagList(sections, "Fields", fields) { renderFieldDef(sections, it, tyRenderer) }
@@ -143,9 +143,9 @@ fun renderDefinition(sb: StringBuilder, block: () -> Unit) {
     sb.append("</pre></div>")
 }
 
-private fun renderTagList(sb: StringBuilder, title: String, name: String, comment: LuaComment) {
-    val tags = comment.findTags(name)
-    renderTagList(sb, title, tags) { tagDef ->
+private fun renderTagList(sb: StringBuilder, name: String, comment: LuaComment) {
+    val tags = comment.findTags(name.toLowerCase())
+    renderTagList(sb, name, tags) { tagDef ->
         tagDef.commentString?.text?.let { sb.append(it) }
     }
 }
