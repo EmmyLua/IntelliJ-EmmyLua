@@ -76,11 +76,7 @@ class LuaStructureVisitor : LuaVisitor() {
      * Get the class/field declarations present in a document comment
      */
     private fun getDocCommentDeclarations(commentOwner: LuaCommentOwner): ArrayList<LuaTreeElement>? {
-        val comment = commentOwner.comment
-
-        if (commentOwner.comment == null) {
-            return null
-        }
+        val comment = commentOwner.comment ?: return null
 
         val elements = ArrayList<LuaTreeElement>()
 
