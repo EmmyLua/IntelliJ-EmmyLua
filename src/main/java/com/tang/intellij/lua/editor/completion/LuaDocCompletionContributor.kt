@@ -46,6 +46,9 @@ class LuaDocCompletionContributor : CompletionContributor() {
                 for (type in set.types) {
                     completionResultSet.addElement(LookupElementBuilder.create(type).withIcon(LuaIcons.ANNOTATION))
                 }
+                ADDITIONAL_TAGS.forEach { tagName ->
+                    completionResultSet.addElement(LookupElementBuilder.create(tagName).withIcon(LuaIcons.ANNOTATION))
+                }
                 completionResultSet.stopHere()
             }
         })
@@ -171,5 +174,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
         private val SHOW_SEE_MEMBER = psiElement(LuaDocTypes.ID).inside(LuaDocSeeRefTag::class.java)
 
         private val SHOW_LAN = psiElement(LuaDocTypes.ID).inside(LuaDocLanDef::class.java)
+
+        private val ADDITIONAL_TAGS = arrayOf("deprecated", "author", "version", "since")
     }
 }
