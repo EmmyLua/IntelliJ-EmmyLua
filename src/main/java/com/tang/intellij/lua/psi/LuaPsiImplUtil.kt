@@ -607,5 +607,17 @@ fun getExpr(exprStat: LuaExprStat): LuaExpr {
 }
 
 fun isDeprecated(member: LuaClassMember): Boolean {
-    return true
+    if (member is StubBasedPsiElement<*>) {
+        val stub = member.stub
+        if (stub is LuaClassMemberStub) {
+            return stub.isDeprecated
+        }
+    }
+
+    if (member is LuaCommentOwner) {
+        val comment = member.comment
+        if (comment != null)
+            return comment.isDeprecated
+    }
+    return false
 }

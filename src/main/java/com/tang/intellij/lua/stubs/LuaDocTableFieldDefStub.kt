@@ -77,4 +77,6 @@ class LuaDocTableFieldDefStubImpl(
 ) : LuaDocStubBase<LuaDocTableField>(parent, LuaElementType.DOC_TABLE_FIELD_DEF), LuaDocTableFieldDefStub {
     override val visibility: Visibility
         get() = Visibility.PUBLIC
+    override val isDeprecated: Boolean
+        get() = false
 }

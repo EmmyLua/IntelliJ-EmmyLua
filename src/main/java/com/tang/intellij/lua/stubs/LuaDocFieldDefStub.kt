@@ -21,6 +21,7 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
@@ -65,10 +66,13 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldD
             }
         }
 
+        var flags = BitUtil.set(0, fieldDef.visibility.bitMask, true)
+        flags = BitUtil.set(flags, FLAG_DEPRECATED, fieldDef.isDeprecated)
+
         return LuaDocFieldDefStubImpl(stubElement,
+                flags,
                 name,
                 className,
-                fieldDef.visibility,
                 fieldDef.ty?.getType() ?: Ty.UNKNOWN)
     }
 
@@ -76,18 +80,18 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldD
         stubOutputStream.writeName(stub.name)
         stubOutputStream.writeName(stub.className)
         Ty.serialize(stub.type, stubOutputStream)
-        stubOutputStream.writeByte(stub.visibility.ordinal)
+        stubOutputStream.writeShort(stub.flags)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocFieldDefStub {
         val name = stubInputStream.readName()
         val className = stubInputStream.readName()
         val type = Ty.deserialize(stubInputStream)
-        val visibility = stubInputStream.readByte()
+        val flags = stubInputStream.readShort()
         return LuaDocFieldDefStubImpl(stubElement,
+                flags.toInt(),
                 StringRef.toString(name)!!,
                 StringRef.toString(className)!!,
-                Visibility.get(visibility.toInt()),
                 type)
     }
 
@@ -99,6 +103,10 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldD
 
         indexSink.occurrence(StubKeys.SHORT_NAME, stub.name)
     }
+
+    companion object {
+        const val FLAG_DEPRECATED = 0x20
+    }
 }
 
 interface LuaDocFieldDefStub : LuaClassMemberStub<LuaDocFieldDef> {
@@ -107,13 +115,21 @@ interface LuaDocFieldDefStub : LuaClassMemberStub<LuaDocFieldDef> {
     val type: ITy
 
     val className: String?
+
+    val flags: Int
 }
 
 class LuaDocFieldDefStubImpl(parent: StubElement<*>,
+                             override val flags: Int,
                              override val name: String,
                              override val className: String?,
-                             override val visibility: Visibility,
                              override val type: ITy)
     : LuaDocStubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocFieldDefStub {
     override val docTy = type
+
+    override val isDeprecated: Boolean
+        get() = BitUtil.isSet(flags, LuaDocClassFieldType.FLAG_DEPRECATED)
+
+    override val visibility: Visibility
+        get() = Visibility.getWithMask(flags)
 }

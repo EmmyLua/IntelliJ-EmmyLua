@@ -22,6 +22,7 @@ import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
@@ -61,10 +62,11 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
 
     override fun createStub(field: LuaTableField, parentStub: StubElement<*>): LuaTableFieldStub {
         val ty = field.comment?.docTy
+        val flags = BitUtil.set(0, FLAG_DEPRECATED, field.isDeprecated)
         return LuaTableFieldStubImpl(ty,
                 field.fieldName,
                 findTableExprTypeName(field),
-                Visibility.PUBLIC,
+                flags,
                 parentStub,
                 this)
     }
@@ -73,16 +75,18 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
         stubOutputStream.writeTyNullable(fieldStub.docTy)
         stubOutputStream.writeName(fieldStub.name)
         stubOutputStream.writeName(fieldStub.typeName)
+        stubOutputStream.writeShort(fieldStub.flags)
     }
 
     override fun deserialize(stream: StubInputStream, stubElement: StubElement<*>): LuaTableFieldStub {
         val ty = stream.readTyNullable()
         val fieldName = stream.readName()
         val typeName = stream.readName()
+        val flags = stream.readShort()
         return LuaTableFieldStubImpl(ty,
                 StringRef.toString(fieldName),
                 StringRef.toString(typeName),
-                Visibility.PUBLIC,
+                flags.toInt(),
                 stubElement,
                 this)
     }
@@ -96,6 +100,10 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
             indexSink.occurrence(StubKeys.SHORT_NAME, fieldName)
         }
     }
+
+    companion object {
+        const val FLAG_DEPRECATED = 0x20
+    }
 }
 
 /**
@@ -105,13 +113,19 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
 interface LuaTableFieldStub : LuaClassMemberStub<LuaTableField> {
     val typeName: String?
     val name: String?
+    val flags: Int
 }
 
 class LuaTableFieldStubImpl(
         override val docTy: ITy?,
         override val name: String?,
         override val typeName: String?,
-        override val visibility: Visibility,
+        override val flags: Int,
         parent: StubElement<*>,
         elementType: LuaStubElementType<*, *>
-) : LuaStubBase<LuaTableField>(parent, elementType), LuaTableFieldStub
+) : LuaStubBase<LuaTableField>(parent, elementType), LuaTableFieldStub {
+    override val isDeprecated: Boolean
+        get() = BitUtil.isSet(flags, LuaTableFieldType.FLAG_DEPRECATED)
+
+    override val visibility = Visibility.PUBLIC
+}

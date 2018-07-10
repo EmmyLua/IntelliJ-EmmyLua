@@ -22,4 +22,5 @@ import com.tang.intellij.lua.psi.Visibility
 
 interface LuaClassMemberStub<T : PsiElement> : StubElement<T>, LuaDocTyStub {
     val visibility: Visibility
+    val isDeprecated: Boolean
 }
