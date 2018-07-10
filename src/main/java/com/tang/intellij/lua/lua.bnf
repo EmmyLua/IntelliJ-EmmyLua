@@ -256,6 +256,7 @@ funcDef ::= 'function' ID funcBody {
         guessReturnType
         guessParentType
         getVisibility
+        isDeprecated
         getParams
         getReferences
     ]
@@ -285,6 +286,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         getComment
         guessParentType
         getVisibility
+        isDeprecated
         getParamNameDefList
         getNameIdentifier
         setName
@@ -399,6 +401,7 @@ left indexExpr ::= '[' expr ']' | '.' ID | ':' ID {
         toString
 
         guessParentType
+        isDeprecated
 
         dot = 'DOT'
         colon = 'COLON'
@@ -493,6 +496,7 @@ tableField ::= tableField1 | tableField2 | expr {
         getPresentation
         guessParentType
         getVisibility
+        isDeprecated
         getComment
         getIdExpr
         nameDef = "tableFieldNameDef"
@@ -548,6 +552,7 @@ nameExpr ::= ID {
         getNameIdentifier
         getPresentation
         getReferences
+        isDeprecated
 
         toString
     ]

@@ -28,6 +28,8 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   @NotNull
   Visibility getVisibility();
 
+  boolean isDeprecated();
+
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();
 

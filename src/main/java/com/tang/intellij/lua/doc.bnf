@@ -121,6 +121,7 @@ tableField ::= tableField2 {
         getName
         getNameIdentifier
         guessType
+        isDeprecated
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTableFieldDefStub"
 }
@@ -172,6 +173,7 @@ field_def ::= TAG_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment
         getFieldName
         toString
         getPresentation
+        isDeprecated
     ]
 }
 

@@ -605,3 +605,7 @@ fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
 fun getExpr(exprStat: LuaExprStat): LuaExpr {
     return PsiTreeUtil.getStubChildOfType(exprStat, LuaExpr::class.java)!!
 }
+
+fun isDeprecated(member: LuaClassMember): Boolean {
+    return true
+}

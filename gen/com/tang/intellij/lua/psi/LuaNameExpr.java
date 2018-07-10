@@ -30,6 +30,8 @@ public interface LuaNameExpr extends LuaExpr, PsiNameIdentifierOwner, LuaExprStu
   @NotNull
   PsiReference[] getReferences();
 
+  boolean isDeprecated();
+
   //WARNING: toString(...) is skipped
   //matching toString(LuaNameExpr, ...)
   //methods are not found in LuaPsiImplUtilKt

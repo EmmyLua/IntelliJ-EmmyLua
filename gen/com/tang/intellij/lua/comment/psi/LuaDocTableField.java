@@ -38,4 +38,6 @@ public interface LuaDocTableField extends LuaDocPsiElement, LuaClassField, PsiNa
   @NotNull
   ITy guessType(SearchContext context);
 
+  boolean isDeprecated();
+
 }

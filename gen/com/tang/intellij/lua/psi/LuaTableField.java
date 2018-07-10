@@ -43,6 +43,8 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, Lu
   @NotNull
   Visibility getVisibility();
 
+  boolean isDeprecated();
+
   @Nullable
   LuaComment getComment();
 

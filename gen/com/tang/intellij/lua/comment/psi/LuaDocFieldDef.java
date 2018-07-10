@@ -53,4 +53,6 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   @NotNull
   ItemPresentation getPresentation();
 
+  boolean isDeprecated();
+
 }

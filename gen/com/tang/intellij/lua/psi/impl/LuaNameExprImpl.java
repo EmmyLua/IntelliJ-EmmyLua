@@ -70,4 +70,8 @@ public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
     return LuaPsiImplUtilKt.getReferences(this);
   }
 
+  public boolean isDeprecated() {
+    return LuaPsiImplUtilKt.isDeprecated(this);
+  }
+
 }
