@@ -32,4 +32,10 @@ public class LuaDocTagDefImpl extends ASTWrapperPsiElement implements LuaDocTagD
     return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
   }
 
+  @Override
+  @NotNull
+  public PsiElement getTagName() {
+    return notNullChild(findChildByType(TAG_NAME));
+  }
+
 }

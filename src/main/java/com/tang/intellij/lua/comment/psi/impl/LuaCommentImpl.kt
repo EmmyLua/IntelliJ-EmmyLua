@@ -51,7 +51,7 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
     }
 
     override fun findTags(name: String): Collection<LuaDocTagDef> {
-        return PsiTreeUtil.findChildrenOfType(this, LuaDocTagDef::class.java)
+        return PsiTreeUtil.findChildrenOfType(this, LuaDocTagDef::class.java).filter { it.tagName.text == name }
     }
 
     override fun getTokenType(): IElementType {

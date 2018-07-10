@@ -176,7 +176,12 @@ field_def ::= TAG_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment
 }
 
 //--- tag
-tag_def ::= TAG_NAME comment_string? { pin = 1 }
+tag_def ::= TAG_NAME comment_string? {
+    pin = 1
+    methods = [
+        tagName = 'TAG_NAME'
+    ]
+}
 
 //@overload
 overload_def ::= TAG_OVERLOAD function_ty { pin = 1 }
