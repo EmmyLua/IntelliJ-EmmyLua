@@ -33,6 +33,7 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     val isDeprecated: Boolean
     fun <T : LuaDocPsiElement> findTag(t:Class<T>): T?
     fun <T : LuaDocPsiElement> findTags(t:Class<T>): Collection<T>
+    fun findTags(name: String): Collection<LuaDocTagDef>
     fun getParamDef(name: String): LuaDocParamDef?
     fun getFieldDef(name: String): LuaDocFieldDef?
     val classDef: LuaDocClassDef?

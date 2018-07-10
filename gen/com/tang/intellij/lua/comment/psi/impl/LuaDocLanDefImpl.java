@@ -28,6 +28,12 @@ public class LuaDocLanDefImpl extends ASTWrapperPsiElement implements LuaDocLanD
 
   @Override
   @Nullable
+  public LuaDocCommentString getCommentString() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
+  }
+
+  @Override
+  @Nullable
   public PsiElement getId() {
     return findChildByType(ID);
   }

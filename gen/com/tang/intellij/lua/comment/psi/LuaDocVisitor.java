@@ -16,10 +16,6 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
-  public void visitAuthor(@NotNull LuaDocAuthor o) {
-    visitPsiElement(o);
-  }
-
   public void visitClassDef(@NotNull LuaDocClassDef o) {
     visitPsiElement(o);
     // visitPsiNameIdentifierOwner(o);
@@ -30,10 +26,6 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitCommentString(@NotNull LuaDocCommentString o) {
-    visitPsiElement(o);
-  }
-
-  public void visitDeprecated(@NotNull LuaDocDeprecated o) {
     visitPsiElement(o);
   }
 
@@ -90,10 +82,6 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitSince(@NotNull LuaDocSince o) {
-    visitPsiElement(o);
-  }
-
   public void visitTableField(@NotNull LuaDocTableField o) {
     visitPsiElement(o);
     // visitLuaClassField(o);
@@ -112,10 +100,6 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitTagValue(@NotNull LuaDocTagValue o) {
-    visitPsiElement(o);
-  }
-
   public void visitTy(@NotNull LuaDocTy o) {
     visitType(o);
   }
@@ -130,10 +114,6 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitUnionTy(@NotNull LuaDocUnionTy o) {
     visitTy(o);
-  }
-
-  public void visitVersion(@NotNull LuaDocVersion o) {
-    visitPsiElement(o);
   }
 
   public void visitLuaClassField(@NotNull LuaClassField o) {

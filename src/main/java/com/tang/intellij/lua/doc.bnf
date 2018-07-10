@@ -70,10 +70,6 @@
         TAG_MODULE = 'module'
         TAG_SEE = 'see'
         TAG_GENERIC = 'generic'
-        TAG_DEPRECATED = 'deprecated'
-        TAG_VERSION = 'version'
-        TAG_AUTHOR = 'author'
-        TAG_SINCE = 'since'
   ]
 }
 
@@ -90,10 +86,6 @@ private doc_item ::= '@' (param_def
     | overload_def
     | see_ref_tag
     | tag_def
-    | deprecated
-    | since
-    | author
-    | version
     | access_modifier
     | generic_def)
 
@@ -184,23 +176,13 @@ field_def ::= TAG_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment
 }
 
 //--- tag
-tag_value ::= ID
-tag_def ::= TAG_NAME tag_value? comment_string? { pin = 1 }
-
-//@deprecated
-deprecated ::= TAG_DEPRECATED comment_string? { pin = 1 }
-
-version ::= TAG_VERSION comment_string? { pin = 1 }
-
-since ::= TAG_SINCE comment_string? { pin = 1 }
-
-author ::= TAG_AUTHOR comment_string? { pin = 1 }
+tag_def ::= TAG_NAME comment_string? { pin = 1 }
 
 //@overload
 overload_def ::= TAG_OVERLOAD function_ty { pin = 1 }
 
 //@language json
-lan_def ::= TAG_LANGUAGE ID { pin = 1 }
+lan_def ::= TAG_LANGUAGE ID comment_string? { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
@@ -251,7 +233,7 @@ type_def ::= TAG_TYPE ty comment_string? {
 }
 
 comment_string ::= STRING_BEGIN? STRING? {
-    pin = 1
+    //pin = 1
     methods = [
         string = "STRING"
     ]
