@@ -82,4 +82,8 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
     return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 
+  public boolean isDeprecated() {
+    return LuaDocPsiImplUtilKt.isDeprecated(this);
+  }
+
 }

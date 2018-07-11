@@ -67,24 +67,6 @@ function dofile(filename) end
 function error(message, level) end
 
 ---
---- A global variable (not a function) that holds the global environment
---- (that is, `_G._G = _G`). Lua itself does not use this variable; changing
---- its value does not affect any environment, nor vice-versa. (Use `setfenv`
---- to change environments.)
---- function _G end
---- * `_G._G`: _G._G
----
---- Returns the current environment in use by the function.
---- `f` can be a Lua function or a number that specifies the function at that
---- stack level: Level 1 is the function calling `getfenv`. If the given
---- function is not a Lua function, or if `f` is 0, `getfenv` returns the
---- global environment. The default for `f` is 1.
----@overload fun():table
----@param f number
----@return table
-function getfenv(f) end
-
----
 --- If `object` does not have a metatable, returns nil. Otherwise, if the
 --- object's metatable has a `"__metatable"` field, returns the associated
 --- value. Otherwise, returns the metatable of the given object.
@@ -211,16 +193,6 @@ function rawset(table, index, value) end
 --- the total number of extra arguments it received.
 ---@param index number|string
 function select(index, ...) end
-
----
---- Sets the environment to be used by the given function. `f` can be a Lua
---- function or a number that specifies the function at that stack level: Level
---- 1 is the function calling `setfenv`. `setfenv` returns the given function.
---- As a special case, when `f` is 0 `setfenv` changes the environment of the
---- running thread. In this case, `setfenv` returns no values.
----@param f number
----@param table table
-function setfenv(f, table) end
 
 ---
 --- Sets the metatable for the given table. (You cannot change the metatable

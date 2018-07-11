@@ -122,6 +122,17 @@ class LuaParserDefinition : ParserDefinition {
                 LuaTypes.DOUBLE_COLON,
                 LuaTypes.GOTO
         )
+        val LUA52_BIN_OP_SET = TokenSet.create(
+                LuaTypes.BIT_AND,
+                LuaTypes.BIT_LTLT,
+                LuaTypes.BIT_OR,
+                LuaTypes.BIT_RTRT,
+                LuaTypes.BIT_TILDE,
+                LuaTypes.DOUBLE_DIV
+        )
+        val LUA52_UNARY_OP_SET = TokenSet.create(
+                LuaTypes.BIT_TILDE
+        )
         val PRIMITIVE_TYPE_SET = TokenSet.create(
                 LuaTypes.FALSE,
                 LuaTypes.NIL,

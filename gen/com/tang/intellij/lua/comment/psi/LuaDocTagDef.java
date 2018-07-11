@@ -10,7 +10,7 @@ public interface LuaDocTagDef extends LuaDocPsiElement {
   @Nullable
   LuaDocCommentString getCommentString();
 
-  @Nullable
-  LuaDocTagValue getTagValue();
+  @NotNull
+  PsiElement getTagName();
 
 }

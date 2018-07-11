@@ -43,6 +43,8 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, LuaClassM
   @NotNull
   ITy guessParentType(SearchContext context);
 
+  boolean isDeprecated();
+
   @Nullable
   PsiElement getDot();
 

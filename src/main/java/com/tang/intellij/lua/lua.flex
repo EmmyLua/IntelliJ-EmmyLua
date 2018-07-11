@@ -1,15 +1,21 @@
 package com.tang.intellij.lua.lexer;
 
 import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.lang.LuaLanguageLevel;
+
+import java.io.Reader;
+
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 %%
 
 %{
-    public _LuaLexer() {
-        this(null);
+    private LuaLanguageLevel level;
+    public _LuaLexer(LuaLanguageLevel level) {
+        this((Reader) null);
+        this.level = level;
     }
 
     private int nBrackets = 0;
@@ -114,7 +120,7 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "true"                      { return TRUE; }
   "until"                     { return UNTIL; }
   "while"                     { return WHILE; }
-  "goto"                      { return GOTO; } //lua5.3
+  "goto"                      { if (level.getVersion() < LuaLanguageLevel.LUA53.getVersion()) return ID; else return GOTO; } //lua5.3
   "#!"                        { yybegin(xSHEBANG); return SHEBANG; }
   "..."                       { return ELLIPSIS; }
   ".."                        { return CONCAT; }

@@ -30,6 +30,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
+import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.search.SearchContext
@@ -299,4 +300,8 @@ fun guessType(f:LuaDocTableField, context: SearchContext): ITy {
 
 fun getNameIdentifier(g: LuaDocGenericDef): PsiElement? {
     return g.id
+}
+
+fun isDeprecated(member: LuaClassMember): Boolean {
+    return true
 }

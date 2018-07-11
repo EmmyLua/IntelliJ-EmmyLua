@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.*
+import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
@@ -46,9 +47,12 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         val params = funcDef.params
         val overloads = funcDef.overloads
 
+        var flags = BitUtil.set(0, funcDef.visibility.bitMask, true)
+        flags = BitUtil.set(flags, FLAG_DEPRECATED, funcDef.isDeprecated)
+
         return LuaFuncStubImpl(nameRef.text,
                 moduleName,
-                funcDef.visibility,
+                flags,
                 retDocTy,
                 params,
                 overloads,
@@ -63,7 +67,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
     override fun serialize(stub: LuaFuncStub, stream: StubOutputStream) {
         stream.writeName(stub.name)
         stream.writeName(stub.module)
-        stream.writeByte(stub.visibility.ordinal)
+        stream.writeShort(stub.flags)
         stream.writeTyNullable(stub.returnDocTy)
         stream.writeParamInfoArray(stub.params)
         stream.writeSignatures(stub.overloads)
@@ -72,13 +76,13 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
     override fun deserialize(stream: StubInputStream, stubElement: StubElement<*>): LuaFuncStub {
         val name = stream.readName()
         val module = stream.readName()
-        val visibility = stream.readByte()
+        val flags = stream.readShort()
         val retDocTy = stream.readTyNullable()
         val params = stream.readParamInfoArray()
         val overloads = stream.readSignatures()
         return LuaFuncStubImpl(StringRef.toString(name),
                 StringRef.toString(module),
-                Visibility.Companion.get(visibility.toInt()),
+                flags.toInt(),
                 retDocTy,
                 params,
                 overloads,
@@ -93,16 +97,21 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
 
         indexSink.occurrence(StubKeys.SHORT_NAME, name)
     }
+
+    companion object {
+        const val FLAG_DEPRECATED = 0x20
+    }
 }
 
 interface LuaFuncStub : LuaFuncBodyOwnerStub<LuaFuncDef>, LuaClassMemberStub<LuaFuncDef> {
     val name: String
     val module: String
+    val flags: Int
 }
 
 class LuaFuncStubImpl(override val name: String,
                       override val module: String,
-                      override val visibility: Visibility,
+                      override val flags: Int,
                       override val returnDocTy: ITy?,
                       override val params: Array<LuaParamInfo>,
                       override val overloads: Array<IFunSignature>,
@@ -110,4 +119,10 @@ class LuaFuncStubImpl(override val name: String,
     : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub {
     override val docTy: ITy?
         get() = null
+
+    override val isDeprecated: Boolean
+        get() = BitUtil.isSet(flags, LuaFuncType.FLAG_DEPRECATED)
+
+    override val visibility: Visibility
+        get() = Visibility.getWithMask(flags)
 }

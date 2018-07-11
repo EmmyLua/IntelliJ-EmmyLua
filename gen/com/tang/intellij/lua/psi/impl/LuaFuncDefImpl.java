@@ -109,6 +109,10 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
     return LuaPsiImplUtilKt.getVisibility(this);
   }
 
+  public boolean isDeprecated() {
+    return LuaPsiImplUtilKt.isDeprecated(this);
+  }
+
   @NotNull
   public LuaParamInfo[] getParams() {
     return LuaPsiImplUtilKt.getParams(this);

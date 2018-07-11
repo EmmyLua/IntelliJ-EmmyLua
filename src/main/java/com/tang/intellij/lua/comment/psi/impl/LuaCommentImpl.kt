@@ -50,6 +50,10 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
         return PsiTreeUtil.findChildrenOfType(this, t)
     }
 
+    override fun findTags(name: String): Collection<LuaDocTagDef> {
+        return PsiTreeUtil.findChildrenOfType(this, LuaDocTagDef::class.java).filter { it.tagName.text == name }
+    }
+
     override fun getTokenType(): IElementType {
         return LuaTypes.DOC_COMMENT
     }
@@ -67,7 +71,7 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
         }
 
     override val isDeprecated: Boolean
-        get() = findTag(LuaDocDeprecated::class.java) != null
+        get() = findTags("deprecated").isNotEmpty()
 
     override fun getParamDef(name: String): LuaDocParamDef? {
         var element: PsiElement? = firstChild

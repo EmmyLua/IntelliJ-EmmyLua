@@ -18,6 +18,7 @@ package com.tang.intellij.lua.stubs
 
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.*
+import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
@@ -53,16 +54,23 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         }
         if (classNameSet.isEmpty()) classNameSet.add(expr.text)
 
+        var flags = 0
+
         val isStatic = methodName.dot != null
+        val isDeprecated = methodDef.isDeprecated
+        flags = BitUtil.set(flags, FLAG_STATIC, isStatic)
+        flags = BitUtil.set(flags, FLAG_DEPRECATED, isDeprecated)
+
         val visibility = methodDef.visibility
+        flags = BitUtil.set(flags, visibility.bitMask, true)
+
         val retDocTy = methodDef.comment?.returnDef?.type
         val params = methodDef.params
         val overloads = methodDef.overloads
 
-        return LuaClassMethodStubImpl(id?.text ?: "",
+        return LuaClassMethodStubImpl(flags,
+                id?.text ?: "",
                 classNameSet.toTypedArray(),
-                isStatic,
-                visibility,
                 retDocTy,
                 params,
                 overloads,
@@ -78,11 +86,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
     override fun serialize(stub: LuaClassMethodStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeNames(stub.classNames)
         stubOutputStream.writeName(stub.name)
-
-        // is static ?
-        stubOutputStream.writeBoolean(stub.isStatic)
-        // visibility
-        stubOutputStream.writeByte(stub.visibility.ordinal)
+        stubOutputStream.writeShort(stub.flags)
         stubOutputStream.writeTyNullable(stub.returnDocTy)
         stubOutputStream.writeParamInfoArray(stub.params)
         stubOutputStream.writeSignatures(stub.overloads)
@@ -91,15 +95,14 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaClassMethodStub {
         val classNames = stubInputStream.readNames()
         val shortName = stubInputStream.readName()
-        val isStatic = stubInputStream.readBoolean()
-        val visibility = stubInputStream.readByte()
+        val flags = stubInputStream.readShort()
         val retDocTy = stubInputStream.readTyNullable()
         val params = stubInputStream.readParamInfoArray()
         val overloads = stubInputStream.readSignatures()
-        return LuaClassMethodStubImpl(StringRef.toString(shortName),
+
+        return LuaClassMethodStubImpl(flags.toInt(),
+                StringRef.toString(shortName),
                 classNames,
-                isStatic,
-                Visibility.get(visibility.toInt()),
                 retDocTy,
                 params,
                 overloads,
@@ -114,6 +117,11 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         }
         indexSink.occurrence(StubKeys.SHORT_NAME, shortName)
     }
+
+    companion object {
+        const val FLAG_STATIC = 0x10
+        const val FLAG_DEPRECATED = 0x20
+    }
 }
 
 interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClassMemberStub<LuaClassMethodDef> {
@@ -123,16 +131,26 @@ interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClass
     val name: String
 
     val isStatic: Boolean
+
+    val flags: Int
 }
 
-class LuaClassMethodStubImpl(override val name: String,
+class LuaClassMethodStubImpl(override val flags: Int,
+                             override val name: String,
                              override val classNames: Array<String>,
-                             override val isStatic: Boolean,
-                             override val visibility: Visibility,
                              override val returnDocTy: ITy?,
                              override val params: Array<LuaParamInfo>,
                              override val overloads: Array<IFunSignature>,
                              parent: StubElement<*>)
     : StubBase<LuaClassMethodDef>(parent, LuaElementType.CLASS_METHOD_DEF), LuaClassMethodStub {
     override val docTy: ITy? = null
+
+    override val isStatic: Boolean
+        get() = BitUtil.isSet(flags, LuaClassMethodType.FLAG_STATIC)
+
+    override val isDeprecated: Boolean
+        get() = BitUtil.isSet(flags, LuaClassMethodType.FLAG_DEPRECATED)
+
+    override val visibility: Visibility
+        get() = Visibility.getWithMask(flags)
 }

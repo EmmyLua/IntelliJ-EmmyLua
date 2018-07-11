@@ -63,7 +63,7 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
     /**
      * Lua language version
      */
-    val languageLevel = LuaSettings.instance.languageLevel
+    val languageLevel get() = LuaSettings.instance.languageLevel
 
     private fun findCachedModuleName(): String? {
         return CachedValuesManager.getCachedValue(this, KEY_CACHED_MODULE_NAME, {

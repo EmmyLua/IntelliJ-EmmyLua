@@ -605,3 +605,19 @@ fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
 fun getExpr(exprStat: LuaExprStat): LuaExpr {
     return PsiTreeUtil.getStubChildOfType(exprStat, LuaExpr::class.java)!!
 }
+
+fun isDeprecated(member: LuaClassMember): Boolean {
+    if (member is StubBasedPsiElement<*>) {
+        val stub = member.stub
+        if (stub is LuaClassMemberStub) {
+            return stub.isDeprecated
+        }
+    }
+
+    if (member is LuaCommentOwner) {
+        val comment = member.comment
+        if (comment != null)
+            return comment.isDeprecated
+    }
+    return false
+}

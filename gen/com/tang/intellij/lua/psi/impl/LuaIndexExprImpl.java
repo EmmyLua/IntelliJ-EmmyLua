@@ -86,6 +86,10 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
+  public boolean isDeprecated() {
+    return LuaPsiImplUtilKt.isDeprecated(this);
+  }
+
   @Override
   @Nullable
   public PsiElement getDot() {

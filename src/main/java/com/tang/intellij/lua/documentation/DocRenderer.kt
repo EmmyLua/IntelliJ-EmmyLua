@@ -75,6 +75,11 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
 
         val sections = StringBuilder()
         sections.append("<table class='sections'>")
+        //Tags
+        renderTagList(sections, "Version", comment)
+        renderTagList(sections, "Author", comment)
+        renderTagList(sections, "Since", comment)
+        renderTagList(sections, "Deprecated", comment)
         //Fields
         val fields = comment.findTags(LuaDocFieldDef::class.java)
         renderTagList(sections, "Fields", fields) { renderFieldDef(sections, it, tyRenderer) }
@@ -138,11 +143,18 @@ fun renderDefinition(sb: StringBuilder, block: () -> Unit) {
     sb.append("</pre></div>")
 }
 
+private fun renderTagList(sb: StringBuilder, name: String, comment: LuaComment) {
+    val tags = comment.findTags(name.toLowerCase())
+    renderTagList(sb, name, tags) { tagDef ->
+        tagDef.commentString?.text?.let { sb.append(it) }
+    }
+}
+
 private fun <T : LuaDocPsiElement> renderTagList(sb: StringBuilder, name: String, tags: Collection<T>, block: (tag: T) -> Unit) {
     if (tags.isEmpty())
         return
     sb.wrapTag("tr") {
-        sb.append("<td valign='top' class='section'><p>$name:</p></td>")
+        sb.append("<td valign='top' class='section'><p>$name</p></td>")
         sb.append("<td valign='top'>")
         for (tag in tags) {
             sb.wrapTag("p") {

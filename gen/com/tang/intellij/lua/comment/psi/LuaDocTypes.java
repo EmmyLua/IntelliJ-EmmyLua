@@ -11,11 +11,9 @@ public interface LuaDocTypes {
 
   IElementType ACCESS_MODIFIER = LuaParserDefinitionKt.createDocType("ACCESS_MODIFIER");
   IElementType ARR_TY = LuaParserDefinitionKt.createDocType("ARR_TY");
-  IElementType AUTHOR = LuaParserDefinitionKt.createDocType("AUTHOR");
   IElementType CLASS_DEF = LuaParserDefinitionKt.createDocType("CLASS_DEF");
   IElementType CLASS_NAME_REF = LuaParserDefinitionKt.createDocType("CLASS_NAME_REF");
   IElementType COMMENT_STRING = LuaParserDefinitionKt.createDocType("COMMENT_STRING");
-  IElementType DEPRECATED = LuaParserDefinitionKt.createDocType("DEPRECATED");
   IElementType FIELD_DEF = LuaParserDefinitionKt.createDocType("FIELD_DEF");
   IElementType FUNCTION_PARAM = LuaParserDefinitionKt.createDocType("FUNCTION_PARAM");
   IElementType FUNCTION_TY = LuaParserDefinitionKt.createDocType("FUNCTION_TY");
@@ -29,17 +27,14 @@ public interface LuaDocTypes {
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
   IElementType RETURN_DEF = LuaParserDefinitionKt.createDocType("RETURN_DEF");
   IElementType SEE_REF_TAG = LuaParserDefinitionKt.createDocType("SEE_REF_TAG");
-  IElementType SINCE = LuaParserDefinitionKt.createDocType("SINCE");
   IElementType TABLE_DEF = LuaParserDefinitionKt.createDocType("TABLE_DEF");
   IElementType TABLE_FIELD = LuaParserDefinitionKt.createDocType("TABLE_FIELD");
   IElementType TABLE_TY = LuaParserDefinitionKt.createDocType("TABLE_TY");
   IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
-  IElementType TAG_VALUE = LuaParserDefinitionKt.createDocType("TAG_VALUE");
   IElementType TY = LuaParserDefinitionKt.createDocType("TY");
   IElementType TYPE_DEF = LuaParserDefinitionKt.createDocType("TYPE_DEF");
   IElementType TYPE_LIST = LuaParserDefinitionKt.createDocType("TYPE_LIST");
   IElementType UNION_TY = LuaParserDefinitionKt.createDocType("UNION_TY");
-  IElementType VERSION = LuaParserDefinitionKt.createDocType("VERSION");
 
   IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
@@ -63,9 +58,7 @@ public interface LuaDocTypes {
   IElementType SHARP = new LuaDocTokenType("#");
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
-  IElementType TAG_AUTHOR = new LuaDocTokenType("author");
   IElementType TAG_CLASS = new LuaDocTokenType("class");
-  IElementType TAG_DEPRECATED = new LuaDocTokenType("deprecated");
   IElementType TAG_FIELD = new LuaDocTokenType("field");
   IElementType TAG_GENERIC = new LuaDocTokenType("generic");
   IElementType TAG_LANGUAGE = new LuaDocTokenType("language");
@@ -78,9 +71,7 @@ public interface LuaDocTypes {
   IElementType TAG_PUBLIC = new LuaDocTokenType("public");
   IElementType TAG_RETURN = new LuaDocTokenType("return");
   IElementType TAG_SEE = new LuaDocTokenType("see");
-  IElementType TAG_SINCE = new LuaDocTokenType("since");
   IElementType TAG_TYPE = new LuaDocTokenType("type");
-  IElementType TAG_VERSION = new LuaDocTokenType("version");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
@@ -91,9 +82,6 @@ public interface LuaDocTypes {
       else if (type == ARR_TY) {
         return new LuaDocArrTyImpl(node);
       }
-      else if (type == AUTHOR) {
-        return new LuaDocAuthorImpl(node);
-      }
       else if (type == CLASS_DEF) {
         return new LuaDocClassDefImpl(node);
       }
@@ -102,9 +90,6 @@ public interface LuaDocTypes {
       }
       else if (type == COMMENT_STRING) {
         return new LuaDocCommentStringImpl(node);
-      }
-      else if (type == DEPRECATED) {
-        return new LuaDocDeprecatedImpl(node);
       }
       else if (type == FIELD_DEF) {
         return new LuaDocFieldDefImpl(node);
@@ -145,9 +130,6 @@ public interface LuaDocTypes {
       else if (type == SEE_REF_TAG) {
         return new LuaDocSeeRefTagImpl(node);
       }
-      else if (type == SINCE) {
-        return new LuaDocSinceImpl(node);
-      }
       else if (type == TABLE_DEF) {
         return new LuaDocTableDefImpl(node);
       }
@@ -160,9 +142,6 @@ public interface LuaDocTypes {
       else if (type == TAG_DEF) {
         return new LuaDocTagDefImpl(node);
       }
-      else if (type == TAG_VALUE) {
-        return new LuaDocTagValueImpl(node);
-      }
       else if (type == TYPE_DEF) {
         return new LuaDocTypeDefImpl(node);
       }
@@ -171,9 +150,6 @@ public interface LuaDocTypes {
       }
       else if (type == UNION_TY) {
         return new LuaDocUnionTyImpl(node);
-      }
-      else if (type == VERSION) {
-        return new LuaDocVersionImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

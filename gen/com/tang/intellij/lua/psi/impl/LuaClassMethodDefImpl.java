@@ -68,6 +68,10 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
     return LuaPsiImplUtilKt.getVisibility(this);
   }
 
+  public boolean isDeprecated() {
+    return LuaPsiImplUtilKt.isDeprecated(this);
+  }
+
   @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtilKt.getParamNameDefList(this);

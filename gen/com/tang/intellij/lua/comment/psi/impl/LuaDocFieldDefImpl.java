@@ -115,4 +115,8 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocFieldDefSt
     return LuaDocPsiImplUtilKt.getPresentation(this);
   }
 
+  public boolean isDeprecated() {
+    return LuaDocPsiImplUtilKt.isDeprecated(this);
+  }
+
 }

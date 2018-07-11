@@ -97,6 +97,10 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     return LuaPsiImplUtilKt.getVisibility(this);
   }
 
+  public boolean isDeprecated() {
+    return LuaPsiImplUtilKt.isDeprecated(this);
+  }
+
   @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtilKt.getComment(this);

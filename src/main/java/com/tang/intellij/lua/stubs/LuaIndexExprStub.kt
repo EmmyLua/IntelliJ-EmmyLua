@@ -20,6 +20,7 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.Visibility
@@ -73,12 +74,15 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         }
         val visibility = indexExpr.visibility
 
+        var flags = BitUtil.set(0, visibility.bitMask, true)
+        flags = BitUtil.set(flags, LuaIndexExprType.FLAG_DEPRECATED, indexExpr.isDeprecated)
+        flags = BitUtil.set(flags, LuaIndexExprType.FLAG_BRACK, indexExpr.lbrack != null)
+        flags = BitUtil.set(flags, LuaIndexExprType.FLAG_ASSIGN, stat != null)
+
         return LuaIndexExprStubImpl(classNameSet.toTypedArray(),
                 indexExpr.name,
+                flags,
                 docTy,
-                indexExpr.lbrack != null,
-                stat != null,
-                visibility,
                 stubElement,
                 this)
     }
@@ -86,25 +90,19 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun serialize(indexStub: LuaIndexExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeNames(indexStub.classNames)
         stubOutputStream.writeName(indexStub.name)
+        stubOutputStream.writeInt(indexStub.flags)
         stubOutputStream.writeTyNullable(indexStub.docTy)
-        stubOutputStream.writeBoolean(indexStub.brack)
-        stubOutputStream.writeBoolean(indexStub.isAssign)
-        stubOutputStream.writeByte(indexStub.visibility.ordinal)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexExprStub {
         val classNames = stubInputStream.readNames()
         val fieldName = stubInputStream.readName()
+        val flags = stubInputStream.readInt()
         val docTy = stubInputStream.readTyNullable()
-        val brack = stubInputStream.readBoolean()
-        val isAssign = stubInputStream.readBoolean()
-        val visibility = Visibility.get(stubInputStream.readByte().toInt())
         return LuaIndexExprStubImpl(classNames,
                 StringRef.toString(fieldName),
+                flags,
                 docTy,
-                brack,
-                isAssign,
-                visibility,
                 stubElement,
                 this)
     }
@@ -120,21 +118,38 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
             indexSink.occurrence(StubKeys.SHORT_NAME, fieldName)
         }
     }
+
+    companion object {
+        const val FLAG_DEPRECATED = 0x20
+        const val FLAG_BRACK = 0x40
+        const val FLAG_ASSIGN = 0x80
+    }
 }
 
 interface LuaIndexExprStub : LuaExprStub<LuaIndexExpr>, LuaClassMemberStub<LuaIndexExpr> {
     val classNames: Array<String>
     val name: String?
+    val flags: Int
     val brack: Boolean
     val isAssign: Boolean
 }
 
 class LuaIndexExprStubImpl(override val classNames: Array<String>,
                            override val name: String?,
+                           override val flags: Int,
                            override val docTy: ITy?,
-                           override val brack: Boolean,
-                           override val isAssign: Boolean,
-                           override val visibility: Visibility,
                            stubElement: StubElement<*>,
                            indexType: LuaIndexExprType)
-    : LuaStubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexExprStub
+    : LuaStubBase<LuaIndexExpr>(stubElement, indexType), LuaIndexExprStub {
+    override val isDeprecated: Boolean
+        get() = BitUtil.isSet(flags, LuaIndexExprType.FLAG_DEPRECATED)
+
+    override val visibility: Visibility
+        get() = Visibility.getWithMask(flags)
+
+    override val brack: Boolean
+        get() = BitUtil.isSet(flags, LuaIndexExprType.FLAG_BRACK)
+
+    override val isAssign: Boolean
+        get() = BitUtil.isSet(flags, LuaIndexExprType.FLAG_ASSIGN)
+}

@@ -24,10 +24,17 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 %{ // User code
+    private int _typeLevel = 0;
+    private boolean _typeReq = false;
+    public _LuaDocLexer() {
+        this((java.io.Reader) null);
+    }
 
-  public _LuaDocLexer() {
-    this((java.io.Reader)null);
-  }
+    private void beginType() {
+        yybegin(xTYPE_REF);
+        _typeLevel = 0;
+        _typeReq = true;
+    }
 %}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,8 +51,15 @@ AT=@
 DOC_DASHES = --+
 
 %state xTAG
+%state xTAG_WITH_ID
 %state xTAG_NAME
 %state xCOMMENT_STRING
+%state xPARAM
+%state xTYPE_REF
+%state xCLASS
+%state xCLASS_EXTEND
+%state xFIELD
+%state xFIELD_ID
 
 %%
 
@@ -57,56 +71,80 @@ DOC_DASHES = --+
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
-<xTAG, xTAG_NAME> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING> {
     {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
 }
 
 <xTAG_NAME> {
-    "field"                    { yybegin(xTAG); return TAG_FIELD; }
-    "return"                   { yybegin(xTAG); return TAG_RETURN; }
-    "param"                    { yybegin(xTAG); return TAG_PARAM; }
-    "class"                    { yybegin(xTAG); return TAG_CLASS; }
-    "type"                     { yybegin(xTAG); return TAG_TYPE;}
-    "language"                 { yybegin(xTAG); return TAG_LANGUAGE;}
-    "overload"                 { yybegin(xTAG); return TAG_OVERLOAD; }
-    "module"                   { yybegin(xTAG); return TAG_MODULE; }
-    "private"                  { yybegin(xTAG); return TAG_PRIVATE; }
-    "protected"                { yybegin(xTAG); return TAG_PROTECTED; }
-    "public"                   { yybegin(xTAG); return TAG_PUBLIC; }
+    "field"                    { yybegin(xFIELD); return TAG_FIELD; }
+    "param"                    { yybegin(xPARAM); return TAG_PARAM; }
+    "class"                    { yybegin(xCLASS); return TAG_CLASS; }
+    "module"                   { yybegin(xCLASS); return TAG_MODULE; }
+    "return"                   { beginType(); return TAG_RETURN; }
+    "type"                     { beginType(); return TAG_TYPE;}
+    "overload"                 { beginType(); return TAG_OVERLOAD; }
+    "private"                  { return TAG_PRIVATE; }
+    "protected"                { return TAG_PROTECTED; }
+    "public"                   { return TAG_PUBLIC; }
+    "language"                 { yybegin(xTAG_WITH_ID); return TAG_LANGUAGE;}
     "generic"                  { yybegin(xTAG); return TAG_GENERIC; }
     "see"                      { yybegin(xTAG); return TAG_SEE; }
-    "deprecated"               { yybegin(xTAG); return TAG_DEPRECATED; }
-    "author"                   { yybegin(xTAG); return TAG_AUTHOR; }
-    "version"                  { yybegin(xTAG); return TAG_VERSION; }
-    "since"                    { yybegin(xTAG); return TAG_SINCE; }
-    {ID}                       { yybegin(xTAG); return TAG_NAME; }
+    {ID}                       { yybegin(xCOMMENT_STRING); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<xCLASS> {
+    {ID}                       { yybegin(xCLASS_EXTEND); return ID; }
+}
+<xCLASS_EXTEND> {
+    ":"                        { beginType(); return EXTENDS;}
+    [^]                        { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
+}
+
+<xPARAM> {
+    {ID}                       { beginType(); return ID; }
+    "..."                      { beginType(); return ID; } //varargs
+}
+
+<xFIELD> {
+    "private"                  { yybegin(xFIELD_ID); return PRIVATE; }
+    "protected"                { yybegin(xFIELD_ID); return PROTECTED; }
+    "public"                   { yybegin(xFIELD_ID); return PUBLIC; }
+    {ID}                       { beginType(); return ID; }
+}
+<xFIELD_ID> {
+    {ID}                       { beginType(); return ID; }
+}
+
+<xTYPE_REF> {
+    "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
+    ","                        { _typeReq = true; return COMMA; }
+    "|"                        { _typeReq = true; return OR; }
+    ":"                        { _typeReq = true; return EXTENDS;}
+    "<"                        { _typeLevel++; return LT; }
+    ">"                        { _typeLevel--; _typeReq = false; return GT; }
+    "("                        { _typeLevel++; return LPAREN; }
+    ")"                        { _typeLevel--; _typeReq = false; return RPAREN; }
+    "{"                        { _typeLevel++; return LCURLY; }
+    "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
+    "[]"                       { _typeReq = false; return ARR; }
+    "fun"                      { return FUN; }
+    "..."|{ID}                 { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(xCOMMENT_STRING); yypushback(yylength()); } }
 }
 
 <xTAG> {
     "@"                        { yybegin(xCOMMENT_STRING); return STRING_BEGIN; }
-    ","                        { return COMMA; }
     "#"                        { return SHARP; }
-    ":"                        { return EXTENDS;}
-    "|"                        { return OR; }
-    ">"                        { return GT; }
-    "<"                        { return LT; }
-    "("                        { return LPAREN; }
-    ")"                        { return RPAREN; }
-    "{"                        { return LCURLY; }
-    "}"                        { return RCURLY; }
-    "[]"                       { return ARR; }
-    "fun"                      { return FUN; }
-    "optional"                 { return OPTIONAL; }
-    "private"                  { yybegin(xTAG); return PRIVATE; }
-    "protected"                { yybegin(xTAG); return PROTECTED; }
-    "public"                   { yybegin(xTAG); return PUBLIC; }
     {ID}                       { return ID; }
-    "..."                      { return ID; } //varargs
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+<xTAG_WITH_ID> {
+    {ID}                       { yybegin(xCOMMENT_STRING); return ID; }
 }
 
 <xCOMMENT_STRING> {
     {STRING}                   { yybegin(YYINITIAL); return STRING; }
 }
+
+[^]                            { return com.intellij.psi.TokenType.BAD_CHARACTER; }
