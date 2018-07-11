@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ArrayUtil;
+import com.intellij.util.FileContentUtil;
 import com.tang.intellij.lua.lang.LuaLanguageLevel;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -134,6 +135,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         if (selectedLevel != settings.getLanguageLevel()) {
             settings.setLanguageLevel(selectedLevel);
             StdLibraryProvider.Companion.reload();
+
+            FileContentUtil.reparseOpenedFiles();
         } else {
             for (Project project : ProjectManager.getInstance().getOpenProjects()) {
                 DaemonCodeAnalyzer.getInstance(project).restart();

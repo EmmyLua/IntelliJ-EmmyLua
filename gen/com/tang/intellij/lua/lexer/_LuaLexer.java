@@ -3,8 +3,12 @@
 package com.tang.intellij.lua.lexer;
 
 import com.intellij.lexer.FlexLexer;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.lang.LuaLanguageLevel;
+
+import java.io.Reader;
+
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 
 
@@ -510,8 +514,10 @@ public class _LuaLexer implements FlexLexer {
   private boolean zzEOFDone;
 
   /* user code: */
-    public _LuaLexer() {
-        this(null);
+    private LuaLanguageLevel level;
+    public _LuaLexer(LuaLanguageLevel level) {
+        this((Reader) null);
+        this.level = level;
     }
 
     private int nBrackets = 0;
@@ -1077,7 +1083,7 @@ public class _LuaLexer implements FlexLexer {
             // fall through
           case 130: break;
           case 58: 
-            { return GOTO;
+            { if (level.getVersion() < LuaLanguageLevel.LUA53.getVersion()) return ID; else return GOTO;
             } 
             // fall through
           case 131: break;

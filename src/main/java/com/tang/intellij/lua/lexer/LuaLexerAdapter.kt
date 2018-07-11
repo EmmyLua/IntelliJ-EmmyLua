@@ -16,8 +16,11 @@
 
 package com.tang.intellij.lua.lexer
 
+import com.tang.intellij.lua.lang.LuaLanguageLevel
+import com.tang.intellij.lua.project.LuaSettings
+
 /**
  * Created by TangZhiXu on 2015/11/15.
  * Email:272669294@qq.com
  */
-class LuaLexerAdapter : LuaLexer()
+class LuaLexerAdapter(level: LuaLanguageLevel = LuaSettings.instance.languageLevel) : LuaLexer(level)
