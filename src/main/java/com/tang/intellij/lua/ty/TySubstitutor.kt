@@ -26,16 +26,21 @@ interface ITySubstitutor {
 class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
     var cur: ITy = arg
 
-    val map = mutableMapOf<String, ITy>()
+    var map:MutableMap<String, ITy>? = null
 
     fun analyze(result: MutableMap<String, ITy>) {
+        map = result
         par.accept(this)
-        result.putAll(map)
-        map.clear()
+        map = null
     }
 
     override fun visitClass(clazz: ITyClass) {
-        map[clazz.className] = cur
+        map?.get(clazz.className) ?: return
+        map?.merge(clazz.className, cur, { a, b -> a.union(b) })
+    }
+
+    override fun visitUnion(u: TyUnion) {
+        TyUnion.each(u) { it.accept(this) }
     }
 
     override fun visitArray(array: ITyArray) {
