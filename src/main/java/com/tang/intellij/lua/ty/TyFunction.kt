@@ -253,14 +253,14 @@ class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, s
 
     override val mainSignature: IFunSignature by lazy {
 
+        val list = mutableListOf<TyParameter>()
         //TODO: cause reparse psi !
         if (LuaSettings.instance.enableGeneric) {
             val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
-            val list = mutableListOf<TyParameter>()
             genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
         }
 
-        object : FunSignatureBase(colonCall, psi.params) {
+        object : FunSignatureBase(colonCall, psi.params, list) {
             override val returnTy: ITy by lazy {
                 var returnTy = psi.guessReturnType(SearchContext(psi.project))
                 /**

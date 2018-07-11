@@ -103,17 +103,12 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
     if (sig.isGeneric()) {
         val list = this.argList.map { it.guessType(context.clone()) }
         val map = mutableMapOf<String, ITy>()
-        sig.params.forEach {
-            val ty = it.ty
-            if (ty is ITyClass) {
-                for (i in 0 until sig.tyParameters.size) {
-                    val parameter = sig.tyParameters[i]
-                    if (parameter.name == ty.className) {
-                        map[parameter.name] = list.getOrElse(i, { Ty.UNKNOWN })
-                        break
-                    }
-                }
+        sig.processArgs(this) { index, param ->
+            val arg = list.getOrNull(index)
+            if (arg != null) {
+                GenericAnalyzer(arg, param.ty).analyze(map)
             }
+            true
         }
         return object : TySubstitutor() {
             override fun substitute(clazz: ITyClass): ITy {

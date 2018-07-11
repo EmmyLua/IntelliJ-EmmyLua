@@ -23,6 +23,51 @@ interface ITySubstitutor {
     fun substitute(ty: ITy): ITy
 }
 
+class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
+    var cur: ITy = arg
+
+    val map = mutableMapOf<String, ITy>()
+
+    fun analyze(result: MutableMap<String, ITy>) {
+        par.accept(this)
+        result.putAll(map)
+        map.clear()
+    }
+
+    override fun visitClass(clazz: ITyClass) {
+        map[clazz.className] = cur
+    }
+
+    override fun visitArray(array: ITyArray) {
+        TyUnion.each(cur) {
+            if (it is ITyArray) {
+                warp(it.base) {
+                    array.base.accept(this)
+                }
+            }
+        }
+    }
+
+    override fun visitFun(f: ITyFunction) {
+        TyUnion.each(cur) { it ->
+            if (it is ITyFunction) {
+                visitSig(it.mainSignature, f.mainSignature)
+            }
+        }
+    }
+
+    private fun visitSig(arg: IFunSignature, par: IFunSignature) {
+        warp(arg.returnTy) { par.returnTy.accept(this) }
+    }
+
+    private fun warp(ty:ITy, action: () -> Unit) {
+        val arg = cur
+        cur = ty
+        action()
+        cur = arg
+    }
+}
+
 open class TySubstitutor : ITySubstitutor {
     override fun substitute(ty: ITy) = ty
 
