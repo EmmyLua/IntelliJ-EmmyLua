@@ -30,7 +30,7 @@ class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
 
     fun analyze(result: MutableMap<String, ITy>) {
         map = result
-        par.accept(this)
+        warp(cur) { par.accept(this) }
         map = null
     }
 
@@ -66,6 +66,8 @@ class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
     }
 
     private fun warp(ty:ITy, action: () -> Unit) {
+        if (Ty.isInvalid(ty))
+            return
         val arg = cur
         cur = ty
         action()
