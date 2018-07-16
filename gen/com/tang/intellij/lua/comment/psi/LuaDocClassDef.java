@@ -35,6 +35,8 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
 
   int getTextOffset();
 
+  boolean isDeprecated();
+
   @Nullable
   LuaDocClassNameRef getSuperClassNameRef();
 
