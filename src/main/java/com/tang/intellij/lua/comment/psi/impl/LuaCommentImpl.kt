@@ -19,6 +19,7 @@ package com.tang.intellij.lua.comment.psi.impl
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
@@ -27,6 +28,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.LuaVisitor
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
@@ -180,5 +182,14 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
 
     override fun toString(): String {
         return "DOC_COMMENT"
+    }
+
+    fun accept(visitor: LuaVisitor) {
+        visitor.visitComment(this)
+    }
+
+    override fun accept(visitor: PsiElementVisitor) {
+        if (visitor is LuaVisitor) accept(visitor)
+        else super.accept(visitor)
     }
 }

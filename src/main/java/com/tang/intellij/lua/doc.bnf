@@ -226,6 +226,7 @@ class_def ::= (TAG_CLASS|TAG_MODULE) ID (EXTENDS class_name_ref)? comment_string
         getName
         getTextOffset
         toString
+        isDeprecated
 
         superClassNameRef = 'class_name_ref'
         module = 'TAG_MODULE'

@@ -85,6 +85,10 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
     return LuaDocPsiImplUtilKt.toString(this);
   }
 
+  public boolean isDeprecated() {
+    return LuaDocPsiImplUtilKt.isDeprecated(this);
+  }
+
   @Override
   @Nullable
   public LuaDocClassNameRef getSuperClassNameRef() {

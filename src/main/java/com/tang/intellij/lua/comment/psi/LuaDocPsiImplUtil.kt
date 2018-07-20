@@ -185,6 +185,11 @@ fun getType(classDef: LuaDocClassDef): ITyClass {
     return stub?.classType ?: TyPsiDocClass(classDef)
 }
 
+fun isDeprecated(classDef: LuaDocClassDef): Boolean {
+    val stub = classDef.stub
+    return stub?.isDeprecated ?: LuaCommentUtil.findContainer(classDef).isDeprecated
+}
+
 /**
  * 猜测类型
  * @param typeDef 类型定义
@@ -303,5 +308,5 @@ fun getNameIdentifier(g: LuaDocGenericDef): PsiElement? {
 }
 
 fun isDeprecated(member: LuaClassMember): Boolean {
-    return true
+    return false
 }
