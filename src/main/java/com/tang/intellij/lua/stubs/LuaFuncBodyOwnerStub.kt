@@ -13,10 +13,7 @@ import com.intellij.psi.stubs.StubElement
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.IFunSignature
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyTuple
+import com.tang.intellij.lua.ty.*
 
 /**
  * func body owner stub
@@ -25,6 +22,7 @@ import com.tang.intellij.lua.ty.TyTuple
 interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
     val returnDocTy:ITy?
     val params: Array<LuaParamInfo>
+    val tyParams: Array<TyParameter>
     val overloads: Array<IFunSignature>
 
     private fun walkStub(stub: StubElement<*>, context: SearchContext): ITy? {

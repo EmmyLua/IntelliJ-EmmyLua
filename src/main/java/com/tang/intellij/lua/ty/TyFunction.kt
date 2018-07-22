@@ -21,8 +21,6 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
-import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
-import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.readParamInfoArray
@@ -34,7 +32,7 @@ interface IFunSignature {
     val params: Array<LuaParamInfo>
     val displayName: String
     val paramSignature: String
-    val tyParameters: List<TyParameter>
+    val tyParameters: Array<TyParameter>
     fun substitute(substitutor: ITySubstitutor): IFunSignature
 }
 
@@ -96,7 +94,7 @@ fun IFunSignature.isGeneric() = tyParameters.isNotEmpty()
 
 abstract class FunSignatureBase(override val colonCall: Boolean,
                                 override val params: Array<LuaParamInfo>,
-                                override val tyParameters: List<TyParameter> = emptyList()
+                                override val tyParameters: Array<TyParameter> = emptyArray()
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
@@ -141,7 +139,7 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
 class FunSignature(colonCall: Boolean,
                    override val returnTy: ITy,
                    params: Array<LuaParamInfo>,
-                   tyParameters: List<TyParameter> = emptyList()
+                   tyParameters: Array<TyParameter> = emptyArray()
 ) : FunSignatureBase(colonCall, params, tyParameters) {
 
     companion object {
@@ -253,14 +251,7 @@ class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, f
 
     override val mainSignature: IFunSignature by lazy {
 
-        val list = mutableListOf<TyParameter>()
-        //TODO: cause reparse psi !
-        if (LuaSettings.instance.enableGeneric) {
-            val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
-            genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
-        }
-
-        object : FunSignatureBase(colonCall, psi.params, list) {
+        object : FunSignatureBase(colonCall, psi.params, psi.tyParams) {
             override val returnTy: ITy by lazy {
                 var returnTy = psi.guessReturnType(SearchContext(psi.project))
                 /**

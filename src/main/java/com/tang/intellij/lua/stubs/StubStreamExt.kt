@@ -20,10 +20,7 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.LuaParamInfo
-import com.tang.intellij.lua.ty.FunSignature
-import com.tang.intellij.lua.ty.IFunSignature
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.*
 
 fun StubOutputStream.writeParamInfoArray(params: Array<LuaParamInfo>) {
     writeByte(params.size)
@@ -78,6 +75,26 @@ fun StubInputStream.readNames(): Array<String> {
     val size = readInt()
     for (i in 0 until size) {
         list.add(StringRef.toString(readName()))
+    }
+    return list.toTypedArray()
+}
+
+fun StubOutputStream.writeTyParams(tyParams: Array<TyParameter>) {
+    writeByte(tyParams.size)
+    tyParams.forEach { parameter ->
+        writeName(parameter.name)
+        writeBoolean(parameter.base != null)
+        parameter.base?.let { Ty.serialize(parameter.base, this) }
+    }
+}
+
+fun StubInputStream.readTyParams(): Array<TyParameter> {
+    val list = mutableListOf<TyParameter>()
+    val size = readByte()
+    for (i in 0 until size) {
+        val name = readName().toString()
+        val base = if (readBoolean()) Ty.deserialize(this) else null
+        list.add(TyParameter(name, base))
     }
     return list.toTypedArray()
 }

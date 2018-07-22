@@ -26,6 +26,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
@@ -175,6 +176,22 @@ val LuaFuncBodyOwner.overloads: Array<IFunSignature> get() {
                     list.add(FunSignature.create(colonCall, fty))
             }
         }
+    }
+    return list.toTypedArray()
+}
+
+val LuaFuncBodyOwner.tyParams: Array<TyParameter> get() {
+    if (this is StubBasedPsiElementBase<*>) {
+        val stub = this.stub
+        if (stub is LuaFuncBodyOwnerStub<*>) {
+            return stub.tyParams
+        }
+    }
+
+    val list = mutableListOf<TyParameter>()
+    if (this is LuaCommentOwner) {
+        val genericDefList = comment?.findTags(LuaDocGenericDef::class.java)
+        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
     }
     return list.toTypedArray()
 }

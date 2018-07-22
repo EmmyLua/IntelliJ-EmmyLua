@@ -27,6 +27,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.TyParameter
 
 /**
 
@@ -45,6 +46,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         if (file is LuaPsiFile) moduleName = file.moduleName ?: Constants.WORD_G
         val retDocTy = funcDef.comment?.returnDef?.type
         val params = funcDef.params
+        val tyParams = funcDef.tyParams
         val overloads = funcDef.overloads
 
         var flags = BitUtil.set(0, funcDef.visibility.bitMask, true)
@@ -55,6 +57,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
                 flags,
                 retDocTy,
                 params,
+                tyParams,
                 overloads,
                 stubElement)
     }
@@ -70,6 +73,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         stream.writeShort(stub.flags)
         stream.writeTyNullable(stub.returnDocTy)
         stream.writeParamInfoArray(stub.params)
+        stream.writeTyParams(stub.tyParams)
         stream.writeSignatures(stub.overloads)
     }
 
@@ -79,12 +83,14 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         val flags = stream.readShort()
         val retDocTy = stream.readTyNullable()
         val params = stream.readParamInfoArray()
+        val tyParams = stream.readTyParams()
         val overloads = stream.readSignatures()
         return LuaFuncStubImpl(StringRef.toString(name),
                 StringRef.toString(module),
                 flags.toInt(),
                 retDocTy,
                 params,
+                tyParams,
                 overloads,
                 stubElement)
     }
@@ -114,6 +120,7 @@ class LuaFuncStubImpl(override val name: String,
                       override val flags: Int,
                       override val returnDocTy: ITy?,
                       override val params: Array<LuaParamInfo>,
+                      override val tyParams: Array<TyParameter>,
                       override val overloads: Array<IFunSignature>,
                       parent: StubElement<*>)
     : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub {

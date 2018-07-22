@@ -27,6 +27,7 @@ import com.tang.intellij.lua.psi.impl.LuaClosureExprImpl
 import com.tang.intellij.lua.psi.overloads
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.TyParameter
 
 class LuaClosureExprType : LuaStubElementType<LuaClosureExprStub, LuaClosureExpr>("CLOSURE_EXPR") {
     override fun indexStub(stub: LuaClosureExprStub, sink: IndexSink) {
@@ -60,4 +61,7 @@ class LuaClosureExprStub(
         override val params: Array<LuaParamInfo>,
         override val overloads: Array<IFunSignature>,
         parent: StubElement<*>?
-) : LuaStubBase<LuaClosureExpr>(parent, LuaElementTypes.CLOSURE_EXPR), LuaFuncBodyOwnerStub<LuaClosureExpr>, LuaExprStub<LuaClosureExpr>
+) : LuaStubBase<LuaClosureExpr>(parent, LuaElementTypes.CLOSURE_EXPR), LuaFuncBodyOwnerStub<LuaClosureExpr>, LuaExprStub<LuaClosureExpr> {
+    override val tyParams: Array<TyParameter>
+        get() = emptyArray()
+}

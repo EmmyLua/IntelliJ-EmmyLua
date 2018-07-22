@@ -26,8 +26,10 @@ import com.tang.intellij.lua.psi.LuaLocalFuncDef
 import com.tang.intellij.lua.psi.LuaParamInfo
 import com.tang.intellij.lua.psi.impl.LuaLocalFuncDefImpl
 import com.tang.intellij.lua.psi.overloads
+import com.tang.intellij.lua.psi.tyParams
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.TyParameter
 
 class LuaLocalFuncDefElementType
     : LuaStubElementType<LuaLocalFuncDefStub, LuaLocalFuncDef>("LOCAL_FUNC_DEF") {
@@ -35,6 +37,7 @@ class LuaLocalFuncDefElementType
         stream.writeName(stub.name)
         stream.writeTyNullable(stub.returnDocTy)
         stream.writeParamInfoArray(stub.params)
+        stream.writeTyParams(stub.tyParams)
         stream.writeSignatures(stub.overloads)
     }
 
@@ -46,10 +49,12 @@ class LuaLocalFuncDefElementType
     override fun createStub(def: LuaLocalFuncDef, parentStub: StubElement<*>?): LuaLocalFuncDefStub {
         val retDocTy = def.comment?.returnDef?.type
         val params = def.params
+        val tyParams = def.tyParams
         val overloads = def.overloads
         return LuaLocalFuncDefStub(def.name!!,
                 retDocTy,
                 params,
+                tyParams,
                 overloads,
                 parentStub,
                 this)
@@ -59,10 +64,12 @@ class LuaLocalFuncDefElementType
         val name = stream.readName()
         val retDocTy = stream.readTyNullable()
         val params = stream.readParamInfoArray()
+        val tyParams = stream.readTyParams()
         val overloads = stream.readSignatures()
         return LuaLocalFuncDefStub(StringRef.toString(name),
                 retDocTy,
                 params,
+                tyParams,
                 overloads,
                 parentStub,
                 this)
@@ -81,6 +88,7 @@ class LuaLocalFuncDefStub(
         val name: String,
         override val returnDocTy: ITy?,
         override val params: Array<LuaParamInfo>,
+        override val tyParams: Array<TyParameter>,
         override val overloads: Array<IFunSignature>,
         parent: StubElement<*>?,
         type: LuaStubElementType<*, *>
