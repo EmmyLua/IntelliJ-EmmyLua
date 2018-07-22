@@ -34,7 +34,7 @@ interface ITyVisitor {
 
 open class TyVisitor : ITyVisitor {
     override fun visitTy(ty: ITy) {
-
+        ty.acceptChildren(this)
     }
 
     override fun visitClass(clazz: ITyClass) {
