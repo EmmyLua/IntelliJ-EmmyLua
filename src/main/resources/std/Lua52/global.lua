@@ -79,7 +79,9 @@ function getmetatable(object) end
 --- for i,v in ipairs(t) do *body* end
 --- will iterate over the pairs (`1,t[1]`), (`2,t[2]`), ..., up to the
 --- first integer key absent from the table.
----@param t table
+---@generic V
+---@param t table<number, V>
+---@return fun(tbl: table<number, V>):(number, V)
 function ipairs(t) end
 
 ---
@@ -142,7 +144,9 @@ function next(table, index) end
 --- will iterate over all key–value pairs of table `t`.
 --- See function `next` for the caveats of modifying the table during its
 --- traversal.
----@param t table
+---@generic V
+---@param t table<string, V>
+---@return fun(tbl: table<string, V>):(string, V)
 function pairs(t) end
 
 ---

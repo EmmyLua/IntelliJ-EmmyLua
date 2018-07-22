@@ -101,8 +101,9 @@ function getmetatable(object) end
 --- > `for i,v in ipairs(t) do` *body* `end`
 --- will iterate over the key–value pairs (1,`t[1]`), (2,`t[2]`), ..., up to
 --- the first absent index.
----@param t table
----@return function|table|number
+---@generic V
+---@param t table<number, V>
+---@return fun(tbl: table<number, V>):(number, V)
 function ipairs(t) end
 
 ---
@@ -184,8 +185,9 @@ function next(table, index) end
 ---
 --- See function `next` for the caveats of modifying the table during its
 --- traversal.
----@param t table
----@return function|table|any
+---@generic V
+---@param t table<string, V>
+---@return fun(tbl: table<string, V>):(string, V)
 function pairs(t) end
 
 ---
