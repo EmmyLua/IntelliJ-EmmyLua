@@ -36,7 +36,7 @@ class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
 
     override fun visitClass(clazz: ITyClass) {
         map?.get(clazz.className) ?: return
-        map?.merge(clazz.className, cur, { a, b -> a.union(b) })
+        map?.merge(clazz.className, cur) { a, b -> a.union(b) }
     }
 
     override fun visitUnion(u: TyUnion) {
@@ -57,6 +57,21 @@ class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
         TyUnion.each(cur) { it ->
             if (it is ITyFunction) {
                 visitSig(it.mainSignature, f.mainSignature)
+            }
+        }
+    }
+
+    override fun visitGeneric(generic: ITyGeneric) {
+        TyUnion.each(cur) {
+            if (it is ITyGeneric) {
+                warp(it.base) {
+                    generic.base.accept(this)
+                }
+                it.params.forEachIndexed { index, iTy ->
+                    warp(iTy) {
+                        generic.getParamTy(index).accept(this)
+                    }
+                }
             }
         }
     }

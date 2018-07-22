@@ -50,8 +50,12 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         return other is TyGeneric
                 && base.subTypeOf(other.base, context, strict) // Base should be subtype of other base
                 && params.size == other.params.size // Equal amount of params
-                && params.indices.all({ i -> params[i].subTypeOf(other.params[i], context, strict) }) // Params need to be subtypes
+                && params.indices.all { i -> params[i].subTypeOf(other.params[i], context, strict) } // Params need to be subtypes
 
+    }
+
+    override fun accept(visitor: ITyVisitor) {
+        visitor.visitGeneric(this)
     }
 }
 

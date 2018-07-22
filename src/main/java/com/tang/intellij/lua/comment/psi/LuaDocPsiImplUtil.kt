@@ -249,8 +249,14 @@ fun getType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
 }
 
 fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
-    val set = luaDocFunctionTy.typeList?.tyList?.firstOrNull()
-    return set?.getType() ?: Ty.VOID
+    val list = luaDocFunctionTy.typeList?.tyList?.map { it.getType() }
+
+    return when {
+        list == null -> Ty.VOID
+        list.isEmpty() -> Ty.VOID
+        list.size == 1 -> list.first()
+        else -> TyTuple(list)
+    }
 }
 
 fun getType(luaDocGenericTy: LuaDocGenericTy): ITy {
