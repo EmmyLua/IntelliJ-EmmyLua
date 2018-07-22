@@ -228,8 +228,8 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         if (super.subTypeOf(other, context, strict) || other == Ty.FUNCTION) return true // Subtype of function primitive.
         if (other is ITyFunction) {
-            if (mainSignature == other.mainSignature || other.signatures.any({ sig -> sig == mainSignature})) return true
-            return signatures.any({ sig -> sig == other.mainSignature || other.signatures.any({ sig2 -> sig2 == sig})})
+            if (mainSignature == other.mainSignature || other.signatures.any { sig -> sig == mainSignature}) return true
+            return signatures.any { sig -> sig == other.mainSignature || other.signatures.any { sig2 -> sig2 == sig} }
         }
         return false
     }
@@ -243,7 +243,7 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 }
 
-class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
+class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, flags: Int = 0) : TyFunction() {
     init {
         this.flags = flags
         if (colonCall) {

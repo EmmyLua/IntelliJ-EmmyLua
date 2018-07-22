@@ -159,10 +159,10 @@ private fun LuaDocFieldDef.infer(): ITy {
 
 private fun LuaFuncBodyOwner.infer(context: SearchContext): ITy {
     if (this is LuaFuncDef)
-        return TyPsiFunction(false, this, context, TyFlags.GLOBAL)
+        return TyPsiFunction(false, this, TyFlags.GLOBAL)
     return if (this is LuaClassMethodDef) {
-        TyPsiFunction(!this.isStatic, this, context, 0)
-    } else TyPsiFunction(false, this, context, 0)
+        TyPsiFunction(!this.isStatic, this, 0)
+    } else TyPsiFunction(false, this, 0)
 }
 
 private fun LuaTableField.infer(context: SearchContext): ITy {
