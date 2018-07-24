@@ -65,8 +65,9 @@ function table.remove(t, pos) end
 --- table elements, and returns true when the first is less than the second
 --- (so that `not comp(a[i+1],a[i])` will be true after the sort). If `comp`
 --- is not given, then the '<' operator will be used.
----@param t table
----@param comp fun(a:any, b:any):number
+---@generic V
+---@param t table<number, V>
+---@param comp fun(a:V, b:V):number
 function table.sort(t, comp) end
 
 return table
