@@ -96,7 +96,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
             clazz is TyDocTable -> {
                 val list = mutableListOf<String>()
                 clazz.table.tableFieldList.forEach { it.ty?.let { ty-> list.add("${it.name}: ${render(ty.getType())}") } }
-                "@{ ${list.joinToString(", ")} }"
+                "{ ${list.joinToString(", ")} }"
             }
             clazz.hasFlag(TyFlags.ANONYMOUS_TABLE) -> renderType(Constants.WORD_TABLE)
             clazz.isAnonymous -> ""
