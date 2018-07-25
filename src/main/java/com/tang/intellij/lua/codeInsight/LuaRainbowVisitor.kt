@@ -42,7 +42,7 @@ class LuaRainbowVisitor : RainbowVisitor() {
             // exclude 'self'
             if (resolve !is LuaParamNameDef && element.text == Constants.WORD_SELF) return
 
-            val context = PsiTreeUtil.findFirstParent(resolve, { it is LuaFuncBodyOwner })
+            val context = PsiTreeUtil.findFirstParent(resolve) { it is LuaFuncBodyOwner }
             if (context != null) {
                 val rainbowElement = element
 

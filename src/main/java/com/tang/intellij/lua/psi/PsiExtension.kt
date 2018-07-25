@@ -316,9 +316,9 @@ val LuaTableField.valueExpr: LuaExpr? get() {
 }
 
 val LuaTableField.shouldCreateStub: Boolean get() =
-    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB, {
+    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB) {
         CachedValueProvider.Result.create(innerShouldCreateStub, this)
-    })
+    }
 
 private val LuaTableField.innerShouldCreateStub: Boolean get() {
     if (id == null && idExpr == null)
@@ -332,9 +332,9 @@ private val LuaTableField.innerShouldCreateStub: Boolean get() {
 }
 
 val LuaTableExpr.shouldCreateStub: Boolean get() =
-    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB, {
+    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB) {
         CachedValueProvider.Result.create(innerShouldCreateStub, this)
-    })
+    }
 
 private val LuaTableExpr.innerShouldCreateStub: Boolean get() {
     val pt = parent
@@ -354,11 +354,11 @@ private val LuaTableExpr.innerShouldCreateStub: Boolean get() {
 private val KEY_FORWARD = Key.create<CachedValue<PsiElement>>("lua.lua_func_def.forward")
 
 val LuaFuncDef.forwardDeclaration: PsiElement? get() {
-    return CachedValuesManager.getCachedValue(this, KEY_FORWARD, {
+    return CachedValuesManager.getCachedValue(this, KEY_FORWARD) {
         val refName = name
         val ret = if (refName == null) null else resolveLocal(refName, this)
         CachedValueProvider.Result.create(ret, this)
-    })
+    }
 }
 
 val LuaCallExpr.argList: List<LuaExpr> get() {

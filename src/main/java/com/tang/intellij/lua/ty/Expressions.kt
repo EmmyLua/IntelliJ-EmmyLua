@@ -113,7 +113,7 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
         }
         return object : TySubstitutor() {
             override fun substitute(clazz: ITyClass): ITy {
-                return map.getOrElse(clazz.className, { clazz })
+                return map.getOrElse(clazz.className) { clazz }
             }
         }
     }

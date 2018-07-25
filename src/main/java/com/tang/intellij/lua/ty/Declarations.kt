@@ -193,10 +193,10 @@ private fun inferFile(file: LuaPsiFile, context: SearchContext): ITy {
             } else {
                 val lastChild = file.lastChild
                 var stat: LuaReturnStat? = null
-                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java, {
+                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) {
                     stat = it
                     false
-                })
+                }
                 if (stat != null)
                     guessReturnType(stat, 0, context)
                 else null

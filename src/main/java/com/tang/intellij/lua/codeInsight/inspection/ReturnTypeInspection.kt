@@ -49,7 +49,7 @@ class ReturnTypeInspection : StrictInspection() {
 
                     // Extend expected types with nil until the same amount as given types
                     if (abstractTypes.size < concreteTypes.size) {
-                        abstractTypes += List(concreteTypes.size - abstractTypes.size, { Ty.UNKNOWN })
+                        abstractTypes += List(concreteTypes.size - abstractTypes.size) { Ty.UNKNOWN }
                     }
 
                     // Check number

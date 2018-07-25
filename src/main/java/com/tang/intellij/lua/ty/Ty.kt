@@ -153,7 +153,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         if (other.kind == TyKind.Unknown) return !strict
 
         // Handle unions, subtype if subtype of any of the union components.
-        if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context, strict) })
+        if (other is TyUnion) return other.getChildTypes().any { type -> subTypeOf(type, context, strict) }
 
         // Classes are equal
         return this == other

@@ -49,7 +49,7 @@ fun fileTreeFromText(@Language("Lua") text: String): FileTree {
         if (path.size == 1) {
             dir.children[name] = Entry.File(contents)
         } else {
-            val childDir = dir.children.getOrPut(name, { Entry.Directory(mutableMapOf()) }) as Entry.Directory
+            val childDir = dir.children.getOrPut(name) { Entry.Directory(mutableMapOf()) } as Entry.Directory
             fill(childDir, path.drop(1), contents)
         }
     }

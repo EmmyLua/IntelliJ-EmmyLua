@@ -135,9 +135,9 @@ class TestCompletion : TestCompletionBase() {
             end
             local v = test()
             v.--[[caret]]
-        """, {
+        """) {
             assertTrue(it.contains("pp"))
-        })
+        }
     }
 
     fun `test doc table 1`() {
@@ -150,8 +150,8 @@ class TestCompletion : TestCompletionBase() {
              --- doc_table_test_B.lua
              local a = getData()
              a.--[[caret]]
-        """, {
+        """) {
             assertTrue(it.contains("name"))
-        })
+        }
     }
 }

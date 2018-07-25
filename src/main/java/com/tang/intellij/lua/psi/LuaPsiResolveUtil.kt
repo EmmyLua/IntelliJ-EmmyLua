@@ -61,11 +61,11 @@ fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLoca
 private val KEY_RESOLVE = Key.create<CachedValue<PsiElement>>("lua.resolve.cache.resolveLocal")
 
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext? = null): PsiElement? {
-    return CachedValuesManager.getCachedValue(ref, KEY_RESOLVE, {
+    return CachedValuesManager.getCachedValue(ref, KEY_RESOLVE) {
         val element = resolveInFile(refName, ref, context)
         val r = if (element is LuaNameExpr) null else element
         CachedValueProvider.Result.create(r, ref)
-    })
+    }
 }
 
 private val KEY_RESOLVE_CACHE = Key.create<PsiElement>("lua.resolve.cache")
