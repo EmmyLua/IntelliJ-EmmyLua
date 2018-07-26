@@ -60,6 +60,7 @@ DOC_DASHES = --+
 %state xCLASS_EXTEND
 %state xFIELD
 %state xFIELD_ID
+%state xGENERIC
 
 %%
 
@@ -71,7 +72,7 @@ DOC_DASHES = --+
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
-<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC> {
     {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
 }
@@ -88,10 +89,17 @@ DOC_DASHES = --+
     "protected"                { return TAG_PROTECTED; }
     "public"                   { return TAG_PUBLIC; }
     "language"                 { yybegin(xTAG_WITH_ID); return TAG_LANGUAGE;}
-    "generic"                  { yybegin(xTAG); return TAG_GENERIC; }
+    "generic"                  { yybegin(xGENERIC); return TAG_GENERIC; }
     "see"                      { yybegin(xTAG); return TAG_SEE; }
     {ID}                       { yybegin(xCOMMENT_STRING); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<xGENERIC> {
+    {ID}                       { return ID; }
+    ":"                        { return EXTENDS;}
+    ","                        { return COMMA; }
+    [^]                        { yybegin(YYINITIAL); yypushback(yylength()); }
 }
 
 <xCLASS> {

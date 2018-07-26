@@ -44,6 +44,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == GENERIC_DEF) {
       r = generic_def(b, 0);
     }
+    else if (t == GENERIC_LIST) {
+      r = generic_list(b, 0);
+    }
     else if (t == LAN_DEF) {
       r = lan_def(b, 0);
     }
@@ -266,7 +269,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   //     | see_ref_tag
   //     | tag_def
   //     | access_modifier
-  //     | generic_def)
+  //     | generic_list)
   static boolean doc_item(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item")) return false;
     if (!nextTokenIs(b, AT)) return false;
@@ -288,7 +291,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   //     | see_ref_tag
   //     | tag_def
   //     | access_modifier
-  //     | generic_def
+  //     | generic_list
   private static boolean doc_item_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
@@ -303,7 +306,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = see_ref_tag(b, l + 1);
     if (!r) r = tag_def(b, l + 1);
     if (!r) r = access_modifier(b, l + 1);
-    if (!r) r = generic_def(b, l + 1);
+    if (!r) r = generic_list(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -481,33 +484,66 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_GENERIC ID (EXTENDS class_name_ref)?
+  // ID (EXTENDS class_name_ref)?
   public static boolean generic_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_def")) return false;
-    if (!nextTokenIs(b, TAG_GENERIC)) return false;
+    if (!nextTokenIs(b, ID)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, GENERIC_DEF, null);
-    r = consumeTokens(b, 1, TAG_GENERIC, ID);
+    r = consumeToken(b, ID);
     p = r; // pin = 1
-    r = r && generic_def_2(b, l + 1);
+    r = r && generic_def_1(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
   // (EXTENDS class_name_ref)?
-  private static boolean generic_def_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "generic_def_2")) return false;
-    generic_def_2_0(b, l + 1);
+  private static boolean generic_def_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "generic_def_1")) return false;
+    generic_def_1_0(b, l + 1);
     return true;
   }
 
   // EXTENDS class_name_ref
-  private static boolean generic_def_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "generic_def_2_0")) return false;
+  private static boolean generic_def_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "generic_def_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, EXTENDS);
     r = r && class_name_ref(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // TAG_GENERIC generic_def (',' generic_def)?
+  public static boolean generic_list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "generic_list")) return false;
+    if (!nextTokenIs(b, TAG_GENERIC)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, GENERIC_LIST, null);
+    r = consumeToken(b, TAG_GENERIC);
+    p = r; // pin = 1
+    r = r && report_error_(b, generic_def(b, l + 1));
+    r = p && generic_list_2(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // (',' generic_def)?
+  private static boolean generic_list_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "generic_list_2")) return false;
+    generic_list_2_0(b, l + 1);
+    return true;
+  }
+
+  // ',' generic_def
+  private static boolean generic_list_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "generic_list_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, COMMA);
+    r = r && generic_def(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
