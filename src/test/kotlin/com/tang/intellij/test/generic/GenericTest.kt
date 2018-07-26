@@ -16,7 +16,6 @@
 
 package com.tang.intellij.test.generic
 
-/*
 import com.tang.intellij.test.completion.TestCompletionBase
 
 class GenericTest : TestCompletionBase() {
@@ -24,7 +23,26 @@ class GenericTest : TestCompletionBase() {
     fun `test generic 1`() {
         myFixture.configureByFile("class.lua")
         doTest("""
-            --- test_generic_1.lua
+            --- test_generic.lua
+
+            ---@generic T
+            ---@param p1 T
+            ---@return T
+            local function test(p1)
+                return p1
+            end
+
+            local value = test(emmy)
+            value.--[[caret]]
+        """) {
+            assertTrue(it.contains("sayHello"))
+        }
+    }
+
+    fun `test generic 2`() {
+        myFixture.configureByFile("class.lua")
+        doTest("""
+            --- test_generic.lua
 
             ---@generic T
             ---@param p1 T
@@ -40,4 +58,31 @@ class GenericTest : TestCompletionBase() {
         }
     }
 
-}*/
+    fun `test custom iterator`() {
+        myFixture.configureByFile("class.lua")
+        doTest("""
+            --- test_generic.lua
+
+            ---@generic T
+            ---@param list T[]
+            ---@return fun():number, T
+            local function myIterator(list)
+                local idx = 0
+                return function()
+                    idx = idx + 1
+                    if idx > #list then return nil end
+                    return idx, list[idx]
+                end
+            end
+
+            ---@type Emmy[]
+            local emmyList = {}
+
+            for i, em in myIterator(emmyList) do
+                em.--[[caret]]
+            end
+        """) {
+            assertTrue(it.contains("sayHello"))
+        }
+    }
+}
