@@ -268,6 +268,6 @@ generic_def ::= ID (EXTENDS class_name_ref)? {
     ]
 }
 
-generic_list ::= TAG_GENERIC generic_def (',' generic_def)? {
+generic_list ::= TAG_GENERIC generic_def (',' generic_def)* {
     pin = 1
 }

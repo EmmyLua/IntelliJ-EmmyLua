@@ -516,7 +516,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_GENERIC generic_def (',' generic_def)?
+  // TAG_GENERIC generic_def (',' generic_def)*
   public static boolean generic_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_list")) return false;
     if (!nextTokenIs(b, TAG_GENERIC)) return false;
@@ -530,10 +530,15 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // (',' generic_def)?
+  // (',' generic_def)*
   private static boolean generic_list_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_list_2")) return false;
-    generic_list_2_0(b, l + 1);
+    int c = current_position_(b);
+    while (true) {
+      if (!generic_list_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "generic_list_2", c)) break;
+      c = current_position_(b);
+    }
     return true;
   }
 
