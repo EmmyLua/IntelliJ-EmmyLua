@@ -20,9 +20,12 @@ import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.search.SearchContext
 
-class TyParameter(val name:String, val base: ITy? = null) : Ty(TyKind.GenericParam) {
+class TyParameter(val name:String, val base: String? = null) : TySerializedClass(name) {
 
     override fun substitute(substitutor: ITySubstitutor) = this
+
+    override val kind: TyKind
+        get() = TyKind.GenericParam
 }
 
 interface ITyGeneric : ITy {

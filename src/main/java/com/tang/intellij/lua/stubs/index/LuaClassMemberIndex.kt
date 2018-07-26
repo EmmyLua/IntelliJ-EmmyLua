@@ -29,6 +29,7 @@ import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyParameter
 
 class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
     override fun getKey() = StubKeys.CLASS_MEMBER
@@ -100,7 +101,9 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
         }
 
         fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>) {
-            process(type.className, fieldName, context, processor)
+            if (type is TyParameter)
+                type.base?.let { process(type.base, fieldName, context, processor) }
+            else process(type.className, fieldName, context, processor)
         }
 
         fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {

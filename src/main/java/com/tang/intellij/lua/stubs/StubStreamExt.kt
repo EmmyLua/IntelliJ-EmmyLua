@@ -83,8 +83,7 @@ fun StubOutputStream.writeTyParams(tyParams: Array<TyParameter>) {
     writeByte(tyParams.size)
     tyParams.forEach { parameter ->
         writeName(parameter.name)
-        writeBoolean(parameter.base != null)
-        parameter.base?.let { Ty.serialize(parameter.base, this) }
+        writeName(parameter.base)
     }
 }
 
@@ -92,8 +91,8 @@ fun StubInputStream.readTyParams(): Array<TyParameter> {
     val list = mutableListOf<TyParameter>()
     val size = readByte()
     for (i in 0 until size) {
-        val name = readName().toString()
-        val base = if (readBoolean()) Ty.deserialize(this) else null
+        val name = StringRef.toString(readName())
+        val base = StringRef.toString(readName())
         list.add(TyParameter(name, base))
     }
     return list.toTypedArray()

@@ -50,7 +50,7 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
-    return Ty.getBuiltin(nameRef.text) ?: TyLazyClass(nameRef.text)
+    return Ty.create(nameRef.text)
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {

@@ -191,7 +191,7 @@ val LuaFuncBodyOwner.tyParams: Array<TyParameter> get() {
     val list = mutableListOf<TyParameter>()
     if (this is LuaCommentOwner) {
         val genericDefList = comment?.findTags(LuaDocGenericDef::class.java)
-        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
+        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.text)) } }
     }
     return list.toTypedArray()
 }
