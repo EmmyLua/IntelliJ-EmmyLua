@@ -58,6 +58,30 @@ class GenericTest : TestCompletionBase() {
         }
     }
 
+    fun `test generic 3`() {
+        myFixture.configureByFile("class.lua")
+        doTest("""
+            --- test_generic.lua
+
+            ---@class EmmyExt : Emmy
+            local ext = {}
+
+            function ext:reading() end
+
+            ---@generic T
+            ---@param p1 T
+            ---@param func fun(value: T):void
+            local function test(p1, func)
+            end
+
+            test(ext, function(value)
+                value.--[[caret]]
+            end)
+        """) {
+            assertTrue(it.contains("reading"))
+        }
+    }
+
     fun `test custom iterator`() {
         myFixture.configureByFile("class.lua")
         doTest("""

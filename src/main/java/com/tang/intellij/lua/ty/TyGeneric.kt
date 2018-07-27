@@ -23,8 +23,6 @@ import com.tang.intellij.lua.search.SearchContext
 
 class TyParameter(val name:String, base: String? = null) : TySerializedClass(name, name, base) {
 
-    override fun substitute(substitutor: ITySubstitutor) = this
-
     override val kind: TyKind
         get() = TyKind.GenericParam
 
