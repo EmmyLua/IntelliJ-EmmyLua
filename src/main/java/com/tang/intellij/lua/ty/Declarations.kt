@@ -294,6 +294,8 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 val returnTy = type.mainSignature.returnTy
                 if (returnTy is TyTuple) {
                     return returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN }
+                } else if (paramIndex == 0) {
+                    return returnTy
                 }
             }
         }
