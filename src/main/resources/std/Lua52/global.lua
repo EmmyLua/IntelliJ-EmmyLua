@@ -83,7 +83,7 @@ function error(message, level) end
 
 ---
 --- A global variable (not a function) that holds the global environment. Lua
--- itself does not use this variable; changing its value does not affect any
+--- itself does not use this variable; changing its value does not affect any
 --- environment, nor vice versa.
 ---@class _G
 
