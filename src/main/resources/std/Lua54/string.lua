@@ -177,9 +177,9 @@ function string.gmatch(s, pattern) end
 ---  >> return loadstring(s)()
 ---  > end)
 --- `-- > x="4+5 = 9"`
---- `local t = {name="lua", version="5.1"}`
+--- `local t = {name="lua", version="5.4"}`
 --- `x = string.gsub("$name-$version.tar.gz", "%$(%w+)", t)`
---- > x="lua-5.1.tar.gz"
+--- > x="lua-5.4.tar.gz"
 ---@overload fun(s:string, pattern:string, repl:string|fun()):string|number
 ---@param s string
 ---@param pattern string

@@ -105,3 +105,6 @@
 ---
 --- Any of the above Built-in Types.
 ---@class any
+
+---
+---@class void

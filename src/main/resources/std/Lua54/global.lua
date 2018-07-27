@@ -302,7 +302,7 @@ function type(v) end
 ---
 --- A global variable (not a function) that holds a string containing the
 --- running Lua version. The current value of this variable is "`Lua 5.4`".
----@class _VERSION
+_VERSION = "Lua 5.4"
 
 ---
 --- This function is similar to `pcall`, except that it sets a new message
