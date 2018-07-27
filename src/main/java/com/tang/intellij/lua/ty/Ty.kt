@@ -248,7 +248,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 }
                 is TyParameter -> {
                     stream.writeName(ty.name)
-                    stream.writeName(ty.base)
+                    stream.writeName(ty.superClassName)
                 }
                 is ITyClass -> {
                     stream.writeName(ty.className)

@@ -18,14 +18,22 @@ package com.tang.intellij.lua.ty
 
 import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocTy
+import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
 
-class TyParameter(val name:String, val base: String? = null) : TySerializedClass(name) {
+class TyParameter(val name:String, base: String? = null) : TySerializedClass(name, name, base) {
 
     override fun substitute(substitutor: ITySubstitutor) = this
 
     override val kind: TyKind
         get() = TyKind.GenericParam
+
+    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
+        val superType = getSuperClass(context) as? ITyClass ?: return
+        superType.processMembers(context, processor, deep)
+    }
+
+    override fun doLazyInit(searchContext: SearchContext) {}
 }
 
 interface ITyGeneric : ITy {
