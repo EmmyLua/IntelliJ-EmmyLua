@@ -27,9 +27,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassIndex
  * Created by TangZX on 2016/12/12.
  */
 class LuaClassNavigationContributor : GotoClassContributor {
-    override fun getQualifiedName(navigationItem: NavigationItem): String? {
-        return "test"
-    }
+    override fun getQualifiedName(navigationItem: NavigationItem): String? = null
 
     override fun getQualifiedNameSeparator(): String? {
         return "."
