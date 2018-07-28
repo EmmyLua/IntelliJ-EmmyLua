@@ -130,7 +130,7 @@ class TyFunctionLookupElement(name: String,
         "$lookupString(${list.joinToString(", ")})"
     }
 
-    override fun getItemText() = lazyItemText
+    override fun getItemText() = myItemString ?: lazyItemText
 
     override fun hashCode(): Int {
         return super.hashCode() * 31 * (signature.params.size + 1)
