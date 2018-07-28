@@ -34,6 +34,7 @@ interface IFunSignature {
     val paramSignature: String
     val tyParameters: Array<TyParameter>
     fun substitute(substitutor: ITySubstitutor): IFunSignature
+    fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean
 }
 
 fun IFunSignature.processArgs(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
@@ -134,6 +135,16 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
         val list = params.map { it.substitute(substitutor) }
         return FunSignature(colonCall, returnTy.substitute(substitutor), list.toTypedArray())
     }
+
+    override fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean {
+        for (i in 0 until params.size) {
+            val p1 = params[i]
+            val p2 = other.params.getOrNull(i) ?: return false
+            if (!p1.ty.subTypeOf(p2.ty, context, strict))
+                return false
+        }
+        return true
+    }
 }
 
 class FunSignature(colonCall: Boolean,
@@ -224,12 +235,20 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.subTypeOf(other, context, strict) || other == Ty.FUNCTION) return true // Subtype of function primitive.
+        if (super.subTypeOf(other, context, strict) || other == Ty.FUNCTION)
+            return true // Subtype of function primitive.
+
+        var matched = false
         if (other is ITyFunction) {
-            if (mainSignature == other.mainSignature || other.signatures.any { sig -> sig == mainSignature}) return true
-            return signatures.any { sig -> sig == other.mainSignature || other.signatures.any { sig2 -> sig2 == sig} }
+            process(Processor { sig1 ->
+                other.process(Processor { sig2 ->
+                    matched = sig2.subTypeOf(sig1, context, strict)
+                    !matched
+                })
+                !matched
+            })
         }
-        return false
+        return matched
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
