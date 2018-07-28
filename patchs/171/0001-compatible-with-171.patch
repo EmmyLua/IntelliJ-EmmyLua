@@ -1,14 +1,14 @@
-From 2962ed0eb72378b5ffd9d290873d66e4b4159924 Mon Sep 17 00:00:00 2001
+From a665d40a1298231de6bd9536861143e00f951d35 Mon Sep 17 00:00:00 2001
 From: tangzx <272669294@qq.com>
-Date: Thu, 7 Jun 2018 09:58:45 +0800
+Date: Sun, 29 Jul 2018 01:20:32 +0800
 Subject: [PATCH] compatible with 171
 
 ---
- .../intellij/lua/editor/LuaBreadcrumbsProvider.kt  | 87 ----------------------
- .../project/EmmyLuaDirectoryProjectGenerator.kt    | 36 ---------
- .../lua/project/LuaAdditionalSourcesRootPanel.kt   |  4 +-
- .../com/tang/intellij/lua/project/LuaModuleType.kt |  5 +-
- src/main/resources/META-INF/plugin.xml             |  2 -
+ .../lua/editor/LuaBreadcrumbsProvider.kt      | 87 -------------------
+ .../EmmyLuaDirectoryProjectGenerator.kt       | 36 --------
+ .../project/LuaAdditionalSourcesRootPanel.kt  |  4 +-
+ .../intellij/lua/project/LuaModuleType.kt     |  5 +-
+ src/main/resources/META-INF/plugin.xml        |  2 -
  5 files changed, 3 insertions(+), 131 deletions(-)
  delete mode 100644 src/main/java/com/tang/intellij/lua/editor/LuaBreadcrumbsProvider.kt
  delete mode 100644 src/main/java/com/tang/intellij/lua/project/EmmyLuaDirectoryProjectGenerator.kt
@@ -190,7 +190,7 @@ index 5d79699b..9468e9f5 100644
      override fun createModuleBuilder() = LuaModuleBuilder()
  
 diff --git a/src/main/resources/META-INF/plugin.xml b/src/main/resources/META-INF/plugin.xml
-index 0e91702c..9c1aeb52 100644
+index 0c7e1c00..75e96ca9 100644
 --- a/src/main/resources/META-INF/plugin.xml
 +++ b/src/main/resources/META-INF/plugin.xml
 @@ -155,7 +155,6 @@
@@ -201,7 +201,7 @@ index 0e91702c..9c1aeb52 100644
  
          <!-- unity dll -->
          <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
-@@ -197,7 +196,6 @@
+@@ -198,7 +197,6 @@
          <!--navigate-->
          <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
          <gotoSymbolContributor implementation="com.tang.intellij.lua.editor.LuaSymbolNavigationContributor"/>
@@ -210,5 +210,5 @@ index 0e91702c..9c1aeb52 100644
          <!--completion-->
          <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaDocCompletionContributor"/>
 -- 
-2.16.2.windows.1
+2.17.0.windows.1
 
