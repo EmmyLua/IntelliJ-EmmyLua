@@ -18,6 +18,34 @@ QQ交流群：`29850775`
 
 ![snapshot](/snapshot/overview.gif)
 
+
+## Find usages
+![find_usages](/snapshot/find_usages.gif)
+
+## Rename
+![rename](/snapshot/rename.gif)
+
+## Parameter hints
+![param_hints](/snapshot/param_hints.png)
+![param_hints_cfg](/snapshot/param_hints_cfg.png)
+
+## Go to symbol
+![go_to_symbol](/snapshot/go_to_symbol.gif)
+
+## Go to class
+![go_to_class](/snapshot/go_to_class.gif)
+
+## Quick Documentation(Ctrl + Q)
+![quick_documentation](/snapshot/quick_documentation.gif)
+
+## Method separators
+![method_separators_cfg](/snapshot/method_separators_cfg.png)
+![method_separators](/snapshot/method_separators.png)
+
+## Method override line marker
+![method_override_line_marker](/snapshot/method_override_line_marker.gif)
+
+## Features
 | feature                              | progress |
 | ------------------------------------ | :------: |
 | Syntax highlighting                  |    ✔     |
