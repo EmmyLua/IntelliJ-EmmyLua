@@ -246,7 +246,8 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                             val types = param.ty
                             var set: ITy = Ty.UNKNOWN
                             TyUnion.each(types) { set = set.union(it) }
-                            return set
+                            if (set != Ty.UNKNOWN)
+                                return set
                         }
                     }
                 }
