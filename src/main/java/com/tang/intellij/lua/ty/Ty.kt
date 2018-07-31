@@ -71,6 +71,8 @@ interface ITy : Comparable<ITy> {
 
     fun getSuperClass(context: SearchContext): ITy?
 
+    fun visitSuper(searchContext: SearchContext, processor: Processor<ITyClass>)
+
     fun substitute(substitutor: ITySubstitutor): ITy
 
     fun eachTopClass(fn: Processor<ITyClass>)
@@ -161,6 +163,12 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun getSuperClass(context: SearchContext): ITy? {
         return null
+    }
+
+    override fun visitSuper(searchContext: SearchContext, processor: Processor<ITyClass>) {
+        val superType = getSuperClass(searchContext) as? ITyClass ?: return
+        if (processor.process(superType))
+            superType.visitSuper(searchContext, processor)
     }
 
     override fun compareTo(other: ITy): Int {
