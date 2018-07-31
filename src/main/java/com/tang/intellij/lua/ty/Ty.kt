@@ -153,7 +153,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         if (other.kind == TyKind.Unknown) return !strict
 
         // Handle unions, subtype if subtype of any of the union components.
-        if (other is TyUnion) return other.getChildTypes().any({ type -> subTypeOf(type, context, strict) })
+        if (other is TyUnion) return other.getChildTypes().any { type -> subTypeOf(type, context, strict) }
 
         // Classes are equal
         return this == other
@@ -227,6 +227,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
             }
         }
 
+        fun create(name: String): ITy {
+            return getBuiltin(name) ?: TyLazyClass(name)
+        }
+
         fun isInvalid(ty: ITy?): Boolean {
             return ty == null || ty is TyUnknown || ty is TyNil || ty is TyVoid
         }
@@ -241,6 +245,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 is ITyFunction -> {
                     FunSignature.serialize(ty.mainSignature, stream)
                     stream.writeSignatures(ty.signatures)
+                }
+                is TyParameter -> {
+                    stream.writeName(ty.name)
+                    stream.writeName(ty.superClassName)
                 }
                 is ITyClass -> {
                     stream.writeName(ty.className)
@@ -316,6 +324,11 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     val list = mutableListOf<ITy>()
                     for (i in 0 until size) list.add(deserialize(stream))
                     TyTuple(list)
+                }
+                TyKind.GenericParam -> {
+                    val name = StringRef.toString(stream.readName())
+                    val base = StringRef.toString(stream.readName())
+                    TyParameter(name, base)
                 }
                 else -> TyUnknown()
             }

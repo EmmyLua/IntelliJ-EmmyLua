@@ -139,7 +139,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                             handlerProcessor: HandlerProcessor?) {
         val type = member.guessType(SearchContext(project))
         val bold = thisType == callType
-        val className = thisType.className
+        val className = thisType.displayName
         if (type is ITyFunction) {
             addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, type, thisType, callType, handlerProcessor)
         } else if (member is LuaClassField) {

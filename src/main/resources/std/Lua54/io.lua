@@ -117,6 +117,7 @@ function io.type(obj) end
 function io.write(...) end
 
 --- File object
+---@class file
 local file = {}
 
 ---
@@ -220,10 +221,13 @@ function file:setvbuf(mode, size) end
 function file:write(...) end
 
 --- * `io.stderr`: Standard error.
-stderr = file
+---@type file
+stderr = nil
 
 --- * `io.stdin`: Standard in.
-stdin = file
+---@type file
+stdin = nil
 
 --- * `io.stdout`: Standard out.
-stdout = file
+---@type file
+stdout = nil

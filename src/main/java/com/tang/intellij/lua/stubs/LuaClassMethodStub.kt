@@ -25,10 +25,7 @@ import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.StubKeys
-import com.tang.intellij.lua.ty.IFunSignature
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.TyUnion
+import com.tang.intellij.lua.ty.*
 
 /**
  * class method static/instance
@@ -44,15 +41,15 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val methodName = methodDef.classMethodName
         val id = methodDef.nameIdentifier
         val expr = methodName.expr
-        val classNameSet = mutableSetOf<String>()
+        val classNameSet = mutableListOf<ITyClass>()
 
         val searchContext = SearchContext(methodDef.project, methodDef.containingFile, true)
         val ty = expr.guessType(searchContext)
         TyUnion.each(ty) {
             if (it is ITyClass)
-                classNameSet.add(it.className)
+                classNameSet.add(it)
         }
-        if (classNameSet.isEmpty()) classNameSet.add(expr.text)
+        if (classNameSet.isEmpty()) classNameSet.add(createSerializedClass(expr.text))
 
         var flags = 0
 
@@ -67,12 +64,14 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val retDocTy = methodDef.comment?.returnDef?.type
         val params = methodDef.params
         val overloads = methodDef.overloads
+        val tyParams = methodDef.tyParams
 
         return LuaClassMethodStubImpl(flags,
                 id?.text ?: "",
                 classNameSet.toTypedArray(),
                 retDocTy,
                 params,
+                tyParams,
                 overloads,
                 stubElement)
     }
@@ -83,37 +82,55 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         return psi.funcBody != null
     }
 
+    private fun StubOutputStream.writeTypes(types: Array<ITyClass>) {
+        writeByte(types.size)
+        types.forEach { Ty.serialize(it, this) }
+    }
+
     override fun serialize(stub: LuaClassMethodStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeNames(stub.classNames)
+        stubOutputStream.writeTypes(stub.classes)
         stubOutputStream.writeName(stub.name)
         stubOutputStream.writeShort(stub.flags)
         stubOutputStream.writeTyNullable(stub.returnDocTy)
         stubOutputStream.writeParamInfoArray(stub.params)
+        stubOutputStream.writeTyParams(stub.tyParams)
         stubOutputStream.writeSignatures(stub.overloads)
     }
 
+    private fun StubInputStream.readTypes(): Array<ITyClass> {
+        val size = readByte()
+        val list = mutableListOf<ITyClass>()
+        for (i in 0 until size) {
+            val ty = Ty.deserialize(this) as? ITyClass ?: continue
+            list.add(ty)
+        }
+        return list.toTypedArray()
+    }
+
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaClassMethodStub {
-        val classNames = stubInputStream.readNames()
+        val classes = stubInputStream.readTypes()
         val shortName = stubInputStream.readName()
         val flags = stubInputStream.readShort()
         val retDocTy = stubInputStream.readTyNullable()
         val params = stubInputStream.readParamInfoArray()
+        val tyParams = stubInputStream.readTyParams()
         val overloads = stubInputStream.readSignatures()
 
         return LuaClassMethodStubImpl(flags.toInt(),
                 StringRef.toString(shortName),
-                classNames,
+                classes,
                 retDocTy,
                 params,
+                tyParams,
                 overloads,
                 stubElement)
     }
 
     override fun indexStub(luaClassMethodStub: LuaClassMethodStub, indexSink: IndexSink) {
-        val classNames = luaClassMethodStub.classNames
+        val classNames = luaClassMethodStub.classes
         val shortName = luaClassMethodStub.name
         classNames.forEach {
-            LuaClassMemberIndex.indexStub(indexSink, it, shortName)
+            LuaClassMemberIndex.indexStub(indexSink, it.className, shortName)
         }
         indexSink.occurrence(StubKeys.SHORT_NAME, shortName)
     }
@@ -126,7 +143,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
 
 interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClassMemberStub<LuaClassMethodDef> {
 
-    val classNames: Array<String>
+    val classes: Array<ITyClass>
 
     val name: String
 
@@ -137,9 +154,10 @@ interface LuaClassMethodStub : LuaFuncBodyOwnerStub<LuaClassMethodDef>, LuaClass
 
 class LuaClassMethodStubImpl(override val flags: Int,
                              override val name: String,
-                             override val classNames: Array<String>,
+                             override val classes: Array<ITyClass>,
                              override val returnDocTy: ITy?,
                              override val params: Array<LuaParamInfo>,
+                             override val tyParams: Array<TyParameter>,
                              override val overloads: Array<IFunSignature>,
                              parent: StubElement<*>)
     : StubBase<LuaClassMethodDef>(parent, LuaElementType.CLASS_METHOD_DEF), LuaClassMethodStub {

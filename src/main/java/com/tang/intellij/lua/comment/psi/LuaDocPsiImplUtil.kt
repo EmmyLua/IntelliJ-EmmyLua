@@ -50,7 +50,7 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
-    return Ty.getBuiltin(nameRef.text) ?: TyLazyClass(nameRef.text)
+    return Ty.create(nameRef.text)
 }
 
 fun getName(identifierOwner: PsiNameIdentifierOwner): String? {
@@ -249,8 +249,14 @@ fun getType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
 }
 
 fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
-    val set = luaDocFunctionTy.typeList?.tyList?.firstOrNull()
-    return set?.getType() ?: Ty.VOID
+    val list = luaDocFunctionTy.typeList?.tyList?.map { it.getType() }
+
+    return when {
+        list == null -> Ty.VOID
+        list.isEmpty() -> Ty.VOID
+        list.size == 1 -> list.first()
+        else -> TyTuple(list)
+    }
 }
 
 fun getType(luaDocGenericTy: LuaDocGenericTy): ITy {

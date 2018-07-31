@@ -46,8 +46,8 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
         });
     }
 
+    protected String myItemString;
     private String myLookupString;
-    private String myItemString;
     private String myTypeText;
     private boolean isBold;
     private Icon myIcon;

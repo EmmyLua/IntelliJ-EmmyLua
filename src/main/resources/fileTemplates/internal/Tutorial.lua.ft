@@ -7,8 +7,8 @@
 
 ---define a class
 ---**Markdown** is available for comment strings
----@class Person @comment string goes here
----@field public age number @age value
+---@class Person comment string goes here
+---@field public age number age value
 ---@field weight number
 local Person = {}
 
@@ -18,14 +18,29 @@ end
 
 ---define class Emmy
 ---@class Emmy : Person @`Emmy` inherited from `Person`
-local tbl = {
+local EmmyClass = {
     name = "Emmy",
     ["*love daddy*"] = true
 }
 
-function tbl:sayHello()
+function EmmyClass:sayHello()
     print('Hi! I am Emmy.')
 end
+
+---@param book string
+function EmmyClass:reading(book)
+end
+
+---define another class Daddy
+---@class Daddy : Person
+local DaddyClass = {
+    name = 'Tang'
+}
+
+---@param code string
+function DaddyClass:coding(code)
+end
+
 --------------------------------------------------------------------------------
 -- Tutorial for annotation "@type"
 ---@type Emmy
@@ -89,3 +104,42 @@ pcall(function(emmy)
 end, inst)
 
 --------------------------------------------------------------------------------
+-- Tutorial for @generic
+
+
+
+---@generic T : Person
+---@param clazz T
+---@return T
+local function createPersonInstance(clazz)
+    --type "clazz:" here
+    -- todo return a instance of clazz
+end
+
+local emmy = createPersonInstance(EmmyClass)
+-- type "emmy:" here
+local daddy = createPersonInstance(DaddyClass)
+-- type "daddy:" here
+
+
+
+-- one more complex generic test
+---@generic T : Person
+---@param clazz T
+---@param initHandler fun(person:T):void
+---@return T
+local function createPersonInstance2(clazz, initHandler)
+    local instance = clazz() -- new clazz()
+    initHandler(instance)
+    return instance
+end
+
+local emmy2 = createPersonInstance2(EmmyClass, function(emmy)
+    -- type "emmy:" here
+end)
+-- type "emmy2:" here
+
+local daddy2 = createPersonInstance2(DaddyClass, function(daddy)
+    -- type "daddy:" here
+end)
+-- type "daddy2:" here

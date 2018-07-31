@@ -120,22 +120,22 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "true"                      { return TRUE; }
   "until"                     { return UNTIL; }
   "while"                     { return WHILE; }
-  "goto"                      { if (level.getVersion() < LuaLanguageLevel.LUA53.getVersion()) return ID; else return GOTO; } //lua5.3
+  "goto"                      { if (level.getVersion() < LuaLanguageLevel.LUA52.getVersion()) return ID; else return GOTO; } //lua5.3
   "#!"                        { yybegin(xSHEBANG); return SHEBANG; }
   "..."                       { return ELLIPSIS; }
   ".."                        { return CONCAT; }
   "=="                        { return EQ; }
   ">="                        { return GE; }
-  ">>"                        { return BIT_RTRT; } //lua5.3
+  ">>"                        { return BIT_RTRT; } //lua5.2
   "<="                        { return LE; }
-  "<<"                        { return BIT_LTLT; } //lua5.3
+  "<<"                        { return BIT_LTLT; } //lua5.2
   "~="                        { return NE; }
-  "~"                         { return BIT_TILDE; } //lua5.3
+  "~"                         { return BIT_TILDE; } //lua5.2
   "-"                         { return MINUS; }
   "+"                         { return PLUS; }
   "*"                         { return MULT; }
   "%"                         { return MOD; }
-  "//"                        { return DOUBLE_DIV; } //lua5.3
+  "//"                        { return DOUBLE_DIV; } //lua5.2
   "/"                         { return DIV; }
   "="                         { return ASSIGN; }
   ">"                         { return GT; }
@@ -149,13 +149,13 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "#"                         { return GETN; }
   ","                         { return COMMA; }
   ";"                         { return SEMI; }
-  "::"                        { return DOUBLE_COLON; } //lua5.3
+  "::"                        { return DOUBLE_COLON; } //lua5.2
   ":"                         { return COLON; }
   "."                         { return DOT; }
   "^"                         { return EXP; }
-  "~"                         { return BIT_TILDE; } //lua5.3
-  "&"                         { return BIT_AND; } //lua5.3
-  "|"                         { return BIT_OR; } //lua5.3
+  "~"                         { return BIT_TILDE; } //lua5.2
+  "&"                         { return BIT_AND; } //lua5.2
+  "|"                         { return BIT_OR; } //lua5.2
 
   "\""                        { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
   "'"                         { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }

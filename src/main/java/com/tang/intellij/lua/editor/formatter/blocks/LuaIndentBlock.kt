@@ -45,12 +45,12 @@ open class LuaIndentBlock(psi: LuaIndentRange, wrap: Wrap?, alignment: Alignment
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
         if (ctx.settings.KEEP_SIMPLE_BLOCKS_IN_ONE_LINE) {
             if (child2 is LuaScriptBlock) {
-                if (set.contains(child2.elementType) && isSimpleBlock(child2, { it.prevBlock })) {
+                if (set.contains(child2.elementType) && isSimpleBlock(child2) { it.prevBlock }) {
                     return space
                 }
             }
             if (child1 is LuaScriptBlock) {
-                if (set.contains(child1.elementType) && isSimpleBlock(child1, { it.nextBlock })) {
+                if (set.contains(child1.elementType) && isSimpleBlock(child1) { it.nextBlock }) {
                     return space
                 }
             }

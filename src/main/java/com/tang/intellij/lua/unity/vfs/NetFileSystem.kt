@@ -51,7 +51,7 @@ class NetFileSystem : ArchiveFileSystem() {
     }
 
     override fun getHandler(entryFile: VirtualFile): NetArchiveHandler {
-        return VfsImplUtil.getHandler<NetArchiveHandler>(this, entryFile, { NetArchiveHandler(it) })
+        return VfsImplUtil.getHandler<NetArchiveHandler>(this, entryFile) { NetArchiveHandler(it) }
     }
 
     override fun extractRootPath(path: String): String {

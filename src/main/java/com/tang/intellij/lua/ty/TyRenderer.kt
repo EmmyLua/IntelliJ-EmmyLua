@@ -39,9 +39,9 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                     is TyUnknown -> sb.append(renderType(Constants.WORD_ANY))
                     is TyNil -> sb.append(renderType(Constants.WORD_NIL))
                     is ITyGeneric -> {
-                        /*val list = mutableListOf<String>()
-                        this.params.forEach { list.add(it.displayName) }
-                        return "${base.displayName}<${list.joinToString(", ")}>"*/
+                        val list = mutableListOf<String>()
+                        ty.params.forEach { list.add(it.displayName) }
+                        sb.append("${ty.base.displayName}<${list.joinToString(", ")}>")
                     }
                     is TyParameter -> {
 
@@ -96,7 +96,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
             clazz is TyDocTable -> {
                 val list = mutableListOf<String>()
                 clazz.table.tableFieldList.forEach { it.ty?.let { ty-> list.add("${it.name}: ${render(ty.getType())}") } }
-                "@{ ${list.joinToString(", ")} }"
+                "{ ${list.joinToString(", ")} }"
             }
             clazz.hasFlag(TyFlags.ANONYMOUS_TABLE) -> renderType(Constants.WORD_TABLE)
             clazz.isAnonymous -> ""

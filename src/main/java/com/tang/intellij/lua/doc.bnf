@@ -87,7 +87,7 @@ private doc_item ::= '@' (param_def
     | see_ref_tag
     | tag_def
     | access_modifier
-    | generic_def)
+    | generic_list)
 
 ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
@@ -254,7 +254,7 @@ see_ref_tag ::= TAG_SEE class_name_ref (SHARP ID)? {
     ]
 }
 
-generic_def ::= TAG_GENERIC ID (EXTENDS class_name_ref)? {
+generic_def ::= ID (EXTENDS class_name_ref)? {
     pin = 1
     implements = [
         "com.intellij.psi.PsiNameIdentifierOwner"
@@ -266,4 +266,8 @@ generic_def ::= TAG_GENERIC ID (EXTENDS class_name_ref)? {
         getName
         getTextOffset
     ]
+}
+
+generic_list ::= TAG_GENERIC generic_def (',' generic_def)* {
+    pin = 1
 }

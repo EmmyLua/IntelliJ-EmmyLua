@@ -26,6 +26,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
@@ -179,6 +180,22 @@ val LuaFuncBodyOwner.overloads: Array<IFunSignature> get() {
     return list.toTypedArray()
 }
 
+val LuaFuncBodyOwner.tyParams: Array<TyParameter> get() {
+    if (this is StubBasedPsiElementBase<*>) {
+        val stub = this.stub
+        if (stub is LuaFuncBodyOwnerStub<*>) {
+            return stub.tyParams
+        }
+    }
+
+    val list = mutableListOf<TyParameter>()
+    if (this is LuaCommentOwner) {
+        val genericDefList = comment?.findTags(LuaDocGenericDef::class.java)
+        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.text)) } }
+    }
+    return list.toTypedArray()
+}
+
 enum class LuaLiteralKind {
     String,
     Bool,
@@ -299,9 +316,9 @@ val LuaTableField.valueExpr: LuaExpr? get() {
 }
 
 val LuaTableField.shouldCreateStub: Boolean get() =
-    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB, {
+    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB) {
         CachedValueProvider.Result.create(innerShouldCreateStub, this)
-    })
+    }
 
 private val LuaTableField.innerShouldCreateStub: Boolean get() {
     if (id == null && idExpr == null)
@@ -315,9 +332,9 @@ private val LuaTableField.innerShouldCreateStub: Boolean get() {
 }
 
 val LuaTableExpr.shouldCreateStub: Boolean get() =
-    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB, {
+    CachedValuesManager.getCachedValue(this, KEY_SHOULD_CREATE_STUB) {
         CachedValueProvider.Result.create(innerShouldCreateStub, this)
-    })
+    }
 
 private val LuaTableExpr.innerShouldCreateStub: Boolean get() {
     val pt = parent
@@ -337,11 +354,11 @@ private val LuaTableExpr.innerShouldCreateStub: Boolean get() {
 private val KEY_FORWARD = Key.create<CachedValue<PsiElement>>("lua.lua_func_def.forward")
 
 val LuaFuncDef.forwardDeclaration: PsiElement? get() {
-    return CachedValuesManager.getCachedValue(this, KEY_FORWARD, {
+    return CachedValuesManager.getCachedValue(this, KEY_FORWARD) {
         val refName = name
         val ret = if (refName == null) null else resolveLocal(refName, this)
         CachedValueProvider.Result.create(ret, this)
-    })
+    }
 }
 
 val LuaCallExpr.argList: List<LuaExpr> get() {

@@ -28,11 +28,13 @@ interface ITyVisitor {
     fun visitTuple(tuple: TyTuple)
 
     fun visitArray(array: ITyArray)
+
+    fun visitGeneric(generic: ITyGeneric)
 }
 
 open class TyVisitor : ITyVisitor {
     override fun visitTy(ty: ITy) {
-
+        ty.acceptChildren(this)
     }
 
     override fun visitClass(clazz: ITyClass) {
@@ -55,4 +57,7 @@ open class TyVisitor : ITyVisitor {
         visitTy(array)
     }
 
+    override fun visitGeneric(generic: ITyGeneric) {
+        visitTy(generic)
+    }
 }

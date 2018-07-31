@@ -11,7 +11,7 @@ public interface LuaDocGenericDef extends PsiNameIdentifierOwner, LuaDocPsiEleme
   @Nullable
   LuaDocClassNameRef getClassNameRef();
 
-  @Nullable
+  @NotNull
   PsiElement getId();
 
   @Nullable

@@ -85,7 +85,8 @@ function math.fmod(x, y) end
 
 ---
 --- The float value `HUGE_VAL`, a value larger than any other numeric value.
-math.huge = ""
+---@type number
+math.huge = nil
 
 ---
 --- Returns the logarithm of `x` in the given base. The default for `base` is
@@ -105,7 +106,8 @@ function math.max(x, ...) end
 
 ---
 --- An integer with the maximum value for an integer.
-math.maxinteger = ""
+---@type number
+math.maxinteger = nil
 
 ---
 --- Returns the argument with the minimum value, according to the Lua operator
@@ -116,13 +118,14 @@ function math.min(x, ...) end
 
 ---
 --- An integer with the minimum value for an integer.
-math.mininteger = ""
+---@type number
+math.mininteger = nil
 
 ---
 --- Returns the integral part of `x` and the fractional part of `x`. Its second
 --- result is always a float.
 ---@param x number
----@return number|number
+---@return number
 function math.modf(x) end
 
 ---

@@ -19,6 +19,7 @@ public interface LuaDocTypes {
   IElementType FUNCTION_TY = LuaParserDefinitionKt.createDocType("FUNCTION_TY");
   IElementType GENERAL_TY = LuaParserDefinitionKt.createDocType("GENERAL_TY");
   IElementType GENERIC_DEF = LuaParserDefinitionKt.createDocType("GENERIC_DEF");
+  IElementType GENERIC_LIST = LuaParserDefinitionKt.createDocType("GENERIC_LIST");
   IElementType GENERIC_TY = LuaParserDefinitionKt.createDocType("GENERIC_TY");
   IElementType LAN_DEF = LuaParserDefinitionKt.createDocType("LAN_DEF");
   IElementType OVERLOAD_DEF = LuaParserDefinitionKt.createDocType("OVERLOAD_DEF");
@@ -105,6 +106,9 @@ public interface LuaDocTypes {
       }
       else if (type == GENERIC_DEF) {
         return new LuaDocGenericDefImpl(node);
+      }
+      else if (type == GENERIC_LIST) {
+        return new LuaDocGenericListImpl(node);
       }
       else if (type == GENERIC_TY) {
         return new LuaDocGenericTyImpl(node);

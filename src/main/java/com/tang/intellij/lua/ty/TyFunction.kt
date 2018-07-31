@@ -21,8 +21,6 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
-import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
-import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.readParamInfoArray
@@ -34,8 +32,9 @@ interface IFunSignature {
     val params: Array<LuaParamInfo>
     val displayName: String
     val paramSignature: String
-    val tyParameters: List<TyParameter>
+    val tyParameters: Array<TyParameter>
     fun substitute(substitutor: ITySubstitutor): IFunSignature
+    fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean
 }
 
 fun IFunSignature.processArgs(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
@@ -96,7 +95,7 @@ fun IFunSignature.isGeneric() = tyParameters.isNotEmpty()
 
 abstract class FunSignatureBase(override val colonCall: Boolean,
                                 override val params: Array<LuaParamInfo>,
-                                override val tyParameters: List<TyParameter> = emptyList()
+                                override val tyParameters: Array<TyParameter> = emptyArray()
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
@@ -136,12 +135,22 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
         val list = params.map { it.substitute(substitutor) }
         return FunSignature(colonCall, returnTy.substitute(substitutor), list.toTypedArray())
     }
+
+    override fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean {
+        for (i in 0 until params.size) {
+            val p1 = params[i]
+            val p2 = other.params.getOrNull(i) ?: return false
+            if (!p1.ty.subTypeOf(p2.ty, context, strict))
+                return false
+        }
+        return true
+    }
 }
 
 class FunSignature(colonCall: Boolean,
                    override val returnTy: ITy,
                    params: Array<LuaParamInfo>,
-                   tyParameters: List<TyParameter> = emptyList()
+                   tyParameters: Array<TyParameter> = emptyArray()
 ) : FunSignatureBase(colonCall, params, tyParameters) {
 
     companion object {
@@ -226,12 +235,20 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.subTypeOf(other, context, strict) || other == Ty.FUNCTION) return true // Subtype of function primitive.
+        if (super.subTypeOf(other, context, strict) || other == Ty.FUNCTION)
+            return true // Subtype of function primitive.
+
+        var matched = false
         if (other is ITyFunction) {
-            if (mainSignature == other.mainSignature || other.signatures.any({ sig -> sig == mainSignature})) return true
-            return signatures.any({ sig -> sig == other.mainSignature || other.signatures.any({ sig2 -> sig2 == sig})})
+            process(Processor { sig1 ->
+                other.process(Processor { sig2 ->
+                    matched = sig2.subTypeOf(sig1, context, strict)
+                    !matched
+                })
+                !matched
+            })
         }
-        return false
+        return matched
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
@@ -243,7 +260,7 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 }
 
-class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, searchContext: SearchContext, flags: Int = 0) : TyFunction() {
+class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, flags: Int = 0) : TyFunction() {
     init {
         this.flags = flags
         if (colonCall) {
@@ -253,14 +270,7 @@ class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, s
 
     override val mainSignature: IFunSignature by lazy {
 
-        //TODO: cause reparse psi !
-        if (LuaSettings.instance.enableGeneric) {
-            val genericDefList = (psi as? LuaCommentOwner)?.comment?.findTags(LuaDocGenericDef::class.java)
-            val list = mutableListOf<TyParameter>()
-            genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.resolveType())) } }
-        }
-
-        object : FunSignatureBase(colonCall, psi.params) {
+        object : FunSignatureBase(colonCall, psi.params, psi.tyParams) {
             override val returnTy: ITy by lazy {
                 var returnTy = psi.guessReturnType(SearchContext(psi.project))
                 /**

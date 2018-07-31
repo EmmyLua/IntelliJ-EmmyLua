@@ -33,9 +33,9 @@ public class LuaDocGenericDefImpl extends ASTWrapperPsiElement implements LuaDoc
   }
 
   @Override
-  @Nullable
+  @NotNull
   public PsiElement getId() {
-    return findChildByType(ID);
+    return notNullChild(findChildByType(ID));
   }
 
   @Nullable

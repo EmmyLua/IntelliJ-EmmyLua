@@ -1,16 +1,15 @@
-From db8c9b4b5c4eee9f743c63b52fd031742e5723a4 Mon Sep 17 00:00:00 2001
+From 34f457a01dfed3cc6749b58e7c37218daa3a50d3 Mon Sep 17 00:00:00 2001
 From: tangzx <272669294@qq.com>
-Date: Wed, 6 Jun 2018 18:31:51 +0800
-Subject: [PATCH] Revert "redesigned documentation"
+Date: Sun, 29 Jul 2018 01:14:33 +0800
+Subject: [PATCH] revert redesigned documentation
 
-This reverts commit e9027fedca60bd885e1b2b378cc57949a6b88394.
 ---
- .../tang/intellij/lua/documentation/DocRenderer.kt | 202 ++++++++++-----------
- .../lua/documentation/LuaDocumentationProvider.kt  | 106 +++++------
- 2 files changed, 142 insertions(+), 166 deletions(-)
+ .../intellij/lua/documentation/DocRenderer.kt | 214 ++++++++----------
+ .../documentation/LuaDocumentationProvider.kt | 108 ++++-----
+ 2 files changed, 143 insertions(+), 179 deletions(-)
 
 diff --git a/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt b/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
-index 59876eb6..dc0db89f 100644
+index eb196586..dc0db89f 100644
 --- a/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
 +++ b/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
 @@ -20,48 +20,95 @@ import com.intellij.codeInsight.documentation.DocumentationManagerUtil
@@ -131,7 +130,7 @@ index 59876eb6..dc0db89f 100644
                  else -> {
                      val elementType = child.node.elementType
                      if (elementType === LuaDocTypes.STRING) {
-@@ -71,134 +118,71 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
+@@ -71,146 +118,71 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
              }
              child = child.nextSibling
          }
@@ -139,6 +138,11 @@ index 59876eb6..dc0db89f 100644
 -
 -        val sections = StringBuilder()
 -        sections.append("<table class='sections'>")
+-        //Tags
+-        renderTagList(sections, "Version", comment)
+-        renderTagList(sections, "Author", comment)
+-        renderTagList(sections, "Since", comment)
+-        renderTagList(sections, "Deprecated", comment)
 -        //Fields
 -        val fields = comment.findTags(LuaDocFieldDef::class.java)
 -        renderTagList(sections, "Fields", fields) { renderFieldDef(sections, it, tyRenderer) }
@@ -190,10 +194,8 @@ index 59876eb6..dc0db89f 100644
      }
 -    sb.append("</pre>")
 -    renderCommentString(" - ", null, sb, def.commentString)
-+    renderCommentString("  ", null, sb, def.commentString)
-+    sb.append("<br>")
- }
- 
+-}
+-
 -private fun renderFieldDef(sb: StringBuilder, def: LuaDocFieldDef, tyRenderer: ITyRenderer) {
 -    sb.append("${def.name}: ")
 -    renderTypeUnion(null, null, sb, def.ty, tyRenderer)
@@ -206,11 +208,20 @@ index 59876eb6..dc0db89f 100644
 -    sb.append("</pre></div>")
 -}
 -
+-private fun renderTagList(sb: StringBuilder, name: String, comment: LuaComment) {
+-    val tags = comment.findTags(name.toLowerCase())
+-    renderTagList(sb, name, tags) { tagDef ->
+-        tagDef.commentString?.text?.let { sb.append(it) }
+-    }
++    renderCommentString("  ", null, sb, def.commentString)
++    sb.append("<br>")
+ }
+ 
 -private fun <T : LuaDocPsiElement> renderTagList(sb: StringBuilder, name: String, tags: Collection<T>, block: (tag: T) -> Unit) {
 -    if (tags.isEmpty())
 -        return
 -    sb.wrapTag("tr") {
--        sb.append("<td valign='top' class='section'><p>$name:</p></td>")
+-        sb.append("<td valign='top' class='section'><p>$name</p></td>")
 -        sb.append("<td valign='top'>")
 -        for (tag in tags) {
 -            sb.wrapTag("p") {
@@ -291,7 +302,7 @@ index 59876eb6..dc0db89f 100644
              sb.append("#${it.text}")
          }
 diff --git a/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt b/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt
-index a9c39290..b148c47f 100644
+index 8357248e..b148c47f 100644
 --- a/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt
 +++ b/src/main/java/com/tang/intellij/lua/documentation/LuaDocumentationProvider.kt
 @@ -16,7 +16,6 @@
@@ -335,6 +346,15 @@ index a9c39290..b148c47f 100644
                      }
                  }
              }
+@@ -56,7 +52,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
+         return super.getQuickNavigateInfo(element, originalElement)
+     }
+ 
+-    override fun getDocumentationElementForLookupItem(psiManager: PsiManager, obj: Any, element: PsiElement?): PsiElement? {
++    override fun getDocumentationElementForLookupItem(psiManager: PsiManager, obj: Any, element: PsiElement): PsiElement? {
+         if (obj is LuaDocumentationLookupElement) {
+             return obj.getDocumentationElement(SearchContext(psiManager.project))
+         }
 @@ -69,29 +65,27 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
  
      override fun generateDoc(element: PsiElement, originalElement: PsiElement?): String? {
@@ -480,5 +500,5 @@ index a9c39290..b148c47f 100644
      }
  }
 -- 
-2.16.2.windows.1
+2.17.0.windows.1
 

@@ -133,11 +133,11 @@ private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITy, SearchCo
  */
 fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITy {
     return CachedValuesManager.getManager(classMethodDef.project).getParameterizedCachedValue(classMethodDef, GET_CLASS_METHOD, { ctx ->
-        val stub = classMethodDef.stub
+        /*val stub = classMethodDef.stub
         var type: ITy = Ty.UNKNOWN
         if (stub != null) {
-            stub.classNames.forEach {
-               type = type.union(createSerializedClass(it))
+            stub.classes.forEach {
+               type = type.union(it)
             }
         } else {
             val expr = classMethodDef.classMethodName.expr
@@ -145,7 +145,11 @@ fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): 
             val perfect = TyUnion.getPerfectClass(ty)
             if (perfect is ITyClass)
                 type = perfect
-        }
+        }*/
+
+        val expr = classMethodDef.classMethodName.expr
+        val ty = expr.guessType(ctx)
+        val type = TyUnion.getPerfectClass(ty)
         CachedValueProvider.Result.create(type, classMethodDef)
     }, false, context) ?: Ty.UNKNOWN
 }

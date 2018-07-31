@@ -159,10 +159,10 @@ private fun LuaDocFieldDef.infer(): ITy {
 
 private fun LuaFuncBodyOwner.infer(context: SearchContext): ITy {
     if (this is LuaFuncDef)
-        return TyPsiFunction(false, this, context, TyFlags.GLOBAL)
+        return TyPsiFunction(false, this, TyFlags.GLOBAL)
     return if (this is LuaClassMethodDef) {
-        TyPsiFunction(!this.isStatic, this, context, 0)
-    } else TyPsiFunction(false, this, context, 0)
+        TyPsiFunction(!this.isStatic, this, 0)
+    } else TyPsiFunction(false, this, 0)
 }
 
 private fun LuaTableField.infer(context: SearchContext): ITy {
@@ -193,10 +193,10 @@ private fun inferFile(file: LuaPsiFile, context: SearchContext): ITy {
             } else {
                 val lastChild = file.lastChild
                 var stat: LuaReturnStat? = null
-                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java, {
+                LuaPsiTreeUtil.walkTopLevelInFile(lastChild, LuaReturnStat::class.java) {
                     stat = it
                     false
-                })
+                }
                 if (stat != null)
                     guessReturnType(stat, 0, context)
                 else null
@@ -270,7 +270,8 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
         val expr = callExpr?.expr
         if (expr is LuaNameExpr) {
             val paramIndex = paramOwner.getIndexFor(paramNameDef)
-            // ipairs
+
+            // ipairs && TyArray
             if (expr.name == Constants.WORD_IPAIRS) {
                 if (paramIndex == 0)
                     return Ty.NUMBER
@@ -283,26 +284,18 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                         val tyArray = TyUnion.find(set, ITyArray::class.java)
                         if (tyArray != null)
                             return tyArray.base
-                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
-                        if (tyGeneric != null)
-                            return tyGeneric.getParamTy(1)
                     }
                 }
             }
-            // pairs
-            if (expr.name == Constants.WORD_PAIRS) {
-                val args = callExpr.args
-                if (args is LuaListArgs) {
-                    val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
-                    if (argExpr != null) {
-                        val set = argExpr.guessType(context)
-                        val tyGeneric = TyUnion.find(set, ITyGeneric::class.java)
-                        if (tyGeneric != null)
-                            return tyGeneric.getParamTy(paramIndex)
-                        val tyArray = TyUnion.find(set, ITyArray::class.java)
-                        if (tyArray != null)
-                            return if (paramIndex == 0) Ty.NUMBER else tyArray.base
-                    }
+
+            // iterator support
+            val type = callExpr.guessType(context)
+            if (type is ITyFunction) {
+                val returnTy = type.mainSignature.returnTy
+                if (returnTy is TyTuple) {
+                    return returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN }
+                } else if (paramIndex == 0) {
+                    return returnTy
                 }
             }
         }

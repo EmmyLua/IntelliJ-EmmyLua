@@ -70,9 +70,8 @@ object LuaPsiTreeUtilEx {
                                     continueSearch
                                 }
                             }
-                            is LuaParamNameDef -> {
-                                continueSearch = processor.process(element)
-                            }
+                            is LuaParamNameDef -> continueSearch = processor.process(element)
+                            is LuaLocalFuncDef -> continueSearch = processor.process(element)
                             else -> { }
                         }
                         continueSearch

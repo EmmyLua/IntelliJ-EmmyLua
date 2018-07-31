@@ -169,11 +169,15 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
                 if (base != null) map[name] = base
             }
         }
+
+        if (map.isEmpty())
+            return null
+
         return object : TySubstitutor() {
             override fun substitute(clazz: ITyClass): ITy {
                 val base = map[clazz.className]
                 if (base != null) {
-                    return TySerializedClass(clazz.className, clazz.className, base)
+                    return TyParameter(clazz.className, base)
                 }
                 return super.substitute(clazz)
             }

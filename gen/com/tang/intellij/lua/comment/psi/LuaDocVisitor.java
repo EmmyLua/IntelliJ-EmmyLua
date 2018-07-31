@@ -50,6 +50,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitPsiNameIdentifierOwner(o);
   }
 
+  public void visitGenericList(@NotNull LuaDocGenericList o) {
+    visitPsiElement(o);
+  }
+
   public void visitGenericTy(@NotNull LuaDocGenericTy o) {
     visitTy(o);
   }
