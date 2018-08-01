@@ -242,7 +242,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
 
             var type: ITy = def.docTy ?: Ty.UNKNOWN
             //guess from value expr
-            if (Ty.isInvalid(type)) {
+            if (Ty.isInvalid(type) && !context.forStore) {
                 val stat = def.assignStat
                 if (stat != null) {
                     val exprList = stat.valueExprList
