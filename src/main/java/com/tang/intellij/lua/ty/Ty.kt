@@ -65,6 +65,7 @@ interface ITy : Comparable<ITy> {
 
     fun union(ty: ITy): ITy
 
+    @Deprecated("use `displayName` instead")
     fun createTypeString(): String
 
     fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
