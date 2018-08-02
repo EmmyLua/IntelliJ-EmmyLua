@@ -39,6 +39,10 @@ class LuaRegionFoldingBuilder : FoldingBuilderEx() {
         override fun getLanguagePlaceholderText(p0: ASTNode, p1: TextRange): String {
             return "..."
         }
+
+        override fun isCustomFoldingCandidate(node: ASTNode): Boolean {
+            return node.elementType == LuaTypes.REGION || node.elementType == LuaTypes.ENDREGION
+        }
     }
 
     override fun getPlaceholderText(astNode: ASTNode) = customFoldingBuilder.getPlaceholderText(astNode)
