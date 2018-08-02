@@ -75,6 +75,10 @@ interface ITy : Comparable<ITy> {
 
     fun substitute(substitutor: ITySubstitutor): ITy
 
+    fun each(fn: (ITy) -> Unit) {
+        TyUnion.each(this, fn)
+    }
+
     fun eachTopClass(fn: Processor<ITyClass>)
 
     fun accept(visitor: ITyVisitor)
