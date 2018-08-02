@@ -26,16 +26,16 @@ import com.intellij.psi.PsiElement
  * region surrounder
  * Created by tangzx on 2017/2/25.
  */
-class RegionSurrounder : Surrounder {
-    override fun getTemplateDescription(): String {
-        return "Lua Region"
-    }
+open class RegionSurrounder(
+        val desc: String,
+        val start: String,
+        val end: String) : Surrounder {
 
-    override fun isApplicable(psiElements: Array<PsiElement>): Boolean {
-        return true
-    }
+    override fun getTemplateDescription() = desc
 
-    override fun surroundElements(project: Project, editor: Editor, psiElements: Array<PsiElement>): TextRange? {
+    override fun isApplicable(psiElements: Array<PsiElement>) = true
+
+    override fun surroundElements(project: Project, editor: Editor, psiElements: Array<PsiElement>): TextRange {
 
         val last = psiElements[psiElements.size - 1]
         val lastTextRange = last.textRange
@@ -47,12 +47,13 @@ class RegionSurrounder : Surrounder {
         val startLineNumber = document.getLineNumber(firstTextRange.startOffset)
         val startIndent = document.getText(TextRange(document.getLineStartOffset(startLineNumber), firstTextRange.startOffset))
 
-        val endString = "\n$startIndent--endregion"
-        val startString = "--region description\n$startIndent"
+        val description = "description"
+        val startString = "--$start $description\n$startIndent"
+        val endString = "\n$startIndent--$end"
         document.insertString(lastTextRange.endOffset, endString)
         document.insertString(firstTextRange.startOffset, startString)
 
-        val begin = firstTextRange.startOffset + 9
-        return TextRange(begin, begin + 11)
+        val begin = firstTextRange.startOffset + (2 + start.length + 1)
+        return TextRange(begin, begin + description.length)
     }
 }
