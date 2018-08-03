@@ -22,7 +22,6 @@ import com.intellij.lang.folding.CompositeFoldingBuilder
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.project.PossiblyDumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.registry.Registry
 import com.intellij.psi.PsiElement
@@ -33,7 +32,7 @@ class LuaRegionFoldingBuilder : FoldingBuilderEx() {
 
     data class FoldingStack(val owner: ASTNode) : Stack<ASTNode>()
 
-    private val customFoldingBuilder = object : FoldingBuilderEx(), PossiblyDumbAware {
+    private val customFoldingBuilder = object : FoldingBuilderEx() {
         private val providerA = LuaFoldingProvider()
         private val providerB = VisualStudioCustomFoldingProvider()
         private val myMaxLookupDepth = Registry.get("custom.folding.max.lookup.depth")
