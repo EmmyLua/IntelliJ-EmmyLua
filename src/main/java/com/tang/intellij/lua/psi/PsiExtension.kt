@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.CachedValue
@@ -32,6 +33,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
 
 /**
@@ -429,4 +431,23 @@ val LuaBinaryExpr.left: LuaExpr? get() {
 val LuaBinaryExpr.right: LuaExpr? get() {
     val list = PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaExpr::class.java)
     return list.getOrNull(1)
+}
+
+fun LuaClassMethod.findOverridingMethod(context: SearchContext): LuaClassMethod? {
+    val methodName = name ?: return null
+
+    val type = guessClassType(context) ?: return null
+    var superType = type.getSuperClass(context)
+
+    while (superType != null && superType is TyClass) {
+        ProgressManager.checkCanceled()
+        val superTypeName = superType.className
+        val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
+        if (superMethod != null) {
+            return superMethod
+        }
+        superType = superType.getSuperClass(context)
+    }
+
+    return null
 }

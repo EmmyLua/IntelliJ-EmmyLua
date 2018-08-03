@@ -22,8 +22,7 @@ import com.intellij.codeInsight.template.Expression
 import com.intellij.codeInsight.template.ExpressionContext
 import com.intellij.codeInsight.template.Macro
 import com.intellij.codeInsight.template.Result
-import com.tang.intellij.lua.psi.LuaClosureExpr
-import com.tang.intellij.lua.psi.shouldBe
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyFunction
 
@@ -41,19 +40,29 @@ class SuggestLuaParametersMacro : Macro() {
         return null
     }
 
-    override fun calculateLookupItems(params: Array<out Expression>, context: ExpressionContext): Array<LookupElement>? {
+    override fun calculateLookupItems(expressions: Array<out Expression>, context: ExpressionContext): Array<LookupElement>? {
         val element = context.psiElementAtStartOffset
-        val closure = element?.nextSibling as? LuaClosureExpr ?: return null
-        val ty = closure.shouldBe(SearchContext(context.project)) as? ITyFunction ?: return null
-        return create(ty)
+        val func = element?.nextSibling
+
+        if (func is LuaClosureExpr) {
+            val ty = func.shouldBe(SearchContext(context.project)) as? ITyFunction ?: return null
+            return create(ty.mainSignature.params)
+        } else if (func is LuaClassMethod) {
+            val method = func.findOverridingMethod(SearchContext(context.project))
+            val params = method?.params
+            if (params != null)
+                return create(params)
+        }
+
+        return null
     }
 
-    private fun create(func: ITyFunction): Array<LookupElement> {
-        val params = mutableListOf<String>()
-        func.mainSignature.params.forEach {
-            params.add(it.name)
+    private fun create(params: Array<LuaParamInfo>): Array<LookupElement> {
+        val paramNames = mutableListOf<String>()
+        params.forEach {
+            paramNames.add(it.name)
         }
-        val builder = LookupElementBuilder.create(params.joinToString(", "))
+        val builder = LookupElementBuilder.create(paramNames.joinToString(", "))
         return arrayOf(builder)
     }
 }
