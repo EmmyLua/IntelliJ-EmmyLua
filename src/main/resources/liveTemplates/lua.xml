@@ -82,7 +82,7 @@
     <template resource-bundle="LuaBundle" key="livetemplate.description.closure"
               name="closure" toReformat="false" toShortenFQNames="true"
               value="function($PARAMS$) $END$ end">
-        <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="PARAMS" expression="SuggestLuaParameters()" defaultValue="" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
         </context>
