@@ -263,14 +263,14 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     stream.writeName(ty.name)
                     stream.writeName(ty.superClassName)
                 }
+                is ITyPrimitive -> {
+                    stream.writeByte(ty.primitiveKind.ordinal)
+                }
                 is ITyClass -> {
                     stream.writeName(ty.className)
                     stream.writeName(ty.varName)
                     stream.writeName(ty.superClassName)
                     stream.writeName(ty.aliasName)
-                }
-                is TyPrimitive -> {
-                    stream.writeByte(ty.primitiveKind.ordinal)
                 }
                 is TyUnion -> {
                     stream.writeByte(ty.size)
