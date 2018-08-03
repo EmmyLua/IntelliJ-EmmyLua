@@ -69,7 +69,7 @@ buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
     into "/${project.name}/classes/"
 }
 buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
-    into "/"
+    into "/${project.name}"
 }
 
 // apply patchs before build plugin
