@@ -23,7 +23,9 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TextExpression
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.EditorEx
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.TokenType
 import com.intellij.psi.util.PsiTreeUtil
@@ -85,20 +87,24 @@ abstract class ArgsInsertHandler : InsertHandler<LookupElement> {
                     return
                 }
             }
-            if (autoInsertParameters) {
-                val paramNameDefList = getParams()
-                val manager = TemplateManager.getInstance(insertionContext.project)
-                val template = createTemplate(manager, paramNameDefList)
+            appendSignature(insertionContext, editor, element)
+        }
+    }
+
+    protected open fun appendSignature(insertionContext: InsertionContext, editor: Editor, element: PsiElement?) {
+        if (autoInsertParameters) {
+            val paramNameDefList = getParams()
+            val manager = TemplateManager.getInstance(insertionContext.project)
+            val template = createTemplate(manager, paramNameDefList)
+            editor.caretModel.moveToOffset(insertionContext.selectionEndOffset)
+            manager.startTemplate(editor, template)
+        } else {
+            editor.document.insertString(insertionContext.selectionEndOffset, "()")
+            if (getParams().isEmpty()) {
                 editor.caretModel.moveToOffset(insertionContext.selectionEndOffset)
-                manager.startTemplate(editor, template)
             } else {
-                editor.document.insertString(insertionContext.selectionEndOffset, "()")
-                if (getParams().isEmpty()) {
-                    editor.caretModel.moveToOffset(insertionContext.selectionEndOffset)
-                } else {
-                    editor.caretModel.moveToOffset(insertionContext.selectionEndOffset - 1)
-                    AutoPopupController.getInstance(insertionContext.project).autoPopupParameterInfo(editor, element)
-                }
+                editor.caretModel.moveToOffset(insertionContext.selectionEndOffset - 1)
+                AutoPopupController.getInstance(insertionContext.project).autoPopupParameterInfo(editor, element)
             }
         }
     }
