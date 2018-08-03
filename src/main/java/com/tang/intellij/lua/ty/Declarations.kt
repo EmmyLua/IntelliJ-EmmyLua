@@ -143,7 +143,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
             }
 
             //anonymous
-            if (type !is TyPrimitive)
+            if (type !is ITyPrimitive)
                 type = type.union(TyClass.createAnonymousType(this))
         }
     }
