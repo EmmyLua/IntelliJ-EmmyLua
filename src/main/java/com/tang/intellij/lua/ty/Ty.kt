@@ -98,6 +98,9 @@ val ITy.isAnonymous: Boolean
 private val ITy.worth: Float get() {
     var value = 10f
     when(this) {
+        is ITyArray, is ITyGeneric -> value = 80f
+        is ITyPrimitive -> value = 70f
+        is ITyFunction -> value = 60f
         is ITyClass -> {
             value = when {
                 this is TyTable -> 9f
@@ -106,9 +109,6 @@ private val ITy.worth: Float get() {
                 else -> 90f
             }
         }
-        is ITyArray, is ITyGeneric -> value = 80f
-        is TyPrimitive -> value = 70f
-        is ITyFunction -> value = 60f
     }
     return value
 }
@@ -205,7 +205,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         val UNKNOWN = TyUnknown()
         val VOID = TyVoid()
         val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
-        val STRING = TyPrimitive(TyPrimitiveKind.String, "string")
+        val STRING = TyPrimitiveClass(TyPrimitiveKind.String, "string")
         val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
         val TABLE = TyPrimitive(TyPrimitiveKind.Table, "table")
         val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, "function")
@@ -346,16 +346,6 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 else -> TyUnknown()
             }
         }
-    }
-}
-
-class TyPrimitive(val primitiveKind: TyPrimitiveKind, override val displayName: String) : Ty(TyKind.Primitive) {
-    override fun equals(other: Any?): Boolean {
-        return other is TyPrimitive && other.primitiveKind == primitiveKind
-    }
-
-    override fun hashCode(): Int {
-        return primitiveKind.hashCode()
     }
 }
 

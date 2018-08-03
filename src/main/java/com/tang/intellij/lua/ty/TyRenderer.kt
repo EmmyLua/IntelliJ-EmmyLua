@@ -34,7 +34,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
         ty.accept(object : TyVisitor() {
             override fun visitTy(ty: ITy) {
                 when (ty) {
-                    is TyPrimitive -> sb.append(renderType(ty.displayName))
+                    is ITyPrimitive -> sb.append(renderType(ty.displayName))
                     is TyVoid -> sb.append(renderType(Constants.WORD_VOID))
                     is TyUnknown -> sb.append(renderType(Constants.WORD_ANY))
                     is TyNil -> sb.append(renderType(Constants.WORD_NIL))
