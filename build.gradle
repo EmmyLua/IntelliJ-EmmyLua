@@ -65,8 +65,11 @@ task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], typ
 
 buildPlugin.dependsOn(copyAttachDebugger)
 buildPlugin.baseName = cfg.archiveName
-buildPlugin.from(fileTree(dir: "${RES_DIR}", includes: ['debugger/**'])) {
+buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
     into "/${project.name}/classes/"
+}
+buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
+    into "/"
 }
 
 // apply patchs before build plugin
