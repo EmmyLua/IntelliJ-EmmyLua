@@ -23,9 +23,9 @@ import com.intellij.codeInsight.template.ExpressionContext
 import com.intellij.codeInsight.template.Macro
 import com.intellij.codeInsight.template.Result
 import com.tang.intellij.lua.psi.LuaClosureExpr
+import com.tang.intellij.lua.psi.shouldBe
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyFunction
-import com.tang.intellij.lua.ty.shouldBe
 
 class SuggestLuaParametersMacro : Macro() {
     override fun getPresentableName(): String {

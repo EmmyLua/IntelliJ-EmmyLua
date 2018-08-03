@@ -25,9 +25,9 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaTableExpr
+import com.tang.intellij.lua.psi.shouldBe
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.shouldBe
 
 class TableCompletionProvider : ClassMemberCompletionProvider() {
 

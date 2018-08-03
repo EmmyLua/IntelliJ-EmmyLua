@@ -35,6 +35,58 @@ import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 import com.tang.intellij.lua.ty.*
 
 /**
+ * 1.
+ * ---@type MyClass
+ * local a = {}
+ *
+ * this table should be `MyClass`
+ *
+ * 2.
+ *
+ * ---@param callback fun(sender: any, type: string):void
+ * local function addListener(type, callback)
+ *      ...
+ * end
+ *
+ * addListener(function() end)
+ *
+ * this closure should be `fun(sender: any, type: string):void`
+ */
+fun LuaExpr.shouldBe(context: SearchContext): ITy {
+    val p1 = parent
+    if (p1 is LuaExprList) {
+        val p2 = p1.parent
+        if (p2 is LuaAssignStat) {
+            val receiver = p2.varExprList.getExprAt(0)
+            if (receiver != null)
+                return infer(receiver, context)
+        } else if (p2 is LuaLocalDef) {
+            val receiver = p2.nameList?.nameDefList?.getOrNull(0)
+            if (receiver != null)
+                return infer(receiver, context)
+        }
+    } else if (p1 is LuaListArgs) {
+        val p2 = p1.parent
+        if (p2 is LuaCallExpr) {
+            val idx = p1.getIndexFor(this)
+            val fTy = infer(p2.expr, context)
+            var ret: ITy = Ty.UNKNOWN
+            fTy.each {
+                if (it is ITyFunction) {
+                    var sig = it.mainSignature
+                    val substitutor = p2.createSubstitutor(sig, context)
+                    if (substitutor != null) sig = sig.substitute(substitutor)
+
+                    ret = ret.union(sig.getParamTy(idx))
+                }
+            }
+            return ret
+        }
+    }
+    return Ty.UNKNOWN
+}
+
+/**
  * 获取所在的位置
  */
 fun LuaLocalDef.getIndexFor(psi: LuaNameDef): Int {
