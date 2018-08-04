@@ -34,6 +34,8 @@ sourceSets {
 apply from: "patchs.gradle"
 setDefaultProperty("IDEA_VER", "182")
 
+version = "${version}-IDEA${IDEA_VER}"
+
 def cfg = getVersionCfg(IDEA_VER)
 def rev = getRev()
 
