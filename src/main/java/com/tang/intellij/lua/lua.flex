@@ -70,8 +70,8 @@ ppp=[Pp][+-]{n}
 NUMBER=(0[xX]({h}|{h}[.]{h})({exp}|{ppp})?|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
 
 //Comments
-REGION_START =--region({LINE_WS}+[^\r\n]*)*
-REGION_END =--endregion({LINE_WS}+[^\r\n]*)*
+REGION_START =--(region|\{\{\{)([^\r\n]*)*
+REGION_END =--(endregion|\}\}\})([^\r\n]*)*
 BLOCK_COMMENT=--\[=*\[[\s\S]*(\]=*\])?
 SHORT_COMMENT=--[^\r\n]*
 DOC_COMMENT=----*[^\r\n]*(\r?\n{LINE_WS}*----*[^\r\n]*)*

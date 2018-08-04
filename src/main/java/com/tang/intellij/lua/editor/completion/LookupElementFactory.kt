@@ -20,6 +20,7 @@ import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.psi.tree.IElementType
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaPsiElement
@@ -66,7 +67,11 @@ class LookupElementFactory {
                     isColonStyle,
                     fnTy,
                     classMember.visibility.warpIcon(icon))
-            element.handler = SignatureInsertHandler(signature, isColonStyle)
+
+            if (clazzName == Constants.WORD_STRING)
+                element.handler = SignatureInsertHandlerForString(signature, isColonStyle)
+            else
+                element.handler = SignatureInsertHandler(signature, isColonStyle)
 
             // looks like static
             if (!isColonStyle)

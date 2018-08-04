@@ -132,7 +132,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
         val localDef = PsiTreeUtil.getParentOfType(this, LuaLocalDef::class.java)
         if (localDef != null) {
             //计算 expr 返回类型
-            if (Ty.isInvalid(type)) {
+            if (Ty.isInvalid(type) && !context.forStore) {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
@@ -143,7 +143,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
             }
 
             //anonymous
-            if (type !is TyPrimitive)
+            if (type !is ITyPrimitive)
                 type = type.union(TyClass.createAnonymousType(this))
         }
     }
@@ -246,7 +246,8 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                             val types = param.ty
                             var set: ITy = Ty.UNKNOWN
                             TyUnion.each(types) { set = set.union(it) }
-                            return set
+                            if (set != Ty.UNKNOWN)
+                                return set
                         }
                     }
                 }
@@ -313,25 +314,10 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
      * guess type for p1
      */
     if (paramOwner is LuaClosureExpr) {
-        val p1 = paramOwner.parent as? LuaListArgs
-        val p2 = p1?.parent as? LuaCallExpr
-        if (p2 != null) {
-            val type = p2.guessParentType(context)
-            if (type is ITyFunction) {
-                val args = p2.args
-                if (args is LuaListArgs) {
-                    val closureIndex = args.getIndexFor(paramOwner)
-                    var sig = type.mainSignature
-                    val substitutor = p2.createSubstitutor(sig, context)
-                    if (substitutor != null) sig = sig.substitute(substitutor)
-
-                    val paramTy = sig.getParamTy(closureIndex)
-                    if (paramTy is ITyFunction) {
-                        val paramIndex = paramOwner.getIndexFor(paramNameDef)
-                        return paramTy.mainSignature.getParamTy(paramIndex)
-                    }
-                }
-            }
+        val shouldBe = paramOwner.shouldBe(context)
+        if (shouldBe is ITyFunction) {
+            val paramIndex = paramOwner.getIndexFor(paramNameDef)
+            return shouldBe.mainSignature.getParamTy(paramIndex)
         }
     }
     return Ty.UNKNOWN

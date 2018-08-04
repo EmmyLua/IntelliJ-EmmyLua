@@ -88,7 +88,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                         object : LuaLineMarkerNavigator<PsiElement, LuaClassMethod>() {
 
                             override fun getTitle(elt: PsiElement)
-                                    = "Choose Overriding Method of ${element.name}"
+                                    = "Choose Overriding Method of ${methodDef.name}"
 
                             override fun search(elt: PsiElement)
                                     = LuaOverridingMethodsSearch.search(methodDef)

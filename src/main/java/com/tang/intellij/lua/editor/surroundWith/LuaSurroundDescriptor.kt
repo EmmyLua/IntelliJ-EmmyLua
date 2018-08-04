@@ -33,7 +33,10 @@ import java.util.*
  * Created by tangzx on 2017/2/25.
  */
 class LuaSurroundDescriptor : SurroundDescriptor {
-    private val surrounders = arrayOf<Surrounder>(RegionSurrounder())
+    private val surrounders = arrayOf<Surrounder>(
+            RegionSurrounder("Lua Region --region", "region", "endregion"),
+            RegionSurrounder("Lua Region --{{{", "{{{", "}}}")
+    )
 
     override fun getElementsToSurround(psiFile: PsiFile, startOffset: Int, endOffset: Int): Array<PsiElement> {
         return findStatementsInRange(psiFile, startOffset, endOffset)

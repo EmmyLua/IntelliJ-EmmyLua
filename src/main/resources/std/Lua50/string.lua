@@ -12,6 +12,12 @@
 -- License for the specific language governing permissions and limitations under
 -- the License.
 
+---
+--- The type *string* represents immutable sequences of bytes. Lua is 8-bit
+--- clean: strings can contain any 8-bit value, including embedded zeros
+--- ('`\0`'). Lua is also encoding-agnostic; it makes no assumptions about
+--- the contents of a string.
+---@class string
 string = {}
 
 ---

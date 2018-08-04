@@ -34,6 +34,8 @@ sourceSets {
 apply from: "patchs.gradle"
 setDefaultProperty("IDEA_VER", "182")
 
+version = "${version}-IDEA${IDEA_VER}"
+
 def cfg = getVersionCfg(IDEA_VER)
 def rev = getRev()
 
@@ -65,8 +67,11 @@ task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], typ
 
 buildPlugin.dependsOn(copyAttachDebugger)
 buildPlugin.baseName = cfg.archiveName
-buildPlugin.from(fileTree(dir: "${RES_DIR}", includes: ['debugger/**'])) {
+buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
     into "/${project.name}/classes/"
+}
+buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
+    into "/${project.name}"
 }
 
 // apply patchs before build plugin

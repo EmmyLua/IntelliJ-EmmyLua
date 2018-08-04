@@ -69,6 +69,23 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.2.5</strong>
+    <ul>
+        <li>[NEW]Support new region style "--{{{", "--}}}" (Suggestion by @adriweb)</li>
+        <li>[IMPROVE]Parameters completion for "closure" & "func" live template</li>
+        <li>[IMPROVE]Completions for raw string</li>
+        <li>[IMPROVE]Redesigned documentation for IDEA2018.2 (Suggestion by @dsmgit)</li>
+        <li>[IMPROVE]Add new annotations @deprecated, @author, @version, @since (Suggestion by @dsmgit)</li>
+        <li>[NEW]Support generic (see doc for new annotation @generic)</li>
+        <li>[NEW]Add Lua5.4 API (By @dsmgit)</li>
+        <li>[NEW]Now we can choose the lua language level Lua5.0/Lua5.1/Lua5.2/Lua5.3/Lua5.4, via: File | Settings | Languages & Frameworks | EmmyLua, default level value is Lua5.3</li>
+        <li>[NEW]Now the Attach debugger can capture the messages output by the WINAPI OutputDebugString</li>
+        <li>[NEW]Compatible with IDEA2017.1, IDEA2017.2-IDEA2018.1, IDEA2018.2<li>
+        <li>[IMPROVE]Improve remote debugger</li>
+        <li>[IMPROVE]Update "EmmyDoc Tutorial"</li>
+        <li>Bug fix #145 #165 #167 #169 ...</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
     <strong>1.2.4</strong>
     <ul>
         <li>[IMPROVE]improved class members completion</li>
@@ -93,30 +110,6 @@
         <li>[NEW]folding for --[[multi-line comments]] && [[multi-line strings]]</li>
         <li>unicode identifier support</li>
         <li>fix bugs</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-
-    <strong>1.2.2</strong>
-    <ul>
-        <li>[IMPROVE]improved performance when opening files</li>
-        <li>[NEW]settings : 'recognize global name as type'</li>
-        <li>[NEW]settings : additional sources root</li>
-        <li>[NEW]new inspection : global name can be local(disabled by default)</li>
-        <li>[NEW]read write access detector</li>
-        <li>fix bug #87 #88 #93</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-
-    <strong>1.2.1</strong>
-    <ul>
-        <li>[IMPROVE]faster attach debugger</li>
-        <li>[IMPROVE]provide icons for processes list</li>
-        <li>[Experimental]show memory files</li>
-        <li>[Experimental]lua profiler</li>
-        <li>[IMPROVE]improve formatting</li>
-        <li>[IMPROVE]highlight unary && binary expression range</li>
-        <li>[NEW]now support use .net dll as lib to provide lua apis (useful for unity developers)</li>
-        <li>fix bug #43 #72 #79 #81 #83 #86</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
     ]]>
@@ -264,6 +257,7 @@
         <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
         <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestFirstLuaVarNameMacro"/>
+        <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestLuaParametersMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaCurrentFunctionNameMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaFunctionParamSigMacro"/>
 

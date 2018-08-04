@@ -54,8 +54,8 @@ public class _LuaRegionLexer implements FlexLexer {
 
   /* The ZZ_CMAP_A table has 256 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\11\0\1\1\1\12\1\0\1\1\1\12\22\0\1\1\14\0\1\2\66\0\1\11\1\4\1\0\1\5\1\0\1"+
-    "\6\4\0\1\10\1\7\2\0\1\3\215\0");
+    "\11\0\1\1\1\14\1\0\1\1\1\14\22\0\1\1\14\0\1\2\66\0\1\12\1\4\1\0\1\5\1\0\1"+
+    "\6\4\0\1\10\1\7\2\0\1\3\10\0\1\11\1\0\1\13\202\0");
 
   /** 
    * Translates DFA states to action switch labels.
@@ -63,11 +63,11 @@ public class _LuaRegionLexer implements FlexLexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\1\1\2\2\1\1\1\3\13\0\1\4\3\0"+
-    "\1\5";
+    "\1\0\1\1\2\2\1\1\1\3\13\0\1\4\1\5"+
+    "\7\0";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[22];
+    int [] result = new int[26];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -92,12 +92,13 @@ public class _LuaRegionLexer implements FlexLexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\13\0\26\0\41\0\54\0\13\0\67\0\102"+
-    "\0\115\0\130\0\143\0\156\0\171\0\204\0\217\0\232"+
-    "\0\245\0\26\0\260\0\273\0\306\0\26";
+    "\0\0\0\15\0\32\0\47\0\64\0\15\0\101\0\116"+
+    "\0\133\0\150\0\165\0\202\0\217\0\234\0\251\0\266"+
+    "\0\303\0\32\0\32\0\320\0\335\0\352\0\367\0\u0104"+
+    "\0\u0111\0\u011e";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[22];
+    int [] result = new int[26];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -120,14 +121,16 @@ public class _LuaRegionLexer implements FlexLexer {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\2\3\1\4\10\3\1\5\1\6\10\5\16\0\1\7"+
-    "\10\0\12\5\4\0\1\10\1\11\12\0\1\12\16\0"+
-    "\1\13\7\0\1\14\16\0\1\15\7\0\1\16\7\0"+
-    "\1\17\16\0\1\20\7\0\1\21\16\0\1\22\7\0"+
-    "\1\23\13\0\1\24\13\0\1\25\13\0\1\26\2\0";
+    "\2\3\1\4\12\3\1\5\1\6\12\5\20\0\1\7"+
+    "\12\0\14\5\4\0\1\10\1\11\4\0\1\12\1\0"+
+    "\1\13\5\0\1\14\20\0\1\15\15\0\1\16\16\0"+
+    "\1\17\6\0\1\20\21\0\1\21\13\0\1\22\16\0"+
+    "\1\23\7\0\1\24\11\0\1\25\20\0\1\26\11\0"+
+    "\1\27\20\0\1\22\11\0\1\30\15\0\1\31\15\0"+
+    "\1\32\15\0\1\23\4\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[209];
+    int [] result = new int[299];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -165,10 +168,10 @@ public class _LuaRegionLexer implements FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\1\1\11\3\1\13\0\1\11\3\0\1\11";
+    "\1\0\1\1\1\11\3\1\13\0\2\11\7\0";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[22];
+    int [] result = new int[26];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;

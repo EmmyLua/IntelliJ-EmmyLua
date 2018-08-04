@@ -4,7 +4,7 @@
               name="func" toReformat="true" toShortenFQNames="true"
               value="function $FN$($PARAMS$)&#10;$END$&#10;end">
         <variable name="FN" expression="" defaultValue="&quot;funcName&quot;" alwaysStopAt="true" />
-        <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="PARAMS" expression="SuggestLuaParameters()" defaultValue="" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
         </context>
@@ -82,7 +82,7 @@
     <template resource-bundle="LuaBundle" key="livetemplate.description.closure"
               name="closure" toReformat="false" toShortenFQNames="true"
               value="function($PARAMS$) $END$ end">
-        <variable name="PARAMS" expression="" defaultValue="" alwaysStopAt="true" />
+        <variable name="PARAMS" expression="SuggestLuaParameters()" defaultValue="" alwaysStopAt="true" />
         <context>
             <option name="LUA_CODE" value="true" />
         </context>

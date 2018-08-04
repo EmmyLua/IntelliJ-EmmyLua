@@ -39,7 +39,9 @@ LINE_WS=[\ \t\f]
 
 <YYINITIAL> {
     "--region"        { yybegin(xREGION_DESC); return REGION_START; }
+    "--{{{"        { yybegin(xREGION_DESC); return REGION_START; }
     "--endregion"     { yybegin(xREGION_DESC); return REGION_END; }
+    "--}}}"     { yybegin(xREGION_DESC); return REGION_END; }
     [^]               { return TokenType.BAD_CHARACTER; }
 }
 

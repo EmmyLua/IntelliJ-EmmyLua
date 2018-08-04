@@ -34,7 +34,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
         ty.accept(object : TyVisitor() {
             override fun visitTy(ty: ITy) {
                 when (ty) {
-                    is TyPrimitive -> sb.append(renderType(ty.displayName))
+                    is ITyPrimitive -> sb.append(renderType(ty.displayName))
                     is TyVoid -> sb.append(renderType(Constants.WORD_VOID))
                     is TyUnknown -> sb.append(renderType(Constants.WORD_ANY))
                     is TyNil -> sb.append(renderType(Constants.WORD_NIL))
@@ -99,8 +99,8 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                 "{ ${list.joinToString(", ")} }"
             }
             clazz.hasFlag(TyFlags.ANONYMOUS_TABLE) -> renderType(Constants.WORD_TABLE)
-            clazz.isAnonymous -> ""
-            clazz.isGlobal -> clazz.varName
+            clazz.isAnonymous -> "[local ${clazz.varName}]"
+            clazz.isGlobal -> "[global ${clazz.varName}]"
             else -> renderType(clazz.className)
         }
     }

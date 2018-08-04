@@ -40,13 +40,6 @@
 ---@class number
 
 ---
---- The type *string* represents immutable sequences of bytes. Lua is 8-bit
---- clean: strings can contain any 8-bit value, including embedded zeros 
---- ('`\0`'). Lua is also encoding-agnostic; it makes no assumptions about 
---- the contents of a string.
----@class string
-
----
 --- Lua can call (and manipulate) functions written in Lua and functions
 --- written in C. Both are represented by the type *function*.
 ---@class function
