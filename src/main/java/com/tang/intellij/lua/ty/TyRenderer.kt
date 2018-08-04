@@ -99,8 +99,8 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                 "{ ${list.joinToString(", ")} }"
             }
             clazz.hasFlag(TyFlags.ANONYMOUS_TABLE) -> renderType(Constants.WORD_TABLE)
-            clazz.isAnonymous -> ""
-            clazz.isGlobal -> clazz.varName
+            clazz.isAnonymous -> "[local ${clazz.varName}]"
+            clazz.isGlobal -> "[global ${clazz.varName}]"
             else -> renderType(clazz.className)
         }
     }
