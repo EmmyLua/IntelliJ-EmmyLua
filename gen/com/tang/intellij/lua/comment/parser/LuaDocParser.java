@@ -413,17 +413,35 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ID ':' ty
+  // ID (':' ty)?
   public static boolean function_param(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_param")) return false;
     if (!nextTokenIs(b, ID)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, FUNCTION_PARAM, null);
-    r = consumeTokens(b, 1, ID, EXTENDS);
+    r = consumeToken(b, ID);
     p = r; // pin = 1
-    r = r && ty(b, l + 1, -1);
+    r = r && function_param_1(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // (':' ty)?
+  private static boolean function_param_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_param_1")) return false;
+    function_param_1_0(b, l + 1);
+    return true;
+  }
+
+  // ':' ty
+  private static boolean function_param_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_param_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EXTENDS);
+    r = r && ty(b, l + 1, -1);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */
