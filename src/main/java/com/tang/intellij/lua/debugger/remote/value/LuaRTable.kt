@@ -20,6 +20,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.*
 import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import java.util.*
 
@@ -74,6 +75,13 @@ class LuaRTable(name: String) : LuaRValue(name) {
                 }
 
                 override fun evaluated(tableValue: XValue) {
+                    //////////tmp solution
+//                    val _tmp_ = tableValue as? LuaRTable ?: return
+                    var tableValue = tableValue
+                    if (data != null)
+                        tableValue = LuaRValue.create(myName, data as LuaValue, myName, process.session)
+                    //////////
+
                     val list = XValueChildrenList()
                     val tbl = tableValue as? LuaRTable ?: return
                     val table = tbl.data?.checktable()
