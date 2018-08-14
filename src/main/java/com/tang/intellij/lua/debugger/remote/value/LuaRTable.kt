@@ -19,6 +19,7 @@ package com.tang.intellij.lua.debugger.remote.value
 import com.intellij.icons.AllIcons
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.*
+import com.intellij.xdebugger.impl.XDebugSessionImpl
 import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -75,10 +76,9 @@ class LuaRTable(name: String) : LuaRValue(name) {
                 }
 
                 override fun evaluated(tableValue: XValue) {
-                    //////////tmp solution
-//                    val _tmp_ = tableValue as? LuaRTable ?: return
+                    //////////tmp solution,非栈顶帧处理
                     var tableValue = tableValue
-                    if (data != null)
+                    if (data != null && !(process.session as XDebugSessionImpl).isTopFrameSelected)
                         tableValue = LuaRValue.create(myName, data as LuaValue, myName, process.session)
                     //////////
 
