@@ -88,15 +88,15 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
                 readSize = socketChannel.read(bf)
                 if (readSize > 0) {
                     var begin = 0
-                    for (i in 1..readSize+1)
-                        if (bf[i-1].toInt() == '\n'.toInt())
-                        {
+                    for (i in 1..readSize + 1) {
+                        if (bf[i - 1].toInt() == '\n'.toInt()) {
                             onResp(String(bf.array(), begin, i))
                             begin = i
                         }
-                    if (begin < readSize)
+                    }
+                    if (begin < readSize) {
                         onResp(String(bf.array(), begin, readSize))
-
+                    }
                     bf.clear()
                 }
             }
@@ -141,13 +141,15 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
     fun stop() {
         try {
             streamWriter?.write("done\n")
-        } catch (ignored: IOException) { }
+        } catch (ignored: IOException) {
+        }
 
         isStopped = true
         currentCommandWaitForResp = null
         try {
             socket.close()
-        } catch (ignored: Exception) {}
+        } catch (ignored: Exception) {
+        }
     }
 
     fun sendAddBreakpoint(file: String, line: Int) {

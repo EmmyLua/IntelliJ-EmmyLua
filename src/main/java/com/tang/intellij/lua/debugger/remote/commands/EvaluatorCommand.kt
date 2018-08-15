@@ -31,6 +31,7 @@ class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCo
     interface Callback {
         fun onResult(data: String)
     }
+
     override fun isFinished(): Boolean {
         return !hasError2Process && super.isFinished()
     }
@@ -56,7 +57,7 @@ class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCo
             handleLines++
             val error = data.substring(0, dataLen)
             debugProcess.error(error)
-            onResult("do local _={\"\\\"%s\\\"\"};return _;end".format("401_error_happened"))
+            onResult("do local _={\"\\\"401_error_happened\\\"\"};return _;end")
             return dataLen
         }
         if (dataLen != 0) {
@@ -89,7 +90,7 @@ class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCo
             val pattern = Pattern.compile("(\\d+)([^\\d]+)(\\d+)")
             val matcher = pattern.matcher(data)
             if (matcher.find()) {
-                dataLen = Integer.parseInt(matcher.group(3))
+                dataLen = matcher.group(3).toInt()
             }
             return
         }
@@ -97,13 +98,13 @@ class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCo
             hasError2Process = false
             handleLines++
             dataLen = 0
-            onResult("do local _={\"\\\"%s\\\"\"};return _;end".format("400_bad_request"))
+            onResult("do local _={\"\\\"400_bad_request\\\"\"};return _;end")
         }
         if (data.startsWith("200 OK")) {
             val pattern = Pattern.compile("\\d+[^\\d]+(\\d+)")
             val matcher = pattern.matcher(data)
             if (matcher.find()) {
-                dataLen = Integer.parseInt(matcher.group(1))
+                dataLen = matcher.group(1).toInt()
             }
         }
     }
