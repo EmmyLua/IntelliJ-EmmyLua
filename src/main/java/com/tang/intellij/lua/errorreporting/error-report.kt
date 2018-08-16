@@ -1,25 +1,20 @@
 /*
- * Copyright (c) 2017 Patrick Scheibe
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Copyright (c) 2017. tangzx(love.tangzx@qq.com)
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
-package de.halirutan.mathematica.errorreporting.emmylua
+package com.tang.intellij.lua.errorreporting
 
 import com.intellij.CommonBundle
 import com.intellij.diagnostic.*
@@ -48,15 +43,13 @@ import org.jetbrains.annotations.PropertyKey
 import java.awt.Component
 import java.io.*
 import java.net.URL
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 private object AnonymousFeedback {
-	private const val tokenFile = "de/halirutan/mathematica/errorreporting-emmylua/token.bin"
+	private const val tokenFile = "errorreporting/token.bin"
 	private const val gitRepoUser = "EmmyLua"
 	private const val gitRepo = "IntelliJ-EmmyLua"
 	private const val issueLabel = "pending review"
@@ -91,12 +84,12 @@ private object AnonymousFeedback {
 				isNewIssue = false
 			} else newGibHubIssue = issueService.createIssue(repoID, newGibHubIssue)
 			return SubmittedReportInfo(newGibHubIssue.htmlUrl, ErrorReportBundle.message(
-				if (isNewIssue) "git.issue.text" else "git.issue.duplicate.text", newGibHubIssue.htmlUrl, newGibHubIssue.number.toLong()),
+					if (isNewIssue) "git.issue.text" else "git.issue.duplicate.text", newGibHubIssue.htmlUrl, newGibHubIssue.number.toLong()),
 				if (isNewIssue) SubmissionStatus.NEW_ISSUE else SubmissionStatus.DUPLICATE)
 		} catch (e: Exception) {
 			e.printStackTrace()
 			return SubmittedReportInfo(null,
-				ErrorReportBundle.message("report.error.connection.failure"),
+					ErrorReportBundle.message("report.error.connection.failure"),
 				SubmissionStatus.FAILED)
 		}
 	}
@@ -173,11 +166,11 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 		doSubmit(events[0], parent, consumer, GitHubErrorBean(events[0].throwable, IdeaLogger.ourLastActionId), info)
 
 	private fun doSubmit(
-		event: IdeaLoggingEvent,
-		parent: Component,
-		callback: Consumer<SubmittedReportInfo>,
-		bean: GitHubErrorBean,
-		description: String?): Boolean {
+			event: IdeaLoggingEvent,
+			parent: Component,
+			callback: Consumer<SubmittedReportInfo>,
+			bean: GitHubErrorBean,
+			description: String?): Boolean {
 		val dataContext = DataManager.getInstance().getDataContext(parent)
 		bean.description = description
 		bean.message = event.message
@@ -195,13 +188,13 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 		(event.data as? LogMessageEx)?.let { bean.attachments = it.includedAttachments }
 		val project = CommonDataKeys.PROJECT.getData(dataContext)
 		val reportValues = getKeyValuePairs(
-			project,
-			bean,
-			ApplicationInfo.getInstance() as ApplicationInfoEx,
-			ApplicationNamesInfo.getInstance())
+				project,
+				bean,
+				ApplicationInfo.getInstance() as ApplicationInfoEx,
+				ApplicationNamesInfo.getInstance())
 		val notifyingCallback = CallbackWithNotification(callback, project)
 		val task = AnonymousFeedbackTask(project, ErrorReportBundle.message(
-			"report.error.progress.dialog.text"), true, reportValues, notifyingCallback)
+				"report.error.progress.dialog.text"), true, reportValues, notifyingCallback)
 		if (project == null) task.run(EmptyProgressIndicator()) else ProgressManager.getInstance().run(task)
 		return true
 	}
@@ -232,7 +225,7 @@ class GitHubErrorBean(throwable: Throwable, lastAction: String?) : ErrorBean(thr
  * Messages and strings used by the error reporter
  */
 private object ErrorReportBundle {
-	@NonNls private const val BUNDLE = "de.halirutan.mathematica.errorreporting-emmylua.report-bundle"
+	@NonNls private const val BUNDLE = "errorreporting.report-bundle"
 	private val bundle: ResourceBundle by lazy { ResourceBundle.getBundle(BUNDLE) }
 
 	@JvmStatic
@@ -254,10 +247,10 @@ private class AnonymousFeedbackTask(
  * Collects information about the running IDEA and the error
  */
 private fun getKeyValuePairs(
-	project: Project?,
-	error: GitHubErrorBean,
-	appInfo: ApplicationInfoEx,
-	namesInfo: ApplicationNamesInfo): MutableMap<String, String> {
+		project: Project?,
+		error: GitHubErrorBean,
+		appInfo: ApplicationInfoEx,
+		namesInfo: ApplicationNamesInfo): MutableMap<String, String> {
 	val params = mutableMapOf(
 		"error.description" to error.description,
 		// TODO
