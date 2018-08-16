@@ -270,8 +270,7 @@ private fun getKeyValuePairs(
 		"error.stacktrace" to error.stackTrace,
 		"error.hash" to error.exceptionHash)
 	for (attachment in error.attachments) {
-		params["attachment.name"] = attachment.name
-		params["attachment.value"] = attachment.encodedBytes
+		params["Attachment ${attachment.name}"] = attachment.encodedBytes
 	}
 	return params
 }
