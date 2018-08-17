@@ -172,7 +172,7 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 			description: String?): Boolean {
 		val dataContext = DataManager.getInstance().getDataContext(parent)
 		bean.description = description.toString()
-		bean.message = event.message
+		bean.message = event.message ?: event.throwable.message.toString()
 		event.throwable?.let { throwable ->
 			IdeErrorsDialog.findPluginId(throwable)?.let { pluginId ->
 				PluginManager.getPlugin(pluginId)?.let { ideaPluginDescriptor ->
