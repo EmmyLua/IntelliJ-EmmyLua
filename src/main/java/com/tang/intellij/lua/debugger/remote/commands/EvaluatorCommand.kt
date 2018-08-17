@@ -24,11 +24,16 @@ import java.util.regex.Pattern
  * Created by tangzx on 2017/1/1.
  */
 class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCommand("EXEC $expr --{maxlevel=1}", 2) {
+    private var hasError2Process: Boolean = false
     private var dataLen: Int = 0
     private val dataBuffer = StringBuffer()
 
     interface Callback {
         fun onResult(data: String)
+    }
+
+    override fun isFinished(): Boolean {
+        return !hasError2Process && super.isFinished()
     }
 
     /*private fun createExpr(chunk: String, getChildren: Boolean): String {
@@ -47,6 +52,14 @@ class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCo
     }*/
 
     override fun handle(data: String): Int {
+        if (hasError2Process && dataLen > 0) {
+            hasError2Process = false
+            handleLines++
+            val error = data.substring(0, dataLen)
+            debugProcess.error(error)
+            onResult("do local _={\"\\\"401_error_happened\\\"\"};return _;end")
+            return dataLen
+        }
         if (dataLen != 0) {
             val index = data.indexOf("return _;end")
             return if (index > 0) {
@@ -72,10 +85,27 @@ class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCo
     }
 
     override fun handle(index: Int, data: String) {
-        val pattern = Pattern.compile("\\d+[^\\d]+(\\d+)")
-        val matcher = pattern.matcher(data)
-        if (matcher.find()) {
-            dataLen = Integer.parseInt(matcher.group(1))
+        if (data.startsWith("401")) {
+            hasError2Process = true
+            val pattern = Pattern.compile("(\\d+)([^\\d]+)(\\d+)")
+            val matcher = pattern.matcher(data)
+            if (matcher.find()) {
+                dataLen = matcher.group(3).toInt()
+            }
+            return
+        }
+        if (data.startsWith("400")) {
+            hasError2Process = false
+            handleLines++
+            dataLen = 0
+            onResult("do local _={\"\\\"400_bad_request\\\"\"};return _;end")
+        }
+        if (data.startsWith("200 OK")) {
+            val pattern = Pattern.compile("\\d+[^\\d]+(\\d+)")
+            val matcher = pattern.matcher(data)
+            if (matcher.find()) {
+                dataLen = matcher.group(1).toInt()
+            }
         }
     }
 }

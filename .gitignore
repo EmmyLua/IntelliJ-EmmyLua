@@ -1,5 +1,6 @@
 out
 build
+publish_tmp
 .idea
 !.idea/IntelliJ-Lua.iml
 !.idea/modules.xml
