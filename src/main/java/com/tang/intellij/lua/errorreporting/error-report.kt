@@ -17,7 +17,9 @@
 package com.tang.intellij.lua.errorreporting
 
 import com.intellij.CommonBundle
-import com.intellij.diagnostic.*
+import com.intellij.diagnostic.AbstractMessage
+import com.intellij.diagnostic.IdeErrorsDialog
+import com.intellij.diagnostic.ReportMessages
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.idea.IdeaLogger
@@ -30,18 +32,26 @@ import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.diagnostic.*
 import com.intellij.openapi.diagnostic.SubmittedReportInfo.SubmissionStatus
 import com.intellij.openapi.extensions.PluginId
-import com.intellij.openapi.progress.*
+import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.Consumer
 import org.apache.commons.codec.binary.Base64
-import org.eclipse.egit.github.core.*
+import org.eclipse.egit.github.core.Issue
+import org.eclipse.egit.github.core.Label
+import org.eclipse.egit.github.core.RepositoryId
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.IssueService
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 import java.awt.Component
-import java.io.*
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
 import java.net.URL
 import java.util.*
 import javax.crypto.Cipher
@@ -51,7 +61,7 @@ import javax.crypto.spec.SecretKeySpec
 private object AnonymousFeedback {
 	private const val tokenFile = "errorreporting/token.bin"
 	private const val gitRepoUser = "EmmyLua"
-	private const val gitRepo = "IntelliJ-EmmyLua"
+	private const val gitRepo = "EmmyLua-ErrorReport"
 	private const val issueLabel = "pending"
 
 	/**
