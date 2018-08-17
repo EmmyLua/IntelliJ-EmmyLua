@@ -29,6 +29,7 @@ import com.intellij.openapi.application.ApplicationNamesInfo
 import com.intellij.openapi.application.ex.ApplicationInfoEx
 import com.intellij.openapi.diagnostic.*
 import com.intellij.openapi.diagnostic.SubmittedReportInfo.SubmissionStatus
+import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.progress.*
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
@@ -51,7 +52,7 @@ private object AnonymousFeedback {
 	private const val tokenFile = "errorreporting/token.bin"
 	private const val gitRepoUser = "EmmyLua"
 	private const val gitRepo = "IntelliJ-EmmyLua"
-	private const val issueLabel = "pending review"
+	private const val issueLabel = "pending"
 
 	/**
 	 * Makes a connection to GitHub. Checks if there is an issue that is a duplicate and based on this, creates either a
@@ -219,8 +220,8 @@ class GitHubErrorBean(throwable: Throwable, val lastAction: String) {
 	val exceptionHash = Arrays.hashCode(throwable.stackTrace).toString()
 	var description = "<null>"
 	var message = "<null>"
-	var pluginName = "<null>"
-	var pluginVersion = "<null>"
+	var pluginName = ""
+	var pluginVersion = ""
 	var stackTrace = "<null>"
 	var attachments: List<Attachment> = emptyList()
 }
@@ -255,7 +256,10 @@ private fun getKeyValuePairs(
 		error: GitHubErrorBean,
 		appInfo: ApplicationInfoEx,
 		namesInfo: ApplicationNamesInfo): MutableMap<String, String> {
-	// val plugin = PluginManager.getPlugin(PluginId.findId("com.tang"))
+	PluginManager.getPlugin(PluginId.findId("com.tang"))?.run {
+		if (error.pluginName.isBlank()) error.pluginName = name
+		if (error.pluginVersion.isBlank()) error.pluginVersion = version
+	}
 	val params = mutableMapOf(
 		"error.description" to error.description,
 		// TODO
