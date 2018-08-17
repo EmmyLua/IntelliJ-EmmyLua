@@ -18,7 +18,6 @@ package com.tang.intellij.lua.errorreporting
 
 import com.intellij.CommonBundle
 import com.intellij.diagnostic.*
-import com.intellij.errorreport.bean.ErrorBean
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManager
 import com.intellij.idea.IdeaLogger
@@ -111,21 +110,20 @@ private object AnonymousFeedback {
 		val errorDescription = details.remove("error.description").orEmpty()
 		val stackTrace = details.remove("error.stacktrace")?.takeIf(String::isNotBlank) ?: "invalid stacktrace"
 		val result = StringBuilder()
-		if (!errorDescription.isEmpty()) {
+		if (errorDescription.isNotEmpty()) {
 			result.append(errorDescription)
-			result.append("\n\n----------------------\n\n")
+			result.appendln("\n\n----------------------\n")
 		}
 		for ((key, value) in details) {
 			result.append("- ")
 			result.append(key)
 			result.append(": ")
-			result.append(value)
-			result.append("\n")
+			result.appendln(value)
 		}
 		if (includeStacktrace) {
-			result.append("\n```\n")
-			result.append(stackTrace)
-			result.append("\n```\n")
+			result.appendln("\n```")
+			result.appendln(stackTrace)
+			result.appendln("```")
 		}
 		return result.toString()
 	}
@@ -172,7 +170,7 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 			bean: GitHubErrorBean,
 			description: String?): Boolean {
 		val dataContext = DataManager.getInstance().getDataContext(parent)
-		bean.description = description
+		bean.description = description.toString()
 		bean.message = event.message
 		event.throwable?.let { throwable ->
 			IdeErrorsDialog.findPluginId(throwable)?.let { pluginId ->
@@ -185,7 +183,7 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 			}
 		}
 
-		(event.data as? LogMessageEx)?.let { bean.attachments = it.includedAttachments }
+		(event.data as? AbstractMessage)?.let { bean.attachments = it.includedAttachments }
 		val project = CommonDataKeys.PROJECT.getData(dataContext)
 		val reportValues = getKeyValuePairs(
 				project,
@@ -217,8 +215,14 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
  *
  * @author patrick (17.06.17).
  */
-class GitHubErrorBean(throwable: Throwable, lastAction: String?) : ErrorBean(throwable, lastAction) {
+class GitHubErrorBean(throwable: Throwable, val lastAction: String) {
 	val exceptionHash = Arrays.hashCode(throwable.stackTrace).toString()
+	var description = "<null>"
+	var message = "<null>"
+	var pluginName = "<null>"
+	var pluginVersion = "<null>"
+	var stackTrace = "<null>"
+	var attachments: List<Attachment> = emptyList()
 }
 
 /**
@@ -251,6 +255,7 @@ private fun getKeyValuePairs(
 		error: GitHubErrorBean,
 		appInfo: ApplicationInfoEx,
 		namesInfo: ApplicationNamesInfo): MutableMap<String, String> {
+	// val plugin = PluginManager.getPlugin(PluginId.findId("com.tang"))
 	val params = mutableMapOf(
 		"error.description" to error.description,
 		// TODO
@@ -262,7 +267,7 @@ private fun getKeyValuePairs(
 		"App Name" to namesInfo.productName,
 		"App Full Name" to namesInfo.fullProductName,
 		"App Version name" to appInfo.versionName,
-		"Is EAP" to java.lang.Boolean.toString(appInfo.isEAP),
+		"Is EAP" to appInfo.isEAP.toString(),
 		"App Build" to appInfo.build.asString(),
 		"App Version" to appInfo.fullVersion,
 		"Last Action" to error.lastAction,
