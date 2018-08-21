@@ -268,10 +268,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
     if (paramOwner is LuaForBStat) {
         val exprList = paramOwner.exprList
         val callExpr = PsiTreeUtil.findChildOfType(exprList, LuaCallExpr::class.java)
+        val paramIndex = paramOwner.getIndexFor(paramNameDef)
         val expr = callExpr?.expr
         if (expr is LuaNameExpr) {
-            val paramIndex = paramOwner.getIndexFor(paramNameDef)
-
             // ipairs && TyArray
             if (expr.name == Constants.WORD_IPAIRS) {
                 if (paramIndex == 0)
@@ -288,16 +287,16 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     }
                 }
             }
+        }
 
-            // iterator support
-            val type = callExpr.guessType(context)
-            if (type is ITyFunction) {
-                val returnTy = type.mainSignature.returnTy
-                if (returnTy is TyTuple) {
-                    return returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN }
-                } else if (paramIndex == 0) {
-                    return returnTy
-                }
+        // iterator support
+        val type = callExpr?.guessType(context)
+        if (type is ITyFunction) {
+            val returnTy = type.mainSignature.returnTy
+            if (returnTy is TyTuple) {
+                return returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN }
+            } else if (paramIndex == 0) {
+                return returnTy
             }
         }
     }

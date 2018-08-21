@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
-    id 'org.jetbrains.intellij' version "0.3.3"
+    id 'org.jetbrains.intellij' version "0.3.5"
     id "org.jetbrains.kotlin.jvm" version "1.2.31"
 }
 
@@ -60,18 +62,21 @@ publishPlugin {
 
 def RES_DIR = "src/main/resources"
 
-task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], type: Copy) {
-    from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
-    destinationDir file("${RES_DIR}/debugger/windows")
-}
-
-buildPlugin.dependsOn(copyAttachDebugger)
 buildPlugin.baseName = cfg.archiveName
-buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
-    into "/${project.name}/classes/"
-}
-buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
-    into "/${project.name}"
+
+if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], type: Copy) {
+        from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
+        destinationDir file("${RES_DIR}/debugger/windows")
+    }
+
+    buildPlugin.dependsOn(copyAttachDebugger)
+    buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
+        into "/${project.name}/classes/"
+    }
+    buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
+        into "/${project.name}"
+    }
 }
 
 // apply patchs before build plugin

@@ -1,2 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 rootProject.name = 'EmmyLua'
-include "debugger:attach:windows"
+
+if (Os.isFamily(Os.FAMILY_WINDOWS)) include "debugger:attach:windows"
