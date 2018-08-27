@@ -16,30 +16,26 @@
 
 package com.tang.intellij.lua.debugger
 
-import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.project.Project
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.xdebugger.XSourcePosition
-import com.intellij.xdebugger.evaluation.EvaluationMode
-import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.xdebugger.evaluation.XDebuggerEditorsProviderBase
 import com.tang.intellij.lua.lang.LuaFileType
-import com.tang.intellij.lua.psi.LuaElementFactory
+import com.tang.intellij.lua.psi.impl.LuaExprCodeFragmentImpl
 
 /**
  *
  * Created by TangZX on 2016/12/30.
  */
-class LuaDebuggerEditorsProvider : XDebuggerEditorsProvider() {
-    override fun getFileType(): FileType {
-        return LuaFileType.INSTANCE
+class LuaDebuggerEditorsProvider : XDebuggerEditorsProviderBase() {
+    override fun createExpressionCodeFragment(project: Project, text: String, context: PsiElement?, isPhysical: Boolean): PsiFile {
+        val fragment = LuaExprCodeFragmentImpl(project,"fragment.lua", text, isPhysical)
+        fragment.context = context
+        return fragment
     }
 
-    override fun createDocument(project: Project,
-                                s: String,
-                                xSourcePosition: XSourcePosition?,
-                                evaluationMode: EvaluationMode): Document {
-        val file = LuaElementFactory.createFile(project, s)
-        return PsiDocumentManager.getInstance(project).getDocument(file)!!
+    override fun getFileType(): FileType {
+        return LuaFileType.INSTANCE
     }
 }

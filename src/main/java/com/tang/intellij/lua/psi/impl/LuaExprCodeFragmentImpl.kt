@@ -29,11 +29,14 @@ import com.tang.intellij.lua.psi.LuaPsiFile
 
 class LuaExprCodeFragmentImpl(project: Project, name: String, text: CharSequence, var myPhysical: Boolean)
     : LuaPsiFile(PsiManagerEx.getInstanceEx(project).fileManager.createFileViewProvider(LightVirtualFile(name, LuaLanguage.INSTANCE, text), myPhysical)), LuaExprCodeFragment {
+    init {
+        (viewProvider as SingleRootFileViewProvider).forceCachedPsi(this)
+    }
 
     private var myViewProvider: FileViewProvider? = null
     private var myContext: PsiElement? = null
 
-    fun setContext(context: PsiElement) {
+    fun setContext(context: PsiElement?) {
         myContext = context
     }
 
@@ -43,7 +46,8 @@ class LuaExprCodeFragmentImpl(project: Project, name: String, text: CharSequence
 
     override fun clone(): LuaExprCodeFragmentImpl {
         val clone = cloneImpl(calcTreeElement().clone() as FileElement) as LuaExprCodeFragmentImpl
-        clone.myPhysical = myPhysical
+        copyCopyableDataTo(clone)
+        clone.myPhysical = false
         clone.originalFile = this
         val fileMgr = (manager as PsiManagerEx).fileManager
         val cloneViewProvider = fileMgr.createFileViewProvider(LightVirtualFile(name, language, text), false) as SingleRootFileViewProvider
@@ -57,6 +61,8 @@ class LuaExprCodeFragmentImpl(project: Project, name: String, text: CharSequence
     }
 
     override fun getViewProvider(): FileViewProvider {
-        return myViewProvider ?: super.getViewProvider()
+        if (myViewProvider != null)
+            return myViewProvider!!
+        return super.getViewProvider()
     }
 }
