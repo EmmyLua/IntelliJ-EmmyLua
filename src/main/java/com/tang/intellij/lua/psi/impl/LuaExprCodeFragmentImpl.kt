@@ -41,14 +41,17 @@ class LuaExprCodeFragmentImpl(project: Project, name: String, text: CharSequence
     }
 
     override fun getContext(): PsiElement? {
-        return myContext
+        val mc = myContext
+        if (mc != null && mc.isValid)
+            return mc
+        return super.getContext()
     }
 
     override fun clone(): LuaExprCodeFragmentImpl {
         val clone = cloneImpl(calcTreeElement().clone() as FileElement) as LuaExprCodeFragmentImpl
         copyCopyableDataTo(clone)
         clone.myPhysical = false
-        clone.originalFile = this
+        clone.myOriginalFile = this
         val fileMgr = (manager as PsiManagerEx).fileManager
         val cloneViewProvider = fileMgr.createFileViewProvider(LightVirtualFile(name, language, text), false) as SingleRootFileViewProvider
         cloneViewProvider.forceCachedPsi(clone)
@@ -61,8 +64,6 @@ class LuaExprCodeFragmentImpl(project: Project, name: String, text: CharSequence
     }
 
     override fun getViewProvider(): FileViewProvider {
-        if (myViewProvider != null)
-            return myViewProvider!!
-        return super.getViewProvider()
+        return myViewProvider ?: super.getViewProvider()
     }
 }

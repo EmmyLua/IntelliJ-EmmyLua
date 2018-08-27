@@ -95,7 +95,7 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
 
         //local
         if (has(LOCAL_FUN) || has(LOCAL_VAR)) {
-            LuaPsiTreeUtilEx.walkUpNameDef(cur.realContext, Processor { nameDef ->
+            LuaPsiTreeUtilEx.walkUpNameDef(cur, Processor { nameDef ->
                 val name = nameDef.name
                 if (nameDef is LuaPsiElement &&
                         name != null &&
