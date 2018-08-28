@@ -96,7 +96,7 @@ object LuaPsiTreeUtilEx {
      * @param processor 处理器
      */
     private fun walkUpPsiLocalName(element: PsiElement, processor: Processor<PsiNamedElement>, nameExprProcessor: Processor<LuaAssignStat>?) {
-        var curr: PsiElement = element
+        var curr: PsiElement = element.realContext
         do {
             var continueSearch = true
             val prev = curr.prevSibling

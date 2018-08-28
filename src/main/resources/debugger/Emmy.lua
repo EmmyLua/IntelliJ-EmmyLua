@@ -103,7 +103,7 @@ end
 emmy = {}
 
 if tolua then
-	if not tolua.getpeer then
+	if tolua.gettag then
 		emmy = toluaDebugger
 	else
 		emmy = cocosLuaDebugger

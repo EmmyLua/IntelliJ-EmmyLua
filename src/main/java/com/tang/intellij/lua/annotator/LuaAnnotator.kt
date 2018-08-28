@@ -64,7 +64,8 @@ class LuaAnnotator : Annotator {
 
         override fun visitExprStat(o: LuaExprStat) {
             if (o.expr !is LuaCallExpr) {
-                myHolder!!.createErrorAnnotation(o, "syntax error")
+                if (o.containingFile !is LuaExprCodeFragment)
+                    myHolder!!.createErrorAnnotation(o, "syntax error")
             } else super.visitExprStat(o)
         }
 
