@@ -296,7 +296,13 @@ val LuaLiteralExpr.stringValue: String get() {
 
 val LuaLiteralExpr.boolValue: Boolean get() = text == "true"
 
-val LuaLiteralExpr.numberValue: Float get() = text.toFloat()
+val LuaLiteralExpr.numberValue: Float get() {
+    val t = text
+    if (t.startsWith("0x", true)) {
+        return "${t}p0".toFloat()
+    }
+    return text.toFloat()
+}
 
 val LuaComment.docTy: ITy? get() {
     return this.typeDef?.type
