@@ -13,7 +13,7 @@ import com.tang.intellij.lua.comment.psi.*;
 
 public class LuaDocGenericListImpl extends ASTWrapperPsiElement implements LuaDocGenericList {
 
-  public LuaDocGenericListImpl(ASTNode node) {
+  public LuaDocGenericListImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -19,11 +19,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFieldDefStub> implements LuaDocTableField {
 
-  public LuaDocTableFieldImpl(LuaDocTableFieldDefStub stub, IStubElementType type) {
+  public LuaDocTableFieldImpl(@NotNull LuaDocTableFieldDefStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaDocTableFieldImpl(ASTNode node) {
+  public LuaDocTableFieldImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -53,7 +53,7 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   }
 
   @NotNull
-  public ITy guessParentType(SearchContext context) {
+  public ITy guessParentType(@NotNull SearchContext context) {
     return LuaDocPsiImplUtilKt.guessParentType(this, context);
   }
 
@@ -63,7 +63,7 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 
@@ -78,7 +78,7 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   }
 
   @NotNull
-  public ITy guessType(SearchContext context) {
+  public ITy guessType(@NotNull SearchContext context) {
     return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 

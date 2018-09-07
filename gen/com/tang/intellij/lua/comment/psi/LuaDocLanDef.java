@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaDocLanDef extends LuaDocPsiElement {
+public interface LuaDocLanDef extends LuaDocTag {
 
   @Nullable
   LuaDocCommentString getCommentString();

@@ -14,7 +14,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocParamDefImpl extends ASTWrapperPsiElement implements LuaDocParamDef {
 
-  public LuaDocParamDefImpl(ASTNode node) {
+  public LuaDocParamDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -13,7 +13,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocUnionTyImpl extends LuaDocTyImpl implements LuaDocUnionTy {
 
-  public LuaDocUnionTyImpl(ASTNode node) {
+  public LuaDocUnionTyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

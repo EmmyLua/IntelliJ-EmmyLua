@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaDocParamDef extends LuaDocPsiElement {
+public interface LuaDocParamDef extends LuaDocTag {
 
   @Nullable
   LuaDocCommentString getCommentString();

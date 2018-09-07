@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.Visibility;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocFieldDefStub> {
+public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocFieldDefStub> {
 
   @Nullable
   LuaDocAccessModifier getAccessModifier();
@@ -31,7 +31,7 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   PsiElement getId();
 
   @NotNull
-  ITy guessParentType(SearchContext context);
+  ITy guessParentType(@NotNull SearchContext context);
 
   @NotNull
   Visibility getVisibility();
@@ -40,7 +40,7 @@ public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiName
   PsiElement getNameIdentifier();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
   @Nullable
   String getName();

@@ -10,7 +10,7 @@ import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.ty.ITyClass;
 
-public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocClassStub> {
+public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocClassStub> {
 
   @Nullable
   LuaDocCommentString getCommentString();
@@ -28,7 +28,7 @@ public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner
   PsiElement getNameIdentifier();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
   @NotNull
   String getName();

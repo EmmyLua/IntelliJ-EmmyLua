@@ -18,11 +18,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub> implements LuaDocClassDef {
 
-  public LuaDocClassDefImpl(LuaDocClassStub stub, IStubElementType type) {
+  public LuaDocClassDefImpl(@NotNull LuaDocClassStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaDocClassDefImpl(ASTNode node) {
+  public LuaDocClassDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -67,7 +67,7 @@ public class LuaDocClassDefImpl extends StubBasedPsiElementBase<LuaDocClassStub>
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 

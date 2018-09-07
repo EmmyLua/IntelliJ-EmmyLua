@@ -71,6 +71,9 @@
         TAG_SEE = 'see'
         TAG_GENERIC = 'generic'
   ]
+  implements(".*def|see_ref_tag") = [
+    "com.tang.intellij.lua.comment.psi.LuaDocTag"
+  ]
 }
 
 doc ::= (DASHES after_dash?)*

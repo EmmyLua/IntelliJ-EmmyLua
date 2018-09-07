@@ -19,6 +19,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
   public void visitClassDef(@NotNull LuaDocClassDef o) {
     visitPsiElement(o);
     // visitPsiNameIdentifierOwner(o);
+    // visitTag(o);
   }
 
   public void visitClassNameRef(@NotNull LuaDocClassNameRef o) {
@@ -32,6 +33,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
   public void visitFieldDef(@NotNull LuaDocFieldDef o) {
     visitLuaClassField(o);
     // visitPsiNameIdentifierOwner(o);
+    // visitTag(o);
   }
 
   public void visitFunctionParam(@NotNull LuaDocFunctionParam o) {
@@ -48,6 +50,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitGenericDef(@NotNull LuaDocGenericDef o) {
     visitPsiNameIdentifierOwner(o);
+    // visitTag(o);
   }
 
   public void visitGenericList(@NotNull LuaDocGenericList o) {
@@ -59,11 +62,11 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitLanDef(@NotNull LuaDocLanDef o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitOverloadDef(@NotNull LuaDocOverloadDef o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitParTy(@NotNull LuaDocParTy o) {
@@ -71,7 +74,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitParamDef(@NotNull LuaDocParamDef o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitParamNameRef(@NotNull LuaDocParamNameRef o) {
@@ -79,11 +82,11 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitReturnDef(@NotNull LuaDocReturnDef o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitSeeRefTag(@NotNull LuaDocSeeRefTag o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitTableField(@NotNull LuaDocTableField o) {
@@ -93,7 +96,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitTableDef(@NotNull LuaDocTableDef o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitTableTy(@NotNull LuaDocTableTy o) {
@@ -101,7 +104,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitTagDef(@NotNull LuaDocTagDef o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitTy(@NotNull LuaDocTy o) {
@@ -109,7 +112,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitTypeDef(@NotNull LuaDocTypeDef o) {
-    visitPsiElement(o);
+    visitTag(o);
   }
 
   public void visitTypeList(@NotNull LuaDocTypeList o) {
@@ -122,6 +125,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitLuaClassField(@NotNull LuaClassField o) {
     visitElement(o);
+  }
+
+  public void visitTag(@NotNull LuaDocTag o) {
+    visitPsiElement(o);
   }
 
   public void visitType(@NotNull LuaDocType o) {

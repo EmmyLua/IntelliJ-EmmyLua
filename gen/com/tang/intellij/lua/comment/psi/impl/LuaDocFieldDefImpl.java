@@ -20,11 +20,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocFieldDefStub> implements LuaDocFieldDef {
 
-  public LuaDocFieldDefImpl(LuaDocFieldDefStub stub, IStubElementType type) {
+  public LuaDocFieldDefImpl(@NotNull LuaDocFieldDefStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaDocFieldDefImpl(ASTNode node) {
+  public LuaDocFieldDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -72,7 +72,7 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocFieldDefSt
   }
 
   @NotNull
-  public ITy guessParentType(SearchContext context) {
+  public ITy guessParentType(@NotNull SearchContext context) {
     return LuaDocPsiImplUtilKt.guessParentType(this, context);
   }
 
@@ -87,7 +87,7 @@ public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocFieldDefSt
   }
 
   @NotNull
-  public PsiElement setName(String newName) {
+  public PsiElement setName(@NotNull String newName) {
     return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 

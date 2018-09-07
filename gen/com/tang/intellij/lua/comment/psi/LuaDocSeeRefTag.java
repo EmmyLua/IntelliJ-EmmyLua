@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 
-public interface LuaDocSeeRefTag extends LuaDocPsiElement {
+public interface LuaDocSeeRefTag extends LuaDocTag {
 
   @Nullable
   LuaDocClassNameRef getClassNameRef();

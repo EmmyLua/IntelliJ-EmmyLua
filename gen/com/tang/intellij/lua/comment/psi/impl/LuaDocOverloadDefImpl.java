@@ -13,7 +13,7 @@ import com.tang.intellij.lua.comment.psi.*;
 
 public class LuaDocOverloadDefImpl extends ASTWrapperPsiElement implements LuaDocOverloadDef {
 
-  public LuaDocOverloadDefImpl(ASTNode node) {
+  public LuaDocOverloadDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 

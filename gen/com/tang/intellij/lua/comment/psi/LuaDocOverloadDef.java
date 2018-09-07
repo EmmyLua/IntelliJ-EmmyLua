@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaDocOverloadDef extends LuaDocPsiElement {
+public interface LuaDocOverloadDef extends LuaDocTag {
 
   @Nullable
   LuaDocFunctionTy getFunctionTy();

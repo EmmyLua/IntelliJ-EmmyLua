@@ -14,7 +14,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocReturnDefImpl extends ASTWrapperPsiElement implements LuaDocReturnDef {
 
-  public LuaDocReturnDefImpl(ASTNode node) {
+  public LuaDocReturnDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 

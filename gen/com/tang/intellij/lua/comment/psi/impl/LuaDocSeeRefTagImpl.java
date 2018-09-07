@@ -14,7 +14,7 @@ import com.intellij.psi.PsiReference;
 
 public class LuaDocSeeRefTagImpl extends ASTWrapperPsiElement implements LuaDocSeeRefTag {
 
-  public LuaDocSeeRefTagImpl(ASTNode node) {
+  public LuaDocSeeRefTagImpl(@NotNull ASTNode node) {
     super(node);
   }
 

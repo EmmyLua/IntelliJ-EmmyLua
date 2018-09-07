@@ -13,7 +13,7 @@ import com.tang.intellij.lua.comment.psi.*;
 
 public class LuaDocAccessModifierImpl extends ASTWrapperPsiElement implements LuaDocAccessModifier {
 
-  public LuaDocAccessModifierImpl(ASTNode node) {
+  public LuaDocAccessModifierImpl(@NotNull ASTNode node) {
     super(node);
   }
 

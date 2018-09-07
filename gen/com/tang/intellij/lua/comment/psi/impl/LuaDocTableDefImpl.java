@@ -16,11 +16,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaDocTableDefImpl extends StubBasedPsiElementBase<LuaDocTableDefStub> implements LuaDocTableDef {
 
-  public LuaDocTableDefImpl(LuaDocTableDefStub stub, IStubElementType type) {
+  public LuaDocTableDefImpl(@NotNull LuaDocTableDefStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaDocTableDefImpl(ASTNode node) {
+  public LuaDocTableDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 
