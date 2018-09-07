@@ -405,6 +405,12 @@
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaDeprecationInspection"/>
+
+        <localInspection
+                displayName="Unresolved symbol in emmy doc"
+                enabledByDefault="true"
+                groupName="Lua > Emmy doc"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedSymbolInEmmyDocInspection"/>
     </extensions>
 
     <application-components>
