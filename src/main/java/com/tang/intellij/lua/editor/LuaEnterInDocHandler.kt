@@ -48,8 +48,8 @@ class LuaEnterInDocHandler : EnterHandlerDelegate {
         if (comment != null && caretOffset > comment.textOffset) {
             val children = comment.node.getChildren(TokenSet.create(LuaDocTypes.DASHES))
             val last = children[children.size - 1]
-            if (caretOffset > last.startOffset)
             //在最后一个 --- 之前才有效
+            if (caretOffset > last.startOffset && comment.owner == null)
                 return null
 
             val document = editor.document
