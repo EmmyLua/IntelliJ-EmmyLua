@@ -117,7 +117,7 @@ function gcinfo() end
 --- will iterate over the key–value pairs (1,`t[1]`), (2,`t[2]`), ..., up to
 --- the first absent index.
 ---@generic V
----@param t table<number, V>
+---@param t table<number, V>|V[]
 ---@return fun(tbl: table<number, V>):(number, V)
 function ipairs(t) end
 
@@ -191,7 +191,7 @@ function next(table, index) end
 --- See function `next` for the caveats of modifying the table during its
 --- traversal.
 ---@generic V
----@param t table<string, V>
+---@param t table<string, V>|V[]
 ---@return fun(tbl: table<string, V>):(string, V)
 function pairs(t) end
 
