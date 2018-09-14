@@ -143,7 +143,7 @@ function debug.setfenv(object, table) end
 --- call `getinfo` with level 2 to get more information about the running
 --- function (level 0 is the `getinfo` function, and level 1 is the hook
 --- function)
----@overload fun(hook:fun():any, mask:any)
+---@overload fun(hook:(fun():any), mask:any)
 ---@param thread thread
 ---@param hook fun():any
 ---@param mask string

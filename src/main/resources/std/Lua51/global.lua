@@ -113,7 +113,7 @@ function getfenv(f) end
 --- the first absent index.
 ---@generic V
 ---@param t table<number, V>|V[]
----@return fun(tbl: table<number, V>):(number, V)
+---@return fun(tbl: table<number, V>):number, V
 function ipairs(t) end
 
 ---
@@ -228,7 +228,7 @@ function next(table, index) end
 --- traversal.
 ---@generic V
 ---@param t table<string, V>|V[]
----@return fun(tbl: table<string, V>):(string, V)
+---@return fun(tbl: table<string, V>):string, V
 function pairs(t) end
 
 ---
