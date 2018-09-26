@@ -18,12 +18,12 @@ package com.tang.intellij.lua.stubs.index
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.intellij.psi.stubs.StringStubIndexExtension
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
 import com.tang.intellij.lua.lang.LuaLanguage
-import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.search.SearchContext
 
 /**
@@ -62,7 +62,7 @@ class LuaClassIndex : StringStubIndexExtension<LuaDocClassDef>() {
         }
 
         fun processKeys(project: Project, processor: Processor<String>) {
-            val scope = LuaPredefinedScope(project)
+            val scope = ProjectAndLibrariesScope(project)
             val allKeys = instance.getAllKeys(project)
             for (key in allKeys) {
                 val ret = process(key, project, scope, Processor { false })

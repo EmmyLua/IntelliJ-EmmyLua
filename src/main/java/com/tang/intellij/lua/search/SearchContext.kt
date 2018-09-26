@@ -21,8 +21,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
-import com.intellij.util.indexing.AdditionalIndexedRootsScope
-import com.tang.intellij.lua.project.LuaPredefinedLibraryProvider
 
 /**
 
@@ -55,7 +53,7 @@ class SearchContext(val project: Project, private val currentFile: PsiFile? = nu
             scope = if (isDumb) {
                 GlobalSearchScope.EMPTY_SCOPE
             } else {
-                LuaPredefinedScope(project)
+                ProjectAndLibrariesScope(project)
             }
         }
         return scope!!
@@ -65,10 +63,4 @@ class SearchContext(val project: Project, private val currentFile: PsiFile? = nu
         get() = DumbService.isDumb(project) || currentFile != null
 
     fun clone() = SearchContext(project, currentFile)
-}
-
-@Deprecated("use `ProjectAndLibrariesScope` instead")
-class LuaPredefinedScope(project: Project) : ProjectAndLibrariesScope(project) {
-    //constructor(project: Project) : this(ProjectAndLibrariesScope(project))
-    //constructor(base: GlobalSearchScope) : super(base, LuaPredefinedLibraryProvider::class.java)
 }

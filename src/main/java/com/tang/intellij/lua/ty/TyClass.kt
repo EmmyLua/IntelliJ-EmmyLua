@@ -18,6 +18,7 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassDef
@@ -25,7 +26,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocTableDef
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
-import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -94,10 +94,10 @@ abstract class TyClass(override val className: String,
         val project = context.project
 
         val memberIndex = LuaClassMemberIndex.instance
-        val list = memberIndex.get(clazzName.hashCode(), project, LuaPredefinedScope(project))
+        val list = memberIndex.get(clazzName.hashCode(), project, ProjectAndLibrariesScope(project))
 
         processAlias(Processor { alias ->
-            val classMembers = memberIndex.get(alias.hashCode(), project, LuaPredefinedScope(project))
+            val classMembers = memberIndex.get(alias.hashCode(), project, ProjectAndLibrariesScope(project))
             list.addAll(classMembers)
         })
 
