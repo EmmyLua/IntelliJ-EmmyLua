@@ -33,9 +33,12 @@ void mainLoop() {
 		cin.getline(input, 2048);
 
 		string line = input;
-		size_t index = line.find(" ");
+		if (line.length() == 0)
+			break;
 
-		string cmd = line.substr(0, index);
+		const auto index = line.find(" ");
+
+		const auto cmd = line.substr(0, index);
 
 		if (cmd == "resume")
 		{
@@ -61,11 +64,10 @@ int main(int argc, char** argv)
 		("e,emmy", "emmy lua", cxxopts::value<std::string>());
 	options.parse(argc, argv);
 	if (options.count("m") > 0) {
-
-		std::string mode = options["m"].as<std::string>();
+		const auto mode = options["m"].as<std::string>();
 		if (mode == "attach") {
 			if (options.count("p")) {
-				int pid = options["p"].as<int>();
+				const auto pid = options["p"].as<int>();
 				code = inst.Attach(pid, "");
 			}
 		}
@@ -81,11 +83,11 @@ int main(int argc, char** argv)
 				args = options["a"].as<std::string>();
 			}
 			//is debug mode
-			bool debug = true;
+			auto debug = true;
 			if (options.count("d")) {
 				debug = options["d"].as<bool>();
 			}
-			bool console = false;
+			auto console = false;
 			if (options.count("console")) {
 				console = options["console"].as<std::string>() == "true";
 			}
