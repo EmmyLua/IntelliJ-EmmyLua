@@ -411,6 +411,8 @@
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedSymbolInEmmyDocInspection"/>
+
+        <fileTypeDetector implementation="com.tang.intellij.lua.lang.LuaFileTypeDetector"/>
     </extensions>
 
     <application-components>
