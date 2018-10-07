@@ -16,23 +16,23 @@
 
 package com.tang.intellij.test.completion
 
-class TestTuple : TestCompletionBase() {
+class ParsingTest : TestCompletionBase() {
 
-    fun `test tuple 1`() {
+    fun `test parse chinese non-java characters`() {
         doTest("""
-            --- test_tuple_1.lua
+            --- test_parse_chinese_characters.lua
 
-            ---@class Type1
-            local obj = { name = "name" }
+            ---@class 类型1
+            local 对象 = { 名字 = "name" }
 
-            ---@return number, Type1
-            local function getTuple()
+            ---@return number, 类型1
+            local function 获得一个什么东西（一）()
             end
 
-            local a, b = getTuple()
-            b.--[[caret]]
+            local 鬼知道我是什么, 天晓得我是什么 = 获得一个什么东西（一）()
+            天晓得我是什么.--[[caret]]
         """) {
-            assertTrue("name" in it)
+            assertTrue("名字" in it)
         }
     }
 }

@@ -20,7 +20,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 
     private int nBrackets = 0;
     private boolean checkAhead(char c, int offset) {
-        return this.zzMarkedPos + offset >= this.zzBuffer.length() ? false : this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
+        return this.zzMarkedPos + offset < this.zzBuffer.length() && this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
     }
 
     private boolean checkBlock() {
@@ -60,7 +60,8 @@ EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
 
-ID=[:jletter:] [:jletterdigit:]*
+VALID_CHAR=[a-zA-Z_\u00ff-\uffff]
+ID={VALID_CHAR} ({VALID_CHAR}|[0-9])*
 
 //Number
 n=[0-9]+
