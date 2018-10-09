@@ -16,8 +16,8 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 plugins {
-    id 'org.jetbrains.intellij' version "0.3.5"
-    id "org.jetbrains.kotlin.jvm" version "1.2.31"
+    id 'org.jetbrains.intellij' version "0.3.11"
+    id "org.jetbrains.kotlin.jvm" version "1.2.70"
 }
 
 dependencies {
