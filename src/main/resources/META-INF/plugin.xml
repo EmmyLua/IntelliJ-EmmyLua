@@ -340,11 +340,6 @@
                 enabledByDefault="true"
                 groupName="Lua"/>
         <localInspection
-                displayName="Lua Standard Compliance"
-                enabledByDefault="true"
-                groupName="Lua"
-                implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaStandardCompliance"/>
-        <localInspection
                 displayName="Remove Unused"
                 enabledByDefault="true"
                 groupName="Lua"
