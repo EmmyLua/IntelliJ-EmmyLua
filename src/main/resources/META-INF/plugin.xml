@@ -416,7 +416,7 @@
                 displayName="Unresolved class in emmy doc"
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
-                implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnresolvedClassInspection"/>
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedClassInspection"/>
 
         <fileTypeDetector implementation="com.tang.intellij.lua.lang.LuaFileTypeDetector"/>
     </extensions>
