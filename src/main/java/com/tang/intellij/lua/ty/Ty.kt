@@ -451,7 +451,7 @@ class TyUnion : Ty(TyKind.Union) {
             }
         }
 
-        /*fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
+        fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
             if (ty is TyUnion) {
                 val list = ty.childSet.sorted()
                 for (iTy in list) {
@@ -459,7 +459,7 @@ class TyUnion : Ty(TyKind.Union) {
                         break
                 }
             } else process(ty)
-        }*/
+        }
 
         fun union(t1: ITy, t2: ITy): ITy {
             return when {
