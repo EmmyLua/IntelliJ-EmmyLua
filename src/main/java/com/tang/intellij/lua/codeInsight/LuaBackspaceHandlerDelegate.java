@@ -25,6 +25,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -32,12 +33,12 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
  */
 public class LuaBackspaceHandlerDelegate extends BackspaceHandlerDelegate {
     @Override
-    public void beforeCharDeleted(char c, PsiFile psiFile, Editor editor) {
+    public void beforeCharDeleted(char c, @NotNull PsiFile psiFile, @NotNull Editor editor) {
 
     }
 
     @Override
-    public boolean charDeleted(char c, PsiFile psiFile, Editor editor) {
+    public boolean charDeleted(char c, @NotNull PsiFile psiFile, @NotNull Editor editor) {
         if (c == '-') { // 一口气删了 ---
             int offset = editor.getCaretModel().getOffset();
             PsiElement element = psiFile.findElementAt(offset);

@@ -42,7 +42,7 @@ public abstract class LuaLineMarkerNavigator<T extends PsiElement, S extends Psi
                 navElements.add((NavigatablePsiElement) t1);
             });
             PsiElementListNavigator.openTargets(mouseEvent,
-                    navElements.toArray(new NavigatablePsiElement[navElements.size()]),
+                    navElements.toArray(new NavigatablePsiElement[0]),
                     getTitle(t),
                     null,
                     new DefaultPsiElementCellRenderer());
