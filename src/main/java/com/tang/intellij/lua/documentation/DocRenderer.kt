@@ -53,24 +53,36 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
         var child: PsiElement? = comment.firstChild
 
         sb.append("<div class='content'>")
+        val docStrBuilder = StringBuilder()
+        val flushDocString = {
+            sb.append(markdownToHtml(docStrBuilder.toString()))
+            docStrBuilder.setLength(0)
+        }
         while (child != null) {
-            when (child) {
-                is LuaDocClassDef -> renderClassDef(sb, child, tyRenderer)
-                is LuaDocTypeDef -> renderTypeDef(sb, child, tyRenderer)
-                is LuaDocFieldDef -> {}
-                is LuaDocSeeRefTag -> {}
-                is LuaDocParamDef -> {}
-                is LuaDocReturnDef -> {}
-                is LuaDocOverloadDef -> {}
-                else -> {
-                    val elementType = child.node.elementType
-                    if (elementType === LuaDocTypes.STRING) {
-                        sb.append(markdownToHtml(child.text))
+            val elementType = child.node.elementType
+            if (elementType == LuaDocTypes.STRING) {
+                docStrBuilder.append(child.text)
+                docStrBuilder.append("\n")
+            } else {
+                when (child) {
+                    is LuaDocClassDef -> {
+                        flushDocString()
+                        renderClassDef(sb, child, tyRenderer)
                     }
+                    is LuaDocTypeDef -> {
+                        flushDocString()
+                        renderTypeDef(sb, child, tyRenderer)
+                    }
+                    is LuaDocFieldDef -> {}
+                    is LuaDocSeeRefTag -> {}
+                    is LuaDocParamDef -> {}
+                    is LuaDocReturnDef -> {}
+                    is LuaDocOverloadDef -> {}
                 }
             }
             child = child.nextSibling
         }
+        flushDocString()
         sb.append("</div>")
 
         val sections = StringBuilder()
