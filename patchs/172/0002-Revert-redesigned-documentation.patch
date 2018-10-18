@@ -1,18 +1,18 @@
-From 34f457a01dfed3cc6749b58e7c37218daa3a50d3 Mon Sep 17 00:00:00 2001
+From 4dedba8cad54ad3a2451ea72f978057efb4c1fec Mon Sep 17 00:00:00 2001
 From: tangzx <272669294@qq.com>
-Date: Sun, 29 Jul 2018 01:14:33 +0800
-Subject: [PATCH] revert redesigned documentation
+Date: Thu, 18 Oct 2018 09:46:26 +0800
+Subject: [PATCH] Revert redesigned documentation
 
 ---
- .../intellij/lua/documentation/DocRenderer.kt | 214 ++++++++----------
- .../documentation/LuaDocumentationProvider.kt | 108 ++++-----
- 2 files changed, 143 insertions(+), 179 deletions(-)
+ .../tang/intellij/lua/documentation/DocRenderer.kt | 234 +++++++++------------
+ .../lua/documentation/LuaDocumentationProvider.kt  | 108 +++++-----
+ 2 files changed, 147 insertions(+), 195 deletions(-)
 
 diff --git a/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt b/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
-index eb196586..dc0db89f 100644
+index 12fe5ef5..dc0db89f 100644
 --- a/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
 +++ b/src/main/java/com/tang/intellij/lua/documentation/DocRenderer.kt
-@@ -20,48 +20,95 @@ import com.intellij.codeInsight.documentation.DocumentationManagerUtil
+@@ -20,209 +20,169 @@ import com.intellij.codeInsight.documentation.DocumentationManagerUtil
  import com.intellij.psi.PsiElement
  import com.tang.intellij.lua.comment.psi.*
  import com.tang.intellij.lua.comment.psi.api.LuaComment
@@ -95,15 +95,22 @@ index eb196586..dc0db89f 100644
          var child: PsiElement? = comment.firstChild
 -
 -        sb.append("<div class='content'>")
+-        val docStrBuilder = StringBuilder()
+-        val flushDocString = {
+-            sb.append(markdownToHtml(docStrBuilder.toString()))
+-            docStrBuilder.setLength(0)
+-        }
          while (child != null) {
-             when (child) {
--                is LuaDocClassDef -> renderClassDef(sb, child, tyRenderer)
--                is LuaDocTypeDef -> renderTypeDef(sb, child, tyRenderer)
--                is LuaDocFieldDef -> {}
--                is LuaDocSeeRefTag -> {}
--                is LuaDocParamDef -> {}
--                is LuaDocReturnDef -> {}
--                is LuaDocOverloadDef -> {}
+-            val elementType = child.node.elementType
+-            if (elementType == LuaDocTypes.STRING) {
+-                docStrBuilder.append(child.text)
+-                docStrBuilder.append("\n")
+-            } else {
+-                when (child) {
+-                    is LuaDocClassDef -> {
+-                        flushDocString()
+-                        renderClassDef(sb, child, tyRenderer)
++            when (child) {
 +                is LuaDocParamDef -> {
 +                    renderDocParam(sb, child)
 +                    sb.append("<br>")
@@ -120,20 +127,31 @@ index eb196586..dc0db89f 100644
 +                        sb.append(")")
 +                        renderCommentString(null, null, sb, child.commentString)
 +                        sb.append("<br>")
-+                    }
+                     }
+-                    is LuaDocTypeDef -> {
+-                        flushDocString()
+-                        renderTypeDef(sb, child, tyRenderer)
 +                }
 +                is LuaDocClassDef -> renderClassDef(sb, child)
 +                is LuaDocFieldDef -> renderFieldDef(sb, child)
 +                is LuaDocOverloadDef -> renderOverload(sb, child)
 +                is LuaDocTypeDef -> renderTypeDef(sb, child)
 +                is LuaDocSeeRefTag -> renderSee(sb, child)
-                 else -> {
-                     val elementType = child.node.elementType
-                     if (elementType === LuaDocTypes.STRING) {
-@@ -71,146 +118,71 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
++                else -> {
++                    val elementType = child.node.elementType
++                    if (elementType === LuaDocTypes.STRING) {
++                        sb.append(markdownToHtml(child.text))
+                     }
+-                    is LuaDocFieldDef -> {}
+-                    is LuaDocSeeRefTag -> {}
+-                    is LuaDocParamDef -> {}
+-                    is LuaDocReturnDef -> {}
+-                    is LuaDocOverloadDef -> {}
+                 }
              }
              child = child.nextSibling
          }
+-        flushDocString()
 -        sb.append("</div>")
 -
 -        val sections = StringBuilder()
@@ -500,5 +518,5 @@ index 8357248e..b148c47f 100644
      }
  }
 -- 
-2.17.0.windows.1
+2.16.2.windows.1
 
