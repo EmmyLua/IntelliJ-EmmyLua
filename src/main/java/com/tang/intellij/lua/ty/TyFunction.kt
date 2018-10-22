@@ -214,6 +214,16 @@ fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
     return sgi ?: mainSignature
 }
 
+fun ITyFunction.findPerfectSignature(call: LuaCallExpr): IFunSignature {
+    val n = call.argList.size
+    // 是否是 inst:method() 被用为 inst.method(self) 形式
+    val isInstanceMethodUsedAsStaticMethod = isColonCall && call.isMethodDotCall
+    if (isInstanceMethodUsedAsStaticMethod)
+        return findPerfectSignature(n - 1)
+    val isStaticMethodUsedAsInstanceMethod = !isColonCall && call.isMethodColonCall
+    return findPerfectSignature(if(isStaticMethodUsedAsInstanceMethod) n + 1 else n)
+}
+
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
 
     override fun equals(other: Any?): Boolean {
