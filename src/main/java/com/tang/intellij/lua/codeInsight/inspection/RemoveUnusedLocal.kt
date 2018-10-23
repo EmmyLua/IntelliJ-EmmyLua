@@ -102,7 +102,7 @@ class RemoveUnusedLocal : LocalInspectionTool() {
         override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
             ApplicationManager.getApplication().invokeLater {
                 val factory = RefactoringFactory.getInstance(project)
-                val refactoring = factory.createRename(descriptor.psiElement, Constants.WORD_UNDERLINE)
+                val refactoring = factory.createRename(descriptor.psiElement, Constants.WORD_UNDERLINE, false, false)
                 refactoring.run()
             }
         }

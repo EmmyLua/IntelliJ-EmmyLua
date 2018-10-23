@@ -35,12 +35,17 @@ class LocalNameShadowed : LocalInspectionTool() {
         return object : LuaVisitor() {
 
             private fun check(namedElement: PsiNamedElement) {
+                val name = namedElement.name
+                if (name == Constants.WORD_UNDERLINE)
+                    return
+
                 val psi = (if (namedElement is PsiNameIdentifierOwner) namedElement.nameIdentifier else namedElement) ?: return
+                val document = FileDocumentManager.getInstance().getDocument(namedElement.containingFile.virtualFile)
+
                 LuaPsiTreeUtilEx.walkUpNameDef(namedElement, Processor{ nameDef ->
-                    if (namedElement.name == nameDef.name) {
-                        val document = FileDocumentManager.getInstance().getDocument(nameDef.containingFile.virtualFile)
+                    if (name == nameDef.name) {
                         val desc = if (document != null)
-                            "Local name shadowed, '${nameDef.name}' was previously defined on line ${document.getLineNumber(nameDef.node.startOffset) + 1}"
+                            "Local name shadowed, '$name' was previously defined on line ${document.getLineNumber(nameDef.node.startOffset) + 1}"
                         else
                             "Local name shadowed"
                         holder.registerProblem(psi, desc, object : RefactoringQuickFix {
