@@ -65,4 +65,9 @@ object LuaElementFactory {
         val fieldDef = PsiTreeUtil.findChildOfType(element, LuaDocFieldDef::class.java)!!
         return fieldDef.id!!
     }
+
+    fun createParamter(project: Project, name: String): PsiElement {
+        val element = createWith(project, "local function($name)end")
+        return PsiTreeUtil.findChildOfType(element, LuaParamNameDef::class.java)!!
+    }
 }

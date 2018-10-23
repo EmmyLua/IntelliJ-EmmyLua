@@ -22,7 +22,6 @@ import com.intellij.lang.annotation.Annotator
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
-import com.intellij.psi.search.searches.ReferencesSearch
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.highlighting.LuaHighlightingData
@@ -126,17 +125,8 @@ class LuaAnnotator : Annotator {
         }
 
         override fun visitParamNameDef(o: LuaParamNameDef) {
-            if (o.textMatches(Constants.WORD_UNDERLINE))
-                return
-
-            val search = ReferencesSearch.search(o, o.useScope)
-            if (search.findFirst() == null) {
-                createInfoAnnotation(o, "Unused parameter : \"${o.name}\"")
-                //annotation.setTextAttributes(CodeInsightColors.WEAK_WARNING_ATTRIBUTES);
-            } else {
-                val annotation = createInfoAnnotation(o, "Parameter : \"${o.name}\"")
-                annotation.setTextAttributes(LuaHighlightingData.PARAMETER)
-            }
+            val annotation = createInfoAnnotation(o, "Parameter : \"${o.name}\"")
+            annotation.textAttributes = LuaHighlightingData.PARAMETER
         }
 
         override fun visitNameExpr(o: LuaNameExpr) {
