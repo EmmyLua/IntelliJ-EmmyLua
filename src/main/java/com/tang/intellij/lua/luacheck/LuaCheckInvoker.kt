@@ -152,4 +152,5 @@ private fun runLuaCheckInner(relativeFilePath: String,
         }
     })
     handler.startNotify()
+    handler.waitFor()
 }
