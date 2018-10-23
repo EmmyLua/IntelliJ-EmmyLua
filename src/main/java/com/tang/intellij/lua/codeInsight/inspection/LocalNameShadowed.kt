@@ -20,6 +20,7 @@ import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.codeInspection.RefactoringQuickFix
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
@@ -34,10 +35,15 @@ class LocalNameShadowed : LocalInspectionTool() {
         return object : LuaVisitor() {
 
             private fun check(namedElement: PsiNamedElement) {
+                val psi = (if (namedElement is PsiNameIdentifierOwner) namedElement.nameIdentifier else namedElement) ?: return
                 LuaPsiTreeUtilEx.walkUpNameDef(namedElement, Processor{ nameDef ->
-                    val psi = if (namedElement is PsiNameIdentifierOwner) namedElement.nameIdentifier else namedElement
-                    if (psi != null && namedElement.name == nameDef.name) {
-                        holder.registerProblem(psi, "Local name shadowed", object : RefactoringQuickFix {
+                    if (namedElement.name == nameDef.name) {
+                        val document = FileDocumentManager.getInstance().getDocument(nameDef.containingFile.virtualFile)
+                        val desc = if (document != null)
+                            "Local name shadowed, '${nameDef.name}' was previously defined on line ${document.getLineNumber(nameDef.node.startOffset) + 1}"
+                        else
+                            "Local name shadowed"
+                        holder.registerProblem(psi, desc, object : RefactoringQuickFix {
                             override fun getHandler(): RefactoringActionHandler {
                                 return RefactoringActionHandlerFactory.getInstance().createRenameHandler()
                             }
