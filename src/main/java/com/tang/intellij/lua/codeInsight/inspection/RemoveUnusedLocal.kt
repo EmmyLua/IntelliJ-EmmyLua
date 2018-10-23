@@ -46,39 +46,28 @@ class RemoveUnusedLocal : LocalInspectionTool() {
                     holder.registerProblem(o,
                             "Unused parameter : '${o.name}'",
                             ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                            object : LocalQuickFix {
-                                override fun getFamilyName() = "Rename to '${Constants.WORD_UNDERLINE}'"
-
-                                override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
-                                    ApplicationManager.getApplication().invokeLater {
-                                        val factory = RefactoringFactory.getInstance(project)
-                                        val refactoring = factory.createRename(o, Constants.WORD_UNDERLINE)
-                                        refactoring.run()
-                                    }
-                                }
-                            })
+                            RenameToUnderlineFix())
                 }
             }
 
             override fun visitLocalDef(o: LuaLocalDef) {
-                val nameList = o.nameList
-                if (nameList != null) {
-                    val nameDefList = nameList.nameDefList
-                    if (nameDefList.size == 1) {
-                        val name = nameDefList.first()
-
-                        if (name.textMatches(Constants.WORD_UNDERLINE))
-                            return
-
+                val list = o.nameList?.nameDefList ?: return
+                list.forEach { name ->
+                    if (!name.textMatches(Constants.WORD_UNDERLINE)) {
                         val search = ReferencesSearch.search(name, name.useScope)
                         if (search.findFirst() == null) {
-                            val offset = name.node.startOffset - o.node.startOffset
-                            val textRange = TextRange(offset, offset + name.textLength)
-                            holder.registerProblem(o,
-                                    "Unused local : '${name.text}'",
-                                    ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                                    textRange,
-                                    Fix("Remove unused local '${name.text}'"))
+                            if (list.size == 1) {
+                                holder.registerProblem(name,
+                                        "Unused local : '${name.text}'",
+                                        ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                                        RemoveFix("Remove unused local '${name.text}'"),
+                                        RenameToUnderlineFix())
+                            } else {
+                                holder.registerProblem(name,
+                                        "Unused local : '${name.text}'",
+                                        ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                                        RenameToUnderlineFix())
+                            }
                         }
                     }
                 }
@@ -97,14 +86,26 @@ class RemoveUnusedLocal : LocalInspectionTool() {
                                 "Unused local function : '${name.text}'",
                                 ProblemHighlightType.LIKE_UNUSED_SYMBOL,
                                 textRange,
-                                Fix("Remove unused local function : '${name.text}'"))
+                                RemoveFix("Remove unused local function : '${name.text}'"))
                     }
                 }
             }
         }
     }
 
-    private inner class Fix(private val familyName: String) : LocalQuickFix {
+    private inner class RenameToUnderlineFix : LocalQuickFix {
+        override fun getFamilyName() = "Rename to '${Constants.WORD_UNDERLINE}'"
+
+        override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
+            ApplicationManager.getApplication().invokeLater {
+                val factory = RefactoringFactory.getInstance(project)
+                val refactoring = factory.createRename(descriptor.psiElement, Constants.WORD_UNDERLINE)
+                refactoring.run()
+            }
+        }
+    }
+
+    private inner class RemoveFix(private val familyName: String) : LocalQuickFix {
 
         @Nls
         override fun getFamilyName() = familyName

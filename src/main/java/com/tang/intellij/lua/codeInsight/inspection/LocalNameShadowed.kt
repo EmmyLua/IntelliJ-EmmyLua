@@ -27,10 +27,7 @@ import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.RefactoringActionHandlerFactory
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.psi.LuaLocalDef
-import com.tang.intellij.lua.psi.LuaLocalFuncDef
-import com.tang.intellij.lua.psi.LuaPsiTreeUtilEx
-import com.tang.intellij.lua.psi.LuaVisitor
+import com.tang.intellij.lua.psi.*
 
 class LocalNameShadowed : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor {
@@ -68,6 +65,10 @@ class LocalNameShadowed : LocalInspectionTool() {
             override fun visitLocalFuncDef(o: LuaLocalFuncDef) {
                 check(o)
                 super.visitLocalFuncDef(o)
+            }
+
+            override fun visitParamNameDef(o: LuaParamNameDef) {
+                check(o)
             }
         }
     }
