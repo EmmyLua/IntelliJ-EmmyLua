@@ -57,9 +57,12 @@ class RemoveUnusedLocal : LocalInspectionTool() {
                         val search = ReferencesSearch.search(name, name.useScope)
                         if (search.findFirst() == null) {
                             if (list.size == 1) {
-                                holder.registerProblem(name,
+                                val offset = name.node.startOffset - o.node.startOffset
+                                val textRange = TextRange(offset, offset + name.textLength)
+                                holder.registerProblem(o,
                                         "Unused local : '${name.text}'",
                                         ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+                                        textRange,
                                         RemoveFix("Remove unused local '${name.text}'"),
                                         RenameToUnderlineFix())
                             } else {
