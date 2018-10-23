@@ -19,14 +19,12 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
-import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaVisitor
-import com.tang.intellij.lua.psi.argList
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
 class MatchFunctionSignatureInspection : StrictInspection() {
+    data class ConcreteTypeInfo(val param: LuaExpr, val ty: ITy)
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
                 override fun visitIndexExpr(o: LuaIndexExpr) {
@@ -71,19 +69,30 @@ class MatchFunctionSignatureInspection : StrictInspection() {
 
                 private fun annotateCall(call: LuaCallExpr, signature: IFunSignature, searchContext: SearchContext) {
                     val concreteParams = call.argList
-                    val last = call.lastChild.lastChild
+                    val concreteTypes = mutableListOf<ConcreteTypeInfo>()
+                    concreteParams.forEachIndexed { index, luaExpr ->
+                        val ty = luaExpr.guessType(searchContext)
+                        if (ty is TyTuple) {
+                            if (index == concreteParams.lastIndex) {
+                                concreteTypes.addAll(ty.list.map { ConcreteTypeInfo(luaExpr, it) })
+                            } else {
+                                concreteTypes.add(ConcreteTypeInfo(luaExpr, ty.list.first()))
+                            }
+                        } else concreteTypes.add(ConcreteTypeInfo(luaExpr, ty))
+                    }
+
                     var nArgs = 0
                     signature.processArgs(call) { i, pi ->
                         nArgs = i + 1
-                        val param = concreteParams.getOrNull(i)
-                        if (param == null) {
-                            myHolder.registerProblem(last, "Missing argument: ${pi.name}: ${pi.ty}")
+                        val typeInfo = concreteTypes.getOrNull(i)
+                        if (typeInfo == null) {
+                            myHolder.registerProblem(call.lastChild.lastChild, "Missing argument: ${pi.name}: ${pi.ty}")
                             return@processArgs true
                         }
 
-                        val type = param.guessType(searchContext)
+                        val type = typeInfo.ty
                         if (!type.subTypeOf(pi.ty, searchContext, false))
-                            myHolder.registerProblem(last, "Type mismatch. Required: '${pi.ty}' Found: '$type'")
+                            myHolder.registerProblem(typeInfo.param, "Type mismatch. Required: '${pi.ty}' Found: '$type'")
                         true
                     }
                     if (nArgs < concreteParams.size && !signature.hasVarArgs()) {
