@@ -24,18 +24,15 @@ import com.intellij.psi.PsiElementVisitor
 import com.tang.intellij.lua.comment.psi.LuaDocGeneralTy
 import com.tang.intellij.lua.comment.psi.LuaDocType
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
-import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
 
 class UnresolvedClassInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor {
         return object : LuaDocVisitor() {
             override fun visitType(o: LuaDocType) {
                 if (o is LuaDocGeneralTy) {
-                    val typeName = o.classNameRef.text ?: return
-                    val r = LuaClassIndex.find(typeName, SearchContext(o.project))
-                    if (r == null) {
-                        holder.registerProblem(o, "Unresolved type \"$typeName\"", ProblemHighlightType.ERROR)
+                    val typeRef = o.classNameRef
+                    if (typeRef.reference.resolve() == null) {
+                        holder.registerProblem(o, "Unresolved type \"${typeRef.text}\"", ProblemHighlightType.ERROR)
                     }
                 }
             }
