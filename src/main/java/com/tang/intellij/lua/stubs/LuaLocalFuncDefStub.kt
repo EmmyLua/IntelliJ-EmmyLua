@@ -36,6 +36,7 @@ class LuaLocalFuncDefElementType
     override fun serialize(stub: LuaLocalFuncDefStub, stream: StubOutputStream) {
         stream.writeName(stub.name)
         stream.writeTyNullable(stub.returnDocTy)
+        stream.writeTyNullable(stub.varargTy)
         stream.writeParamInfoArray(stub.params)
         stream.writeTyParams(stub.tyParams)
         stream.writeSignatures(stub.overloads)
@@ -53,6 +54,7 @@ class LuaLocalFuncDefElementType
         val overloads = def.overloads
         return LuaLocalFuncDefStub(def.name!!,
                 retDocTy,
+                def.varargType,
                 params,
                 tyParams,
                 overloads,
@@ -63,11 +65,13 @@ class LuaLocalFuncDefElementType
     override fun deserialize(stream: StubInputStream, parentStub: StubElement<*>?): LuaLocalFuncDefStub {
         val name = stream.readName()
         val retDocTy = stream.readTyNullable()
+        val varargTy = stream.readTyNullable()
         val params = stream.readParamInfoArray()
         val tyParams = stream.readTyParams()
         val overloads = stream.readSignatures()
         return LuaLocalFuncDefStub(StringRef.toString(name),
                 retDocTy,
+                varargTy,
                 params,
                 tyParams,
                 overloads,
@@ -87,6 +91,7 @@ class LuaLocalFuncDefElementType
 class LuaLocalFuncDefStub(
         val name: String,
         override val returnDocTy: ITy?,
+        override val varargTy: ITy?,
         override val params: Array<LuaParamInfo>,
         override val tyParams: Array<TyParameter>,
         override val overloads: Array<IFunSignature>,

@@ -119,6 +119,14 @@ fun getType(paramDec: LuaDocParamDef): ITy {
     return type ?: Ty.UNKNOWN
 }
 
+fun getType(vararg: LuaDocVarargDef): ITy {
+    return vararg.ty?.getType() ?: Ty.UNKNOWN
+}
+
+fun getType(vararg: LuaDocVarargParam): ITy {
+    return vararg.ty?.getType() ?: Ty.UNKNOWN
+}
+
 /**
  * 获取返回类型
  * @param returnDef 返回定义

@@ -35,7 +35,7 @@ fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
         is LuaBinaryExpr -> expr.infer(context)
         is LuaCallExpr -> expr.infer(context)
         is LuaClosureExpr -> infer(expr, context)
-        is LuaTableExpr -> TyTable(expr)
+        is LuaTableExpr -> expr.infer()
         is LuaParenExpr -> infer(expr.expr, context)
         is LuaNameExpr -> expr.infer(context)
         is LuaLiteralExpr -> expr.infer()
@@ -103,13 +103,21 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
     if (sig.isGeneric()) {
         val list = this.argList.map { it.guessType(context.clone()) }
         val map = mutableMapOf<String, ITy>()
+        var processedIndex = -1
         sig.tyParameters.forEach { map[it.name] = Ty.UNKNOWN }
         sig.processArgs(this) { index, param ->
             val arg = list.getOrNull(index)
             if (arg != null) {
                 GenericAnalyzer(arg, param.ty).analyze(map)
             }
+            processedIndex = index
             true
+        }
+        // vararg
+        val varargTy = sig.varargTy
+        if (varargTy != null && processedIndex < list.lastIndex) {
+            val argTy = list[processedIndex + 1]
+            GenericAnalyzer(argTy, varargTy).analyze(map)
         }
         sig.tyParameters.forEach {
             val superCls = it.superClassName
@@ -277,6 +285,10 @@ private fun LuaLiteralExpr.infer(): ITy {
         LuaLiteralKind.Bool -> Ty.BOOLEAN
         LuaLiteralKind.String -> Ty.STRING
         LuaLiteralKind.Number -> Ty.NUMBER
+        LuaLiteralKind.Varargs -> {
+            val o = PsiTreeUtil.getParentOfType(this, LuaFuncBodyOwner::class.java)
+            o?.varargType ?: Ty.UNKNOWN
+        }
         //LuaLiteralKind.Nil -> Ty.NIL
         else -> Ty.UNKNOWN
     }
@@ -346,4 +358,18 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
     })
 
     return set
+}
+
+private fun LuaTableExpr.infer(): ITy {
+    val list = this.tableFieldList
+    if (list.size == 1) {
+        val valueExpr = list.first().valueExpr
+        if (valueExpr is LuaLiteralExpr && valueExpr.kind == LuaLiteralKind.Varargs) {
+            val func = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaFuncBodyOwner::class.java)
+            val ty = func?.varargType
+            if (ty != null)
+                return TyArray(ty)
+        }
+    }
+    return TyTable(this)
 }

@@ -44,20 +44,23 @@ class LuaClosureExprType : LuaStubElementType<LuaClosureExprStub, LuaClosureExpr
     }
 
     override fun createStub(expr: LuaClosureExpr, parentStub: StubElement<*>?): LuaClosureExprStub {
+        val varargTy = expr.varargType
         val params = expr.params
         val overloads = expr.overloads
-        return LuaClosureExprStub(null, params, overloads, parentStub)
+        return LuaClosureExprStub(null, varargTy, params, overloads, parentStub)
     }
 
     override fun deserialize(inputStream: StubInputStream, parentStub: StubElement<*>?): LuaClosureExprStub {
+        val varargTy = inputStream.readTyNullable()
         val params = inputStream.readParamInfoArray()
         val overloads = inputStream.readSignatures()
-        return LuaClosureExprStub(null, params, overloads, parentStub)
+        return LuaClosureExprStub(null, varargTy, params, overloads, parentStub)
     }
 }
 
 class LuaClosureExprStub(
         override val returnDocTy: ITy?,
+        override val varargTy: ITy?,
         override val params: Array<LuaParamInfo>,
         override val overloads: Array<IFunSignature>,
         parent: StubElement<*>?

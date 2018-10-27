@@ -151,7 +151,8 @@ class LuaParserDefinition : ParserDefinition {
                 LuaDocTypes.TAG_PROTECTED,
                 LuaDocTypes.TAG_PUBLIC,
                 LuaDocTypes.TAG_SEE,
-                LuaDocTypes.TAG_GENERIC
+                LuaDocTypes.TAG_GENERIC,
+                LuaDocTypes.TAG_VARARG
         )
         val DOC_KEYWORD_TOKENS = TokenSet.create(
                 LuaDocTypes.FUN

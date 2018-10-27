@@ -39,6 +39,11 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
     @NotNull
     ITy guessReturnType(SearchContext searchContext);
 
+    @Nullable
+    default ITy getVarargType() {
+        return LuaPsiImplUtilKt.getVarargTy(this);
+    }
+
     @NotNull
     LuaParamInfo[] getParams();
 

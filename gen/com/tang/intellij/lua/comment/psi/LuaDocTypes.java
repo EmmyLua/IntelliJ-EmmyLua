@@ -36,6 +36,8 @@ public interface LuaDocTypes {
   IElementType TYPE_DEF = LuaParserDefinitionKt.createDocType("TYPE_DEF");
   IElementType TYPE_LIST = LuaParserDefinitionKt.createDocType("TYPE_LIST");
   IElementType UNION_TY = LuaParserDefinitionKt.createDocType("UNION_TY");
+  IElementType VARARG_DEF = LuaParserDefinitionKt.createDocType("VARARG_DEF");
+  IElementType VARARG_PARAM = LuaParserDefinitionKt.createDocType("VARARG_PARAM");
 
   IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
@@ -73,11 +75,12 @@ public interface LuaDocTypes {
   IElementType TAG_RETURN = new LuaDocTokenType("return");
   IElementType TAG_SEE = new LuaDocTokenType("see");
   IElementType TAG_TYPE = new LuaDocTokenType("type");
+  IElementType TAG_VARARG = new LuaDocTokenType("vararg");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ACCESS_MODIFIER) {
+      if (type == ACCESS_MODIFIER) {
         return new LuaDocAccessModifierImpl(node);
       }
       else if (type == ARR_TY) {
@@ -154,6 +157,12 @@ public interface LuaDocTypes {
       }
       else if (type == UNION_TY) {
         return new LuaDocUnionTyImpl(node);
+      }
+      else if (type == VARARG_DEF) {
+        return new LuaDocVarargDefImpl(node);
+      }
+      else if (type == VARARG_PARAM) {
+        return new LuaDocVarargParamImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

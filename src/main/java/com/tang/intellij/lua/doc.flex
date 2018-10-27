@@ -80,6 +80,7 @@ DOC_DASHES = --+
 <xTAG_NAME> {
     "field"                    { yybegin(xFIELD); return TAG_FIELD; }
     "param"                    { yybegin(xPARAM); return TAG_PARAM; }
+    "vararg"                   { yybegin(xPARAM); return TAG_VARARG; }
     "class"                    { yybegin(xCLASS); return TAG_CLASS; }
     "module"                   { yybegin(xCLASS); return TAG_MODULE; }
     "return"                   { beginType(); return TAG_RETURN; }

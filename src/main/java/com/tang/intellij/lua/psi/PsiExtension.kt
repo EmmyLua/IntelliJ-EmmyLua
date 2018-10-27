@@ -255,6 +255,7 @@ enum class LuaLiteralKind {
     Bool,
     Number,
     Nil,
+    Varargs,
     Unknown;
 
     companion object {
@@ -275,6 +276,7 @@ val LuaLiteralExpr.kind: LuaLiteralKind get() {
         LuaTypes.FALSE -> LuaLiteralKind.Bool
         LuaTypes.NIL -> LuaLiteralKind.Nil
         LuaTypes.NUMBER -> LuaLiteralKind.Number
+        LuaTypes.ELLIPSIS -> LuaLiteralKind.Varargs
         else -> LuaLiteralKind.Unknown
     }
 }

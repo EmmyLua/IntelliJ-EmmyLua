@@ -123,6 +123,14 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
+  public void visitVarargDef(@NotNull LuaDocVarargDef o) {
+    visitTag(o);
+  }
+
+  public void visitVarargParam(@NotNull LuaDocVarargParam o) {
+    visitPsiElement(o);
+  }
+
   public void visitLuaClassField(@NotNull LuaClassField o) {
     visitElement(o);
   }

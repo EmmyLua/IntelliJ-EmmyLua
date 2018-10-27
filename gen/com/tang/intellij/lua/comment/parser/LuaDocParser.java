@@ -83,6 +83,12 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == TYPE_LIST) {
       r = type_list(b, 0);
     }
+    else if (t == VARARG_DEF) {
+      r = vararg_def(b, 0);
+    }
+    else if (t == VARARG_PARAM) {
+      r = vararg_param(b, 0);
+    }
     else {
       r = parse_root_(t, b, 0);
     }
@@ -257,6 +263,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // '@' (param_def
+  //     | vararg_def
   //     | return_def
   //     | class_def
   //     | field_def
@@ -279,6 +286,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   // param_def
+  //     | vararg_def
   //     | return_def
   //     | class_def
   //     | field_def
@@ -293,6 +301,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
     r = param_def(b, l + 1);
+    if (!r) r = vararg_def(b, l + 1);
     if (!r) r = return_def(b, l + 1);
     if (!r) r = class_def(b, l + 1);
     if (!r) r = field_def(b, l + 1);
@@ -439,10 +448,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (function_param ',')* (function_param |& ')')
+  // (function_param ',')* ((function_param|vararg_param) |& ')')
   static boolean function_param_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_param_list")) return false;
-    if (!nextTokenIs(b, "", ID, RPAREN)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = function_param_list_0(b, l + 1);
@@ -473,14 +481,23 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // function_param |& ')'
+  // (function_param|vararg_param) |& ')'
   private static boolean function_param_list_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_param_list_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = function_param(b, l + 1);
+    r = function_param_list_1_0(b, l + 1);
     if (!r) r = function_param_list_1_1(b, l + 1);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // function_param|vararg_param
+  private static boolean function_param_list_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_param_list_1_0")) return false;
+    boolean r;
+    r = function_param(b, l + 1);
+    if (!r) r = vararg_param(b, l + 1);
     return r;
   }
 
@@ -848,6 +865,42 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // TAG_VARARG ty comment_string?
+  public static boolean vararg_def(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "vararg_def")) return false;
+    if (!nextTokenIs(b, TAG_VARARG)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, VARARG_DEF, null);
+    r = consumeToken(b, TAG_VARARG);
+    p = r; // pin = 1
+    r = r && report_error_(b, ty(b, l + 1, -1));
+    r = p && vararg_def_2(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // comment_string?
+  private static boolean vararg_def_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "vararg_def_2")) return false;
+    comment_string(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // TAG_VARARG ty
+  public static boolean vararg_param(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "vararg_param")) return false;
+    if (!nextTokenIs(b, TAG_VARARG)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, VARARG_PARAM, null);
+    r = consumeToken(b, TAG_VARARG);
+    p = r; // pin = 1
+    r = r && ty(b, l + 1, -1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // Expression root: ty
   // Operator priority table:
   // 0: N_ARY(union_ty)
@@ -981,7 +1034,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  final static Parser after_dash_recover_parser_ = new Parser() {
+  static final Parser after_dash_recover_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return after_dash_recover(b, l + 1);
     }
