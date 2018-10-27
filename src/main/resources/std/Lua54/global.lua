@@ -241,8 +241,10 @@ function rawset(table, index, value) end
 --- `index`. a negative number indexes from the end (-1 is the last argument).
 --- Otherwise, `index` must be the string "#", and `select` returns
 --- the total number of extra arguments it received.
+---@generic T
 ---@param index number|string
----@return any
+---@vararg T
+---@return T
 function select(index, ...) end
 
 ---
