@@ -38,6 +38,8 @@ abstract class ArgsInsertHandler : InsertHandler<LookupElement> {
 
     protected abstract fun getParams(): Array<LuaParamInfo>
 
+    protected open val isVarargs = false
+
     protected open val autoInsertParameters: Boolean = LuaSettings.instance.autoInsertParameters
 
     private var mask = -1
@@ -100,7 +102,7 @@ abstract class ArgsInsertHandler : InsertHandler<LookupElement> {
             manager.startTemplate(editor, template)
         } else {
             editor.document.insertString(insertionContext.selectionEndOffset, "()")
-            if (getParams().isEmpty()) {
+            if (getParams().isEmpty() && !isVarargs) {
                 editor.caretModel.moveToOffset(insertionContext.selectionEndOffset)
             } else {
                 editor.caretModel.moveToOffset(insertionContext.selectionEndOffset - 1)

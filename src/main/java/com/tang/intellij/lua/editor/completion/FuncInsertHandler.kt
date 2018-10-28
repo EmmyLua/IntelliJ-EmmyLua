@@ -28,4 +28,7 @@ open class FuncInsertHandler(private val funcBodyOwner: LuaFuncBodyOwner) : Args
     override fun getParams(): Array<LuaParamInfo> {
         return funcBodyOwner.params
     }
+
+    override val isVarargs: Boolean
+        get() = funcBodyOwner.funcBody?.ellipsis != null
 }

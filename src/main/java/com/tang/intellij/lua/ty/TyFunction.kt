@@ -89,8 +89,8 @@ fun IFunSignature.getParamTy(index: Int): ITy {
 }
 
 //eg. print(...)
-fun IFunSignature.hasVarArgs(): Boolean {
-    return params.lastOrNull()?.isVarArgs ?: false
+fun IFunSignature.hasVarargs(): Boolean {
+    return this.varargTy != null
 }
 
 fun IFunSignature.isGeneric() = tyParameters.isNotEmpty()

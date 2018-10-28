@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.ty.IFunSignature
+import com.tang.intellij.lua.ty.hasVarargs
 import com.tang.intellij.lua.ty.processArgs
 
 open class SignatureInsertHandler(val sig: IFunSignature, private val isColonStyle: Boolean = false) : ArgsInsertHandler() {
@@ -35,6 +36,9 @@ open class SignatureInsertHandler(val sig: IFunSignature, private val isColonSty
     }
 
     override fun getParams(): Array<LuaParamInfo> = myParams
+
+    override val isVarargs: Boolean
+        get() = sig.hasVarargs()
 }
 
 /**

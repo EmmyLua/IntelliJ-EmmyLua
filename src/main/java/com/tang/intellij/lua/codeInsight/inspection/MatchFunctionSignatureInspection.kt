@@ -95,7 +95,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                             myHolder.registerProblem(typeInfo.param, "Type mismatch. Required: '${pi.ty}' Found: '$type'")
                         true
                     }
-                    if (nArgs < concreteParams.size && !signature.hasVarArgs()) {
+                    if (nArgs < concreteParams.size && !signature.hasVarargs()) {
                         for (i in nArgs until concreteParams.size) {
                             myHolder.registerProblem(concreteParams[i], "Too many arguments.")
                         }
