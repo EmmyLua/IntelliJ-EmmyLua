@@ -414,6 +414,7 @@
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedClassInspection"/>
 
         <fileTypeDetector implementation="com.tang.intellij.lua.lang.LuaFileTypeDetector"/>
+        <customPasteProvider implementation="com.tang.intellij.lua.codeInsight.editorActions.StringLiteralPasteProvider"/>
     </extensions>
 
     <application-components>
