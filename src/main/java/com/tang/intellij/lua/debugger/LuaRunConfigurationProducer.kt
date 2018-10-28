@@ -18,7 +18,7 @@ package com.tang.intellij.lua.debugger
 
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.RunConfigurationProducer
-import com.intellij.openapi.project.rootManager
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.debugger.app.LuaAppConfigurationType
@@ -42,7 +42,7 @@ class LuaRunConfigurationProducer : RunConfigurationProducer<LuaAppRunConfigurat
 
         val dir = containingFile.parent?.virtualFile
         if (dir != null) {
-            val rootManager = configurationContext.module.rootManager
+            val rootManager = ModuleRootManager.getInstance(configurationContext.module)
             for (root in rootManager.sourceRoots) {
                 luaAppRunConfiguration.workingDir = root.canonicalPath
                 return true
