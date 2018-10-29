@@ -47,6 +47,8 @@ class LuaCompletionContributor : CompletionContributor() {
 
         extend(CompletionType.BASIC, SHOW_REQUIRE_PATH, RequirePathCompletionProvider())
 
+        extend(CompletionType.BASIC, LuaStringArgHistoryProvider.STRING_ARG, LuaStringArgHistoryProvider())
+
         //提示全局函数,local变量,local函数
         extend(CompletionType.BASIC, IN_NAME_EXPR, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.ALL))
 

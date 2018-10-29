@@ -233,6 +233,7 @@
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMemberIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaSuperClassIndex"/>
+        <fileBasedIndex implementation="com.tang.intellij.lua.stubs.index.LuaStringArgIndex"/>
 
         <!--surround descriptors-->
         <lang.surroundDescriptor language="Lua" implementationClass="com.tang.intellij.lua.editor.surroundWith.LuaSurroundDescriptor"/>
