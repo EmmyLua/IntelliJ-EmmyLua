@@ -35,7 +35,7 @@ public class LuaDocTagDefImpl extends ASTWrapperPsiElement implements LuaDocTagD
   @Override
   @NotNull
   public PsiElement getTagName() {
-    return notNullChild(findChildByType(TAG_NAME));
+    return notNullChild(findChildByType(TAG_NAME_NAME));
   }
 
 }

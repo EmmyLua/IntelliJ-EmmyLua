@@ -49,28 +49,28 @@
         RCURLY = "}"
         ARR = '[]'
         FUN = 'fun'
-        TAG_NAME = 'TAG_NAME'
-        TAG_PARAM = 'param'
-        TAG_VARARG = 'vararg'
         OPTIONAL = 'optional'
-        TAG_RETURN = 'return'
         PRIVATE = 'private'
         PROTECTED = 'protected'
         PUBLIC = 'public'
-        TAG_PRIVATE = 'private'
-        TAG_PROTECTED = 'protected'
-        TAG_PUBLIC = 'public'
-        TAG_CLASS = 'class'
-        TAG_FIELD = 'field'
         DASHES = 'DASHES'
         STRING_BEGIN = 'STRING_BEGIN'
         STRING = 'STRING'
-        TAG_TYPE = 'type'
-        TAG_LANGUAGE = 'language'
-        TAG_OVERLOAD = 'overload'
-        TAG_MODULE = 'module'
-        TAG_SEE = 'see'
-        TAG_GENERIC = 'generic'
+        TAG_NAME_RETURN = 'return'
+        TAG_NAME = 'TAG_NAME'
+        TAG_NAME_PARAM = 'param'
+        TAG_NAME_VARARG = 'vararg'
+        TAG_NAME_PRIVATE = 'private'
+        TAG_NAME_PROTECTED = 'protected'
+        TAG_NAME_PUBLIC = 'public'
+        TAG_NAME_CLASS = 'class'
+        TAG_NAME_FIELD = 'field'
+        TAG_NAME_TYPE = 'type'
+        TAG_NAME_LANGUAGE = 'language'
+        TAG_NAME_OVERLOAD = 'overload'
+        TAG_NAME_MODULE = 'module'
+        TAG_NAME_SEE = 'see'
+        TAG_NAME_GENERIC = 'generic'
   ]
   implements(".*def|see_ref_tag") = [
     "com.tang.intellij.lua.comment.psi.LuaDocTag"
@@ -149,7 +149,7 @@ generic_ty ::= general_ty '<' generic_param_list '>' {
 function_param ::= ID (':' ty)? {
     pin = 1
 }
-vararg_param ::= TAG_VARARG ty {
+vararg_param ::= TAG_NAME_VARARG ty {
     pin = 1
     methods = [getType]
 }
@@ -162,9 +162,9 @@ function_ty ::= fun '(' function_param_list ')' (':' type_list)? {
 union_ty ::= ty ('|' ty)+ {
     methods = [getType]
 }
-access_modifier ::= PRIVATE | PUBLIC | PROTECTED | TAG_PRIVATE | TAG_PUBLIC | TAG_PROTECTED
+access_modifier ::= PRIVATE | PUBLIC | PROTECTED | TAG_NAME_PRIVATE | TAG_NAME_PUBLIC | TAG_NAME_PROTECTED
 
-field_def ::= TAG_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string? {
+field_def ::= TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
@@ -187,35 +187,35 @@ field_def ::= TAG_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment
 }
 
 //--- tag
-tag_def ::= TAG_NAME comment_string? {
+tag_def ::= TAG_NAME_NAME comment_string? {
     pin = 1
     methods = [
-        tagName = 'TAG_NAME'
+        tagName = 'TAG_NAME_NAME'
     ]
 }
 
 //@overload
-overload_def ::= TAG_OVERLOAD function_ty { pin = 1 }
+overload_def ::= TAG_NAME_OVERLOAD function_ty { pin = 1 }
 
 //@language json
-lan_def ::= TAG_LANGUAGE ID comment_string? { pin = 1 }
+lan_def ::= TAG_NAME_LANGUAGE ID comment_string? { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_def ::= TAG_PARAM OPTIONAL? param_name_ref ty comment_string? {
+param_def ::= TAG_NAME_PARAM OPTIONAL? param_name_ref ty comment_string? {
     pin = 1
     methods = [getType optional = 'OPTIONAL']
 }
-vararg_def ::= TAG_VARARG ty comment_string? {
+vararg_def ::= TAG_NAME_VARARG ty comment_string? {
     pin = 1
     methods = [getType]
 }
 
 //--- return
 type_list ::= ty(',' ty)*
-return_def ::= TAG_RETURN type_list comment_string? {
+return_def ::= TAG_NAME_RETURN type_list comment_string? {
     pin = 1
     methods = [resolveTypeAt getType]
 }
@@ -223,7 +223,7 @@ return_def ::= TAG_RETURN type_list comment_string? {
 class_name_ref ::= ID {
     methods = [getReference resolveType]
 }
-class_def ::= (TAG_CLASS|TAG_MODULE) ID (EXTENDS class_name_ref)? comment_string? {
+class_def ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comment_string? {
     pin = 2
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
@@ -242,12 +242,12 @@ class_def ::= (TAG_CLASS|TAG_MODULE) ID (EXTENDS class_name_ref)? comment_string
         isDeprecated
 
         superClassNameRef = 'class_name_ref'
-        module = 'TAG_MODULE'
+        module = 'TAG_NAME_MODULE'
     ]
 }
 
 // @type CLASS_REF
-type_def ::= TAG_TYPE ty comment_string? {
+type_def ::= TAG_NAME_TYPE ty comment_string? {
     pin = 1
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTypeDefStub"
     methods = [getType]
@@ -260,7 +260,7 @@ comment_string ::= STRING_BEGIN? STRING? {
     ]
 }
 
-see_ref_tag ::= TAG_SEE class_name_ref (SHARP ID)? {
+see_ref_tag ::= TAG_NAME_SEE class_name_ref (SHARP ID)? {
     pin = 1
     methods = [
         getReference
@@ -281,6 +281,6 @@ generic_def ::= ID (EXTENDS class_name_ref)? {
     ]
 }
 
-generic_list ::= TAG_GENERIC generic_def (',' generic_def)* {
+generic_list ::= TAG_NAME_GENERIC generic_def (',' generic_def)* {
     pin = 1
 }

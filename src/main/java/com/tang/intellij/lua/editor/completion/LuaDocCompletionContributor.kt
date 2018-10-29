@@ -158,14 +158,14 @@ class LuaDocCompletionContributor : CompletionContributor() {
 
         // 在 @param 之后提示 optional
         private val SHOW_OPTIONAL = psiElement().afterLeaf(
-                psiElement(LuaDocTypes.TAG_PARAM))
+                psiElement(LuaDocTypes.TAG_NAME_PARAM))
 
         // 在 extends 之后提示类型
         private val SHOW_CLASS = psiElement().withParent(LuaDocClassNameRef::class.java)
 
         // 在 @field 之后提示 public / protected
         private val SHOW_ACCESS_MODIFIER = psiElement().afterLeaf(
-                psiElement().withElementType(LuaDocTypes.TAG_FIELD)
+                psiElement().withElementType(LuaDocTypes.TAG_NAME_FIELD)
         )
 
         private val SHOW_FIELD = psiElement(LuaDocTypes.ID).inside(LuaDocFieldDef::class.java)

@@ -105,7 +105,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   };
 
   /* ********************************************************** */
-  // PRIVATE | PUBLIC | PROTECTED | TAG_PRIVATE | TAG_PUBLIC | TAG_PROTECTED
+  // PRIVATE | PUBLIC | PROTECTED | TAG_NAME_PRIVATE | TAG_NAME_PUBLIC | TAG_NAME_PROTECTED
   public static boolean access_modifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "access_modifier")) return false;
     boolean r;
@@ -113,9 +113,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, PRIVATE);
     if (!r) r = consumeToken(b, PUBLIC);
     if (!r) r = consumeToken(b, PROTECTED);
-    if (!r) r = consumeToken(b, TAG_PRIVATE);
-    if (!r) r = consumeToken(b, TAG_PUBLIC);
-    if (!r) r = consumeToken(b, TAG_PROTECTED);
+    if (!r) r = consumeToken(b, TAG_NAME_PRIVATE);
+    if (!r) r = consumeToken(b, TAG_NAME_PUBLIC);
+    if (!r) r = consumeToken(b, TAG_NAME_PROTECTED);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -144,10 +144,10 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (TAG_CLASS|TAG_MODULE) ID (EXTENDS class_name_ref)? comment_string?
+  // (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comment_string?
   public static boolean class_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_def")) return false;
-    if (!nextTokenIs(b, "<class def>", TAG_CLASS, TAG_MODULE)) return false;
+    if (!nextTokenIs(b, "<class def>", TAG_NAME_CLASS, TAG_NAME_MODULE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CLASS_DEF, "<class def>");
     r = class_def_0(b, l + 1);
@@ -159,12 +159,12 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // TAG_CLASS|TAG_MODULE
+  // TAG_NAME_CLASS|TAG_NAME_MODULE
   private static boolean class_def_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_def_0")) return false;
     boolean r;
-    r = consumeToken(b, TAG_CLASS);
-    if (!r) r = consumeToken(b, TAG_MODULE);
+    r = consumeToken(b, TAG_NAME_CLASS);
+    if (!r) r = consumeToken(b, TAG_NAME_MODULE);
     return r;
   }
 
@@ -365,13 +365,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string?
+  // TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string?
   public static boolean field_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "field_def")) return false;
-    if (!nextTokenIs(b, TAG_FIELD)) return false;
+    if (!nextTokenIs(b, TAG_NAME_FIELD)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, FIELD_DEF, null);
-    r = consumeToken(b, TAG_FIELD);
+    r = consumeToken(b, TAG_NAME_FIELD);
     p = r; // pin = 1
     r = r && report_error_(b, field_def_1(b, l + 1));
     r = p && report_error_(b, field_def_2(b, l + 1)) && r;
@@ -544,13 +544,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_GENERIC generic_def (',' generic_def)*
+  // TAG_NAME_GENERIC generic_def (',' generic_def)*
   public static boolean generic_list(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_list")) return false;
-    if (!nextTokenIs(b, TAG_GENERIC)) return false;
+    if (!nextTokenIs(b, TAG_NAME_GENERIC)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, GENERIC_LIST, null);
-    r = consumeToken(b, TAG_GENERIC);
+    r = consumeToken(b, TAG_NAME_GENERIC);
     p = r; // pin = 1
     r = r && report_error_(b, generic_def(b, l + 1));
     r = p && generic_list_2(b, l + 1) && r;
@@ -615,13 +615,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_LANGUAGE ID comment_string?
+  // TAG_NAME_LANGUAGE ID comment_string?
   public static boolean lan_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "lan_def")) return false;
-    if (!nextTokenIs(b, TAG_LANGUAGE)) return false;
+    if (!nextTokenIs(b, TAG_NAME_LANGUAGE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, LAN_DEF, null);
-    r = consumeTokens(b, 1, TAG_LANGUAGE, ID);
+    r = consumeTokens(b, 1, TAG_NAME_LANGUAGE, ID);
     p = r; // pin = 1
     r = r && lan_def_2(b, l + 1);
     exit_section_(b, l, m, r, p, null);
@@ -636,13 +636,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_OVERLOAD function_ty
+  // TAG_NAME_OVERLOAD function_ty
   public static boolean overload_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "overload_def")) return false;
-    if (!nextTokenIs(b, TAG_OVERLOAD)) return false;
+    if (!nextTokenIs(b, TAG_NAME_OVERLOAD)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, OVERLOAD_DEF, null);
-    r = consumeToken(b, TAG_OVERLOAD);
+    r = consumeToken(b, TAG_NAME_OVERLOAD);
     p = r; // pin = 1
     r = r && function_ty(b, l + 1);
     exit_section_(b, l, m, r, p, null);
@@ -650,13 +650,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_PARAM OPTIONAL? param_name_ref ty comment_string?
+  // TAG_NAME_PARAM OPTIONAL? param_name_ref ty comment_string?
   public static boolean param_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "param_def")) return false;
-    if (!nextTokenIs(b, TAG_PARAM)) return false;
+    if (!nextTokenIs(b, TAG_NAME_PARAM)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, PARAM_DEF, null);
-    r = consumeToken(b, TAG_PARAM);
+    r = consumeToken(b, TAG_NAME_PARAM);
     p = r; // pin = 1
     r = r && report_error_(b, param_def_1(b, l + 1));
     r = p && report_error_(b, param_name_ref(b, l + 1)) && r;
@@ -693,13 +693,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_RETURN type_list comment_string?
+  // TAG_NAME_RETURN type_list comment_string?
   public static boolean return_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_def")) return false;
-    if (!nextTokenIs(b, TAG_RETURN)) return false;
+    if (!nextTokenIs(b, TAG_NAME_RETURN)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, RETURN_DEF, null);
-    r = consumeToken(b, TAG_RETURN);
+    r = consumeToken(b, TAG_NAME_RETURN);
     p = r; // pin = 1
     r = r && report_error_(b, type_list(b, l + 1));
     r = p && return_def_2(b, l + 1) && r;
@@ -715,13 +715,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_SEE class_name_ref (SHARP ID)?
+  // TAG_NAME_SEE class_name_ref (SHARP ID)?
   public static boolean see_ref_tag(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "see_ref_tag")) return false;
-    if (!nextTokenIs(b, TAG_SEE)) return false;
+    if (!nextTokenIs(b, TAG_NAME_SEE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, SEE_REF_TAG, null);
-    r = consumeToken(b, TAG_SEE);
+    r = consumeToken(b, TAG_NAME_SEE);
     p = r; // pin = 1
     r = r && report_error_(b, class_name_ref(b, l + 1));
     r = p && see_ref_tag_2(b, l + 1) && r;
@@ -788,13 +788,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME comment_string?
+  // TAG_NAME_NAME comment_string?
   public static boolean tag_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_def")) return false;
-    if (!nextTokenIs(b, TAG_NAME)) return false;
+    if (!nextTokenIs(b, TAG_NAME_NAME)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, TAG_DEF, null);
-    r = consumeToken(b, TAG_NAME);
+    r = consumeToken(b, TAG_NAME_NAME);
     p = r; // pin = 1
     r = r && tag_def_1(b, l + 1);
     exit_section_(b, l, m, r, p, null);
@@ -809,13 +809,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_TYPE ty comment_string?
+  // TAG_NAME_TYPE ty comment_string?
   public static boolean type_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_def")) return false;
-    if (!nextTokenIs(b, TAG_TYPE)) return false;
+    if (!nextTokenIs(b, TAG_NAME_TYPE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, TYPE_DEF, null);
-    r = consumeToken(b, TAG_TYPE);
+    r = consumeToken(b, TAG_NAME_TYPE);
     p = r; // pin = 1
     r = r && report_error_(b, ty(b, l + 1, -1));
     r = p && type_def_2(b, l + 1) && r;
@@ -865,13 +865,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_VARARG ty comment_string?
+  // TAG_NAME_VARARG ty comment_string?
   public static boolean vararg_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "vararg_def")) return false;
-    if (!nextTokenIs(b, TAG_VARARG)) return false;
+    if (!nextTokenIs(b, TAG_NAME_VARARG)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, VARARG_DEF, null);
-    r = consumeToken(b, TAG_VARARG);
+    r = consumeToken(b, TAG_NAME_VARARG);
     p = r; // pin = 1
     r = r && report_error_(b, ty(b, l + 1, -1));
     r = p && vararg_def_2(b, l + 1) && r;
@@ -887,13 +887,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_VARARG ty
+  // TAG_NAME_VARARG ty
   public static boolean vararg_param(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "vararg_param")) return false;
-    if (!nextTokenIs(b, TAG_VARARG)) return false;
+    if (!nextTokenIs(b, TAG_NAME_VARARG)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, VARARG_PARAM, null);
-    r = consumeToken(b, TAG_VARARG);
+    r = consumeToken(b, TAG_NAME_VARARG);
     p = r; // pin = 1
     r = r && ty(b, l + 1, -1);
     exit_section_(b, l, m, r, p, null);

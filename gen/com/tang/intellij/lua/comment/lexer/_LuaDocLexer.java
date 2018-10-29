@@ -877,7 +877,7 @@ public class _LuaDocLexer implements FlexLexer, LuaDocTypes {
             // fall through
           case 79: break;
           case 31: 
-            { yybegin(xTAG); return TAG_SEE;
+            { yybegin(xTAG); return TAG_NAME_SEE;
             } 
             // fall through
           case 80: break;
@@ -887,47 +887,47 @@ public class _LuaDocLexer implements FlexLexer, LuaDocTypes {
             // fall through
           case 81: break;
           case 33: 
-            { beginType(); return TAG_TYPE;
+            { beginType(); return TAG_NAME_TYPE;
             } 
             // fall through
           case 82: break;
           case 34: 
-            { yybegin(xFIELD); return TAG_FIELD;
+            { yybegin(xFIELD); return TAG_NAME_FIELD;
             } 
             // fall through
           case 83: break;
           case 35: 
-            { yybegin(xPARAM); return TAG_PARAM;
+            { yybegin(xPARAM); return TAG_NAME_PARAM;
             } 
             // fall through
           case 84: break;
           case 36: 
-            { yybegin(xCLASS); return TAG_CLASS;
+            { yybegin(xCLASS); return TAG_NAME_CLASS;
             } 
             // fall through
           case 85: break;
           case 37: 
-            { return TAG_PUBLIC;
+            { return TAG_NAME_PUBLIC;
             } 
             // fall through
           case 86: break;
           case 38: 
-            { beginType(); return TAG_RETURN;
+            { beginType(); return TAG_NAME_RETURN;
             } 
             // fall through
           case 87: break;
           case 39: 
-            { yybegin(xCLASS); return TAG_MODULE;
+            { yybegin(xCLASS); return TAG_NAME_MODULE;
             } 
             // fall through
           case 88: break;
           case 40: 
-            { yybegin(xPARAM); return TAG_VARARG;
+            { yybegin(xPARAM); return TAG_NAME_VARARG;
             } 
             // fall through
           case 89: break;
           case 41: 
-            { _typeReq = true; return TAG_VARARG;
+            { _typeReq = true; return TAG_NAME_VARARG;
             } 
             // fall through
           case 90: break;
@@ -937,12 +937,12 @@ public class _LuaDocLexer implements FlexLexer, LuaDocTypes {
             // fall through
           case 91: break;
           case 43: 
-            { return TAG_PRIVATE;
+            { return TAG_NAME_PRIVATE;
             } 
             // fall through
           case 92: break;
           case 44: 
-            { yybegin(xGENERIC); return TAG_GENERIC;
+            { yybegin(xGENERIC); return TAG_NAME_GENERIC;
             } 
             // fall through
           case 93: break;
@@ -952,17 +952,17 @@ public class _LuaDocLexer implements FlexLexer, LuaDocTypes {
             // fall through
           case 94: break;
           case 46: 
-            { yybegin(xTAG_WITH_ID); return TAG_LANGUAGE;
+            { yybegin(xTAG_WITH_ID); return TAG_NAME_LANGUAGE;
             } 
             // fall through
           case 95: break;
           case 47: 
-            { beginType(); return TAG_OVERLOAD;
+            { beginType(); return TAG_NAME_OVERLOAD;
             } 
             // fall through
           case 96: break;
           case 48: 
-            { return TAG_PROTECTED;
+            { return TAG_NAME_PROTECTED;
             } 
             // fall through
           case 97: break;

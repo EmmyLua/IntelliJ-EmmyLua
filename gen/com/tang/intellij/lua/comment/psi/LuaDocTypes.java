@@ -61,21 +61,22 @@ public interface LuaDocTypes {
   IElementType SHARP = new LuaDocTokenType("#");
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
-  IElementType TAG_CLASS = new LuaDocTokenType("class");
-  IElementType TAG_FIELD = new LuaDocTokenType("field");
-  IElementType TAG_GENERIC = new LuaDocTokenType("generic");
-  IElementType TAG_LANGUAGE = new LuaDocTokenType("language");
-  IElementType TAG_MODULE = new LuaDocTokenType("module");
   IElementType TAG_NAME = new LuaDocTokenType("TAG_NAME");
-  IElementType TAG_OVERLOAD = new LuaDocTokenType("overload");
-  IElementType TAG_PARAM = new LuaDocTokenType("param");
-  IElementType TAG_PRIVATE = new LuaDocTokenType("private");
-  IElementType TAG_PROTECTED = new LuaDocTokenType("protected");
-  IElementType TAG_PUBLIC = new LuaDocTokenType("public");
-  IElementType TAG_RETURN = new LuaDocTokenType("return");
-  IElementType TAG_SEE = new LuaDocTokenType("see");
-  IElementType TAG_TYPE = new LuaDocTokenType("type");
-  IElementType TAG_VARARG = new LuaDocTokenType("vararg");
+  IElementType TAG_NAME_CLASS = new LuaDocTokenType("class");
+  IElementType TAG_NAME_FIELD = new LuaDocTokenType("field");
+  IElementType TAG_NAME_GENERIC = new LuaDocTokenType("generic");
+  IElementType TAG_NAME_LANGUAGE = new LuaDocTokenType("language");
+  IElementType TAG_NAME_MODULE = new LuaDocTokenType("module");
+  IElementType TAG_NAME_NAME = new LuaDocTokenType("TAG_NAME_NAME");
+  IElementType TAG_NAME_OVERLOAD = new LuaDocTokenType("overload");
+  IElementType TAG_NAME_PARAM = new LuaDocTokenType("param");
+  IElementType TAG_NAME_PRIVATE = new LuaDocTokenType("private");
+  IElementType TAG_NAME_PROTECTED = new LuaDocTokenType("protected");
+  IElementType TAG_NAME_PUBLIC = new LuaDocTokenType("public");
+  IElementType TAG_NAME_RETURN = new LuaDocTokenType("return");
+  IElementType TAG_NAME_SEE = new LuaDocTokenType("see");
+  IElementType TAG_NAME_TYPE = new LuaDocTokenType("type");
+  IElementType TAG_NAME_VARARG = new LuaDocTokenType("vararg");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
