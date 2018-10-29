@@ -10,16 +10,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
-import com.tang.intellij.lua.ty.ITy;
+import com.intellij.psi.PsiReference;
 
-public class LuaDocParamDefImpl extends ASTWrapperPsiElement implements LuaDocParamDef {
+public class LuaDocTagSeeImpl extends ASTWrapperPsiElement implements LuaDocTagSee {
 
-  public LuaDocParamDefImpl(@NotNull ASTNode node) {
+  public LuaDocTagSeeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitParamDef(this);
+    visitor.visitTagSee(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -29,31 +29,19 @@ public class LuaDocParamDefImpl extends ASTWrapperPsiElement implements LuaDocPa
 
   @Override
   @Nullable
-  public LuaDocCommentString getCommentString() {
-    return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
+  public LuaDocClassNameRef getClassNameRef() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocClassNameRef.class);
   }
 
   @Override
   @Nullable
-  public LuaDocParamNameRef getParamNameRef() {
-    return PsiTreeUtil.getChildOfType(this, LuaDocParamNameRef.class);
+  public PsiElement getId() {
+    return findChildByType(ID);
   }
 
-  @Override
   @Nullable
-  public LuaDocTy getTy() {
-    return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
-  }
-
-  @NotNull
-  public ITy getType() {
-    return LuaDocPsiImplUtilKt.getType(this);
-  }
-
-  @Override
-  @Nullable
-  public PsiElement getOptional() {
-    return findChildByType(OPTIONAL);
+  public PsiReference getReference() {
+    return LuaDocPsiImplUtilKt.getReference(this);
   }
 
 }

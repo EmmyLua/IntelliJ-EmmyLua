@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocTableDefStub;
 
-public interface LuaDocTableDef extends LuaDocTag, StubBasedPsiElement<LuaDocTableDefStub> {
+public interface LuaDocTableDef extends LuaDocPsiElement, StubBasedPsiElement<LuaDocTableDefStub> {
 
   @NotNull
   List<LuaDocTableField> getTableFieldList();

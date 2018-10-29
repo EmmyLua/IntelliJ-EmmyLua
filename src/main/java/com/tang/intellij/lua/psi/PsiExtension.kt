@@ -26,9 +26,9 @@ import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
-import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagOverload
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
@@ -222,7 +222,7 @@ val LuaFuncBodyOwner.overloads: Array<IFunSignature> get() {
     if (this is LuaCommentOwner) {
         val comment = comment
         if (comment != null) {
-            val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocOverloadDef::class.java)
+            val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocTagOverload::class.java)
             val colonCall = this is LuaClassMethodDef && !this.isStatic
             children.forEach {
                 val fty = it.functionTy
@@ -307,15 +307,15 @@ val LuaLiteralExpr.numberValue: Float get() {
 }
 
 val LuaComment.docTy: ITy? get() {
-    return this.typeDef?.type
+    return this.tagType?.type
 }
 
 val LuaComment.ty: ITy? get() {
-    val cls = classDef?.type
-    return cls ?: typeDef?.type
+    val cls = tagClass?.type
+    return cls ?: tagType?.type
 }
 
-val LuaDocClassDef.aliasName: String? get() {
+val LuaDocTagClass.aliasName: String? get() {
     val owner = LuaCommentUtil.findOwner(this)
     when (owner) {
         is LuaAssignStat -> {

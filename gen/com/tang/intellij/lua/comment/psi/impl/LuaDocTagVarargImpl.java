@@ -10,15 +10,16 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
+import com.tang.intellij.lua.ty.ITy;
 
-public class LuaDocGenericListImpl extends ASTWrapperPsiElement implements LuaDocGenericList {
+public class LuaDocTagVarargImpl extends ASTWrapperPsiElement implements LuaDocTagVararg {
 
-  public LuaDocGenericListImpl(@NotNull ASTNode node) {
+  public LuaDocTagVarargImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitGenericList(this);
+    visitor.visitTagVararg(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -27,9 +28,20 @@ public class LuaDocGenericListImpl extends ASTWrapperPsiElement implements LuaDo
   }
 
   @Override
+  @Nullable
+  public LuaDocCommentString getCommentString() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocCommentString.class);
+  }
+
+  @Override
+  @Nullable
+  public LuaDocTy getTy() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
+  }
+
   @NotNull
-  public List<LuaDocGenericDef> getGenericDefList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocGenericDef.class);
+  public ITy getType() {
+    return LuaDocPsiImplUtilKt.getType(this);
   }
 
 }

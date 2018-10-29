@@ -24,7 +24,7 @@ import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.LuaBundle
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 
@@ -35,7 +35,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassIndex
 class DuplicateClassDeclaration : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor {
         return object : LuaDocVisitor() {
-            override fun visitClassDef(o: LuaDocClassDef) {
+            override fun visitTagClass(o: LuaDocTagClass) {
                 val useScope = o.useScope as? GlobalSearchScope ?: return
                 val identifier = o.nameIdentifier
                 LuaClassIndex.process(identifier.text, o.project, useScope, Processor {

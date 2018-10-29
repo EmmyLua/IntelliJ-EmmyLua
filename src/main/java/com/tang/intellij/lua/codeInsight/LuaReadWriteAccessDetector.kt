@@ -19,9 +19,9 @@ package com.tang.intellij.lua.codeInsight
 import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.comment.psi.LuaDocParamNameRef
 import com.tang.intellij.lua.psi.*
 
@@ -43,10 +43,10 @@ class LuaReadWriteAccessDetector : ReadWriteAccessDetector() {
                 else Access.Read
             }
             is LuaIndexExpr -> Access.Read
-            is LuaDocClassDef -> Access.Write
+            is LuaDocTagClass -> Access.Write
             is LuaDocClassNameRef -> Access.Read
             is LuaDocParamNameRef -> Access.Read
-            is LuaDocFieldDef -> Access.Write
+            is LuaDocTagField -> Access.Write
             else -> return Access.ReadWrite
         }
     }

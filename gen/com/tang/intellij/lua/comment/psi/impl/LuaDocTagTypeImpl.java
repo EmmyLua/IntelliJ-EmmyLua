@@ -15,22 +15,22 @@ import com.tang.intellij.lua.ty.ITy;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaDocTypeDefImpl extends StubBasedPsiElementBase<LuaDocTypeDefStub> implements LuaDocTypeDef {
+public class LuaDocTagTypeImpl extends StubBasedPsiElementBase<LuaDocTypeDefStub> implements LuaDocTagType {
 
-  public LuaDocTypeDefImpl(@NotNull LuaDocTypeDefStub stub, @NotNull IStubElementType type) {
+  public LuaDocTagTypeImpl(@NotNull LuaDocTypeDefStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaDocTypeDefImpl(@NotNull ASTNode node) {
+  public LuaDocTagTypeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaDocTypeDefImpl(LuaDocTypeDefStub stub, IElementType type, ASTNode node) {
+  public LuaDocTagTypeImpl(LuaDocTypeDefStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitTypeDef(this);
+    visitor.visitTagType(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

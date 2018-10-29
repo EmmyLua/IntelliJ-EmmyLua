@@ -11,32 +11,32 @@ public interface LuaDocTypes {
 
   IElementType ACCESS_MODIFIER = LuaParserDefinitionKt.createDocType("ACCESS_MODIFIER");
   IElementType ARR_TY = LuaParserDefinitionKt.createDocType("ARR_TY");
-  IElementType CLASS_DEF = LuaParserDefinitionKt.createDocType("CLASS_DEF");
   IElementType CLASS_NAME_REF = LuaParserDefinitionKt.createDocType("CLASS_NAME_REF");
   IElementType COMMENT_STRING = LuaParserDefinitionKt.createDocType("COMMENT_STRING");
-  IElementType FIELD_DEF = LuaParserDefinitionKt.createDocType("FIELD_DEF");
   IElementType FUNCTION_PARAM = LuaParserDefinitionKt.createDocType("FUNCTION_PARAM");
   IElementType FUNCTION_TY = LuaParserDefinitionKt.createDocType("FUNCTION_TY");
   IElementType GENERAL_TY = LuaParserDefinitionKt.createDocType("GENERAL_TY");
   IElementType GENERIC_DEF = LuaParserDefinitionKt.createDocType("GENERIC_DEF");
-  IElementType GENERIC_LIST = LuaParserDefinitionKt.createDocType("GENERIC_LIST");
   IElementType GENERIC_TY = LuaParserDefinitionKt.createDocType("GENERIC_TY");
-  IElementType LAN_DEF = LuaParserDefinitionKt.createDocType("LAN_DEF");
-  IElementType OVERLOAD_DEF = LuaParserDefinitionKt.createDocType("OVERLOAD_DEF");
-  IElementType PARAM_DEF = LuaParserDefinitionKt.createDocType("PARAM_DEF");
   IElementType PARAM_NAME_REF = LuaParserDefinitionKt.createDocType("PARAM_NAME_REF");
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
-  IElementType RETURN_DEF = LuaParserDefinitionKt.createDocType("RETURN_DEF");
-  IElementType SEE_REF_TAG = LuaParserDefinitionKt.createDocType("SEE_REF_TAG");
   IElementType TABLE_DEF = LuaParserDefinitionKt.createDocType("TABLE_DEF");
   IElementType TABLE_FIELD = LuaParserDefinitionKt.createDocType("TABLE_FIELD");
   IElementType TABLE_TY = LuaParserDefinitionKt.createDocType("TABLE_TY");
+  IElementType TAG_CLASS = LuaParserDefinitionKt.createDocType("TAG_CLASS");
   IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
+  IElementType TAG_FIELD = LuaParserDefinitionKt.createDocType("TAG_FIELD");
+  IElementType TAG_GENERIC_LIST = LuaParserDefinitionKt.createDocType("TAG_GENERIC_LIST");
+  IElementType TAG_LAN = LuaParserDefinitionKt.createDocType("TAG_LAN");
+  IElementType TAG_OVERLOAD = LuaParserDefinitionKt.createDocType("TAG_OVERLOAD");
+  IElementType TAG_PARAM = LuaParserDefinitionKt.createDocType("TAG_PARAM");
+  IElementType TAG_RETURN = LuaParserDefinitionKt.createDocType("TAG_RETURN");
+  IElementType TAG_SEE = LuaParserDefinitionKt.createDocType("TAG_SEE");
+  IElementType TAG_TYPE = LuaParserDefinitionKt.createDocType("TAG_TYPE");
+  IElementType TAG_VARARG = LuaParserDefinitionKt.createDocType("TAG_VARARG");
   IElementType TY = LuaParserDefinitionKt.createDocType("TY");
-  IElementType TYPE_DEF = LuaParserDefinitionKt.createDocType("TYPE_DEF");
   IElementType TYPE_LIST = LuaParserDefinitionKt.createDocType("TYPE_LIST");
   IElementType UNION_TY = LuaParserDefinitionKt.createDocType("UNION_TY");
-  IElementType VARARG_DEF = LuaParserDefinitionKt.createDocType("VARARG_DEF");
   IElementType VARARG_PARAM = LuaParserDefinitionKt.createDocType("VARARG_PARAM");
 
   IElementType ARR = new LuaDocTokenType("[]");
@@ -87,17 +87,11 @@ public interface LuaDocTypes {
       else if (type == ARR_TY) {
         return new LuaDocArrTyImpl(node);
       }
-      else if (type == CLASS_DEF) {
-        return new LuaDocClassDefImpl(node);
-      }
       else if (type == CLASS_NAME_REF) {
         return new LuaDocClassNameRefImpl(node);
       }
       else if (type == COMMENT_STRING) {
         return new LuaDocCommentStringImpl(node);
-      }
-      else if (type == FIELD_DEF) {
-        return new LuaDocFieldDefImpl(node);
       }
       else if (type == FUNCTION_PARAM) {
         return new LuaDocFunctionParamImpl(node);
@@ -111,32 +105,14 @@ public interface LuaDocTypes {
       else if (type == GENERIC_DEF) {
         return new LuaDocGenericDefImpl(node);
       }
-      else if (type == GENERIC_LIST) {
-        return new LuaDocGenericListImpl(node);
-      }
       else if (type == GENERIC_TY) {
         return new LuaDocGenericTyImpl(node);
-      }
-      else if (type == LAN_DEF) {
-        return new LuaDocLanDefImpl(node);
-      }
-      else if (type == OVERLOAD_DEF) {
-        return new LuaDocOverloadDefImpl(node);
-      }
-      else if (type == PARAM_DEF) {
-        return new LuaDocParamDefImpl(node);
       }
       else if (type == PARAM_NAME_REF) {
         return new LuaDocParamNameRefImpl(node);
       }
       else if (type == PAR_TY) {
         return new LuaDocParTyImpl(node);
-      }
-      else if (type == RETURN_DEF) {
-        return new LuaDocReturnDefImpl(node);
-      }
-      else if (type == SEE_REF_TAG) {
-        return new LuaDocSeeRefTagImpl(node);
       }
       else if (type == TABLE_DEF) {
         return new LuaDocTableDefImpl(node);
@@ -147,20 +123,44 @@ public interface LuaDocTypes {
       else if (type == TABLE_TY) {
         return new LuaDocTableTyImpl(node);
       }
+      else if (type == TAG_CLASS) {
+        return new LuaDocTagClassImpl(node);
+      }
       else if (type == TAG_DEF) {
         return new LuaDocTagDefImpl(node);
       }
-      else if (type == TYPE_DEF) {
-        return new LuaDocTypeDefImpl(node);
+      else if (type == TAG_FIELD) {
+        return new LuaDocTagFieldImpl(node);
+      }
+      else if (type == TAG_GENERIC_LIST) {
+        return new LuaDocTagGenericListImpl(node);
+      }
+      else if (type == TAG_LAN) {
+        return new LuaDocTagLanImpl(node);
+      }
+      else if (type == TAG_OVERLOAD) {
+        return new LuaDocTagOverloadImpl(node);
+      }
+      else if (type == TAG_PARAM) {
+        return new LuaDocTagParamImpl(node);
+      }
+      else if (type == TAG_RETURN) {
+        return new LuaDocTagReturnImpl(node);
+      }
+      else if (type == TAG_SEE) {
+        return new LuaDocTagSeeImpl(node);
+      }
+      else if (type == TAG_TYPE) {
+        return new LuaDocTagTypeImpl(node);
+      }
+      else if (type == TAG_VARARG) {
+        return new LuaDocTagVarargImpl(node);
       }
       else if (type == TYPE_LIST) {
         return new LuaDocTypeListImpl(node);
       }
       else if (type == UNION_TY) {
         return new LuaDocUnionTyImpl(node);
-      }
-      else if (type == VARARG_DEF) {
-        return new LuaDocVarargDefImpl(node);
       }
       else if (type == VARARG_PARAM) {
         return new LuaDocVarargParamImpl(node);

@@ -21,7 +21,7 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
@@ -51,7 +51,7 @@ class LuaDeprecationInspection : LocalInspectionTool() {
             val resolve = o.reference?.resolve() ?: o
             val isDeprecated = when (resolve) {
                 is LuaClassMember -> resolve.isDeprecated
-                is LuaDocClassDef -> resolve.isDeprecated
+                is LuaDocTagClass -> resolve.isDeprecated
                 else -> false
             }
             if (isDeprecated) action()

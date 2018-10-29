@@ -11,14 +11,14 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
 
-public class LuaDocLanDefImpl extends ASTWrapperPsiElement implements LuaDocLanDef {
+public class LuaDocTagLanImpl extends ASTWrapperPsiElement implements LuaDocTagLan {
 
-  public LuaDocLanDefImpl(@NotNull ASTNode node) {
+  public LuaDocTagLanImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitLanDef(this);
+    visitor.visitTagLan(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

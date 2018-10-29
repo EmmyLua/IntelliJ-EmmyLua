@@ -207,11 +207,11 @@ fun createToken(string: String): IElementType {
 
 fun createDocType(string: String): IElementType {
     return when (string) {
-        "CLASS_DEF" -> LuaElementType.CLASS_DEF
-        "FIELD_DEF" -> LuaElementType.CLASS_FIELD_DEF
+        "TAG_CLASS" -> LuaElementType.CLASS_DEF
+        "TAG_FIELD" -> LuaElementType.CLASS_FIELD_DEF
         "TABLE_DEF" -> LuaElementType.DOC_TABLE_DEF
         "TABLE_FIELD" -> LuaElementType.DOC_TABLE_FIELD_DEF
-        else -> if ("TYPE_DEF" == string) LuaElementType.TYPE_DEF else LuaDocElementType(string)
+        else -> if ("TAG_TYPE" == string) LuaElementType.TYPE_DEF else LuaDocElementType(string)
     }
 
 }

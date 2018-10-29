@@ -6,7 +6,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 
-public interface LuaDocGenericDef extends PsiNameIdentifierOwner, LuaDocPsiElement, LuaDocTag {
+public interface LuaDocGenericDef extends PsiNameIdentifierOwner, LuaDocPsiElement {
 
   @Nullable
   LuaDocClassNameRef getClassNameRef();

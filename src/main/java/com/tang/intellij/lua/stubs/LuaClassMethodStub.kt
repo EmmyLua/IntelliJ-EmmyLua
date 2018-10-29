@@ -61,7 +61,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val visibility = methodDef.visibility
         flags = BitUtil.set(flags, visibility.bitMask, true)
 
-        val retDocTy = methodDef.comment?.returnDef?.type
+        val retDocTy = methodDef.comment?.tagReturn?.type
         val params = methodDef.params
         val overloads = methodDef.overloads
         val tyParams = methodDef.tyParams

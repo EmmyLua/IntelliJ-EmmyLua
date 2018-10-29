@@ -11,14 +11,14 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
 
-public class LuaDocOverloadDefImpl extends ASTWrapperPsiElement implements LuaDocOverloadDef {
+public class LuaDocTagOverloadImpl extends ASTWrapperPsiElement implements LuaDocTagOverload {
 
-  public LuaDocOverloadDefImpl(@NotNull ASTNode node) {
+  public LuaDocTagOverloadImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitOverloadDef(this);
+    visitor.visitTagOverload(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

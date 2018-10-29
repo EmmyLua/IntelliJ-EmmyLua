@@ -21,7 +21,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocTableDef
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
@@ -201,13 +201,13 @@ abstract class TyClass(override val className: String,
     }
 }
 
-class TyPsiDocClass(val classDef: LuaDocClassDef) : TyClass(classDef.name) {
+class TyPsiDocClass(val tagClass: LuaDocTagClass) : TyClass(tagClass.name) {
 
     init {
-        val supperRef = classDef.superClassNameRef
+        val supperRef = tagClass.superClassNameRef
         if (supperRef != null)
             superClassName = supperRef.text
-        aliasName = classDef.aliasName
+        aliasName = tagClass.aliasName
     }
 
     override fun doLazyInit(searchContext: SearchContext) {}

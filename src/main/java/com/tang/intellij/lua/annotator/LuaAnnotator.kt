@@ -218,8 +218,8 @@ class LuaAnnotator : Annotator {
     }
 
     internal inner class LuaDocElementVisitor : LuaDocVisitor() {
-        override fun visitClassDef(o: LuaDocClassDef) {
-            super.visitClassDef(o)
+        override fun visitTagClass(o: LuaDocTagClass) {
+            super.visitTagClass(o)
             val annotation = createInfoAnnotation(o.id, null)
             annotation.textAttributes = LuaHighlightingData.CLASS_NAME
         }
@@ -229,8 +229,8 @@ class LuaAnnotator : Annotator {
             annotation.textAttributes = LuaHighlightingData.CLASS_REFERENCE
         }
 
-        override fun visitFieldDef(o: LuaDocFieldDef) {
-            super.visitFieldDef(o)
+        override fun visitTagField(o: LuaDocTagField) {
+            super.visitTagField(o)
             val id = o.nameIdentifier
             if (id != null) {
                 val annotation = createInfoAnnotation(id, null)

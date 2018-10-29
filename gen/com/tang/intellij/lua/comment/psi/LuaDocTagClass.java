@@ -10,7 +10,7 @@ import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.ty.ITyClass;
 
-public interface LuaDocClassDef extends LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocClassStub> {
+public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocClassStub> {
 
   @Nullable
   LuaDocCommentString getCommentString();

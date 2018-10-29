@@ -22,8 +22,8 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
+import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
 import com.tang.intellij.lua.ext.ILuaTypeInfer
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
@@ -42,7 +42,7 @@ internal fun inferInner(element: LuaTypeGuessable, context: SearchContext): ITy 
         is LuaExpr -> inferExpr(element, context)
         is LuaParamNameDef -> element.infer(context)
         is LuaNameDef -> element.infer(context)
-        is LuaDocFieldDef -> element.infer()
+        is LuaDocTagField -> element.infer()
         is LuaTableField -> element.infer(context)
         is LuaPsiFile -> inferFile(element, context)
         else -> Ty.UNKNOWN
@@ -64,7 +64,7 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
     if (owner is LuaCommentOwner) {
         val comment = LuaCommentUtil.findComment(owner)
         if (comment != null) {
-            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
+            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocTagReturn::class.java)
             if (returnDef != null) {
                 //return returnDef.resolveTypeAt(searchContext.index)
                 return returnDef.type
@@ -150,7 +150,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
     return type
 }
 
-private fun LuaDocFieldDef.infer(): ITy {
+private fun LuaDocTagField.infer(): ITy {
     val stub = stub
     if (stub != null)
         return stub.type

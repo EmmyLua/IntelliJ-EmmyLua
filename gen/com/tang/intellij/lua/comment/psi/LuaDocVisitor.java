@@ -16,24 +16,12 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
-  public void visitClassDef(@NotNull LuaDocClassDef o) {
-    visitPsiElement(o);
-    // visitPsiNameIdentifierOwner(o);
-    // visitTag(o);
-  }
-
   public void visitClassNameRef(@NotNull LuaDocClassNameRef o) {
     visitPsiElement(o);
   }
 
   public void visitCommentString(@NotNull LuaDocCommentString o) {
     visitPsiElement(o);
-  }
-
-  public void visitFieldDef(@NotNull LuaDocFieldDef o) {
-    visitLuaClassField(o);
-    // visitPsiNameIdentifierOwner(o);
-    // visitTag(o);
   }
 
   public void visitFunctionParam(@NotNull LuaDocFunctionParam o) {
@@ -50,43 +38,18 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitGenericDef(@NotNull LuaDocGenericDef o) {
     visitPsiNameIdentifierOwner(o);
-    // visitTag(o);
-  }
-
-  public void visitGenericList(@NotNull LuaDocGenericList o) {
-    visitPsiElement(o);
   }
 
   public void visitGenericTy(@NotNull LuaDocGenericTy o) {
     visitTy(o);
   }
 
-  public void visitLanDef(@NotNull LuaDocLanDef o) {
-    visitTag(o);
-  }
-
-  public void visitOverloadDef(@NotNull LuaDocOverloadDef o) {
-    visitTag(o);
-  }
-
   public void visitParTy(@NotNull LuaDocParTy o) {
     visitTy(o);
   }
 
-  public void visitParamDef(@NotNull LuaDocParamDef o) {
-    visitTag(o);
-  }
-
   public void visitParamNameRef(@NotNull LuaDocParamNameRef o) {
     visitPsiElement(o);
-  }
-
-  public void visitReturnDef(@NotNull LuaDocReturnDef o) {
-    visitTag(o);
-  }
-
-  public void visitSeeRefTag(@NotNull LuaDocSeeRefTag o) {
-    visitTag(o);
   }
 
   public void visitTableField(@NotNull LuaDocTableField o) {
@@ -96,23 +59,63 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitTableDef(@NotNull LuaDocTableDef o) {
-    visitTag(o);
+    visitPsiElement(o);
   }
 
   public void visitTableTy(@NotNull LuaDocTableTy o) {
     visitTy(o);
   }
 
+  public void visitTagClass(@NotNull LuaDocTagClass o) {
+    visitPsiElement(o);
+    // visitPsiNameIdentifierOwner(o);
+    // visitTag(o);
+  }
+
   public void visitTagDef(@NotNull LuaDocTagDef o) {
+    visitTag(o);
+  }
+
+  public void visitTagField(@NotNull LuaDocTagField o) {
+    visitLuaClassField(o);
+    // visitPsiNameIdentifierOwner(o);
+    // visitTag(o);
+  }
+
+  public void visitTagGenericList(@NotNull LuaDocTagGenericList o) {
+    visitTag(o);
+  }
+
+  public void visitTagLan(@NotNull LuaDocTagLan o) {
+    visitTag(o);
+  }
+
+  public void visitTagOverload(@NotNull LuaDocTagOverload o) {
+    visitTag(o);
+  }
+
+  public void visitTagParam(@NotNull LuaDocTagParam o) {
+    visitTag(o);
+  }
+
+  public void visitTagReturn(@NotNull LuaDocTagReturn o) {
+    visitTag(o);
+  }
+
+  public void visitTagSee(@NotNull LuaDocTagSee o) {
+    visitTag(o);
+  }
+
+  public void visitTagType(@NotNull LuaDocTagType o) {
+    visitTag(o);
+  }
+
+  public void visitTagVararg(@NotNull LuaDocTagVararg o) {
     visitTag(o);
   }
 
   public void visitTy(@NotNull LuaDocTy o) {
     visitType(o);
-  }
-
-  public void visitTypeDef(@NotNull LuaDocTypeDef o) {
-    visitTag(o);
   }
 
   public void visitTypeList(@NotNull LuaDocTypeList o) {
@@ -121,10 +124,6 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitUnionTy(@NotNull LuaDocUnionTy o) {
     visitTy(o);
-  }
-
-  public void visitVarargDef(@NotNull LuaDocVarargDef o) {
-    visitTag(o);
   }
 
   public void visitVarargParam(@NotNull LuaDocVarargParam o) {

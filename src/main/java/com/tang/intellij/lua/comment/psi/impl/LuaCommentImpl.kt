@@ -65,7 +65,7 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
 
     override val moduleName: String?
         get() {
-            val classDef = PsiTreeUtil.getChildOfType(this, LuaDocClassDef::class.java)
+            val classDef = PsiTreeUtil.getChildOfType(this, LuaDocTagClass::class.java)
             if (classDef != null && classDef.module != null) {
                 return classDef.name
             }
@@ -75,10 +75,10 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
     override val isDeprecated: Boolean
         get() = findTags("deprecated").isNotEmpty()
 
-    override fun getParamDef(name: String): LuaDocParamDef? {
+    override fun getParamDef(name: String): LuaDocTagParam? {
         var element: PsiElement? = firstChild
         while (element != null) {
-            if (element is LuaDocParamDef) {
+            if (element is LuaDocTagParam) {
                 val nameRef = element.paramNameRef
                 if (nameRef != null && nameRef.text == name)
                     return element
@@ -88,10 +88,10 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
         return null
     }
 
-    override fun getFieldDef(name: String): LuaDocFieldDef? {
+    override fun getFieldDef(name: String): LuaDocTagField? {
         var element: PsiElement? = firstChild
         while (element != null) {
-            if (element is LuaDocFieldDef) {
+            if (element is LuaDocTagField) {
                 val nameRef = element.fieldName
                 if (nameRef != null && nameRef == name)
                     return element
@@ -101,11 +101,11 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
         return null
     }
 
-    override val classDef: LuaDocClassDef?
+    override val tagClass: LuaDocTagClass?
         get() {
         var element: PsiElement? = firstChild
         while (element != null) {
-            if (element is LuaDocClassDef) {
+            if (element is LuaDocTagClass) {
                 return element
             }
             element = element.nextSibling
@@ -113,11 +113,11 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
         return null
     }
 
-    override val returnDef: LuaDocReturnDef?
+    override val tagReturn: LuaDocTagReturn?
         get() {
             var element: PsiElement? = firstChild
             while (element != null) {
-                if (element is LuaDocReturnDef) {
+                if (element is LuaDocTagReturn) {
                     return element
                 }
                 element = element.nextSibling
@@ -125,11 +125,11 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
             return null
         }
 
-    override val typeDef: LuaDocTypeDef?
+    override val tagType: LuaDocTagType?
         get() {
         var element: PsiElement? = firstChild
         while (element != null) {
-            if (element is LuaDocTypeDef) {
+            if (element is LuaDocTagType) {
                 return element
             }
             element = element.nextSibling
@@ -138,10 +138,10 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
     }
 
     override fun guessType(context: SearchContext): ITy {
-        val classDef = classDef
+        val classDef = tagClass
         if (classDef != null)
             return classDef.type
-        val typeDef = typeDef
+        val typeDef = tagType
         return typeDef?.type ?: Ty.UNKNOWN
     }
 

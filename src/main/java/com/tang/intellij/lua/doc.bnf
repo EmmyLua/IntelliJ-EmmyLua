@@ -72,7 +72,7 @@
         TAG_NAME_SEE = 'see'
         TAG_NAME_GENERIC = 'generic'
   ]
-  implements(".*def|see_ref_tag") = [
+  implements("tag.*") = [
     "com.tang.intellij.lua.comment.psi.LuaDocTag"
   ]
 }
@@ -81,18 +81,18 @@ doc ::= (DASHES after_dash?)*
 
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
-private doc_item ::= '@' (param_def
-    | vararg_def
-    | return_def
-    | class_def
-    | field_def
-    | type_def
-    | lan_def
-    | overload_def
-    | see_ref_tag
+private doc_item ::= '@' (tag_param
+    | tag_vararg
+    | tag_return
+    | tag_class
+    | tag_field
+    | tag_type
+    | tag_lan
+    | tag_overload
+    | tag_see
     | tag_def
     | access_modifier
-    | generic_list)
+    | tag_generic_list)
 
 ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
@@ -164,7 +164,7 @@ union_ty ::= ty ('|' ty)+ {
 }
 access_modifier ::= PRIVATE | PUBLIC | PROTECTED | TAG_NAME_PRIVATE | TAG_NAME_PUBLIC | TAG_NAME_PROTECTED
 
-field_def ::= TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string? {
+tag_field ::= TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
@@ -195,27 +195,27 @@ tag_def ::= TAG_NAME_NAME comment_string? {
 }
 
 //@overload
-overload_def ::= TAG_NAME_OVERLOAD function_ty { pin = 1 }
+tag_overload ::= TAG_NAME_OVERLOAD function_ty { pin = 1 }
 
 //@language json
-lan_def ::= TAG_NAME_LANGUAGE ID comment_string? { pin = 1 }
+tag_lan ::= TAG_NAME_LANGUAGE ID comment_string? { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
     methods = [getReference]
 }
-param_def ::= TAG_NAME_PARAM OPTIONAL? param_name_ref ty comment_string? {
+tag_param ::= TAG_NAME_PARAM OPTIONAL? param_name_ref ty comment_string? {
     pin = 1
     methods = [getType optional = 'OPTIONAL']
 }
-vararg_def ::= TAG_NAME_VARARG ty comment_string? {
+tag_vararg ::= TAG_NAME_VARARG ty comment_string? {
     pin = 1
     methods = [getType]
 }
 
 //--- return
 type_list ::= ty(',' ty)*
-return_def ::= TAG_NAME_RETURN type_list comment_string? {
+tag_return ::= TAG_NAME_RETURN type_list comment_string? {
     pin = 1
     methods = [resolveTypeAt getType]
 }
@@ -223,7 +223,7 @@ return_def ::= TAG_NAME_RETURN type_list comment_string? {
 class_name_ref ::= ID {
     methods = [getReference resolveType]
 }
-class_def ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comment_string? {
+tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comment_string? {
     pin = 2
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
@@ -247,7 +247,7 @@ class_def ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
 }
 
 // @type CLASS_REF
-type_def ::= TAG_NAME_TYPE ty comment_string? {
+tag_type ::= TAG_NAME_TYPE ty comment_string? {
     pin = 1
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTypeDefStub"
     methods = [getType]
@@ -260,7 +260,7 @@ comment_string ::= STRING_BEGIN? STRING? {
     ]
 }
 
-see_ref_tag ::= TAG_NAME_SEE class_name_ref (SHARP ID)? {
+tag_see ::= TAG_NAME_SEE class_name_ref (SHARP ID)? {
     pin = 1
     methods = [
         getReference
@@ -281,6 +281,6 @@ generic_def ::= ID (EXTENDS class_name_ref)? {
     ]
 }
 
-generic_list ::= TAG_NAME_GENERIC generic_def (',' generic_def)* {
+tag_generic_list ::= TAG_NAME_GENERIC generic_def (',' generic_def)* {
     pin = 1
 }

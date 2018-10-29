@@ -44,7 +44,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         var moduleName = Constants.WORD_G
         val file = funcDef.containingFile
         if (file is LuaPsiFile) moduleName = file.moduleName ?: Constants.WORD_G
-        val retDocTy = funcDef.comment?.returnDef?.type
+        val retDocTy = funcDef.comment?.tagReturn?.type
         val params = funcDef.params
         val tyParams = funcDef.tyParams
         val overloads = funcDef.overloads

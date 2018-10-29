@@ -12,14 +12,14 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.ty.ITy;
 
-public class LuaDocVarargDefImpl extends ASTWrapperPsiElement implements LuaDocVarargDef {
+public class LuaDocTagParamImpl extends ASTWrapperPsiElement implements LuaDocTagParam {
 
-  public LuaDocVarargDefImpl(@NotNull ASTNode node) {
+  public LuaDocTagParamImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitVarargDef(this);
+    visitor.visitTagParam(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -35,6 +35,12 @@ public class LuaDocVarargDefImpl extends ASTWrapperPsiElement implements LuaDocV
 
   @Override
   @Nullable
+  public LuaDocParamNameRef getParamNameRef() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocParamNameRef.class);
+  }
+
+  @Override
+  @Nullable
   public LuaDocTy getTy() {
     return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
   }
@@ -42,6 +48,12 @@ public class LuaDocVarargDefImpl extends ASTWrapperPsiElement implements LuaDocV
   @NotNull
   public ITy getType() {
     return LuaDocPsiImplUtilKt.getType(this);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getOptional() {
+    return findChildByType(OPTIONAL);
   }
 
 }

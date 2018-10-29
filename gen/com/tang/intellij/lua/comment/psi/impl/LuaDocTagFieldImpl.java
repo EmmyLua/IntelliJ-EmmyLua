@@ -18,22 +18,22 @@ import com.tang.intellij.lua.ty.ITy;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaDocFieldDefImpl extends StubBasedPsiElementBase<LuaDocFieldDefStub> implements LuaDocFieldDef {
+public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocFieldDefStub> implements LuaDocTagField {
 
-  public LuaDocFieldDefImpl(@NotNull LuaDocFieldDefStub stub, @NotNull IStubElementType type) {
+  public LuaDocTagFieldImpl(@NotNull LuaDocFieldDefStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaDocFieldDefImpl(@NotNull ASTNode node) {
+  public LuaDocTagFieldImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaDocFieldDefImpl(LuaDocFieldDefStub stub, IElementType type, ASTNode node) {
+  public LuaDocTagFieldImpl(LuaDocFieldDefStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitFieldDef(this);
+    visitor.visitTagField(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

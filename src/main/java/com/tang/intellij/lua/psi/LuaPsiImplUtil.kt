@@ -34,7 +34,7 @@ import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
-import com.tang.intellij.lua.comment.psi.LuaDocVarargDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagVararg
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaIcons
@@ -384,7 +384,7 @@ fun getVarargTy(owner: LuaFuncBodyOwner): ITy? {
     owner.funcBody?.ellipsis?.let {
         var ret: ITy? = null
         if (owner is LuaCommentOwner) {
-            val varargDef = owner.comment?.findTag(LuaDocVarargDef::class.java)
+            val varargDef = owner.comment?.findTag(LuaDocTagVararg::class.java)
             ret = varargDef?.type
         }
         return ret ?: Ty.UNKNOWN

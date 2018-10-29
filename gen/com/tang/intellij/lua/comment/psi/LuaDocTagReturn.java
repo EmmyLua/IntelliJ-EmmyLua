@@ -4,13 +4,20 @@ package com.tang.intellij.lua.comment.psi;
 import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
+import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaDocLanDef extends LuaDocTag {
+public interface LuaDocTagReturn extends LuaDocTag {
 
   @Nullable
   LuaDocCommentString getCommentString();
 
   @Nullable
-  PsiElement getId();
+  LuaDocTypeList getTypeList();
+
+  @NotNull
+  ITy resolveTypeAt(int index);
+
+  @NotNull
+  ITy getType();
 
 }

@@ -22,7 +22,7 @@ import com.intellij.psi.InjectedLanguagePlaces
 import com.intellij.psi.LanguageInjector
 import com.intellij.psi.PsiLanguageInjectionHost
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.comment.psi.LuaDocLanDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagLan
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaLiteralExpr
@@ -34,7 +34,7 @@ class LuaLanguageInjector : LanguageInjector {
             if (commentOwner != null) {
                 val comment = commentOwner.comment
                 if (comment != null) {
-                    val lanDef = PsiTreeUtil.findChildOfType(comment, LuaDocLanDef::class.java)
+                    val lanDef = PsiTreeUtil.findChildOfType(comment, LuaDocTagLan::class.java)
                     if (lanDef != null) {
                         val lan = Language.findLanguageByID(lanDef.id?.text)
                         if (lan != null) {

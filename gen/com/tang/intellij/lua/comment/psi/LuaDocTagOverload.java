@@ -5,9 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaDocGenericList extends LuaDocPsiElement {
+public interface LuaDocTagOverload extends LuaDocTag {
 
-  @NotNull
-  List<LuaDocGenericDef> getGenericDefList();
+  @Nullable
+  LuaDocFunctionTy getFunctionTy();
 
 }

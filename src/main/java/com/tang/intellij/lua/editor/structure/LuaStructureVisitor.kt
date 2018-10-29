@@ -19,8 +19,8 @@ package com.tang.intellij.lua.editor.structure
 import com.intellij.ide.util.treeView.smartTree.TreeElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
 import com.tang.intellij.lua.psi.*
 import java.util.*
@@ -81,11 +81,11 @@ class LuaStructureVisitor : LuaVisitor() {
         val elements = ArrayList<LuaTreeElement>()
 
         comment.acceptChildren(object : LuaDocVisitor() {
-            override fun visitClassDef(o: LuaDocClassDef) {
+            override fun visitTagClass(o: LuaDocTagClass) {
                 elements.add(LuaClassElement(o))
             }
 
-            override fun visitFieldDef(o: LuaDocFieldDef) {
+            override fun visitTagField(o: LuaDocTagField) {
                 elements.add(LuaClassFieldElement(o))
             }
         })

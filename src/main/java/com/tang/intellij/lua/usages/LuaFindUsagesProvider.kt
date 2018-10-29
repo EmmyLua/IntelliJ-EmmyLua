@@ -22,8 +22,8 @@ import com.intellij.lang.findUsages.FindUsagesProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.tree.TokenSet
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.psi.*
@@ -49,9 +49,9 @@ class LuaFindUsagesProvider : FindUsagesProvider {
     }
 
     override fun getType(psiElement: PsiElement): String {
-        if (psiElement is LuaDocClassDef)
+        if (psiElement is LuaDocTagClass)
             return "Class"
-        if (psiElement is LuaDocFieldDef)
+        if (psiElement is LuaDocTagField)
             return "Class Field"
         if (psiElement is LuaFuncDef)
             return "Global Function"

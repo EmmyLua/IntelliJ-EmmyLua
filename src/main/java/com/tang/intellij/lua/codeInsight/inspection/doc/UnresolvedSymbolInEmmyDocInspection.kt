@@ -19,13 +19,13 @@ package com.tang.intellij.lua.codeInsight.inspection.doc
 import com.intellij.codeInspection.*
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElementVisitor
-import com.tang.intellij.lua.comment.psi.LuaDocParamDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagParam
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
 
 class UnresolvedSymbolInEmmyDocInspection : LocalInspectionTool() {
     override fun buildVisitor(holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor {
         return object : LuaDocVisitor() {
-            override fun visitParamDef(o: LuaDocParamDef) {
+            override fun visitTagParam(o: LuaDocTagParam) {
                 o.paramNameRef?.let { paramNameRef ->
                     if (paramNameRef.reference.resolve() == null) {
                         holder.registerProblem(paramNameRef,

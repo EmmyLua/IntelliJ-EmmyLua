@@ -106,7 +106,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 val position = completionParameters.position
                 val comment = PsiTreeUtil.getParentOfType(position, LuaComment::class.java)
-                val classDef = PsiTreeUtil.findChildOfType(comment, LuaDocClassDef::class.java)
+                val classDef = PsiTreeUtil.findChildOfType(comment, LuaDocTagClass::class.java)
                 if (classDef != null) {
                     val classType = classDef.type
                     classType.processMembers(SearchContext(classDef.project)) { _, member ->
@@ -122,7 +122,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, SHOW_SEE_MEMBER, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 val position = completionParameters.position
-                val seeRefTag = PsiTreeUtil.getParentOfType(position, LuaDocSeeRefTag::class.java)
+                val seeRefTag = PsiTreeUtil.getParentOfType(position, LuaDocTagSee::class.java)
                 if (seeRefTag != null) {
                     val classType = seeRefTag.classNameRef?.resolveType() as? ITyClass
                     classType?.processMembers(SearchContext(seeRefTag.project)) { _, member ->
@@ -168,12 +168,12 @@ class LuaDocCompletionContributor : CompletionContributor() {
                 psiElement().withElementType(LuaDocTypes.TAG_NAME_FIELD)
         )
 
-        private val SHOW_FIELD = psiElement(LuaDocTypes.ID).inside(LuaDocFieldDef::class.java)
+        private val SHOW_FIELD = psiElement(LuaDocTypes.ID).inside(LuaDocTagField::class.java)
 
         //@see type#MEMBER
-        private val SHOW_SEE_MEMBER = psiElement(LuaDocTypes.ID).inside(LuaDocSeeRefTag::class.java)
+        private val SHOW_SEE_MEMBER = psiElement(LuaDocTypes.ID).inside(LuaDocTagSee::class.java)
 
-        private val SHOW_LAN = psiElement(LuaDocTypes.ID).inside(LuaDocLanDef::class.java)
+        private val SHOW_LAN = psiElement(LuaDocTypes.ID).inside(LuaDocTagLan::class.java)
 
         private val ADDITIONAL_TAGS = arrayOf("deprecated", "author", "version", "since")
     }

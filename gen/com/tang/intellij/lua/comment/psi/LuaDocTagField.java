@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.Visibility;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaDocFieldDef extends LuaClassField, LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocFieldDefStub> {
+public interface LuaDocTagField extends LuaClassField, LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocFieldDefStub> {
 
   @Nullable
   LuaDocAccessModifier getAccessModifier();

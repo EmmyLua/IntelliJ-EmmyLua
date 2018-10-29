@@ -34,11 +34,11 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     fun <T : LuaDocPsiElement> findTag(t:Class<T>): T?
     fun <T : LuaDocPsiElement> findTags(t:Class<T>): Collection<T>
     fun findTags(name: String): Collection<LuaDocTagDef>
-    fun getParamDef(name: String): LuaDocParamDef?
-    fun getFieldDef(name: String): LuaDocFieldDef?
-    val classDef: LuaDocClassDef?
-    val typeDef: LuaDocTypeDef?
-    val returnDef: LuaDocReturnDef?
+    fun getParamDef(name: String): LuaDocTagParam?
+    fun getFieldDef(name: String): LuaDocTagField?
+    val tagClass: LuaDocTagClass?
+    val tagType: LuaDocTagType?
+    val tagReturn: LuaDocTagReturn?
     fun guessType(context: SearchContext): ITy
     fun isOverride(): Boolean
     fun createSubstitutor(): ITySubstitutor?
