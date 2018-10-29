@@ -23,6 +23,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.search.SearchScope
+import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.usageView.UsageInfo
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClassMethod
@@ -54,6 +55,7 @@ class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler
         query.forEach {
             if (psiFile == it.containingFile)
                 collection.add(LuaOverridingMethodReference(it, methodDef))
+            collection.addAll(ReferencesSearch.search(it, searchScope).findAll())
         }
         return collection
     }
@@ -83,6 +85,10 @@ class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler
                     val identifier = it.nameIdentifier
                     if (identifier != null)
                         processor.process(UsageInfo(identifier))
+
+                    ReferencesSearch.search(it, options.searchScope).forEach { ref ->
+                        processor.process(UsageInfo(ref.element))
+                    }
                 }
             }
         }
