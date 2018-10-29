@@ -50,10 +50,4 @@ public class LuaDocTagParamImpl extends ASTWrapperPsiElement implements LuaDocTa
     return LuaDocPsiImplUtilKt.getType(this);
   }
 
-  @Override
-  @Nullable
-  public PsiElement getOptional() {
-    return findChildByType(OPTIONAL);
-  }
-
 }

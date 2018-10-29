@@ -50,7 +50,6 @@
         ARR = '[]'
         FUN = 'fun'
         VARARG = 'vararg'
-        OPTIONAL = 'optional'
         PRIVATE = 'private'
         PROTECTED = 'protected'
         PUBLIC = 'public'
@@ -205,9 +204,9 @@ tag_lan ::= TAG_NAME_LANGUAGE ID comment_string? { pin = 1 }
 param_name_ref ::= ID {
     methods = [getReference]
 }
-tag_param ::= TAG_NAME_PARAM OPTIONAL? param_name_ref ty comment_string? {
+tag_param ::= TAG_NAME_PARAM param_name_ref ty comment_string? {
     pin = 1
-    methods = [getType optional = 'OPTIONAL']
+    methods = [getType]
 }
 tag_vararg ::= TAG_NAME_VARARG ty comment_string? {
     pin = 1
