@@ -92,11 +92,7 @@ class GenericTest : TestCompletionBase() {
             ---@return fun():number, T
             local function myIterator(list)
                 local idx = 0
-                return function()
-                    idx = idx + 1
-                    if idx > #list then return nil end
-                    return idx, list[idx]
-                end
+                return nil -- todo
             end
 
             ---@type Emmy[]
