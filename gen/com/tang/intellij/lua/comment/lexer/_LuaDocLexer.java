@@ -927,7 +927,7 @@ public class _LuaDocLexer implements FlexLexer, LuaDocTypes {
             // fall through
           case 89: break;
           case 41: 
-            { _typeReq = true; return TAG_NAME_VARARG;
+            { _typeReq = true; return VARARG;
             } 
             // fall through
           case 90: break;

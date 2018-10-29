@@ -139,7 +139,7 @@ DOC_DASHES = --+
     "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
     "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
-    "vararg"                   { _typeReq = true; return TAG_NAME_VARARG; }
+    "vararg"                   { _typeReq = true; return VARARG; }
     "..."|{ID}                 { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(xCOMMENT_STRING); yypushback(yylength()); } }
 }
 

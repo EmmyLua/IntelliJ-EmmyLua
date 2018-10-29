@@ -887,13 +887,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME_VARARG ty
+  // VARARG ty
   public static boolean vararg_param(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "vararg_param")) return false;
-    if (!nextTokenIs(b, TAG_NAME_VARARG)) return false;
+    if (!nextTokenIs(b, VARARG)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, VARARG_PARAM, null);
-    r = consumeToken(b, TAG_NAME_VARARG);
+    r = consumeToken(b, VARARG);
     p = r; // pin = 1
     r = r && ty(b, l + 1, -1);
     exit_section_(b, l, m, r, p, null);

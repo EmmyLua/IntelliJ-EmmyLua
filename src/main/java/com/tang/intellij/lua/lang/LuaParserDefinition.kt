@@ -155,7 +155,8 @@ class LuaParserDefinition : ParserDefinition {
                 LuaDocTypes.TAG_NAME_VARARG
         )
         val DOC_KEYWORD_TOKENS = TokenSet.create(
-                LuaDocTypes.FUN
+                LuaDocTypes.FUN,
+                LuaDocTypes.VARARG
         )
         val FILE = LuaFileElementType()
     }

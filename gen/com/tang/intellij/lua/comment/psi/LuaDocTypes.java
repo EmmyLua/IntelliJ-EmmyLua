@@ -77,6 +77,7 @@ public interface LuaDocTypes {
   IElementType TAG_NAME_SEE = new LuaDocTokenType("see");
   IElementType TAG_NAME_TYPE = new LuaDocTokenType("type");
   IElementType TAG_NAME_VARARG = new LuaDocTokenType("vararg");
+  IElementType VARARG = new LuaDocTokenType("VARARG");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {

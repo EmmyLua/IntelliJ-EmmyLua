@@ -49,6 +49,7 @@
         RCURLY = "}"
         ARR = '[]'
         FUN = 'fun'
+        VARARG = 'vararg'
         OPTIONAL = 'optional'
         PRIVATE = 'private'
         PROTECTED = 'protected'
@@ -149,7 +150,7 @@ generic_ty ::= general_ty '<' generic_param_list '>' {
 function_param ::= ID (':' ty)? {
     pin = 1
 }
-vararg_param ::= TAG_NAME_VARARG ty {
+vararg_param ::= VARARG ty {
     pin = 1
     methods = [getType]
 }
