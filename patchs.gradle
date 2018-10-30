@@ -26,7 +26,7 @@ versions["172"] = [
     archiveName: "IntelliJ-EmmyLua",
     patchs: [
         "patchs/172/0002-Revert-redesigned-documentation.patch",
-        "patchs/172/0001-Revert-Compatible-with-IDEA2018.2.patch"
+        "patchs/172/0001-compatible-with-171-172.patch"
     ] + versions["182"].patchs
 ]
 versions["171"] = [

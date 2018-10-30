@@ -1,9 +1,8 @@
-From 62a8bcfae83c5441abd6f77a6f1603af06fc6c6a Mon Sep 17 00:00:00 2001
+From a8ba5fd580b8af76920b019179598090a0007172 Mon Sep 17 00:00:00 2001
 From: tangzx <272669294@qq.com>
-Date: Thu, 31 May 2018 19:36:26 +0800
-Subject: [PATCH] Revert "Compatible with IDEA2018.2"
+Date: Tue, 30 Oct 2018 13:08:42 +0800
+Subject: [PATCH 1/2] compatible with 171/172
 
-This reverts commit 02ba97eb05f65991bfc2c0071ca782b7478b00d6.
 ---
  .../com/tang/intellij/lua/psi/search/LuaAllClassesSearchExecutor.kt   | 2 +-
  .../tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt  | 4 ++--
@@ -24,24 +23,24 @@ index cba47831..f96418a1 100644
              LuaClassIndex.instance.processAllKeys(searchParameters.project) { typeName ->
                  //todo no TySerializedClass
 diff --git a/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt b/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt
-index b4df879b..d2afadd7 100644
+index 2ed07622..becfda4b 100644
 --- a/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt
 +++ b/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt
-@@ -31,7 +31,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassI
+@@ -31,7 +31,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocTagClass, LuaClassI
      private fun processInheritors(searchParameters: LuaClassInheritorsSearch.SearchParameters,
                                    typeName: String,
                                    processedNames: MutableSet<String>,
--                                  processor: Processor<in LuaDocClassDef>): Boolean {
-+                                  processor: Processor<LuaDocClassDef>): Boolean {
+-                                  processor: Processor<in LuaDocTagClass>): Boolean {
++                                  processor: Processor<LuaDocTagClass>): Boolean {
          var ret = true
          // recursion guard!!
          if (!processedNames.add(typeName))
-@@ -52,7 +52,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocClassDef, LuaClassI
+@@ -52,7 +52,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocTagClass, LuaClassI
          return ret
      }
  
--    override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<in LuaDocClassDef>): Boolean {
-+    override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<LuaDocClassDef>): Boolean {
+-    override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<in LuaDocTagClass>): Boolean {
++    override fun execute(searchParameters: LuaClassInheritorsSearch.SearchParameters, processor: Processor<LuaDocTagClass>): Boolean {
          var ref = true
          DumbService.getInstance(searchParameters.project).runReadActionInSmartMode {
              ref = processInheritors(searchParameters, searchParameters.typeName, mutableSetOf(), processor)
