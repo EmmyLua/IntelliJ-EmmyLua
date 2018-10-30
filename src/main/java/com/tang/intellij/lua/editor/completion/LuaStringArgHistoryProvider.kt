@@ -22,9 +22,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.psi.LuaArgs
-import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.stubs.index.LuaStringArgIndex
 
 class LuaStringArgHistoryProvider : LuaCompletionProvider() {
@@ -36,13 +34,20 @@ class LuaStringArgHistoryProvider : LuaCompletionProvider() {
     }
 
     override fun addCompletions(session: CompletionSession) {
-        val psi = PsiTreeUtil.getParentOfType(session.parameters.position, LuaCallExpr::class.java) ?: return
-        val fnName = psi.expr.name ?: return
+        val argExpr = session.parameters.position.parent as? LuaExpr ?: return
+        val callExpr = PsiTreeUtil.getParentOfType(session.parameters.position, LuaCallExpr::class.java) ?: return
+        val fnName = callExpr.expr.name ?: return
+        var index = callExpr.argList.indexOf(argExpr)
+        index = if (callExpr.isMethodColonCall) index + 1 else index
         LuaStringArgIndex.processValues(
                 fnName,
-                GlobalSearchScope.projectScope(psi.project),
+                GlobalSearchScope.projectScope(callExpr.project),
                 Processor { arg ->
-                    session.resultSet.addElement(LookupElementBuilder.create(arg.argString).withIcon(LuaIcons.META_METHOD))
+                    if (arg.argIndex == index) {
+                        session.resultSet.addElement(LookupElementBuilder.create(arg.argString)
+                                .withIcon(LuaIcons.STRING_ARG_HISTORY)
+                                .withTypeText("History", true))
+                    }
                     true
                 })
     }

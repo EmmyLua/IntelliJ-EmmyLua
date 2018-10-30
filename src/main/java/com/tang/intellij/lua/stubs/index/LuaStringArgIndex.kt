@@ -46,8 +46,9 @@ class LuaStringArgIndex : FileBasedIndexExtension<String, LuaStringArgIndex.LuaC
         override fun save(output: DataOutput, occurrence: LuaCallOccurrence) {
             output.writeInt(occurrence.args.size)
             occurrence.args.forEach {
-                output.writeInt(it.argIndex)
+                output.writeByte(it.argIndex)
                 output.writeUTF(it.argString)
+                output.writeInt(it.offset)
             }
         }
 
@@ -55,9 +56,10 @@ class LuaStringArgIndex : FileBasedIndexExtension<String, LuaStringArgIndex.LuaC
             val list = mutableListOf<LuaCallArg>()
             val size = input.readInt()
             for (i in 0 until size) {
-                val argIndex = input.readInt()
+                val argIndex = input.readByte()
                 val argString = input.readUTF()
-                list.add(LuaCallArg(argIndex, argString))
+                val offset = input.readInt()
+                list.add(LuaCallArg(argIndex.toInt(), argString, offset))
             }
             return LuaCallOccurrence(list)
         }
@@ -72,13 +74,15 @@ class LuaStringArgIndex : FileBasedIndexExtension<String, LuaStringArgIndex.LuaC
     override fun getIndexer() = DataIndexer<String, LuaCallOccurrence, FileContent> {
         val map = mutableMapOf<String, LuaCallOccurrence>()
         PsiTreeUtil.findChildrenOfType(it.psiFile, LuaCallExpr::class.java).forEach { call ->
-            call.argList.forEach { arg ->
+            val isColon = call.isMethodColonCall
+            call.argList.forEachIndexed { index, arg ->
                 val name = call.expr.name
                 if (name != null && arg is LuaLiteralExpr && arg.kind == LuaLiteralKind.String) {
                     val sv = arg.stringValue
                     if (sv.length > 1) {
+                        val offset = arg.node.startOffset
                         val occ = map.getOrPut(name) { LuaCallOccurrence(mutableListOf()) }
-                        occ.args.add(LuaCallArg(0, sv))
+                        occ.args.add(LuaCallArg(if (isColon) index + 1 else index, sv, offset))
                     }
                 }
             }
@@ -94,5 +98,5 @@ class LuaStringArgIndex : FileBasedIndexExtension<String, LuaStringArgIndex.LuaC
 
     data class LuaCallOccurrence(val args: MutableList<LuaCallArg>)
 
-    data class LuaCallArg(val argIndex: Int, val argString: String)
+    data class LuaCallArg(val argIndex: Int, val argString: String, val offset: Int)
 }

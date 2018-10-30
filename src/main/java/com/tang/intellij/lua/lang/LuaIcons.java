@@ -52,6 +52,8 @@ public class LuaIcons {
 
     public static final Icon MODULE = IconLoader.getIcon("/icons/module.png");
 
+    public static final Icon STRING_ARG_HISTORY = AllIcons.Vcs.History;
+
     public static class Debugger {
         public static class Actions {
             public static final Icon PROFILER = AllIcons.Debugger.Db_primitive;
