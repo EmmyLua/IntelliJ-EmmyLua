@@ -1,0 +1,112 @@
+<!--
+  ~ Copyright (c) 2017. tangzx(love.tangzx@qq.com)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<idea-plugin>
+    <description><![CDATA[
+    Support for Lua programming language.<br>
+    <p><a href="https://github.com/EmmyLua">Source Code</a> | <a href="https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link">Gitter</a> | <a href="https://emmylua.github.io/donate.html">Donate</a> | <a href="https://emmylua.github.io/?plugin">Doc</a> | <a href="https://github.com/EmmyLua/VSCode-EmmyLua">VSCode-EmmyLua</a></p>
+    Features:
+    <ul>
+        <li>Syntax highlighting</li>
+        <ul>
+            <li>Highlight global value</li>
+            <li>Highlight local/param value</li>
+            <li>Highlight up value</li>
+        </ul>
+        <li>Code completion</li>
+        <ul>
+            <li>Keyword completion</li>
+            <li>Basic completion</li>
+            <li>Type inferred based completion</li>
+        </ul>
+        <li>Debugger</li>
+        <ul>
+            <li>Attach Debugger(Windows only)</li>
+            <li>Remote Debugger(Mobdebug.lua)</li>
+        </ul>
+        <li>Lua 5.3 support</li>
+        <li>Find usages</li>
+        <li>Rename</li>
+        <li>Go to definition</li>
+        <li>Go to symbol</li>
+        <li>Go to class</li>
+        <li>Go to file</li>
+        <li>Parameter name hints</li>
+        <li>Comment based type/class annotation</li>
+        <li>Structure view</li>
+        <li>Comment in/out</li>
+        <li>Color settings page</li>
+        <li>Method override line marker</li>
+        <li>Quick Documentation</li>
+        <li>Live templates</li>
+        <li>Postfix completion templates</li>
+        <li>Code formatter</li>
+        <li>Code intentions</li>
+        <li>Code inspections</li>
+        <li>Lua Standard Library/API</li>
+        <li>Region folding</li>
+        <li>Lua Check Tool</li>
+    </ul>
+    <p>中国朋友可以加QQ群29850775交流及反馈BUG</p>
+    ]]></description>
+
+    <change-notes><![CDATA[
+    <strong>1.2.5</strong>
+    <ul>
+        <li>[NEW]Support new region style "--{{{", "--}}}" (Suggestion by @adriweb)</li>
+        <li>[IMPROVE]Parameters completion for "closure" & "func" live template</li>
+        <li>[IMPROVE]Completions for raw string</li>
+        <li>[IMPROVE]Redesigned documentation for IDEA2018.2 (Suggestion by @dsmgit)</li>
+        <li>[IMPROVE]Add new annotations @deprecated, @author, @version, @since (Suggestion by @dsmgit)</li>
+        <li>[NEW]Support generic (see doc for new annotation @generic)</li>
+        <li>[NEW]Add Lua5.4 API (By @dsmgit)</li>
+        <li>[NEW]Now we can choose the lua language level Lua5.0/Lua5.1/Lua5.2/Lua5.3/Lua5.4, via: File | Settings | Languages & Frameworks | EmmyLua, default level value is Lua5.3</li>
+        <li>[NEW]Now the Attach debugger can capture the messages output by the WINAPI OutputDebugString</li>
+        <li>[NEW]Compatible with IDEA2017.1, IDEA2017.2-IDEA2018.1, IDEA2018.2<li>
+        <li>[IMPROVE]Improve remote debugger</li>
+        <li>[IMPROVE]Update "EmmyDoc Tutorial"</li>
+        <li>Bug fix #145 #165 #167 #169 ...</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
+    <strong>1.2.4</strong>
+    <ul>
+        <li>[IMPROVE]improved class members completion</li>
+        <li>[FIX]code style can not saved</li>
+        <li>[FIX]fix target application crash when attach debugger attached</li>
+        <li>bug fix #121 #126 #129 #134 #135 #138 #141</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
+    <strong>1.2.3</strong>
+    <ul>
+        <li>Compatible with IDEA2018.1</li>
+        <li>[IMPROVE]improved parsing performance</li>
+        <li>[IMPROVE]improved formatting</li>
+        <li>[IMPROVE]more annotation infos</li>
+        <li>[IMPROVE]improved remote debugger performance & compatible with mobdebug.lua v0.70</li>
+        <li>[IMPROVE]new settings : stdout charset for run configuration</li>
+        <li>[IMPROVE]new settings : hide/show console window for debug configuration(WIN32)</li>
+        <li>[NEW]add `Emmy.log` console for attaching debugger logs</li>
+        <li>[NEW]lua call hierarchy(Ctrl+Alt+H) (by @LiamYao)</li>
+        <li>[NEW]region highlighting & color settings</li>
+        <li>[NEW]new type : doc table type, ---@type { name:string, value:{ size:number } }</li>
+        <li>[NEW]folding for --[[multi-line comments]] && [[multi-line strings]]</li>
+        <li>unicode identifier support</li>
+        <li>fix bugs</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
+    ]]>
+    </change-notes>
+</idea-plugin>
