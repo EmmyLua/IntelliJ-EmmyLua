@@ -23,6 +23,13 @@ class VarargTest : TestCompletionBase() {
         myFixture.configureByFile("class.lua")
         doTest("""
             --- test_vararg_1.lua
+            
+            ---@generic T
+            ---@param index number|string
+            ---@vararg T
+            ---@return T
+            local function select(index, ...)
+            end
 
             ---@type Emmy
             local emmy = {}
