@@ -86,6 +86,7 @@ function error(message, level) end
 --- itself does not use this variable; changing its value does not affect any
 --- environment, nor vice versa.
 ---@class _G
+_G = {}
 
 ---
 --- If `object` does not have a metatable, returns **nil**. Otherwise, if the
