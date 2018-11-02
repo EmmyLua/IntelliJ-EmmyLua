@@ -69,6 +69,19 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.2.6</strong>
+    <ul>
+        <li>[NEW]Code completion for breakpoint condition</li>
+        <li>[NEW]Compatible with IDEA2018.3</li>
+        <li>[NEW]New inspection "Unresolved symbol in emmy doc"</li>
+        <li>[NEW]New inspection "Unresolved class"</li>
+        <li>[NEW]Shebang file type detector</li>
+        <li>[NEW]String literal paste provider</li>
+        <li>[NEW]New annotator: @vararg TYPE</li>
+        <li>[NEW]Arguments history completion</li>
+        <li>Bug fix #178 #168 #186 #192 #196 #198 #199 #195 #116 ...</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
     <strong>1.2.5</strong>
     <ul>
         <li>[NEW]Support new region style "--{{{", "--}}}" (Suggestion by @adriweb)</li>
@@ -92,24 +105,6 @@
         <li>[FIX]code style can not saved</li>
         <li>[FIX]fix target application crash when attach debugger attached</li>
         <li>bug fix #121 #126 #129 #134 #135 #138 #141</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-    <strong>1.2.3</strong>
-    <ul>
-        <li>Compatible with IDEA2018.1</li>
-        <li>[IMPROVE]improved parsing performance</li>
-        <li>[IMPROVE]improved formatting</li>
-        <li>[IMPROVE]more annotation infos</li>
-        <li>[IMPROVE]improved remote debugger performance & compatible with mobdebug.lua v0.70</li>
-        <li>[IMPROVE]new settings : stdout charset for run configuration</li>
-        <li>[IMPROVE]new settings : hide/show console window for debug configuration(WIN32)</li>
-        <li>[NEW]add `Emmy.log` console for attaching debugger logs</li>
-        <li>[NEW]lua call hierarchy(Ctrl+Alt+H) (by @LiamYao)</li>
-        <li>[NEW]region highlighting & color settings</li>
-        <li>[NEW]new type : doc table type, ---@type { name:string, value:{ size:number } }</li>
-        <li>[NEW]folding for --[[multi-line comments]] && [[multi-line strings]]</li>
-        <li>unicode identifier support</li>
-        <li>fix bugs</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
     ]]>
