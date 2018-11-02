@@ -350,6 +350,10 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
 }
 
 private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchContext): ITy {
+    // _G.var = {}  <==>  var = {}
+    if (type.className == Constants.WORD_G)
+        return TyClass.createGlobalType(fieldName)
+
     var set:ITy = Ty.UNKNOWN
 
     LuaClassMemberIndex.processAll(type, fieldName, context, Processor {
