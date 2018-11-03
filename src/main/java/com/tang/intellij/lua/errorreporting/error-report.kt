@@ -117,27 +117,14 @@ private object AnonymousFeedback {
 		labels = listOf(Label().apply { name = issueLabel })
 	}
 
-	private fun generateGitHubIssueBody(details: MutableMap<String, String>, includeStacktrace: Boolean): String {
-		val errorDescription = details.remove("error.description").orEmpty()
-		val stackTrace = details.remove("error.stacktrace")?.takeIf(String::isNotBlank) ?: "invalid stacktrace"
-		val result = StringBuilder()
-		if (errorDescription.isNotEmpty()) {
-			result.append(errorDescription)
-			result.appendln("\n\n----------------------\n")
-		}
-		for ((key, value) in details) {
-			result.append("- ")
-			result.append(key)
-			result.append(": ")
-			result.appendln(value)
-		}
-		if (includeStacktrace) {
-			result.appendln("\n```")
-			result.appendln(stackTrace)
-			result.appendln("```")
-		}
-		return result.toString()
-	}
+	private fun generateGitHubIssueBody(details: MutableMap<String, String>, includeStacktrace: Boolean) =
+			buildString {
+				val errorDescription = details.remove("error.description").orEmpty()
+				val stackTrace = details.remove("error.stacktrace")?.takeIf(String::isNotBlank) ?: "invalid stacktrace"
+				if (errorDescription.isNotEmpty()) append(errorDescription).appendln("\n\n----------------------\n")
+				for ((key, value) in details) append("- ").append(key).append(": ").appendln(value)
+				if (includeStacktrace) appendln("\n```").appendln(stackTrace).appendln("```")
+			}
 }
 
 private const val initVector = "RandomInitVector"
@@ -171,26 +158,31 @@ private fun encrypt(value: String): String {
 class GitHubErrorReporter : ErrorReportSubmitter() {
 	override fun getReportActionText() = ErrorReportBundle.message("report.error.to.plugin.vendor")
 	override fun submit(
-		events: Array<IdeaLoggingEvent>, info: String?, parent: Component, consumer: Consumer<SubmittedReportInfo>) =
-		doSubmit(events[0], parent, consumer, GitHubErrorBean(events[0].throwable, IdeaLogger.ourLastActionId), info)
+			events: Array<IdeaLoggingEvent>,
+			info: String?,
+			parent: Component,
+			consumer: Consumer<SubmittedReportInfo>): Boolean {
+		// TODO improve
+		val event = events.firstOrNull { it.throwable != null } ?: return false
+		return doSubmit(event, parent, consumer, info)
+	}
 
 	private fun doSubmit(
 			event: IdeaLoggingEvent,
 			parent: Component,
 			callback: Consumer<SubmittedReportInfo>,
-			bean: GitHubErrorBean,
 			description: String?): Boolean {
 		val dataContext = DataManager.getInstance().getDataContext(parent)
-		bean.description = description.toString()
-		bean.message = event.message ?: event.throwable.message.toString()
-		event.throwable?.let { throwable ->
-			IdeErrorsDialog.findPluginId(throwable)?.let { pluginId ->
-				PluginManager.getPlugin(pluginId)?.let { ideaPluginDescriptor ->
-					if (!ideaPluginDescriptor.isBundled) {
-						bean.pluginName = ideaPluginDescriptor.name
-						bean.pluginVersion = ideaPluginDescriptor.version
-					}
-				}
+		val bean = GitHubErrorBean(
+				event.throwable,
+				IdeaLogger.ourLastActionId,
+				description ?: "<No description>",
+				event.message ?: event.throwable.message.toString())
+		IdeErrorsDialog.findPluginId(event.throwable)?.let { pluginId ->
+			PluginManager.getPlugin(pluginId)?.let { ideaPluginDescriptor ->
+				if (!ideaPluginDescriptor.isBundled) {
+					bean.pluginName = ideaPluginDescriptor.name
+					bean.pluginVersion = ideaPluginDescriptor.version				}
 			}
 		}
 
@@ -226,13 +218,20 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
  *
  * @author patrick (17.06.17).
  */
-class GitHubErrorBean(throwable: Throwable, val lastAction: String) {
-	val exceptionHash = Arrays.hashCode(throwable.stackTrace).toString()
-	var description = "<null>"
-	var message = "<null>"
+class GitHubErrorBean(
+		throwable: Throwable,
+		val lastAction: String,
+		val description: String,
+		val message: String) {
+	val exceptionHash: String
+	val stackTrace: String
+	init {
+		val trace = throwable.stackTrace
+		exceptionHash = Arrays.hashCode(trace).toString()
+		stackTrace = trace.joinToString(System.lineSeparator())
+	}
 	var pluginName = ""
 	var pluginVersion = ""
-	var stackTrace = "<null>"
 	var attachments: List<Attachment> = emptyList()
 }
 
