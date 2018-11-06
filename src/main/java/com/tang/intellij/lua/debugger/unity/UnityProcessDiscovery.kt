@@ -52,7 +52,7 @@ class UnityProcessDiscovery {
             return processes
         }
 
-        private fun GetUnityEditorProcesses(): List<ProcessInfo> {
+        private fun getUnityEditorProcesses(): List<ProcessInfo> {
             val list = arrayListOf<ProcessInfo>()
             val systemProcesses = OSProcessUtil.getProcessList()
             for (processInfo in systemProcesses){
