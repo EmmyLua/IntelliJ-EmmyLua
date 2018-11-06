@@ -32,7 +32,7 @@ class LuaUnityDebugProcess internal constructor(session: XDebugSession, private 
     : LuaAttachDebugProcessBase(session) {
 
     private fun queryUnityProcess(): ProcessInfo? {
-        val list = UnityProcessDiscovery.GetAttachableProcesses(GetProcessOptions.All)
+        val list = UnityProcessDiscovery.getAttachableProcesses(GetProcessOptions.All)
         if(list.isNotEmpty()){
             var processMap = ProcessUtils.listProcesses()
             for (processInfo in list){

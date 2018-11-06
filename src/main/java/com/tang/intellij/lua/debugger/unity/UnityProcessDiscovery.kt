@@ -41,13 +41,13 @@ class UnityProcessDiscovery {
         //private val unityProcessess = mutableListOf<ProcessInfo>()
         //private var unityProcessesFinished  = true
 
-        fun GetAttachableProcesses(flags: GetProcessOptions): List<ProcessInfo> {
+        fun getAttachableProcesses(flags: GetProcessOptions): List<ProcessInfo> {
             val processes = mutableListOf<ProcessInfo>()
             if (flags.hasFlag(GetProcessOptions.Editor)){
-                processes.addAll(GetUnityEditorProcesses())
+                processes.addAll(getUnityEditorProcesses())
             }
             //if (flags.hasFlag(GetProcessOptions.Players)){
-            //    processes.addAll(GetUnityPlayerProcesses(true))
+            //    processes.addAll(getUnityPlayerProcesses(true))
             //}
             return processes
         }
