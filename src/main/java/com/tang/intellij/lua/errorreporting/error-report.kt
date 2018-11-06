@@ -48,10 +48,7 @@ import org.eclipse.egit.github.core.service.IssueService
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
 import java.awt.Component
-import java.io.FileOutputStream
-import java.io.IOException
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
+import java.io.*
 import java.net.URL
 import java.util.*
 import javax.crypto.Cipher
@@ -228,7 +225,9 @@ class GitHubErrorBean(
 	init {
 		val trace = throwable.stackTrace
 		exceptionHash = Arrays.hashCode(trace).toString()
-		stackTrace = trace.joinToString(System.lineSeparator())
+		val sw = StringWriter()
+		throwable.printStackTrace(PrintWriter(sw))
+		stackTrace = sw.toString()
 	}
 	var pluginName = ""
 	var pluginVersion = ""
