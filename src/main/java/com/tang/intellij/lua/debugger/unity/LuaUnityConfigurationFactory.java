@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LuaUnityConfigurationFactory extends ConfigurationFactory {
 
-    LuaUnityConfigurationFactory(LuaUnityConfigurationType type) {
+    public LuaUnityConfigurationFactory(LuaUnityConfigurationType type) {
         super(type);
     }
 

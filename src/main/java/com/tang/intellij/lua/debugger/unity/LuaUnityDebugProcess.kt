@@ -33,13 +33,11 @@ class LuaUnityDebugProcess internal constructor(session: XDebugSession, private 
 
     private fun queryUnityProcess(): ProcessInfo? {
         val list = UnityProcessDiscovery.getAttachableProcesses(GetProcessOptions.All)
-        if(list.isNotEmpty()){
+        if (list.isNotEmpty()) {
             var processMap = ProcessUtils.listProcesses()
-            for (processInfo in list){
-                val processDetailsInfo = processMap[processInfo.pid]
-                if(processDetailsInfo != null){
-                    var title = processDetailsInfo.title
-                    if(title.contains(configuration.preferedUnityInstanceName, false)){
+            for (processInfo in list) {
+                processMap[processInfo.pid]?.run {
+                    if (title.contains(configuration.preferedUnityInstanceName, false)) {
                         return processInfo
                     }
                 }
@@ -53,7 +51,7 @@ class LuaUnityDebugProcess internal constructor(session: XDebugSession, private 
         this.bridge = bridge
         bridge.setProtoHandler(this)
         val processInfo = queryUnityProcess()
-        if(processInfo == null){
+        if (processInfo == null) {
             if (configuration.preferedUnityInstanceName.isNotEmpty())
                 error("Cannot find suitable Unity instance for prefered instance name: ${configuration.preferedUnityInstanceName}")
             else
