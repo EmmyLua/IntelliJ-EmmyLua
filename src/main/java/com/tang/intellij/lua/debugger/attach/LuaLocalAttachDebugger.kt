@@ -24,6 +24,8 @@ import com.intellij.xdebugger.XDebugProcessStarter
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.attach.XLocalAttachDebugger
+import com.tang.intellij.lua.debugger.utils.ProcessDetailInfo
+import com.tang.intellij.lua.debugger.utils.getDisplayName
 
 /**
  *
