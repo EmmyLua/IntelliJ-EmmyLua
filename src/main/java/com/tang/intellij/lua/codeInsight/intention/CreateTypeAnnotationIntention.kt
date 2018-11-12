@@ -45,7 +45,7 @@ class CreateTypeAnnotationIntention : BaseIntentionAction() {
         val localDef = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaLocalDef::class.java, false)
         if (localDef != null) {
             val comment = localDef.comment
-            return comment?.typeDef == null
+            return comment?.tagType == null
         }
         return false
     }

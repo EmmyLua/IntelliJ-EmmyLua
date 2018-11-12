@@ -73,60 +73,68 @@ fun getTextOffset(identifierOwner: PsiNameIdentifierOwner): Int {
     return id?.textOffset ?: identifierOwner.node.startOffset
 }
 
-fun getNameIdentifier(fieldDef: LuaDocFieldDef): PsiElement? {
-    return fieldDef.id
+fun getNameIdentifier(tagField: LuaDocTagField): PsiElement? {
+    return tagField.id
 }
 
-fun getNameIdentifier(classDef: LuaDocClassDef): PsiElement {
-    return classDef.id
+fun getNameIdentifier(tagClass: LuaDocTagClass): PsiElement {
+    return tagClass.id
 }
 
-fun guessType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
-    val stub = fieldDef.stub
+fun guessType(tagField: LuaDocTagField, context: SearchContext): ITy {
+    val stub = tagField.stub
     if (stub != null)
         return stub.type
-    return fieldDef.ty?.getType() ?: Ty.UNKNOWN
+    return tagField.ty?.getType() ?: Ty.UNKNOWN
 }
 
-fun guessParentType(fieldDef: LuaDocFieldDef, context: SearchContext): ITy {
-    val parent = fieldDef.parent
-    val classDef = PsiTreeUtil.findChildOfType(parent, LuaDocClassDef::class.java)
+fun guessParentType(tagField: LuaDocTagField, context: SearchContext): ITy {
+    val parent = tagField.parent
+    val classDef = PsiTreeUtil.findChildOfType(parent, LuaDocTagClass::class.java)
     return classDef?.type ?: Ty.UNKNOWN
 }
 
-fun getVisibility(fieldDef: LuaDocFieldDef): Visibility {
-    val stub = fieldDef.stub
+fun getVisibility(tagField: LuaDocTagField): Visibility {
+    val stub = tagField.stub
     if (stub != null)
         return stub.visibility
 
-    val v = fieldDef.accessModifier?.let { Visibility.get(it.text) }
+    val v = tagField.accessModifier?.let { Visibility.get(it.text) }
     return v ?: Visibility.PUBLIC
 }
 
 /**
  * 猜测参数的类型
- * @param paramDec 参数定义
+ * @param tagParamDec 参数定义
  * *
  * @return 类型集合
  */
-fun getType(paramDec: LuaDocParamDef): ITy {
-    val type = paramDec.ty?.getType()
+fun getType(tagParamDec: LuaDocTagParam): ITy {
+    val type = tagParamDec.ty?.getType()
     if (type != null) {
-        val substitutor = LuaCommentUtil.findContainer(paramDec).createSubstitutor()
+        val substitutor = LuaCommentUtil.findContainer(tagParamDec).createSubstitutor()
         if (substitutor != null)
             return type.substitute(substitutor)
     }
     return type ?: Ty.UNKNOWN
 }
 
+fun getType(vararg: LuaDocTagVararg): ITy {
+    return vararg.ty?.getType() ?: Ty.UNKNOWN
+}
+
+fun getType(vararg: LuaDocVarargParam): ITy {
+    return vararg.ty?.getType() ?: Ty.UNKNOWN
+}
+
 /**
  * 获取返回类型
- * @param returnDef 返回定义
+ * @param tagReturn 返回定义
  *
  * @return 类型集合
  */
-fun resolveTypeAt(returnDef: LuaDocReturnDef, index: Int): ITy {
-    val typeList = returnDef.typeList
+fun resolveTypeAt(tagReturn: LuaDocTagReturn, index: Int): ITy {
+    val typeList = tagReturn.typeList
     if (typeList != null) {
         val list = typeList.tyList
         if (list.size > index) {
@@ -136,8 +144,8 @@ fun resolveTypeAt(returnDef: LuaDocReturnDef, index: Int): ITy {
     return Ty.UNKNOWN
 }
 
-fun getType(returnDef: LuaDocReturnDef): ITy {
-    val tyList = returnDef.typeList?.tyList
+fun getType(tagReturn: LuaDocTagReturn): ITy {
+    val tyList = tagReturn.typeList?.tyList
     if (tyList != null && tyList.isNotEmpty()) {
         val tupleList = tyList.map { it.getType() }
         return if (tupleList.size == 1) tupleList.first() else TyTuple(tupleList)
@@ -147,31 +155,31 @@ fun getType(returnDef: LuaDocReturnDef): ITy {
 
 /**
  * 优化：从stub中取名字
- * @param classDef LuaDocClassDef
+ * @param tagClass LuaDocClassDef
  * *
  * @return string
  */
-fun getName(classDef: LuaDocClassDef): String {
-    val stub = classDef.stub
+fun getName(tagClass: LuaDocTagClass): String {
+    val stub = tagClass.stub
     if (stub != null)
         return stub.className
-    return classDef.id.text
+    return tagClass.id.text
 }
 
 /**
  * for Goto Class
- * @param classDef class def
+ * @param tagClass class def
  * *
  * @return ItemPresentation
  */
-fun getPresentation(classDef: LuaDocClassDef): ItemPresentation {
+fun getPresentation(tagClass: LuaDocTagClass): ItemPresentation {
     return object : ItemPresentation {
         override fun getPresentableText(): String? {
-            return classDef.name
+            return tagClass.name
         }
 
         override fun getLocationString(): String? {
-            return classDef.containingFile.name
+            return tagClass.containingFile.name
         }
 
         override fun getIcon(b: Boolean): Icon? {
@@ -180,24 +188,24 @@ fun getPresentation(classDef: LuaDocClassDef): ItemPresentation {
     }
 }
 
-fun getType(classDef: LuaDocClassDef): ITyClass {
-    val stub = classDef.stub
-    return stub?.classType ?: TyPsiDocClass(classDef)
+fun getType(tagClass: LuaDocTagClass): ITyClass {
+    val stub = tagClass.stub
+    return stub?.classType ?: TyPsiDocClass(tagClass)
 }
 
-fun isDeprecated(classDef: LuaDocClassDef): Boolean {
-    val stub = classDef.stub
-    return stub?.isDeprecated ?: LuaCommentUtil.findContainer(classDef).isDeprecated
+fun isDeprecated(tagClass: LuaDocTagClass): Boolean {
+    val stub = tagClass.stub
+    return stub?.isDeprecated ?: LuaCommentUtil.findContainer(tagClass).isDeprecated
 }
 
 /**
  * 猜测类型
- * @param typeDef 类型定义
+ * @param tagType 类型定义
  * *
  * @return 类型集合
  */
-fun getType(typeDef: LuaDocTypeDef): ITy {
-    return typeDef.ty?.getType() ?: Ty.UNKNOWN
+fun getType(tagType: LuaDocTagType): ITy {
+    return tagType.ty?.getType() ?: Ty.UNKNOWN
 }
 
 @Suppress("UNUSED_PARAMETER")
@@ -205,28 +213,28 @@ fun toString(stubElement: StubBasedPsiElement<out StubElement<*>>): String {
     return "[STUB]"// + stubElement.getNode().getElementType().toString();
 }
 
-fun getName(fieldDef: LuaDocFieldDef): String? {
-    val stub = fieldDef.stub
+fun getName(tagField: LuaDocTagField): String? {
+    val stub = tagField.stub
     if (stub != null)
         return stub.name
-    return getName(fieldDef as PsiNameIdentifierOwner)
+    return getName(tagField as PsiNameIdentifierOwner)
 }
 
-fun getFieldName(fieldDef: LuaDocFieldDef): String? {
-    val stub = fieldDef.stub
+fun getFieldName(tagField: LuaDocTagField): String? {
+    val stub = tagField.stub
     if (stub != null)
         return stub.name
-    return fieldDef.name
+    return tagField.name
 }
 
-fun getPresentation(fieldDef: LuaDocFieldDef): ItemPresentation {
+fun getPresentation(tagField: LuaDocTagField): ItemPresentation {
     return object : ItemPresentation {
         override fun getPresentableText(): String? {
-            return fieldDef.name
+            return tagField.name
         }
 
         override fun getLocationString(): String? {
-            return fieldDef.containingFile.name
+            return tagField.containingFile.name
         }
 
         override fun getIcon(b: Boolean): Icon? {
@@ -276,7 +284,7 @@ fun getType(unionTy: LuaDocUnionTy): ITy {
     return retTy
 }
 
-fun getReference(see: LuaDocSeeRefTag): PsiReference? {
+fun getReference(see: LuaDocTagSee): PsiReference? {
     if (see.id == null) return null
     return LuaDocSeeReference(see)
 }

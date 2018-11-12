@@ -13,7 +13,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocTableTyImpl extends LuaDocTyImpl implements LuaDocTableTy {
 
-  public LuaDocTableTyImpl(ASTNode node) {
+  public LuaDocTableTyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

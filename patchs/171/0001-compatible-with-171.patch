@@ -8,7 +8,6 @@ Subject: [PATCH] compatible with 171
  .../EmmyLuaDirectoryProjectGenerator.kt       | 36 --------
  .../project/LuaAdditionalSourcesRootPanel.kt  |  4 +-
  .../intellij/lua/project/LuaModuleType.kt     |  5 +-
- src/main/resources/META-INF/plugin.xml        |  2 -
  5 files changed, 3 insertions(+), 131 deletions(-)
  delete mode 100644 src/main/java/com/tang/intellij/lua/editor/LuaBreadcrumbsProvider.kt
  delete mode 100644 src/main/java/com/tang/intellij/lua/project/EmmyLuaDirectoryProjectGenerator.kt
@@ -189,26 +188,6 @@ index 5d79699b..9468e9f5 100644
  
      override fun createModuleBuilder() = LuaModuleBuilder()
  
-diff --git a/src/main/resources/META-INF/plugin.xml b/src/main/resources/META-INF/plugin.xml
-index 0c7e1c00..75e96ca9 100644
---- a/src/main/resources/META-INF/plugin.xml
-+++ b/src/main/resources/META-INF/plugin.xml
-@@ -155,7 +155,6 @@
-         <library.type implementation="com.tang.intellij.lua.project.LuaLibraryType"/>
-         <!--<indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>-->
-         <additionalLibraryRootsProvider implementation="com.tang.intellij.lua.project.StdLibraryProvider"/>
--        <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
- 
-         <!-- unity dll -->
-         <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
-@@ -198,7 +197,6 @@
-         <!--navigate-->
-         <gotoClassContributor implementation="com.tang.intellij.lua.editor.LuaClassNavigationContributor"/>
-         <gotoSymbolContributor implementation="com.tang.intellij.lua.editor.LuaSymbolNavigationContributor"/>
--        <breadcrumbsInfoProvider implementation="com.tang.intellij.lua.editor.LuaBreadcrumbsProvider"/>
- 
-         <!--completion-->
-         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaDocCompletionContributor"/>
 -- 
 2.17.0.windows.1
 

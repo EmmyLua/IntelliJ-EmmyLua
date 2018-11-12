@@ -24,8 +24,8 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
-import com.tang.intellij.lua.comment.psi.impl.LuaDocFieldDefImpl
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
+import com.tang.intellij.lua.comment.psi.impl.LuaDocTagFieldImpl
 import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -37,43 +37,43 @@ import com.tang.intellij.lua.ty.Ty
 
  * Created by tangzx on 2016/12/10.
  */
-class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldDef>("CLASS_DOC_FIELD") {
+class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocTagField>("CLASS_DOC_FIELD") {
 
-    override fun createPsi(stub: LuaDocFieldDefStub) = LuaDocFieldDefImpl(stub, this)
+    override fun createPsi(stub: LuaDocFieldDefStub) = LuaDocTagFieldImpl(stub, this)
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
-        val element = node.psi as LuaDocFieldDef
+        val element = node.psi as LuaDocTagField
         if (element.nameIdentifier == null)
             return false
         if (element.classNameRef != null)
             return true
         val comment = LuaCommentUtil.findContainer(element)
-        return comment.classDef != null
+        return comment.tagClass != null
     }
 
-    override fun createStub(fieldDef: LuaDocFieldDef, stubElement: StubElement<*>): LuaDocFieldDefStub {
-        val name = fieldDef.name!!
+    override fun createStub(tagField: LuaDocTagField, stubElement: StubElement<*>): LuaDocFieldDefStub {
+        val name = tagField.name!!
         var className: String? = null
 
-        val classRef = fieldDef.classNameRef
+        val classRef = tagField.classNameRef
         if (classRef != null) {
             className = classRef.id.text
         } else {
-            val comment = LuaCommentUtil.findContainer(fieldDef)
-            val classDef = comment.classDef
+            val comment = LuaCommentUtil.findContainer(tagField)
+            val classDef = comment.tagClass
             if (classDef != null) {
                 className = classDef.name
             }
         }
 
-        var flags = BitUtil.set(0, fieldDef.visibility.bitMask, true)
-        flags = BitUtil.set(flags, FLAG_DEPRECATED, fieldDef.isDeprecated)
+        var flags = BitUtil.set(0, tagField.visibility.bitMask, true)
+        flags = BitUtil.set(flags, FLAG_DEPRECATED, tagField.isDeprecated)
 
         return LuaDocFieldDefStubImpl(stubElement,
                 flags,
                 name,
                 className,
-                fieldDef.ty?.getType() ?: Ty.UNKNOWN)
+                tagField.ty?.getType() ?: Ty.UNKNOWN)
     }
 
     override fun serialize(stub: LuaDocFieldDefStub, stubOutputStream: StubOutputStream) {
@@ -109,7 +109,7 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocFieldD
     }
 }
 
-interface LuaDocFieldDefStub : LuaClassMemberStub<LuaDocFieldDef> {
+interface LuaDocFieldDefStub : LuaClassMemberStub<LuaDocTagField> {
     val name: String
 
     val type: ITy
@@ -124,7 +124,7 @@ class LuaDocFieldDefStubImpl(parent: StubElement<*>,
                              override val name: String,
                              override val className: String?,
                              override val type: ITy)
-    : LuaDocStubBase<LuaDocFieldDef>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocFieldDefStub {
+    : LuaDocStubBase<LuaDocTagField>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocFieldDefStub {
     override val docTy = type
 
     override val isDeprecated: Boolean

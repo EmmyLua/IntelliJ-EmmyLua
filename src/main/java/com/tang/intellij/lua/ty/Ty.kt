@@ -544,4 +544,36 @@ class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
     override fun acceptChildren(visitor: ITyVisitor) {
         list.forEach { it.accept(visitor) }
     }
+
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (other is TyTuple && other.size == size) {
+            for (i in 0 until size) {
+                if (!list[i].subTypeOf(other.list[i], context, strict)) {
+                    return false
+                }
+            }
+            return true
+        }
+        return false
+    }
+
+    override fun hashCode(): Int {
+        var hash = 0
+        for (ty in list) {
+            hash = hash * 31 + ty.hashCode()
+        }
+        return hash
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other is TyTuple && other.size == size) {
+            for (i in 0 until size) {
+                if (list[i] != other.list[i]) {
+                    return false
+                }
+            }
+            return true
+        }
+        return super.equals(other)
+    }
 }

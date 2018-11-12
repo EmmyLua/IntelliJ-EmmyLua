@@ -34,6 +34,7 @@ import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
+import com.tang.intellij.lua.comment.psi.LuaDocTagVararg
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaIcons
@@ -373,6 +374,25 @@ fun guessReturnType(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy 
     return inferReturnTy(owner, searchContext)
 }
 
+fun getVarargTy(owner: LuaFuncBodyOwner): ITy? {
+    if (owner is StubBasedPsiElementBase<*>) {
+        val stub = owner.stub
+        if (stub is LuaFuncBodyOwnerStub<*>) {
+            return stub.varargTy
+        }
+    }
+    owner.funcBody?.ellipsis?.let {
+        var ret: ITy? = null
+        if (owner is LuaCommentOwner) {
+            val varargDef = owner.comment?.findTag(LuaDocTagVararg::class.java)
+            ret = varargDef?.type
+        }
+        return ret ?: Ty.UNKNOWN
+    }
+
+    return null
+}
+
 fun getParams(owner: LuaFuncBodyOwner): Array<LuaParamInfo> {
     if (owner is StubBasedPsiElementBase<*>) {
         val stub = owner.stub
@@ -404,13 +424,6 @@ private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo>
                 }
             }
             list.add(paramInfo)
-        }
-        //check varArgs
-        funcBodyOwner.funcBody?.ellipsis?.let {
-            val args = LuaParamInfo()
-            args.name = "..."
-            args.isVarArgs = true
-            list.add(args)
         }
         return list.toTypedArray()
     }

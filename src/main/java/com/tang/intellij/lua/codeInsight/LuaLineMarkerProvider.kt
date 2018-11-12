@@ -34,7 +34,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Function
 import com.intellij.util.FunctionUtil
 import com.intellij.util.Query
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
@@ -111,7 +111,7 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                 lineSeparator.separatorPlacement = SeparatorPlacement.TOP
                 result.add(lineSeparator)
             }
-        } else if (element is LuaDocClassDef) {
+        } else if (element is LuaDocTagClass) {
             val classType = element.type
             val project = element.getProject()
             val query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.className)
@@ -122,11 +122,11 @@ class LuaLineMarkerProvider(private val daemonSettings: DaemonCodeAnalyzerSettin
                         AllIcons.Gutter.OverridenMethod,
                         Pass.LINE_MARKERS,
                         Function<PsiElement, String> { element.name },
-                        object : LuaLineMarkerNavigator<PsiElement, LuaDocClassDef>() {
+                        object : LuaLineMarkerNavigator<PsiElement, LuaDocTagClass>() {
                             override fun getTitle(elt: PsiElement)
                                     = "Choose Subclass of ${element.name}"
 
-                            override fun search(elt: PsiElement): Query<LuaDocClassDef> {
+                            override fun search(elt: PsiElement): Query<LuaDocTagClass> {
                                 return LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, element.name)
                             }
                         },

@@ -19,12 +19,12 @@ package com.tang.intellij.lua.comment.reference
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
+import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.search.LuaPredefinedScope
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 
 /**
@@ -53,7 +53,7 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
             if (genericDef.name == name)
                 return genericDef
         }
-        return LuaClassIndex.find(name, myElement.project, LuaPredefinedScope(myElement.project))
+        return LuaClassIndex.find(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
     }
 
     override fun getVariants(): Array<Any> = emptyArray()

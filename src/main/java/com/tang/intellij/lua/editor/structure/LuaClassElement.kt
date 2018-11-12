@@ -16,11 +16,11 @@
 
 package com.tang.intellij.lua.editor.structure
 
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.lang.LuaIcons
 
 /**
  * Created by TangZX on 2016/12/13.
  */
-class LuaClassElement internal constructor(docClassDef: LuaDocClassDef, className: String? = null)
-    : LuaVarElement(docClassDef, className ?: docClassDef.name, LuaIcons.CLASS)
+class LuaClassElement internal constructor(docTagClass: LuaDocTagClass, className: String? = null)
+    : LuaVarElement(docTagClass, className ?: docTagClass.name, LuaIcons.CLASS)

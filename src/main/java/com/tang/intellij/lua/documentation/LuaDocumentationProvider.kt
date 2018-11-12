@@ -22,8 +22,8 @@ import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.comment.psi.LuaDocClassDef
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.editor.completion.LuaDocumentationLookupElement
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -72,7 +72,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         val tyRenderer = renderer
         when (element) {
             is LuaParamNameDef -> renderParamNameDef(sb, element)
-            is LuaDocClassDef -> renderClassDef(sb, element, tyRenderer)
+            is LuaDocTagClass -> renderClassDef(sb, element, tyRenderer)
             is LuaClassMember -> renderClassMember(sb, element)
             is LuaNameDef -> { //local xx
 
@@ -145,7 +145,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         //comment content
         when (classMember) {
             is LuaCommentOwner -> renderComment(sb, classMember.comment, tyRenderer)
-            is LuaDocFieldDef -> renderCommentString("  ", null, sb, classMember.commentString)
+            is LuaDocTagField -> renderCommentString("  ", null, sb, classMember.commentString)
             is LuaIndexExpr -> {
                 val p1 = classMember.parent
                 val p2 = p1.parent

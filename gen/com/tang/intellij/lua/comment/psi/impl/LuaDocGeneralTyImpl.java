@@ -13,7 +13,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocGeneralTyImpl extends LuaDocTyImpl implements LuaDocGeneralTy {
 
-  public LuaDocGeneralTyImpl(ASTNode node) {
+  public LuaDocGeneralTyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

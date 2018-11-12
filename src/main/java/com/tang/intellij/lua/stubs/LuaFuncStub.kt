@@ -44,7 +44,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         var moduleName = Constants.WORD_G
         val file = funcDef.containingFile
         if (file is LuaPsiFile) moduleName = file.moduleName ?: Constants.WORD_G
-        val retDocTy = funcDef.comment?.returnDef?.type
+        val retDocTy = funcDef.comment?.tagReturn?.type
         val params = funcDef.params
         val tyParams = funcDef.tyParams
         val overloads = funcDef.overloads
@@ -56,6 +56,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
                 moduleName,
                 flags,
                 retDocTy,
+                funcDef.varargType,
                 params,
                 tyParams,
                 overloads,
@@ -72,6 +73,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         stream.writeName(stub.module)
         stream.writeShort(stub.flags)
         stream.writeTyNullable(stub.returnDocTy)
+        stream.writeTyNullable(stub.varargTy)
         stream.writeParamInfoArray(stub.params)
         stream.writeTyParams(stub.tyParams)
         stream.writeSignatures(stub.overloads)
@@ -82,6 +84,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         val module = stream.readName()
         val flags = stream.readShort()
         val retDocTy = stream.readTyNullable()
+        val varargTy = stream.readTyNullable()
         val params = stream.readParamInfoArray()
         val tyParams = stream.readTyParams()
         val overloads = stream.readSignatures()
@@ -89,6 +92,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
                 StringRef.toString(module),
                 flags.toInt(),
                 retDocTy,
+                varargTy,
                 params,
                 tyParams,
                 overloads,
@@ -119,6 +123,7 @@ class LuaFuncStubImpl(override val name: String,
                       override val module: String,
                       override val flags: Int,
                       override val returnDocTy: ITy?,
+                      override val varargTy: ITy?,
                       override val params: Array<LuaParamInfo>,
                       override val tyParams: Array<TyParameter>,
                       override val overloads: Array<IFunSignature>,

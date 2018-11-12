@@ -22,8 +22,8 @@ import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
+import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
 import com.tang.intellij.lua.ext.ILuaTypeInfer
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
@@ -42,7 +42,7 @@ internal fun inferInner(element: LuaTypeGuessable, context: SearchContext): ITy 
         is LuaExpr -> inferExpr(element, context)
         is LuaParamNameDef -> element.infer(context)
         is LuaNameDef -> element.infer(context)
-        is LuaDocFieldDef -> element.infer()
+        is LuaDocTagField -> element.infer()
         is LuaTableField -> element.infer(context)
         is LuaPsiFile -> inferFile(element, context)
         else -> Ty.UNKNOWN
@@ -64,7 +64,7 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
     if (owner is LuaCommentOwner) {
         val comment = LuaCommentUtil.findComment(owner)
         if (comment != null) {
-            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
+            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocTagReturn::class.java)
             if (returnDef != null) {
                 //return returnDef.resolveTypeAt(searchContext.index)
                 return returnDef.type
@@ -150,7 +150,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
     return type
 }
 
-private fun LuaDocFieldDef.infer(): ITy {
+private fun LuaDocTagField.infer(): ITy {
     val stub = stub
     if (stub != null)
         return stub.type
@@ -269,25 +269,6 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
         val exprList = paramOwner.exprList
         val callExpr = PsiTreeUtil.findChildOfType(exprList, LuaCallExpr::class.java)
         val paramIndex = paramOwner.getIndexFor(paramNameDef)
-        val expr = callExpr?.expr
-        if (expr is LuaNameExpr) {
-            // ipairs && TyArray
-            if (expr.name == Constants.WORD_IPAIRS) {
-                if (paramIndex == 0)
-                    return Ty.NUMBER
-
-                val args = callExpr.args
-                if (args is LuaListArgs) {
-                    val argExpr = PsiTreeUtil.findChildOfType(args, LuaExpr::class.java)
-                    if (argExpr != null) {
-                        val set = argExpr.guessType(context)
-                        val tyArray = TyUnion.find(set, ITyArray::class.java)
-                        if (tyArray != null)
-                            return tyArray.base
-                    }
-                }
-            }
-        }
 
         // iterator support
         val type = callExpr?.guessType(context)

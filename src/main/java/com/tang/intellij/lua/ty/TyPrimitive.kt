@@ -45,6 +45,12 @@ class TyPrimitiveClass(override val primitiveKind: TyPrimitiveKind,
     override fun doLazyInit(searchContext: SearchContext) { }
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        // Everything is subset of any
+        if (other.kind == TyKind.Unknown) return !strict
+
+        // Handle unions, subtype if subtype of any of the union components.
+        if (other is TyUnion) return other.getChildTypes().any { type -> subTypeOf(type, context, strict) }
+
         return this == other
     }
 

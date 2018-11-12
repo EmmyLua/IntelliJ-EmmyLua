@@ -78,19 +78,20 @@ DOC_DASHES = --+
 }
 
 <xTAG_NAME> {
-    "field"                    { yybegin(xFIELD); return TAG_FIELD; }
-    "param"                    { yybegin(xPARAM); return TAG_PARAM; }
-    "class"                    { yybegin(xCLASS); return TAG_CLASS; }
-    "module"                   { yybegin(xCLASS); return TAG_MODULE; }
-    "return"                   { beginType(); return TAG_RETURN; }
-    "type"                     { beginType(); return TAG_TYPE;}
-    "overload"                 { beginType(); return TAG_OVERLOAD; }
-    "private"                  { return TAG_PRIVATE; }
-    "protected"                { return TAG_PROTECTED; }
-    "public"                   { return TAG_PUBLIC; }
-    "language"                 { yybegin(xTAG_WITH_ID); return TAG_LANGUAGE;}
-    "generic"                  { yybegin(xGENERIC); return TAG_GENERIC; }
-    "see"                      { yybegin(xTAG); return TAG_SEE; }
+    "field"                    { yybegin(xFIELD); return TAG_NAME_FIELD; }
+    "param"                    { yybegin(xPARAM); return TAG_NAME_PARAM; }
+    "vararg"                   { yybegin(xPARAM); return TAG_NAME_VARARG; }
+    "class"                    { yybegin(xCLASS); return TAG_NAME_CLASS; }
+    "module"                   { yybegin(xCLASS); return TAG_NAME_MODULE; }
+    "return"                   { beginType(); return TAG_NAME_RETURN; }
+    "type"                     { beginType(); return TAG_NAME_TYPE;}
+    "overload"                 { beginType(); return TAG_NAME_OVERLOAD; }
+    "private"                  { return TAG_NAME_PRIVATE; }
+    "protected"                { return TAG_NAME_PROTECTED; }
+    "public"                   { return TAG_NAME_PUBLIC; }
+    "language"                 { yybegin(xTAG_WITH_ID); return TAG_NAME_LANGUAGE;}
+    "generic"                  { yybegin(xGENERIC); return TAG_NAME_GENERIC; }
+    "see"                      { yybegin(xTAG); return TAG_NAME_SEE; }
     {ID}                       { yybegin(xCOMMENT_STRING); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
@@ -138,6 +139,7 @@ DOC_DASHES = --+
     "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
     "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
+    "vararg"                   { _typeReq = true; return VARARG; }
     "..."|{ID}                 { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(xCOMMENT_STRING); yypushback(yylength()); } }
 }
 

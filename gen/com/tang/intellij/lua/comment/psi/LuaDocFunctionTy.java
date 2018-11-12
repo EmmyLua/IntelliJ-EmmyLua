@@ -14,6 +14,9 @@ public interface LuaDocFunctionTy extends LuaDocTy {
   @Nullable
   LuaDocTypeList getTypeList();
 
+  @Nullable
+  LuaDocVarargParam getVarargParam();
+
   @NotNull
   ITy getType();
 

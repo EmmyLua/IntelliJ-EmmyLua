@@ -40,7 +40,7 @@ class ReturnTypeInspection : StrictInspection() {
                     val abstractType = if (bodyOwner is LuaClassMethodDef) {
                         guessSuperReturnTypes(bodyOwner, context)
                     } else {
-                        val returnDef = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
+                        val returnDef = (bodyOwner as? LuaCommentOwner)?.comment?.tagReturn
                         returnDef?.type
                     }
                     val concreteType = guessReturnType(o, -1, context)
@@ -90,7 +90,7 @@ class ReturnTypeInspection : StrictInspection() {
                                 return superMember.guessReturnType(context)
                             }
                         } else {
-                            return comment.returnDef?.type
+                            return comment.tagReturn?.type
                         }
                     }
                     return null
@@ -113,7 +113,7 @@ class ReturnTypeInspection : StrictInspection() {
                             /*if (bodyOwner == null) {
                                 myHolder.registerProblem(o, "Return statement needs to be in function.")
                             }*/
-                            val returnDef = (bodyOwner as? LuaCommentOwner)?.comment?.returnDef
+                            val returnDef = (bodyOwner as? LuaCommentOwner)?.comment?.tagReturn
                             returnDef?.type
                         }
 

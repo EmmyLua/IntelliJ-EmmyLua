@@ -13,7 +13,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunctionTy {
 
-  public LuaDocFunctionTyImpl(ASTNode node) {
+  public LuaDocFunctionTyImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -36,6 +36,12 @@ public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunction
   @Nullable
   public LuaDocTypeList getTypeList() {
     return PsiTreeUtil.getChildOfType(this, LuaDocTypeList.class);
+  }
+
+  @Override
+  @Nullable
+  public LuaDocVarargParam getVarargParam() {
+    return PsiTreeUtil.getChildOfType(this, LuaDocVarargParam.class);
   }
 
   @NotNull

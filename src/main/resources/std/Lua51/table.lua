@@ -20,6 +20,8 @@ table = {}
 --- `sep` is the empty string, the default for `i` is 1, and the default for
 --- `j` is #list. If `i` is greater than `j`, returns the empty string.
 ---@overload fun(list:table):string
+---@overload fun(list:table, sep:string):string
+---@overload fun(list:table, sep:string, i:number):string
 ---@param list table
 ---@param sep string
 ---@param i number

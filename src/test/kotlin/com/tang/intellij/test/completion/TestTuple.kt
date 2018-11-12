@@ -32,7 +32,7 @@ class TestTuple : TestCompletionBase() {
             local a, b = getTuple()
             b.--[[caret]]
         """) {
-            assertTrue(it.contains("name"))
+            assertTrue("name" in it)
         }
     }
 }

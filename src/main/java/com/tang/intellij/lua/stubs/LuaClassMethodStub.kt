@@ -61,7 +61,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val visibility = methodDef.visibility
         flags = BitUtil.set(flags, visibility.bitMask, true)
 
-        val retDocTy = methodDef.comment?.returnDef?.type
+        val retDocTy = methodDef.comment?.tagReturn?.type
         val params = methodDef.params
         val overloads = methodDef.overloads
         val tyParams = methodDef.tyParams
@@ -73,6 +73,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
                 params,
                 tyParams,
                 overloads,
+                methodDef.varargType,
                 stubElement)
     }
 
@@ -94,6 +95,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         stubOutputStream.writeTyNullable(stub.returnDocTy)
         stubOutputStream.writeParamInfoArray(stub.params)
         stubOutputStream.writeTyParams(stub.tyParams)
+        stubOutputStream.writeTyNullable(stub.varargTy)
         stubOutputStream.writeSignatures(stub.overloads)
     }
 
@@ -114,6 +116,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val retDocTy = stubInputStream.readTyNullable()
         val params = stubInputStream.readParamInfoArray()
         val tyParams = stubInputStream.readTyParams()
+        val varargTy = stubInputStream.readTyNullable()
         val overloads = stubInputStream.readSignatures()
 
         return LuaClassMethodStubImpl(flags.toInt(),
@@ -123,6 +126,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
                 params,
                 tyParams,
                 overloads,
+                varargTy,
                 stubElement)
     }
 
@@ -159,6 +163,7 @@ class LuaClassMethodStubImpl(override val flags: Int,
                              override val params: Array<LuaParamInfo>,
                              override val tyParams: Array<TyParameter>,
                              override val overloads: Array<IFunSignature>,
+                             override val varargTy: ITy?,
                              parent: StubElement<*>)
     : StubBase<LuaClassMethodDef>(parent, LuaElementType.CLASS_METHOD_DEF), LuaClassMethodStub {
     override val docTy: ITy? = null

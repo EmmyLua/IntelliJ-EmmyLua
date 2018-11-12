@@ -13,7 +13,7 @@ import com.tang.intellij.lua.comment.psi.*;
 
 public class LuaDocCommentStringImpl extends ASTWrapperPsiElement implements LuaDocCommentString {
 
-  public LuaDocCommentStringImpl(ASTNode node) {
+  public LuaDocCommentStringImpl(@NotNull ASTNode node) {
     super(node);
   }
 

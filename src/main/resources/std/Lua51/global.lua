@@ -86,6 +86,7 @@ function error(message, level) end
 --- itself does not use this variable; changing its value does not affect any
 --- environment, nor vice versa.
 ---@class _G
+_G = {}
 
 ---
 --- If `object` does not have a metatable, returns **nil**. Otherwise, if the
@@ -112,8 +113,8 @@ function getfenv(f) end
 --- will iterate over the key–value pairs (1,`t[1]`), (2,`t[2]`), ..., up to
 --- the first absent index.
 ---@generic V
----@param t table<number, V>
----@return fun(tbl: table<number, V>):(number, V)
+---@param t table<number, V>|V[]
+---@return fun(tbl: table<number, V>):number, V
 function ipairs(t) end
 
 ---
@@ -227,8 +228,8 @@ function next(table, index) end
 --- See function `next` for the caveats of modifying the table during its
 --- traversal.
 ---@generic V
----@param t table<string, V>
----@return fun(tbl: table<string, V>):(string, V)
+---@param t table<string, V>|V[]
+---@return fun(tbl: table<string, V>):string, V
 function pairs(t) end
 
 ---
@@ -316,8 +317,10 @@ function require(modname) end
 --- `index`. a negative number indexes from the end (-1 is the last argument).
 --- Otherwise, `index` must be the string "#", and `select` returns
 --- the total number of extra arguments it received.
+---@generic T
 ---@param index number|string
----@return any
+---@vararg T
+---@return T
 function select(index, ...) end
 
 --- Sets the environment to be used by the given function. f can be a Lua

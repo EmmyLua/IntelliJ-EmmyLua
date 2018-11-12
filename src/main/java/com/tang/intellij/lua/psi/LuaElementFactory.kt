@@ -20,7 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.comment.psi.LuaDocFieldDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.lang.LuaLanguage
 
 /**
@@ -62,7 +62,12 @@ object LuaElementFactory {
 
     fun createDocIdentifier(project: Project, name: String): PsiElement {
         val element = createWith(project, "---@field $name string")
-        val fieldDef = PsiTreeUtil.findChildOfType(element, LuaDocFieldDef::class.java)!!
+        val fieldDef = PsiTreeUtil.findChildOfType(element, LuaDocTagField::class.java)!!
         return fieldDef.id!!
+    }
+
+    fun createParamter(project: Project, name: String): PsiElement {
+        val element = createWith(project, "local function($name)end")
+        return PsiTreeUtil.findChildOfType(element, LuaParamNameDef::class.java)!!
     }
 }

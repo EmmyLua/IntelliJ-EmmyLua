@@ -24,6 +24,7 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
     val params: Array<LuaParamInfo>
     val tyParams: Array<TyParameter>
     val overloads: Array<IFunSignature>
+    val varargTy: ITy?
 
     private fun walkStub(stub: StubElement<*>, context: SearchContext): ITy? {
         val psi = stub.psi

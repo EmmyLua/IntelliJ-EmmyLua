@@ -15,7 +15,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public class LuaDocClassNameRefImpl extends ASTWrapperPsiElement implements LuaDocClassNameRef {
 
-  public LuaDocClassNameRefImpl(ASTNode node) {
+  public LuaDocClassNameRefImpl(@NotNull ASTNode node) {
     super(node);
   }
 

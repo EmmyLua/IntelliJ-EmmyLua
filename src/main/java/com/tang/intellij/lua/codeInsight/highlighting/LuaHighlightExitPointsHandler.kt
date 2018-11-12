@@ -22,8 +22,8 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Consumer
-import com.tang.intellij.lua.comment.psi.LuaDocOverloadDef
-import com.tang.intellij.lua.comment.psi.LuaDocReturnDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagOverload
+import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
 import com.tang.intellij.lua.psi.*
 
 /**
@@ -62,11 +62,11 @@ class LuaHighlightExitPointsHandler internal constructor(editor: Editor, file: P
         val parent = funcBody.parent
         if (parent is LuaCommentOwner) {
             val comment = parent.comment
-            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocReturnDef::class.java)
+            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocTagReturn::class.java)
             if (returnDef != null)
                 addOccurrence(returnDef)
 
-            val overloads = PsiTreeUtil.findChildrenOfType(comment, LuaDocOverloadDef::class.java)
+            val overloads = PsiTreeUtil.findChildrenOfType(comment, LuaDocTagOverload::class.java)
             overloads.forEach { overload ->
                 overload.functionTy?.typeList?.let { addOccurrence(it) }
             }

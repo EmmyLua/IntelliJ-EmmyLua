@@ -19,13 +19,12 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.psi.PsiErrorElement
-import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
 class MatchFunctionSignatureInspection : StrictInspection() {
+    data class ConcreteTypeInfo(val param: LuaExpr, val ty: ITy)
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
                 override fun visitIndexExpr(o: LuaIndexExpr) {
@@ -53,39 +52,8 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     val type = prefixExpr.guessType(searchContext)
 
                     if (type is TyPsiFunction) {
-                        val givenParams = o.argList
-                        val givenTypes = mutableListOf<ITy>()
-                        for ((i, param) in givenParams.withIndex()) {
-                            val paramType = param.guessType(searchContext)
-                            if (paramType is TyTuple) {
-                                if (i == givenParams.lastIndex) {
-                                    givenTypes.addAll(paramType.list)
-                                }
-                                else {
-                                    givenTypes.add(paramType.list.first())
-                                }
-                            }
-                            else {
-                                givenTypes.add(paramType)
-                            }
-                        }
-                        //find the perfect one.
-                        var perfectSig: IFunSignature? = null
-                        var perfectMatchNum = -1
-                        var fullMatch = false
-                        type.process(Processor { sig ->
-                            val pair = matchCallSignature(givenTypes, sig, searchContext)
-                            if (pair.second > perfectMatchNum) {
-                                perfectSig = sig
-                                perfectMatchNum = pair.second
-                            }
-                            if (pair.first)
-                                fullMatch = true
-                            !fullMatch
-                        })
-                        if (!fullMatch && perfectSig != null) {
-                            annotateCall(o, givenParams, givenTypes, perfectSig!!, searchContext)
-                        }
+                        val perfectSig = type.findPerfectSignature(o)
+                        annotateCall(o, perfectSig, searchContext)
                     } else if (prefixExpr is LuaIndexExpr) {
                         // Get parent type
                         val parentType = prefixExpr.guessParentType(searchContext)
@@ -99,69 +67,39 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     }
                 }
 
-                private fun annotateCall(call: LuaCallExpr, concreteParams: List<LuaExpr>, concreteTypes: List<ITy>, signature: IFunSignature, searchContext: SearchContext) {
-                    val abstractParams = signature.params
-                    val hasVarArgs = signature.hasVarArgs()
-                    val sigParamSize = if (hasVarArgs) signature.params.size - 1 else signature.params.size
-
-                    // Check if number of arguments match
-                    // 代码明确填写的实参过多
-                    if (concreteParams.size > sigParamSize) {
-                        if (!hasVarArgs) {
-                            val signatureString = abstractParams.joinToString(", ", transform = { param -> param.ty.displayName })
-                            for (i in sigParamSize until concreteParams.size) {
-                                myHolder.registerProblem(concreteParams[i], "Too many arguments for type %s(%s).".format(call.firstChild.text, signatureString))
+                private fun annotateCall(call: LuaCallExpr, signature: IFunSignature, searchContext: SearchContext) {
+                    val concreteParams = call.argList
+                    val concreteTypes = mutableListOf<ConcreteTypeInfo>()
+                    concreteParams.forEachIndexed { index, luaExpr ->
+                        val ty = luaExpr.guessType(searchContext)
+                        if (ty is TyTuple) {
+                            if (index == concreteParams.lastIndex) {
+                                concreteTypes.addAll(ty.list.map { ConcreteTypeInfo(luaExpr, it) })
+                            } else {
+                                concreteTypes.add(ConcreteTypeInfo(luaExpr, ty.list.first()))
                             }
-                        }
-                    }
-                    // 实参过少
-                    else if (concreteTypes.size < sigParamSize) {
-                        val last = call.lastChild.lastChild
-                        if (last is PsiErrorElement)
-                            return
-                        for (i in concreteTypes.size until sigParamSize) {
-                            myHolder.registerProblem(last, "Missing argument: %s: %s".format(abstractParams[i].name, abstractParams[i].ty.displayName))
-                        }
-                    }
-                    else {
-                        // Check individual arguments
-                        for (i in 0 until sigParamSize) {
-                            // Check if concrete param is subtype of abstract type.
-                            val concreteType = concreteTypes[i]
-                            val abstractType = abstractParams[i].ty
-
-                            if (!concreteType.subTypeOf(abstractType, searchContext, false)) {
-                                myHolder.registerProblem(concreteParams[i], "Type mismatch. Required: '%s' Found: '%s'".format(abstractType.displayName, concreteType.displayName))
-                            }
-                        }
-                    }
-                }
-
-                // Evaluate if concrete function parameters match abstract function parameters.
-                private fun matchCallSignature(concreteTypes: List<ITy>, signature: IFunSignature, searchContext: SearchContext): Pair<Boolean, Int> {
-                    val hasVarArgs = signature.hasVarArgs()
-                    val sigParamSize = if (hasVarArgs) signature.params.size - 1 else signature.params.size
-
-                    // Check if number of arguments matches
-                    if (hasVarArgs) {
-                        if (concreteTypes.size < sigParamSize)
-                            return Pair(false, 0)
-                    } else if (concreteTypes.size != sigParamSize)
-                        return Pair(false, 0)
-
-                    var matchScore = 0
-                    // Check individual arguments
-                    for (i in 0 until sigParamSize) {
-                        // Check if concrete param is subtype of abstract type.
-                        val concreteType = concreteTypes[i]
-                        val abstractType = signature.getParamTy(i)
-
-                        if (concreteType.subTypeOf(abstractType, searchContext, false)) {
-                            matchScore++
-                        }
+                        } else concreteTypes.add(ConcreteTypeInfo(luaExpr, ty))
                     }
 
-                    return Pair(matchScore == sigParamSize, matchScore)
+                    var nArgs = 0
+                    signature.processArgs(call) { i, pi ->
+                        nArgs = i + 1
+                        val typeInfo = concreteTypes.getOrNull(i)
+                        if (typeInfo == null) {
+                            myHolder.registerProblem(call.lastChild.lastChild, "Missing argument: ${pi.name}: ${pi.ty}")
+                            return@processArgs true
+                        }
+
+                        val type = typeInfo.ty
+                        if (!type.subTypeOf(pi.ty, searchContext, false))
+                            myHolder.registerProblem(typeInfo.param, "Type mismatch. Required: '${pi.ty}' Found: '$type'")
+                        true
+                    }
+                    if (nArgs < concreteParams.size && !signature.hasVarargs()) {
+                        for (i in nArgs until concreteParams.size) {
+                            myHolder.registerProblem(concreteParams[i], "Too many arguments.")
+                        }
+                    }
                 }
             }
 }

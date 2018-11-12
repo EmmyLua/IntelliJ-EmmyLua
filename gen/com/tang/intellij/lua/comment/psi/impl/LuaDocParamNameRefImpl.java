@@ -14,7 +14,7 @@ import com.intellij.psi.PsiReference;
 
 public class LuaDocParamNameRefImpl extends ASTWrapperPsiElement implements LuaDocParamNameRef {
 
-  public LuaDocParamNameRefImpl(ASTNode node) {
+  public LuaDocParamNameRefImpl(@NotNull ASTNode node) {
     super(node);
   }
 

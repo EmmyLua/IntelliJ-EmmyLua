@@ -21,13 +21,13 @@ public interface LuaDocTableField extends LuaDocPsiElement, LuaClassField, PsiNa
   PsiElement getId();
 
   @NotNull
-  ITy guessParentType(SearchContext context);
+  ITy guessParentType(@NotNull SearchContext context);
 
   @NotNull
   Visibility getVisibility();
 
   @NotNull
-  PsiElement setName(String newName);
+  PsiElement setName(@NotNull String newName);
 
   @NotNull
   String getName();
@@ -36,7 +36,7 @@ public interface LuaDocTableField extends LuaDocPsiElement, LuaClassField, PsiNa
   PsiElement getNameIdentifier();
 
   @NotNull
-  ITy guessType(SearchContext context);
+  ITy guessType(@NotNull SearchContext context);
 
   boolean isDeprecated();
 
