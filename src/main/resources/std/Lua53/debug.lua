@@ -34,6 +34,19 @@ function debug.debug() end
 ---@return thread
 function debug.gethook(thread) end
 
+---@class DebugInfo
+---@field linedefined number
+---@field lastlinedefined number
+---@field currentline number
+---@field func function
+---@field isvararg boolean
+---@field namewhat string
+---@field source string
+---@field nups number
+---@field what string
+---@field nparams number
+---@field short_src string
+
 ---
 --- Returns a table with information about a function. You can give the
 --- function directly, or you can give a number as the value of `f`,
@@ -54,11 +67,11 @@ function debug.gethook(thread) end
 --- with a name for the current function, if a reasonable name can be found,
 --- and the expression `debug.getinfo(print)` returns a table with all available
 --- information about the `print` function.
----@overload fun(f:table):table
+---@overload fun(f:function):DebugInfo
 ---@param thread thread
----@param f table
+---@param f function
 ---@param what string
----@return table
+---@return DebugInfo
 function debug.getinfo(thread, f, what) end
 
 ---
