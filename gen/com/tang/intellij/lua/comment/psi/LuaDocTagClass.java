@@ -5,12 +5,13 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.tang.intellij.lua.psi.LuaClass;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaDocClassStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.ty.ITyClass;
 
-public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocClassStub> {
+public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner, LuaClass, LuaDocTag, StubBasedPsiElement<LuaDocClassStub> {
 
   @Nullable
   LuaDocCommentString getCommentString();

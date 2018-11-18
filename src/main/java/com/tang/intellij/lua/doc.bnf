@@ -228,6 +228,7 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.psi.LuaClass"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocClassStub"
     methods = [

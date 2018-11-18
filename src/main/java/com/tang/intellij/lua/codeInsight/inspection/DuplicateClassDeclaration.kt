@@ -26,7 +26,7 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.LuaBundle
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 
 /**
  * 重复定义class
@@ -38,7 +38,7 @@ class DuplicateClassDeclaration : LocalInspectionTool() {
             override fun visitTagClass(o: LuaDocTagClass) {
                 val useScope = o.useScope as? GlobalSearchScope ?: return
                 val identifier = o.nameIdentifier
-                LuaClassIndex.process(identifier.text, o.project, useScope, Processor {
+                LuaShortNamesManager.processClassesWithName(identifier.text, o.project, useScope, Processor {
                     if (it != o)
                         holder.registerProblem(identifier, LuaBundle.message("inspection.duplicate_class", it.containingFile.virtualFile.canonicalPath), ProblemHighlightType.GENERIC_ERROR)
                     true

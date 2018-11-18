@@ -5,6 +5,7 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.tang.intellij.lua.psi.LuaClass;
 
 public class LuaDocVisitor extends PsiElementVisitor {
 
@@ -69,6 +70,7 @@ public class LuaDocVisitor extends PsiElementVisitor {
   public void visitTagClass(@NotNull LuaDocTagClass o) {
     visitPsiElement(o);
     // visitPsiNameIdentifierOwner(o);
+    // visitLuaClass(o);
     // visitTag(o);
   }
 

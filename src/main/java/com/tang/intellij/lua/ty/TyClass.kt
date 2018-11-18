@@ -21,11 +21,12 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocTableDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -143,7 +144,7 @@ abstract class TyClass(override val className: String,
     }
 
     open fun doLazyInit(searchContext: SearchContext) {
-        val classDef = LuaClassIndex.find(className, searchContext)
+        val classDef = LuaShortNamesManager.findClass(className, searchContext)
         if (classDef != null && aliasName == null) {
             val tyClass = classDef.type
             aliasName = tyClass.aliasName

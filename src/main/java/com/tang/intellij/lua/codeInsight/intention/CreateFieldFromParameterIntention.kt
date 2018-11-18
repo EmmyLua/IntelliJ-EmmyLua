@@ -15,8 +15,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.IncorrectOperationException
 import com.tang.intellij.lua.codeInsight.template.macro.SuggestTypeMacro
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import org.jetbrains.annotations.Nls
 
 /**
@@ -66,7 +66,7 @@ class CreateFieldFromParameterIntention : BaseIntentionAction() {
                         val context = SearchContext(project)
                         val classType = methodDef.guessClassType(context)
                         if (classType != null) {
-                            val def = LuaClassIndex.find(classType.className, context)
+                            val def = LuaShortNamesManager.findClass(classType.className, context)
                             if (def != null) {
                                 val tempString = String.format("\n---@field public %s \$type$\$END$", fieldName)
                                 val templateManager = TemplateManager.getInstance(project)

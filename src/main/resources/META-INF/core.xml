@@ -360,6 +360,7 @@
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaOverridingMethodsSearch" interface="com.intellij.util.QueryExecutor"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaFileResolver" interface="com.tang.intellij.lua.ext.ILuaFileResolver"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaTypeInfer" interface="com.tang.intellij.lua.ext.ILuaTypeInfer"/>
+        <extensionPoint qualifiedName="com.tang.intellij.lua.luaShortNamesManager" interface="com.tang.intellij.lua.psi.search.LuaShortNamesManager"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.tang.intellij.lua">
@@ -374,5 +375,7 @@
 
         <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer"/>
         <luaTypeInfer implementation="com.tang.intellij.lua.unity.ty.UnityTypeInfer"/>
+
+        <luaShortNamesManager implementation="com.tang.intellij.lua.psi.search.LuaShortNamesManagerImpl"/>
     </extensions>
 </idea-plugin>
