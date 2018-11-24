@@ -41,13 +41,10 @@ class LuaRunConfigurationProducer : RunConfigurationProducer<LuaAppRunConfigurat
         luaAppRunConfiguration.name = containingFile.name
 
         val dir = containingFile.parent?.virtualFile
-        if (dir != null) {
-            val rootManager = ModuleRootManager.getInstance(configurationContext.module)
-            for (root in rootManager.sourceRoots) {
-                luaAppRunConfiguration.workingDir = root.canonicalPath
-                return true
-            }
-            for (root in rootManager.contentRoots) {
+        val module = configurationContext.module
+        if (dir != null && module != null) {
+            val rootManager = ModuleRootManager.getInstance(module)
+            for (root in rootManager.sourceRoots + rootManager.contentRoots) {
                 luaAppRunConfiguration.workingDir = root.canonicalPath
                 return true
             }
