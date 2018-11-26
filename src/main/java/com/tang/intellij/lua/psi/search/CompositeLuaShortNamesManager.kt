@@ -22,32 +22,57 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.ITyClass
 
-class LuaShortNamesManagerImpl : LuaShortNamesManager() {
+class CompositeLuaShortNamesManager : LuaShortNamesManager() {
+    private val list: Array<LuaShortNamesManager> = LuaShortNamesManager.EP_NAME.extensions
+
     override fun findClass(name: String, project: Project, scope: GlobalSearchScope): LuaClass? {
-        return LuaClassIndex.find(name, project, scope)
+        for (ep in list) {
+            val c = ep.findClass(name, project, scope)
+            if (c != null)
+                return c
+        }
+        return null
     }
 
     override fun findClass(name: String, context: SearchContext): LuaClass? {
-        return LuaClassIndex.find(name, context)
+        for (ep in list) {
+            val c = ep.findClass(name, context)
+            if (c != null)
+                return c
+        }
+        return null
     }
 
     override fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
-        return LuaClassMemberIndex.find(type, fieldName, context)
+        for (manager in list) {
+            val ret = manager.findMember(type, fieldName, context)
+            if (ret != null) return ret
+        }
+        return null
     }
 
     override fun processAllClassNames(project: Project, processor: Processor<String>) {
-        LuaClassIndex.processKeys(project, processor)
+        for (ep in list) {
+            ep.processAllClassNames(project, processor)
+        }
     }
 
     override fun processClassesWithName(name: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaClass>) {
-        LuaClassIndex.process(name, project, scope, Processor { processor.process(it) })
+        for (ep in list) {
+            ep.processClassesWithName(name, project, scope, processor)
+        }
     }
 
     override fun getClassMembers(clazzName: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> {
-        return LuaClassMemberIndex.instance.get(clazzName.hashCode(), project, scope)
+        var collection: MutableCollection<LuaClassMember>? = null
+        for (manager in list) {
+            val col = manager.getClassMembers(clazzName, project, scope)
+            if (col.isNotEmpty()) {
+                if (collection == null) collection = col else collection.addAll(col)
+            }
+        }
+        return collection ?: mutableListOf()
     }
 }

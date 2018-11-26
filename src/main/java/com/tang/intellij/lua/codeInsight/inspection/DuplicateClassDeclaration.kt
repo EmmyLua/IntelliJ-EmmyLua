@@ -38,7 +38,8 @@ class DuplicateClassDeclaration : LocalInspectionTool() {
             override fun visitTagClass(o: LuaDocTagClass) {
                 val useScope = o.useScope as? GlobalSearchScope ?: return
                 val identifier = o.nameIdentifier
-                LuaShortNamesManager.processClassesWithName(identifier.text, o.project, useScope, Processor {
+                val project = o.project
+                LuaShortNamesManager.getInstance(project).processClassesWithName(identifier.text, project, useScope, Processor {
                     if (it != o)
                         holder.registerProblem(identifier, LuaBundle.message("inspection.duplicate_class", it.containingFile.virtualFile.canonicalPath), ProblemHighlightType.GENERIC_ERROR)
                     true

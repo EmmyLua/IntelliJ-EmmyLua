@@ -53,7 +53,7 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
             if (genericDef.name == name)
                 return genericDef
         }
-        return LuaShortNamesManager.findClass(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
+        return LuaShortNamesManager.getInstance(myElement.project).findClass(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
     }
 
     override fun getVariants(): Array<Any> = emptyArray()
