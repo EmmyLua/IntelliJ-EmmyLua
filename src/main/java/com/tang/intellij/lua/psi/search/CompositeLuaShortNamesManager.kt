@@ -75,4 +75,10 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         }
         return collection ?: mutableListOf()
     }
+
+    override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>) {
+        for (manager in list) {
+            manager.processAllMembers(type, fieldName, context, processor)
+        }
+    }
 }
