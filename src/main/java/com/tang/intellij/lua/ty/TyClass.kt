@@ -28,7 +28,6 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
 
 interface ITyClass : ITy {
     val className: String
@@ -155,7 +154,7 @@ abstract class TyClass(override val className: String,
         lazyInit(context)
         val clsName = superClassName
         if (clsName != null) {
-            return Ty.getBuiltin(clsName) ?: LuaClassIndex.find(clsName, context)?.type
+            return Ty.getBuiltin(clsName) ?: LuaShortNamesManager.getInstance(context.project).findClass(clsName, context)?.type
         }
         return null
     }
