@@ -50,4 +50,8 @@ class LuaShortNamesManagerImpl : LuaShortNamesManager() {
     override fun getClassMembers(clazzName: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> {
         return LuaClassMemberIndex.instance.get(clazzName.hashCode(), project, scope)
     }
+
+    override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>) {
+        LuaClassMemberIndex.processAll(type, fieldName, context, processor)
+    }
 }
