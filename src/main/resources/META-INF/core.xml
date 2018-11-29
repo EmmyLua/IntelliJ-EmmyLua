@@ -359,17 +359,17 @@
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.tang.intellij.lua">
-        <luaClassInheritorsSearch implementation="com.tang.intellij.lua.psi.search.LuaClassInheritorsSearchExecutor"/>
-        <luaAllClassesSearch implementation="com.tang.intellij.lua.psi.search.LuaAllClassesSearchExecutor"/>
-        <luaOverridingMethodsSearch implementation="com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearchExecutor"/>
+        <luaClassInheritorsSearch implementation="com.tang.intellij.lua.psi.search.LuaClassInheritorsSearchExecutor" id="base"/>
+        <luaAllClassesSearch implementation="com.tang.intellij.lua.psi.search.LuaAllClassesSearchExecutor" id="base"/>
+        <luaOverridingMethodsSearch implementation="com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearchExecutor" id="base"/>
 
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileSourcesRootResolver" id="base"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAdditionalResolver" id="additional"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAbsoluteResolver" id="absolute"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileFuzzyResolver" id="fuzzy"/>
 
-        <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer"/>
+        <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer" id="base"/>
 
-        <luaShortNamesManager implementation="com.tang.intellij.lua.psi.search.LuaShortNamesManagerImpl"/>
+        <luaShortNamesManager implementation="com.tang.intellij.lua.psi.search.LuaShortNamesManagerImpl" id="base"/>
     </extensions>
 </idea-plugin>
