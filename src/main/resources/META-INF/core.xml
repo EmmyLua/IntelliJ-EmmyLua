@@ -48,10 +48,7 @@
         <additionalLibraryRootsProvider implementation="com.tang.intellij.lua.project.StdLibraryProvider"/>
         <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
 
-        <!-- unity dll -->
-        <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
-        <virtualFileSystem implementationClass="com.tang.intellij.lua.unity.vfs.NetFileSystem" key="dll"/>
-        <iconProvider implementation="com.tang.intellij.lua.unity.NetDirectoryIconProvider" order="before javaDirectory"/>
+
 
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
@@ -149,8 +146,6 @@
         <configurationType implementation="com.tang.intellij.lua.debugger.remote.LuaMobConfigurationType"/>
         <programRunner implementation="com.tang.intellij.lua.debugger.app.LuaAppRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.app.LuaAppConfigurationType"/>
-        <programRunner implementation="com.tang.intellij.lua.debugger.unity.LuaUnityDebuggerRunner"/>
-        <configurationType implementation="com.tang.intellij.lua.debugger.unity.LuaUnityConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
         <xdebugger.localAttachDebuggerProvider implementation="com.tang.intellij.lua.debugger.attach.LuaLocalAttachDebuggerProvider"/>
 
@@ -374,7 +369,6 @@
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileFuzzyResolver" id="fuzzy"/>
 
         <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer"/>
-        <luaTypeInfer implementation="com.tang.intellij.lua.unity.ty.UnityTypeInfer"/>
 
         <luaShortNamesManager implementation="com.tang.intellij.lua.psi.search.LuaShortNamesManagerImpl"/>
     </extensions>
