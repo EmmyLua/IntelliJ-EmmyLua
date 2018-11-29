@@ -53,16 +53,20 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         return null
     }
 
-    override fun processAllClassNames(project: Project, processor: Processor<String>) {
+    override fun processAllClassNames(project: Project, processor: Processor<String>): Boolean {
         for (ep in list) {
-            ep.processAllClassNames(project, processor)
+            if (!ep.processAllClassNames(project, processor))
+                return false
         }
+        return true
     }
 
-    override fun processClassesWithName(name: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaClass>) {
+    override fun processClassesWithName(name: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaClass>): Boolean {
         for (ep in list) {
-            ep.processClassesWithName(name, project, scope, processor)
+            if (!ep.processClassesWithName(name, project, scope, processor))
+                return false
         }
+        return true
     }
 
     override fun getClassMembers(clazzName: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> {
@@ -76,9 +80,11 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         return collection ?: mutableListOf()
     }
 
-    override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>) {
+    override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
         for (manager in list) {
-            manager.processAllMembers(type, fieldName, context, processor)
+            if (!manager.processAllMembers(type, fieldName, context, processor))
+                return false
         }
+        return true
     }
 }

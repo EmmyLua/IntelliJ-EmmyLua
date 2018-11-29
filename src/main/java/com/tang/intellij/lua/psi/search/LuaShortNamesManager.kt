@@ -48,11 +48,11 @@ abstract class LuaShortNamesManager {
 
     abstract fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember?
 
-    abstract fun processAllClassNames(project: Project, processor: Processor<String>)
+    abstract fun processAllClassNames(project: Project, processor: Processor<String>): Boolean
 
-    abstract fun processClassesWithName(name: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaClass>)
+    abstract fun processClassesWithName(name: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaClass>): Boolean
 
     abstract fun getClassMembers(clazzName: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember>
 
-    abstract fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>)
+    abstract fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean
 }
