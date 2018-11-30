@@ -23,6 +23,7 @@ public interface LuaDocTypes {
   IElementType TABLE_DEF = LuaParserDefinitionKt.createDocType("TABLE_DEF");
   IElementType TABLE_FIELD = LuaParserDefinitionKt.createDocType("TABLE_FIELD");
   IElementType TABLE_TY = LuaParserDefinitionKt.createDocType("TABLE_TY");
+  IElementType TAG_ALIAS = LuaParserDefinitionKt.createDocType("TAG_ALIAS");
   IElementType TAG_CLASS = LuaParserDefinitionKt.createDocType("TAG_CLASS");
   IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
   IElementType TAG_FIELD = LuaParserDefinitionKt.createDocType("TAG_FIELD");
@@ -61,6 +62,7 @@ public interface LuaDocTypes {
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
   IElementType TAG_NAME = new LuaDocTokenType("TAG_NAME");
+  IElementType TAG_NAME_ALIAS = new LuaDocTokenType("alias");
   IElementType TAG_NAME_CLASS = new LuaDocTokenType("class");
   IElementType TAG_NAME_FIELD = new LuaDocTokenType("field");
   IElementType TAG_NAME_GENERIC = new LuaDocTokenType("generic");
@@ -122,6 +124,9 @@ public interface LuaDocTypes {
       }
       else if (type == TABLE_TY) {
         return new LuaDocTableTyImpl(node);
+      }
+      else if (type == TAG_ALIAS) {
+        return new LuaDocTagAliasImpl(node);
       }
       else if (type == TAG_CLASS) {
         return new LuaDocTagClassImpl(node);

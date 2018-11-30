@@ -23,6 +23,8 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
+import com.tang.intellij.lua.psi.LuaTypeAlias
+import com.tang.intellij.lua.psi.LuaTypeDef
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
 
@@ -55,4 +57,16 @@ abstract class LuaShortNamesManager {
     abstract fun getClassMembers(clazzName: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember>
 
     abstract fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean
+
+    open fun findAlias(name: String, project: Project, scope: GlobalSearchScope): LuaTypeAlias? {
+        return null
+    }
+
+    open fun processAllAlias(project: Project, processor: Processor<String>): Boolean {
+        return true
+    }
+
+    open fun findTypeDef(name: String, project: Project, scope: GlobalSearchScope): LuaTypeDef? {
+        return findClass(name, project, scope) ?: findAlias(name, project, scope)
+    }
 }

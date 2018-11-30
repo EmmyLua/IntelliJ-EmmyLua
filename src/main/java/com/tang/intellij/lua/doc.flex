@@ -61,6 +61,7 @@ DOC_DASHES = --+
 %state xFIELD
 %state xFIELD_ID
 %state xGENERIC
+%state xALIAS
 
 %%
 
@@ -72,7 +73,7 @@ DOC_DASHES = --+
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
-<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS> {
     {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
 }
@@ -92,8 +93,14 @@ DOC_DASHES = --+
     "language"                 { yybegin(xTAG_WITH_ID); return TAG_NAME_LANGUAGE;}
     "generic"                  { yybegin(xGENERIC); return TAG_NAME_GENERIC; }
     "see"                      { yybegin(xTAG); return TAG_NAME_SEE; }
+    "alias"                    { yybegin(xALIAS); return TAG_NAME_ALIAS; }
     {ID}                       { yybegin(xCOMMENT_STRING); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
+}
+
+<xALIAS> {
+    {ID}                       { beginType(); return ID; }
+    [^]                        { yybegin(YYINITIAL); yypushback(yylength()); }
 }
 
 <xGENERIC> {

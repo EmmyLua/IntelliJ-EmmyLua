@@ -31,6 +31,7 @@ public class LuaIcons {
     public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");
     public static final Icon UNITY = IconLoader.getIcon("/icons/Unity.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
+    public static final Icon Alias = AllIcons.Nodes.AbstractClass;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;
     public static final Icon CLASS_METHOD = AllIcons.Nodes.Method;
     public static final Icon CLASS_METHOD_OVERRIDING = new RowIcon(AllIcons.Nodes.Method, AllIcons.Gutter.OverridingMethod);

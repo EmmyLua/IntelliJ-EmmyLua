@@ -44,6 +44,10 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
             results.add(LookupElementBuilder.create(key).withIcon(LuaIcons.CLASS));
             return true;
         });
+        LuaShortNamesManager.Companion.getInstance(project).processAllAlias(project, key -> {
+           results.add(LookupElementBuilder.create(key).withIcon(LuaIcons.Alias));
+            return true;
+        });
     }
 
     protected String myItemString;

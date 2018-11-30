@@ -90,6 +90,11 @@ class LuaDocCompletionContributor : CompletionContributor() {
                     completionResultSet.addElement(LookupElementBuilder.create(it).withIcon(LuaIcons.CLASS))
                     true
                 })
+
+                LuaShortNamesManager.getInstance(project).processAllAlias(project, Processor { key ->
+                    completionResultSet.addElement(LookupElementBuilder.create(key).withIcon(LuaIcons.Alias))
+                    true
+                })
                 completionResultSet.stopHere()
             }
         })

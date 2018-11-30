@@ -19,6 +19,7 @@ package com.tang.intellij.lua.psi;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.DeclarationsKt;
 import com.tang.intellij.lua.ty.ITy;
+import com.tang.intellij.lua.ty.TyAliasSubstitutor;
 
 /**
  *
@@ -26,6 +27,8 @@ import com.tang.intellij.lua.ty.ITy;
  */
 public interface LuaTypeGuessable extends LuaPsiElement {
     default ITy guessType(SearchContext context) {
-        return DeclarationsKt.infer(this, context);
+        ITy ty = DeclarationsKt.infer(this, context);
+        ty = ty.substitute(new TyAliasSubstitutor(getProject()));
+        return ty;
     }
 }

@@ -324,3 +324,13 @@ fun getNameIdentifier(g: LuaDocGenericDef): PsiElement? {
 fun isDeprecated(member: LuaClassMember): Boolean {
     return false
 }
+
+fun getNameIdentifier(g: LuaDocTagAlias): PsiElement? {
+    return g.id
+}
+
+fun getType(alias: LuaDocTagAlias): ITy {
+    val stub = alias.stub
+    val ty = stub?.type ?: alias.ty?.getType()
+    return ty ?: Ty.UNKNOWN
+}

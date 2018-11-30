@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi
+package com.tang.intellij.lua.stubs.index
 
-import com.intellij.navigation.NavigationItem
-import com.intellij.psi.PsiElement
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyClass
+import com.intellij.psi.stubs.StringStubIndexExtension
+import com.intellij.psi.stubs.StubIndexKey
+import com.tang.intellij.lua.comment.psi.LuaDocTagAlias
 
-interface LuaTypeDef : PsiElement, NavigationItem {
-    val type: ITy
+class LuaAliasIndex : StringStubIndexExtension<LuaDocTagAlias>() {
+    companion object {
+        val instance = LuaAliasIndex()
+    }
+
+    override fun getKey(): StubIndexKey<String, LuaDocTagAlias> {
+        return StubKeys.ALIAS
+    }
 }
-
-interface LuaClass : LuaTypeDef {
-    override val type: ITyClass
-}
-
-interface LuaTypeAlias : LuaTypeDef

@@ -43,6 +43,10 @@ interface ITyClass : ITy {
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
     fun findMemberType(name: String, searchContext: SearchContext): ITy?
     fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember?
+
+    fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
+        return this
+    }
 }
 
 fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visibility): Boolean {
@@ -207,7 +211,7 @@ abstract class TyClass(override val className: String,
     }
 }
 
-class TyPsiDocClass(val tagClass: LuaDocTagClass) : TyClass(tagClass.name) {
+class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(tagClass.name) {
 
     init {
         val supperRef = tagClass.superClassNameRef
@@ -228,6 +232,11 @@ open class TySerializedClass(name: String,
     init {
         aliasName = alias
         this.flags = flags
+    }
+
+    override fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
+        val alias = LuaShortNamesManager.getInstance(context.project).findAlias(className, context.project, context.getScope())
+        return alias?.type?.substitute(aliasSubstitutor) ?: this
     }
 }
 
@@ -316,4 +325,8 @@ class TyDocTable(val table: LuaDocTableDef) : TyClass(getDocTableTypeName(table)
     }
 }
 
-class TySerializedDocTable(name: String) : TySerializedClass(name)
+class TySerializedDocTable(name: String) : TySerializedClass(name) {
+    override fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
+        return this
+    }
+}

@@ -21,6 +21,7 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
+import com.tang.intellij.lua.psi.LuaTypeAlias
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
 
@@ -83,6 +84,23 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
     override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
         for (manager in list) {
             if (!manager.processAllMembers(type, fieldName, context, processor))
+                return false
+        }
+        return true
+    }
+
+    override fun findAlias(name: String, project: Project, scope: GlobalSearchScope): LuaTypeAlias? {
+        for (manager in list) {
+            val alias = manager.findAlias(name, project, scope)
+            if (alias != null)
+                return alias
+        }
+        return null
+    }
+
+    override fun processAllAlias(project: Project, processor: Processor<String>): Boolean {
+        for (manager in list) {
+            if (!manager.processAllAlias(project, processor))
                 return false
         }
         return true
