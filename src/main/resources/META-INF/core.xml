@@ -175,6 +175,9 @@
                           id="preferences.LuaCheck"/>
         </applicationConfigurable>
 
+        <projectViewPane implementation="com.tang.intellij.lua.project.LuaProjectViewPane"/>
+        <iconLayerProvider implementation="com.tang.intellij.lua.project.LuaSourceRootIconProvider"/>
+
         <!--intentions-->
         <intentionAction>
             <category>Lua</category>
@@ -320,7 +323,9 @@
     </application-components>
 
     <project-components>
-        <!-- Add your project components here -->
+        <component>
+            <implementation-class>com.tang.intellij.lua.project.LuaSourceRootManager</implementation-class>
+        </component>
     </project-components>
 
     <actions>
@@ -348,6 +353,17 @@
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+
+        <group>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <action class="com.tang.intellij.lua.actions.MarkLuaSourceRootAction"
+                    text="Mark as Lua Source Root"
+                    id="lua.project.markSourceRoot"/>
+
+            <action class="com.tang.intellij.lua.actions.UnmarkLuaSourceRootAction"
+                    text="Unmark as Lua Source Root"
+                    id="lua.project.unmarkSourceRoot"/>
+        </group>
     </actions>
 
     <extensionPoints>
