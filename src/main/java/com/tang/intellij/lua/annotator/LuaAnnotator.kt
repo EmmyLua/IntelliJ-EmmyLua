@@ -224,6 +224,13 @@ class LuaAnnotator : Annotator {
             annotation.textAttributes = LuaHighlightingData.CLASS_NAME
         }
 
+        override fun visitTagAlias(o: LuaDocTagAlias) {
+            super.visitTagAlias(o)
+            val id = o.id ?: return
+            val annotation = createInfoAnnotation(id, null)
+            annotation.textAttributes = LuaHighlightingData.TYPE_ALIAS
+        }
+
         override fun visitClassNameRef(o: LuaDocClassNameRef) {
             val annotation = createInfoAnnotation(o, null)
             annotation.textAttributes = LuaHighlightingData.CLASS_REFERENCE
