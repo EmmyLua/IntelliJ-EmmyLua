@@ -1,26 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 22.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+<svg version="1.1" id="图层_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
 <style type="text/css">
 	.st0{fill:#9AA7B0;fill-opacity:0.8;}
-	.st1{display:none;fill:#009DD5;}
-	.st2{fill:#009DD5;}
-	.st3{display:none;}
-	.st4{display:inline;}
-	.st5{fill:#FF9900;}
+	.st1{fill:#993399;}
 </style>
-<g id="图层_1">
-	<path class="st0" d="M1,13h14V4H8L6.7,2.7C6.2,2.3,5.6,2,5,2H1.1C1,2,1,2,1,2.1V13z"/>
-	<g>
-		<path class="st1" d="M1,4v9h9C10,8,6,4,1,4z"/>
-		<path class="st2" d="M1,7.9V13h5.1C6.1,10.2,3.8,7.9,1,7.9z"/>
-	</g>
-</g>
-<g id="图层_2" class="st3">
-	<g class="st4">
-		<path class="st5" d="M0,0v16h16C16,7.2,8.8,0,0,0z"/>
-		<path class="st2" d="M0,6.9V16h9.1C9.1,11,5,6.9,0,6.9z"/>
-	</g>
+<path class="st0" d="M1,13h14V4H8L6.7,2.7C6.2,2.3,5.6,2,5,2H1.1C1,2,1,2,1,2.1V13z"/>
+<g>
+	<path class="st1" d="M1,7.9V13h5.1C6.1,10.2,3.8,7.9,1,7.9z"/>
 </g>
 </svg>
