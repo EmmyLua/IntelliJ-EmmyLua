@@ -19,7 +19,10 @@ package com.tang.intellij.lua.actions
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.LangDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
+import com.intellij.openapi.roots.ModuleRootManager
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.project.LuaSourceRootManager
 
@@ -28,7 +31,13 @@ class MarkLuaSourceRootAction : AnAction(), DumbAware {
         val project = event.project ?: return
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         if (file.isDirectory) {
-            LuaSourceRootManager.getInstance(project).appendRoot(file)
+            ApplicationManager.getApplication().runWriteAction {
+                LuaSourceRootManager.getInstance(project).appendRoot(file)
+                val module = event.getData(LangDataKeys.MODULE)
+                if (module != null) {
+                    ModuleRootManager.getInstance(module)?.modifiableModel?.commit()
+                }
+            }
         }
     }
 
@@ -50,7 +59,13 @@ class UnmarkLuaSourceRootAction : AnAction(), DumbAware {
         val project = event.project ?: return
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
         if (file.isDirectory) {
-            LuaSourceRootManager.getInstance(project).removeRoot(file)
+            ApplicationManager.getApplication().runWriteAction {
+                LuaSourceRootManager.getInstance(project).removeRoot(file)
+                val module = event.getData(LangDataKeys.MODULE)
+                if (module != null) {
+                    ModuleRootManager.getInstance(module)?.modifiableModel?.commit()
+                }
+            }
         }
     }
 
