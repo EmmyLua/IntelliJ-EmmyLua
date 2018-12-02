@@ -90,7 +90,7 @@ class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project)
     }
 
     override fun getIcon(): Icon {
-        return LuaIcons.FILE
+        return LuaIcons.PROJECT
     }
 
     override fun getWeight(): Int {

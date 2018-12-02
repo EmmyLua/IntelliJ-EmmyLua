@@ -176,7 +176,7 @@
         </applicationConfigurable>
 
         <projectViewPane implementation="com.tang.intellij.lua.project.LuaProjectViewPane"/>
-        <iconLayerProvider implementation="com.tang.intellij.lua.project.LuaSourceRootIconProvider"/>
+        <iconProvider implementation="com.tang.intellij.lua.project.LuaSourceRootIconProvider"/>
 
         <!--intentions-->
         <intentionAction>
@@ -344,18 +344,18 @@
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="lua.newFile"/>
         </action>
 
-        <action id="LuaCheck"
+        <action id="lua.LuaCheck"
                 text="Run LuaCheck"
                 popup="true"
                 icon="/icons/lua.png"
                 class="com.tang.intellij.lua.luacheck.LuaCheckGroup">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
 
-        <group>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        <group id="lua.ProjectViewPopupMenu">
+            <separator/>
+            <add-to-group group-id="ProjectViewPopupMenu"/>
             <action class="com.tang.intellij.lua.actions.MarkLuaSourceRootAction"
                     text="Mark as Lua Source Root"
                     id="lua.project.markSourceRoot"/>
@@ -363,6 +363,7 @@
             <action class="com.tang.intellij.lua.actions.UnmarkLuaSourceRootAction"
                     text="Unmark as Lua Source Root"
                     id="lua.project.unmarkSourceRoot"/>
+            <reference ref="lua.LuaCheck"/>
         </group>
     </actions>
 

@@ -16,23 +16,19 @@
 
 package com.tang.intellij.lua.project
 
-import com.intellij.ide.IconLayerProvider
-import com.intellij.openapi.util.Iconable
+import com.intellij.ide.IconProvider
 import com.intellij.psi.PsiDirectory
-import com.intellij.util.PlatformIcons
+import com.intellij.psi.PsiElement
+import com.tang.intellij.lua.lang.LuaIcons
 import javax.swing.Icon
 
-class LuaSourceRootIconProvider : IconLayerProvider {
-    override fun getLayerIcon(element: Iconable, isLocked: Boolean): Icon? {
+class LuaSourceRootIconProvider : IconProvider() {
+    override fun getIcon(element: PsiElement, flags: Int): Icon? {
         if (element is PsiDirectory) {
             if (LuaSourceRootManager.getInstance(element.project).isSourceRoot(element.virtualFile)) {
-                return PlatformIcons.PUBLIC_ICON
+                return LuaIcons.ROOT
             }
         }
         return null
-    }
-
-    override fun getLayerDescription(): String {
-        return "Lua source root"
     }
 }

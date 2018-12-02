@@ -20,6 +20,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.DumbAware
+import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.project.LuaSourceRootManager
 
 class MarkLuaSourceRootAction : AnAction(), DumbAware {
@@ -33,6 +34,7 @@ class MarkLuaSourceRootAction : AnAction(), DumbAware {
 
     override fun update(e: AnActionEvent) {
         e.presentation.isVisible = isVisible(e)
+        e.presentation.icon = LuaIcons.ROOT
     }
 
     private fun isVisible(e: AnActionEvent): Boolean {
@@ -54,6 +56,7 @@ class UnmarkLuaSourceRootAction : AnAction(), DumbAware {
 
     override fun update(e: AnActionEvent) {
         e.presentation.isVisible = isVisible(e)
+        e.presentation.icon = LuaIcons.ROOT
     }
 
     private fun isVisible(e: AnActionEvent): Boolean {
