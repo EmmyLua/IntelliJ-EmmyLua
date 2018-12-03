@@ -86,7 +86,7 @@ class LuaStructureVisitor : LuaVisitor() {
             }
 
             override fun visitTagField(o: LuaDocTagField) {
-                elements.add(LuaClassFieldElement(o))
+                o.name?.let { elements.add(LuaClassFieldElement(o, it)) }
             }
         })
 
