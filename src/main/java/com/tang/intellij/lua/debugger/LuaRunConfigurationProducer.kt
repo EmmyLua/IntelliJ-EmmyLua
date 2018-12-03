@@ -18,12 +18,12 @@ package com.tang.intellij.lua.debugger
 
 import com.intellij.execution.actions.ConfigurationContext
 import com.intellij.execution.actions.RunConfigurationProducer
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.util.Ref
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.debugger.app.LuaAppConfigurationType
 import com.tang.intellij.lua.debugger.app.LuaAppRunConfiguration
 import com.tang.intellij.lua.lang.LuaFileType
+import com.tang.intellij.lua.project.LuaSourceRootManager
 import com.tang.intellij.lua.psi.LuaFileUtil
 import com.tang.intellij.lua.psi.LuaPsiFile
 
@@ -43,10 +43,12 @@ class LuaRunConfigurationProducer : RunConfigurationProducer<LuaAppRunConfigurat
         val dir = containingFile.parent?.virtualFile
         val module = configurationContext.module
         if (dir != null && module != null) {
-            val rootManager = ModuleRootManager.getInstance(module)
-            for (root in rootManager.sourceRoots + rootManager.contentRoots) {
-                luaAppRunConfiguration.workingDir = root.canonicalPath
-                return true
+            val rootManager = LuaSourceRootManager.getInstance(element.project)
+            for (root in rootManager.getSourceRoots()) {
+                if (root.url.startsWith(dir.url)) {
+                    luaAppRunConfiguration.workingDir = root.canonicalPath
+                    break
+                }
             }
         }
         return true
