@@ -35,7 +35,8 @@ versions["171"] = [
     untilBuild: "171.*",
     archiveName: "IntelliJ-EmmyLua",
     patchs: [
-        "patchs/171/0001-compatible-with-171.patch"
+        "patchs/171/0001-compatible-with-171.patch",
+        "patchs/171/0002-compatible-with-171.patch"
     ] + versions["172"].patchs
 ]
 
