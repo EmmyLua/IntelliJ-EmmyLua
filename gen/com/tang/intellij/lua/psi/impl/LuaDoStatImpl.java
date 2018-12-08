@@ -15,15 +15,15 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaDoStatImpl extends LuaStatMixin<LuaPlaceholderStub> implements LuaDoStat {
 
-  public LuaDoStatImpl(LuaPlaceholderStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaDoStatImpl(@NotNull LuaPlaceholderStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaDoStatImpl(ASTNode node) {
+  public LuaDoStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaDoStatImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+  public LuaDoStatImpl(@NotNull LuaPlaceholderStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 

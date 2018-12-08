@@ -24,7 +24,7 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, Lu
   PsiElement getNameIdentifier();
 
   @NotNull
-  PsiElement setName(String name);
+  PsiElement setName(@NotNull String name);
 
   @Nullable
   String getName();
@@ -38,7 +38,7 @@ public interface LuaTableField extends LuaClassField, PsiNameIdentifierOwner, Lu
   ItemPresentation getPresentation();
 
   @NotNull
-  ITy guessParentType(SearchContext context);
+  ITy guessParentType(@NotNull SearchContext context);
 
   @NotNull
   Visibility getVisibility();

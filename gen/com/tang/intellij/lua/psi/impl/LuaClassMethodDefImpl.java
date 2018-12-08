@@ -20,11 +20,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMethodStub> implements LuaClassMethodDef {
 
-  public LuaClassMethodDefImpl(LuaClassMethodStub stub, IStubElementType type) {
+  public LuaClassMethodDefImpl(@NotNull LuaClassMethodStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaClassMethodDefImpl(ASTNode node) {
+  public LuaClassMethodDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -59,7 +59,7 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
   }
 
   @NotNull
-  public ITy guessParentType(SearchContext context) {
+  public ITy guessParentType(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
@@ -83,7 +83,7 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
   }
 
   @NotNull
-  public PsiElement setName(String name) {
+  public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
@@ -102,7 +102,7 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
   }
 
   @NotNull
-  public ITy guessReturnType(SearchContext searchContext) {
+  public ITy guessReturnType(@NotNull SearchContext searchContext) {
     return LuaPsiImplUtilKt.guessReturnType(this, searchContext);
   }
 

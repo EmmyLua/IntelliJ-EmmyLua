@@ -16,15 +16,15 @@ import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaLiteralExprImpl extends LuaLiteralExprMixin implements LuaLiteralExpr {
 
-  public LuaLiteralExprImpl(LuaLiteralExprStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaLiteralExprImpl(@NotNull LuaLiteralExprStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaLiteralExprImpl(ASTNode node) {
+  public LuaLiteralExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaLiteralExprImpl(LuaLiteralExprStub stub, IElementType type, ASTNode node) {
+  public LuaLiteralExprImpl(@NotNull LuaLiteralExprStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 

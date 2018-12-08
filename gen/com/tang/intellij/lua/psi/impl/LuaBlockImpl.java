@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaBlockImpl extends ASTWrapperPsiElement implements LuaBlock {
 
-  public LuaBlockImpl(ASTNode node) {
+  public LuaBlockImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -12,7 +12,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaForBStatImpl extends LuaStatementImpl implements LuaForBStat {
 
-  public LuaForBStatImpl(ASTNode node) {
+  public LuaForBStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 

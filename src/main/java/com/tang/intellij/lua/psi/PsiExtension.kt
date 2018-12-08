@@ -347,7 +347,8 @@ val LuaIndexExpr.docTy: ITy? get() {
 }
 
 val LuaIndexExpr.prefixExpr: LuaExpr get() {
-    return firstChild as LuaExpr
+    return PsiTreeUtil.getStubChildOfType(this, LuaExpr::class.java)!!
+    //return firstChild as LuaExpr
 }
 
 val LuaExpr.assignStat: LuaAssignStat? get() {

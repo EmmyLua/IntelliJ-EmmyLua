@@ -23,7 +23,7 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   LuaComment getComment();
 
   @NotNull
-  ITy guessParentType(SearchContext context);
+  ITy guessParentType(@NotNull SearchContext context);
 
   @NotNull
   Visibility getVisibility();
@@ -37,7 +37,7 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   PsiElement getNameIdentifier();
 
   @NotNull
-  PsiElement setName(String name);
+  PsiElement setName(@NotNull String name);
 
   @Nullable
   String getName();
@@ -45,7 +45,7 @@ public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaSt
   int getTextOffset();
 
   @NotNull
-  ITy guessReturnType(SearchContext searchContext);
+  ITy guessReturnType(@NotNull SearchContext searchContext);
 
   @NotNull
   LuaParamInfo[] getParams();

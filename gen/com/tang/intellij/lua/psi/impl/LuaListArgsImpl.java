@@ -15,11 +15,11 @@ import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 
 public class LuaListArgsImpl extends LuaArgsImpl implements LuaListArgs {
 
-  public LuaListArgsImpl(LuaPlaceholderStub stub, IStubElementType type) {
+  public LuaListArgsImpl(@NotNull LuaPlaceholderStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaListArgsImpl(ASTNode node) {
+  public LuaListArgsImpl(@NotNull ASTNode node) {
     super(node);
   }
 

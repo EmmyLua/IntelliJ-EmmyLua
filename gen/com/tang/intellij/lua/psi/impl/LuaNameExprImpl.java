@@ -18,15 +18,15 @@ import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
 
-  public LuaNameExprImpl(LuaNameExprStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaNameExprImpl(@NotNull LuaNameExprStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaNameExprImpl(ASTNode node) {
+  public LuaNameExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaNameExprImpl(LuaNameExprStub stub, IElementType type, ASTNode node) {
+  public LuaNameExprImpl(@NotNull LuaNameExprStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 
@@ -46,7 +46,7 @@ public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
   }
 
   @NotNull
-  public PsiElement setName(String name) {
+  public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 

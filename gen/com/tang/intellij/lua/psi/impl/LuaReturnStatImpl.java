@@ -15,15 +15,15 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaReturnStatImpl extends LuaStatMixin<LuaPlaceholderStub> implements LuaReturnStat {
 
-  public LuaReturnStatImpl(LuaPlaceholderStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaReturnStatImpl(@NotNull LuaPlaceholderStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaReturnStatImpl(ASTNode node) {
+  public LuaReturnStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaReturnStatImpl(LuaPlaceholderStub stub, IElementType type, ASTNode node) {
+  public LuaReturnStatImpl(@NotNull LuaPlaceholderStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 

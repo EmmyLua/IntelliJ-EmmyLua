@@ -16,6 +16,6 @@ public interface LuaTableExpr extends LuaExpr, LuaIndentRange, LuaExprStubElemen
   List<LuaTableFieldSep> getTableFieldSepList();
 
   @Nullable
-  LuaTableField findField(String fieldName);
+  LuaTableField findField(@NotNull String fieldName);
 
 }

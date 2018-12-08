@@ -30,6 +30,13 @@ import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 
 fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
+    if (expr is LuaIndexExpr || expr is LuaNameExpr) {
+        val tree = LuaDeclarationTree.get(expr.containingFile)
+        val declaration = tree.find(expr)?.firstDeclaration?.psi
+        if (declaration != expr && declaration is LuaTypeGuessable) {
+            return declaration.guessType(context)
+        }
+    }
     return when (expr) {
         is LuaUnaryExpr -> expr.infer(context)
         is LuaBinaryExpr -> expr.infer(context)

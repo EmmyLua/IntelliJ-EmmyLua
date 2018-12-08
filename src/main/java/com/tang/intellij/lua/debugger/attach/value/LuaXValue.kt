@@ -19,7 +19,6 @@ package com.tang.intellij.lua.debugger.attach.value
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.psi.PsiManager
-import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.frame.XNavigatable
 import com.intellij.xdebugger.frame.XValue
@@ -28,7 +27,7 @@ import com.intellij.xdebugger.frame.XValuePlace
 import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.attach.LuaAttachDebugProcessBase
 import com.tang.intellij.lua.debugger.attach.readString
-import com.tang.intellij.lua.psi.LuaPsiTreeUtilEx
+import com.tang.intellij.lua.psi.LuaDeclarationTree
 import java.io.DataInputStream
 
 enum class StackNodeId
@@ -83,15 +82,15 @@ abstract class LuaXValue(val L:Long,
                 if (psiFile != null && editor is TextEditor) {
                     val document = editor.editor.document
                     val lineEndOffset = document.getLineStartOffset(currentPosition.line)
-                    val element = psiFile.findElementAt(lineEndOffset)
-                    LuaPsiTreeUtilEx.walkUpNameDef(element, Processor{ nameDef ->
-                        if (name == nameDef.name) {
-                            val position = XSourcePositionImpl.createByElement(nameDef)
+                    val element = psiFile.findElementAt(lineEndOffset) ?: return
+                    LuaDeclarationTree.get(psiFile).walkUpLocal(element) {
+                        if (name == it.name) {
+                            val position = XSourcePositionImpl.createByElement(it.psi)
                             xNavigable.setSourcePosition(position)
-                            return@Processor false
+                            return@walkUpLocal false
                         }
                         true
-                    })
+                    }
                 }
             }
         }

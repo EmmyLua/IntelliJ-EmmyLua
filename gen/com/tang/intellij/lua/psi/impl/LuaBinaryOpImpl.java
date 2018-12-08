@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaBinaryOpImpl extends ASTWrapperPsiElement implements LuaBinaryOp {
 
-  public LuaBinaryOpImpl(ASTNode node) {
+  public LuaBinaryOpImpl(@NotNull ASTNode node) {
     super(node);
   }
 

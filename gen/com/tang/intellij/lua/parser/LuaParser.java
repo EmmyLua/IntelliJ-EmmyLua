@@ -192,11 +192,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (expr ',')*
   private static boolean arg_expr_list_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "arg_expr_list_0")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!arg_expr_list_0_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "arg_expr_list_0", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -314,11 +313,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   public static boolean block(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "block")) return false;
     Marker m = enter_section_(b, l, _NONE_, BLOCK, "<block>");
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!stat_semi(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "block", c)) break;
-      c = current_position_(b);
     }
     exit_section_(b, l, m, true, false, null);
     return true;
@@ -407,11 +405,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (funcPrefixRef)*
   private static boolean classMethodName_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "classMethodName_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!classMethodName_1_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "classMethodName_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -541,11 +538,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (',' expr)*
   private static boolean exprList_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "exprList_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!exprList_1_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "exprList_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -596,11 +592,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (tableFieldSep tableField)*
   private static boolean fieldList_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "fieldList_0_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!fieldList_0_1_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "fieldList_0_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -801,11 +796,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // ('elseif' expr 'then' <<lazyBlock>>)*
   private static boolean ifStat_4(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "ifStat_4")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!ifStat_4_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "ifStat_4", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -1015,11 +1009,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // stat_semi*
   private static boolean luaFile_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "luaFile_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!stat_semi(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "luaFile_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -1064,11 +1057,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (',' nameDef)*
   private static boolean nameList_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "nameList_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!nameList_1_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "nameList_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -1111,11 +1103,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (',' paramNameDef)*
   private static boolean parList_0_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parList_0_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!parList_0_1_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "parList_0_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -1202,12 +1193,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   static boolean prefixExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefixExpr")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = parenExpr(b, l + 1);
     if (!r) r = nameExpr(b, l + 1);
     if (!r) r = tableExpr(b, l + 1);
     if (!r) r = literalExpr(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1226,11 +1215,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // suffixExpr*
   private static boolean primaryExpr_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "primaryExpr_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!suffixExpr(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "primaryExpr_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -1404,10 +1392,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
   static boolean suffixExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "suffixExpr")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = indexExpr(b, l + 1);
     if (!r) r = callExpr(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1524,10 +1510,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
   private static boolean unaryExpr_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryExpr_1")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = unaryExpr(b, l + 1);
     if (!r) r = primaryExpr(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1568,11 +1552,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   // (',' varExpr)*
   private static boolean varList_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "varList_1")) return false;
-    int c = current_position_(b);
     while (true) {
+      int c = current_position_(b);
       if (!varList_1_0(b, l + 1)) break;
       if (!empty_element_parsed_guard_(b, "varList_1", c)) break;
-      c = current_position_(b);
     }
     return true;
   }
@@ -1606,22 +1589,22 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  final static Parser checkFuncPrefix_parser_ = new Parser() {
+  static final Parser checkFuncPrefix_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return checkFuncPrefix(b, l + 1);
     }
   };
-  final static Parser parList_recover_parser_ = new Parser() {
+  static final Parser parList_recover_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return parList_recover(b, l + 1);
     }
   };
-  final static Parser stat_recover_parser_ = new Parser() {
+  static final Parser stat_recover_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return stat_recover(b, l + 1);
     }
   };
-  final static Parser tableField_recover_parser_ = new Parser() {
+  static final Parser tableField_recover_parser_ = new Parser() {
     public boolean parse(PsiBuilder b, int l) {
       return tableField_recover(b, l + 1);
     }

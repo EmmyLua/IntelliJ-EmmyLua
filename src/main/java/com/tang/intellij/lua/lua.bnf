@@ -120,7 +120,11 @@ luaFile ::= shebang_line? stat_semi*
 shebang_line ::= SHEBANG SHEBANG_CONTENT
 
 private stat_semi ::= <<parseStatement>>
-block ::= stat_semi*
+block ::= stat_semi* {
+    implements = [
+        "com.tang.intellij.lua.psi.LuaDeclarationScope"
+    ]
+}
 
 fake statement ::= () {
     implements = "com.tang.intellij.lua.psi.LuaCommentOwner"
@@ -183,6 +187,7 @@ repeatStat ::= 'repeat' <<lazyBlock>> 'until' expr {
     implements = [
         "com.tang.intellij.lua.psi.LuaLoop"
         "com.tang.intellij.lua.psi.LuaIndentRange"
+        "com.tang.intellij.lua.psi.LuaDeclarationScope"
     ]
     methods = [
         until = 'UNTIL'
@@ -203,6 +208,7 @@ forAStat ::= 'for' paramNameDef '=' expr ',' expr (',' expr)? 'do' <<lazyBlock>>
         "com.tang.intellij.lua.psi.LuaParametersOwner"
         "com.tang.intellij.lua.psi.LuaLoop"
         "com.tang.intellij.lua.psi.LuaIndentRange"
+        "com.tang.intellij.lua.psi.LuaDeclarationScope"
     ]
 }
 forBStat ::= 'for' parList 'in' exprList 'do' <<lazyBlock>> 'end' {
@@ -211,6 +217,7 @@ forBStat ::= 'for' parList 'in' exprList 'do' <<lazyBlock>> 'end' {
         "com.tang.intellij.lua.psi.LuaParametersOwner"
         "com.tang.intellij.lua.psi.LuaLoop"
         "com.tang.intellij.lua.psi.LuaIndentRange"
+        "com.tang.intellij.lua.psi.LuaDeclarationScope"
     ]
 }
 labelStat ::= '::' ID '::' {
@@ -330,6 +337,7 @@ localDef ::= 'local' nameList ('=' exprList)? {
     implements = [
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
+        "com.tang.intellij.lua.psi.LuaDeclarationScope"
     ]
     methods = [getComment assign = 'ASSIGN']
 }
@@ -425,7 +433,6 @@ listArgs ::= '(' (arg_expr_list)? ')' { extends = args pin = 1 }
 left callExpr ::= args {
     methods = [
         guessParentType
-        resolveFuncBodyOwner
         getFirstStringArg
 
         isMethodDotCall
@@ -455,6 +462,7 @@ funcBody ::= '(' (parList)? ')' <<lazyBlock>>? 'end' {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaIndentRange"
+        "com.tang.intellij.lua.psi.LuaDeclarationScope"
     ]
     methods = [
         RPAREN = 'RPAREN'

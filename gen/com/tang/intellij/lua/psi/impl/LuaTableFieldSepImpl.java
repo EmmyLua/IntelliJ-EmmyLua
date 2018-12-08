@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaTableFieldSepImpl extends ASTWrapperPsiElement implements LuaTableFieldSep {
 
-  public LuaTableFieldSepImpl(ASTNode node) {
+  public LuaTableFieldSepImpl(@NotNull ASTNode node) {
     super(node);
   }
 

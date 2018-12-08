@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaShebangLineImpl extends ASTWrapperPsiElement implements LuaShebangLine {
 
-  public LuaShebangLineImpl(ASTNode node) {
+  public LuaShebangLineImpl(@NotNull ASTNode node) {
     super(node);
   }
 

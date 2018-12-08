@@ -95,17 +95,17 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
 
         //local
         if (has(LOCAL_FUN) || has(LOCAL_VAR)) {
-            LuaPsiTreeUtilEx.walkUpNameDef(cur, Processor { nameDef ->
-                val name = nameDef.name
+            LuaDeclarationTree.get(cur.containingFile).walkUpLocal(cur) {
+                val nameDef = it.psi
+                val name = it.name
                 if (nameDef is LuaPsiElement &&
-                        name != null &&
                         completionResultSet.prefixMatcher.prefixMatches(name) &&
                         localNamesSet.add(name)) {
                     session.addWord(name)
                     addCompletion(name, session, nameDef)
                 }
                 true
-            })
+            }
         }
 
         //global

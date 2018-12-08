@@ -16,11 +16,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaNameListImpl extends StubBasedPsiElementBase<LuaPlaceholderStub> implements LuaNameList {
 
-  public LuaNameListImpl(LuaPlaceholderStub stub, IStubElementType type) {
+  public LuaNameListImpl(@NotNull LuaPlaceholderStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaNameListImpl(ASTNode node) {
+  public LuaNameListImpl(@NotNull ASTNode node) {
     super(node);
   }
 

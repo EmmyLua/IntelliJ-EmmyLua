@@ -12,7 +12,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaLabelStatImpl extends LuaStatementImpl implements LuaLabelStat {
 
-  public LuaLabelStatImpl(ASTNode node) {
+  public LuaLabelStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -41,7 +41,7 @@ public class LuaLabelStatImpl extends LuaStatementImpl implements LuaLabelStat {
   }
 
   @NotNull
-  public PsiElement setName(String name) {
+  public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 

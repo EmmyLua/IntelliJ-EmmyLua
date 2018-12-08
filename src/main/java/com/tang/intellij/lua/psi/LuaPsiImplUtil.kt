@@ -197,27 +197,6 @@ fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
 }
 
 /**
- * 找出函数体
- * @param callExpr call expr
- * *
- * @return LuaFuncBodyOwner
- */
-fun resolveFuncBodyOwner(callExpr: LuaCallExpr, context: SearchContext): LuaFuncBodyOwner? {
-    return recursionGuard(callExpr, Computable {
-        var owner: LuaFuncBodyOwner? = null
-        val expr = callExpr.expr
-        if (expr is LuaIndexExpr) {
-            val resolve = resolve(expr, context)
-            if (resolve is LuaFuncBodyOwner)
-                owner = resolve
-        } else if (expr is LuaNameExpr) {
-            owner = resolveFuncBodyOwner(expr, context)
-        }
-        owner
-    })
-}
-
-/**
  * 获取第一个字符串参数
  * @param callExpr callExpr
  * *

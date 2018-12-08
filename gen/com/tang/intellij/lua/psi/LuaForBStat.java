@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaForBStat extends LuaStatement, LuaParametersOwner, LuaLoop, LuaIndentRange {
+public interface LuaForBStat extends LuaStatement, LuaParametersOwner, LuaLoop, LuaIndentRange, LuaDeclarationScope {
 
   @Nullable
   LuaExprList getExprList();

@@ -26,7 +26,6 @@ import com.intellij.psi.PsiNameIdentifierOwner
 import com.intellij.psi.PsiNamedElement
 import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.RefactoringActionHandlerFactory
-import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 
@@ -42,8 +41,9 @@ class LocalNameShadowed : LocalInspectionTool() {
                 val psi = (if (namedElement is PsiNameIdentifierOwner) namedElement.nameIdentifier else namedElement) ?: return
                 val document = FileDocumentManager.getInstance().getDocument(namedElement.containingFile.virtualFile)
 
-                LuaPsiTreeUtilEx.walkUpNameDef(namedElement, Processor{ nameDef ->
-                    if (name == nameDef.name) {
+                LuaDeclarationTree.get(namedElement.containingFile).walkUpLocal(namedElement) {
+                    if (name == it.name) {
+                        val nameDef = it.psi
                         val desc = if (document != null)
                             "Local name shadowed, '$name' was previously defined on line ${document.getLineNumber(nameDef.node.startOffset) + 1}"
                         else
@@ -57,10 +57,10 @@ class LocalNameShadowed : LocalInspectionTool() {
                                 return "Rename"
                             }
                         })
-                        return@Processor false
+                        return@walkUpLocal false
                     }
-                    return@Processor true
-                })
+                    true
+                }
             }
 
             override fun visitLocalDef(o: LuaLocalDef) {

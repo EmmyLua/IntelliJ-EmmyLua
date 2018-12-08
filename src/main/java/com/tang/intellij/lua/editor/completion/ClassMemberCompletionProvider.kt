@@ -69,7 +69,8 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                 val postfixName = indexExpr.name?.let { it.substring(0, it.indexOf(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)) }
 
                 val matcher = completionResultSet.prefixMatcher.cloneWithPrefix(prefixName)
-                LuaPsiTreeUtilEx.walkUpNameDef(indexExpr, Processor {
+                LuaDeclarationTree.get(indexExpr.containingFile).walkUpLocal(indexExpr) { d ->
+                    val it = d.firstDeclaration.psi
                     val txt = it.name
                     if (it is LuaTypeGuessable && txt != null && prefixName != txt && matcher.prefixMatches(txt)) {
                         val type = it.guessType(searchContext)
@@ -86,7 +87,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                         }
                     }
                     true
-                })
+                }
             }
         }
     }
