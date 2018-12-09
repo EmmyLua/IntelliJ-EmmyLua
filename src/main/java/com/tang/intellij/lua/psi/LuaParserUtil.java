@@ -50,7 +50,7 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             if (type == DOC_COMMENT) {
                 return i;
             } else {
-                String sequence = String.valueOf(tokenTextGetter.get(i));
+                CharSequence sequence = tokenTextGetter.get(i);
                 lines += StringUtil.getLineBreakCount(sequence);
                 if (lines > 1) {
                     break;
@@ -66,8 +66,8 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             if (type == DOC_COMMENT) {
                 return i + 1;
             } else {
-                String sequence = String.valueOf(tokenTextGetter.get(i));
-                if (sequence.contains("\n")) {
+                CharSequence sequence = tokenTextGetter.get(i);
+                if (StringUtil.contains(sequence, "\n")) {
                     break;
                 }
             }
@@ -88,52 +88,6 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
     public static boolean checkType(PsiBuilder builder_, int level_, IElementType type) {
         LighterASTNode marker = builder_.getLatestDoneMarker();
         return marker != null && marker.getTokenType() == type;
-    }
-
-    public static boolean fastCheckArgs(PsiBuilder builder_, int level_) {
-        boolean r;
-        PsiBuilder.Marker marker = builder_.mark();
-        r = builder_.getTokenType() == LPAREN;
-        if (r) {
-            int lTimes = 1;
-            while (true) {
-                builder_.advanceLexer();
-                IElementType type = builder_.getTokenType();
-                if (type == LPAREN)
-                    lTimes++;
-                else if (type == RPAREN)
-                    lTimes--;
-                if (type == null || lTimes == 0) {
-                    break;
-                }
-            }
-            r = lTimes == 0;
-        }
-        if (!r) marker.drop();
-        return r;
-    }
-
-    public static boolean fastCheckTable(PsiBuilder builder_, int level_) {
-        boolean r;
-        PsiBuilder.Marker marker = builder_.mark();
-        r = builder_.getTokenType() == LCURLY;
-        if (r) {
-            int lTimes = 1;
-            while (true) {
-                builder_.advanceLexer();
-                IElementType type = builder_.getTokenType();
-                if (type == LCURLY)
-                    lTimes++;
-                else if (type == RCURLY)
-                    lTimes--;
-                if (type == null || lTimes == 0) {
-                    break;
-                }
-            }
-            r = lTimes == 0;
-        }
-        if (!r) marker.drop();
-        return r;
     }
 
     public static boolean lazyBlock(PsiBuilder builder_, int level_) {
