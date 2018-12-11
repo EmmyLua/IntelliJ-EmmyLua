@@ -30,8 +30,8 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.LuaParserDefinition
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaFuncBodyOwner
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.ty.ITyClass
 
 /**
@@ -86,8 +86,13 @@ class LuaDocCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, SHOW_CLASS, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 val project = completionParameters.position.project
-                LuaClassIndex.processKeys(project, Processor{
+                LuaShortNamesManager.getInstance(project).processAllClassNames(project, Processor{
                     completionResultSet.addElement(LookupElementBuilder.create(it).withIcon(LuaIcons.CLASS))
+                    true
+                })
+
+                LuaShortNamesManager.getInstance(project).processAllAlias(project, Processor { key ->
+                    completionResultSet.addElement(LookupElementBuilder.create(key).withIcon(LuaIcons.Alias))
                     true
                 })
                 completionResultSet.stopHere()

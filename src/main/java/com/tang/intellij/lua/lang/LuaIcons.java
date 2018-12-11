@@ -31,6 +31,7 @@ public class LuaIcons {
     public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");
     public static final Icon UNITY = IconLoader.getIcon("/icons/Unity.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
+    public static final Icon Alias = AllIcons.Nodes.AbstractClass;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;
     public static final Icon CLASS_METHOD = AllIcons.Nodes.Method;
     public static final Icon CLASS_METHOD_OVERRIDING = new RowIcon(AllIcons.Nodes.Method, AllIcons.Gutter.OverridingMethod);
@@ -50,9 +51,13 @@ public class LuaIcons {
     public static final Icon PROTECTED = AllIcons.Nodes.C_protected;
     public static final Icon PRIVATE = AllIcons.Nodes.C_private;
 
-    public static final Icon MODULE = IconLoader.getIcon("/icons/module.png");
+    public static final Icon MODULE = IconLoader.getIcon("/icons/lua_module.svg");
 
     public static final Icon STRING_ARG_HISTORY = AllIcons.Vcs.History;
+
+    public static final Icon LAYER = IconLoader.getIcon("/icons/lua_layer.svg");
+    public static final Icon ROOT = IconLoader.getIcon("/icons/lua_root.svg");
+    public static final Icon PROJECT = IconLoader.getIcon("/icons/lua_project.svg");
 
     public static class Debugger {
         public static class Actions {

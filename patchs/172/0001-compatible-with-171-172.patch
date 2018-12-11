@@ -1,7 +1,7 @@
-From a8ba5fd580b8af76920b019179598090a0007172 Mon Sep 17 00:00:00 2001
+From 7d0f90066cf0d74bbe260bfa385dd2aca7374ae9 Mon Sep 17 00:00:00 2001
 From: tangzx <272669294@qq.com>
 Date: Tue, 30 Oct 2018 13:08:42 +0800
-Subject: [PATCH 1/2] compatible with 171/172
+Subject: [PATCH] compatible with 171/172
 
 ---
  .../com/tang/intellij/lua/psi/search/LuaAllClassesSearchExecutor.kt   | 2 +-
@@ -10,20 +10,20 @@ Subject: [PATCH 1/2] compatible with 171/172
  3 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/src/main/java/com/tang/intellij/lua/psi/search/LuaAllClassesSearchExecutor.kt b/src/main/java/com/tang/intellij/lua/psi/search/LuaAllClassesSearchExecutor.kt
-index cba47831..f96418a1 100644
+index 1b540c3f..25f04991 100644
 --- a/src/main/java/com/tang/intellij/lua/psi/search/LuaAllClassesSearchExecutor.kt
 +++ b/src/main/java/com/tang/intellij/lua/psi/search/LuaAllClassesSearchExecutor.kt
-@@ -28,7 +28,7 @@ import com.tang.intellij.lua.ty.createSerializedClass
+@@ -27,7 +27,7 @@ import com.tang.intellij.lua.ty.createSerializedClass
   * Created by tangzx on 2017/3/29.
   */
  class LuaAllClassesSearchExecutor : QueryExecutorBase<ITyClass, LuaAllClassesSearch.SearchParameters>() {
 -    override fun processQuery(searchParameters: LuaAllClassesSearch.SearchParameters, processor: Processor<in ITyClass>) {
 +    override fun processQuery(searchParameters: LuaAllClassesSearch.SearchParameters, processor: Processor<ITyClass>) {
          DumbService.getInstance(searchParameters.project).runReadActionInSmartMode {
-             LuaClassIndex.instance.processAllKeys(searchParameters.project) { typeName ->
+             LuaShortNamesManager.getInstance(searchParameters.project).processAllClassNames(searchParameters.project, Processor { typeName ->
                  //todo no TySerializedClass
 diff --git a/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt b/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt
-index 2ed07622..becfda4b 100644
+index 2ed07622..3a9ba96f 100644
 --- a/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt
 +++ b/src/main/java/com/tang/intellij/lua/psi/search/LuaClassInheritorsSearchExecutor.kt
 @@ -31,7 +31,7 @@ class LuaClassInheritorsSearchExecutor : QueryExecutor<LuaDocTagClass, LuaClassI
@@ -45,7 +45,7 @@ index 2ed07622..becfda4b 100644
          DumbService.getInstance(searchParameters.project).runReadActionInSmartMode {
              ref = processInheritors(searchParameters, searchParameters.typeName, mutableSetOf(), processor)
 diff --git a/src/main/java/com/tang/intellij/lua/psi/search/LuaOverridingMethodsSearchExecutor.kt b/src/main/java/com/tang/intellij/lua/psi/search/LuaOverridingMethodsSearchExecutor.kt
-index af61f00d..08d7b8b8 100644
+index af61f00d..7597e1da 100644
 --- a/src/main/java/com/tang/intellij/lua/psi/search/LuaOverridingMethodsSearchExecutor.kt
 +++ b/src/main/java/com/tang/intellij/lua/psi/search/LuaOverridingMethodsSearchExecutor.kt
 @@ -29,7 +29,7 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex

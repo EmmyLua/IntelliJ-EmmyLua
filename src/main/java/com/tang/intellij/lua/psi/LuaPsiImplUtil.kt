@@ -407,6 +407,10 @@ private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo>
     var comment: LuaComment? = null
     if (funcBodyOwner is LuaCommentOwner) {
         comment = LuaCommentUtil.findComment(funcBodyOwner)
+    } else {
+        val commentOwner = PsiTreeUtil.getParentOfType(funcBodyOwner, LuaCommentOwner::class.java)
+        if (commentOwner != null)
+            comment = LuaCommentUtil.findComment(commentOwner)
     }
 
     val paramNameList = funcBodyOwner.paramNameDefList

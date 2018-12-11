@@ -47,6 +47,9 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     else if (t == TABLE_DEF) {
       r = table_def(b, 0);
     }
+    else if (t == TAG_ALIAS) {
+      r = tag_alias(b, 0);
+    }
     else if (t == TAG_CLASS) {
       r = tag_class(b, 0);
     }
@@ -213,6 +216,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // '@' (tag_param
+  //     | tag_alias
   //     | tag_vararg
   //     | tag_return
   //     | tag_class
@@ -236,6 +240,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   // tag_param
+  //     | tag_alias
   //     | tag_vararg
   //     | tag_return
   //     | tag_class
@@ -251,6 +256,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
     r = tag_param(b, l + 1);
+    if (!r) r = tag_alias(b, l + 1);
     if (!r) r = tag_vararg(b, l + 1);
     if (!r) r = tag_return(b, l + 1);
     if (!r) r = tag_class(b, l + 1);
@@ -525,6 +531,20 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, fieldList(b, l + 1));
     r = p && consumeToken(b, RCURLY) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
+  // TAG_NAME_ALIAS ID ty
+  public static boolean tag_alias(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_alias")) return false;
+    if (!nextTokenIs(b, TAG_NAME_ALIAS)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, TAG_ALIAS, null);
+    r = consumeTokens(b, 1, TAG_NAME_ALIAS, ID);
+    p = r; // pin = 1
+    r = r && ty(b, l + 1, -1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }

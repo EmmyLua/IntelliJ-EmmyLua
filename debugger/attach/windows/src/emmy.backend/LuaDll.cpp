@@ -811,14 +811,12 @@ void lua_getglobal_dll(LAPI api, lua_State* L, const char* s)
 
 void lua_rawgetglobal_dll(LAPI api, lua_State* L, const char* s)
 {
-	lua_getglobal_dll(api, L, s);
-
-	// todo crash on lua53
-	// lua_pushglobaltable_dll(api, L);
-	// int glb = lua_gettop_dll(api, L);
-	// lua_pushstring_dll(api, L, s);
-	// lua_rawget_dll(api, L, glb);
-	// lua_remove_dll(api, L, glb);
+	//lua_getglobal_dll(api, L, s);
+	lua_pushglobaltable_dll(api, L);
+	const auto glb = lua_gettop_dll(api, L);
+	lua_pushstring_dll(api, L, s);
+	lua_rawget_dll(api, L, glb);
+	lua_remove_dll(api, L, glb);
 }
 
 lua_State* lua_newstate_dll(LAPI api, lua_Alloc f, void* ud)

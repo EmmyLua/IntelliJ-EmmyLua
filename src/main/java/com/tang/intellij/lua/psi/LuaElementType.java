@@ -66,6 +66,7 @@ public class LuaElementType extends IElementType {
     public static LuaStubElementType CLASS_DEF = new LuaDocClassType();
     public static LuaStubElementType DOC_TABLE_DEF = new LuaDocTableDefType();
     public static LuaStubElementType DOC_TABLE_FIELD_DEF = new LuaDocTableFieldDefType();
+    public static LuaStubElementType DOC_ALIAS = new LuaDocTagAliasType();
     public static IStubElementType TABLE = new LuaTableExprType();
     public static IStubElementType TABLE_FIELD = new LuaTableFieldType();
     public static IStubElementType INDEX = new LuaIndexExprType();

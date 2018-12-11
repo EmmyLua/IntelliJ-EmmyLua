@@ -19,15 +19,13 @@ package com.tang.intellij.lua.editor.completion
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.roots.impl.ProjectFileIndexFacade
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
+import com.tang.intellij.lua.project.LuaSourceRootManager
 
 /**
  *
@@ -52,18 +50,15 @@ class RequirePathCompletionProvider : LuaCompletionProvider() {
 
     private fun addAllFiles(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet) {
         val project = completionParameters.originalFile.project
-        val modules = ModuleManager.getInstance(project).modules
-        for (module in modules) {
-            val sourceRoots = ModuleRootManager.getInstance(module).sourceRoots
-            for (sourceRoot in sourceRoots) {
-                addAllFiles(project, completionResultSet, null, sourceRoot.children)
-            }
+        val sourceRoots = LuaSourceRootManager.getInstance(project).getSourceRoots()
+        for (sourceRoot in sourceRoots) {
+            addAllFiles(project, completionResultSet, null, sourceRoot.children)
         }
     }
 
     private fun addAllFiles(project: Project, completionResultSet: CompletionResultSet, pck: String?, children: Array<VirtualFile>) {
         for (child in children) {
-            if (!ProjectFileIndexFacade.getInstance(project).isInSource(child))
+            if (!LuaSourceRootManager.getInstance(project).isInSource(child))
                 continue
 
             val fileName = FileUtil.getNameWithoutExtension(child.name)

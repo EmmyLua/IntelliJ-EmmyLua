@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.unity
+package com.tang.intellij.lua.stubs.index
 
-import com.intellij.ide.IconProvider
-import com.intellij.psi.PsiDirectory
-import com.intellij.psi.PsiElement
-import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.unity.vfs.NetFileSystem
-import javax.swing.Icon
+import com.intellij.psi.stubs.StringStubIndexExtension
+import com.intellij.psi.stubs.StubIndexKey
+import com.tang.intellij.lua.comment.psi.LuaDocTagAlias
 
-class NetDirectoryIconProvider : IconProvider() {
-    override fun getIcon(element: PsiElement, flags: Int): Icon? {
-        if (element is PsiDirectory && element.virtualFile.fileSystem is NetFileSystem) {
-            return LuaIcons.UNITY
-        }
-        return null
+class LuaAliasIndex : StringStubIndexExtension<LuaDocTagAlias>() {
+    companion object {
+        val instance = LuaAliasIndex()
+    }
+
+    override fun getKey(): StubIndexKey<String, LuaDocTagAlias> {
+        return StubKeys.ALIAS
     }
 }

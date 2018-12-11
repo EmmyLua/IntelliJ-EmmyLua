@@ -16,6 +16,9 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.openapi.project.Project
+import com.tang.intellij.lua.search.SearchContext
+
 interface ITySubstitutor {
     fun substitute(function: ITyFunction): ITy
     fun substitute(clazz: ITyClass): ITy
@@ -106,4 +109,23 @@ open class TySubstitutor : ITySubstitutor {
                 function.signatures.map { it.substitute(this) }.toTypedArray(),
                 function.flags)
     }
+}
+
+class TyAliasSubstitutor(val project: Project) : ITySubstitutor {
+    override fun substitute(function: ITyFunction): ITy {
+        return function
+    }
+
+    override fun substitute(clazz: ITyClass): ITy {
+        return clazz.recoverAlias(SearchContext(project), this)
+    }
+
+    override fun substitute(generic: ITyGeneric): ITy {
+        return generic
+    }
+
+    override fun substitute(ty: ITy): ITy {
+        return ty
+    }
+
 }

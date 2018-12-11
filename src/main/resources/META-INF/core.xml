@@ -48,10 +48,7 @@
         <additionalLibraryRootsProvider implementation="com.tang.intellij.lua.project.StdLibraryProvider"/>
         <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
 
-        <!-- unity dll -->
-        <library.type implementation="com.tang.intellij.lua.unity.library.LuaNetLibraryType"/>
-        <virtualFileSystem implementationClass="com.tang.intellij.lua.unity.vfs.NetFileSystem" key="dll"/>
-        <iconProvider implementation="com.tang.intellij.lua.unity.NetDirectoryIconProvider" order="before javaDirectory"/>
+
 
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
@@ -133,6 +130,7 @@
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMemberIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaSuperClassIndex"/>
+        <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaAliasIndex"/>
         <fileBasedIndex implementation="com.tang.intellij.lua.stubs.index.LuaStringArgIndex"/>
 
         <!--surround descriptors-->
@@ -149,8 +147,6 @@
         <configurationType implementation="com.tang.intellij.lua.debugger.remote.LuaMobConfigurationType"/>
         <programRunner implementation="com.tang.intellij.lua.debugger.app.LuaAppRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.app.LuaAppConfigurationType"/>
-        <programRunner implementation="com.tang.intellij.lua.debugger.unity.LuaUnityDebuggerRunner"/>
-        <configurationType implementation="com.tang.intellij.lua.debugger.unity.LuaUnityConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
         <xdebugger.localAttachDebuggerProvider implementation="com.tang.intellij.lua.debugger.attach.LuaLocalAttachDebuggerProvider"/>
 
@@ -178,6 +174,9 @@
                           displayName="LuaCheck"
                           id="preferences.LuaCheck"/>
         </applicationConfigurable>
+
+        <projectViewPane implementation="com.tang.intellij.lua.project.LuaProjectViewPane"/>
+        <iconProvider implementation="com.tang.intellij.lua.project.LuaSourceRootIconProvider"/>
 
         <!--intentions-->
         <intentionAction>
@@ -324,7 +323,9 @@
     </application-components>
 
     <project-components>
-        <!-- Add your project components here -->
+        <component>
+            <implementation-class>com.tang.intellij.lua.project.LuaSourceRootManager</implementation-class>
+        </component>
     </project-components>
 
     <actions>
@@ -343,15 +344,27 @@
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="lua.newFile"/>
         </action>
 
-        <action id="LuaCheck"
+        <action id="lua.LuaCheck"
                 text="Run LuaCheck"
                 popup="true"
                 icon="/icons/lua.png"
                 class="com.tang.intellij.lua.luacheck.LuaCheckGroup">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
+
+        <group id="lua.ProjectViewPopupMenu">
+            <separator/>
+            <add-to-group group-id="ProjectViewPopupMenu"/>
+            <action class="com.tang.intellij.lua.actions.MarkLuaSourceRootAction"
+                    text="Mark as Lua Source Root"
+                    id="lua.project.markSourceRoot"/>
+
+            <action class="com.tang.intellij.lua.actions.UnmarkLuaSourceRootAction"
+                    text="Unmark as Lua Source Root"
+                    id="lua.project.unmarkSourceRoot"/>
+            <reference ref="lua.LuaCheck"/>
+        </group>
     </actions>
 
     <extensionPoints>
@@ -360,19 +373,21 @@
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaOverridingMethodsSearch" interface="com.intellij.util.QueryExecutor"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaFileResolver" interface="com.tang.intellij.lua.ext.ILuaFileResolver"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaTypeInfer" interface="com.tang.intellij.lua.ext.ILuaTypeInfer"/>
+        <extensionPoint qualifiedName="com.tang.intellij.lua.luaShortNamesManager" interface="com.tang.intellij.lua.psi.search.LuaShortNamesManager"/>
     </extensionPoints>
 
     <extensions defaultExtensionNs="com.tang.intellij.lua">
-        <luaClassInheritorsSearch implementation="com.tang.intellij.lua.psi.search.LuaClassInheritorsSearchExecutor"/>
-        <luaAllClassesSearch implementation="com.tang.intellij.lua.psi.search.LuaAllClassesSearchExecutor"/>
-        <luaOverridingMethodsSearch implementation="com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearchExecutor"/>
+        <luaClassInheritorsSearch implementation="com.tang.intellij.lua.psi.search.LuaClassInheritorsSearchExecutor" id="base"/>
+        <luaAllClassesSearch implementation="com.tang.intellij.lua.psi.search.LuaAllClassesSearchExecutor" id="base"/>
+        <luaOverridingMethodsSearch implementation="com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearchExecutor" id="base"/>
 
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileSourcesRootResolver" id="base"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAdditionalResolver" id="additional"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAbsoluteResolver" id="absolute"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileFuzzyResolver" id="fuzzy"/>
 
-        <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer"/>
-        <luaTypeInfer implementation="com.tang.intellij.lua.unity.ty.UnityTypeInfer"/>
+        <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer" id="base"/>
+
+        <luaShortNamesManager implementation="com.tang.intellij.lua.psi.search.LuaShortNamesManagerImpl" id="base"/>
     </extensions>
 </idea-plugin>

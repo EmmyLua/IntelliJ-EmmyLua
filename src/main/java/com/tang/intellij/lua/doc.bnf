@@ -71,6 +71,7 @@
         TAG_NAME_MODULE = 'module'
         TAG_NAME_SEE = 'see'
         TAG_NAME_GENERIC = 'generic'
+        TAG_NAME_ALIAS = 'alias'
   ]
   implements("tag.*") = [
     "com.tang.intellij.lua.comment.psi.LuaDocTag"
@@ -82,6 +83,7 @@ doc ::= (DASHES after_dash?)*
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (tag_param
+    | tag_alias
     | tag_vararg
     | tag_return
     | tag_class
@@ -228,6 +230,7 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.psi.LuaClass"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocClassStub"
     methods = [
@@ -283,4 +286,21 @@ generic_def ::= ID (EXTENDS class_name_ref)? {
 
 tag_generic_list ::= TAG_NAME_GENERIC generic_def (',' generic_def)* {
     pin = 1
+}
+
+tag_alias ::= TAG_NAME_ALIAS ID ty {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.psi.LuaTypeAlias"
+        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
+    methods = [
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+        getType
+    ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTagAliasStub"
 }

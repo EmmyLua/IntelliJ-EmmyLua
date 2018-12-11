@@ -1,0 +1,30 @@
+From 5eecdfbf2e321955e82d696fc2be7e2cde319212 Mon Sep 17 00:00:00 2001
+From: tangzx <272669294@qq.com>
+Date: Tue, 4 Dec 2018 22:37:11 +0800
+Subject: [PATCH] 171
+
+---
+ src/main/java/com/tang/intellij/lua/project/LuaProjectViewPane.kt | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/main/java/com/tang/intellij/lua/project/LuaProjectViewPane.kt b/src/main/java/com/tang/intellij/lua/project/LuaProjectViewPane.kt
+index 91f77d33..b880900d 100644
+--- a/src/main/java/com/tang/intellij/lua/project/LuaProjectViewPane.kt
++++ b/src/main/java/com/tang/intellij/lua/project/LuaProjectViewPane.kt
+@@ -101,7 +101,12 @@ class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project)
+         return LuaProjectTreeView(model)
+     }
+ 
+-    private inner class LuaProjectTreeView(model: DefaultTreeModel) : ProjectViewTree(myProject, model)
++    private inner class LuaProjectTreeView(model: DefaultTreeModel) : ProjectViewTree(myProject, model) {
++        override fun getSelectedNode(): javax.swing.tree.DefaultMutableTreeNode? {
++            val path = this.selectionPath ?: return null
++            return path.lastPathComponent as? javax.swing.tree.DefaultMutableTreeNode
++        }
++    }
+ }
+ 
+ private class LuaTreeStructureProvider : TreeStructureProvider {
+-- 
+2.16.2.windows.1
+

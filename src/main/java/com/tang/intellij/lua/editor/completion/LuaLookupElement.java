@@ -25,7 +25,7 @@ import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.tang.intellij.lua.lang.LuaIcons;
-import com.tang.intellij.lua.stubs.index.LuaClassIndex;
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,8 +40,12 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
     private boolean itemTextUnderlined;
 
     public static void fillTypes(Project project, Collection<LookupElement> results) {
-        LuaClassIndex.Companion.processKeys(project, key -> {
+        LuaShortNamesManager.Companion.getInstance(project).processAllClassNames(project, key -> {
             results.add(LookupElementBuilder.create(key).withIcon(LuaIcons.CLASS));
+            return true;
+        });
+        LuaShortNamesManager.Companion.getInstance(project).processAllAlias(project, key -> {
+           results.add(LookupElementBuilder.create(key).withIcon(LuaIcons.Alias));
             return true;
         });
     }

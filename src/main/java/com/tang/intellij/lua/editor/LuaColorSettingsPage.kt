@@ -49,6 +49,9 @@ class LuaColorSettingsPage : ColorSettingsPage {
             local <localVar>var</localVar> = {} -- a short comment
             local <localVar>a</localVar>, <localVar>b</localVar>, <localVar>c</localVar> = <primitive>true</primitive>, <primitive>false</primitive>, <primitive>nil</primitive>
             <regionHeader>--region</regionHeader> <regionDesc>my class members region</regionDesc>
+
+            ---@alias <docTypeAlias>MyType</docTypeAlias> <docClassNameRef>Emmy</docClassNameRef>
+
             --- doc comment
             ---@param <docTagValue>par1</docTagValue> <docClassNameRef>Par1Type</docClassNameRef> @comments
             function var:<method>fun</method>(<parameter>par1</parameter>, <parameter>par2</parameter>)
@@ -113,6 +116,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 AttributesDescriptor("Comments//EmmyDoc//Tag value", LuaHighlightingData.DOC_COMMENT_TAG_VALUE),
                 AttributesDescriptor("Comments//EmmyDoc//Class name", LuaHighlightingData.CLASS_NAME),
                 AttributesDescriptor("Comments//EmmyDoc//Class name reference", LuaHighlightingData.CLASS_REFERENCE),
+                AttributesDescriptor("Comments//EmmyDoc//Type alias", LuaHighlightingData.TYPE_ALIAS),
                 AttributesDescriptor("Comments//EmmyDoc//Keyword", LuaHighlightingData.DOC_KEYWORD),
                 AttributesDescriptor("Region//Region Header", LuaHighlightingData.REGION_HEADER),
                 AttributesDescriptor("Region//Region Description", LuaHighlightingData.REGION_DESC),
@@ -130,6 +134,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
             ourTags["docTagValue"] = LuaHighlightingData.DOC_COMMENT_TAG_VALUE
             ourTags["docClassName"] = LuaHighlightingData.CLASS_NAME
             ourTags["docClassNameRef"] = LuaHighlightingData.CLASS_REFERENCE
+            ourTags["docTypeAlias"] = LuaHighlightingData.TYPE_ALIAS
             ourTags["docKeyword"] = LuaHighlightingData.DOC_KEYWORD
             ourTags["localVar"] = LuaHighlightingData.LOCAL_VAR
             ourTags["globalVar"] = LuaHighlightingData.GLOBAL_VAR

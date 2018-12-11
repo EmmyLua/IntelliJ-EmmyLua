@@ -5,6 +5,8 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.tang.intellij.lua.psi.LuaClass;
+import com.tang.intellij.lua.psi.LuaTypeAlias;
 
 public class LuaDocVisitor extends PsiElementVisitor {
 
@@ -66,9 +68,16 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
+  public void visitTagAlias(@NotNull LuaDocTagAlias o) {
+    visitLuaTypeAlias(o);
+    // visitPsiNameIdentifierOwner(o);
+    // visitTag(o);
+  }
+
   public void visitTagClass(@NotNull LuaDocTagClass o) {
     visitPsiElement(o);
     // visitPsiNameIdentifierOwner(o);
+    // visitLuaClass(o);
     // visitTag(o);
   }
 
@@ -140,6 +149,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
 
   public void visitType(@NotNull LuaDocType o) {
     visitPsiElement(o);
+  }
+
+  public void visitLuaTypeAlias(@NotNull LuaTypeAlias o) {
+    visitElement(o);
   }
 
   public void visitPsiNameIdentifierOwner(@NotNull PsiNameIdentifierOwner o) {

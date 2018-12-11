@@ -19,11 +19,8 @@ package com.tang.intellij.lua.psi;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.PluginId;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.FileIndexFacade;
-import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -31,6 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.SmartList;
 import com.tang.intellij.lua.ext.ILuaFileResolver;
+import com.tang.intellij.lua.project.LuaSourceRootManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,15 +98,12 @@ public class LuaFileUtil {
         String fileFullUrl = file.getUrl();
         String fileShortUrl = fileFullUrl;
 
-        Module[] modules = ModuleManager.getInstance(project).getModules();
-        moduleLoop: for (Module module : modules) {
-            VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
-            for (VirtualFile sourceRoot : sourceRoots) {
-                String sourceRootUrl = sourceRoot.getUrl();
-                if (fileFullUrl.startsWith(sourceRootUrl)) {
-                    fileShortUrl = fileFullUrl.substring(sourceRootUrl.length() + 1);
-                    break moduleLoop;
-                }
+        List<VirtualFile> roots = LuaSourceRootManager.Companion.getInstance(project).getSourceRoots();
+        for (VirtualFile root : roots) {
+            String sourceRootUrl = root.getUrl();
+            if (fileFullUrl.startsWith(sourceRootUrl)) {
+                fileShortUrl = fileFullUrl.substring(sourceRootUrl.length() + 1);
+                break;
             }
         }
         return fileShortUrl;
@@ -118,14 +113,11 @@ public class LuaFileUtil {
     private static VirtualFile getSourceRoot(Project project, VirtualFile file) {
         String fileFullUrl = file.getUrl();
 
-        Module[] modules = ModuleManager.getInstance(project).getModules();
-        for (Module module : modules) {
-            VirtualFile[] sourceRoots = ModuleRootManager.getInstance(module).getSourceRoots();
-            for (VirtualFile sourceRoot : sourceRoots) {
-                String sourceRootUrl = sourceRoot.getUrl();
-                if (fileFullUrl.startsWith(sourceRootUrl)) {
-                    return sourceRoot;
-                }
+        List<VirtualFile> roots = LuaSourceRootManager.Companion.getInstance(project).getSourceRoots();
+        for (VirtualFile root : roots) {
+            String sourceRootUrl = root.getUrl();
+            if (fileFullUrl.startsWith(sourceRootUrl)) {
+                return root;
             }
         }
         return null;

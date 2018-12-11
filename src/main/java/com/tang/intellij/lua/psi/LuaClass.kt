@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.unity.library
+package com.tang.intellij.lua.psi
 
-import com.intellij.openapi.roots.libraries.DummyLibraryProperties
-import com.intellij.openapi.roots.libraries.PersistentLibraryKind
+import com.intellij.navigation.NavigationItem
+import com.intellij.psi.PsiElement
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyClass
 
-class LuaNetLibraryKind : PersistentLibraryKind<DummyLibraryProperties>("Lua_net") {
-    override fun createDefaultProperties() = DummyLibraryProperties()
-
-    companion object {
-        val INSTANCE = LuaNetLibraryKind()
-    }
+interface LuaTypeDef : PsiElement, NavigationItem {
+    val type: ITy
 }
+
+interface LuaClass : LuaTypeDef {
+    override val type: ITyClass
+}
+
+interface LuaTypeAlias : LuaTypeDef

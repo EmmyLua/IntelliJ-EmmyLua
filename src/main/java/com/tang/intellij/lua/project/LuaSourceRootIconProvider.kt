@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi;
+package com.tang.intellij.lua.project
 
-import com.tang.intellij.lua.search.SearchContext;
-import com.tang.intellij.lua.ty.DeclarationsKt;
-import com.tang.intellij.lua.ty.ITy;
-import com.tang.intellij.lua.ty.TyAliasSubstitutor;
+import com.intellij.ide.IconProvider
+import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiElement
+import com.tang.intellij.lua.lang.LuaIcons
+import javax.swing.Icon
 
-/**
- *
- * Created by tangzx on 2016/12/1.
- */
-public interface LuaTypeGuessable extends LuaPsiElement {
-    default ITy guessType(SearchContext context) {
-        ITy ty = DeclarationsKt.infer(this, context);
-        ty = ty.substitute(new TyAliasSubstitutor(getProject()));
-        return ty;
+class LuaSourceRootIconProvider : IconProvider() {
+    override fun getIcon(element: PsiElement, flags: Int): Icon? {
+        if (element is PsiDirectory) {
+            if (LuaSourceRootManager.getInstance(element.project).isSourceRoot(element.virtualFile)) {
+                return LuaIcons.ROOT
+            }
+        }
+        return null
     }
 }

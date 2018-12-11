@@ -105,6 +105,7 @@ QQ交流群：`29850775`
 - [**@dsmgit** dsmgit](https://github.com/dsmgit)
 - [**@Perryvw** Perry van Wesel](https://github.com/Perryvw)
 - [**@mqualizz** Marco Qualizza](https://github.com/mqualizz)
+- [**@taigacon** taigacon](https://github.com/taigacon)
 - [**@ice1000** Tesla Ice Zhang](https://github.com/ice1000)
 - [**@LiamYao** Yao](https://github.com/LiamYao)
 - [**@luchuanbaker** luchuanbaker](https://github.com/luchuanbaker)

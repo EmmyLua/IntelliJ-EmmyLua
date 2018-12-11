@@ -26,8 +26,8 @@ import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaNameExprMixin
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
 fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
     return when (expr) {
@@ -356,7 +356,7 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
 
     var set:ITy = Ty.UNKNOWN
 
-    LuaClassMemberIndex.processAll(type, fieldName, context, Processor {
+    LuaShortNamesManager.getInstance(context.project).processAllMembers(type, fieldName, context, Processor {
         set = set.union(it.guessType(context))
         true
     })

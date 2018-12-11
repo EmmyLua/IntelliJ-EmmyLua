@@ -100,9 +100,9 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return perfect
         }
 
-        fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>) {
-            if (type is TyParameter)
-                type.superClassName?.let { process(it, fieldName, context, processor) }
+        fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+            return if (type is TyParameter)
+                type.superClassName?.let { process(it, fieldName, context, processor) } ?: true
             else process(type.className, fieldName, context, processor)
         }
 

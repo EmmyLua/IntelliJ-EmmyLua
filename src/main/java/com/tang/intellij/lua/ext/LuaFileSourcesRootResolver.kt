@@ -16,29 +16,16 @@
 
 package com.tang.intellij.lua.ext
 
-import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
+import com.tang.intellij.lua.project.LuaSourceRootManager
 
 class LuaFileSourcesRootResolver : ILuaFileResolver {
     override fun find(project: Project, shortUrl: String, extNames: Array<String>): VirtualFile? {
-        val modules = ModuleManager.getInstance(project).modules
-        for (module in modules) {
-            val moduleRootManager = ModuleRootManager.getInstance(module)
-            val sourceRoots = moduleRootManager.sourceRootUrls
-            //sources root
-            for (sourceRoot in sourceRoots) {
-                val file = findFile(shortUrl, sourceRoot, extNames)
-                if (file != null) return file
-            }
-            //content root
-            val contentRoots = moduleRootManager.contentRootUrls
-            for (root in contentRoots) {
-                val file = findFile(shortUrl, root, extNames)
-                if (file != null) return file
-            }
+        for (sourceRoot in LuaSourceRootManager.getInstance(project).getSourceRootUrls()) {
+            val file = findFile(shortUrl, sourceRoot, extNames)
+            if (file != null) return file
         }
         return null
     }

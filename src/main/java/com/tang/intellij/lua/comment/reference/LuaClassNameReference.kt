@@ -25,7 +25,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 
 /**
 
@@ -53,7 +53,8 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
             if (genericDef.name == name)
                 return genericDef
         }
-        return LuaClassIndex.find(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
+        val def = LuaShortNamesManager.getInstance(myElement.project).findTypeDef(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
+        return def
     }
 
     override fun getVariants(): Array<Any> = emptyArray()
