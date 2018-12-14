@@ -122,7 +122,7 @@ public interface LuaTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ASSIGN_STAT) {
+      if (type == ASSIGN_STAT) {
         return new LuaAssignStatImpl(node);
       }
       else if (type == BINARY_EXPR) {

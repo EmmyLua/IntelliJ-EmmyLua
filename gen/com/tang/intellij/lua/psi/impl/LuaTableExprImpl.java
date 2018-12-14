@@ -16,15 +16,15 @@ import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr {
 
-  public LuaTableExprImpl(LuaTableExprStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaTableExprImpl(@NotNull LuaTableExprStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaTableExprImpl(ASTNode node) {
+  public LuaTableExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaTableExprImpl(LuaTableExprStub stub, IElementType type, ASTNode node) {
+  public LuaTableExprImpl(@NotNull LuaTableExprStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 
@@ -50,7 +50,7 @@ public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr 
   }
 
   @Nullable
-  public LuaTableField findField(String fieldName) {
+  public LuaTableField findField(@NotNull String fieldName) {
     return LuaPsiImplUtilKt.findField(this, fieldName);
   }
 

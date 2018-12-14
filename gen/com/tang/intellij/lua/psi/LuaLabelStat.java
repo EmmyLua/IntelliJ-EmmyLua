@@ -17,7 +17,7 @@ public interface LuaLabelStat extends LuaStatement, PsiNameIdentifierOwner {
   int getTextOffset();
 
   @NotNull
-  PsiElement setName(String name);
+  PsiElement setName(@NotNull String name);
 
   @Nullable
   String getName();

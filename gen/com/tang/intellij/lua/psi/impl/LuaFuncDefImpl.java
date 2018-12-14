@@ -22,11 +22,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> implements LuaFuncDef {
 
-  public LuaFuncDefImpl(LuaFuncStub stub, IStubElementType type) {
+  public LuaFuncDefImpl(@NotNull LuaFuncStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaFuncDefImpl(ASTNode node) {
+  public LuaFuncDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -76,7 +76,7 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
   }
 
   @NotNull
-  public PsiElement setName(String name) {
+  public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
@@ -95,12 +95,12 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
   }
 
   @NotNull
-  public ITy guessReturnType(SearchContext searchContext) {
+  public ITy guessReturnType(@NotNull SearchContext searchContext) {
     return LuaPsiImplUtilKt.guessReturnType(this, searchContext);
   }
 
   @NotNull
-  public ITyClass guessParentType(SearchContext searchContext) {
+  public ITyClass guessParentType(@NotNull SearchContext searchContext) {
     return LuaPsiImplUtilKt.guessParentType(this, searchContext);
   }
 

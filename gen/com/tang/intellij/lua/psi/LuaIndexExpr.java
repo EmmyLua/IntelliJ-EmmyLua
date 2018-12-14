@@ -23,7 +23,7 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, LuaClassM
   PsiElement getNameIdentifier();
 
   @NotNull
-  PsiElement setName(String name);
+  PsiElement setName(@NotNull String name);
 
   @Nullable
   String getName();
@@ -41,7 +41,7 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, LuaClassM
   //methods are not found in LuaPsiImplUtilKt
 
   @NotNull
-  ITy guessParentType(SearchContext context);
+  ITy guessParentType(@NotNull SearchContext context);
 
   boolean isDeprecated();
 

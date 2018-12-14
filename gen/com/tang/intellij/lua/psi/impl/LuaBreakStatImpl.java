@@ -12,7 +12,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaBreakStatImpl extends LuaStatementImpl implements LuaBreakStat {
 
-  public LuaBreakStatImpl(ASTNode node) {
+  public LuaBreakStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 

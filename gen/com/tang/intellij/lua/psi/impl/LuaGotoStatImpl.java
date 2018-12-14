@@ -13,7 +13,7 @@ import com.intellij.psi.PsiReference;
 
 public class LuaGotoStatImpl extends LuaStatementImpl implements LuaGotoStat {
 
-  public LuaGotoStatImpl(ASTNode node) {
+  public LuaGotoStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 

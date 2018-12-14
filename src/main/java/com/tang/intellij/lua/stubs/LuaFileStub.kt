@@ -25,6 +25,7 @@ import com.intellij.psi.tree.IStubFileElementType
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.lang.LuaParserDefinition
+import com.tang.intellij.lua.psi.LuaDeclarationTree
 import com.tang.intellij.lua.psi.LuaPsiFile
 
 /**
@@ -39,12 +40,13 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
 
     // debug performance
     override fun parseContents(chameleon: ASTNode): ASTNode? {
+        val psi = chameleon.psi
         val t = System.currentTimeMillis()
         val contents = super.parseContents(chameleon)
-        if (LOG.isDebugEnabled) {
-            val dt = System.currentTimeMillis() - t
-            val psi = chameleon.psi
-            if (psi is LuaPsiFile) {
+        if (psi is LuaPsiFile) {
+            LuaDeclarationTree.rebuild(psi)
+            if (LOG.isDebugEnabled) {
+                val dt = System.currentTimeMillis() - t
                 val fileName = psi.name
                 println("$fileName : $dt")
                 LOG.debug("$fileName : $dt")

@@ -34,7 +34,7 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitBlock(@NotNull LuaBlock o) {
-    visitPsiElement(o);
+    visitDeclarationScope(o);
   }
 
   public void visitBreakStat(@NotNull LuaBreakStat o) {
@@ -87,6 +87,7 @@ public class LuaVisitor extends PsiElementVisitor {
     // visitParametersOwner(o);
     // visitLoop(o);
     // visitIndentRange(o);
+    // visitDeclarationScope(o);
   }
 
   public void visitForBStat(@NotNull LuaForBStat o) {
@@ -94,10 +95,12 @@ public class LuaVisitor extends PsiElementVisitor {
     // visitParametersOwner(o);
     // visitLoop(o);
     // visitIndentRange(o);
+    // visitDeclarationScope(o);
   }
 
   public void visitFuncBody(@NotNull LuaFuncBody o) {
     visitIndentRange(o);
+    // visitDeclarationScope(o);
   }
 
   public void visitFuncDef(@NotNull LuaFuncDef o) {
@@ -139,6 +142,7 @@ public class LuaVisitor extends PsiElementVisitor {
   public void visitLocalDef(@NotNull LuaLocalDef o) {
     visitDeclaration(o);
     // visitStatement(o);
+    // visitDeclarationScope(o);
   }
 
   public void visitLocalFuncDef(@NotNull LuaLocalFuncDef o) {
@@ -177,6 +181,7 @@ public class LuaVisitor extends PsiElementVisitor {
     visitStatement(o);
     // visitLoop(o);
     // visitIndentRange(o);
+    // visitDeclarationScope(o);
   }
 
   public void visitReturnStat(@NotNull LuaReturnStat o) {
@@ -243,6 +248,10 @@ public class LuaVisitor extends PsiElementVisitor {
   }
 
   public void visitDeclaration(@NotNull LuaDeclaration o) {
+    visitPsiElement(o);
+  }
+
+  public void visitDeclarationScope(@NotNull LuaDeclarationScope o) {
     visitPsiElement(o);
   }
 

@@ -19,15 +19,15 @@ import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr {
 
-  public LuaIndexExprImpl(LuaIndexExprStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaIndexExprImpl(@NotNull LuaIndexExprStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaIndexExprImpl(ASTNode node) {
+  public LuaIndexExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaIndexExprImpl(LuaIndexExprStub stub, IElementType type, ASTNode node) {
+  public LuaIndexExprImpl(@NotNull LuaIndexExprStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 
@@ -58,7 +58,7 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
   }
 
   @NotNull
-  public PsiElement setName(String name) {
+  public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
@@ -82,7 +82,7 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
   }
 
   @NotNull
-  public ITy guessParentType(SearchContext context) {
+  public ITy guessParentType(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 

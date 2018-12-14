@@ -13,7 +13,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaUnaryOpImpl extends ASTWrapperPsiElement implements LuaUnaryOp {
 
-  public LuaUnaryOpImpl(ASTNode node) {
+  public LuaUnaryOpImpl(@NotNull ASTNode node) {
     super(node);
   }
 

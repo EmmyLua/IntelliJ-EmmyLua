@@ -30,7 +30,7 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaSt
   PsiElement getNameIdentifier();
 
   @NotNull
-  PsiElement setName(String name);
+  PsiElement setName(@NotNull String name);
 
   @Nullable
   String getName();
@@ -41,7 +41,7 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaSt
   SearchScope getUseScope();
 
   @NotNull
-  ITy guessReturnType(SearchContext searchContext);
+  ITy guessReturnType(@NotNull SearchContext searchContext);
 
   @NotNull
   LuaParamInfo[] getParams();

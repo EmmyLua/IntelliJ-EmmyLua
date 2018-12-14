@@ -12,7 +12,7 @@ import com.tang.intellij.lua.psi.*;
 
 public class LuaWhileStatImpl extends LuaStatementImpl implements LuaWhileStat {
 
-  public LuaWhileStatImpl(ASTNode node) {
+  public LuaWhileStatImpl(@NotNull ASTNode node) {
     super(node);
   }
 

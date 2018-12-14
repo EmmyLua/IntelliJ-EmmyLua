@@ -36,7 +36,7 @@ import com.tang.intellij.lua.stubs.LuaFileStub
  * Created by TangZhiXu on 2015/11/15.
  * Email:272669294@qq.com
  */
-open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider, LuaLanguage.INSTANCE), LuaTypeGuessable {
+open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider, LuaLanguage.INSTANCE), LuaTypeGuessable, LuaDeclarationScope {
 
     override fun getFileType(): FileType {
         return LuaFileType.INSTANCE

@@ -29,33 +29,6 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
-internal fun resolveFuncBodyOwner(ref: LuaNameExpr, context: SearchContext): LuaFuncBodyOwner? {
-    var ret:LuaFuncBodyOwner? = null
-    val refName = ref.name
-    //local 函数名
-    LuaPsiTreeUtilEx.walkUpLocalFuncDef(ref, Processor { localFuncDef ->
-        if (refName == localFuncDef.name) {
-            ret = localFuncDef
-            return@Processor false
-        }
-        true
-    })
-
-    //global function
-    if (ret == null) {
-        val module = ref.moduleName ?: Constants.WORD_G
-        LuaClassMemberIndex.process(module, refName, context, Processor {
-            if (it is LuaFuncBodyOwner) {
-                ret = it
-                return@Processor false
-            }
-            true
-        })
-    }
-
-    return ret
-}
-
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
 private val KEY_RESOLVE = Key.create<CachedValue<PsiElement>>("lua.resolve.cache.resolveLocal")
@@ -70,24 +43,11 @@ fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext? = null
 
 fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): PsiElement? {
     var ret: PsiElement? = null
-    var lastNameExpr: LuaNameExpr? = null
-
-    //local/param
-    LuaPsiTreeUtilEx.walkUpNameDef(pin, Processor { nameDef ->
-        if (refName == nameDef.name)
-            ret = nameDef
+    LuaDeclarationTree.get(pin.containingFile).walkUp(pin) { decl ->
+        if (decl.name == refName)
+            ret = decl.firstDeclaration.psi
         ret == null
-    }, Processor {
-        for (expr in it.varExprList.exprList) {
-            if (expr is LuaNameExpr && expr.name == refName) {
-                lastNameExpr = expr
-                return@Processor true
-            }
-        }
-        true
-    })
-
-    ret = ret ?: lastNameExpr
+    }
 
     if (ret == null && refName == Constants.WORD_SELF) {
         val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(pin, LuaClassMethodDef::class.java)
@@ -173,6 +133,12 @@ fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
 }
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
+    val tree = LuaDeclarationTree.get(indexExpr.containingFile)
+    val declaration = tree.find(indexExpr)
+    if (declaration != null) {
+        return declaration.psi
+    }
+
     val type = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
     type.eachTopClass(Processor { ty ->

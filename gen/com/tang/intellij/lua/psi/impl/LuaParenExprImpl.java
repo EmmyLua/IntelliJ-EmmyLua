@@ -16,15 +16,15 @@ import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaParenExprImpl extends LuaParenExprMixin implements LuaParenExpr {
 
-  public LuaParenExprImpl(LuaExprPlaceStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaParenExprImpl(@NotNull LuaExprPlaceStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaParenExprImpl(ASTNode node) {
+  public LuaParenExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaParenExprImpl(LuaExprPlaceStub stub, IElementType type, ASTNode node) {
+  public LuaParenExprImpl(@NotNull LuaExprPlaceStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 

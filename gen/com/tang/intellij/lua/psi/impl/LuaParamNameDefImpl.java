@@ -15,11 +15,11 @@ import com.tang.intellij.lua.stubs.LuaNameDefStub;
 
 public class LuaParamNameDefImpl extends LuaNameDefImpl implements LuaParamNameDef {
 
-  public LuaParamNameDefImpl(LuaNameDefStub stub, IStubElementType type) {
+  public LuaParamNameDefImpl(@NotNull LuaNameDefStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaParamNameDefImpl(ASTNode node) {
+  public LuaParamNameDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 

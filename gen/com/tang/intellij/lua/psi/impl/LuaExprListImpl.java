@@ -18,11 +18,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaExprListImpl extends StubBasedPsiElementBase<LuaPlaceholderStub> implements LuaExprList {
 
-  public LuaExprListImpl(LuaPlaceholderStub stub, IStubElementType type) {
+  public LuaExprListImpl(@NotNull LuaPlaceholderStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaExprListImpl(ASTNode node) {
+  public LuaExprListImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -46,7 +46,7 @@ public class LuaExprListImpl extends StubBasedPsiElementBase<LuaPlaceholderStub>
   }
 
   @NotNull
-  public ITy guessTypeAt(SearchContext context) {
+  public ITy guessTypeAt(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessTypeAt(this, context);
   }
 

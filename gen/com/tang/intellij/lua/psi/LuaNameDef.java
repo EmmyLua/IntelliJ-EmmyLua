@@ -18,7 +18,7 @@ public interface LuaNameDef extends LuaNamedElement, LuaTypeGuessable, PsiNameId
   String getName();
 
   @NotNull
-  PsiElement setName(String name);
+  PsiElement setName(@NotNull String name);
 
   @NotNull
   PsiElement getNameIdentifier();

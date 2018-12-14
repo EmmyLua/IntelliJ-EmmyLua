@@ -17,11 +17,11 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaNameDefImpl extends StubBasedPsiElementBase<LuaNameDefStub> implements LuaNameDef {
 
-  public LuaNameDefImpl(LuaNameDefStub stub, IStubElementType type) {
+  public LuaNameDefImpl(@NotNull LuaNameDefStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaNameDefImpl(ASTNode node) {
+  public LuaNameDefImpl(@NotNull ASTNode node) {
     super(node);
   }
 
@@ -50,7 +50,7 @@ public class LuaNameDefImpl extends StubBasedPsiElementBase<LuaNameDefStub> impl
   }
 
   @NotNull
-  public PsiElement setName(String name) {
+  public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 

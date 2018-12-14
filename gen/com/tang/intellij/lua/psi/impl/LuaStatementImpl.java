@@ -14,7 +14,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 
 public class LuaStatementImpl extends ASTWrapperPsiElement implements LuaStatement {
 
-  public LuaStatementImpl(ASTNode node) {
+  public LuaStatementImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -34,7 +34,7 @@ public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement
   PsiElement getNameIdentifier();
 
   @NotNull
-  PsiElement setName(String name);
+  PsiElement setName(@NotNull String name);
 
   @Nullable
   String getName();
@@ -42,10 +42,10 @@ public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement
   int getTextOffset();
 
   @NotNull
-  ITy guessReturnType(SearchContext searchContext);
+  ITy guessReturnType(@NotNull SearchContext searchContext);
 
   @NotNull
-  ITyClass guessParentType(SearchContext searchContext);
+  ITyClass guessParentType(@NotNull SearchContext searchContext);
 
   @NotNull
   Visibility getVisibility();

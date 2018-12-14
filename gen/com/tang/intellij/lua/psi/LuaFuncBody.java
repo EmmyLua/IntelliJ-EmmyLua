@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 
-public interface LuaFuncBody extends LuaIndentRange, StubBasedPsiElement<LuaPlaceholderStub> {
+public interface LuaFuncBody extends LuaIndentRange, LuaDeclarationScope, StubBasedPsiElement<LuaPlaceholderStub> {
 
   @NotNull
   List<LuaParamNameDef> getParamNameDefList();

@@ -18,15 +18,15 @@ import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaClosureExprImpl extends LuaClosureExprMixin implements LuaClosureExpr {
 
-  public LuaClosureExprImpl(LuaClosureExprStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaClosureExprImpl(@NotNull LuaClosureExprStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaClosureExprImpl(ASTNode node) {
+  public LuaClosureExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaClosureExprImpl(LuaClosureExprStub stub, IElementType type, ASTNode node) {
+  public LuaClosureExprImpl(@NotNull LuaClosureExprStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 
@@ -51,7 +51,7 @@ public class LuaClosureExprImpl extends LuaClosureExprMixin implements LuaClosur
   }
 
   @NotNull
-  public ITy guessReturnType(SearchContext searchContext) {
+  public ITy guessReturnType(@NotNull SearchContext searchContext) {
     return LuaPsiImplUtilKt.guessReturnType(this, searchContext);
   }
 

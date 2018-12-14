@@ -16,27 +16,14 @@
 
 package com.tang.intellij.lua.psi
 
-import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.PsiTreeChangeEventImpl
+import com.intellij.psi.impl.PsiTreeChangePreprocessor
 
-abstract class LuaRecursiveVisitor : LuaVisitor() {
-    override fun visitElement(element: PsiElement) {
-        element.acceptChildren(this)
-    }
-}
-
-abstract class LuaStubRecursiveVisitor : LuaRecursiveVisitor() {
-    override fun visitElement(element: PsiElement) {
-        var stub: STUB_ELE? = null
-        if (element is LuaPsiFile) {
-            stub = element.stub
+class LuaPsiTreeChangePreprocessor : PsiTreeChangePreprocessor {
+    override fun treeChanged(event: PsiTreeChangeEventImpl) {
+        val file = event.file
+        if (file is LuaPsiFile) {
+            LuaDeclarationTree.rebuild(file)
         }
-        if (element is STUB_PSI) {
-            stub  = element.stub
-        }
-        if (stub != null) {
-            for (child in stub.childrenStubs) {
-                child.psi.accept(this)
-            }
-        } else super.visitElement(element)
     }
 }

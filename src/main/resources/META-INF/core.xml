@@ -177,6 +177,7 @@
 
         <projectViewPane implementation="com.tang.intellij.lua.project.LuaProjectViewPane"/>
         <iconProvider implementation="com.tang.intellij.lua.project.LuaSourceRootIconProvider"/>
+        <psi.treeChangePreprocessor implementation="com.tang.intellij.lua.psi.LuaPsiTreeChangePreprocessor"/>
 
         <!--intentions-->
         <intentionAction>

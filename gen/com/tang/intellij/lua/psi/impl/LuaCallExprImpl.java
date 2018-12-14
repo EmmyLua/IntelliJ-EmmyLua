@@ -18,15 +18,15 @@ import com.tang.intellij.lua.stubs.LuaExprStub;
 
 public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
 
-  public LuaCallExprImpl(LuaExprPlaceStub stub, IStubElementType<?, ?> nodeType) {
+  public LuaCallExprImpl(@NotNull LuaExprPlaceStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
   }
 
-  public LuaCallExprImpl(ASTNode node) {
+  public LuaCallExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaCallExprImpl(LuaExprPlaceStub stub, IElementType type, ASTNode node) {
+  public LuaCallExprImpl(@NotNull LuaExprPlaceStub stub, @NotNull IElementType type, @NotNull ASTNode node) {
     super(stub, type, node);
   }
 
@@ -52,13 +52,8 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
   }
 
   @NotNull
-  public ITy guessParentType(SearchContext context) {
+  public ITy guessParentType(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
-  }
-
-  @Nullable
-  public LuaFuncBodyOwner resolveFuncBodyOwner(SearchContext context) {
-    return LuaPsiImplUtilKt.resolveFuncBodyOwner(this, context);
   }
 
   @Nullable
