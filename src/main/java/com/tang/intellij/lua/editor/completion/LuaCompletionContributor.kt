@@ -55,7 +55,7 @@ class LuaCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, IN_CLASS_METHOD_NAME, LocalAndGlobalCompletionProvider(LocalAndGlobalCompletionProvider.VARS))
 
         extend(CompletionType.BASIC, GOTO, object : CompletionProvider<CompletionParameters>(){
-            override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext?, resultSet: CompletionResultSet) {
+            override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, resultSet: CompletionResultSet) {
                 LuaPsiTreeUtil.walkUpLabel(parameters.position) {
                     val name = it.name
                     if (name != null) {
