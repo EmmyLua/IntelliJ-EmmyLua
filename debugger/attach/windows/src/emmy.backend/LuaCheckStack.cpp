@@ -21,7 +21,7 @@ along with Decoda.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "LuaCheckStack.h"    
-#include <assert.h>
+#include <cassert>
 
 LuaCheckStack::LuaCheckStack(LAPI api, lua_State* L, int delta)
 {
@@ -30,9 +30,14 @@ LuaCheckStack::LuaCheckStack(LAPI api, lua_State* L, int delta)
     m_delta = delta;
     m_top   = lua_gettop_dll(api, L);
 }
-    
+
 LuaCheckStack::~LuaCheckStack()
 {
-    int top = lua_gettop_dll(m_api, m_L);
-    assert(top - m_top == m_delta);
+	const auto top = lua_gettop_dll(m_api, m_L);
+#ifdef _DEBUG
+	assert(top - m_top == m_delta);
+#else
+	if (top - m_top != m_delta)
+		lua_settop_dll(m_api, m_L, m_top + m_delta);
+#endif
 }
