@@ -130,7 +130,7 @@ tableField ::= tableField2 {
         guessType
         isDeprecated
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocTableFieldDefStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTableFieldStub"
 }
 
 table_def ::= '{' fieldList '}' {
@@ -173,7 +173,7 @@ tag_field ::= TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty co
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.intellij.psi.PsiNameIdentifierOwner"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocFieldDefStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTagFieldStub"
     methods = [
         guessParentType
         getVisibility
@@ -232,7 +232,7 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
         "com.intellij.psi.PsiNameIdentifierOwner"
         "com.tang.intellij.lua.psi.LuaClass"
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocClassStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTagClassStub"
     methods = [
         getType
         
@@ -252,7 +252,7 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
 // @type CLASS_REF
 tag_type ::= TAG_NAME_TYPE ty comment_string? {
     pin = 1
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocTypeDefStub"
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTagTypeStub"
     methods = [getType]
 }
 

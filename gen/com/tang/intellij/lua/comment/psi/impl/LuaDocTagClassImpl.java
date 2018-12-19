@@ -9,16 +9,16 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.tang.intellij.lua.stubs.LuaDocClassStub;
+import com.tang.intellij.lua.stubs.LuaDocTagClassStub;
 import com.tang.intellij.lua.comment.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.ty.ITyClass;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaDocTagClassImpl extends StubBasedPsiElementBase<LuaDocClassStub> implements LuaDocTagClass {
+public class LuaDocTagClassImpl extends StubBasedPsiElementBase<LuaDocTagClassStub> implements LuaDocTagClass {
 
-  public LuaDocTagClassImpl(@NotNull LuaDocClassStub stub, @NotNull IStubElementType type) {
+  public LuaDocTagClassImpl(@NotNull LuaDocTagClassStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
@@ -26,7 +26,7 @@ public class LuaDocTagClassImpl extends StubBasedPsiElementBase<LuaDocClassStub>
     super(node);
   }
 
-  public LuaDocTagClassImpl(LuaDocClassStub stub, IElementType type, ASTNode node) {
+  public LuaDocTagClassImpl(LuaDocTagClassStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 
