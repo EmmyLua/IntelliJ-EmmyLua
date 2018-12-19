@@ -28,8 +28,14 @@ interface LuaDeclarationTree {
         private val key = Key.create<LuaDeclarationTree>("lua.object.tree.manager")
         fun get(file: PsiFile): LuaDeclarationTree {
             var ret = file.getUserData(key)
+            if (file is LuaPsiFile) {
+                if (ret is LuaDeclarationTreeStub && file.fileElement != null) {
+                    rebuild(file)
+                    ret = null
+                }
+            }
             if (ret == null) {
-                val manager = if (file is LuaPsiFile && file.stub != null) LuaDeclarationTreeStub() else LuaDeclarationTreePsi()
+                val manager = if (file is LuaPsiFile && file.fileElement == null) LuaDeclarationTreeStub() else LuaDeclarationTreePsi()
                 manager.buildTree(file)
                 file.putUserData(key, manager)
                 ret = manager

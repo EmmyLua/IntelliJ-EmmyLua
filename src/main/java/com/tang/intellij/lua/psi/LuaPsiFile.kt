@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.FileElement
 import com.intellij.psi.util.CachedValue
 import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.CachedValuesManager
@@ -40,6 +41,10 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
 
     override fun getFileType(): FileType {
         return LuaFileType.INSTANCE
+    }
+
+    val fileElement: FileElement? get() {
+        return derefTreeElement()
     }
 
     val tooLarger: Boolean get() {
