@@ -192,7 +192,7 @@ private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaStubRecurs
         val scopeKey = Key.create<Scope>("lua.object.tree.scope")
     }
 
-    val modificationStamp = file.modificationStamp
+    val modificationStamp: Long = file.modificationStamp
 
     private val scopes = Stack<Scope>()
     private var topScope: Scope? = null
