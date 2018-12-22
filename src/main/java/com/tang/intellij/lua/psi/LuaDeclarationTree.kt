@@ -246,6 +246,8 @@ private abstract class LuaDeclarationTreeBase : LuaStubRecursiveVisitor(), LuaDe
     fun buildTree(file: PsiFile) {
         //val t = System.currentTimeMillis()
         scopes.clear()
+        topScope = null
+        curScope = null
         file.accept(this)
         //println("build tree : ${file.name}, ${System.currentTimeMillis() - t}")
     }
@@ -313,9 +315,6 @@ private abstract class LuaDeclarationTreeBase : LuaStubRecursiveVisitor(), LuaDe
             }
         }
         super.visitAssignStat(o)
-    }
-
-    override fun visitIndexExpr(o: LuaIndexExpr) {
     }
 
     override fun visitElement(element: PsiElement) {
