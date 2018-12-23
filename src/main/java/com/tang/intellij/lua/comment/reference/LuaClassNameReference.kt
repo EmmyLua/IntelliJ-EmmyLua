@@ -23,6 +23,7 @@ import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
+import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
@@ -47,14 +48,21 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
 
     override fun resolve(): PsiElement? {
         val name = myElement.text
-        // generic ?
-        val comment = LuaCommentUtil.findContainer(myElement)
-        for (genericDef in comment.findTags(LuaDocGenericDef::class.java)) {
+        // generic in docFunction
+        val fn = PsiTreeUtil.getParentOfType(myElement, LuaDocFunctionTy::class.java)
+        var genericDefList: Collection<LuaDocGenericDef>? = fn?.genericDefList
+        if (genericDefList == null) {
+            // generic in comments ?
+            val comment = LuaCommentUtil.findContainer(myElement)
+            genericDefList = comment.findTags(LuaDocGenericDef::class.java)
+        }
+
+        for (genericDef in genericDefList) {
             if (genericDef.name == name)
                 return genericDef
         }
-        val def = LuaShortNamesManager.getInstance(myElement.project).findTypeDef(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
-        return def
+
+        return LuaShortNamesManager.getInstance(myElement.project).findTypeDef(name, myElement.project, ProjectAndLibrariesScope(myElement.project))
     }
 
     override fun getVariants(): Array<Any> = emptyArray()

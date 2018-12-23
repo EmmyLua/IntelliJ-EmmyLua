@@ -160,7 +160,10 @@ vararg_param ::= VARARG ty {
     methods = [getType]
 }
 private function_param_list::= (function_param ',')* ((function_param|vararg_param) |& ')')
-function_ty ::= fun '(' function_param_list ')' (':' type_list)? {
+private function_generic ::= '<' generic_def (',' generic_def)* '>' {
+    pin = 1
+}
+function_ty ::= fun function_generic? '(' function_param_list ')' (':' type_list)? {
     methods = [getType getReturnType]
     pin = 1
 }

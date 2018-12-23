@@ -169,7 +169,15 @@ class FunSignature(colonCall: Boolean,
         }
 
         fun create(colonCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
-            return FunSignature(colonCall, functionTy.returnType, functionTy.varargParam?.type, initParams(functionTy))
+            val list = mutableListOf<TyParameter>()
+            functionTy.genericDefList.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.text)) } }
+            return FunSignature(
+                    colonCall,
+                    functionTy.returnType,
+                    functionTy.varargParam?.type,
+                    initParams(functionTy),
+                    list.toTypedArray()
+            )
         }
 
         fun serialize(sig: IFunSignature, stream: StubOutputStream) {
