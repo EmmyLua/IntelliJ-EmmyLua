@@ -58,10 +58,11 @@ function table.pack(...) end
 ---
 --- The default value for `pos` is `#list`, so that a call `table.remove(l)`
 --- removes the last element of list `l`.
----@overload fun(list:table):any
----@param list table
+---@overload fun<V>(list:table<number, V> | V[]):V
+---@generic V
+---@param list table<number, V>
 ---@param pos number
----@return any
+---@return V
 function table.remove(list, pos) end
 
 ---
@@ -78,9 +79,9 @@ function table.remove(list, pos) end
 ---
 --- The sort algorithm is not stable: elements considered equal by the given
 --- order may have their relative positions changed by the sort.
----@generic V
 ---@overload fun(list:table):number
----@param list table<number, V>
+---@generic V
+---@param list table<number, V> | V[]
 ---@param comp fun(a:V, b:V):number
 ---@return number
 function table.sort(list, comp) end
