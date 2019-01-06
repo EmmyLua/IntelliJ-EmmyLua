@@ -275,6 +275,11 @@ fun getType(luaDocParTy: LuaDocParTy): ITy {
     return luaDocParTy.ty?.getType() ?: Ty.UNKNOWN
 }
 
+fun getType(stringLiteral: LuaDocStringLiteralTy): ITy {
+    val text = stringLiteral.text
+    return TyStringLiteral(if (text.length >= 2) text.substring(1, text.length - 1) else "")
+}
+
 fun getType(unionTy: LuaDocUnionTy): ITy {
     val list = unionTy.tyList
     var retTy: ITy = Ty.UNKNOWN

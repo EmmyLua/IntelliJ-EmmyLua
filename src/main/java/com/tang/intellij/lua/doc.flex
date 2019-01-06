@@ -49,6 +49,9 @@ ID=[:jletter:] ([:jletterdigit:]|\.)*
 AT=@
 //三个-以上
 DOC_DASHES = --+
+//Strings
+DOUBLE_QUOTED_STRING=\"([^\\\"]|\\\S|\\[\r\n])*\"?  //\"([^\\\"\r\n]|\\[^\r\n])*\"?
+SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 
 %state xTAG
 %state xTAG_WITH_ID
@@ -62,6 +65,8 @@ DOC_DASHES = --+
 %state xFIELD_ID
 %state xGENERIC
 %state xALIAS
+%state xDOUBLE_QUOTED_STRING
+%state xSINGLE_QUOTED_STRING
 
 %%
 
@@ -144,10 +149,20 @@ DOC_DASHES = --+
     ")"                        { _typeLevel--; _typeReq = false; return RPAREN; }
     "{"                        { _typeLevel++; return LCURLY; }
     "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
+    "\""                       { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
+    "'"                        { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
     "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
     "vararg"                   { _typeReq = true; return VARARG; }
     "..."|{ID}                 { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(xCOMMENT_STRING); yypushback(yylength()); } }
+}
+
+<xDOUBLE_QUOTED_STRING> {
+    {DOUBLE_QUOTED_STRING}    { yybegin(xTYPE_REF); return STRING_LITERAL; }
+}
+
+<xSINGLE_QUOTED_STRING> {
+    {SINGLE_QUOTED_STRING}    { yybegin(xTYPE_REF); return STRING_LITERAL; }
 }
 
 <xTAG> {

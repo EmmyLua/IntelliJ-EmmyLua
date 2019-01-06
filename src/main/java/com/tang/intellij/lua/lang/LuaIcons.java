@@ -59,6 +59,8 @@ public class LuaIcons {
     public static final Icon ROOT = IconLoader.getIcon("/icons/lua_root.svg");
     public static final Icon PROJECT = IconLoader.getIcon("/icons/lua_project.svg");
 
+    public static final Icon STRING_LITERAL = AllIcons.Nodes.Aspect;
+
     public static class Debugger {
         public static class Actions {
             public static final Icon PROFILER = AllIcons.Debugger.Db_primitive;

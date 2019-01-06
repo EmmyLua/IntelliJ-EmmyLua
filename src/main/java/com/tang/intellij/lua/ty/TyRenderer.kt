@@ -46,6 +46,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                     is TyParameter -> {
 
                     }
+                    is TyStringLiteral -> sb.append(ty.toString())
                     else -> {
                         error("")
                     }

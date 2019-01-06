@@ -47,6 +47,7 @@
         RPAREN = ")"
         LCURLY = "{"
         RCURLY = "}"
+        STRING_LITERAL = "STRING_LITERAL"
         ARR = '[]'
         FUN = 'fun'
         VARARG = 'vararg'
@@ -96,7 +97,7 @@ private doc_item ::= '@' (tag_param
     | access_modifier
     | tag_generic_list)
 
-ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty {
+ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty | string_literal_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
 }
 
@@ -109,6 +110,9 @@ general_ty ::= class_name_ref {
 par_ty ::= '(' ty ')' {
     pin = 1
     methods = [getType]
+}
+string_literal_ty ::= STRING_LITERAL{
+    methods = [getType content = 'STRING_LITERAL']
 }
 
 private fieldList ::= (tableField (',' tableField)* (',')?)?
