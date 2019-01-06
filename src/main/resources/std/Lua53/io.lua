@@ -17,7 +17,7 @@ io = {}
 ---
 --- Equivalent to `file:close()`. Without a file, closes the default output
 --- file.
----@overload fun()
+---@overload fun():void
 ---@param file file
 function io.close(file) end
 
@@ -33,9 +33,9 @@ function io.flush() end
 ---
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
----@overload fun():number
----@param file file
----@return number
+---@overload fun():file
+---@param file file | string
+---@return file
 function io.input(file) end
 
 ---
@@ -73,14 +73,15 @@ function io.lines(filename, ...) end
 --- some systems to open the file in binary mode.
 ---@overload fun(filename:string):file
 ---@param filename string
----@param mode string
+---@param mode string | '"r"' | '"w"' | '"a"' | '"r+"' | '"w+"' | '"a+"' | '"rb"' | '"wb"' | '"ab"' | '"rb+"' | '"wb+"' | '"ab+"'
 ---@return file
 function io.open(filename, mode) return file end
 
 ---
 --- Similar to `io.input`, but operates over the default output file.
----@overload fun()
----@param file file
+---@overload fun():file
+---@param file file | string
+---@return file
 function io.output(file) end
 
 ---
@@ -89,10 +90,10 @@ function io.output(file) end
 --- Starts program `prog` in a separated process and returns a file handle that
 --- you can use to read data from this program (if `mode` is "`r`", the default)
 --- or to write data to this program (if `mode` is "`w`").
----@overload fun(prog:file):any
----@param prog file
----@param mode string
----@return any
+---@overload fun(prog:string):file
+---@param prog string
+---@param mode string | '"r"' | '"w"'
+---@return file
 function io.popen(prog, mode) end
 
 ---
@@ -191,7 +192,7 @@ function file:read(...) end
 --- file (and returns 0); and the call `file:seek("end")` sets the position
 --- to the end of the file, and returns its size.
 ---@overload fun()
----@param whence string
+---@param whence string | '"set"' | '"cur"' | '"end"'
 ---@param offset number
 function file:seek(whence, offset) end
 
@@ -208,7 +209,7 @@ function file:seek(whence, offset) end
 --- For the last two cases, `size` specifies the size of the buffer, in
 --- bytes. The default is an appropriate size.
 ---@overload fun(mode:string)
----@param mode string
+---@param mode string | '"no"' | '"full"' | '"line"'
 ---@param size number
 function file:setvbuf(mode, size) end
 
