@@ -1,4 +1,4 @@
-ï»¿#ifndef UTILITY_H
+#ifndef UTILITY_H
 #define UTILITY_H
 #include <Windows.h>
 #include <string>
@@ -16,11 +16,11 @@ struct ExeInfo
 */
 bool GetExeInfo(LPCSTR fileName, ExeInfo&info);
 
-// è·å–å½“å‰ä¸»çª—å£
+// »ñÈ¡µ±Ç°Ö÷´°¿Ú
 HWND GetCurrentWnd();
 
 std::wstring CharToWchar(const char* c, size_t m_encode = CP_ACP);
 
-std::string WcharToChar(const wchar_t* wp, size_t m_encode = CP_UTF8);
+std::string WcharToChar(const wchar_t* wp, size_t m_encode = CP_ACP);
 
 #endif

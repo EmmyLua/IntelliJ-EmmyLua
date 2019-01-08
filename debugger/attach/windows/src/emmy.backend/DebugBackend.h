@@ -266,11 +266,6 @@ public:
 	* if otherwise.
 	*/
 	bool GetIsAttached() const;
-
-	/************************************************************************/
-	/* Get the output charset in launch profile of idea                     */
-	/************************************************************************/
-	size_t GetOutputCP();
 private:
 	class Breakpoint
 	{
@@ -660,7 +655,6 @@ private:
 
 	bool							m_hooked;
 	std::string						m_emmyLuaFilePath;
-	size_t							m_outputCP;
 	DebugPipeline*					m_debugPipeline;
 
 	bool                            m_profiler;
