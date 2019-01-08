@@ -28,17 +28,17 @@ interface LuaDeclarationTree {
         private val key = Key.create<LuaDeclarationTree>("lua.object.tree.manager")
         fun get(file: PsiFile): LuaDeclarationTree {
             var ret = file.getUserData(key)
+            if (ret != null && ret.shouldRebuild()) {
+                file.putUserData(key, null)
+                ret = null
+            }
             if (ret == null) {
-                val manager = if (file is LuaPsiFile && file.stub != null) LuaDeclarationTreeStub() else LuaDeclarationTreePsi()
+                val manager = if (file is LuaPsiFile && file.fileElement == null) LuaDeclarationTreeStub(file) else LuaDeclarationTreePsi(file)
                 manager.buildTree(file)
                 file.putUserData(key, manager)
                 ret = manager
             }
             return ret
-        }
-
-        fun rebuild(file: PsiFile) {
-            file.putUserData(key, null)
         }
     }
 
@@ -51,6 +51,7 @@ interface LuaDeclarationTree {
         val firstDeclaration: IDeclaration
     }
 
+    fun shouldRebuild(): Boolean
     fun find(expr: LuaExpr): IDeclaration?
     fun walkUp(pin: PsiElement, process: (declaration: IDeclaration) -> Boolean)
     fun walkUpLocal(pin: PsiElement, process: (declaration: IDeclaration) -> Boolean) {
@@ -186,14 +187,20 @@ private open class Scope(
     }
 }
 
-private abstract class LuaDeclarationTreeBase : LuaStubRecursiveVisitor(), LuaDeclarationTree {
+private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaStubRecursiveVisitor(), LuaDeclarationTree {
     companion object {
         val scopeKey = Key.create<Scope>("lua.object.tree.scope")
     }
 
+    val modificationStamp: Long = file.modificationStamp
+
     private val scopes = Stack<Scope>()
     private var topScope: Scope? = null
     private var curScope: Scope? = null
+
+    override fun shouldRebuild(): Boolean {
+        return modificationStamp != file.modificationStamp
+    }
 
     private fun push(psi: LuaDeclarationScope): Scope {
         val pos = getPosition(psi)
@@ -240,6 +247,8 @@ private abstract class LuaDeclarationTreeBase : LuaStubRecursiveVisitor(), LuaDe
     fun buildTree(file: PsiFile) {
         //val t = System.currentTimeMillis()
         scopes.clear()
+        topScope = null
+        curScope = null
         file.accept(this)
         //println("build tree : ${file.name}, ${System.currentTimeMillis() - t}")
     }
@@ -249,6 +258,7 @@ private abstract class LuaDeclarationTreeBase : LuaStubRecursiveVisitor(), LuaDe
     abstract fun getPosition(psi: PsiElement): Int
 
     override fun walkUp(pin: PsiElement, process: (declaration: LuaDeclarationTree.IDeclaration) -> Boolean) {
+        assert(pin.containingFile == file)
         val scope = findScope(pin)
         scope?.walkUp(getPosition(pin), 0, process)
     }
@@ -309,9 +319,6 @@ private abstract class LuaDeclarationTreeBase : LuaStubRecursiveVisitor(), LuaDe
         super.visitAssignStat(o)
     }
 
-    override fun visitIndexExpr(o: LuaIndexExpr) {
-    }
-
     override fun visitElement(element: PsiElement) {
         if (element is LuaDeclarationScope) {
             push(element)
@@ -321,7 +328,7 @@ private abstract class LuaDeclarationTreeBase : LuaStubRecursiveVisitor(), LuaDe
     }
 }
 
-private class LuaDeclarationTreePsi : LuaDeclarationTreeBase() {
+private class LuaDeclarationTreePsi(file: PsiFile) : LuaDeclarationTreeBase(file) {
     override fun findScope(psi: PsiElement): Scope? {
         var cur: PsiElement? = psi
         while (cur != null) {
@@ -343,9 +350,13 @@ private class LuaDeclarationTreePsi : LuaDeclarationTreeBase() {
     }
 }
 
-private class LuaDeclarationTreeStub : LuaDeclarationTreeBase()  {
+private class LuaDeclarationTreeStub(file: PsiFile) : LuaDeclarationTreeBase(file)  {
     val map = mutableMapOf<PsiElement, Int>()
     var count = 0
+
+    override fun shouldRebuild(): Boolean {
+        return super.shouldRebuild() || (file as? LuaPsiFile)?.fileElement != null
+    }
 
     override fun findScope(psi: PsiElement): Scope? {
         if (psi is STUB_PSI) {

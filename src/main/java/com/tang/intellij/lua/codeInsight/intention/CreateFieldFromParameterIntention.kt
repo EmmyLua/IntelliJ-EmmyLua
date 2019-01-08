@@ -77,7 +77,7 @@ class CreateFieldFromParameterIntention : BaseIntentionAction() {
                                 val textRange = def.textRange
                                 editor.caretModel.moveToOffset(textRange.endOffset)
                                 templateManager.startTemplate(editor, template, object : TemplateEditingAdapter() {
-                                    override fun templateFinished(template: Template?, brokenOff: Boolean) {
+                                    override fun templateFinished(template: Template, brokenOff: Boolean) {
                                         insertFieldAssign(project, editor, block, paramName, fieldName)
                                     }
                                 })

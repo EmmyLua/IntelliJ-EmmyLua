@@ -17,21 +17,15 @@
 package com.tang.intellij.lua.hierarchy.call
 
 import com.intellij.ide.hierarchy.CallHierarchyBrowserBase
-import com.intellij.ide.hierarchy.HierarchyBrowserManager
 import com.intellij.ide.hierarchy.HierarchyNodeDescriptor
 import com.intellij.ide.hierarchy.HierarchyTreeStructure
-import com.intellij.ide.hierarchy.call.CallHierarchyNodeDescriptor
 import com.intellij.ide.util.treeView.AlphaComparator
 import com.intellij.ide.util.treeView.NodeDescriptor
-import com.intellij.ide.util.treeView.SourceComparator
 import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.psi.PsiElement
 import com.intellij.ui.PopupHandler
-import com.tang.intellij.lua.psi.LuaClassMethodDef
-import com.tang.intellij.lua.psi.LuaFuncDef
-import com.tang.intellij.lua.psi.LuaLocalFuncDef
 import java.util.*
 import javax.swing.JTree
 
@@ -41,21 +35,16 @@ class LuaCallHierarchyBrowser(element: PsiElement) : CallHierarchyBrowserBase(el
     }
 
     override fun isApplicableElement(element: PsiElement): Boolean {
-        return element is LuaClassMethodDef || element is LuaFuncDef || element is LuaLocalFuncDef
+        return LuaCallHierarchyUtil.isValidElement(element)
     }
 
     override fun getComparator(): Comparator<NodeDescriptor<Any>>? {
-        return if (HierarchyBrowserManager.getInstance(myProject).state!!.SORT_ALPHABETICALLY) {
-            AlphaComparator.INSTANCE
-        } else {
-            SourceComparator.INSTANCE
-        }
+        return AlphaComparator.INSTANCE
     }
 
     override fun getElementFromDescriptor(descriptor: HierarchyNodeDescriptor): PsiElement? {
-        return (descriptor as? CallHierarchyNodeDescriptor)?.enclosingElement
+        return descriptor.psiElement
     }
-
 
     private fun createHierarchyTree(group: ActionGroup): JTree {
         val tree = createTree(false)

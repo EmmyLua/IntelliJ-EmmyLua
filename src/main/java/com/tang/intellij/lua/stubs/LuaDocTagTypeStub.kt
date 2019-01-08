@@ -24,25 +24,25 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagType
 import com.tang.intellij.lua.comment.psi.impl.LuaDocTagTypeImpl
 import com.tang.intellij.lua.psi.LuaElementType
 
-class LuaDocTypeDefType : LuaStubElementType<LuaDocTypeDefStub, LuaDocTagType>("DOC_TY"){
-    override fun indexStub(stub: LuaDocTypeDefStub, sink: IndexSink) {
+class LuaDocTagTypeType : LuaStubElementType<LuaDocTagTypeStub, LuaDocTagType>("DOC_TY"){
+    override fun indexStub(stub: LuaDocTagTypeStub, sink: IndexSink) {
     }
 
-    override fun deserialize(inputStream: StubInputStream, stubElement: StubElement<*>?): LuaDocTypeDefStub {
-        return LuaDocTypeDefStubImpl(stubElement)
+    override fun deserialize(inputStream: StubInputStream, stubElement: StubElement<*>?): LuaDocTagTypeStub {
+        return LuaDocTagTypeStubImpl(stubElement)
     }
 
-    override fun createPsi(stub: LuaDocTypeDefStub) = LuaDocTagTypeImpl(stub, this)
+    override fun createPsi(stub: LuaDocTagTypeStub) = LuaDocTagTypeImpl(stub, this)
 
-    override fun serialize(stub: LuaDocTypeDefStub, stubElement: StubOutputStream) {
+    override fun serialize(stub: LuaDocTagTypeStub, stubElement: StubOutputStream) {
     }
 
-    override fun createStub(tagType: LuaDocTagType, stubElement: StubElement<*>?): LuaDocTypeDefStub {
-        return LuaDocTypeDefStubImpl(stubElement)
+    override fun createStub(tagType: LuaDocTagType, stubElement: StubElement<*>?): LuaDocTagTypeStub {
+        return LuaDocTagTypeStubImpl(stubElement)
     }
 }
 
-interface LuaDocTypeDefStub : StubElement<LuaDocTagType>
+interface LuaDocTagTypeStub : StubElement<LuaDocTagType>
 
-class LuaDocTypeDefStubImpl(parent: StubElement<*>?)
-    : LuaDocStubBase<LuaDocTagType>(parent, LuaElementType.TYPE_DEF), LuaDocTypeDefStub
+class LuaDocTagTypeStubImpl(parent: StubElement<*>?)
+    : LuaDocStubBase<LuaDocTagType>(parent, LuaElementType.TYPE_DEF), LuaDocTagTypeStub

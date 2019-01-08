@@ -167,7 +167,7 @@ class LuaCheckPanel(val project: Project) : SimpleToolWindowPanel(false), DataPr
         myUsagePreviewPanel?.updateLayout(if (list.isEmpty()) null else list)
     }
 
-    override fun getData(dataId: String?): Any? {
+    override fun getData(dataId: String): Any? {
         if (CommonDataKeys.NAVIGATABLE.`is`(dataId)) {
             val path = tree.selectionPath
             if (path != null && !builder.showPreview) {
@@ -242,7 +242,7 @@ class LuaCheckTreeStructure(project: Project) : AbstractTreeStructureBase(projec
 
     override fun hasSomethingToCommit(): Boolean = false
 
-    override fun isAlwaysLeaf(element: Any?): Boolean {
+    override fun isAlwaysLeaf(element: Any): Boolean {
         return element is LCRecord
     }
 }

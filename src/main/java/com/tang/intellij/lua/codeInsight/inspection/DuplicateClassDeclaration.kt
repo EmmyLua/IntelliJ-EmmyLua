@@ -40,8 +40,10 @@ class DuplicateClassDeclaration : LocalInspectionTool() {
                 val identifier = o.nameIdentifier
                 val project = o.project
                 LuaShortNamesManager.getInstance(project).processClassesWithName(identifier.text, project, useScope, Processor {
-                    if (it != o)
-                        holder.registerProblem(identifier, LuaBundle.message("inspection.duplicate_class", it.containingFile.virtualFile.canonicalPath), ProblemHighlightType.GENERIC_ERROR)
+                    val path = it.containingFile.virtualFile.canonicalPath
+                    if (it != o && path != null) {
+                        holder.registerProblem(identifier, LuaBundle.message("inspection.duplicate_class", path), ProblemHighlightType.GENERIC_ERROR)
+                    }
                     true
                 })
             }

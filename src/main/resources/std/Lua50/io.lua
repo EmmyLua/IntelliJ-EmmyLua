@@ -17,7 +17,7 @@ io = {}
 ---
 --- Equivalent to `file:close()`. Without a file, closes the default output
 --- file.
----@overload fun()
+---@overload fun():void
 ---@param file file
 function io.close(file) end
 
@@ -33,9 +33,9 @@ function io.flush() end
 ---
 --- In case of errors this function raises the error, instead of returning an
 --- error code.
----@overload fun():number
----@param file file
----@return number
+---@overload fun():file
+---@param file file | string
+---@return file
 function io.input(file) end
 
 ---
@@ -73,14 +73,15 @@ function io.lines(filename, ...) end
 --- some systems to open the file in binary mode.
 ---@overload fun(filename:string):file
 ---@param filename string
----@param mode string
+---@param mode string | '"r"' | '"w"' | '"a"' | '"r+"' | '"w+"' | '"a+"' | '"rb"' | '"wb"' | '"ab"' | '"rb+"' | '"wb+"' | '"ab+"'
 ---@return file
 function io.open(filename, mode) return file end
 
 ---
 --- Similar to `io.input`, but operates over the default output file.
----@overload fun()
----@param file file
+---@overload fun(): file
+---@param file file | string
+---@return file
 function io.output(file) end
 
 ---
@@ -179,7 +180,7 @@ function file:read(...) end
 --- file (and returns 0); and the call `file:seek("end")` sets the position
 --- to the end of the file, and returns its size.
 ---@overload fun()
----@param whence string
+---@param whence string | '"set"' | '"cur"' | '"end"'
 ---@param offset number
 function file:seek(whence, offset) end
 

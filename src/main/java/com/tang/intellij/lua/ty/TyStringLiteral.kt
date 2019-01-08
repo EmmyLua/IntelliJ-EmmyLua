@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.psi
+package com.tang.intellij.lua.ty
 
-import com.intellij.psi.impl.PsiTreeChangeEventImpl
-import com.intellij.psi.impl.PsiTreeChangePreprocessor
-
-class LuaPsiTreeChangePreprocessor : PsiTreeChangePreprocessor {
-    override fun treeChanged(event: PsiTreeChangeEventImpl) {
-        val file = event.file
-        if (file is LuaPsiFile) {
-            LuaDeclarationTree.rebuild(file)
-        }
-    }
+class TyStringLiteral(val content: String) : Ty(TyKind.StringLiteral) {
+    override fun toString() = content
 }

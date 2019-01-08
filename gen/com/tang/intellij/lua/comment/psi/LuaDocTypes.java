@@ -20,6 +20,7 @@ public interface LuaDocTypes {
   IElementType GENERIC_TY = LuaParserDefinitionKt.createDocType("GENERIC_TY");
   IElementType PARAM_NAME_REF = LuaParserDefinitionKt.createDocType("PARAM_NAME_REF");
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
+  IElementType STRING_LITERAL_TY = LuaParserDefinitionKt.createDocType("STRING_LITERAL_TY");
   IElementType TABLE_DEF = LuaParserDefinitionKt.createDocType("TABLE_DEF");
   IElementType TABLE_FIELD = LuaParserDefinitionKt.createDocType("TABLE_FIELD");
   IElementType TABLE_TY = LuaParserDefinitionKt.createDocType("TABLE_TY");
@@ -61,6 +62,7 @@ public interface LuaDocTypes {
   IElementType SHARP = new LuaDocTokenType("#");
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
+  IElementType STRING_LITERAL = new LuaDocTokenType("STRING_LITERAL");
   IElementType TAG_NAME = new LuaDocTokenType("TAG_NAME");
   IElementType TAG_NAME_ALIAS = new LuaDocTokenType("alias");
   IElementType TAG_NAME_CLASS = new LuaDocTokenType("class");
@@ -115,6 +117,9 @@ public interface LuaDocTypes {
       }
       else if (type == PAR_TY) {
         return new LuaDocParTyImpl(node);
+      }
+      else if (type == STRING_LITERAL_TY) {
+        return new LuaDocStringLiteralTyImpl(node);
       }
       else if (type == TABLE_DEF) {
         return new LuaDocTableDefImpl(node);

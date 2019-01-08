@@ -7,11 +7,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
 import com.tang.intellij.lua.psi.LuaClass;
 import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaDocClassStub;
+import com.tang.intellij.lua.stubs.LuaDocTagClassStub;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.ty.ITyClass;
 
-public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner, LuaClass, LuaDocTag, StubBasedPsiElement<LuaDocClassStub> {
+public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner, LuaClass, LuaDocTag, StubBasedPsiElement<LuaDocTagClassStub> {
 
   @Nullable
   LuaDocCommentString getCommentString();

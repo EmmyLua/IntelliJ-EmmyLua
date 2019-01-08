@@ -20,8 +20,10 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.process.ProcessListener
+import com.intellij.execution.process.ProcessNotCreatedException
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ServiceManager
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
@@ -81,6 +83,12 @@ fun runLuaCheck(project: Project, file: VirtualFile) {
     }
 }
 
+private fun showSettingsPanel(project: Project) {
+    ApplicationManager.getApplication().invokeLater {
+        ShowSettingsUtil.getInstance().showSettingsDialog(project, LuaCheckSettingsPanel::class.java)
+    }
+}
+
 private fun runLuaCheck(project: Project,
                         fileList: Array<Pair<String, PsiFile>>,
                         dir: VirtualFile,
@@ -98,7 +106,12 @@ private fun runLuaCheck(project: Project,
         indicator.text = second.name
         indicator.fraction = idx.toDouble() / fileList.size
         idx++
-        runLuaCheckInner(first, second, dir, builder)
+        try {
+            runLuaCheckInner(first, second, dir, builder)
+        } catch (e: ProcessNotCreatedException) {
+            showSettingsPanel(project)
+            break
+        }
     }
 
     ApplicationManager.getApplication().invokeLater { builder.performUpdate() }

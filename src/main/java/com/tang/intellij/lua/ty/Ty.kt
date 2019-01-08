@@ -39,6 +39,7 @@ enum class TyKind {
     Void,
     Tuple,
     GenericParam,
+    StringLiteral
 }
 enum class TyPrimitiveKind {
     String,
@@ -285,6 +286,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     stream.writeByte(ty.list.size)
                     ty.list.forEach { serialize(it, stream) }
                 }
+                is TyStringLiteral -> stream.writeUTF(ty.content)
             }
         }
 
@@ -343,6 +345,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     val base = StringRef.toString(stream.readName())
                     TyParameter(name, base)
                 }
+                TyKind.StringLiteral -> TyStringLiteral(stream.readUTF())
                 else -> TyUnknown()
             }
         }

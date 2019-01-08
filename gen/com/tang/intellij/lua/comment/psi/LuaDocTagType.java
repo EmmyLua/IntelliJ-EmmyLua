@@ -5,10 +5,10 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
-import com.tang.intellij.lua.stubs.LuaDocTypeDefStub;
+import com.tang.intellij.lua.stubs.LuaDocTagTypeStub;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaDocTagType extends LuaDocTag, StubBasedPsiElement<LuaDocTypeDefStub> {
+public interface LuaDocTagType extends LuaDocTag, StubBasedPsiElement<LuaDocTagTypeStub> {
 
   @Nullable
   LuaDocCommentString getCommentString();

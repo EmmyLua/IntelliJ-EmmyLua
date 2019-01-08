@@ -9,7 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.tang.intellij.lua.stubs.LuaDocFieldDefStub;
+import com.tang.intellij.lua.stubs.LuaDocTagFieldStub;
 import com.tang.intellij.lua.comment.psi.*;
 import com.intellij.navigation.ItemPresentation;
 import com.tang.intellij.lua.psi.Visibility;
@@ -18,9 +18,9 @@ import com.tang.intellij.lua.ty.ITy;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocFieldDefStub> implements LuaDocTagField {
+public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocTagFieldStub> implements LuaDocTagField {
 
-  public LuaDocTagFieldImpl(@NotNull LuaDocFieldDefStub stub, @NotNull IStubElementType type) {
+  public LuaDocTagFieldImpl(@NotNull LuaDocTagFieldStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
@@ -28,7 +28,7 @@ public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocFieldDefSt
     super(node);
   }
 
-  public LuaDocTagFieldImpl(LuaDocFieldDefStub stub, IElementType type, ASTNode node) {
+  public LuaDocTagFieldImpl(LuaDocTagFieldStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 

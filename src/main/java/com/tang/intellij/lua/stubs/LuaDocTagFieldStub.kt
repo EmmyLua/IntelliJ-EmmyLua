@@ -37,9 +37,9 @@ import com.tang.intellij.lua.ty.Ty
 
  * Created by tangzx on 2016/12/10.
  */
-class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocTagField>("CLASS_DOC_FIELD") {
+class LuaDocTagFieldType : LuaStubElementType<LuaDocTagFieldStub, LuaDocTagField>("CLASS_DOC_FIELD") {
 
-    override fun createPsi(stub: LuaDocFieldDefStub) = LuaDocTagFieldImpl(stub, this)
+    override fun createPsi(stub: LuaDocTagFieldStub) = LuaDocTagFieldImpl(stub, this)
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val element = node.psi as LuaDocTagField
@@ -51,7 +51,7 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocTagFie
         return comment.tagClass != null
     }
 
-    override fun createStub(tagField: LuaDocTagField, stubElement: StubElement<*>): LuaDocFieldDefStub {
+    override fun createStub(tagField: LuaDocTagField, stubElement: StubElement<*>): LuaDocTagFieldStub {
         val name = tagField.name!!
         var className: String? = null
 
@@ -76,14 +76,14 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocTagFie
                 tagField.ty?.getType() ?: Ty.UNKNOWN)
     }
 
-    override fun serialize(stub: LuaDocFieldDefStub, stubOutputStream: StubOutputStream) {
+    override fun serialize(stub: LuaDocTagFieldStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(stub.name)
         stubOutputStream.writeName(stub.className)
         Ty.serialize(stub.type, stubOutputStream)
         stubOutputStream.writeShort(stub.flags)
     }
 
-    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocFieldDefStub {
+    override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocTagFieldStub {
         val name = stubInputStream.readName()
         val className = stubInputStream.readName()
         val type = Ty.deserialize(stubInputStream)
@@ -95,7 +95,7 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocTagFie
                 type)
     }
 
-    override fun indexStub(stub: LuaDocFieldDefStub, indexSink: IndexSink) {
+    override fun indexStub(stub: LuaDocTagFieldStub, indexSink: IndexSink) {
         val className = stub.className
         className ?: return
 
@@ -109,7 +109,7 @@ class LuaDocClassFieldType : LuaStubElementType<LuaDocFieldDefStub, LuaDocTagFie
     }
 }
 
-interface LuaDocFieldDefStub : LuaClassMemberStub<LuaDocTagField> {
+interface LuaDocTagFieldStub : LuaClassMemberStub<LuaDocTagField> {
     val name: String
 
     val type: ITy
@@ -124,11 +124,11 @@ class LuaDocFieldDefStubImpl(parent: StubElement<*>,
                              override val name: String,
                              override val className: String?,
                              override val type: ITy)
-    : LuaDocStubBase<LuaDocTagField>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocFieldDefStub {
+    : LuaDocStubBase<LuaDocTagField>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocTagFieldStub {
     override val docTy = type
 
     override val isDeprecated: Boolean
-        get() = BitUtil.isSet(flags, LuaDocClassFieldType.FLAG_DEPRECATED)
+        get() = BitUtil.isSet(flags, LuaDocTagFieldType.FLAG_DEPRECATED)
 
     override val visibility: Visibility
         get() = Visibility.getWithMask(flags)

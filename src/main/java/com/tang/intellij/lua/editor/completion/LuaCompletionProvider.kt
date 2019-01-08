@@ -22,7 +22,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.util.ProcessingContext
 
 abstract class LuaCompletionProvider : CompletionProvider<CompletionParameters>() {
-    override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext?, resultSet: CompletionResultSet) {
+    override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, resultSet: CompletionResultSet) {
         val session = CompletionSession[parameters]
         addCompletions(session)
     }

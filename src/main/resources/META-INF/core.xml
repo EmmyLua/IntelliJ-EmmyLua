@@ -89,6 +89,7 @@
         <breadcrumbsInfoProvider implementation="com.tang.intellij.lua.editor.LuaBreadcrumbsProvider"/>
 
         <!--completion-->
+        <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.SmartCompletionContributor"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaDocCompletionContributor"/>
         <completion.contributor language="Lua" implementationClass="com.tang.intellij.lua.editor.completion.LuaCompletionContributor"/>
 
@@ -177,7 +178,6 @@
 
         <projectViewPane implementation="com.tang.intellij.lua.project.LuaProjectViewPane"/>
         <iconProvider implementation="com.tang.intellij.lua.project.LuaSourceRootIconProvider"/>
-        <psi.treeChangePreprocessor implementation="com.tang.intellij.lua.psi.LuaPsiTreeChangePreprocessor"/>
 
         <!--intentions-->
         <intentionAction>

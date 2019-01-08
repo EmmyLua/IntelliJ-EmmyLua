@@ -21,7 +21,6 @@ import com.intellij.execution.configurations.RunProfile;
 import com.intellij.execution.configurations.RunProfileState;
 import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.execution.runners.GenericProgramRunner;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
@@ -53,11 +52,11 @@ public class LuaMobDebuggerRunner extends LuaRunner {
     @Nullable
     @Override
     protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment environment) throws ExecutionException {
-        XDebugSession session = createSession(state, environment);
+        XDebugSession session = createSession(environment);
         return session.getRunContentDescriptor();
     }
 
-    private XDebugSession createSession(RunProfileState state, ExecutionEnvironment environment) throws ExecutionException {
+    private XDebugSession createSession(ExecutionEnvironment environment) throws ExecutionException {
         XDebuggerManager manager = XDebuggerManager.getInstance(environment.getProject());
         return manager.startSession(environment, new XDebugProcessStarter() {
             @NotNull
