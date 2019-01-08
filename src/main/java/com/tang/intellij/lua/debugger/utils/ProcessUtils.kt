@@ -32,7 +32,7 @@ data class ProcessDetailInfo(
 
 private const val MAX_DISPLAY_LEN = 60
 
-internal fun getDisplayName(processInfo: ProcessInfo, detailInfo: ProcessDetailInfo): String {
+fun getDisplayName(processInfo: ProcessInfo, detailInfo: ProcessDetailInfo): String {
     val s = if (detailInfo.title.isNotEmpty())
         "${processInfo.executableName} - ${detailInfo.title}"
     else processInfo.executableName
@@ -42,49 +42,44 @@ internal fun getDisplayName(processInfo: ProcessInfo, detailInfo: ProcessDetailI
     return s
 }
 
+fun listProcesses(): Map<Int, ProcessDetailInfo> {
+    val processMap = mutableMapOf<Int, ProcessDetailInfo>()
+    val archExe = LuaFileUtil.getArchExeFile() ?: return processMap
+    val commandLine = GeneralCommandLine(archExe)
+    //commandLine.charset = Charset.forName("UTF-8")
+    commandLine.addParameters("list_processes")
 
-class ProcessUtils {
-    companion object {
-        fun listProcesses(): Map<Int, ProcessDetailInfo> {
-            var processMap = mutableMapOf<Int, ProcessDetailInfo>()
-            val archExe = LuaFileUtil.getArchExeFile()
-            val commandLine = GeneralCommandLine(archExe)
-            //commandLine.charset = Charset.forName("UTF-8")
-            commandLine.addParameters("list_processes")
+    val processOutput = ExecUtil.execAndGetOutput(commandLine)
 
-            val processOutput = ExecUtil.execAndGetOutput(commandLine)
-
-            val text = processOutput.stdout
-            val builder = DocumentBuilderFactory.newInstance()
-            val documentBuilder = builder.newDocumentBuilder()
-            val document = documentBuilder.parse(ByteArrayInputStream(text.toByteArray()))
-            val root = document.documentElement
-            root.childNodes.let {
-                for (i in 0 until it.length) {
-                    val c = it.item(i)
-                    val p = ProcessDetailInfo()
-                    val map = c.attributes
-                    map.getNamedItem("pid")?.let {
-                        p.pid = it.nodeValue.toInt()
+    val text = processOutput.stdout
+    val builder = DocumentBuilderFactory.newInstance()
+    val documentBuilder = builder.newDocumentBuilder()
+    val document = documentBuilder.parse(ByteArrayInputStream(text.toByteArray()))
+    val root = document.documentElement
+    root.childNodes.let {
+        for (i in 0 until it.length) {
+            val c = it.item(i)
+            val p = ProcessDetailInfo()
+            val map = c.attributes
+            map.getNamedItem("pid")?.let { node ->
+                p.pid = node.nodeValue.toInt()
+            }
+            val childNodes = c.childNodes
+            for (j in 0 until childNodes.length) {
+                val child = childNodes.item(j)
+                when (child.nodeName) {
+                    "title" -> {
+                        val item = child.childNodes.item(0)
+                        p.title = item?.nodeValue ?: ""
                     }
-                    val childNodes = c.childNodes
-                    for (j in 0 until childNodes.length) {
-                        val child = childNodes.item(j)
-                        when (child.nodeName) {
-                            "title" -> {
-                                val item = child.childNodes.item(0)
-                                p.title = item?.nodeValue ?: ""
-                            }
-                            "path" -> {
-                                val item = child.childNodes.item(0)
-                                p.path = item?.nodeValue ?: ""
-                            }
-                        }
+                    "path" -> {
+                        val item = child.childNodes.item(0)
+                        p.path = item?.nodeValue ?: ""
                     }
-                    processMap[p.pid] = p
                 }
             }
-            return processMap
+            processMap[p.pid] = p
         }
     }
+    return processMap
 }

@@ -17,6 +17,10 @@
 package com.tang.intellij.lua.debugger.attach
 
 import com.intellij.execution.process.ProcessInfo
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
@@ -24,7 +28,8 @@ import com.intellij.xdebugger.attach.XLocalAttachDebugger
 import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
 import com.intellij.xdebugger.attach.XLocalAttachGroup
 import com.tang.intellij.lua.debugger.utils.ProcessDetailInfo
-import com.tang.intellij.lua.debugger.utils.ProcessUtils
+import com.tang.intellij.lua.debugger.utils.listProcesses
+import com.tang.intellij.lua.psi.LuaFileUtil
 import java.util.*
 
 /**
@@ -43,18 +48,27 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
 
     override fun getAvailableDebuggers(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): List<XLocalAttachDebugger> {
 
-        val b = userDataHolder.getUserData(DETAIL_KEY)
-        if (b == null) {
-            processMap = ProcessUtils.listProcesses()
+        if (userDataHolder.getUserData(DETAIL_KEY) == null) {
+            val archExe = LuaFileUtil.getArchExeFile()
+            if (archExe == null) {
+                ApplicationManager.getApplication().invokeLater {
+                    val notification = Notification(
+                            "Emmylua",
+                            "Error",
+                            "Debugging tool 'emmy.arch.exe' has been removed, please reinstall the 'emmylua' plugin",
+                            NotificationType.WARNING)
+                    notification.isImportant = true
+                    Notifications.Bus.notify(notification)
+                }
+            }
+            processMap = listProcesses()
             userDataHolder.putUserData(DETAIL_KEY, processMap)
         }
 
         if (processInfo.executableName.endsWith(".exe")) {
             val list = ArrayList<XLocalAttachDebugger>()
             val info = processMap[processInfo.pid]
-            if (info != null
-                    && info.path.isNotEmpty()
-                    && !info.path.contains("windows", true)) {
+            if (info != null && info.path.isNotEmpty() && !info.path.contains("windows", true)) {
                 list.add(LuaLocalAttachDebugger(processInfo, info))
             }
             return list
