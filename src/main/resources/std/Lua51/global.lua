@@ -150,7 +150,7 @@ function ipairs(t) end
 ---@param chunk fun():string
 ---@param chunkname string
 ---@param mode string
----@param env nay
+---@param env any
 function load(chunk, chunkname, mode, env) end
 
 ---Similar to `load`, but gets the chunk from the given string.
@@ -339,9 +339,10 @@ function setfenv(f, table) end
 --- metatable has a `"__metatable"` field, raises an error.
 ---
 --- This function returns `table`.
----@param table table
+---@generic T
+---@param table T
 ---@param metatable table
----@return table
+---@return T
 function setmetatable(table, metatable) end
 
 ---

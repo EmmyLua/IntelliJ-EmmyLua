@@ -292,9 +292,10 @@ function setfenv(f, table) end
 --- metatable has a `"__metatable"` field, raises an error.
 ---
 --- This function returns `table`.
----@param table table
+---@generic T
+---@param table T
 ---@param metatable table
----@return table
+---@return T
 function setmetatable(table, metatable) end
 
 ---
