@@ -24,6 +24,7 @@ import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.RunContentBuilder;
 import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
@@ -53,6 +54,8 @@ public class LuaAppRunner extends LuaRunner {
     @Nullable
     @Override
     protected RunContentDescriptor doExecute(@NotNull RunProfileState state, @NotNull ExecutionEnvironment environment) throws ExecutionException {
+        FileDocumentManager.getInstance().saveAllDocuments();
+
         // debug
         if (environment.getExecutor().getId().equals(DefaultDebugExecutor.EXECUTOR_ID)) {
             XDebugSession session = createSession(environment);
