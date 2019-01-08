@@ -90,19 +90,34 @@ open class LuaXTable(L: Long, process: LuaAttachDebugProcessBase)
         children.add(value)
     }
 
+    // fix https://github.com/EmmyLua/IntelliJ-EmmyLua/issues/122
+    private fun removeNonNumberChars(str: String): String {
+        return str.replace("[", "").replace("]", "")
+    }
+
     private fun sort() {
         deep = true
-        val sortList = mutableListOf<LuaXValue>()
+        val numberList = mutableListOf<LuaXValue>()
+        val notNumberList = mutableListOf<LuaXValue>()
         children.forEach {
             if (it is LuaXFunction) {
                 functionList.add(it)
-            } else sortList.add(it)
+            } else {
+                if (removeNonNumberChars(it.name!!).toLongOrNull() == null) {
+                    notNumberList.add(it)
+                } else {
+                    numberList.add(it)
+                }
+            }
         }
         val list = XValueChildrenList()
         if (!functionList.isEmpty())
             list.add(functionList.name, functionList)
-        sortList.sortBy { it.name }
-        sortList.forEach { list.add(it.name, it) }
+        numberList.sortBy { removeNonNumberChars(it.name!!).toLong() }
+        notNumberList.sortBy { it.name!!.toUpperCase() }
+
+        notNumberList.forEach { list.add(it.name, it) }
+        numberList.forEach { list.add(it.name, it) }
         childrenList = list
     }
 
@@ -112,14 +127,19 @@ open class LuaXTable(L: Long, process: LuaAttachDebugProcessBase)
 
             process.bridge.eval(L, evalExpr, frame.stack, 2, object : LuaAttachBridgeBase.EvalCallback {
                 override fun onResult(result: DMRespEvaluate) {
-                    val value = result.resultNode.value
-                    if (value is LuaXTable) {
-                        value.children.forEach {
-                            add(it)
+                    // add lua error to evaluate view
+                    /*if (result.success && result.resultNode.success) {*/
+                        val value = result.resultNode.value
+                        if (value is LuaXTable) {
+                            value.children.forEach {
+                                add(it)
+                            }
                         }
-                    }
-                    sort()
-                    node.addChildren(childrenList!!, true)
+                        sort()
+                        node.addChildren(childrenList!!, true)
+                    /*} else {
+                        node.setErrorMessage(if (!result.success) "error" else result.resultNode.error)
+                    }*/
                 }
             })
         } else

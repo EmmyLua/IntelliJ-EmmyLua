@@ -27,7 +27,11 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaIndexExprType
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyUnion
 
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
@@ -147,8 +151,58 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
             return@Processor false
         true
     })
+    // for chain
+    // add by clu on 2018-12-29 16:25:34 添加对无上下文的元素的支持t.data.name
+    val typeByRoot = resolveTypeByRoot(indexExpr, idString, context)
+    if (typeByRoot.isNotEmpty()) {
+        return typeByRoot.first()
+    }
+    // end
     return ret
 }
+
+// for chain
+/**
+ * t.data.name，直接通过name的父类型找自己肯定找不到的，因为对t.data, name进行indexStub的时候，t.data类型还没有index，
+ * 因此无法找到name的父类型t.data，自然就没有存储t.data和name的关系了，因此需要通过t找到t.data，然后再找t.__data找到name即可
+ * 目前本方法只返回第一个PsiElement
+ */
+fun resolveTypeByRoot(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): Array<PsiElement> {
+    val all = mutableListOf<PsiElement>()
+    LuaIndexExprType.getAllKnownIndexLuaExprType(indexExpr, context).forEach {
+        val baseType = it.key
+        val indexExprNames = it.value
+        val matches = mutableListOf<PsiElement>()
+        TyUnion.each(baseType, {
+            if (it is ITyClass) {
+                // it类型是：118@F_LuaTest_src_test_t.lua
+                // 获取118@F_LuaTest_src_test_t.lua.__data类型的idString属性
+                val parentClassNameOfCurrentIndexExpr = LuaIndexExprType.getFiledNameAsClassName(it.className, indexExprNames.toTypedArray(), indexExprNames.size)
+                LuaClassMemberIndex.process(parentClassNameOfCurrentIndexExpr, idString, context, Processor {
+                    if (it.text.endsWith("." + idString)) {
+                        matches.add(it)
+                    }
+                    true
+                })
+
+                // 只要最短的
+                if (matches.isNotEmpty()) {
+                    // 只要1个
+                    return@each
+                }
+            }
+        })
+
+        // 只要1个
+        if (matches.isNotEmpty()) {
+            matches.sortBy { it.text.length }
+            all.add(matches.first())
+            return@forEach
+        }
+    }
+    return all.toTypedArray()
+}
+// end
 
 /**
  * 找到 require 的文件路径

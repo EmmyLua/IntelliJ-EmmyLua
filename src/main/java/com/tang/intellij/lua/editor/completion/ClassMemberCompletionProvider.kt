@@ -16,8 +16,10 @@
 
 package com.tang.intellij.lua.editor.completion
 
+import com.google.common.collect.LinkedHashMultimap
 import com.intellij.codeInsight.completion.CompletionInitializationContext
 import com.intellij.codeInsight.completion.CompletionResultSet
+import com.intellij.codeInsight.completion.CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED
 import com.intellij.codeInsight.completion.PrefixMatcher
 import com.intellij.codeInsight.completion.PrioritizedLookupElement
 import com.intellij.codeInsight.lookup.LookupElement
@@ -27,6 +29,8 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaIndexExprType
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
 
 enum class MemberCompletionMode {
@@ -61,6 +65,71 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
             if (!Ty.isInvalid(prefixType)) {
                 complete(isColon, project, contextTy, prefixType, completionResultSet, completionResultSet.prefixMatcher, null)
             }
+
+            // for chain
+            // 多级t.data.name的提示
+            // 查找并t.data占位类型，并扩展到结果中
+            // val list = LuaIndexExprType.getAllKnownIndexLuaExprType(indexExpr, searchContext)
+            LuaIndexExprType.getAllKnownIndexLuaExprType(indexExpr, searchContext).forEach {
+                val baseType = it.key
+                val indexExprNames = it.value
+                TyUnion.each(baseType, {
+                    if (it is ITyClass) {
+                        // it类型是：118@F_LuaTest_src_test_t.lua
+                        // 获取118@F_LuaTest_src_test_t.lua.__data类型
+                        val parentClassNameOfCurrentIndexExpr = LuaIndexExprType.getFiledNameAsClassName(it.className, indexExprNames.toTypedArray(), indexExprNames.size)
+
+                        val all = LuaClassMemberIndex.instance.get(parentClassNameOfCurrentIndexExpr.hashCode(), searchContext.project, searchContext.getScope())
+                        val suggestDotCountMap = LinkedHashMultimap.create<Int, LuaIndexExpr>()
+                        val inputText = indexExpr.text.replace(".$DUMMY_IDENTIFIER_TRIMMED", "") // t.data.
+                        all.forEach {
+                            val completeText = it.text  // t.data.name.a.b
+                            if (it is LuaIndexExpr) {
+                                suggestDotCountMap.put(completeText.replace(inputText, "").count { it == '.' }, it)
+                            }
+                        }
+
+                        suggestDotCountMap.keys().sorted().forEach {
+                            suggestDotCountMap.get(it).forEach {
+                                var suggestText = it.text.replaceFirst(inputText, "")
+                                if (suggestText[0] == '.') {
+                                    suggestText = suggestText.substring(1)
+                                }
+
+                                val funType = it.guessType(searchContext)
+                                if (funType is ITyFunction) {
+                                    val luaIndexExpr = it as LuaIndexExpr
+                                    val funName = it.name!!
+                                    resolveTypeByRoot(it, it.name!!, searchContext).forEach {
+                                        // 遍历所有方法
+                                        funType.process(Processor {
+                                            val element = TyFunctionLookupElement(funName,
+                                                    luaIndexExpr,
+                                                    it,
+                                                    true,
+                                                    isColon,
+                                                    funType,
+                                                    LuaIcons.CLASS_METHOD)
+
+                                            element.handler = SignatureInsertHandler(it, isColon)
+                                            element.setTailText("  [${funName}]")
+                                            completionResultSet.addElement(element)
+                                            true
+                                        })
+                                    }
+                                } else {
+                                    if (!isColon) {
+                                        val element = LookupElementFactory.createGuessableLookupElement(suggestText, it, funType, LuaIcons.CLASS_FIELD) as LuaTypeGuessableLookupElement
+                                        completionResultSet.addElement(element)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+            }
+            // end
+
             //smart
             val nameExpr = indexExpr.prefixExpr
             if (nameExpr is LuaNameExpr) {

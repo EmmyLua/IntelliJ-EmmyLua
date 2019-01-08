@@ -17,9 +17,16 @@
 package com.tang.intellij.lua.ty
 
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.UserDataHolderBase
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
+import com.intellij.testFramework.LightVirtualFileBase
 import com.intellij.util.Processor
+import com.intellij.util.keyFMap.ArrayBackedFMap
+import com.intellij.util.keyFMap.KeyFMap
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocTableDef
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass
@@ -259,17 +266,73 @@ fun createSerializedClass(name: String,
     return TySerializedClass(name, varName, supper, alias, flags)
 }
 
+/**
+ * 嘿嘿
+ */
+fun getFilePath(psiFile: PsiFile): String? {
+    var filePath : String? = null
+    if (psiFile.virtualFile != null) {
+        filePath = psiFile.virtualFile.path
+    } else {
+        //return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
+        if (psiFile is UserDataHolderBase) {
+            val field = UserDataHolderBase::class.java.getDeclaredField("myUserMap")
+            field.isAccessible = true
+            val fMap = field.get(psiFile) as KeyFMap
+            if (fMap is ArrayBackedFMap) {
+                val valuesFields = ArrayBackedFMap::class.java.getDeclaredField("values")
+                valuesFields.isAccessible = true
+                val values = valuesFields.get(fMap) as Array<*>
+                values.forEach {
+                    if (it is VirtualFile) {
+                        filePath = it.path
+                        return@forEach
+                    }
+                }
+            } else if (fMap.javaClass.name == "com.intellij.util.keyFMap.PairElementsFMap") {
+                val virtualFile = psiFile.viewProvider.virtualFile
+                if (virtualFile is LightVirtualFileBase) {
+                    filePath = virtualFile.originalFile.path
+                } else {
+                    fMap.keys.forEach {
+                        val v = fMap.get(it)
+                        if (v is VirtualFile) {
+                            filePath = v.path
+                            return@forEach
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+    return filePath
+}
+
+fun getFilePathAsName(psiFile: PsiFile): String {
+    var filePath = getFilePath(psiFile.originalFile)
+    if (filePath == null) {
+        filePath = psiFile.name
+    } else {
+        filePath = filePath.replace(":", "").replace('/', '_')
+    }
+
+    return filePath
+}
+
 fun getTableTypeName(table: LuaTableExpr): String {
     val stub = table.stub
     if (stub != null)
         return stub.tableTypeName
 
-    val fileName = table.containingFile.name
-    return "$fileName@(${table.node.startOffset})table"
+    return "${getFilePathAsName(table.containingFile)}@(${table.node.startOffset})table"
 }
 
-fun getAnonymousType(nameDef: LuaNameDef): String {
-    return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
+//fun getAnonymousType(nameDef: LuaNameDef): String {
+fun getAnonymousType(psiElement: PsiElement): String {
+    /*if (nameDef.containingFile.virtualFile != null) nameDef.containingFile.virtualFile.path.replace(File.separatorChar, '_') else */
+    //(nameDef.containingFile as LuaPsiFile).getUserData(Key.create<String>("Context virtual file"))
+    return "${psiElement.node.startOffset}@${getFilePathAsName(psiElement.containingFile)}"
 }
 
 fun getGlobalTypeName(text: String): String {
@@ -307,7 +370,7 @@ fun getDocTableTypeName(table: LuaDocTableDef): String {
     if (stub != null)
         return stub.className
 
-    val fileName = table.containingFile.name
+    val fileName = getFilePathAsName(table.containingFile)//table.containingFile.name
     return "10|$fileName|${table.node.startOffset}"
 }
 

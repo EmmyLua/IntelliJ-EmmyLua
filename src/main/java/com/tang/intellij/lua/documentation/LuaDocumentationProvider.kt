@@ -22,12 +22,15 @@ import com.intellij.lang.documentation.DocumentationProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.editor.completion.LuaDocumentationLookupElement
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaIndexExprType
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
 
 /**
@@ -100,14 +103,31 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
 
     private fun renderClassMember(sb: StringBuilder, classMember: LuaClassMember) {
         val context = SearchContext(classMember.project)
-        val parentType = classMember.guessClassType(context)
+        var parentType = classMember.guessClassType(context)
+        // for chain
+        // add by clu on 2019-1-3 15:12:43 添加对a.b.c.d.e.f = 123中.f的parent，.e的获取支持(document中)
+        if (parentType == null) {
+            (classMember as? LuaIndexExpr)?.let {
+                val parentLuaIndexExpr = PsiTreeUtil.getStubChildOfType(it, LuaIndexExpr::class.java)
+                if (parentLuaIndexExpr != null) {
+                    val definitions = resolveTypeByRoot(parentLuaIndexExpr, parentLuaIndexExpr.name!!, context)
+                    if (definitions.isNotEmpty()) {
+                        (definitions[0] as? LuaIndexExpr)?.let {
+                            parentType = it.guessType(context) as? ITyClass
+                        }
+                    }
+                }
+            }
+        }
+        // end
         val ty = classMember.guessType(context)
         val tyRenderer = renderer
 
         renderDefinition(sb) {
             //base info
             if (parentType != null) {
-                renderTy(sb, parentType, tyRenderer)
+                // for chain, add: as ITyClass
+                renderTy(sb, parentType as ITyClass, tyRenderer)
                 with(sb) {
                     when (ty) {
                         is TyFunction -> {
@@ -122,9 +142,12 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
                     }
                 }
             } else {
+                // add by clu on 2019年1月3日15:11:41 添加对a.b.c.d.e.f = 123这种格式的.f的document的支持
                 //NameExpr
-                if (classMember is LuaNameExpr) {
-                    val nameExpr: LuaNameExpr = classMember
+                // for chain add: || classMember is LuaIndexExpr
+                if (classMember is LuaNameExpr || classMember is LuaIndexExpr) {
+                    //val nameExpr: LuaNameExpr = classMember
+                    val nameExpr = classMember as LuaExpr
                     with(sb) {
                         append(nameExpr.name)
                         when (ty) {
@@ -136,8 +159,15 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
                         }
                     }
 
-                    val stat = nameExpr.parent.parent // VAR_LIST ASSIGN_STAT
-                    if (stat is LuaAssignStat) renderComment(sb, stat.comment, tyRenderer)
+                    // 排除LuaIndexExpr
+                    // for chain
+                    if (classMember is LuaNameExpr) {
+                    // end
+                        val stat = nameExpr.parent.parent // VAR_LIST ASSIGN_STAT
+                        if (stat is LuaAssignStat) renderComment(sb, stat.comment, tyRenderer)
+                    // for chain
+                    }
+                    // end
                 }
             }
         }
