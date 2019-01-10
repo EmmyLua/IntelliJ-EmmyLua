@@ -258,7 +258,7 @@ function print(...) end
 --- a boolean.
 ---@param v1 any
 ---@param v2 any
----@returns boolean
+---@return boolean
 function rawequal(v1, v2) end
 
 ---
