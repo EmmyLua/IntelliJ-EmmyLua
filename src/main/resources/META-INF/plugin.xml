@@ -114,6 +114,7 @@
     <idea-version since-build="172" until-build="183.*"/>
 
     <depends config-file="core.xml" optional="true">com.intellij.modules.lang</depends>
+    <depends config-file="unity.xml" optional="true">com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
     </extensions>
