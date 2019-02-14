@@ -50,7 +50,7 @@ class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project)
     }
 
     companion object {
-        val ID = "lua.project.view"
+        const val ID = "lua.project.view"
     }
 
     override fun getId() = ID
@@ -94,7 +94,7 @@ class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project)
     }
 
     override fun getWeight(): Int {
-        return 0
+        return 10
     }
 
     override fun createTree(model: DefaultTreeModel): ProjectViewTree {
