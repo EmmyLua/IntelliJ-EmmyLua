@@ -274,7 +274,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     stream.writeName(ty.aliasName)
                 }
                 is TyUnion -> {
-                    stream.writeByte(ty.size)
+                    stream.writeInt(ty.size)
                     TyUnion.each(ty) { serialize(it, stream) }
                 }
                 is ITyGeneric -> {
@@ -317,7 +317,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 TyKind.Primitive -> getPrimitive(stream.readByte())
                 TyKind.Union -> {
                     var union:ITy = TyUnion()
-                    val size = stream.readByte()
+                    val size = stream.readInt()
                     for (i in 0 until size) {
                         union = TyUnion.union(union, deserialize(stream))
                     }
