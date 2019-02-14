@@ -111,7 +111,7 @@
     ]]>
     </change-notes>
     <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
-    <idea-version since-build="172" until-build="183.*"/>
+    <idea-version since-build="172" until-build="191.*"/>
 
     <depends config-file="core.xml" optional="true">com.intellij.modules.lang</depends>
     <depends config-file="unity.xml" optional="true">com.intellij.modules.lang</depends>
