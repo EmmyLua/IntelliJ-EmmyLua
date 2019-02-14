@@ -176,9 +176,6 @@
                           id="preferences.LuaCheck"/>
         </applicationConfigurable>
 
-        <projectViewPane implementation="com.tang.intellij.lua.project.LuaProjectViewPane"/>
-        <iconProvider implementation="com.tang.intellij.lua.project.LuaSourceRootIconProvider"/>
-
         <!--intentions-->
         <intentionAction>
             <category>Lua</category>
