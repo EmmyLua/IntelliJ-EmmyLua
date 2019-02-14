@@ -172,14 +172,15 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 		val dataContext = DataManager.getInstance().getDataContext(parent)
 		val bean = GitHubErrorBean(
 				event.throwable,
-				IdeaLogger.ourLastActionId,
+				IdeaLogger.ourLastActionId.orEmpty(),
 				description ?: "<No description>",
 				event.message ?: event.throwable.message.toString())
 		IdeErrorsDialog.findPluginId(event.throwable)?.let { pluginId ->
 			PluginManager.getPlugin(pluginId)?.let { ideaPluginDescriptor ->
 				if (!ideaPluginDescriptor.isBundled) {
 					bean.pluginName = ideaPluginDescriptor.name
-					bean.pluginVersion = ideaPluginDescriptor.version				}
+					bean.pluginVersion = ideaPluginDescriptor.version
+				}
 			}
 		}
 
