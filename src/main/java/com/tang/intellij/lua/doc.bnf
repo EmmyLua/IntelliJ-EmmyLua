@@ -73,6 +73,7 @@
         TAG_NAME_SEE = 'see'
         TAG_NAME_GENERIC = 'generic'
         TAG_NAME_ALIAS = 'alias'
+        TAG_NAME_SUPPRESS = 'suppress'
   ]
   implements("tag.*") = [
     "com.tang.intellij.lua.comment.psi.LuaDocTag"
@@ -85,6 +86,7 @@ private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (tag_param
     | tag_alias
+    | tag_suppress
     | tag_vararg
     | tag_return
     | tag_class
@@ -310,4 +312,8 @@ tag_alias ::= TAG_NAME_ALIAS ID ty {
         getType
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTagAliasStub"
+}
+
+tag_suppress ::= TAG_NAME_SUPPRESS ID (',' ID)* {
+    pin = 1
 }

@@ -119,6 +119,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTag(o);
   }
 
+  public void visitTagSuppress(@NotNull LuaDocTagSuppress o) {
+    visitTag(o);
+  }
+
   public void visitTagType(@NotNull LuaDocTagType o) {
     visitTag(o);
   }

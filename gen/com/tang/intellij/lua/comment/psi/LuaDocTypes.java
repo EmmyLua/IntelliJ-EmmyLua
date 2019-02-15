@@ -34,6 +34,7 @@ public interface LuaDocTypes {
   IElementType TAG_PARAM = LuaParserDefinitionKt.createDocType("TAG_PARAM");
   IElementType TAG_RETURN = LuaParserDefinitionKt.createDocType("TAG_RETURN");
   IElementType TAG_SEE = LuaParserDefinitionKt.createDocType("TAG_SEE");
+  IElementType TAG_SUPPRESS = LuaParserDefinitionKt.createDocType("TAG_SUPPRESS");
   IElementType TAG_TYPE = LuaParserDefinitionKt.createDocType("TAG_TYPE");
   IElementType TAG_VARARG = LuaParserDefinitionKt.createDocType("TAG_VARARG");
   IElementType TY = LuaParserDefinitionKt.createDocType("TY");
@@ -78,6 +79,7 @@ public interface LuaDocTypes {
   IElementType TAG_NAME_PUBLIC = new LuaDocTokenType("public");
   IElementType TAG_NAME_RETURN = new LuaDocTokenType("return");
   IElementType TAG_NAME_SEE = new LuaDocTokenType("see");
+  IElementType TAG_NAME_SUPPRESS = new LuaDocTokenType("suppress");
   IElementType TAG_NAME_TYPE = new LuaDocTokenType("type");
   IElementType TAG_NAME_VARARG = new LuaDocTokenType("vararg");
   IElementType VARARG = new LuaDocTokenType("VARARG");
@@ -159,6 +161,9 @@ public interface LuaDocTypes {
       }
       else if (type == TAG_SEE) {
         return new LuaDocTagSeeImpl(node);
+      }
+      else if (type == TAG_SUPPRESS) {
+        return new LuaDocTagSuppressImpl(node);
       }
       else if (type == TAG_TYPE) {
         return new LuaDocTagTypeImpl(node);

@@ -228,6 +228,8 @@
             <className>com.tang.intellij.lua.codeInsight.intention.ComputeConstantValueIntention</className>
         </intentionAction>
 
+        <lang.inspectionSuppressor language="Lua" implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaSuppressManager"/>
+
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
                 displayName="Duplicate Class"
