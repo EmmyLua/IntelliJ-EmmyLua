@@ -23,6 +23,7 @@ import com.intellij.notification.Notifications
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.openapi.util.UserDataHolder
 import com.intellij.xdebugger.attach.XLocalAttachDebugger
 import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
@@ -47,6 +48,8 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
     private var processMap = mapOf<Int, ProcessDetailInfo>()
 
     override fun getAvailableDebuggers(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): List<XLocalAttachDebugger> {
+        if (!SystemInfoRt.isWindows)
+            return emptyList()
 
         if (userDataHolder.getUserData(DETAIL_KEY) == null) {
             val archExe = LuaFileUtil.getArchExeFile()
