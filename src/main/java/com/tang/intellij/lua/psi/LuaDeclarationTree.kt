@@ -229,28 +229,34 @@ private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaStubRecurs
     }
 
     private fun push(scope: Scope, psi: PsiElement): Scope {
-        scopes.push(scope)
-        if (topScope == null)
-            topScope = scope
-        psi.putUserData(scopeKey, scope)
-        curScope?.add(scope)
-        curScope = scope
+        synchronized(scope) {
+            scopes.push(scope)
+            if (topScope == null)
+                topScope = scope
+            psi.putUserData(scopeKey, scope)
+            curScope?.add(scope)
+            curScope = scope
+        }
         return scope
     }
 
     private fun pop(): Scope {
-        val pop = scopes.pop()
-        curScope = if (scopes.isEmpty()) topScope else scopes.peek()
-        return pop
+        synchronized(scopes) {
+            val pop = scopes.pop()
+            curScope = if (scopes.isEmpty()) topScope else scopes.peek()
+            return pop
+        }
     }
 
     fun buildTree(file: PsiFile) {
-        //val t = System.currentTimeMillis()
-        scopes.clear()
-        topScope = null
-        curScope = null
-        file.accept(this)
-        //println("build tree : ${file.name}, ${System.currentTimeMillis() - t}")
+        synchronized(scopes) {
+            //val t = System.currentTimeMillis()
+            scopes.clear()
+            topScope = null
+            curScope = null
+            file.accept(this)
+            //println("build tree : ${file.name}, ${System.currentTimeMillis() - t}")
+        }
     }
 
     abstract fun findScope(psi: PsiElement): Scope?
