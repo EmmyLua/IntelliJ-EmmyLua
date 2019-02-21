@@ -108,9 +108,8 @@ math.huge = nil
 ---
 --- Returns the natural logarithm of `x`.
 ---@param x number
----@param base number
 ---@return number
-function math.log(x, base) end
+function math.log(x) end
 
 --- Returns the base-10 logarithm of `x`.
 ---@param x number
