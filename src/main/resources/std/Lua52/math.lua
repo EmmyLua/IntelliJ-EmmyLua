@@ -34,7 +34,6 @@ function math.asin(x) return 0 end
 
 ---
 --- Returns the arc tangent of `x` (in radians).
----@param y number
 ---@param x number
 ---@return number
 function math.atan(x) return 0 end
