@@ -33,7 +33,7 @@ function math.acos(x) return 0 end
 function math.asin(x) return 0 end
 
 ---
---- Returns the arc tangent of x (in radians).
+--- Returns the arc tangent of `x` (in radians).
 ---@param x number
 ---@return number
 function math.atan(x) return 0 end
