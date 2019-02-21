@@ -33,12 +33,10 @@ function math.acos(x) return 0 end
 function math.asin(x) return 0 end
 
 ---
---- Returns the arc tangent of x (in radians).
----@overload fun(y:number):number
----@param y number
+--- Returns the arc tangent of `x` (in radians).
 ---@param x number
 ---@return number
-function math.atan(y, x) return 0 end
+function math.atan(x) return 0 end
 
 --- Returns the arc tangent of `y/x` (in radians), but uses the signs of both
 --- parameters to find the quadrant of the result. (It also handles correctly
@@ -108,9 +106,7 @@ function math.frexp(x) end
 math.huge = nil
 
 ---
---- Returns the logarithm of `x` in the given base. The default for `base` is
---- *e* (so that the function returns the natural logarithm of `x`).
----@overload fun(x:number):number
+--- Returns the natural logarithm of `x`.
 ---@param x number
 ---@param base number
 ---@return number
