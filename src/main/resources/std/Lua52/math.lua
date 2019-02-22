@@ -33,17 +33,10 @@ function math.acos(x) return 0 end
 function math.asin(x) return 0 end
 
 ---
---- Returns the arc tangent of `y/x` (in radians), but uses the signs of both
---- parameters to find the quadrant of the result. (It also handles correctly
---- the case of `x` being zero.)
----
---- The default value for `x` is 1, so that the call `math.atan(y)`` returns the
---- arc tangent of `y`.
----@overload fun(y:number):number
----@param y number
+--- Returns the arc tangent of `x` (in radians).
 ---@param x number
 ---@return number
-function math.atan(y, x) return 0 end
+function math.atan(x) return 0 end
 
 ---Returns the arc tangent of `y/x` (in radians), but uses the signs of both
 ---parameters to find the quadrant of the result. (It also handles correctly the
