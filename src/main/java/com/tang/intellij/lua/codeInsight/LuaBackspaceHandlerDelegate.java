@@ -53,8 +53,8 @@ public class LuaBackspaceHandlerDelegate extends BackspaceHandlerDelegate {
                         LuaComment comment = PsiTreeUtil.getParentOfType(element, LuaComment.class);
                         assert comment != null;
 
-                        if (comment.getNode().getStartOffset() < start) //如果有两行以上的 --- 则把换行符一起删了
-                            start = start - 1;
+                        //if (comment.getNode().getStartOffset() < start) //如果有两行以上的 --- 则把换行符一起删了
+                        //    start = start - 1;
 
                         editor.getDocument().deleteString(start, offset);
                         editor.getCaretModel().moveToOffset(start);
