@@ -17,7 +17,7 @@
 <idea-plugin>
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.3.0</version>
+    <version>1.2.7</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
@@ -69,6 +69,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.2.7</strong>
+    <ul>
+        <li>[NEW]New annotation @alias, usage: @alias ALIAS_NAME TYPE</li>
+        <li>[FIX]Lua 5.0 - 5.2 Math std fixes (#225 by @Christopher-St)</li>
+        <li>Bug fix #206 #207 #201 #46 #210 #212 #211 #215 #216 #223 #220 EmmyLua-ErrorReport#38 ...</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
     <strong>1.2.6</strong>
     <ul>
         <li>[NEW]Code completion for breakpoint condition</li>
@@ -81,31 +88,6 @@
         <li>[NEW]Arguments history completion</li>
         <li>[NEW]Unity attach debugger support (By @jb574)</li>
         <li>Bug fix #178 #168 #186 #192 #196 #198 #199 #195 #116 ...</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-    <strong>1.2.5</strong>
-    <ul>
-        <li>[NEW]Support new region style "--{{{", "--}}}" (Suggestion by @adriweb)</li>
-        <li>[IMPROVE]Parameters completion for "closure" & "func" live template</li>
-        <li>[IMPROVE]Completions for raw string</li>
-        <li>[IMPROVE]Redesigned documentation for IDEA2018.2 (Suggestion by @dsmgit)</li>
-        <li>[IMPROVE]Add new annotations @deprecated, @author, @version, @since (Suggestion by @dsmgit)</li>
-        <li>[NEW]Support generic (see doc for new annotation @generic)</li>
-        <li>[NEW]Add Lua5.4 API (By @dsmgit)</li>
-        <li>[NEW]Now we can choose the lua language level Lua5.0/Lua5.1/Lua5.2/Lua5.3/Lua5.4, via: File | Settings | Languages & Frameworks | EmmyLua, default level value is Lua5.3</li>
-        <li>[NEW]Now the Attach debugger can capture the messages output by the WINAPI OutputDebugString</li>
-        <li>[NEW]Compatible with IDEA2017.1, IDEA2017.2-IDEA2018.1, IDEA2018.2<li>
-        <li>[IMPROVE]Improve remote debugger</li>
-        <li>[IMPROVE]Update "EmmyDoc Tutorial"</li>
-        <li>Bug fix #145 #165 #167 #169 ...</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-    <strong>1.2.4</strong>
-    <ul>
-        <li>[IMPROVE]improved class members completion</li>
-        <li>[FIX]code style can not saved</li>
-        <li>[FIX]fix target application crash when attach debugger attached</li>
-        <li>bug fix #121 #126 #129 #134 #135 #138 #141</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
     ]]>
