@@ -87,10 +87,10 @@ task buildPluginWithPatchs() {
             executable "git"
             args "reset", "HEAD", "--hard"
         }
-        if (cfg.patchs.size() > 0) {
+        cfg.patchs.each { patch->
             exec {
                 executable "git"
-                args = ["apply"] + cfg.patchs
+                args = ["am", "--3way", "--ignore-space-change", "--keep-cr", patch]
             }
         }
     }
