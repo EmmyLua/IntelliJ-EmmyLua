@@ -157,7 +157,7 @@ abstract class TyClass(override val className: String,
     override fun getSuperClass(context: SearchContext): ITy? {
         lazyInit(context)
         val clsName = superClassName
-        if (clsName != null) {
+        if (clsName != null && clsName != className) {
             return Ty.getBuiltin(clsName) ?: LuaShortNamesManager.getInstance(context.project).findClass(clsName, context)?.type
         }
         return null
