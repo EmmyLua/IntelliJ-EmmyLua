@@ -226,9 +226,12 @@ function setfenv(f, table) end
 --- metatable of the given table. If the original metatable has a `"__metatable"`
 --- field, raises an error.
 --- This function returns `table`.
----@param table table
----@param metatable table
+---@generic T,K:T
+---@param table T
+---@param metatable K
+---@return K
 function setmetatable(table, metatable) end
+
 
 ---
 --- Tries to convert its argument to a number. If the argument is already
