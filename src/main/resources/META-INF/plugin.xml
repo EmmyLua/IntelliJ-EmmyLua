@@ -86,7 +86,7 @@
         <li>[NEW]String literal paste provider</li>
         <li>[NEW]New annotator: @vararg TYPE</li>
         <li>[NEW]Arguments history completion</li>
-        <li>[NEW]Unity attach debugger support (By @jb574)</li>
+        <li>[NEW]Unity attach debugger support (By @taigacon)</li>
         <li>Bug fix #178 #168 #186 #192 #196 #198 #199 #195 #116 ...</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
