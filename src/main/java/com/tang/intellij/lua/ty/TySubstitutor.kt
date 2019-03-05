@@ -113,7 +113,9 @@ open class TySubstitutor : ITySubstitutor {
 
 class TyAliasSubstitutor(val project: Project) : ITySubstitutor {
     override fun substitute(function: ITyFunction): ITy {
-        return function
+        return TySerializedFunction(function.mainSignature.substitute(this),
+                function.signatures.map { it.substitute(this) }.toTypedArray(),
+                function.flags)
     }
 
     override fun substitute(clazz: ITyClass): ITy {
