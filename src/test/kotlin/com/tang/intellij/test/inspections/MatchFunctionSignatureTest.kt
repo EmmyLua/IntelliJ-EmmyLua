@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+/*
 package com.tang.intellij.test.inspections
 
 import com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection
@@ -72,4 +73,4 @@ class MatchFunctionSignatureTest : LuaInspectionsTestBase(MatchFunctionSignature
 
         acp_ns(A.a())
     """)
-}
+}*/

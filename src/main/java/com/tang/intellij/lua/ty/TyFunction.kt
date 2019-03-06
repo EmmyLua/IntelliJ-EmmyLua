@@ -135,7 +135,11 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
 
     override fun substitute(substitutor: ITySubstitutor): IFunSignature {
         val list = params.map { it.substitute(substitutor) }
-        return FunSignature(colonCall, returnTy.substitute(substitutor), varargTy?.substitute(substitutor), list.toTypedArray())
+        return FunSignature(colonCall,
+                returnTy.substitute(substitutor),
+                varargTy?.substitute(substitutor),
+                list.toTypedArray(),
+                tyParameters)
     }
 
     override fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean {
