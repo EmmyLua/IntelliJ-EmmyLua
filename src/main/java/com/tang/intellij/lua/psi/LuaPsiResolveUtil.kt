@@ -17,12 +17,8 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
-import com.intellij.psi.util.CachedValue
-import com.intellij.psi.util.CachedValueProvider
-import com.intellij.psi.util.CachedValuesManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
@@ -31,14 +27,9 @@ import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
-private val KEY_RESOLVE = Key.create<CachedValue<PsiElement>>("lua.resolve.cache.resolveLocal")
-
 fun resolveLocal(refName:String, ref: PsiElement, context: SearchContext? = null): PsiElement? {
-    return CachedValuesManager.getCachedValue(ref, KEY_RESOLVE) {
-        val element = resolveInFile(refName, ref, context)
-        val r = if (element is LuaNameExpr) null else element
-        CachedValueProvider.Result.create(r, ref)
-    }
+    val element = resolveInFile(refName, ref, context)
+    return if (element is LuaNameExpr) null else element
 }
 
 fun resolveInFile(refName:String, pin: PsiElement, context: SearchContext?): PsiElement? {
