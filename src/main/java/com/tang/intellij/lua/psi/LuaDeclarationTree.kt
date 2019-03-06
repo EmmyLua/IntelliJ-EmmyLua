@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.StackOverflowPreventedException
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNamedElement
@@ -33,8 +34,19 @@ interface LuaDeclarationTree {
                 ret = null
             }
             if (ret == null) {
-                val manager = if (file is LuaPsiFile && !file.isContentsLoaded) LuaDeclarationTreeStub(file) else LuaDeclarationTreePsi(file)
-                manager.buildTree(file)
+                var manager: LuaDeclarationTree? = null
+                if (file is LuaPsiFile && !file.isContentsLoaded) {
+                    manager = LuaDeclarationTreeStub(file)
+                    try {
+                        manager.buildTree(file)
+                    } catch (e: StackOverflowPreventedException) {
+                        manager = null
+                    }
+                }
+                if (manager == null) {
+                    manager = LuaDeclarationTreePsi(file)
+                    manager.buildTree(file)
+                }
                 file.putUserData(key, manager)
                 ret = manager
             }
