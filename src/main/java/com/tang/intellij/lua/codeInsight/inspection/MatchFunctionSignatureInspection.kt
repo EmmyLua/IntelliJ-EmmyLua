@@ -51,7 +51,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     val prefixExpr = o.expr
                     val type = prefixExpr.guessType(searchContext)
 
-                    if (type is TyPsiFunction) {
+                    if (type is TyFunction) {
                         val perfectSig = type.findPerfectSignature(o)
                         annotateCall(o, perfectSig, searchContext)
                     } else if (prefixExpr is LuaIndexExpr) {
