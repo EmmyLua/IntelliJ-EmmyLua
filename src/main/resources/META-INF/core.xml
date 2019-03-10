@@ -168,9 +168,9 @@
                                  displayName="EmmyLua"
                                  id="preferences.Lua"
                                  instance="com.tang.intellij.lua.project.LuaSettingsPanel">
-            <configurable instance="com.tang.intellij.lua.project.CompletionSettingsPanel"
+            <!--<configurable instance="com.tang.intellij.lua.project.CompletionSettingsPanel"
                           displayName="Emmy Completion"
-                          id="preferences.Lua.Completion"/>
+                          id="preferences.Lua.Completion"/>-->
             <configurable instance="com.tang.intellij.lua.luacheck.LuaCheckSettingsPanel"
                           displayName="LuaCheck"
                           id="preferences.LuaCheck"/>
