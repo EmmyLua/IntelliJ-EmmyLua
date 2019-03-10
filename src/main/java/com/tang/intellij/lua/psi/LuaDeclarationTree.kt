@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.StackOverflowPreventedException
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNamedElement
@@ -39,7 +38,7 @@ interface LuaDeclarationTree {
                     manager = LuaDeclarationTreeStub(file)
                     try {
                         manager.buildTree(file)
-                    } catch (e: StackOverflowPreventedException) {
+                    } catch (e: Exception) {
                         manager = null
                     }
                 }
