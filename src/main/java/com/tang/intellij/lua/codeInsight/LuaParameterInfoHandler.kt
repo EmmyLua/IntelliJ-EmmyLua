@@ -20,10 +20,8 @@ import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.parameterInfo.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
-import com.tang.intellij.lua.psi.LuaArgs
-import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaListArgs
-import com.tang.intellij.lua.psi.LuaTypes
+import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
@@ -52,7 +50,26 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, ParameterInfoType>
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
             val isColonStyle = callExpr.isMethodColonCall
-            val type = callExpr.guessParentType(SearchContext(context.project))
+            val searchContext = SearchContext(context.project)
+            var type = callExpr.guessParentType(searchContext)
+	    // for chain
+            // add by clu on 添加对t.data.sayHello()方法的提示支持
+            if (type == Ty.UNKNOWN) {
+                val children = luaArgs.parent.children
+                if (children.isNotEmpty()) {
+                    (children[0] as? LuaIndexExpr).let {
+                        if (it != null && it.name != null) {
+                            val functions = resolveTypeByRoot(it, it.name!!, searchContext)
+                            if (functions.isNotEmpty()) {
+                                (functions[0] as? LuaIndexExpr)?.let {
+                                    type = it.guessType(searchContext)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+	    // end
             val list = mutableListOf<ParameterInfoType>()
             TyUnion.each(type) { ty ->
                 if (ty is ITyFunction) {
