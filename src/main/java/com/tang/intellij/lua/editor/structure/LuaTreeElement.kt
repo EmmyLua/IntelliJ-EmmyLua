@@ -25,7 +25,7 @@ import javax.swing.Icon
 /**
  * Created by TangZX on 2016/12/28.
  */
-open class LuaTreeElement internal constructor(val element: NavigationItem, var name: String, val icon: Icon) : StructureViewTreeElement {
+open class LuaTreeElement(val element: NavigationItem, var name: String, val icon: Icon) : StructureViewTreeElement {
     var parent: LuaTreeElement? = null
     private val children = LinkedHashMap<String, LuaTreeElement>()
 

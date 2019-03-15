@@ -22,5 +22,5 @@ import com.tang.intellij.lua.lang.LuaIcons
 /**
  * Created by TangZX on 2016/12/13.
  */
-class LuaClassElement internal constructor(docTagClass: LuaDocTagClass, className: String? = null)
+class LuaClassElement(docTagClass: LuaDocTagClass, className: String? = null)
     : LuaVarElement(docTagClass, className ?: docTagClass.name, LuaIcons.CLASS)

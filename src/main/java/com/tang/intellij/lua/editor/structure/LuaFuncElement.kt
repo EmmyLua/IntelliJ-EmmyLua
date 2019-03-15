@@ -22,7 +22,7 @@ import javax.swing.Icon
 /**
  * Created by TangZX on 2016/12/13.
  */
-abstract class LuaFuncElement constructor(target: LuaPsiElement, name: String, paramSignature: String, icon: Icon)
+abstract class LuaFuncElement(target: LuaPsiElement, name: String, paramSignature: String, icon: Icon)
     : LuaTreeElement(target, name, icon) {
     private var text: String = name + paramSignature
 

@@ -19,5 +19,5 @@ package com.tang.intellij.lua.editor.structure
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.LuaPsiElement
 
-class LuaGlobalVarElement constructor(target: LuaPsiElement, name: String? = null)
+class LuaGlobalVarElement(target: LuaPsiElement, name: String? = null)
     : LuaVarElement(target, name ?: target.name!!, LuaIcons.GLOBAL_VAR)
