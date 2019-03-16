@@ -124,12 +124,6 @@ fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
 }
 
 fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
-    val tree = LuaDeclarationTree.get(indexExpr.containingFile)
-    val declaration = tree.find(indexExpr)
-    if (declaration != null) {
-        return declaration.psi
-    }
-
     val type = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
     type.eachTopClass(Processor { ty ->
@@ -138,6 +132,13 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
             return@Processor false
         true
     })
+    if (ret == null) {
+        val tree = LuaDeclarationTree.get(indexExpr.containingFile)
+        val declaration = tree.find(indexExpr)
+        if (declaration != null) {
+            return declaration.psi
+        }
+    }
     return ret
 }
 
