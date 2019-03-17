@@ -35,14 +35,7 @@ versions["171"] = [
 
 versions.each { shortVer, cfg ->
     task "build_${shortVer}"(type: GradleBuild) {
-        tasks = ["buildPluginWithBunch"]
-        buildFile = 'build.gradle'
-        startParameter.setProjectProperties([
-            "IDEA_VER": shortVer
-        ] + cfg)
-    }
-    task "test_${shortVer}"(type: GradleBuild) {
-        tasks = ["test"]
+        tasks = ["buildPluginWithBunch", "test"]
         buildFile = 'build.gradle'
         startParameter.setProjectProperties([
             "IDEA_VER": shortVer
