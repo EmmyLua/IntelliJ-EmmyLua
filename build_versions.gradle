@@ -41,6 +41,13 @@ versions.each { shortVer, cfg ->
             "IDEA_VER": shortVer
         ] + cfg)
     }
+    task "test_${shortVer}"(type: GradleBuild) {
+        tasks = ["test"]
+        buildFile = 'build.gradle'
+        startParameter.setProjectProperties([
+            "IDEA_VER": shortVer
+        ] + cfg)
+    }
 }
 
 task buildAll(dependsOn: [build_182, build_172, build_171])
