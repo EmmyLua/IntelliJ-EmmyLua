@@ -64,7 +64,9 @@ def RES_DIR = "src/main/resources"
 
 buildPlugin.baseName = cfg.archiveName
 
-if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+def isWin = Os.isFamily(Os.FAMILY_WINDOWS)
+
+if (isWin) {
     task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], type: Copy) {
         from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
         destinationDir file("${RES_DIR}/debugger/windows")
@@ -83,15 +85,25 @@ if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 task buildPluginWithPatchs() {
     finalizedBy buildPlugin
     doLast {
+        // reset
         exec {
             executable "git"
             args "reset", "HEAD", "--hard"
         }
-        cfg.patchs.each { patch->
-            exec {
-                executable "git"
-                args = ["am", "--3way", "--ignore-space-change", "--keep-cr", patch]
-            }
+        // clean untracked files
+        exec {
+            executable "git"
+            args "clean", "-d", "-f"
+        }
+        // switch
+        exec {
+            executable isWin ? "bunch/bin/bunch.bat" : "bunch/bin/bunch"
+            args "switch", ".", IDEA_VER
+        }
+        // reset to HEAD
+        exec {
+            executable "git"
+            args "reset", rev
         }
     }
 }
