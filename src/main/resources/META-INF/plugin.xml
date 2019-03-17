@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<idea-plugin>
+<idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
     <id>com.tang</id>
     <name>EmmyLua</name>
     <version>1.2.8</version>
@@ -92,12 +92,9 @@
     </ul>
     ]]>
     </change-notes>
-    <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
     <idea-version since-build="172" until-build="191.*"/>
-
-    <depends config-file="core.xml" optional="true">com.intellij.modules.lang</depends>
-    <depends config-file="unity.xml" optional="true">com.intellij.modules.lang</depends>
-
+    <xi:include href="core.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <xi:include href="unity.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <extensions defaultExtensionNs="com.intellij">
     </extensions>
 </idea-plugin>
