@@ -33,6 +33,19 @@ sourceSets {
     }
 }
 
+ext {
+    getRev = {
+        def os = new ByteArrayOutputStream()
+        def e = exec {
+            executable "git"
+            args "rev-parse"
+            args "HEAD"
+            standardOutput = os
+        }
+        return os.toString().substring(0, 7)
+    }
+}
+
 apply from: "patchs.gradle"
 setDefaultProperty("IDEA_VER", "182")
 
