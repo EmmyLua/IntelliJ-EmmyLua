@@ -19,8 +19,11 @@ package com.tang.intellij.lua.refactoring.rename
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.SearchScope
+import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.refactoring.rename.RenamePsiElementProcessor
+import com.intellij.util.MergeQuery
 import com.tang.intellij.lua.psi.LuaClassMethod
+import com.tang.intellij.lua.psi.search.LuaOverridenMethodsSearch
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
 
 /**
@@ -43,7 +46,13 @@ class RenameLuaMethodProcessor : RenamePsiElementProcessor() {
          */
         FileDocumentManager.getInstance().saveAllDocuments()
 
-        val search = LuaOverridingMethodsSearch.search(methodDef)
-        search.forEach { methodDef1 -> allRenames[methodDef1] = newName }
+        val search = MergeQuery(LuaOverridingMethodsSearch.search(methodDef), LuaOverridenMethodsSearch.search(methodDef))
+        search.forEach {
+            allRenames[it] = newName
+
+            ReferencesSearch.search(it, scope).forEach { ref ->
+                allRenames[ref.element] = newName
+            }
+        }
     }
 }

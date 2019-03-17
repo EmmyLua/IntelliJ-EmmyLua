@@ -25,8 +25,10 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.usageView.UsageInfo
+import com.intellij.util.MergeQuery
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClassMethod
+import com.tang.intellij.lua.psi.search.LuaOverridenMethodsSearch
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
 import com.tang.intellij.lua.reference.LuaOverridingMethodReference
 import com.tang.intellij.lua.search.SearchContext
@@ -50,7 +52,7 @@ class LuaFindUsagesHandlerFactory : FindUsagesHandlerFactory() {
 class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler(methodDef) {
     override fun findReferencesToHighlight(target: PsiElement, searchScope: SearchScope): MutableCollection<PsiReference> {
         val collection = super.findReferencesToHighlight(target, searchScope)
-        val query = LuaOverridingMethodsSearch.search(methodDef, true)
+        val query = MergeQuery(LuaOverridingMethodsSearch.search(methodDef), LuaOverridenMethodsSearch.search(methodDef))
         val psiFile = target.containingFile
         query.forEach {
             if (psiFile == it.containingFile)
@@ -80,7 +82,7 @@ class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler
     override fun processElementUsages(element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions): Boolean {
         if (super.processElementUsages(element, processor, options)) {
             ApplicationManager.getApplication().runReadAction {
-                val query = LuaOverridingMethodsSearch.search(methodDef, true)
+                val query = MergeQuery(LuaOverridingMethodsSearch.search(methodDef), LuaOverridenMethodsSearch.search(methodDef))
                 query.forEach {
                     val identifier = it.nameIdentifier
                     if (identifier != null)

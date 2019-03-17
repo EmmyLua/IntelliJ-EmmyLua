@@ -358,6 +358,7 @@
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaClassInheritorsSearch" interface="com.intellij.util.QueryExecutor"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaAllClassesSearch" interface="com.intellij.util.QueryExecutor"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaOverridingMethodsSearch" interface="com.intellij.util.QueryExecutor"/>
+        <extensionPoint qualifiedName="com.tang.intellij.lua.luaOverridenMethodsSearch" interface="com.intellij.util.QueryExecutor"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaFileResolver" interface="com.tang.intellij.lua.ext.ILuaFileResolver"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaTypeInfer" interface="com.tang.intellij.lua.ext.ILuaTypeInfer"/>
         <extensionPoint qualifiedName="com.tang.intellij.lua.luaShortNamesManager" interface="com.tang.intellij.lua.psi.search.LuaShortNamesManager"/>
@@ -367,6 +368,7 @@
         <luaClassInheritorsSearch implementation="com.tang.intellij.lua.psi.search.LuaClassInheritorsSearchExecutor" id="base"/>
         <luaAllClassesSearch implementation="com.tang.intellij.lua.psi.search.LuaAllClassesSearchExecutor" id="base"/>
         <luaOverridingMethodsSearch implementation="com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearchExecutor" id="base"/>
+        <luaOverridenMethodsSearch implementation="com.tang.intellij.lua.psi.search.LuaOverridenMethodsSearchExecutor" id="base"/>
 
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileSourcesRootResolver" id="base"/>
         <luaFileResolver implementation="com.tang.intellij.lua.ext.LuaFileAdditionalResolver" id="additional"/>

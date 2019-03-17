@@ -27,9 +27,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagClass
  *
  * Created by tangzx on 2017/3/28.
  */
-class LuaClassInheritorsSearch private constructor() : ExtensibleQueryFactory<LuaDocTagClass, LuaClassInheritorsSearch.SearchParameters>("com.tang.intellij.lua") {
+class LuaClassInheritorsSearch : ExtensibleQueryFactory<LuaDocTagClass, LuaClassInheritorsSearch.SearchParameters>("com.tang.intellij.lua") {
 
-    class SearchParameters internal constructor(val searchScope: GlobalSearchScope, val project: Project, val typeName: String, val isDeep: Boolean)
+    class SearchParameters(val searchScope: GlobalSearchScope, val project: Project, val typeName: String, val isDeep: Boolean)
 
     companion object {
 
