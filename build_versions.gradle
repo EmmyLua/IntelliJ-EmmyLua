@@ -13,32 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+def versions = [:]
+versions["182"] = [
+    ideaSDKVersion: "IC-182.2371.4",
+    sinceBuild: "182",
+    untilBuild: "191.*",
+    archiveName: "IntelliJ-EmmyLua"
+]
+versions["172"] = [
+    ideaSDKVersion: "IC-172.4574.19",
+    sinceBuild: "172",
+    untilBuild: "181.*",
+    archiveName: "IntelliJ-EmmyLua"
+]
+versions["171"] = [
+    ideaSDKVersion: "IC-171.4694.73",
+    sinceBuild: "171",
+    untilBuild: "171.*",
+    archiveName: "IntelliJ-EmmyLua"
+]
 
-//171
-task build_171(type: GradleBuild) {
-    tasks = ["buildPluginWithPatchs"]
-    buildFile = 'build.gradle'
-    startParameter.setProjectProperties([
-        "IDEA_VER": "171"
-    ])
-}
-
-//172 - 181
-task build_172(type: GradleBuild) {
-    tasks = ["buildPluginWithPatchs"]
-    buildFile = 'build.gradle'
-    startParameter.setProjectProperties([
-        "IDEA_VER": "172"
-    ])
-}
-
-//182 - ?
-task build_182(type: GradleBuild) {
-    tasks = ["buildPluginWithPatchs"]
-    buildFile = 'build.gradle'
-    startParameter.setProjectProperties([
-        "IDEA_VER": "182"
-    ])
+versions.each { shortVer, cfg ->
+    task "build_${shortVer}"(type: GradleBuild) {
+        tasks = ["buildPluginWithBunch"]
+        buildFile = 'build.gradle'
+        startParameter.setProjectProperties([
+            "IDEA_VER": shortVer
+        ] + cfg)
+    }
 }
 
 task buildAll(dependsOn: [build_182, build_172, build_171])

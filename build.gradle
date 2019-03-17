@@ -33,6 +33,19 @@ sourceSets {
     }
 }
 
+// Appveyor CI
+if (System.env['APPVEYOR']) {
+    version = System.env['APPVEYOR_BUILD_VERSION']
+    exec {
+        executable "git"
+        args "config", "--global", "user.email", "love.tangzx@qq.com"
+    }
+    exec {
+        executable "git"
+        args "config", "--global", "user.name", "tangzx"
+    }
+}
+
 ext {
     getRev = {
         def os = new ByteArrayOutputStream()
@@ -44,14 +57,23 @@ ext {
         }
         return os.toString().substring(0, 7)
     }
+
+    setDefaultProperty = { name, defaultValue ->
+        if (!this.hasProperty(name))
+            ext[name] = defaultValue
+    }
 }
 
-apply from: "patchs.gradle"
 setDefaultProperty("IDEA_VER", "182")
 
 version = "${version}-IDEA${IDEA_VER}"
 
-def cfg = getVersionCfg(IDEA_VER)
+def cfg = [
+    ideaSDKVersion: ideaSDKVersion,
+    sinceBuild: sinceBuild,
+    untilBuild: untilBuild,
+    archiveName: archiveName
+]
 def rev = getRev()
 
 intellij {
@@ -95,7 +117,7 @@ if (isWin) {
 }
 
 // apply patchs before build plugin
-task buildPluginWithPatchs() {
+task buildPluginWithBunch() {
     finalizedBy buildPlugin
     doLast {
         // reset
