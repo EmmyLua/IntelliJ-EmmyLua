@@ -54,7 +54,7 @@ import com.tang.intellij.lua.ty.*
  *
  * this closure should be `fun(sender: any, type: string):void`
  */
-fun LuaExpr.shouldBe(context: SearchContext): ITy {
+private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
     val p1 = parent
     if (p1 is LuaExprList) {
         val p2 = p1.parent
@@ -86,6 +86,11 @@ fun LuaExpr.shouldBe(context: SearchContext): ITy {
         }
     }
     return Ty.UNKNOWN
+}
+
+fun LuaExpr.shouldBe(context: SearchContext): ITy {
+    val ty = shouldBeInternal(context)
+    return TyAliasSubstitutor.substitute(ty, context)
 }
 
 /**

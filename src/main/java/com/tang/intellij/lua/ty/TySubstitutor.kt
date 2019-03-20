@@ -111,7 +111,15 @@ open class TySubstitutor : ITySubstitutor {
     }
 }
 
-class TyAliasSubstitutor(val project: Project) : ITySubstitutor {
+class TyAliasSubstitutor private constructor(val project: Project) : ITySubstitutor {
+    companion object {
+        fun substitute(ty: ITy, context: SearchContext): ITy {
+            /*if (context.forStore)
+                return ty*/
+            return ty.substitute(TyAliasSubstitutor(context.project))
+        }
+    }
+
     override fun substitute(function: ITyFunction): ITy {
         return TySerializedFunction(function.mainSignature.substitute(this),
                 function.signatures.map { it.substitute(this) }.toTypedArray(),
