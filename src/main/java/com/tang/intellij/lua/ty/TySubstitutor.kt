@@ -57,7 +57,7 @@ class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
     }
 
     override fun visitFun(f: ITyFunction) {
-        TyUnion.each(cur) { it ->
+        TyUnion.each(cur) {
             if (it is ITyFunction) {
                 visitSig(it.mainSignature, f.mainSignature)
             }

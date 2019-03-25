@@ -274,13 +274,20 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
 
         // iterator support
         val type = callExpr?.guessType(context)
-        if (type is ITyFunction) {
-            val returnTy = type.mainSignature.returnTy
-            if (returnTy is TyTuple) {
-                return returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN }
-            } else if (paramIndex == 0) {
-                return returnTy
+        if (type != null) {
+            var result: ITy = Ty.UNKNOWN
+            TyUnion.each(type) {
+                if (it is ITyFunction) {
+                    val returnTy = it.mainSignature.returnTy
+                    if (returnTy is TyTuple) {
+                        result = result.union(returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN })
+                    } else if (paramIndex == 0) {
+                        result = result.union(returnTy)
+                    }
+                }
             }
+            if (result != Ty.UNKNOWN)
+                return result
         }
     }
     // for param = 1, 2 do end
