@@ -51,7 +51,7 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
         // generic in docFunction
         val fn = PsiTreeUtil.getParentOfType(myElement, LuaDocFunctionTy::class.java)
         var genericDefList: Collection<LuaDocGenericDef>? = fn?.genericDefList
-        if (genericDefList == null) {
+        if (genericDefList == null || genericDefList.isEmpty()) {
             // generic in comments ?
             val comment = LuaCommentUtil.findContainer(myElement)
             genericDefList = comment.findTags(LuaDocGenericDef::class.java)
