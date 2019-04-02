@@ -71,7 +71,7 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
         if (processInfo.executableName.endsWith(".exe")) {
             val list = ArrayList<XLocalAttachDebugger>()
             val info = processMap[processInfo.pid]
-            if (info != null && info.path.isNotEmpty() && !info.path.contains("windows", true)) {
+            if (info != null && info.path.isNotEmpty()) {
                 list.add(LuaLocalAttachDebugger(processInfo, info))
             }
             return list
