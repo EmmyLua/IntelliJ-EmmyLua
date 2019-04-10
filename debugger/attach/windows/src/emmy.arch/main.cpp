@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string>
 #include <psapi.h>
+#include <algorithm>
 #include "Utility.h"
 #include "WindowUtility.h"
 
@@ -29,10 +30,45 @@ int main(int argc, char** argv)
 			HANDLE m_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processId);
 			GetModuleFileNameEx(m_process, nullptr, fileName, _MAX_PATH);
 
+			USHORT processMachine = 0, nativeMachine = 0;
+
+			typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
+			LPFN_ISWOW64PROCESS fnIsWow64Process = nullptr;
+
+			typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS2) (HANDLE, USHORT*, USHORT*);
+			LPFN_ISWOW64PROCESS2 fnIsWow64Process2 = nullptr;
+
+			fnIsWow64Process2 = (LPFN_ISWOW64PROCESS2)GetProcAddress(
+				GetModuleHandle(TEXT("kernel32")), "IsWow64Process2");
+
+			fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
+				GetModuleHandle(TEXT("kernel32")), "IsWow64Process");
+
+			////fnIsWow64Process2 = nullptr;
+
 			ExeInfo info;
 			if (GetExeInfo(fileName, info)) {
-				printf("%d", info.i386);
-				return info.i386;
+				if (!info.managed)
+				{
+					printf("%d", info.i386);
+					return info.i386;
+				}
+				else
+				{
+					BOOL is64bit = FALSE;
+					if (fnIsWow64Process2)
+					{
+						is64bit = fnIsWow64Process2(m_process, &processMachine, &nativeMachine);
+					}
+					else if (fnIsWow64Process)
+					{
+						is64bit = fnIsWow64Process(m_process, &is64bit);
+					}
+
+					printf("%d", !is64bit);
+					return !is64bit;
+				}
+		
 			}
 		}
 	}

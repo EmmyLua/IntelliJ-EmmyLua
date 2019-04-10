@@ -2483,12 +2483,25 @@ bool LocateSymbolFile(const IMAGEHLP_MODULE64& moduleInfo, char fileName[_MAX_PA
 
 }
 
+static bool is_lua_method(const char* name)
+{
+	const std::string lua_tinker_name = "lua_tinker";
+	const std::string lua_name = "lua";
+	std::string tmpName = name;
+	if (!(tmpName.length() >= lua_tinker_name.length() && tmpName.substr(0, lua_tinker_name.length()) == lua_tinker_name))
+	{
+		return tmpName.substr(0, 3) == lua_name;
+	}
+	return false;
+}
+
+
 BOOL CALLBACK GatherSymbolsCallback(PSYMBOL_INFO pSymInfo, ULONG SymbolSize, PVOID UserContext)
 {
 
 	stdext::hash_map<std::string, DWORD64>* symbols = reinterpret_cast<stdext::hash_map<std::string, DWORD64>*>(UserContext);
 
-	if (pSymInfo != nullptr && pSymInfo->Name != nullptr)
+	if (pSymInfo != nullptr && pSymInfo->Name != nullptr && is_lua_method(pSymInfo->Name))
 	{
 		symbols->insert(std::make_pair(pSymInfo->Name, pSymInfo->Address));
 	}
@@ -2533,6 +2546,197 @@ bool ScanForSignature(DWORD64 start, DWORD64 length, const char* signature)
 
 }
 
+
+static void TryToDetectLuaFunctionsInModule(HANDLE hProcess, HMODULE hModule, const char* moduleName, const char* modulePath)
+{
+	stdext::hash_map<std::string, DWORD64> symbols;
+
+	PE pe = { 0 };
+	PE_STATUS st = peOpenFile(&pe, modulePath);
+
+	////std::string except_name = "lua_tinker";
+
+	if (st == PE_SUCCESS)
+	{
+		PE_FOREACH_SECTION(&pe, pSection)
+		{
+
+		}
+
+		st = peParseExportTable(&pe, 0xFFFF);
+	}
+
+	if (st == PE_SUCCESS && PE_HAS_TABLE(&pe, ExportTable))
+	{
+		PE_FOREACH_EXPORTED_SYMBOL(&pe, pSymbol)
+		{
+			if (PE_SYMBOL_HAS_NAME(pSymbol))
+			{
+				const char* name = pSymbol->Name;
+				std::string tmpName = name;
+
+				if (is_lua_method(name))
+				{
+					uint64_t addr = (uint64_t)(hModule);
+					addr += pSymbol->Address.VA - pe.qwBaseAddress;
+					symbols[pSymbol->Name] = addr;
+#ifdef VERBOSE
+					////DebugBackend::Get().Message(MessageType_Normal, "\t[B]Lua symbol : '%s'", name);
+#endif
+				}
+				else {
+#ifdef VERBOSE
+					////DebugBackend::Get().Message(MessageType_Normal, "\t[B]Symbol : '%s'", name);
+#endif
+				}
+			}
+		}
+
+
+		/*st = peParseImportTable(&pe);
+		if (st == PE_SUCCESS && PE_HAS_TABLE(&pe, ImportTable))
+		{
+			PE_FOREACH_IMPORTED_MODULE(&pe, pModule)
+			{
+				//HMODULE hImportModule = GetModuleHandle(pModule->Name);
+				//LoadSymbolsRecursively(loadedModules, symbols, hProcess, hImportModule);
+			}
+		}
+		return;*/
+	}
+
+	////Modify by fangfang
+	//Do not need here code now, always use pe to enumerate needed export functions!
+////	else
+////	{
+////		MODULEINFO moduleInfo = { nullptr };
+////		GetModuleInformation(hProcess, hModule, &moduleInfo, sizeof(moduleInfo));
+////
+////		char moduleFileName[_MAX_PATH];
+////		GetModuleFileNameEx(hProcess, hModule, moduleFileName, _MAX_PATH);
+////
+////		DWORD64 base = SymLoadModule64_dll(hProcess, nullptr, moduleFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
+////
+/////*#ifdef VERBOSE
+////		char message[1024];
+////		_snprintf(message, 1024, "Examining '%s' %s\n", moduleName, base ? "(symbols loaded)" : "");
+////		DebugBackend::Get().Log(message);
+////#endif*/
+////
+////		// Check to see if there was a symbol file we failed to load (usually
+////		// becase it didn't match the version of the module).
+////
+////		IMAGEHLP_MODULE64 module;
+////		memset(&module, 0, sizeof(module));
+////		module.SizeOfStruct = sizeof(module);
+////
+////		BOOL result = SymGetModuleInfo64_dll(hProcess, base, &module);
+////
+////		if (result && module.SymType == SymNone)
+////		{
+////
+////			// No symbols were found. Check to see if the module file name + ".pdb"
+////			// exists, since the symbol file and/or module names may have been renamed.
+////
+////			char pdbFileName[_MAX_PATH];
+////			strcpy(pdbFileName, moduleFileName);
+////			ReplaceExtension(pdbFileName, "pdb");
+////
+////			if (GetFileExists(pdbFileName))
+////			{
+////				base = SymLoadModule64_dll(hProcess, nullptr, pdbFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
+////
+////				if (base != 0)
+////				{
+////					result = SymGetModuleInfo64_dll(hProcess, base, &module);
+////				}
+////				else
+////				{
+////					result = FALSE;
+////				}
+////
+////			}
+////
+////		}
+////
+////		if (result)
+////		{
+////
+////			// Check to see if we've already warned about this module.
+////			if (g_warnedAboutPdb.find(moduleFileName) == g_warnedAboutPdb.end())
+////			{
+////				if (strlen(module.CVData) > 0 && (module.SymType == SymExport || module.SymType == SymNone))
+////				{
+////
+////					char symbolFileName[_MAX_PATH];
+////
+////					if (LocateSymbolFile(module, symbolFileName))
+////					{
+////						char message2[1024];
+////						_snprintf(message2, 1024, "Warning 1002: Symbol file '%s' located but it does not match module '%s'", symbolFileName, moduleFileName);
+////						DebugBackend::Get().Message(message2, MessageType_Warning);
+////					}
+////
+////					// Remember that we've checked on this file, so no need to check again.
+////					g_warnedAboutPdb.insert(moduleFileName);
+////
+////				}
+////			}
+////
+////		}
+////
+////		if (base != 0)
+////		{
+////			// SymFromName is really slow, so we gather up our own list of the symbols that we
+////			// can index much faster.
+////			SymEnumSymbols_dll(hProcess, base, "lua*", GatherSymbolsCallback, reinterpret_cast<PVOID>(&symbols));
+////		}
+////
+////		// Check to see if the module contains the Lua signature but we didn't find any Lua functions.
+////
+////		if (g_warnedAboutLua.find(moduleFileName) == g_warnedAboutLua.end())
+////		{
+////
+////			// Check to see if this module contains any Lua functions loaded from the symbols.
+////
+////			bool foundLuaFunctions = false;
+////
+////			if (base != 0)
+////			{
+////				SymEnumSymbols_dll(hProcess, base, "lua_*", FindSymbolsCallback, &foundLuaFunctions);
+////			}
+////
+////			if (!foundLuaFunctions)
+////			{
+////
+////				// Check to see if this module contains a string from the Lua source code. If it's there, it probably
+////				// means this module has Lua compiled into it.
+////
+////				bool luaFile = ScanForSignature((DWORD64)hModule, moduleInfo.SizeOfImage, "$Lua:");
+////
+////				if (luaFile)
+////				{
+////					char message2[1024];
+////					_snprintf(message2, 1024, "Warning 1001: '%s' appears to contain Lua functions however no Lua functions could located with the symbolic information", moduleFileName);
+////					DebugBackend::Get().Message(message2, MessageType_Warning);
+////				}
+////
+////			}
+////
+////			// Remember that we've checked on this file, so no need to check again.
+////			g_warnedAboutLua.insert(moduleFileName);
+////
+////		}
+////
+////		// Unload
+////		SymUnloadModule64_dll(hProcess, base);
+////	}
+
+	LoadLuaFunctions(moduleName, symbols, hProcess);
+
+	peClose(&pe);
+}
+
 void LoadSymbolsRecursively(std::set<std::string>& loadedModules, HANDLE hProcess, HMODULE hModule)
 {
 	assert(hModule != NULL);
@@ -2570,173 +2774,7 @@ void LoadSymbolsRecursively(std::set<std::string>& loadedModules, HANDLE hProces
 	DebugBackend::Get().Message(MessageType_Normal, "[B]Scan module : '%s'", moduleName);
 #endif
 	
-	stdext::hash_map<std::string, DWORD64> symbols;
-
-	PE pe = { 0 };
-	PE_STATUS st = peOpenFile(&pe, modulePath);
-
-	if (st == PE_SUCCESS)
-		st = peParseExportTable(&pe, 1000);
-	if (st == PE_SUCCESS && PE_HAS_TABLE(&pe, ExportTable))
-	{
-		PE_FOREACH_EXPORTED_SYMBOL(&pe, pSymbol)
-		{
-			if (PE_SYMBOL_HAS_NAME(pSymbol))
-			{
-				const char* name = pSymbol->Name;
-				if (name[0] == 'l' && name[1] == 'u' && name[2] == 'a') {
-					uint64_t addr = (uint64_t)(hModule);
-					addr += pSymbol->Address.VA - pe.qwBaseAddress;
-					symbols[pSymbol->Name] = addr;
-#ifdef VERBOSE
-					DebugBackend::Get().Message(MessageType_Normal, "\t[B]Lua symbol : '%s'", name);
-#endif
-				}
-				else {
-#ifdef VERBOSE
-					DebugBackend::Get().Message(MessageType_Normal, "\t[B]Symbol : '%s'", name);
-#endif
-				}
-			}
-		}
-
-		/*st = peParseImportTable(&pe);
-		if (st == PE_SUCCESS && PE_HAS_TABLE(&pe, ImportTable))
-		{
-			PE_FOREACH_IMPORTED_MODULE(&pe, pModule)
-			{
-				//HMODULE hImportModule = GetModuleHandle(pModule->Name);
-				//LoadSymbolsRecursively(loadedModules, symbols, hProcess, hImportModule);
-			}
-		}
-		return;*/
-	}
-	else
-	{
-		MODULEINFO moduleInfo = { nullptr };
-		GetModuleInformation(hProcess, hModule, &moduleInfo, sizeof(moduleInfo));
-
-		char moduleFileName[_MAX_PATH];
-		GetModuleFileNameEx(hProcess, hModule, moduleFileName, _MAX_PATH);
-
-		DWORD64 base = SymLoadModule64_dll(hProcess, nullptr, moduleFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
-
-/*#ifdef VERBOSE
-		char message[1024];
-		_snprintf(message, 1024, "Examining '%s' %s\n", moduleName, base ? "(symbols loaded)" : "");
-		DebugBackend::Get().Log(message);
-#endif*/
-
-		// Check to see if there was a symbol file we failed to load (usually
-		// becase it didn't match the version of the module).
-
-		IMAGEHLP_MODULE64 module;
-		memset(&module, 0, sizeof(module));
-		module.SizeOfStruct = sizeof(module);
-
-		BOOL result = SymGetModuleInfo64_dll(hProcess, base, &module);
-
-		if (result && module.SymType == SymNone)
-		{
-
-			// No symbols were found. Check to see if the module file name + ".pdb"
-			// exists, since the symbol file and/or module names may have been renamed.
-
-			char pdbFileName[_MAX_PATH];
-			strcpy(pdbFileName, moduleFileName);
-			ReplaceExtension(pdbFileName, "pdb");
-
-			if (GetFileExists(pdbFileName))
-			{
-				base = SymLoadModule64_dll(hProcess, nullptr, pdbFileName, moduleName, (DWORD64)moduleInfo.lpBaseOfDll, moduleInfo.SizeOfImage);
-
-				if (base != 0)
-				{
-					result = SymGetModuleInfo64_dll(hProcess, base, &module);
-				}
-				else
-				{
-					result = FALSE;
-				}
-
-			}
-
-		}
-
-		if (result)
-		{
-
-			// Check to see if we've already warned about this module.
-			if (g_warnedAboutPdb.find(moduleFileName) == g_warnedAboutPdb.end())
-			{
-				if (strlen(module.CVData) > 0 && (module.SymType == SymExport || module.SymType == SymNone))
-				{
-
-					char symbolFileName[_MAX_PATH];
-
-					if (LocateSymbolFile(module, symbolFileName))
-					{
-						char message2[1024];
-						_snprintf(message2, 1024, "Warning 1002: Symbol file '%s' located but it does not match module '%s'", symbolFileName, moduleFileName);
-						DebugBackend::Get().Message(message2, MessageType_Warning);
-					}
-
-					// Remember that we've checked on this file, so no need to check again.
-					g_warnedAboutPdb.insert(moduleFileName);
-
-				}
-			}
-
-		}
-
-		if (base != 0)
-		{
-			// SymFromName is really slow, so we gather up our own list of the symbols that we
-			// can index much faster.
-			SymEnumSymbols_dll(hProcess, base, "lua*", GatherSymbolsCallback, reinterpret_cast<PVOID>(&symbols));
-		}
-
-		// Check to see if the module contains the Lua signature but we didn't find any Lua functions.
-
-		if (g_warnedAboutLua.find(moduleFileName) == g_warnedAboutLua.end())
-		{
-
-			// Check to see if this module contains any Lua functions loaded from the symbols.
-
-			bool foundLuaFunctions = false;
-
-			if (base != 0)
-			{
-				SymEnumSymbols_dll(hProcess, base, "lua_*", FindSymbolsCallback, &foundLuaFunctions);
-			}
-
-			if (!foundLuaFunctions)
-			{
-
-				// Check to see if this module contains a string from the Lua source code. If it's there, it probably
-				// means this module has Lua compiled into it.
-
-				bool luaFile = ScanForSignature((DWORD64)hModule, moduleInfo.SizeOfImage, "$Lua:");
-
-				if (luaFile)
-				{
-					char message2[1024];
-					_snprintf(message2, 1024, "Warning 1001: '%s' appears to contain Lua functions however no Lua functions could located with the symbolic information", moduleFileName);
-					DebugBackend::Get().Message(message2, MessageType_Warning);
-				}
-
-			}
-
-			// Remember that we've checked on this file, so no need to check again.
-			g_warnedAboutLua.insert(moduleFileName);
-
-		}
-
-		// Unload
-		SymUnloadModule64_dll(hProcess, base);
-	}
-	
-	LoadLuaFunctions(moduleName, symbols, hProcess);
+	TryToDetectLuaFunctionsInModule(hProcess, hModule, moduleName, modulePath);
 
 	// Get the imports for the module. These are loaded before we're able to hook
 	// LoadLibrary for the module.

@@ -176,6 +176,8 @@ ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 {
 	//MessageBox(nullptr, "Waiting to attach the debugger", nullptr, MB_OK);
 
+
+
     if (GetIsBeingDebugged(m_processId))
     {
         MessageEvent("The process already attached.");
@@ -189,6 +191,7 @@ ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
 	Channel handshakeChannel;
 	if (!handshakeChannel.Create(handshakeChannelName))
 	{
+		MessageEvent("Create Pipeline failed!", MessageType_Error);
 		return ErrorCode::UNKNOWN;
 	}
 
@@ -201,7 +204,9 @@ ErrorCode DebugFrontend::InitializeBackend(const char* symbolsDirectory)
     }
 
     // Wait for the client to connect.
+	MessageEvent("Start to wait connection ...");
 	handshakeChannel.WaitForConnection();
+	MessageEvent("Wait to connection suc!");
 
     // Read the initialization function from the event channel.
     if (!ProcessInitialization(handshakeChannel, symbolsDirectory))
@@ -319,6 +324,8 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
         return false;
     }
 
+	MessageEvent("GetStartupDirectory = true");
+
     strcat(fullFileName, dllFileName);
 
     HANDLE process = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
@@ -329,6 +336,10 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 		OutputError(GetLastError());
         return false;
 	}
+
+	MessageEvent("Try to open process suc!");
+
+
 	DWORD exitCode;
     
 	// set dll directory
@@ -339,6 +350,10 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 	void* dllDirRemote = RemoteDup(process, path, strlen(path) + 1);
 	ExecuteRemoteKernelFuntion(process, "SetDllDirectoryA", dllDirRemote, exitCode);
 
+	MessageEvent("Call SetDllDirectoryA suc!");
+
+	////MessageBox(NULL, "test tool", "test tool", MB_OK);
+
 	// Load the DLL.
 	void* remoteFileName = RemoteDup(process, fullFileName, strlen(fullFileName) + 1);
     if (!ExecuteRemoteKernelFuntion(process, "LoadLibraryA", remoteFileName, exitCode))
@@ -346,6 +361,11 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 		MessageEvent("Failed to load library");
         success = false;
     }
+	else
+	{
+		MessageEvent("Call LoadLibraryA suc!");
+	}
+
     HMODULE dllHandle = reinterpret_cast<HMODULE>(exitCode);
 	if (dllHandle == nullptr)
 	{
@@ -353,8 +373,12 @@ bool DebugFrontend::InjectDll(DWORD processId, const char* dllFileName) const
 		OutputError(GetLastError());
 	}
 
+
+
 	// reset dll directory
 	ExecuteRemoteKernelFuntion(process, "SetDllDirectoryA", nullptr, exitCode);
+
+	
 
     /*
     // Unload the DLL.
