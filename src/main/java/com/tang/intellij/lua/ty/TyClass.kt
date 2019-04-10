@@ -235,6 +235,8 @@ open class TySerializedClass(name: String,
     }
 
     override fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
+        if (this.isAnonymous || this.isGlobal)
+            return this
         val alias = LuaShortNamesManager.getInstance(context.project).findAlias(className, context.project, context.getScope())
         return alias?.type?.substitute(aliasSubstitutor) ?: this
     }
