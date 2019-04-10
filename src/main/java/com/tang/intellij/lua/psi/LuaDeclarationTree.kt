@@ -198,7 +198,7 @@ private open class Scope(
     }
 }
 
-private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaStubRecursiveVisitor(), LuaDeclarationTree {
+private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaRecursiveVisitor(), LuaDeclarationTree {
     companion object {
         val scopeKey = Key.create<Scope>("lua.object.tree.scope")
     }
@@ -373,6 +373,21 @@ private class LuaDeclarationTreeStub(file: PsiFile) : LuaDeclarationTreeBase(fil
 
     override fun shouldRebuild(): Boolean {
         return super.shouldRebuild() || (file as? LuaPsiFile)?.isContentsLoaded == true
+    }
+
+    override fun visitElement(element: PsiElement) {
+        var stub: STUB_ELE? = null
+        if (element is LuaPsiFile) {
+            stub = element.stub
+        }
+        if (element is STUB_PSI) {
+            stub  = element.stub
+        }
+        if (stub != null) {
+            for (child in stub.childrenStubs) {
+                child.psi.accept(this)
+            }
+        } else super.visitElement(element)
     }
 
     override fun findScope(psi: PsiElement): Scope? {
