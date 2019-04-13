@@ -34,7 +34,7 @@ class GlobalNameCanbeLocal : LocalInspectionTool() {
                 val stat = o.assignStat
                 if (stat != null && o.moduleName == null) {
                     val name = o.name
-                    val resolve = resolveInFile(name, o, SearchContext(o.project))
+                    val resolve = resolveInFile(name, o, SearchContext.get(o.project))
                     if (resolve == null) {
                         val scope = GlobalSearchScope.allScope(o.project)
                         val searchScope = scope.intersectWith(GlobalSearchScope.notScope(GlobalSearchScope.fileScope(o.containingFile)))

@@ -24,7 +24,6 @@ import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
-import com.tang.intellij.lua.ext.ILuaTypeInfer
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -33,7 +32,7 @@ import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
     if (element == null)
         return Ty.UNKNOWN
-    return ILuaTypeInfer.infer(element, context)
+    return SearchContext.infer(element)
 }
 
 internal fun inferInner(element: LuaTypeGuessable, context: SearchContext): ITy {
@@ -132,7 +131,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
         val localDef = PsiTreeUtil.getParentOfType(this, LuaLocalDef::class.java)
         if (localDef != null) {
             //计算 expr 返回类型
-            if (Ty.isInvalid(type) && !context.forStore) {
+            if (Ty.isInvalid(type) && !context.forStub) {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {

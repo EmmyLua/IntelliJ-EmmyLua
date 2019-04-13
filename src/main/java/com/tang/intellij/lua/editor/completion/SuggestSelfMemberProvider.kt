@@ -39,7 +39,7 @@ class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
         val methodDef = PsiTreeUtil.getParentOfType(position, LuaClassMethodDef::class.java)
         if (methodDef != null && !methodDef.isStatic) {
             val project = position.project
-            val searchContext = SearchContext(project)
+            val searchContext = SearchContext.get(project)
             methodDef.guessClassType(searchContext)?.let { type ->
                 val contextTy = LuaPsiTreeUtil.findContextClass(position)
                 type.processMembers(searchContext) { curType, member ->

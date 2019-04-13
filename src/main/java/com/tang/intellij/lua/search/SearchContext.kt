@@ -21,20 +21,83 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
+import com.tang.intellij.lua.ext.ILuaTypeInfer
+import com.tang.intellij.lua.psi.LuaTypeGuessable
+import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
+import java.util.*
 
 /**
 
  * Created by tangzx on 2017/1/14.
  */
-class SearchContext(val project: Project, private val currentFile: PsiFile? = null, var forStore: Boolean = false) {
-    constructor(project: Project) : this(project, null)
+class SearchContext private constructor(val project: Project) {
+
+    var currentFile: PsiFile? = null
+    var forStub: Boolean = false
+
+    companion object {
+        private val threadLocal = object : ThreadLocal<Stack<SearchContext>>() {
+            override fun initialValue(): Stack<SearchContext> {
+                return Stack()
+            }
+        }
+
+        fun get(project: Project): SearchContext {
+            val stack = threadLocal.get()
+            return if (stack.isEmpty()) {
+                SearchContext(project)
+            } else {
+                stack.peek()
+            }
+        }
+
+        fun infer(psi: LuaTypeGuessable): ITy {
+            return with(psi.project) { it.inferAndCache(psi) }
+        }
+
+        fun <T> with(ctx: SearchContext, action: (ctx: SearchContext) -> T): T {
+            return if (ctx.myInStack) {
+                action(ctx)
+            } else {
+                val stack = threadLocal.get()
+                val size = stack.size
+                stack.push(ctx)
+                ctx.myInStack = true
+                val result = action(ctx)
+                ctx.myInStack = false
+                stack.pop()
+                assert(size == stack.size)
+                result
+            }
+        }
+
+        fun <T> with(project: Project, action: (ctx: SearchContext) -> T): T {
+            val ctx = get(project)
+            return with(ctx, action)
+        }
+
+        fun <T> withStub(project: Project, file: PsiFile, action: (ctx: SearchContext) -> T): T {
+            return with(project) {
+                it.currentFile = file
+                it.forStub = true
+                val ret = action(it)
+                it.currentFile = null
+                it.forStub = false
+                ret
+            }
+        }
+    }
 
     /**
      * 用于有多返回值的索引设定
      */
     val index: Int get() = myIndex
 
-    private var myIndex: Int = -1
+    private var myIndex = -1
+    private var myInStack = false
+    private val guardList = mutableListOf<InferRecursionGuard>()
+    private val inferCache = mutableMapOf<LuaTypeGuessable, ITy>()
 
     fun <T> withIndex(index: Int, action: () -> T): T {
         val savedIndex = this.index
@@ -62,5 +125,33 @@ class SearchContext(val project: Project, private val currentFile: PsiFile? = nu
     val isDumb: Boolean
         get() = DumbService.isDumb(project) || currentFile != null
 
-    fun clone() = SearchContext(project, currentFile)
+    fun clone(): SearchContext {
+        val c = SearchContext(project)
+        c.currentFile = currentFile
+        c.forStub = forStub
+        return c
+    }
+
+    fun withRecursionGuard(psi: LuaTypeGuessable, type: GuardType, action: () -> ITy): ITy {
+        guardList.forEach {
+            if (it.check(psi, type)) {
+                return Ty.UNKNOWN
+            }
+        }
+        val guard = createGuard(psi, type)
+        if (guard != null)
+            guardList.add(guard)
+        val r = action()
+        guardList.remove(guard)
+        return r
+    }
+
+    private fun inferAndCache(psi: LuaTypeGuessable):  ITy {
+        /*if (inferCache.containsKey(psi)) {
+            println("use cache!!!")
+        }*/
+        return inferCache.getOrPut(psi) {
+            ILuaTypeInfer.infer(psi, this)
+        }
+    }
 }

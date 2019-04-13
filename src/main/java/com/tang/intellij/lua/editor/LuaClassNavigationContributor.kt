@@ -39,7 +39,7 @@ class LuaClassNavigationContributor : GotoClassContributor {
     }
 
     override fun getItemsByName(s: String, s1: String, project: Project, b: Boolean): Array<NavigationItem> {
-        val classDef = LuaClassIndex.find(s, SearchContext(project))
+        val classDef = LuaClassIndex.find(s, SearchContext.get(project))
         return if (classDef == null)
             emptyArray()
         else

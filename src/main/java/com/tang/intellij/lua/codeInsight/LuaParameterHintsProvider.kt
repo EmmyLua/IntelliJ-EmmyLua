@@ -63,7 +63,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             val callExpr = psi
             val args = callExpr.args as? LuaListArgs ?: return list
             val exprList = args.exprList
-            val context = SearchContext(callExpr.getProject())
+            val context = SearchContext.get(callExpr.getProject())
             val type = callExpr.guessParentType(context)
             val ty = TyUnion.find(type, ITyFunction::class.java) ?: return list
 
@@ -84,7 +84,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         }
         else if (psi is LuaParamNameDef) {
             if (PARAMETER_TYPE_HINT.get()) {
-                val type = psi.guessType(SearchContext(psi.project))
+                val type = psi.guessType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
                     return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", psi.textOffset + psi.textLength))
                 }
@@ -92,7 +92,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         }
         else if (psi is LuaNameDef) {
             if (LOCAL_VARIABLE_HINT.get()) {
-                val type = psi.guessType(SearchContext(psi.project))
+                val type = psi.guessType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
                     return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", psi.textOffset + psi.textLength))
                 }
@@ -101,7 +101,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         else if (psi is LuaFuncBodyOwner) {
             val paren = psi.funcBody?.rparen
             if (FUNCTION_HINT.get() && paren != null) {
-                val type = psi.guessReturnType(SearchContext(psi.project))
+                val type = psi.guessReturnType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
                     return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", paren.textOffset + paren.textLength))
                 }

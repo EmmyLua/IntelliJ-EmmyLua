@@ -40,7 +40,7 @@ class CreateMethodIntention : BaseIntentionAction() {
     override fun isAvailable(project: Project, editor: Editor, psiFile: PsiFile): Boolean {
         /*val callExpr = LuaPsiTreeUtil.findElementOfClassAtOffset(psiFile, editor.caretModel.offset, LuaCallExpr::class.java, false)
         if (callExpr != null && !callExpr.isFunctionCall) {
-            val bodyOwner = callExpr.resolveFuncBodyOwner(SearchContext(project))
+            val bodyOwner = callExpr.resolveFuncBodyOwner(SearchContext.get(project))
             return bodyOwner == null
         }*/
         return false
@@ -52,7 +52,7 @@ class CreateMethodIntention : BaseIntentionAction() {
         if (callExpr != null && !callExpr.isFunctionCall) {
             val expr = callExpr.expr
             if (expr is LuaIndexExpr) {
-                val type = expr.guessParentType(SearchContext(project))
+                val type = expr.guessParentType(SearchContext.get(project))
                 if (Ty.isInvalid(type)) return
 
                 val position = calcInsertPosition(TyUnion.getPerfectClass(type), project)

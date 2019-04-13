@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.stubs
 
-import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
@@ -58,20 +57,10 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         }
     }
 
-    override fun shouldCreateStub(node: ASTNode): Boolean {
+    /*override fun shouldCreateStub(node: ASTNode): Boolean {
         val psi = node.psi as LuaIndexExpr
         return psi.isPure()
-        /*val parent = psi.parent
-        if (!psi.isPure())
-            return false
-
-        if (psi.id != null || psi.idExpr != null) {
-            if (parent is LuaVarList) {
-                return true
-            }
-        }
-        return false*/
-    }
+    }*/
 
     override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexExprStub {
         val stat = indexExpr.assignStat
@@ -79,13 +68,13 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         val classNameSet = mutableSetOf<String>()
 
         if (stat != null) {
-            val context = SearchContext(indexExpr.project, indexExpr.containingFile, true)
-            val ty = indexExpr.guessParentType(context)
+            val ty = SearchContext.withStub(indexExpr.project, indexExpr.containingFile) {
+                indexExpr.guessParentType(it)
+            }
             TyUnion.each(ty) {
                 if (it is ITyClass)
                     classNameSet.add(it.className)
             }
-            context.forStore = false
         }
         val visibility = indexExpr.visibility
 

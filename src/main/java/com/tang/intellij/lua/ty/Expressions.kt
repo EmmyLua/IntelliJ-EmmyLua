@@ -27,9 +27,12 @@ import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaNameExprMixin
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
+import com.tang.intellij.lua.search.GuardType
 import com.tang.intellij.lua.search.SearchContext
 
 fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
+    if (expr == null)
+        return Ty.UNKNOWN
     if (expr is LuaIndexExpr || expr is LuaNameExpr) {
         val tree = LuaDeclarationTree.get(expr.containingFile)
         val declaration = tree.find(expr)?.firstDeclaration?.psi
@@ -37,6 +40,10 @@ fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
             return declaration.guessType(context)
         }
     }
+    return inferExprInner(expr, context)
+}
+
+private fun inferExprInner(expr: LuaPsiElement, context: SearchContext): ITy {
     return when (expr) {
         is LuaUnaryExpr -> expr.infer(context)
         is LuaBinaryExpr -> expr.infer(context)
@@ -47,7 +54,6 @@ fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
         is LuaNameExpr -> expr.infer(context)
         is LuaLiteralExpr -> expr.infer()
         is LuaIndexExpr -> expr.infer(context)
-        null -> Ty.UNKNOWN
         else -> Ty.UNKNOWN
     }
 }
@@ -70,7 +76,7 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
         val nextVisibleLeaf = PsiTreeUtil.nextVisibleLeaf(firstChild)
         nextVisibleLeaf?.node?.elementType
     }
-    var ty: ITy = Ty.UNKNOWN
+    var ty: ITy
     operator.let {
         ty = when (it) {
         //..
@@ -210,6 +216,18 @@ private fun LuaNameExpr.infer(context: SearchContext): ITy {
     val set = recursionGuard(this, Computable {
         var type:ITy = Ty.UNKNOWN
 
+        context.withRecursionGuard(this, GuardType.GlobalName) {
+            val multiResolve = multiResolve(this, context)
+            var maxTimes = 10
+            for (element in multiResolve) {
+                val set = getType(context, element)
+                type = type.union(set)
+                if (--maxTimes == 0)
+                    break
+            }
+            type
+        }
+
         /**
          * fixme : optimize it.
          * function xx:method()
@@ -252,7 +270,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
 
             var type: ITy = def.docTy ?: Ty.UNKNOWN
             //guess from value expr
-            if (Ty.isInvalid(type) && !context.forStore) {
+            if (Ty.isInvalid(type) && !context.forStub) {
                 val stat = def.assignStat
                 if (stat != null) {
                     val exprList = stat.valueExprList
@@ -267,7 +285,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
             //Global
             if (isGlobal(def) && type !is ITyPrimitive) {
                 //use globalClassTy to store class members, that's very important
-                type = type.union(TyClass.createGlobalType(def, context.forStore))
+                type = type.union(TyClass.createGlobalType(def, context.forStub))
             }
             return type
         }

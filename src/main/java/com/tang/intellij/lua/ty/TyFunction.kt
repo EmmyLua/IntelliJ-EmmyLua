@@ -42,7 +42,7 @@ interface IFunSignature {
 fun IFunSignature.processArgs(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     val expr = callExpr.expr
     val thisTy = if (expr is LuaIndexExpr) {
-        expr.guessType(SearchContext(expr.project))
+        expr.guessType(SearchContext.get(expr.project))
     } else null
     processArgs(thisTy, callExpr.isMethodColonCall, processor)
 }
@@ -299,7 +299,7 @@ class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, f
 
         object : FunSignatureBase(colonCall, psi.params, psi.tyParams) {
             override val returnTy: ITy by lazy {
-                var returnTy = psi.guessReturnType(SearchContext(psi.project))
+                var returnTy = psi.guessReturnType(SearchContext.get(psi.project))
                 /**
                  * todo optimize this bug solution
                  * local function test()

@@ -50,7 +50,9 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
         val p2 = p1?.parent as? LuaAssignStat
         var ty: String? = null
         if (p2 != null) {
-            val type = p2.getExprAt(0)?.guessType(SearchContext(p2.project, field.containingFile, true))
+            val type = SearchContext.withStub(p2.project, field.containingFile) {
+                p2.getExprAt(0)?.guessType(it)
+            }
             if (type != null) {
                 ty = TyUnion.getPerfectClass(type)?.className
             }

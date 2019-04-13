@@ -34,7 +34,7 @@ class SmartCompletionContributor : CompletionContributor() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 val id = completionParameters.position
                 val expr = PsiTreeUtil.getParentOfType(id, LuaNameExpr::class.java) ?: return
-                val ty = expr.shouldBe(SearchContext(expr.project))
+                val ty = expr.shouldBe(SearchContext.get(expr.project))
                 ty.each {
                     if (it is TyStringLiteral) {
                         val lookupElement = LookupElementBuilder.create(it.content)

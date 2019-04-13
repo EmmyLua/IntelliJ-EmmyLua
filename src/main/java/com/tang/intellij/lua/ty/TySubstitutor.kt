@@ -114,7 +114,7 @@ open class TySubstitutor : ITySubstitutor {
 class TyAliasSubstitutor private constructor(val project: Project) : ITySubstitutor {
     companion object {
         fun substitute(ty: ITy, context: SearchContext): ITy {
-            /*if (context.forStore)
+            /*if (context.forStub)
                 return ty*/
             return ty.substitute(TyAliasSubstitutor(context.project))
         }
@@ -127,7 +127,7 @@ class TyAliasSubstitutor private constructor(val project: Project) : ITySubstitu
     }
 
     override fun substitute(clazz: ITyClass): ITy {
-        return clazz.recoverAlias(SearchContext(project), this)
+        return clazz.recoverAlias(SearchContext.get(project), this)
     }
 
     override fun substitute(generic: ITyGeneric): ITy {

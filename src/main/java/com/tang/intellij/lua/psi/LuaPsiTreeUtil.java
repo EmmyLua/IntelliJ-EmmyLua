@@ -119,7 +119,7 @@ public class LuaPsiTreeUtil {
                 break;
             if (current instanceof LuaClassMethod) {
                 LuaClassMethod method = (LuaClassMethod) current;
-                return method.guessParentType(new SearchContext(current.getProject()));
+                return method.guessParentType(SearchContext.Companion.get(current.getProject()));
             }
             current = current.getParent();
         }

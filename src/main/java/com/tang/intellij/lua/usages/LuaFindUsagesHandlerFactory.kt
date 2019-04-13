@@ -64,7 +64,7 @@ class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler
 
     override fun getPrimaryElements(): Array<PsiElement> {
         val arr: MutableList<PsiElement> = mutableListOf(methodDef)
-        val ctx = SearchContext(psiElement.project)
+        val ctx = SearchContext.get(psiElement.project)
         //base declarations
         val methodName = methodDef.name
         var parentType = methodDef.guessParentType(ctx) as? ITyClass

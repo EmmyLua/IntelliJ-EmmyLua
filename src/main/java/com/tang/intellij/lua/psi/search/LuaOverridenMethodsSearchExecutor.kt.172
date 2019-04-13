@@ -29,7 +29,7 @@ class LuaOverridenMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOverr
     override fun execute(searchParameters: LuaOverridenMethodsSearch.SearchParameters, processor: Processor<LuaClassMethod>): Boolean {
         val method = searchParameters.method
         val project = method.project
-        val context = SearchContext(project)
+        val context = SearchContext.get(project)
         val type = method.guessClassType(context)
         val methodName = method.name
         if (type != null && methodName != null) {

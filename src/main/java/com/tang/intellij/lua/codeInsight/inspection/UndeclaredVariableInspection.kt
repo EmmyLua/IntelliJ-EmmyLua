@@ -29,7 +29,7 @@ class UndeclaredVariableInspection : StrictInspection() {
             object : LuaVisitor() {
                 override fun visitNameExpr(o: LuaNameExpr) {
                     super.visitNameExpr(o)
-                    val res = resolve(o, SearchContext(o.project))
+                    val res = resolve(o, SearchContext.get(o.project))
 
                     if (res == null) {
                         myHolder.registerProblem(o, "Undeclared variable '%s'.".format(o.text))

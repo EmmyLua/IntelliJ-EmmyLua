@@ -42,7 +42,7 @@ class OverrideCompletionProvider : LuaCompletionProvider() {
         val id = completionParameters.position
         val methodDef = PsiTreeUtil.getParentOfType(id, LuaClassMethodDef::class.java)
         if (methodDef != null) {
-            val context = SearchContext(methodDef.project)
+            val context = SearchContext.get(methodDef.project)
             val classType = methodDef.guessClassType(context)
             if (classType != null) {
                 val memberNameSet = mutableSetOf<String>()
@@ -59,7 +59,7 @@ class OverrideCompletionProvider : LuaCompletionProvider() {
 
     private fun addOverrideMethod(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet, memberNameSet:MutableSet<String>, sup: ITyClass) {
         val project = completionParameters.originalFile.project
-        val context = SearchContext(project)
+        val context = SearchContext.get(project)
         val clazzName = sup.className
         LuaClassMemberIndex.processAll(TyLazyClass(clazzName), context, Processor { def ->
             if (def is LuaClassMethod) {

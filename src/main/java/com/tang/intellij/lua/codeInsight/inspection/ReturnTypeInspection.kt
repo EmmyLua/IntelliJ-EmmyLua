@@ -35,7 +35,7 @@ class ReturnTypeInspection : StrictInspection() {
                     if (o.parent is PsiFile)
                         return
 
-                    val context = SearchContext(o.project)
+                    val context = SearchContext.get(o.project)
                     val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java) ?: return
                     val abstractType = if (bodyOwner is LuaClassMethodDef) {
                         guessSuperReturnTypes(bodyOwner, context)
@@ -104,7 +104,7 @@ class ReturnTypeInspection : StrictInspection() {
 
                     if (returnStat == null) {
                         // Find function definition
-                        val context = SearchContext(o.project)
+                        val context = SearchContext.get(o.project)
                         val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java)
 
                         val type = if (bodyOwner is LuaClassMethodDef) {

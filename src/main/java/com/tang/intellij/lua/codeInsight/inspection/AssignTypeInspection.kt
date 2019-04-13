@@ -34,7 +34,7 @@ class AssignTypeInspection : StrictInspection() {
 
                     val assignees = o.varExprList.exprList
                     val values = o.valueExprList?.exprList ?: listOf()
-                    val searchContext = SearchContext(o.project)
+                    val searchContext = SearchContext.get(o.project)
 
                     // Check right number of fields/assignments
                     if (assignees.size > values.size) {

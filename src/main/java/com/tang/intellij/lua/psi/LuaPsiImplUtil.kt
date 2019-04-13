@@ -106,7 +106,7 @@ fun isStatic(classMethodDef: LuaClassMethodDef): Boolean {
 fun getPresentation(classMethodDef: LuaClassMethodDef): ItemPresentation {
     return object : ItemPresentation {
         override fun getPresentableText(): String? {
-            val type = classMethodDef.guessClassType(SearchContext(classMethodDef.project))
+            val type = classMethodDef.guessClassType(SearchContext.get(classMethodDef.project))
             if (type != null) {
                 val c = if (classMethodDef.isStatic) "." else ":"
                 return type.displayName + c + classMethodDef.name + classMethodDef.paramSignature

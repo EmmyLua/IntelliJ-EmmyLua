@@ -84,7 +84,7 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, val
     }
 
     val type: ITy by lazy {
-        ty ?: field.guessType(SearchContext(field.project))
+        ty ?: SearchContext.infer(field)
     }
 
     private fun lazyInit() {

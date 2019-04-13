@@ -55,9 +55,8 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
         if (indexExpr is LuaIndexExpr) {
             val isColon = indexExpr.colon != null
             val project = indexExpr.project
-            val searchContext = SearchContext(project)
             val contextTy = LuaPsiTreeUtil.findContextClass(indexExpr)
-            val prefixType = indexExpr.guessParentType(searchContext)
+            val prefixType = SearchContext.with(project) { indexExpr.guessParentType(it) }
             if (!Ty.isInvalid(prefixType)) {
                 complete(isColon, project, contextTy, prefixType, completionResultSet, completionResultSet.prefixMatcher, null)
             }
@@ -73,7 +72,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                     val it = d.firstDeclaration.psi
                     val txt = it.name
                     if (it is LuaTypeGuessable && txt != null && prefixName != txt && matcher.prefixMatches(txt)) {
-                        val type = it.guessType(searchContext)
+                        val type = SearchContext.infer(it)
                         if (!Ty.isInvalid(prefixType)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher("$prefixName*$postfixName")
@@ -113,7 +112,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                            completionResultSet: CompletionResultSet,
                            prefixMatcher: PrefixMatcher,
                            handlerProcessor: HandlerProcessor?) {
-        val context = SearchContext(project)
+        val context = SearchContext.get(project)
         luaType.lazyInit(context)
         luaType.processMembers(context) { curType, member ->
             ProgressManager.checkCanceled()
@@ -138,7 +137,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                             completionMode: MemberCompletionMode,
                             project: Project,
                             handlerProcessor: HandlerProcessor?) {
-        val type = member.guessType(SearchContext(project))
+        val type = member.guessType(SearchContext.get(project))
         val bold = thisType == callType
         val className = thisType.displayName
         if (type is ITyFunction) {
@@ -179,7 +178,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                 val firstParam = it.getFirstParam(thisType, isColonStyle)
                 if (isColonStyle) {
                     if (firstParam == null) return@Processor true
-                    if (!callType.subTypeOf(firstParam.ty, SearchContext(classMember.project), true))
+                    if (!callType.subTypeOf(firstParam.ty, SearchContext.get(classMember.project), true))
                         return@Processor true
                 }
 
