@@ -27,7 +27,7 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyLazyClass
 
@@ -45,41 +45,37 @@ class OverrideCompletionProvider : LuaCompletionProvider() {
             val context = SearchContext(methodDef.project)
             val classType = methodDef.guessClassType(context)
             if (classType != null) {
-                val sup = classType.getSuperClass(context)
                 val memberNameSet = mutableSetOf<String>()
                 classType.processMembers(context, { _, m ->
                     m.name?.let { memberNameSet.add(it) }
                 }, false)
-                addOverrideMethod(completionParameters, completionResultSet, memberNameSet, sup)
+                TyClass.processSuperClass(classType, context) { sup ->
+                    addOverrideMethod(completionParameters, completionResultSet, memberNameSet, sup)
+                    true
+                }
             }
         }
     }
 
-    private fun addOverrideMethod(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet, memberNameSet:MutableSet<String>, sup: ITy?) {
-        var superCls = sup
-        if (superCls != null && superCls is TyClass) {
-            val project = completionParameters.originalFile.project
-            val context = SearchContext(project)
-            val clazzName = superCls.className
-            LuaClassMemberIndex.processAll(TyLazyClass(clazzName), context, Processor { def ->
-                if (def is LuaClassMethod) {
-                    def.name?.let {
-                        if (memberNameSet.add(it)) {
-                            val elementBuilder = LookupElementBuilder.create(def.name!!)
-                                    .withIcon(LuaIcons.CLASS_METHOD_OVERRIDING)
-                                    .withInsertHandler(OverrideInsertHandler(def))
-                                    .withTailText(def.paramSignature)
+    private fun addOverrideMethod(completionParameters: CompletionParameters, completionResultSet: CompletionResultSet, memberNameSet:MutableSet<String>, sup: ITyClass) {
+        val project = completionParameters.originalFile.project
+        val context = SearchContext(project)
+        val clazzName = sup.className
+        LuaClassMemberIndex.processAll(TyLazyClass(clazzName), context, Processor { def ->
+            if (def is LuaClassMethod) {
+                def.name?.let {
+                    if (memberNameSet.add(it)) {
+                        val elementBuilder = LookupElementBuilder.create(def.name!!)
+                                .withIcon(LuaIcons.CLASS_METHOD_OVERRIDING)
+                                .withInsertHandler(OverrideInsertHandler(def))
+                                .withTailText(def.paramSignature)
 
-                            completionResultSet.addElement(elementBuilder)
-                        }
+                        completionResultSet.addElement(elementBuilder)
                     }
                 }
-                true
-            })
-
-            superCls = superCls.getSuperClass(context)
-            addOverrideMethod(completionParameters, completionResultSet, memberNameSet, superCls)
-        }
+            }
+            true
+        })
     }
 
     internal class OverrideInsertHandler(funcBodyOwner: LuaFuncBodyOwner) : FuncInsertHandler(funcBodyOwner) {

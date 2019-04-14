@@ -29,6 +29,7 @@ import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyParameter
 
 class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
@@ -65,9 +66,8 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                         return false
 
                     // from supper
-                    val superClassName = type.superClassName
-                    if (superClassName != null && superClassName != className) {
-                        return process(superClassName, fieldName, context, processor)
+                    return TyClass.processSuperClass(type, context) {
+                        process(it.className, fieldName, context, processor, false)
                     }
                 }
             }

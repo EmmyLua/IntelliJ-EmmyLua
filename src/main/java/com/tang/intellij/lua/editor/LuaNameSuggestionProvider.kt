@@ -43,11 +43,12 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
     private fun collectNames(type: ITy, context: SearchContext, collector: (name: String, suffix: String, preferLonger: Boolean) -> Unit) {
         when (type) {
             is ITyClass -> {
-                var cur: ITy? = type
-                while (cur != null) {
-                    if (!cur.isAnonymous)
-                        collector(fixName(type.className), "", false)
-                    cur = cur.getSuperClass(context)
+                if (!type.isAnonymous)
+                    collector(fixName(type.className), "", false)
+                TyClass.processSuperClass(type, context) { superType ->
+                    if (!superType.isAnonymous)
+                        collector(fixName(superType.className), "", false)
+                    true
                 }
             }
             is ITyArray -> collectNames(type.base, context) { name, _, _ ->
