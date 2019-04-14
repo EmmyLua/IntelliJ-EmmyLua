@@ -336,12 +336,16 @@ private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaRecursiveV
         super.visitAssignStat(o)
     }
 
+    protected open fun visitElementExt(element: PsiElement) {
+        super.visitElement(element)
+    }
+
     override fun visitElement(element: PsiElement) {
         if (element is LuaDeclarationScope) {
             push(element)
-            super.visitElement(element)
+            visitElementExt(element)
             pop()
-        } else super.visitElement(element)
+        } else visitElementExt(element)
     }
 }
 
@@ -375,7 +379,7 @@ private class LuaDeclarationTreeStub(file: PsiFile) : LuaDeclarationTreeBase(fil
         return super.shouldRebuild() || (file as? LuaPsiFile)?.isContentsLoaded == true
     }
 
-    override fun visitElement(element: PsiElement) {
+    override fun visitElementExt(element: PsiElement) {
         var stub: STUB_ELE? = null
         if (element is LuaPsiFile) {
             stub = element.stub
@@ -387,7 +391,7 @@ private class LuaDeclarationTreeStub(file: PsiFile) : LuaDeclarationTreeBase(fil
             for (child in stub.childrenStubs) {
                 child.psi.accept(this)
             }
-        } else super.visitElement(element)
+        } else super.visitElementExt(element)
     }
 
     override fun findScope(psi: PsiElement): Scope? {
