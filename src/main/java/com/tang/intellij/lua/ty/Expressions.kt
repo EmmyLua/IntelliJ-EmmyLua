@@ -209,11 +209,6 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
 private fun LuaNameExpr.infer(context: SearchContext): ITy {
     val set = recursionGuard(this, Computable {
         var type:ITy = Ty.UNKNOWN
-        val multiResolve = multiResolve(this, context)
-        multiResolve.forEach {
-            val set = getType(context, it)
-            type = type.union(set)
-        }
 
         /**
          * fixme : optimize it.
