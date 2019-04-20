@@ -16,21 +16,22 @@
 
 package com.tang.intellij.lua.search
 
+import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.psi.LuaNameExpr
-import com.tang.intellij.lua.psi.LuaTypeGuessable
 
 enum class GuardType {
     Unknown,
-    GlobalName
+    GlobalName,
+    RecursionCall
 }
 
-open class InferRecursionGuard(val psi: LuaTypeGuessable) {
-    open fun check(psi: LuaTypeGuessable, type: GuardType): Boolean {
+open class InferRecursionGuard(val psi: PsiElement) {
+    open fun check(psi: PsiElement, type: GuardType): Boolean {
         return this.psi == psi
     }
 }
 
-fun createGuard(psi: LuaTypeGuessable, type: GuardType): InferRecursionGuard? {
+fun createGuard(psi: PsiElement, type: GuardType): InferRecursionGuard? {
     if (type == GuardType.GlobalName && psi is LuaNameExpr) {
         return GlobalSearchGuard(psi)
     }
@@ -40,7 +41,7 @@ fun createGuard(psi: LuaTypeGuessable, type: GuardType): InferRecursionGuard? {
 class GlobalSearchGuard(psi: LuaNameExpr) : InferRecursionGuard(psi) {
     private val name = psi.name
 
-    override fun check(psi: LuaTypeGuessable, type: GuardType): Boolean {
+    override fun check(psi: PsiElement, type: GuardType): Boolean {
         if (type == GuardType.GlobalName && psi is LuaNameExpr && psi.name == name) {
             //println("guard global name: $name")
             return true

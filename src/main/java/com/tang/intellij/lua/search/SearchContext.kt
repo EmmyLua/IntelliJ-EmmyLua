@@ -18,6 +18,7 @@ package com.tang.intellij.lua.search
 
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
@@ -134,7 +135,7 @@ class SearchContext private constructor(val project: Project) {
         return c
     }
 
-    fun withRecursionGuard(psi: LuaTypeGuessable, type: GuardType, action: () -> ITy): ITy {
+    fun withRecursionGuard(psi: PsiElement, type: GuardType, action: () -> ITy): ITy {
         guardList.forEach {
             if (it.check(psi, type)) {
                 return Ty.UNKNOWN

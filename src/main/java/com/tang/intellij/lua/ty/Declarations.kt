@@ -18,7 +18,6 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.openapi.util.Computable
-import com.intellij.psi.util.CachedValueProvider
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.LuaCommentUtil
@@ -26,6 +25,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.search.GuardType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 
@@ -72,7 +72,7 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
     }
 
     //infer from return stat
-    return recursionGuard(owner, Computable {
+    return searchContext.withRecursionGuard(owner, GuardType.RecursionCall) {
         var type: ITy = Ty.VOID
         owner.acceptChildren(object : LuaRecursiveVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
@@ -103,9 +103,8 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
             override fun visitLocalDef(o: LuaLocalDef) {}
             override fun visitLocalFuncDef(o: LuaLocalFuncDef) {}
         })
-        CachedValueProvider.Result.create(type, owner)
         type
-    }) ?: Ty.UNKNOWN
+    }
 }
 
 private fun LuaParamNameDef.infer(context: SearchContext): ITy {
