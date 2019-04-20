@@ -76,9 +76,8 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
         val nextVisibleLeaf = PsiTreeUtil.nextVisibleLeaf(firstChild)
         nextVisibleLeaf?.node?.elementType
     }
-    var ty: ITy
-    operator.let {
-        ty = when (it) {
+    return operator.let {
+        when (it) {
         //..
             LuaTypes.CONCAT -> Ty.STRING
         //<=, ==, <, ~=, >=, >
@@ -91,7 +90,6 @@ private fun LuaBinaryExpr.infer(context: SearchContext): ITy {
             else -> Ty.UNKNOWN
         }
     }
-    return ty
 }
 
 private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, context:SearchContext): ITy {
