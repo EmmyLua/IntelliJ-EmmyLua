@@ -33,8 +33,8 @@ import java.util.*
  */
 class SearchContext private constructor(val project: Project) {
 
-    var currentFile: PsiFile? = null
-    var forStub: Boolean = false
+    var myDumb = false
+    var forStub = false
 
     companion object {
         private val threadLocal = object : ThreadLocal<Stack<SearchContext>>() {
@@ -79,11 +79,13 @@ class SearchContext private constructor(val project: Project) {
 
         fun <T> withStub(project: Project, file: PsiFile, action: (ctx: SearchContext) -> T): T {
             return with(project) {
-                it.currentFile = file
+                val dumb = it.myDumb
+                val stub = it.forStub
+                it.myDumb = true
                 it.forStub = true
                 val ret = action(it)
-                it.currentFile = null
-                it.forStub = false
+                it.myDumb = dumb
+                it.forStub = stub
                 ret
             }
         }
@@ -123,11 +125,11 @@ class SearchContext private constructor(val project: Project) {
     }
 
     val isDumb: Boolean
-        get() = DumbService.isDumb(project) || currentFile != null
+        get() = myDumb || DumbService.isDumb(project)
 
     fun clone(): SearchContext {
         val c = SearchContext(project)
-        c.currentFile = currentFile
+        c.myDumb = myDumb
         c.forStub = forStub
         return c
     }
