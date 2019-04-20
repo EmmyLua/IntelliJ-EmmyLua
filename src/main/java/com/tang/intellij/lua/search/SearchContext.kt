@@ -34,9 +34,6 @@ import java.util.*
  */
 class SearchContext private constructor(val project: Project) {
 
-    var myDumb = false
-    var forStub = false
-
     companion object {
         private val threadLocal = object : ThreadLocal<Stack<SearchContext>>() {
             override fun initialValue(): Stack<SearchContext> {
@@ -81,12 +78,12 @@ class SearchContext private constructor(val project: Project) {
         fun <T> withStub(project: Project, file: PsiFile, action: (ctx: SearchContext) -> T): T {
             return with(project) {
                 val dumb = it.myDumb
-                val stub = it.forStub
+                val stub = it.myForStub
                 it.myDumb = true
-                it.forStub = true
+                it.myForStub = true
                 val ret = action(it)
                 it.myDumb = dumb
-                it.forStub = stub
+                it.myForStub = stub
                 ret
             }
         }
@@ -97,10 +94,12 @@ class SearchContext private constructor(val project: Project) {
      */
     val index: Int get() = myIndex
 
+    private var myDumb = false
+    private var myForStub = false
     private var myIndex = -1
     private var myInStack = false
-    private val guardList = mutableListOf<InferRecursionGuard>()
-    private val inferCache = mutableMapOf<LuaTypeGuessable, ITy>()
+    private val myGuardList = mutableListOf<InferRecursionGuard>()
+    private val myInferCache = mutableMapOf<LuaTypeGuessable, ITy>()
 
     fun <T> withIndex(index: Int, action: () -> T): T {
         val savedIndex = this.index
@@ -128,32 +127,35 @@ class SearchContext private constructor(val project: Project) {
     val isDumb: Boolean
         get() = myDumb || DumbService.isDumb(project)
 
+    val forStub get() = myForStub
+
     fun clone(): SearchContext {
         val c = SearchContext(project)
         c.myDumb = myDumb
-        c.forStub = forStub
+        c.myForStub = myForStub
         return c
     }
 
     fun withRecursionGuard(psi: PsiElement, type: GuardType, action: () -> ITy): ITy {
-        guardList.forEach {
+        myGuardList.forEach {
             if (it.check(psi, type)) {
                 return Ty.UNKNOWN
             }
         }
         val guard = createGuard(psi, type)
         if (guard != null)
-            guardList.add(guard)
-        val r = action()
-        guardList.remove(guard)
-        return r
+            myGuardList.add(guard)
+        val result = action()
+        if (guard != null)
+            myGuardList.remove(guard)
+        return result
     }
 
     private fun inferAndCache(psi: LuaTypeGuessable):  ITy {
         /*if (inferCache.containsKey(psi)) {
             println("use cache!!!")
         }*/
-        return inferCache.getOrPut(psi) {
+        return myInferCache.getOrPut(psi) {
             ILuaTypeInfer.infer(psi, this)
         }
     }
