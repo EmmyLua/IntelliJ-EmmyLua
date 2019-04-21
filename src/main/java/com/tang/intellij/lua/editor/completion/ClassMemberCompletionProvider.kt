@@ -56,7 +56,8 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
             val isColon = indexExpr.colon != null
             val project = indexExpr.project
             val contextTy = LuaPsiTreeUtil.findContextClass(indexExpr)
-            val prefixType = SearchContext.with(project) { indexExpr.guessParentType(it) }
+            val context = SearchContext.get(project)
+            val prefixType = indexExpr.guessParentType(context)
             if (!Ty.isInvalid(prefixType)) {
                 complete(isColon, project, contextTy, prefixType, completionResultSet, completionResultSet.prefixMatcher, null)
             }
@@ -72,7 +73,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                     val it = d.firstDeclaration.psi
                     val txt = it.name
                     if (it is LuaTypeGuessable && txt != null && prefixName != txt && matcher.prefixMatches(txt)) {
-                        val type = SearchContext.infer(it)
+                        val type = it.guessType(context)
                         if (!Ty.isInvalid(prefixType)) {
                             val prefixMatcher = completionResultSet.prefixMatcher
                             val resultSet = completionResultSet.withPrefixMatcher("$prefixName*$postfixName")

@@ -49,12 +49,13 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
                 true
             })
         }
+        val ctx = SearchContext.get(psi.project)
         when (psi) {
             is LuaFuncBodyOwner -> {
-                addTy(SearchContext.infer(psi) as ITyFunction)
+                addTy(psi.guessType(ctx) as ITyFunction)
             }
             is LuaTypeGuessable -> {
-                val type = SearchContext.infer(psi)
+                val type = psi.guessType(ctx)
                 var isFn = false
                 TyUnion.each(type) {
                     if (it is ITyFunction) {

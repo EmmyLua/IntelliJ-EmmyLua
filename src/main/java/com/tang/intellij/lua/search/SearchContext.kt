@@ -54,6 +54,10 @@ class SearchContext private constructor(val project: Project) {
             return with(psi.project) { it.inferAndCache(psi) }
         }
 
+        fun infer(psi: LuaTypeGuessable, context: SearchContext): ITy {
+            return with(context) { it.inferAndCache(psi) }
+        }
+
         fun <T> with(ctx: SearchContext, action: (ctx: SearchContext) -> T): T {
             return if (ctx.myInStack) {
                 action(ctx)

@@ -32,7 +32,7 @@ import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
     if (element == null)
         return Ty.UNKNOWN
-    return SearchContext.infer(element)
+    return SearchContext.infer(element, context)
 }
 
 internal fun inferInner(element: LuaTypeGuessable, context: SearchContext): ITy {
