@@ -30,5 +30,6 @@
 
     <extensions defaultExtensionNs="com.tang.intellij.lua">
         <luaTypeInfer implementation="com.tang.intellij.lua.unity.ty.UnityTypeInfer"/>
+        <luaShortNamesManager implementation="com.tang.intellij.lua.unity.ty.UnityShortNamesManager" id="unity"/>
     </extensions>
 </idea-plugin>
