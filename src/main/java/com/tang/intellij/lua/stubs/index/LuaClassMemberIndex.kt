@@ -44,7 +44,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
         fun process(key: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             if (context.isDumb)
                 return false
-            val all = LuaClassMemberIndex.instance.get(key.hashCode(), context.project, context.getScope())
+            val all = LuaClassMemberIndex.instance.get(key.hashCode(), context.project, context.scope)
             return ContainerUtil.process(all, processor)
         }
 

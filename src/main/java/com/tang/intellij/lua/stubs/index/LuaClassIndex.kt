@@ -44,7 +44,7 @@ class LuaClassIndex : StringStubIndexExtension<LuaDocTagClass>() {
         fun find(name: String, context: SearchContext): LuaDocTagClass? {
             if (context.isDumb)
                 return null
-            return find(name, context.project, context.getScope())
+            return find(name, context.project, context.scope)
         }
 
         fun find(name: String, project: Project, scope: GlobalSearchScope): LuaDocTagClass? {

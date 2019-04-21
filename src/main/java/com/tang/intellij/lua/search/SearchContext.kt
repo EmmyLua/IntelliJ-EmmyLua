@@ -100,6 +100,7 @@ class SearchContext private constructor(val project: Project) {
     private var myInStack = false
     private val myGuardList = mutableListOf<InferRecursionGuard>()
     private val myInferCache = mutableMapOf<LuaTypeGuessable, ITy>()
+    private var myScope: GlobalSearchScope? = null
 
     fun <T> withIndex(index: Int, action: () -> T): T {
         val savedIndex = this.index
@@ -111,17 +112,13 @@ class SearchContext private constructor(val project: Project) {
 
     fun guessTuple() = index < 0
 
-    private var scope: GlobalSearchScope? = null
-
-    fun getScope(): GlobalSearchScope {
-        if (scope == null) {
-            scope = if (isDumb) {
-                GlobalSearchScope.EMPTY_SCOPE
-            } else {
-                ProjectAndLibrariesScope(project)
-            }
+    val scope get(): GlobalSearchScope {
+        if (isDumb)
+            return GlobalSearchScope.EMPTY_SCOPE
+        if (myScope == null) {
+            myScope = ProjectAndLibrariesScope(project)
         }
-        return scope!!
+        return myScope!!
     }
 
     val isDumb: Boolean
