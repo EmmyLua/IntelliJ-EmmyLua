@@ -126,10 +126,12 @@ class SearchContext private constructor(val project: Project) {
 
     val forStub get() = myForStub
 
-    fun withScope(scope: GlobalSearchScope): SearchContext {
-        //TODO SearchContext.withScope
-        //  see https://github.com/EmmyLua/IntelliJ-EmmyLua/issues/186
-        return this
+    fun <T> withScope(scope: GlobalSearchScope, action: () -> T): T {
+        val oriScope = myScope
+        myScope = scope
+        val ret = action()
+        myScope = oriScope
+        return ret
     }
 
     fun withRecursionGuard(psi: PsiElement, type: GuardType, action: () -> ITy): ITy {

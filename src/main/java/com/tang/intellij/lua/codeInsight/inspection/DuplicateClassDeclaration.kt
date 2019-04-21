@@ -40,14 +40,21 @@ class DuplicateClassDeclaration : LocalInspectionTool() {
                 val useScope = o.useScope as? GlobalSearchScope ?: return
                 val identifier = o.nameIdentifier
                 val project = o.project
-                val context = SearchContext.get(project).withScope(useScope)
-                LuaShortNamesManager.getInstance(project).processClassesWithName(identifier.text, context, Processor {
-                    val path = it.containingFile.virtualFile.canonicalPath
-                    if (it != o && path != null) {
-                        holder.registerProblem(identifier, LuaBundle.message("inspection.duplicate_class", path), ProblemHighlightType.GENERIC_ERROR)
-                    }
-                    true
-                })
+                val context = SearchContext.get(project)
+                context.withScope(useScope) {
+                    LuaShortNamesManager
+                            .getInstance(project)
+                            .processClassesWithName(identifier.text, context, Processor {
+                        val path = it.containingFile.virtualFile.canonicalPath
+                        if (it != o && path != null) {
+                            holder.registerProblem(
+                                    identifier,
+                                    LuaBundle.message("inspection.duplicate_class", path),
+                                    ProblemHighlightType.GENERIC_ERROR)
+                        }
+                        true
+                    })
+                }
             }
         }
     }
