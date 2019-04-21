@@ -129,11 +129,10 @@ class SearchContext private constructor(val project: Project) {
 
     val forStub get() = myForStub
 
-    fun clone(): SearchContext {
-        val c = SearchContext(project)
-        c.myDumb = myDumb
-        c.myForStub = myForStub
-        return c
+    fun withScope(scope: GlobalSearchScope): SearchContext {
+        //TODO SearchContext.withScope
+        //  see https://github.com/EmmyLua/IntelliJ-EmmyLua/issues/186
+        return this
     }
 
     fun withRecursionGuard(psi: PsiElement, type: GuardType, action: () -> ITy): ITy {

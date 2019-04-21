@@ -19,7 +19,6 @@ package com.tang.intellij.lua.psi.search
 import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
@@ -46,19 +45,17 @@ abstract class LuaShortNamesManager {
 
     abstract fun findClass(name: String, context: SearchContext): LuaClass?
 
-    abstract fun findClass(name: String, project: Project, scope: GlobalSearchScope): LuaClass?
-
     abstract fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember?
 
     abstract fun processAllClassNames(project: Project, processor: Processor<String>): Boolean
 
-    abstract fun processClassesWithName(name: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaClass>): Boolean
+    abstract fun processClassesWithName(name: String, context: SearchContext, processor: Processor<LuaClass>): Boolean
 
-    abstract fun getClassMembers(clazzName: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember>
+    abstract fun getClassMembers(clazzName: String, context: SearchContext): Collection<LuaClassMember>
 
     abstract fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean
 
-    open fun findAlias(name: String, project: Project, scope: GlobalSearchScope): LuaTypeAlias? {
+    open fun findAlias(name: String, context: SearchContext): LuaTypeAlias? {
         return null
     }
 
@@ -66,7 +63,7 @@ abstract class LuaShortNamesManager {
         return true
     }
 
-    open fun findTypeDef(name: String, project: Project, scope: GlobalSearchScope): LuaTypeDef? {
-        return findClass(name, project, scope) ?: findAlias(name, project, scope)
+    open fun findTypeDef(name: String, context: SearchContext): LuaTypeDef? {
+        return findClass(name, context) ?: findAlias(name, context)
     }
 }

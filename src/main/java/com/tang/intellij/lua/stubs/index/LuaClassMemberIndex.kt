@@ -35,7 +35,7 @@ import com.tang.intellij.lua.ty.TyParameter
 class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
     override fun getKey() = StubKeys.CLASS_MEMBER
 
-    override fun get(s: Int, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> =
+    override fun get(s: Int, project: Project, scope: GlobalSearchScope): Collection<LuaClassMember> =
             StubIndex.getElements(StubKeys.CLASS_MEMBER, s, project, scope, LuaClassMember::class.java)
 
     companion object {

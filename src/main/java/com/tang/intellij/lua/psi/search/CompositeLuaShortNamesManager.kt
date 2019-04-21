@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.psi.search
 
 import com.intellij.openapi.project.Project
-import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
@@ -27,15 +26,6 @@ import com.tang.intellij.lua.ty.ITyClass
 
 class CompositeLuaShortNamesManager : LuaShortNamesManager() {
     private val list: Array<LuaShortNamesManager> = LuaShortNamesManager.EP_NAME.extensions
-
-    override fun findClass(name: String, project: Project, scope: GlobalSearchScope): LuaClass? {
-        for (ep in list) {
-            val c = ep.findClass(name, project, scope)
-            if (c != null)
-                return c
-        }
-        return null
-    }
 
     override fun findClass(name: String, context: SearchContext): LuaClass? {
         for (ep in list) {
@@ -62,23 +52,21 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         return true
     }
 
-    override fun processClassesWithName(name: String, project: Project, scope: GlobalSearchScope, processor: Processor<LuaClass>): Boolean {
+    override fun processClassesWithName(name: String, context: SearchContext, processor: Processor<LuaClass>): Boolean {
         for (ep in list) {
-            if (!ep.processClassesWithName(name, project, scope, processor))
+            if (!ep.processClassesWithName(name, context, processor))
                 return false
         }
         return true
     }
 
-    override fun getClassMembers(clazzName: String, project: Project, scope: GlobalSearchScope): MutableCollection<LuaClassMember> {
-        var collection: MutableCollection<LuaClassMember>? = null
+    override fun getClassMembers(clazzName: String, context: SearchContext): Collection<LuaClassMember> {
+        val collection = mutableListOf<LuaClassMember>()
         for (manager in list) {
-            val col = manager.getClassMembers(clazzName, project, scope)
-            if (col.isNotEmpty()) {
-                if (collection == null) collection = col else collection.addAll(col)
-            }
+            val col = manager.getClassMembers(clazzName, context)
+            collection.addAll(col)
         }
-        return collection ?: mutableListOf()
+        return collection
     }
 
     override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
@@ -89,9 +77,9 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         return true
     }
 
-    override fun findAlias(name: String, project: Project, scope: GlobalSearchScope): LuaTypeAlias? {
+    override fun findAlias(name: String, context: SearchContext): LuaTypeAlias? {
         for (manager in list) {
-            val alias = manager.findAlias(name, project, scope)
+            val alias = manager.findAlias(name, context)
             if (alias != null)
                 return alias
         }

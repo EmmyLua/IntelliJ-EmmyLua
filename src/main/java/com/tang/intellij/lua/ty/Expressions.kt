@@ -112,7 +112,7 @@ private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, context:SearchContext)
 
 fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): ITySubstitutor? {
     if (sig.isGeneric()) {
-        val list = this.argList.map { it.guessType(context.clone()) }
+        val list = this.argList.map { it.guessType(context) }
         val map = mutableMapOf<String, ITy>()
         var processedIndex = -1
         sig.tyParameters.forEach { map[it.name] = Ty.UNKNOWN }
