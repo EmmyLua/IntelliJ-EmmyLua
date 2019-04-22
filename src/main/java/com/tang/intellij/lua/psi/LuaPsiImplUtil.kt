@@ -21,22 +21,16 @@ package com.tang.intellij.lua.psi
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
-import com.intellij.openapi.util.Computable
-import com.intellij.openapi.util.Key
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.stubs.StubElement
-import com.intellij.psi.util.CachedValueProvider
-import com.intellij.psi.util.CachedValuesManager
-import com.intellij.psi.util.ParameterizedCachedValue
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.LuaDocTagVararg
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
@@ -124,8 +118,6 @@ fun getPresentation(classMethodDef: LuaClassMethodDef): ItemPresentation {
     }
 }
 
-private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITy, SearchContext>>("GET_CLASS_METHOD")
-
 /**
  * 寻找对应的类
  * @param classMethodDef def
@@ -133,26 +125,23 @@ private val GET_CLASS_METHOD = Key.create<ParameterizedCachedValue<ITy, SearchCo
  * @return LuaType
  */
 fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): ITy {
-    return CachedValuesManager.getManager(classMethodDef.project).getParameterizedCachedValue(classMethodDef, GET_CLASS_METHOD, { ctx ->
-        /*val stub = classMethodDef.stub
-        var type: ITy = Ty.UNKNOWN
-        if (stub != null) {
-            stub.classes.forEach {
-               type = type.union(it)
-            }
-        } else {
-            val expr = classMethodDef.classMethodName.expr
-            val ty = expr.guessType(ctx)
-            val perfect = TyUnion.getPerfectClass(ty)
-            if (perfect is ITyClass)
-                type = perfect
-        }*/
-
+    /*val stub = classMethodDef.stub
+    var type: ITy = Ty.UNKNOWN
+    if (stub != null) {
+        stub.classes.forEach {
+           type = type.union(it)
+        }
+    } else {
         val expr = classMethodDef.classMethodName.expr
         val ty = expr.guessType(ctx)
-        val type = TyUnion.getPerfectClass(ty)
-        CachedValueProvider.Result.create(type, classMethodDef)
-    }, false, context) ?: Ty.UNKNOWN
+        val perfect = TyUnion.getPerfectClass(ty)
+        if (perfect is ITyClass)
+            type = perfect
+    }*/
+
+    val expr = classMethodDef.classMethodName.expr
+    val ty = expr.guessType(context)
+    return TyUnion.getPerfectClass(ty) ?: Ty.UNKNOWN
 }
 
 fun getNameIdentifier(funcDef: LuaFuncDef): PsiElement? {
