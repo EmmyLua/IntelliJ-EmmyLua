@@ -69,6 +69,10 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         mobClient?.addCommand("RUN")
     }
 
+    override fun startPausing() {
+        mobClient?.addCommand("SUSPEND")
+    }
+
     override fun startStepOver(context: XSuspendContext?) {
         mobClient?.addCommand("OVER")
     }
