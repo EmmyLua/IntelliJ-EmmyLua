@@ -38,17 +38,19 @@ public class LuaMobStackFrame extends XStackFrame {
     private XSourcePosition position;
     private LuaMobDebugProcess process;
     private XValueChildrenList values = new XValueChildrenList();
+    private int stackLevel = 0;
 
-    public LuaMobStackFrame(String functionName, XSourcePosition position, LuaMobDebugProcess debugProcess) {
+    public LuaMobStackFrame(String functionName, XSourcePosition position, int _stackLevel, LuaMobDebugProcess debugProcess) {
         this.functionName = functionName;
         this.position = position;
+        this.stackLevel = _stackLevel;
         process = debugProcess;
     }
 
     @Nullable
     @Override
     public XDebuggerEvaluator getEvaluator() {
-        return  new LuaMobDebuggerEvaluator(process);
+        return  new LuaMobDebuggerEvaluator(process, this);
     }
 
     @Nullable
@@ -78,5 +80,10 @@ public class LuaMobStackFrame extends XStackFrame {
             info = String.format("%s (%s)", functionName, positionInfo);
         component.append(info, SimpleTextAttributes.REGULAR_ATTRIBUTES);
         component.setIcon(AllIcons.Debugger.StackFrame);
+    }
+
+    public int getStackLevel()
+    {
+        return this.stackLevel;
     }
 }

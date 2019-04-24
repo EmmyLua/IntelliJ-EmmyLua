@@ -90,7 +90,7 @@ class GetStackCommand : DefaultCommand("STACK --{maxlevel=0}", 1) {
                 if (funcName.isnil())
                     functionName = "main"
 
-                val frame = LuaMobStackFrame(functionName, position, debugProcess)
+                val frame = LuaMobStackFrame(functionName, position, i, debugProcess)
 
                 parseValues(stackValue.get(2).checktable(), frame)
                 parseValues(stackValue.get(3).checktable(), frame)

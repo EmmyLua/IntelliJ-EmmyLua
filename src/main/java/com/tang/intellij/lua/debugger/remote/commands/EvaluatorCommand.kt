@@ -23,7 +23,7 @@ import java.util.regex.Pattern
  *
  * Created by tangzx on 2017/1/1.
  */
-class EvaluatorCommand(expr: String, private val callback: Callback) : DefaultCommand("EXEC $expr --{maxlevel=1}", 2) {
+class EvaluatorCommand(expr: String, stackLevel: Int, private val callback: Callback) : DefaultCommand("EXEC $expr --{maxlevel=1, stack=$stackLevel}", 2) {
     private var hasError2Process: Boolean = false
     private var dataLen: Int = 0
     private val dataBuffer = StringBuffer()
