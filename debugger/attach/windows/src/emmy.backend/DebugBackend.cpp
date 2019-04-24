@@ -1843,7 +1843,14 @@ int DebugBackend::ErrorHandler(LAPI api, lua_State* L)
 
 	if (!lua_isnil_dll(api, L, -1))
 	{
-		lua_pushvalue_dll(api, L, -2);
+		////lua_pushvalue_dll(api, L, -2);
+
+		////for (int i = -1; i>=-3; i--)
+		////{
+		////	int type = lua_type_dll(api, L, i);
+		////	const char* typeName = lua_typename_dll(api, L, type);
+		////}
+		lua_pushstring_dll(api, L, message);
 		lua_pcall_dll(api, L, 1, 1, 0);
 	}
 	else
