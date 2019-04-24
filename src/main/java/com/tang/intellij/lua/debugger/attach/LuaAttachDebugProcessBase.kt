@@ -133,6 +133,11 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
         bridge.send(LuaAttachMessage(DebugMessageId.StepOut))
     }
 
+    override fun startPausing() {
+        //super.startPausing()
+
+    }
+
     override fun stop() {
         bridge.stop()
     }

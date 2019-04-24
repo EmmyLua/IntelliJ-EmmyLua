@@ -32,14 +32,16 @@ import org.luaj.vm2.lib.jse.JsePlatform;
  */
 public class LuaMobDebuggerEvaluator extends LuaDebuggerEvaluator {
     private LuaMobDebugProcess process;
+    private LuaMobStackFrame stackFrame;
 
-    public LuaMobDebuggerEvaluator(@NotNull LuaMobDebugProcess process) {
+    public LuaMobDebuggerEvaluator(@NotNull LuaMobDebugProcess process, @NotNull LuaMobStackFrame stackFrame) {
         this.process = process;
+        this.stackFrame = stackFrame;
     }
 
     @Override
     protected void eval(@NotNull String s, @NotNull XEvaluationCallback xEvaluationCallback, @Nullable XSourcePosition xSourcePosition) {
-        EvaluatorCommand evaluatorCommand = new EvaluatorCommand("return " + s, data -> {
+        EvaluatorCommand evaluatorCommand = new EvaluatorCommand("return " + s, this.stackFrame.getStackLevel(), data -> {
             Globals standardGlobals = JsePlatform.standardGlobals();
             LuaValue code = standardGlobals.load(data);
             code = code.call();
