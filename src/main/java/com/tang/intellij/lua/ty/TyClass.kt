@@ -84,7 +84,9 @@ abstract class TyClass(override val className: String,
 
     override fun processAlias(processor: Processor<String>): Boolean {
         val alias = aliasName
-        if (alias != null && !processor.process(alias))
+        if (alias == null || alias == className)
+            return true
+        if (!processor.process(alias))
             return false
         if (!isGlobal && !isAnonymous && LuaSettings.instance.isRecognizeGlobalNameAsType)
             return processor.process(getGlobalTypeName(className))
