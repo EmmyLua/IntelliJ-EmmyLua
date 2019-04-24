@@ -996,8 +996,11 @@ void DebugBackend::HookCallback(LAPI api, lua_State* L, lua_Debug* ar)
 			if (m_mode == Mode_StepInto) {
 				stop = true;
 			}
-			else if (m_mode == Mode_StepOver) {
-				stop = vm->callCount == 0;
+			else if (m_mode == Mode_StepOver) 
+			{
+				int stackDepth = GetStackDepth(api, L);
+				stop = stop || (vm->callStackDepth >= stackDepth);
+				////stop = stop || (vm->callCount == 0);
 			}
 			else if (m_mode == Mode_StepOut) {
 				int stackDepth = GetStackDepth(api, L);
