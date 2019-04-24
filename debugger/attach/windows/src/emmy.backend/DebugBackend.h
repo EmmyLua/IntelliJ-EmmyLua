@@ -660,6 +660,9 @@ private:
 	bool                            m_profiler;
 	std::hash_map<std::string, LPFunctionCall*> m_profilerCallMap;
 	bool                            m_checkReloadNextTime;
+
+
+	CriticalSection					m_debugHookInstallLock;
 };
 
 #endif

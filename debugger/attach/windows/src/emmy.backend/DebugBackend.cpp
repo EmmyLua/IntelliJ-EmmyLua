@@ -818,6 +818,10 @@ void DebugBackend::Message(MessageType type, const char *fmt, ...) const
 
 void DebugBackend::HookCallback(LAPI api, lua_State* L, lua_Debug* ar)
 {
+	{
+		CriticalSectionLock tmpInstallHookLock(m_debugHookInstallLock);
+	}
+
 
 	m_criticalSection.Enter();
 
@@ -847,7 +851,7 @@ void DebugBackend::HookCallback(LAPI api, lua_State* L, lua_Debug* ar)
 		vm = iterator->second;
 	}
 
-	//TODO: 同一个L在不同的lua代码里被调用?
+	//TODO: Same L call by not same lua 
 	//assert(vm->api == api);
 	if (vm->api != api) {
 		api = vm->api;
@@ -1241,8 +1245,12 @@ void DebugBackend::HandleMessage(DebugMessage* message)
 	{
 	case DebugMessageId::ReqInitialize:
 		{
+		CriticalSectionLock tmpInstallLock(m_debugHookInstallLock);
+
 		DMReqInitialize* init_emmy = dynamic_cast<DMReqInitialize*>(message);
 		if (!m_hooked) {
+			
+
 			m_hooked = InstallLuaHooker(g_hInstance, init_emmy->emmyLuaFile.c_str());
 			if (m_hooked && init_emmy->captureOutputDebugString)
 				HookOuputDebugString();
