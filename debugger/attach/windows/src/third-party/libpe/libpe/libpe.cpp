@@ -279,7 +279,12 @@ PE_STATUS peParseBuffer( PE *pe )
 	if( pe->Headers.NT->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC )
 	{
 		pe->Headers.Plus    = FALSE;
-		pe->Headers.OPT.p32 = &((PIMAGE_NT_HEADERS32)pe->Headers.NT)->OptionalHeader;
+#if _WIN64
+		pe->Headers.OPT.p64 = &pe->Headers.NT->OptionalHeader;
+#else
+		pe->Headers.OPT.p32 = &pe->Headers.NT->OptionalHeader;
+#endif
+		
 		pe->qwBaseAddress   = pe->Headers.OPT.p32->ImageBase;
 		pe->dwImageSize     = pe->Headers.OPT.p32->SizeOfImage;
 
@@ -584,7 +589,8 @@ PE_STATUS peParseExportTable( PE *pe, uint32_t dwMaxExports, uint32_t dwOptions 
 	ht_add( pe->ExportTable.ByAddress, (void *)(SYM)->Address.VA, (SYM) ); \
 	ht_add( pe->ExportTable.ByOrdinal, (void *)(SYM)->Ordinal, (SYM) )
 
-				dwMaxExports = min( dwMaxExports, pExportDirectory->NumberOfNames + pExportDirectory->NumberOfFunctions );
+				////dwMaxExports = min( dwMaxExports, pExportDirectory->NumberOfNames + pExportDirectory->NumberOfFunctions );
+				dwMaxExports = min(dwMaxExports, pExportDirectory->NumberOfFunctions);
 
 #pragma region Loop by Name
 
