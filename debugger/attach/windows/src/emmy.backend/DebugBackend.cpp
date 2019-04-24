@@ -2005,17 +2005,18 @@ bool DebugBackend::CreateEnvironment(LAPI api, lua_State* L, int stackLevel, int
 
 int IndexChained_worker(LAPI api, lua_State* L)
 {
-
 	LUA_CHECK_STACK(api, L, 1)
 
-		int key = 2;
+	int key = 2;
 
 	int nilSentinel = lua_upvalueindex_dll(api, 1);
 
-	int table[3];
+	int table[2];
 	table[0] = lua_upvalueindex_dll(api, 2); // Locals
 	table[1] = lua_upvalueindex_dll(api, 3); // Up values
-	table[2] = lua_upvalueindex_dll(api, 4); // Globals
+
+
+	////table[2] = lua_upvalueindex_dll(api, 4); // Globals
 
 											 // Get from the local table.
 	lua_pushvalue_dll(api, L, key);
@@ -2033,8 +2034,14 @@ int IndexChained_worker(LAPI api, lua_State* L)
 	if (lua_isnil_dll(api, L, -1))
 	{
 		lua_pop_dll(api, L, 1);
+
+		//Modify here to use push global help function(serve 5.1 & 5.2 & 5.3)
+		lua_pushglobaltable_dll(api, L);
 		lua_pushvalue_dll(api, L, key);
-		lua_gettable_dll(api, L, table[2]);
+
+		lua_gettable_dll(api, L, -2);
+		lua_remove_dll(api, L, -2);		//remove global table
+	
 	}
 
 	// If the value is our nil sentinel, convert it to an actual nil.
@@ -2064,18 +2071,17 @@ int DebugBackend::IndexChained_intercept(lua_State* L)
 
 int NewIndexChained_worker(LAPI api, lua_State* L)
 {
-
 	LUA_CHECK_STACK(api, L, 0)
 
-		int key = 2;
+	int key = 2;
 	int value = 3;
 
 	int nilSentinel = lua_upvalueindex_dll(api, 1);
 
-	int table[3];
+	int table[2];
 	table[0] = lua_upvalueindex_dll(api, 2); // Locals
 	table[1] = lua_upvalueindex_dll(api, 3); // Up values
-	table[2] = lua_upvalueindex_dll(api, 4); // Globals
+	////table[2] = lua_upvalueindex_dll(api, 4); // Globals
 
 											 // Try to set the value in the local table.
 
@@ -2111,9 +2117,13 @@ int NewIndexChained_worker(LAPI api, lua_State* L)
 	}
 
 	// Set on the global table.
+	lua_pushglobaltable_dll(api, L);
+
 	lua_pushvalue_dll(api, L, key);
 	lua_pushvalue_dll(api, L, value);
-	lua_settable_dll(api, L, table[2]);
+	lua_settable_dll(api, L, -2);
+
+	lua_pop_dll(api, L, 1);		//pop global table
 
 	return 0;
 
@@ -2391,7 +2401,7 @@ EvalResultNode* DebugBackend::Evaluate(LAPI api, lua_State* L, const std::string
 
 	}
 
-	//恢复现场，MS不恢复也没问题？
+	//restore run enviroment, not need in MS?
 	// Copy any changes to the up values due to evaluating the watch back.
 	SetLocals(api, L, stackLevel, localTable, nilSentinel);
 	SetUpValues(api, L, stackLevel, upValueTable, nilSentinel);
@@ -2431,7 +2441,7 @@ bool DebugBackend::CallMetaMethod(LAPI api, lua_State* L, int valueIndex, const 
 		{
 
 			lua_pushstring_dll(api, L, method);
-			//lua_gettable_dll(api, L, metaTableIndex); //在tolua中直接获取table字段会挂的
+			//lua_gettable_dll(api, L, metaTableIndex); //get table in to lua will failed
 			lua_rawget_dll(api, L, metaTableIndex);
 
 			if (lua_isnil_dll(api, L, -1))
@@ -2576,7 +2586,7 @@ StackLuaObjectNode* DebugBackend::GetValueAsText(LAPI api, lua_State* L, int n, 
 
 	if (askEmmy)
 	{
-		//存value index
+		//save value index
 		lua_pushvalue_dll(api, L, n);
 		int valueIndex = lua_gettop_dll(api, L);
 
