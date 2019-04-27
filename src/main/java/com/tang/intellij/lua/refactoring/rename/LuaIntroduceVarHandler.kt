@@ -31,7 +31,6 @@ import com.intellij.refactoring.introduce.inplace.InplaceVariableIntroducer
 import com.intellij.refactoring.introduce.inplace.OccurrencesChooser
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
-import kotlin.reflect.jvm.internal.impl.utils.SmartList
 
 /**
  *
@@ -39,12 +38,18 @@ import kotlin.reflect.jvm.internal.impl.utils.SmartList
  */
 class LuaIntroduceVarHandler : RefactoringActionHandler {
 
-    internal inner class IntroduceOperation(val element: PsiElement, val project: Project, val editor: Editor, val file: PsiFile) {
+    internal inner class IntroduceOperation(
+            val element: PsiElement,
+            val project: Project,
+            val editor: Editor,
+            val file: PsiFile,
+            var occurrences: List<PsiElement>
+    ) {
         var isReplaceAll: Boolean = false
-        var occurrences: List<PsiElement>? = null
         var name = "var"
-        var newOccurrences: List<PsiElement>? = null
+        var newOccurrences = mutableListOf<PsiElement>()
         var newNameElement: LuaNameDef? = null
+        var position: PsiElement? = null
     }
 
     override fun invoke(project: Project, editor: Editor, psiFile: PsiFile, dataContext: DataContext) {
@@ -56,9 +61,9 @@ class LuaIntroduceVarHandler : RefactoringActionHandler {
     }
 
     operator fun invoke(project: Project, editor: Editor, expr: LuaExpr) {
-        val operation = IntroduceOperation(expr, project, editor, expr.containingFile)
-        operation.occurrences = getOccurrences(expr)
-        OccurrencesChooser.simpleChooser<PsiElement>(editor).showChooser(expr, operation.occurrences!!, object : Pass<OccurrencesChooser.ReplaceChoice>() {
+        val occurrences = getOccurrences(expr)
+        val operation = IntroduceOperation(expr, project, editor, expr.containingFile, occurrences)
+        OccurrencesChooser.simpleChooser<PsiElement>(editor).showChooser(expr, occurrences, object : Pass<OccurrencesChooser.ReplaceChoice>() {
             override fun pass(choice: OccurrencesChooser.ReplaceChoice) {
                 operation.isReplaceAll = choice == OccurrencesChooser.ReplaceChoice.ALL
                 WriteCommandAction.runWriteCommandAction(operation.project) { performReplace(operation) }
@@ -92,40 +97,41 @@ class LuaIntroduceVarHandler : RefactoringActionHandler {
         var parent = commonParent
         if (parent === operation.element)
             parent = operation.element.parent
-        return parent is LuaStatement && (!operation.isReplaceAll || operation.occurrences!!.size == 1)
+        return parent is LuaExprStat && (!operation.isReplaceAll || operation.occurrences.size == 1)
     }
 
     private fun performReplace(operation: IntroduceOperation) {
         if (!operation.isReplaceAll)
             operation.occurrences = listOf(operation.element)
 
-        var commonParent = PsiTreeUtil.findCommonParent(operation.occurrences!!)
+        var commonParent = PsiTreeUtil.findCommonParent(operation.occurrences)
         if (commonParent != null) {
             var element = operation.element
-            val newOccurrences = SmartList<PsiElement>()
             var localDef = LuaElementFactory.createWith(operation.project, "local var = " + element.text)
-
-            if (isInline(commonParent, operation)) {
-                if (element is LuaCallExpr && element.parent is LuaExprStat) element = element.parent
-
+            val inline = isInline(commonParent, operation)
+            if (inline) {
+                if (element is LuaCallExpr && element.parent is LuaExprStat)
+                    element = element.parent
                 localDef = element.replace(localDef)
-                val nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef::class.java)!!
-                operation.editor.caretModel.moveToOffset(nameDef.textOffset)
+                operation.position = localDef
             } else {
                 val anchor = findAnchor(operation.occurrences)
-                commonParent = anchor!!.parent
+                commonParent = anchor?.parent
                 localDef = commonParent!!.addBefore(localDef, anchor)
                 commonParent.addAfter(LuaElementFactory.newLine(operation.project), localDef)
-                for (occ in operation.occurrences!!) {
+                operation.occurrences.forEach { occ->
                     var identifier = LuaElementFactory.createName(operation.project, operation.name)
                     identifier = occ.replace(identifier)
-                    newOccurrences.add(identifier)
+                    operation.newOccurrences.add(identifier)
+                    if (occ == operation.element)
+                        operation.position = identifier
                 }
             }
 
-            operation.newOccurrences = newOccurrences
             localDef = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(localDef)
             val nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef::class.java)
+            if (nameDef != null)
+                operation.editor.caretModel.moveToOffset(nameDef.textOffset)
             operation.newNameElement = nameDef
         }
     }
@@ -134,12 +140,25 @@ class LuaIntroduceVarHandler : RefactoringActionHandler {
         LuaIntroduce(operation).performInplaceRefactoring(null)
     }
 
-    private inner class LuaIntroduce internal constructor(operation: IntroduceOperation)
-        : InplaceVariableIntroducer<PsiElement>(operation.newNameElement, operation.editor, operation.project, "Introduce Variable", operation.newOccurrences?.toTypedArray(), null) {
+    private inner class LuaIntroduce(val operation: IntroduceOperation) : InplaceVariableIntroducer<PsiElement>(
+            operation.newNameElement,
+            operation.editor,
+            operation.project,
+            "Introduce Variable",
+            operation.newOccurrences.toTypedArray(),
+            operation.position
+    ) {
 
         override fun checkLocalScope(): PsiElement? {
             val currentFile = PsiDocumentManager.getInstance(this.myProject).getPsiFile(this.myEditor.document)
             return currentFile ?: super.checkLocalScope()
+        }
+
+        override fun moveOffsetAfter(success: Boolean) {
+            val position = exprMarker
+            if (position != null)
+                operation.editor.caretModel.moveToOffset(position.endOffset)
+            super.moveOffsetAfter(success)
         }
     }
 }

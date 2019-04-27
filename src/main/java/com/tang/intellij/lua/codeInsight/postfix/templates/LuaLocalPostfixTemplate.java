@@ -38,6 +38,6 @@ public class LuaLocalPostfixTemplate extends PostfixTemplateWithExpressionSelect
     @Override
     protected void expandForChooseExpression(@NotNull PsiElement psiElement, @NotNull Editor editor) {
         LuaIntroduceVarHandler handler = new LuaIntroduceVarHandler();
-        handler.invoke(editor.getProject(), editor, (LuaExpr) psiElement);
+        handler.invoke(psiElement.getProject(), editor, (LuaExpr) psiElement);
     }
 }
