@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi.parser
 
 import com.intellij.lang.PsiBuilder
+import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.tang.intellij.lua.psi.LuaParserUtil.MY_LEFT_COMMENT_BINDER
 import com.tang.intellij.lua.psi.LuaParserUtil.MY_RIGHT_COMMENT_BINDER
@@ -120,10 +121,28 @@ object LuaExpressionParser {
     }
 
     private fun parsePrimaryExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
-        var prefix = parsePrefixExpr(b, l + 1)
+        val pair = parsePrefixExpr(b, l + 1)
+        val prefixType = pair?.second
+        var prefix = pair?.first
+        val validatePrefixForCall = prefixType != TABLE_EXPR && prefixType != LITERAL_EXPR
+        /**
+         * ok:
+         * {
+         *      ({}){},
+         *      ("")""
+         * }
+         * not ok:
+         * {
+         *      {}{},
+         *      """",
+         *      {}""
+         * }
+         */
         while (prefix != null) {
-            val suffix = parseIndexExpr(prefix, b, l + 1)
-                    ?: parseCallExpr(prefix, b, l + 1)
+            var suffix = parseIndexExpr(prefix, b, l + 1)
+            if (suffix == null && validatePrefixForCall) {
+                suffix = parseCallExpr(prefix, b, l + 1)
+            }
             if (suffix == null) break
             else prefix = suffix
         }
@@ -203,7 +222,7 @@ object LuaExpressionParser {
         }
     }
 
-    private fun parsePrefixExpr(b: PsiBuilder, l: Int): PsiBuilder.Marker? {
+    private fun parsePrefixExpr(b: PsiBuilder, l: Int): Pair<PsiBuilder.Marker, IElementType>? {
         when (b.tokenType) {
             LPAREN -> { // parenExpr ::= '(' expr ')'
                 val m = b.mark()
@@ -214,22 +233,25 @@ object LuaExpressionParser {
                 expectError(b, RPAREN) { "')'" } // )
 
                 m.done(PAREN_EXPR)
-                return m
+                return Pair(m, PAREN_EXPR)
             }
             ID -> { // nameExpr ::= ID
                 val m = b.mark()
                 b.advanceLexer()
                 m.done(NAME_EXPR)
-                return m
+                return Pair(m, NAME_EXPR)
             }
             NUMBER, STRING, NIL, TRUE, FALSE, ELLIPSIS -> { //literalExpr ::= nil | false | true | NUMBER | STRING | "..."
                 val m = b.mark()
                 b.advanceLexer()
                 m.done(LITERAL_EXPR)
-                return m
+                return Pair(m, LITERAL_EXPR)
             }
             LCURLY -> { // table expr
-                return parseTableExpr(b, l)
+                val tableExpr = parseTableExpr(b, l)
+                return if (tableExpr != null)
+                    Pair(tableExpr, LITERAL_EXPR)
+                else null
             }
         }
         return null
