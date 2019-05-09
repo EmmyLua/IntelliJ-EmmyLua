@@ -90,6 +90,7 @@ QQ交流群：1群：`29850775` 2群：`529914962`
 - [ ] Remote debugger rewriting
 - [ ] Data follow inspections
 - [ ] Ctrl follow inspections
+- [ ] `@interface` support
 - [ ] API Hub
 
 ## Build environment requirements
