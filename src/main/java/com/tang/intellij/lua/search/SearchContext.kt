@@ -80,7 +80,11 @@ class SearchContext private constructor(val project: Project) {
         }
 
         fun <T> withStub(project: Project, file: PsiFile, action: (ctx: SearchContext) -> T): T {
-            return with(project) {
+            return withStub(get(project), action)
+        }
+
+        fun <T> withStub(ctx: SearchContext, action: (ctx: SearchContext) -> T): T {
+            return with(ctx) {
                 val dumb = it.myDumb
                 val stub = it.myForStub
                 it.myDumb = true
@@ -153,12 +157,16 @@ class SearchContext private constructor(val project: Project) {
         return result
     }
 
-    private fun inferAndCache(psi: LuaTypeGuessable):  ITy {
+    private fun inferAndCache(psi: LuaTypeGuessable): ITy {
         /*if (inferCache.containsKey(psi)) {
             println("use cache!!!")
         }*/
         return myInferCache.getOrPut(psi) {
             ILuaTypeInfer.infer(psi, this)
         }
+    }
+
+    fun getTypeFromCache(psi: LuaTypeGuessable): ITy {
+        return myInferCache.getOrElse(psi) { Ty.UNKNOWN }
     }
 }
