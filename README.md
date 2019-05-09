@@ -20,7 +20,6 @@ QQ交流群：1群：`29850775` 2群：`529914962`
 
 ![snapshot](/snapshot/overview.gif)
 
-
 ## Find usages
 ![find_usages](/snapshot/find_usages.gif)
 
@@ -85,6 +84,13 @@ QQ交流群：1群：`29850775` 2群：`529914962`
 | Embed Remote Debugger                |    0%    |
 | Lua Profiler                         |    ✔     |
 | ... .etc                             |          |
+
+## Road map
+- [ ] Attach debugger rewriting
+- [ ] Remote debugger rewriting
+- [ ] Data follow inspections
+- [ ] Ctrl follow inspections
+- [ ] API Hub
 
 ## Build environment requirements
 
