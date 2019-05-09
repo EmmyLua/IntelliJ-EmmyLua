@@ -6,7 +6,8 @@
 [![Jetbrains plugin](https://img.shields.io/jetbrains/plugin/v/9768-emmylua.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/9768-emmylua)
 [![donate](https://img.shields.io/badge/donate-emmy-FF69B4.svg?style=flat-square)](https://emmylua.github.io/donate.html)
 [![Join the chat at gitter](https://img.shields.io/badge/chat-on%20gitter-46BC99.svg?style=flat-square)](https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
-[![加入QQ群](https://img.shields.io/badge/chat-QQ群-46BC99.svg?style=flat-square)](//shang.qq.com/wpa/qunwpa?idkey=f1acce081c45fbb5670ed5f880f7578df7a8b84caa5d2acec230ac957f0c1716)
+[![加入QQ群](https://img.shields.io/badge/chat-QQ(1)群-46BC99.svg?style=flat-square)](https://jq.qq.com/?_wv=1027&k=5Br83i5)
+[![加入QQ群](https://img.shields.io/badge/chat-QQ(2)群-46BC99.svg?style=flat-square)](https://jq.qq.com/?_wv=1027&k=5EeI0Sm)
 
 Version | CI status
 --------|----------
@@ -14,7 +15,7 @@ IDEA 171|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2
 IDEA 172-181|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 IDEA 182|[![Build status](https://ci.appveyor.com/api/projects/status/xvahlg1ceiy16dxl?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua-7n83m)
 
-QQ交流群：`29850775`
+QQ交流群：1群：`29850775` 2群：`529914962`
 (最新版本以及部分视频演示在群文件中下载)
 
 ![snapshot](/snapshot/overview.gif)
