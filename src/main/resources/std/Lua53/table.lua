@@ -98,7 +98,7 @@ function table.remove(list, pos) end
 ---@overload fun(list:table):number
 ---@generic V
 ---@param list table<number, V> | V[]
----@param comp fun(a:V, b:V):number
+---@param comp fun(a:V, b:V):boolean
 ---@return number
 function table.sort(list, comp) end
 
