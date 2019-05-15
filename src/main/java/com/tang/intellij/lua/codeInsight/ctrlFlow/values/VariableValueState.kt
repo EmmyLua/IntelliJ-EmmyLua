@@ -20,7 +20,7 @@ class VariableValueState : ValueState {
 
     private var myValue: VMValue? = null
 
-    private var myFactMap: FactMap
+    private val myFactMap: FactMap
 
     override val facts: FactMap
         get() = myFactMap
