@@ -27,6 +27,14 @@ abstract class Range {
         fun range(min: Long, max: Long): Range {
             return if (min == max) Point(min) else RangeMinMax(min, max)
         }
+
+        fun fromRanges(ranges: Array<Long>): Range {
+            return when (ranges.size) {
+                0 -> EMPTY
+                2 -> range(ranges[0], ranges[1])
+                else -> RangeSet(ranges)
+            }
+        }
     }
 
     abstract val min: Long
@@ -61,6 +69,10 @@ abstract class Range {
     abstract fun subtract(other: Range): Range
 
     abstract fun contains(p: Point): Boolean
+
+    open fun asRanges(): Array<Long> {
+        return arrayOf(min, max)
+    }
 
     open val isEmpty: Boolean get() = this == EMPTY
 }
@@ -100,6 +112,10 @@ private class Empty : Range() {
 
     override fun intersect(other: Range): Range {
         return this
+    }
+
+    override fun asRanges(): Array<Long> {
+        return emptyArray()
     }
 
     override fun contains(p: Point): Boolean = false
@@ -179,15 +195,18 @@ class RangeSet : Range {
 
     val length: Int get() = list.size
 
-    constructor(list: Array<RangeMinMax>) {
+    private val ranges: Array<Long>
+
+    /*constructor(list: Array<RangeMinMax>) {
         assert(list.isNotEmpty())
         this.list = list
-    }
+    }*/
 
     constructor(array: Array<Long>) {
         assert(array.size % 2 == 0)
         assert(array.isNotEmpty())
 
+        ranges = array
         val list = mutableListOf<RangeMinMax>()
         for (i in 0 until array.size step 2) {
             list.add(RangeMinMax(array[i], array[i + 1]))
@@ -206,15 +225,32 @@ class RangeSet : Range {
     }
 
     override fun subtract(other: Range): Range {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (other.isEmpty)
+            return this
+        if (other == this)
+            return EMPTY
+        val rangeList = mutableListOf<Long>()
+        for (l in list) {
+            val res = l.subtract(other)
+            rangeList.addAll(res.asRanges())
+        }
+        return fromRanges(rangeList.toTypedArray())
     }
 
     override fun intersect(other: Range): Range {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (other == this)
+            return this
+        if (other.isEmpty)
+            return other
+        return subtract(ALL.subtract(other))
     }
 
     override fun contains(p: Point): Boolean {
         return list.any { it.contains(p) }
+    }
+
+    override fun asRanges(): Array<Long> {
+        return ranges
     }
 
     override fun toString(): String {
