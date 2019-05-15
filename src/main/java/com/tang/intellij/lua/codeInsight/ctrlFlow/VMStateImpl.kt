@@ -253,6 +253,7 @@ open class VMStateImpl : VMState {
     override fun hashCode(): Int {
         var result = stack.hashCode()
         result = 31 * result + variableStates.hashCode()
+        result = 31 * result + eqManager.hashCode()
         return result
     }
 
@@ -261,6 +262,7 @@ open class VMStateImpl : VMState {
         if (other !is VMStateImpl) return false
 
         if (stack != other.stack) return false
+        if (eqManager != other.eqManager) return false
         if (variableStates != other.variableStates) return false
 
         return true
