@@ -117,7 +117,7 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
     protected open fun unregisterBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
     }
 
-    private fun getBreakpoint(file: VirtualFile, line: Int): XLineBreakpoint<*>? {
+    protected fun getBreakpoint(file: VirtualFile, line: Int): XLineBreakpoint<*>? {
         var bp:XLineBreakpoint<*>? = null
         processBreakpoint(Processor {
             val pos = it.sourcePosition

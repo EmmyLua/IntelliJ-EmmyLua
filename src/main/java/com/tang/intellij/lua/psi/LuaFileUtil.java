@@ -123,6 +123,14 @@ public class LuaFileUtil {
         return null;
     }
 
+    public static File getPluginFolder(){
+        IdeaPluginDescriptor descriptor = PluginManager.getPlugin(PluginId.getId("com.tang"));
+        if (descriptor != null) {
+            return descriptor.getPath();
+        }
+        return null;
+    }
+
     @Nullable
     public static VirtualFile getPluginVirtualDirectory() {
         IdeaPluginDescriptor descriptor = PluginManager.getPlugin(PluginId.getId("com.tang"));
