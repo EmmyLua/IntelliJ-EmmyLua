@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.tang.intellij.lua.debugger.emmy
 
 import gherkin.deps.com.google.gson.Gson
@@ -73,7 +75,29 @@ class DebugActionMessage(actionName: DebugAction) : Message(MessageCMD.ActionReq
     val action = actionName.ordinal
 }
 
-class VariableValue(val name: String, val value: String, val type: String, val children: List<VariableValue>?)
+enum class VariableNameType {
+    TNIL,
+    TBOOLEAN,
+    TLIGHTUSERDATA,
+    TNUMBER,
+    TSTRING,
+    TTABLE,
+    TFUNCTION,
+    TUSERDATA,
+    TTHREAD,
+}
+
+class VariableValue(val name: String, val nameType: Int, val value: String, val valueType: String, val children: List<VariableValue>?) {
+    val nameTypeValue: VariableNameType get() {
+        return VariableNameType.values().find { it.ordinal == nameType } ?: VariableNameType.TSTRING
+    }
+
+    val nameValue: String get() {
+        if (nameTypeValue == VariableNameType.TSTRING)
+            return name
+        return "[$name]"
+    }
+}
 
 class Stack(
         val file: String,

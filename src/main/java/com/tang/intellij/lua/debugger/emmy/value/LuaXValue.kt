@@ -29,7 +29,7 @@ import java.util.ArrayList
 abstract class LuaXValue : XValue() {
     companion object {
         fun create(v: VariableValue, frame: EmmyDebugStackFrame): LuaXValue {
-            return when(v.type) {
+            return when(v.valueType) {
                 "string" -> StringXValue(v)
                 "number" -> NumberXValue(v)
                 "boolean" -> BoolXValue(v)
@@ -47,7 +47,7 @@ abstract class LuaXValue : XValue() {
 class StringXValue(val v: VariableValue) : LuaXValue() {
 
     override val name: String
-        get() = v.name
+        get() = v.nameValue
 
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
         xValueNode.setPresentation(null, LuaXStringPresentation(v.value), false)
@@ -57,7 +57,7 @@ class StringXValue(val v: VariableValue) : LuaXValue() {
 class NumberXValue(val v: VariableValue) : LuaXValue() {
 
     override val name: String
-        get() = v.name
+        get() = v.nameValue
 
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
         xValueNode.setPresentation(null, LuaXNumberPresentation(v.value), false)
@@ -67,7 +67,7 @@ class NumberXValue(val v: VariableValue) : LuaXValue() {
 class BoolXValue(val v: VariableValue) : LuaXValue() {
 
     override val name: String
-        get() = v.name
+        get() = v.nameValue
 
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
         xValueNode.setPresentation(null, LuaXBoolPresentation(v.value), false)
@@ -76,10 +76,10 @@ class BoolXValue(val v: VariableValue) : LuaXValue() {
 
 class AnyXValue(val v: VariableValue) : LuaXValue() {
     override val name: String
-        get() = v.name
+        get() = v.nameValue
 
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
-        xValueNode.setPresentation(null, v.type, v.value, false)
+        xValueNode.setPresentation(null, v.valueType, v.value, false)
     }
 }
 
@@ -88,16 +88,18 @@ class TableXValue(val v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXVa
     private val children = mutableListOf<LuaXValue>()
 
     init {
-        v.children?.forEach {
+        v.children?.
+                sortedBy { it.nameValue }?.
+                forEach {
             children.add(create(it, frame))
         }
     }
 
     override val name: String
-        get() = v.name
+        get() = v.nameValue
 
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
-        xValueNode.setPresentation(AllIcons.Json.Object, v.type, v.value, true)
+        xValueNode.setPresentation(AllIcons.Json.Object, v.valueType, v.value, true)
     }
 
     override fun computeChildren(node: XCompositeNode) {
