@@ -33,6 +33,7 @@ abstract class LuaXValue : XValue() {
                 "string" -> StringXValue(v)
                 "number" -> NumberXValue(v)
                 "boolean" -> BoolXValue(v)
+                "userdata",
                 "table" -> TableXValue(v, frame)
                 else -> AnyXValue(v)
             }
