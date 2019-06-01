@@ -105,7 +105,7 @@
     </ul>
     ]]>
     </change-notes>
-    <idea-version since-build="172" until-build="191.*"/>
+    <idea-version since-build="172" until-build="192.*"/>
     <xi:include href="core.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <xi:include href="unity.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <extensions defaultExtensionNs="com.intellij">
