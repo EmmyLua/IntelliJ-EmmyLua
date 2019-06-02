@@ -68,6 +68,60 @@ local toluaHelper = {
     end
 }
 
+local xluaDebugger = {
+    queryVariable = function(variable, obj, typeName, depth)
+        if typeName == 'userdata' then
+            local mt = getmetatable(obj)
+            if mt == nil then
+                return false
+            end
+
+            local CSType = obj:GetType()
+            if CSType then
+                variable.valueTypeName = 'C#'
+                variable.value = tostring(obj)--CSType.FullName
+
+                if depth > 1 then
+                    local Type = CS.System.Type
+                    local ObsoleteType = Type.GetType('System.ObsoleteAttribute')
+                    local BindType = Type.GetType('System.Reflection.BindingFlags')
+                    local bindValue = CS.System.Enum.ToObject(BindType, 4150) -- Instance | Public | NonPublic | GetProperty | DeclaredOnly
+
+                    local parent = variable
+                    while CSType do
+                        local properties = CSType:GetProperties(bindValue)
+                        for i = 1, properties.Length do
+                            local p = properties[i - 1]
+                            if CS.System.Attribute.GetCustomAttribute(p, ObsoleteType) == nil then
+                                local property = p.Name
+                                local value = obj[property]
+
+                                local v = emmy.createNode()
+                                v.name = property
+                                v:query(value, depth - 1, true)
+                                parent:addChild(v)
+                            end
+                        end
+
+                        CSType = CSType.BaseType
+                        if CSType then
+                            local super = emmy.createNode()
+                            super.name = "base"
+                            super.value = CSType.FullName
+                            super.valueType = 9
+                            super.valueTypeName = "C#"
+                            parent:addChild(super)
+                            parent = super
+                        end
+                    end
+                end
+
+                return true
+            end
+        end
+    end
+}
+
 ---@class emmy
 ---@field createNode fun(): Variable
 emmy = {}
@@ -79,7 +133,7 @@ if tolua then
         --emmy = cocosLuaDebugger
     end
 elseif xlua then
-    --emmy = xluaDebugger
+    emmy = xluaDebugger
 end
 
 if emmy_init then
