@@ -30,14 +30,13 @@ local toluaHelper = {
             end
         elseif typeName == 'userdata' then
             local mt = getmetatable(obj)
-            if mt == nil then
-                return false
-            end
+            if mt == nil then return false end
 
             variable.valueTypeName = 'C#'
             variable.value = tostring(obj)
 
             if depth > 1 then
+                local parent = variable
                 local propMap = {}
                 while mt ~= nil do
                     local getTab = mt[tolua.gettag]
@@ -48,11 +47,20 @@ local toluaHelper = {
                                 local v = emmy.createNode()
                                 v.name = property
                                 v:query(obj[property], depth - 1, true)
-                                variable:addChild(v)
+                                parent:addChild(v)
                             end
                         end
                     end
                     mt = getmetatable(mt)
+                    if mt then
+                        local super = emmy.createNode()
+                        super.name = "base"
+                        super.value = mt[".name"]
+                        super.valueType = 9
+                        super.valueTypeName = "C#"
+                        parent:addChild(super)
+                        parent = super
+                    end
                 end
             end
             return true
