@@ -23,18 +23,19 @@ import com.tang.intellij.lua.debugger.LuaXBoolPresentation
 import com.tang.intellij.lua.debugger.LuaXNumberPresentation
 import com.tang.intellij.lua.debugger.LuaXStringPresentation
 import com.tang.intellij.lua.debugger.emmy.EmmyDebugStackFrame
+import com.tang.intellij.lua.debugger.emmy.LuaValueType
 import com.tang.intellij.lua.debugger.emmy.VariableValue
-import java.util.ArrayList
+import java.util.*
 
 abstract class LuaXValue : XValue() {
     companion object {
         fun create(v: VariableValue, frame: EmmyDebugStackFrame): LuaXValue {
-            return when(v.valueType) {
-                "string" -> StringXValue(v)
-                "number" -> NumberXValue(v)
-                "boolean" -> BoolXValue(v)
-                "userdata",
-                "table" -> TableXValue(v, frame)
+            return when(v.valueTypeValue) {
+                LuaValueType.TSTRING -> StringXValue(v)
+                LuaValueType.TNUMBER -> NumberXValue(v)
+                LuaValueType.TBOOLEAN -> BoolXValue(v)
+                LuaValueType.TUSERDATA,
+                LuaValueType.TTABLE -> TableXValue(v, frame)
                 else -> AnyXValue(v)
             }
         }
@@ -80,7 +81,7 @@ class AnyXValue(val v: VariableValue) : LuaXValue() {
         get() = v.nameValue
 
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
-        xValueNode.setPresentation(null, v.valueType, v.value, false)
+        xValueNode.setPresentation(null, v.valueTypeName, v.value, false)
     }
 }
 
@@ -100,7 +101,7 @@ class TableXValue(val v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXVa
         get() = v.nameValue
 
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
-        xValueNode.setPresentation(AllIcons.Json.Object, v.valueType, v.value, true)
+        xValueNode.setPresentation(AllIcons.Json.Object, v.valueTypeName, v.value, true)
     }
 
     override fun computeChildren(node: XCompositeNode) {
@@ -121,6 +122,9 @@ class TableXValue(val v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXVa
                             cl.add(it.name, it)
                         }
                         node.addChildren(cl, true)
+                    }
+                    else { // todo: table is nil?
+                        node.setErrorMessage("nil")
                     }
                 }
 

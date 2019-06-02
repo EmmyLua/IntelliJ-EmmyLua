@@ -75,7 +75,7 @@ class DebugActionMessage(actionName: DebugAction) : Message(MessageCMD.ActionReq
     val action = actionName.ordinal
 }
 
-enum class VariableNameType {
+enum class LuaValueType {
     TNIL,
     TBOOLEAN,
     TLIGHTUSERDATA,
@@ -87,15 +87,24 @@ enum class VariableNameType {
     TTHREAD,
 }
 
-class VariableValue(val name: String, val nameType: Int, val value: String, val valueType: String, val children: List<VariableValue>?) {
-    val nameTypeValue: VariableNameType get() {
-        return VariableNameType.values().find { it.ordinal == nameType } ?: VariableNameType.TSTRING
+class VariableValue(val name: String,
+                    val nameType: Int,
+                    val value: String,
+                    val valueType: Int,
+                    val valueTypeName: String,
+                    val children: List<VariableValue>?) {
+    val nameTypeValue: LuaValueType get() {
+        return LuaValueType.values().find { it.ordinal == nameType } ?: LuaValueType.TSTRING
     }
 
     val nameValue: String get() {
-        if (nameTypeValue == VariableNameType.TSTRING)
+        if (nameTypeValue == LuaValueType.TSTRING)
             return name
         return "[$name]"
+    }
+
+    val valueTypeValue: LuaValueType get() {
+        return LuaValueType.values().find { it.ordinal == valueType } ?: LuaValueType.TSTRING
     }
 }
 
