@@ -25,9 +25,10 @@ import com.tang.intellij.lua.debugger.LuaXStringPresentation
 import com.tang.intellij.lua.debugger.emmy.EmmyDebugStackFrame
 import com.tang.intellij.lua.debugger.emmy.LuaValueType
 import com.tang.intellij.lua.debugger.emmy.VariableValue
+import com.tang.intellij.lua.lang.LuaIcons
 import java.util.*
 
-abstract class LuaXValue : XValue() {
+abstract class LuaXValue(val value: VariableValue) : XValue() {
     companion object {
         fun create(v: VariableValue, frame: EmmyDebugStackFrame): LuaXValue {
             return when(v.valueTypeValue) {
@@ -36,72 +37,96 @@ abstract class LuaXValue : XValue() {
                 LuaValueType.TBOOLEAN -> BoolXValue(v)
                 LuaValueType.TUSERDATA,
                 LuaValueType.TTABLE -> TableXValue(v, frame)
+                LuaValueType.GROUP -> GroupXValue(v, frame)
                 else -> AnyXValue(v)
             }
         }
     }
 
-    abstract val name: String
+    val name: String get() {
+        return value.nameValue
+    }
 
     var parent: LuaXValue? = null
 }
 
-class StringXValue(val v: VariableValue) : LuaXValue() {
-
-    override val name: String
-        get() = v.nameValue
-
-    override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
-        xValueNode.setPresentation(null, LuaXStringPresentation(v.value), false)
+private object VariableComparator : Comparator<VariableValue> {
+    override fun compare(o1: VariableValue, o2: VariableValue): Int {
+        val w1 = if (o1.fake) 0 else 1
+        val w2 = if (o2.fake) 0 else 1
+        if (w1 != w2)
+            return w1.compareTo(w2)
+        return o1.nameValue.compareTo(o2.nameValue)
     }
 }
 
-class NumberXValue(val v: VariableValue) : LuaXValue() {
-
-    override val name: String
-        get() = v.nameValue
-
+class StringXValue(v: VariableValue) : LuaXValue(v) {
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
-        xValueNode.setPresentation(null, LuaXNumberPresentation(v.value), false)
+        xValueNode.setPresentation(null, LuaXStringPresentation(value.value), false)
     }
 }
 
-class BoolXValue(val v: VariableValue) : LuaXValue() {
+class NumberXValue(v: VariableValue) : LuaXValue(v) {
+    override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
+        xValueNode.setPresentation(null, LuaXNumberPresentation(value.value), false)
+    }
+}
 
-    override val name: String
-        get() = v.nameValue
-
+class BoolXValue(val v: VariableValue) : LuaXValue(v) {
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
         xValueNode.setPresentation(null, LuaXBoolPresentation(v.value), false)
     }
 }
 
-class AnyXValue(val v: VariableValue) : LuaXValue() {
-    override val name: String
-        get() = v.nameValue
-
+class AnyXValue(val v: VariableValue) : LuaXValue(v) {
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
         xValueNode.setPresentation(null, v.valueTypeName, v.value, false)
     }
 }
 
-class TableXValue(val v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXValue() {
+class GroupXValue(v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXValue(v) {
+    private val children = mutableListOf<LuaXValue>()
+
+    init {
+        value.children?.
+                sortedWith(VariableComparator)?.
+                forEach {
+                    children.add(create(it, frame))
+                }
+    }
+
+    override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
+        xValueNode.setPresentation(AllIcons.Nodes.UpLevel, value.valueTypeName, value.value, true)
+    }
+
+    override fun computeChildren(node: XCompositeNode) {
+        val cl = XValueChildrenList()
+        children.forEach {
+            it.parent = this
+            cl.add(it.name, it)
+        }
+        node.addChildren(cl, true)
+    }
+}
+
+class TableXValue(v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXValue(v) {
 
     private val children = mutableListOf<LuaXValue>()
 
     init {
-        v.children?.
-                sortedBy { it.nameValue }?.
+        value.children?.
+                sortedWith(VariableComparator)?.
                 forEach {
             children.add(create(it, frame))
         }
     }
 
-    override val name: String
-        get() = v.nameValue
-
     override fun computePresentation(xValueNode: XValueNode, place: XValuePlace) {
-        xValueNode.setPresentation(AllIcons.Json.Object, v.valueTypeName, v.value, true)
+        var icon = AllIcons.Json.Object
+        if (value.valueTypeName == "C#") {
+            icon = LuaIcons.CSHARP
+        }
+        xValueNode.setPresentation(icon, value.valueTypeName, value.value, true)
     }
 
     override fun computeChildren(node: XCompositeNode) {
@@ -139,9 +164,10 @@ class TableXValue(val v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXVa
             val properties = ArrayList<String>()
             var parent = this.parent
             while (parent != null) {
-                val parentName = parent.name
-                properties.add(name)
-                name = parentName
+                if (!parent.value.fake) {
+                    properties.add(name)
+                    name = parent.name
+                }
                 parent = parent.parent
             }
 

@@ -85,6 +85,8 @@ enum class LuaValueType {
     TFUNCTION,
     TUSERDATA,
     TTHREAD,
+
+    GROUP,
 }
 
 class VariableValue(val name: String,
@@ -105,6 +107,10 @@ class VariableValue(val name: String,
 
     val valueTypeValue: LuaValueType get() {
         return LuaValueType.values().find { it.ordinal == valueType } ?: LuaValueType.TSTRING
+    }
+
+    val fake: Boolean get() {
+        return valueTypeValue > LuaValueType.TTHREAD
     }
 }
 
