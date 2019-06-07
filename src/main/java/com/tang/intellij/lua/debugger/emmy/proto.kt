@@ -22,8 +22,12 @@ import gherkin.deps.com.google.gson.Gson
 
 enum class MessageCMD {
     Unknown,
+
     InitReq,
     InitRsp,
+
+    ReadyReq,
+    ReadyRsp,
 
     AddBreakPointReq,
     AddBreakPointRsp,
@@ -61,6 +65,8 @@ open class Message(cmdName: MessageCMD) : IMessage {
         }
     }
 }
+
+class InitMessage(val emmyHelper: String) : Message(MessageCMD.InitReq)
 
 enum class DebugAction {
     Break,

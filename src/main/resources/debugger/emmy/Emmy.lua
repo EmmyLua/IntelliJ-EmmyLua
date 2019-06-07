@@ -124,7 +124,7 @@ local xluaDebugger = {
 
 ---@class emmy
 ---@field createNode fun(): Variable
-emmy = {}
+local emmy = {}
 
 if tolua then
     if tolua.gettag then
@@ -136,6 +136,7 @@ elseif xlua then
     emmy = xluaDebugger
 end
 
-if emmy_init then
-    emmy_init()
+_G.emmy = emmy
+if _G.emmy_init then
+    _G.emmy_init()
 end

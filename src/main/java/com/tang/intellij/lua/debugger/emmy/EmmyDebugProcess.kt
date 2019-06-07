@@ -30,6 +30,7 @@ import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.LuaSuspendContext
 import com.tang.intellij.lua.psi.LuaFileUtil
 import gherkin.deps.com.google.gson.Gson
+import java.io.File
 
 interface IEvalResultHandler {
     fun handleMessage(msg: EvalRsp)
@@ -57,12 +58,16 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
 
     override fun onConnect(suc: Boolean) {
         if (suc) {
+            val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/Emmy.lua")
+            val code = File(path).readText()
+            transporter?.send(InitMessage(code))
             processBreakpoint(Processor { bp ->
                 bp.sourcePosition?.let {
                     registerBreakpoint(it, bp)
                 }
                 true
             })
+            transporter?.send(Message(MessageCMD.ReadyReq))
         }
         else stop()
     }
