@@ -20,7 +20,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.SystemInfoRt;
@@ -35,7 +34,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
-import java.io.File;
 
 public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguration> implements DocumentListener {
     private JComboBox<EmmyDebugTransportType> typeCombox;
@@ -50,6 +48,11 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
     private JPanel codePanel;
     private JCheckBox waitIDECheckBox;
     private JCheckBox breakWhenIDEConnectedCheckBox;
+
+    private JRadioButton x64RadioButton;
+    private JRadioButton x86RadioButton;
+    private JPanel winArchPanel;
+    private ButtonGroup winArchGroup;
 
     private EditorEx editorEx;
 
@@ -77,6 +80,14 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
         waitIDECheckBox.addActionListener(e -> onChanged());
         breakWhenIDEConnectedCheckBox.addActionListener(e -> onChanged());
 
+        // arch
+        winArchGroup = new ButtonGroup();
+        winArchPanel.setVisible(SystemInfoRt.isWindows);
+        winArchGroup.add(x64RadioButton);
+        winArchGroup.add(x86RadioButton);
+        x64RadioButton.addChangeListener(e -> onChanged());
+        x86RadioButton.addChangeListener(e -> onChanged());
+
         // editor
         editorEx = createEditorEx(project);
         codePanel.add(editorEx.getComponent(), BorderLayout.CENTER);
@@ -103,10 +114,18 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
         tcpPortInput.setText(String.valueOf(configuration.getPort()));
 
         pipelineInput.setText(configuration.getPipeName());
+
+        if (SystemInfoRt.isWindows) {
+            if (configuration.getWinArch() == EmmyWinArch.X64) {
+                x64RadioButton.setSelected(true);
+            } else {
+                x86RadioButton.setSelected(true);
+            }
+        }
     }
 
     @Override
-    protected void applyEditorTo(@NotNull EmmyDebugConfiguration configuration) throws ConfigurationException {
+    protected void applyEditorTo(@NotNull EmmyDebugConfiguration configuration) {
         EmmyDebugTransportType type = (EmmyDebugTransportType) typeCombox.getSelectedItem();
         assert type != null;
         configuration.setType(type);
@@ -115,6 +134,9 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
         configuration.setPort(Integer.parseInt(tcpPortInput.getText()));
 
         configuration.setPipeName(pipelineInput.getText());
+        if (SystemInfoRt.isWindows) {
+            configuration.setWinArch(x64RadioButton.isSelected() ? EmmyWinArch.X64 : EmmyWinArch.X86);
+        }
     }
 
     protected void setType(EmmyDebugTransportType type) {
@@ -128,7 +150,6 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
         pipelineInput.setVisible(!isTCP);
 
         waitIDECheckBox.setVisible(isClient());
-        //breakWhenIDEConnectedCheckBox.setVisible(isClient());
     }
 
     private boolean isClient() {
@@ -182,9 +203,16 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
     private void updateCodeImpl() {
         StringBuilder sb = new StringBuilder();
         if (SystemInfoRt.isWindows) {
-            sb.append("package.cpath = package.cpath .. ';").append(getDebuggerFolder()).append("/?.dll'\n");
+            EmmyWinArch arch = x64RadioButton.isSelected() ? EmmyWinArch.X64 : EmmyWinArch.X86;
+            sb.append("package.cpath = package.cpath .. ';")
+                    .append(getDebuggerFolder())
+                    .append("/")
+                    .append(arch.getDesc())
+                    .append("/?.dll'\n");
         } else {
-            sb.append("package.cpath = package.cpath .. ';").append(getDebuggerFolder()).append("/?.so'\n");
+            sb.append("package.cpath = package.cpath .. ';")
+                    .append(getDebuggerFolder())
+                    .append("/?.so'\n");
         }
         sb.append("local dbg = require('emmy_core')\n");
         EmmyDebugTransportType type = getType();

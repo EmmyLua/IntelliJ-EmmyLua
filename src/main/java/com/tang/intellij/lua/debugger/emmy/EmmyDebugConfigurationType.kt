@@ -66,6 +66,15 @@ enum class EmmyDebugTransportType(val desc: String) {
     }
 }
 
+enum class EmmyWinArch(val desc: String) {
+    X86("x86"),
+    X64("x64");
+
+    override fun toString(): String {
+        return desc;
+    }
+}
+
 class EmmyDebuggerConfigurationFactory(val type: EmmyDebugConfigurationType) : ConfigurationFactory(type) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
         return EmmyDebugConfiguration(project, this)
@@ -77,12 +86,12 @@ class EmmyDebugConfiguration(project: Project, factory: EmmyDebuggerConfiguratio
 
     var host = "localhost"
     var port = 9966
-
+    var winArch = EmmyWinArch.X64
     var pipeName = "emmy"
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> {
         val group = SettingsEditorGroup<EmmyDebugConfiguration>()
-        group.addEditor("mob", EmmyDebugSettingsPanel(project))
+        group.addEditor("emmy", EmmyDebugSettingsPanel(project))
         return group
     }
 
@@ -100,6 +109,7 @@ class EmmyDebugConfiguration(project: Project, factory: EmmyDebuggerConfiguratio
         JDOMExternalizerUtil.writeField(element, "HOST", host)
         JDOMExternalizerUtil.writeField(element, "PORT", port.toString())
         JDOMExternalizerUtil.writeField(element, "PIPE", pipeName)
+        JDOMExternalizerUtil.writeField(element, "WIN_ARCH", winArch.ordinal.toString())
     }
 
     override fun readExternal(element: Element) {
@@ -116,6 +126,10 @@ class EmmyDebugConfiguration(project: Project, factory: EmmyDebuggerConfiguratio
         JDOMExternalizerUtil.readField(element, "TYPE")?.let { value ->
             val i = value.toInt()
             type = EmmyDebugTransportType.values().find { it.ordinal == i } ?: EmmyDebugTransportType.TCP_SERVER
+        }
+        JDOMExternalizerUtil.readField(element, "WIN_ARCH")?.let { value ->
+            val i = value.toInt()
+            winArch = EmmyWinArch.values().find { it.ordinal == i } ?: EmmyWinArch.X64
         }
     }
 }
