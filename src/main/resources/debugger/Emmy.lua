@@ -12,122 +12,169 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+---@class Variable
+---@field query fun(self: Variable, obj: any, depth: number, queryHelper: boolean):void
+---@field name string
+---@field value string
+---@field valueTypeName string
 
-local toluaDebugger = {}
+local toluaHelper = {
+    ---@param variable Variable
+    queryVariable = function(variable, obj, typeName, depth)
+        if typeName == 'table' then
+            local cname = rawget(obj, '__cname')
+            if cname then
+                variable:query(obj, depth)
+                variable.valueTypeName = cname
+                return true
+            end
+        elseif typeName == 'userdata' then
+            local mt = getmetatable(obj)
+            if mt == nil then return false end
 
-function toluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
-    if ty == 'userdata' then
-        if depth <= 1 then return nil end
-        local mt = getmetatable(obj)
-        if mt == nil then return nil end
-        local tableNode = toluaDebugger.RawGetValueAsText(obj, depth, nil, false)
-        if tableNode == nil then return nil end
+            variable.valueTypeName = 'C#'
+            variable.value = tostring(obj)
 
-        local propMap = {}
-        while mt ~= nil do
-            local getTab = mt[tolua.gettag]
-            if getTab then
-                for property, _ in pairs(getTab) do
-                    if not propMap[property] then
-                        propMap[property] = true
-                        local key = toluaDebugger.RawGetValueAsText(property, 0, nil, true)
-                        local value = toluaDebugger.RawGetValueAsText(obj[property], depth - 1, nil, false)
-                        toluaDebugger.AddChildNode(tableNode, key, value)
+            if depth > 1 then
+                local parent = variable
+                local propMap = {}
+                while mt ~= nil do
+                    local getTab = mt[tolua.gettag]
+                    if getTab then
+                        for property, _ in pairs(getTab) do
+                            if not propMap[property] then
+                                propMap[property] = true
+                                local v = emmy.createNode()
+                                v.name = property
+                                v:query(obj[property], depth - 1, true)
+                                parent:addChild(v)
+                            end
+                        end
+                    end
+                    mt = getmetatable(mt)
+                    if mt then
+                        local super = emmy.createNode()
+                        super.name = "base"
+                        super.value = mt[".name"]
+                        super.valueType = 9
+                        super.valueTypeName = "C#"
+                        parent:addChild(super)
+                        parent = super
                     end
                 end
             end
-            mt = getmetatable(mt)
+            return true
         end
-        return tableNode
     end
-end
+}
 
-local xluaDebugger = {}
-function xluaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
-    if ty == 'userdata' then
-        local mt = getmetatable(obj)
-        if mt == nil or depth <= 1 then return nil end
-
-        local CSType = obj:GetType()
-        if CSType then
-            local tableNode = xluaDebugger.RawGetValueAsText(obj, depth, nil, false)
-
-            local Type = CS.System.Type
-            local ObsoleteType = Type.GetType('System.ObsoleteAttribute')
-            local BindType = Type.GetType('System.Reflection.BindingFlags')
-            local bindValue = CS.System.Enum.ToObject(BindType, 4157) -- 60 | 4096
-            local properties = CSType:GetProperties(bindValue)
-            for i = 1, properties.Length do
-                local p = properties[i - 1]
-                if CS.System.Attribute.GetCustomAttribute(p, ObsoleteType) == nil then
-                    local property = p.Name
-                    local value = obj[property]
-
-                    local key = xluaDebugger.RawGetValueAsText(property, 0, nil, true)
-                    local value = xluaDebugger.RawGetValueAsText(value, depth - 1, nil, false)
-                    xluaDebugger.AddChildNode(tableNode, key, value)
-                end
+local xluaDebugger = {
+    queryVariable = function(variable, obj, typeName, depth)
+        if typeName == 'userdata' then
+            local mt = getmetatable(obj)
+            if mt == nil then
+                return false
             end
 
-            return tableNode
+            local CSType = obj:GetType()
+            if CSType then
+                variable.valueTypeName = 'C#'
+                variable.value = tostring(obj)--CSType.FullName
+
+                if depth > 1 then
+                    local Type = CS.System.Type
+                    local ObsoleteType = Type.GetType('System.ObsoleteAttribute')
+                    local BindType = Type.GetType('System.Reflection.BindingFlags')
+                    local bindValue = CS.System.Enum.ToObject(BindType, 4150) -- Instance | Public | NonPublic | GetProperty | DeclaredOnly
+
+                    local parent = variable
+                    while CSType do
+                        local properties = CSType:GetProperties(bindValue)
+                        for i = 1, properties.Length do
+                            local p = properties[i - 1]
+                            if CS.System.Attribute.GetCustomAttribute(p, ObsoleteType) == nil then
+                                local property = p.Name
+                                local value = obj[property]
+
+                                local v = emmy.createNode()
+                                v.name = property
+                                v:query(value, depth - 1, true)
+                                parent:addChild(v)
+                            end
+                        end
+
+                        CSType = CSType.BaseType
+                        if CSType then
+                            local super = emmy.createNode()
+                            super.name = "base"
+                            super.value = CSType.FullName
+                            super.valueType = 9
+                            super.valueTypeName = "C#"
+                            parent:addChild(super)
+                            parent = super
+                        end
+                    end
+                end
+
+                return true
+            end
         end
     end
-end
+}
 
+local cocosLuaDebugger = {
+    queryVariable = function(variable, obj, typeName, depth)
+        if typeName == 'userdata' then
+            local mt = getmetatable(obj)
+            if mt == nil then return false end
+            variable.valueTypeName = 'C++'
+            variable.value = mt[".classname"]
 
-local cocosLuaDebugger = {}
-function cocosLuaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displayAsKey)
-    if ty == 'userdata' then
-        if depth <= 1 then return nil end
-        local mt, tab = getmetatable(obj), tolua.getpeer(obj)
-        if mt == nil then return nil end
-        local tableNode = cocosLuaDebugger.RawGetValueAsText(obj, depth, nil, false)
-        if tableNode == nil then return nil end
-
-        local propMap = {}
-        while mt ~= nil and tab ~= nil do
-            for property, _ in pairs(tab) do
-                if not propMap[property] then
-                    propMap[property] = true
-                    local key = cocosLuaDebugger.RawGetValueAsText(property, 0, nil, true)
-                    local value = cocosLuaDebugger.RawGetValueAsText(obj[property], depth - 1, nil, false)
-                    cocosLuaDebugger.AddChildNode(tableNode, key, value)
+            if depth > 1 then
+                local parent = variable
+                local propMap = {}
+                while mt ~= nil do
+                    for property, _ in pairs(mt) do
+                        if not propMap[property] then
+                            propMap[property] = true
+                            local v = emmy.createNode()
+                            v.name = property
+                            v:query(obj[property], depth - 1, true)
+                            parent:addChild(v)
+                        end
+                    end
+                    mt = getmetatable(mt)
+                    if mt then
+                        local super = emmy.createNode()
+                        super.name = "base"
+                        super.value = mt[".classname"]
+                        super.valueType = 9
+                        super.valueTypeName = "C++"
+                        parent:addChild(super)
+                        parent = super
+                    end
                 end
             end
-            mt, tab = getmetatable(mt), tolua.getpeer(mt)
+            return true
         end
-        return tableNode
     end
-end
+}
 
-emmy = {}
+---@class emmy
+---@field createNode fun(): Variable
+local emmy = {}
 
 if tolua then
-	if tolua.gettag then
-		emmy = toluaDebugger
-	else
-		emmy = cocosLuaDebugger
-	end
+    if tolua.gettag then
+        emmy = toluaHelper
+    else
+        emmy = cocosLuaDebugger
+    end
 elseif xlua then
     emmy = xluaDebugger
 end
 
-function emmy.Reload(fileName)
-    local a, b, c = string.find(fileName, '%.lua')
-    if a then
-        fileName = string.sub(fileName, 1, a - 1)
-    end
-
-    emmy.DebugLog('Try reload : ' .. fileName, 1)
-    local searchers = package.searchers or package.loaders
-    for _, load in ipairs(searchers) do
-        local result = load(fileName)
-        if type(result) == 'function' then
-            break
-        end
-    end
-end
-
-if emmy_init then
-    emmy_init()
+_G.emmy = emmy
+if _G.emmy_init then
+    _G.emmy_init()
 end
