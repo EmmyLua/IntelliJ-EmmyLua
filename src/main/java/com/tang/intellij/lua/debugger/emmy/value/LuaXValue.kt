@@ -126,6 +126,9 @@ class TableXValue(v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXValue(
         if (value.valueTypeName == "C#") {
             icon = LuaIcons.CSHARP
         }
+        else if (value.valueTypeName == "C++") {
+            icon = LuaIcons.CPP
+        }
         xValueNode.setPresentation(icon, value.valueTypeName, value.value, true)
     }
 
