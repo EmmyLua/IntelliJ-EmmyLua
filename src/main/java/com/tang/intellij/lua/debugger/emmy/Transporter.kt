@@ -183,7 +183,11 @@ class SocketServerTransporter(val host: String, val port: Int) : SocketChannelTr
         logger?.println("Server($host:$port) open successfully, wait for connection...", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
         ApplicationManager.getApplication().executeOnPooledThread {
             while (!stopped) {
-                val channel = server.accept()
+                val channel = try {
+                    server.accept()
+                } catch (e: Exception) {
+                    continue
+                }
                 if (socket != null) {
                     try {
                         channel.close()
