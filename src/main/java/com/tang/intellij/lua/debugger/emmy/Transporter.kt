@@ -51,12 +51,14 @@ abstract class Transporter {
 
     protected val messageQueue = LinkedBlockingQueue<IMessage>()
 
+    protected var stopped = false
+
     open fun start() {
 
     }
 
     open fun close() {
-
+        stopped = true
     }
 
     fun send(msg: IMessage) {
@@ -70,9 +72,8 @@ abstract class Transporter {
         }
     }
 
-    protected fun onDisconnect() {
+    protected open fun onDisconnect() {
         logger?.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
-        handler?.onDisconnect()
     }
 
     protected fun onReceiveMessage(type: MessageCMD, json: String) {
@@ -141,6 +142,12 @@ abstract class SocketChannelTransporter : Transporter() {
     override fun close() {
         super.close()
         socket?.close()
+        socket = null
+    }
+
+    override fun onDisconnect() {
+        super.onDisconnect()
+        socket = null
     }
 }
 
@@ -161,6 +168,11 @@ class SocketClientTransporter(val host: String, val port: Int) : SocketChannelTr
         }
         onConnect(connected)
     }
+
+    override fun onDisconnect() {
+        super.onDisconnect()
+        handler?.onDisconnect()
+    }
 }
 
 class SocketServerTransporter(val host: String, val port: Int) : SocketChannelTransporter() {
@@ -170,10 +182,20 @@ class SocketServerTransporter(val host: String, val port: Int) : SocketChannelTr
         server.bind(InetSocketAddress(InetAddress.getByName(host), port))
         logger?.println("Server($host:$port) open successfully, wait for connection...", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
         ApplicationManager.getApplication().executeOnPooledThread {
-            val channel = server.accept()
-            socket = channel
-            run()
-            onConnect(true)
+            while (!stopped) {
+                val channel = server.accept()
+                if (socket != null) {
+                    try {
+                        channel.close()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                } else {
+                    socket = channel
+                    run()
+                    onConnect(true)
+                }
+            }
         }
     }
 
@@ -217,6 +239,11 @@ class PipelineClientTransporter(val name: String) : SocketChannelTransporter() {
     override fun close() {
         super.close()
         pipe?.close()
+    }
+
+    override fun onDisconnect() {
+        super.onDisconnect()
+        handler?.onDisconnect()
     }
 }
 

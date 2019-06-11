@@ -162,6 +162,7 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
         send(DebugActionMessage(DebugAction.Stop))
         send(StopSign())
         transporter?.close()
+        transporter = null
     }
 
     override fun startStepOver(context: XSuspendContext?) {
