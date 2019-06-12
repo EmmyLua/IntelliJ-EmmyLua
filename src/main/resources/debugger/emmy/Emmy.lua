@@ -122,6 +122,44 @@ local xluaDebugger = {
     end
 }
 
+local cocosLuaDebugger = {
+    queryVariable = function(variable, obj, typeName, depth)
+        if typeName == 'userdata' then
+            local mt = getmetatable(obj)
+            if mt == nil then return false end
+            variable.valueTypeName = 'C++'
+            variable.value = mt[".classname"]
+
+            if depth > 1 then
+                local parent = variable
+                local propMap = {}
+                while mt ~= nil do
+                    for property, _ in pairs(mt) do
+                        if not propMap[property] then
+                            propMap[property] = true
+                            local v = emmy.createNode()
+                            v.name = property
+                            v:query(obj[property], depth - 1, true)
+                            parent:addChild(v)
+                        end
+                    end
+                    mt = getmetatable(mt)
+                    if mt then
+                        local super = emmy.createNode()
+                        super.name = "base"
+                        super.value = mt[".classname"]
+                        super.valueType = 9
+                        super.valueTypeName = "C++"
+                        parent:addChild(super)
+                        parent = super
+                    end
+                end
+            end
+            return true
+        end
+    end
+}
+
 ---@class emmy
 ---@field createNode fun(): Variable
 local emmy = {}
@@ -130,7 +168,7 @@ if tolua then
     if tolua.gettag then
         emmy = toluaHelper
     else
-        --emmy = cocosLuaDebugger
+        emmy = cocosLuaDebugger
     end
 elseif xlua then
     emmy = xluaDebugger
