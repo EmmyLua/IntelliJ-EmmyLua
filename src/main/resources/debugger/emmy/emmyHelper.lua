@@ -12,6 +12,10 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
+---@class emmy
+---@field createNode fun(): Variable
+local emmy = {}
+
 ---@class Variable
 ---@field query fun(self: Variable, obj: any, depth: number, queryHelper: boolean):void
 ---@field name string
@@ -85,13 +89,26 @@ local xluaDebugger = {
                     local Type = CS.System.Type
                     local ObsoleteType = Type.GetType('System.ObsoleteAttribute')
                     local BindType = Type.GetType('System.Reflection.BindingFlags')
-                    local bindValue = CS.System.Enum.ToObject(BindType, 4150) -- Instance | Public | NonPublic | GetProperty | DeclaredOnly
+                    local bindValue = CS.System.Enum.ToObject(BindType, 5174) -- Instance | Public | NonPublic | GetProperty | DeclaredOnly | GetField
 
                     local parent = variable
                     while CSType do
                         local properties = CSType:GetProperties(bindValue)
                         for i = 1, properties.Length do
                             local p = properties[i - 1]
+                            if CS.System.Attribute.GetCustomAttribute(p, ObsoleteType) == nil then
+                                local property = p.Name
+                                local value = obj[property]
+
+                                local v = emmy.createNode()
+                                v.name = property
+                                v:query(value, depth - 1, true)
+                                parent:addChild(v)
+                            end
+                        end
+                        local fields = CSType:GetFields(bindValue)
+                        for i = 1, fields.Length do
+                            local p = fields[i - 1]
                             if CS.System.Attribute.GetCustomAttribute(p, ObsoleteType) == nil then
                                 local property = p.Name
                                 local value = obj[property]
@@ -160,10 +177,6 @@ local cocosLuaDebugger = {
     end
 }
 
----@class emmy
----@field createNode fun(): Variable
-local emmy = {}
-
 if tolua then
     if tolua.gettag then
         emmy = toluaHelper
@@ -174,7 +187,7 @@ elseif xlua then
     emmy = xluaDebugger
 end
 
-_G.emmy = emmy
-if _G.emmy_init then
-    _G.emmy_init()
+_G.emmyHelper = emmy
+if _G.emmyHelperInit then
+    _G.emmyHelperInit()
 end

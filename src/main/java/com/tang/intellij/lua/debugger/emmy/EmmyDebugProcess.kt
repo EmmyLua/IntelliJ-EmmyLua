@@ -58,7 +58,7 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
 
     override fun onConnect(suc: Boolean) {
         if (suc) {
-            val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/Emmy.lua")
+            val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/emmyHelper.lua")
             val code = File(path).readText()
             transporter?.send(InitMessage(code))
             processBreakpoint(Processor { bp ->
