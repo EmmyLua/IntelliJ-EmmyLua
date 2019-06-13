@@ -18,7 +18,7 @@
 
 package com.tang.intellij.lua.debugger.emmy
 
-import gherkin.deps.com.google.gson.Gson
+import com.google.gson.Gson
 
 enum class MessageCMD {
     Unknown,

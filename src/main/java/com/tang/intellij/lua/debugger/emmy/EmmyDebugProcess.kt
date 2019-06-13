@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.debugger.emmy
 
+import com.google.gson.Gson
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
@@ -29,7 +30,6 @@ import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.LuaSuspendContext
 import com.tang.intellij.lua.psi.LuaFileUtil
-import gherkin.deps.com.google.gson.Gson
 import java.io.File
 
 interface IEvalResultHandler {
