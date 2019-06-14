@@ -68,12 +68,12 @@ abstract class Transporter {
     protected fun onConnect(suc: Boolean) {
         handler?.onConnect(suc)
         if (suc) {
-            logger?.println("Connected.", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
+            logger?.println("Connected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
     }
 
     protected open fun onDisconnect() {
-        logger?.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
+        logger?.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
     }
 
     protected fun onReceiveMessage(type: MessageCMD, json: String) {
@@ -156,7 +156,7 @@ class SocketClientTransporter(val host: String, val port: Int) : SocketChannelTr
     private var server: SocketChannel? = null
 
     override fun start() {
-        logger?.println("Try connect $host:$port ...", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
+        logger?.println("Try connect $host:$port ...", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         val server = SocketChannel.open()
         val address = InetAddress.getByName(host)
         var connected = false
@@ -180,7 +180,7 @@ class SocketServerTransporter(val host: String, val port: Int) : SocketChannelTr
 
     override fun start() {
         server.bind(InetSocketAddress(InetAddress.getByName(host), port))
-        logger?.println("Server($host:$port) open successfully, wait for connection...", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
+        logger?.println("Server($host:$port) open successfully, wait for connection...", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         ApplicationManager.getApplication().executeOnPooledThread {
             while (!stopped) {
                 val channel = try {
@@ -227,7 +227,7 @@ class PipelineClientTransporter(val name: String) : SocketChannelTransporter() {
         } else {
             UnixDomainSocket(getPipename(name))
         }
-        logger?.println("Pipeline($name) connect successfully.", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
+        logger?.println("Pipeline($name) connect successfully.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         run()
         onConnect(true)
     }
@@ -266,7 +266,7 @@ class PipelineServerTransporter(val name: String) : SocketChannelTransporter() {
             }
             UnixDomainServerSocket(pipeName)
         }
-        logger?.println("Pipeline($name) open successfully, wait for connection...", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_INFO_OUTPUT)
+        logger?.println("Pipeline($name) open successfully, wait for connection...", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         ApplicationManager.getApplication().executeOnPooledThread {
             try {
                 client = pipe?.accept()
