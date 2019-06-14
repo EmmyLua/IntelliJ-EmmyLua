@@ -274,7 +274,7 @@ class PipelineServerTransporter(val name: String) : SocketChannelTransporter() {
                 onConnect(true)
             } catch (e: Exception) {
                 println(e)
-                logger?.println(e.message ?: "Unknown error.", LogConsoleType.NORMAL, ConsoleViewContentType.LOG_ERROR_OUTPUT)
+                logger?.println(e.message ?: "Unknown error.", LogConsoleType.NORMAL, ConsoleViewContentType.ERROR_OUTPUT)
             }
         }
     }
