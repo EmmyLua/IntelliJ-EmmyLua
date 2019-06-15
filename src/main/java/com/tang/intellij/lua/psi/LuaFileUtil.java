@@ -87,6 +87,11 @@ public class LuaFileUtil {
     public static VirtualFile findFile(@NotNull Project project, String shortUrl) {
         if (shortUrl == null)
             return null;
+
+        // ./x.lua
+        if (shortUrl.startsWith("./") || shortUrl.startsWith(".\\")) {
+            shortUrl = shortUrl.substring(2);
+        }
         return ILuaFileResolver.Companion.findLuaFile(project, shortUrl, extensions);
     }
 
