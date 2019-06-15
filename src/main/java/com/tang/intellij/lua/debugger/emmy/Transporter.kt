@@ -108,7 +108,7 @@ abstract class SocketChannelTransporter : Transporter() {
 
     private fun doReceive() {
         val iss = getInputStream() ?: return
-        val reader = BufferedReader(InputStreamReader(iss))
+        val reader = BufferedReader(InputStreamReader(iss, "UTF-8"))
         while (true) {
             try {
                 val cmdValue = reader.readLine()
