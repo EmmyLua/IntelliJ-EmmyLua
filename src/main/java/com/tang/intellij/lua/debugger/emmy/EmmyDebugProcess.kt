@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.emmy
 
 import com.google.gson.Gson
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
@@ -29,6 +30,7 @@ import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.LuaSuspendContext
+import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.File
 
@@ -58,15 +60,23 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
 
     override fun onConnect(suc: Boolean) {
         if (suc) {
+            // send init
             val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/emmyHelper.lua")
             val code = File(path).readText()
-            transporter?.send(InitMessage(code))
+            val extList = FileTypeManager.getInstance().getAssociations(LuaFileType.INSTANCE).mapNotNull {
+                if (it.presentableString.startsWith("*."))
+                    it.presentableString.substring(1)
+                else null
+            }
+            transporter?.send(InitMessage(code, extList))
+            // send bps
             processBreakpoint(Processor { bp ->
                 bp.sourcePosition?.let {
                     registerBreakpoint(it, bp)
                 }
                 true
             })
+            // send ready
             transporter?.send(Message(MessageCMD.ReadyReq))
         }
         else stop()
@@ -96,26 +106,26 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
     override fun registerBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
         val project = session.project
         val file = sourcePosition.file
-        val shortPath: String? = LuaFileUtil.getShortPath(project, file)
+        val shortPath = LuaFileUtil.getShortPath(project, file)
         if (shortPath != null) {
-            val bps = mutableListOf<BreakPoint>()
+            /*val bps = mutableListOf<BreakPoint>()
             LuaFileUtil.getAllAvailablePathsForMob(shortPath, file).forEach{ path ->
                 bps.add(BreakPoint(path, breakpoint.line + 1))
-            }
-            send(AddBreakPointReq(bps))
+            }*/
+            send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
         }
     }
 
     override fun unregisterBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
         val project = session.project
         val file = sourcePosition.file
-        val shortPath: String? = LuaFileUtil.getShortPath(project, file)
+        val shortPath = LuaFileUtil.getShortPath(project, file)
         if (shortPath != null) {
-            val bps = mutableListOf<BreakPoint>()
+            /*val bps = mutableListOf<BreakPoint>()
             LuaFileUtil.getAllAvailablePathsForMob(shortPath, file).forEach{ path ->
                 bps.add(BreakPoint(path, breakpoint.line + 1))
-            }
-            send(RemoveBreakPointReq(bps))
+            }*/
+            send(RemoveBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
         }
     }
 
