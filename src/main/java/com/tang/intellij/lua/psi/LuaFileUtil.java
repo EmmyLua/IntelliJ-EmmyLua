@@ -88,7 +88,7 @@ public class LuaFileUtil {
         if (shortUrl == null)
             return null;
 
-        // ./x.lua
+        // "./x.lua" => "x.lua"
         if (shortUrl.startsWith("./") || shortUrl.startsWith(".\\")) {
             shortUrl = shortUrl.substring(2);
         }
