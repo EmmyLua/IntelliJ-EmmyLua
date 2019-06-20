@@ -108,10 +108,6 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
         val file = sourcePosition.file
         val shortPath = LuaFileUtil.getShortPath(project, file)
         if (shortPath != null) {
-            /*val bps = mutableListOf<BreakPoint>()
-            LuaFileUtil.getAllAvailablePathsForMob(shortPath, file).forEach{ path ->
-                bps.add(BreakPoint(path, breakpoint.line + 1))
-            }*/
             send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
         }
     }
@@ -121,10 +117,6 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
         val file = sourcePosition.file
         val shortPath = LuaFileUtil.getShortPath(project, file)
         if (shortPath != null) {
-            /*val bps = mutableListOf<BreakPoint>()
-            LuaFileUtil.getAllAvailablePathsForMob(shortPath, file).forEach{ path ->
-                bps.add(BreakPoint(path, breakpoint.line + 1))
-            }*/
             send(RemoveBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
         }
     }
