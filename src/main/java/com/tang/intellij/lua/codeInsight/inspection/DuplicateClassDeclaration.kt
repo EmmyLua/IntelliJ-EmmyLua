@@ -45,7 +45,7 @@ class DuplicateClassDeclaration : LocalInspectionTool() {
                     LuaShortNamesManager
                             .getInstance(project)
                             .processClassesWithName(identifier.text, context, Processor {
-                        val path = it.containingFile.virtualFile.canonicalPath
+                        val path = it.containingFile?.virtualFile?.canonicalPath
                         if (it != o && path != null) {
                             holder.registerProblem(
                                     identifier,
