@@ -38,7 +38,6 @@ class LuaFileManager : ApplicationComponent, FileTypeListener {
     }
 
     override fun initComponent() {
-        super.initComponent()
         myMessageBus.connect().subscribe(FileTypeManager.TOPIC, this)
     }
 
