@@ -321,6 +321,7 @@
     <application-components>
         <component>
             <implementation-class>com.tang.intellij.lua.project.StdSDK</implementation-class>
+            <implementation-class>com.tang.intellij.lua.psi.LuaFileManager</implementation-class>
         </component>
     </application-components>
 

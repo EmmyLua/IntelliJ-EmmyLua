@@ -43,14 +43,6 @@ import java.util.List;
  */
 public class LuaFileUtil {
 
-    //有些扩展名也许是txt
-    private static String[] extensions = new String[] {
-            ".lua.txt",
-            ".lua",
-            ".txt",
-            ""
-    };
-
     public static boolean fileEquals(VirtualFile f1, VirtualFile f2) {
         if (f1 == null || f2 == null)
             return false;
@@ -61,6 +53,7 @@ public class LuaFileUtil {
     public static List<String> getAllAvailablePathsForMob(@Nullable String shortPath, @NotNull VirtualFile file) {
         SmartList<String> list = new SmartList<>();
         String fullPath = file.getCanonicalPath();
+        String[] extensions = LuaFileManager.Companion.getInstance().getExtensions();
         if (fullPath != null) {
             for (String ext : extensions) {
                 if (!fullPath.endsWith(ext)) {
@@ -92,6 +85,7 @@ public class LuaFileUtil {
         if (shortUrl.startsWith("./") || shortUrl.startsWith(".\\")) {
             shortUrl = shortUrl.substring(2);
         }
+        String[] extensions = LuaFileManager.Companion.getInstance().getExtensions();
         return ILuaFileResolver.Companion.findLuaFile(project, shortUrl, extensions);
     }
 

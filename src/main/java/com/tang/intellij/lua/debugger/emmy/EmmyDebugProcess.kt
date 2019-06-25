@@ -18,7 +18,6 @@ package com.tang.intellij.lua.debugger.emmy
 
 import com.google.gson.Gson
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XSourcePosition
@@ -30,7 +29,7 @@ import com.tang.intellij.lua.debugger.LuaDebugProcess
 import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
 import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.LuaSuspendContext
-import com.tang.intellij.lua.lang.LuaFileType
+import com.tang.intellij.lua.psi.LuaFileManager
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.File
 
@@ -63,11 +62,7 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
             // send init
             val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/emmyHelper.lua")
             val code = File(path).readText()
-            val extList = FileTypeManager.getInstance().getAssociations(LuaFileType.INSTANCE).mapNotNull {
-                if (it.presentableString.startsWith("*."))
-                    it.presentableString.substring(1)
-                else null
-            }
+            val extList = LuaFileManager.getInstance().extensions
             transporter?.send(InitMessage(code, extList))
             // send bps
             processBreakpoint(Processor { bp ->
