@@ -80,10 +80,11 @@ class SearchContext private constructor(val project: Project) {
         }
 
         fun <T> withStub(project: Project, file: PsiFile, action: (ctx: SearchContext) -> T): T {
-            return withStub(get(project), action)
+            val context = SearchContext(project)
+            return withStub(context, action)
         }
 
-        fun <T> withStub(ctx: SearchContext, action: (ctx: SearchContext) -> T): T {
+        private fun <T> withStub(ctx: SearchContext, action: (ctx: SearchContext) -> T): T {
             return with(ctx) {
                 val dumb = it.myDumb
                 val stub = it.myForStub
