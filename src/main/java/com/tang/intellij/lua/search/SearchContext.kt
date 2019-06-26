@@ -55,10 +55,10 @@ class SearchContext private constructor(val project: Project) {
         }
 
         fun infer(psi: LuaTypeGuessable, context: SearchContext): ITy {
-            return with(context) { it.inferAndCache(psi) }
+            return with(context, Ty.UNKNOWN) { it.inferAndCache(psi) }
         }
 
-        fun <T> with(ctx: SearchContext, action: (ctx: SearchContext) -> T): T {
+        private fun <T> with(ctx: SearchContext, defaultValue: T, action: (ctx: SearchContext) -> T): T {
             return if (ctx.myInStack) {
                 action(ctx)
             } else {
@@ -66,7 +66,11 @@ class SearchContext private constructor(val project: Project) {
                 val size = stack.size
                 stack.push(ctx)
                 ctx.myInStack = true
-                val result = action(ctx)
+                val result = try {
+                    action(ctx)
+                } catch (e: Exception) {
+                    defaultValue
+                }
                 ctx.myInStack = false
                 stack.pop()
                 assert(size == stack.size)
@@ -74,18 +78,18 @@ class SearchContext private constructor(val project: Project) {
             }
         }
 
-        fun <T> with(project: Project, action: (ctx: SearchContext) -> T): T {
+        private fun <T> with(project: Project, action: (ctx: SearchContext) -> T): T {
             val ctx = get(project)
             return with(ctx, action)
         }
 
-        fun <T> withStub(project: Project, file: PsiFile, action: (ctx: SearchContext) -> T): T {
+        fun <T> withStub(project: Project, file: PsiFile, defaultValue: T, action: (ctx: SearchContext) -> T): T {
             val context = SearchContext(project)
-            return withStub(context, action)
+            return withStub(context, defaultValue, action)
         }
 
-        private fun <T> withStub(ctx: SearchContext, action: (ctx: SearchContext) -> T): T {
-            return with(ctx) {
+        private fun <T> withStub(ctx: SearchContext, defaultValue: T, action: (ctx: SearchContext) -> T): T {
+            return with(ctx, defaultValue) {
                 val dumb = it.myDumb
                 val stub = it.myForStub
                 it.myDumb = true
