@@ -44,6 +44,8 @@ class LuaFileManager : ApplicationComponent, FileTypeListener {
     override fun disposeComponent() {
     }
 
+    override fun getComponentName() = "LuaFileManager"
+
     override fun fileTypesChanged(event: FileTypeEvent) {
         dirty = true
     }
