@@ -62,6 +62,7 @@ class LuaFileManager : ApplicationComponent, FileTypeListener {
             }
             myExtensions.clear()
             myExtensions.addAll(all)
+            myExtensions.add("")
         }
         return myExtensions.toTypedArray()
     }
