@@ -130,7 +130,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
         val localDef = PsiTreeUtil.getParentOfType(this, LuaLocalDef::class.java)
         if (localDef != null) {
             //计算 expr 返回类型
-            if (Ty.isInvalid(type) && !context.forStub) {
+            if (Ty.isInvalid(type) /*&& !context.forStub*/) {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
