@@ -23,6 +23,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.lang.LuaLanguage
 
+// todo: impl inline action
 class LuaInlineActionHandler : InlineActionHandler() {
     override fun inlineElement(project: Project, editor: Editor, psiElement: PsiElement) {
         
@@ -33,6 +34,6 @@ class LuaInlineActionHandler : InlineActionHandler() {
     }
 
     override fun canInlineElement(element: PsiElement): Boolean {
-        return true
+        return false
     }
 }
