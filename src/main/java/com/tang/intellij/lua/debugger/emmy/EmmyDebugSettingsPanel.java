@@ -59,9 +59,11 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
     public EmmyDebugSettingsPanel(Project project) {
         // type
         DefaultComboBoxModel<EmmyDebugTransportType> model = new DefaultComboBoxModel<>();
-        for (EmmyDebugTransportType value : EmmyDebugTransportType.values()) {
+        model.addElement(EmmyDebugTransportType.TCP_CLIENT);
+        model.addElement(EmmyDebugTransportType.TCP_SERVER);
+        /*for (EmmyDebugTransportType value : EmmyDebugTransportType.values()) {
             model.addElement(value);
-        }
+        }*/
         typeCombox.addActionListener(e -> {
             setType((EmmyDebugTransportType) typeCombox.getSelectedItem());
             onChanged();

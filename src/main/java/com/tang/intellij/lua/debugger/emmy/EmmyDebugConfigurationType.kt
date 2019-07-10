@@ -82,7 +82,7 @@ class EmmyDebuggerConfigurationFactory(val type: EmmyDebugConfigurationType) : C
 }
 
 class EmmyDebugConfiguration(project: Project, factory: EmmyDebuggerConfigurationFactory) : LuaRunConfiguration(project, factory) {
-    var type = EmmyDebugTransportType.TCP_SERVER
+    var type = EmmyDebugTransportType.TCP_CLIENT
 
     var host = "localhost"
     var port = 9966
