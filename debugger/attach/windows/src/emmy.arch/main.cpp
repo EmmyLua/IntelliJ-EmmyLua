@@ -78,16 +78,14 @@ int main(int argc, char** argv)
 		std::vector<Process> list;
 		GetProcesses(list);
 
-		printf("<list>");
 		for (int i = 0; i < list.size(); ++i)
 		{
 			auto& value = list[i];
-			printf("<process pid=\"%d\">", value.id);
-			printf("<title><![CDATA[%s]]></title>", value.title.c_str());
-			printf("<path><![CDATA[%s]]></path>", value.path.c_str());
-			printf("</process>");
+			printf("%d\n", value.id);
+			printf("%s\n", value.title.c_str());
+			printf("%s\n", value.path.c_str());
+			printf("----\n");
 		}
-		printf("</list>\n");
 	}
 	return 0;
 }

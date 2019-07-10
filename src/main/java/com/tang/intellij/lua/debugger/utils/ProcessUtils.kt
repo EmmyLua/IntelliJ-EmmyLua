@@ -20,9 +20,6 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.ProcessInfo
 import com.intellij.execution.util.ExecUtil
 import com.tang.intellij.lua.psi.LuaFileUtil
-import java.io.ByteArrayInputStream
-import javax.xml.parsers.DocumentBuilderFactory
-
 
 data class ProcessDetailInfo(
         var pid: Int = 0,
@@ -52,34 +49,14 @@ fun listProcesses(): Map<Int, ProcessDetailInfo> {
     val processOutput = ExecUtil.execAndGetOutput(commandLine)
 
     val text = processOutput.stdout
-    val builder = DocumentBuilderFactory.newInstance()
-    val documentBuilder = builder.newDocumentBuilder()
-    val document = documentBuilder.parse(ByteArrayInputStream(text.toByteArray()))
-    val root = document.documentElement
-    root.childNodes.let {
-        for (i in 0 until it.length) {
-            val c = it.item(i)
-            val p = ProcessDetailInfo()
-            val map = c.attributes
-            map.getNamedItem("pid")?.let { node ->
-                p.pid = node.nodeValue.toInt()
-            }
-            val childNodes = c.childNodes
-            for (j in 0 until childNodes.length) {
-                val child = childNodes.item(j)
-                when (child.nodeName) {
-                    "title" -> {
-                        val item = child.childNodes.item(0)
-                        p.title = item?.nodeValue ?: ""
-                    }
-                    "path" -> {
-                        val item = child.childNodes.item(0)
-                        p.path = item?.nodeValue ?: ""
-                    }
-                }
-            }
-            processMap[p.pid] = p
-        }
+    val lines = text.split("\n")
+    val size = lines.size / 4
+    for (i in 0 until size) {
+        val pid = lines[i * 4 + 0].toInt()
+        val title = lines[i * 4 + 1]
+        val path = lines[i * 4 + 2]
+        val p = ProcessDetailInfo(pid, path, title)
+        processMap[pid] = p
     }
     return processMap
 }
