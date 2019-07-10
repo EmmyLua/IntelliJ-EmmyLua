@@ -30,6 +30,8 @@ import javax.swing.*;
 public class LuaIcons {
     public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");
     public static final Icon UNITY = IconLoader.getIcon("/icons/Unity.png");
+    public static final Icon CSHARP = IconLoader.getIcon("/icons/csharp.svg");
+    public static final Icon CPP = IconLoader.getIcon("/icons/cpp.svg");
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon Alias = AllIcons.Nodes.AbstractClass;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;

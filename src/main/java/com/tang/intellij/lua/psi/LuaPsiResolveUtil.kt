@@ -118,6 +118,26 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
     return list.toTypedArray()
 }
 
+fun multiResolve(indexExpr: LuaIndexExpr, context: SearchContext): List<PsiElement> {
+    val list = mutableListOf<PsiElement>()
+    val name = indexExpr.name ?: return list
+    val type = indexExpr.guessParentType(context)
+    type.eachTopClass(Processor { ty ->
+        val m = ty.findMember(name, context)
+        if (m != null)
+            list.add(m)
+        true
+    })
+    if (list.isEmpty()) {
+        val tree = LuaDeclarationTree.get(indexExpr.containingFile)
+        val declaration = tree.find(indexExpr)
+        if (declaration != null) {
+            list.add(declaration.psi)
+        }
+    }
+    return list
+}
+
 fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
     val name = indexExpr.name ?: return null
     return resolve(indexExpr, name, context)

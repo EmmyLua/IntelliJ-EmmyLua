@@ -148,6 +148,8 @@
         <configurationType implementation="com.tang.intellij.lua.debugger.remote.LuaMobConfigurationType"/>
         <programRunner implementation="com.tang.intellij.lua.debugger.app.LuaAppRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.app.LuaAppConfigurationType"/>
+        <programRunner implementation="com.tang.intellij.lua.debugger.emmy.EmmyDebuggerRunner"/>
+        <configurationType implementation="com.tang.intellij.lua.debugger.emmy.EmmyDebugConfigurationType"/>
         <xdebugger.breakpointType implementation="com.tang.intellij.lua.debugger.LuaLineBreakpointType"/>
         <xdebugger.localAttachDebuggerProvider implementation="com.tang.intellij.lua.debugger.attach.LuaLocalAttachDebuggerProvider"/>
 
@@ -319,6 +321,7 @@
     <application-components>
         <component>
             <implementation-class>com.tang.intellij.lua.project.StdSDK</implementation-class>
+            <implementation-class>com.tang.intellij.lua.psi.LuaFileManager</implementation-class>
         </component>
     </application-components>
 
