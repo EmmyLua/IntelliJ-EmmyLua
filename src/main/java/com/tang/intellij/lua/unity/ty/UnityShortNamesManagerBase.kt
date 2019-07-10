@@ -29,11 +29,13 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
+import com.tang.intellij.lua.unity.UnitySettings
 import java.io.ByteArrayInputStream
 import java.io.DataInputStream
 import java.io.EOFException
 import java.io.InputStream
 import java.net.InetSocketAddress
+import java.nio.channels.AsynchronousCloseException
 import java.nio.channels.ServerSocketChannel
 import java.nio.channels.SocketChannel
 import java.nio.charset.Charset
@@ -48,6 +50,7 @@ abstract class UnityShortNamesManagerBase : LuaShortNamesManager() {
     private val myClassMap = mutableMapOf<String, NsMember>()
     private var myRootNS: Namespace? = null
     private var myClient: SocketChannel? = null
+    private var myServer: ServerSocketChannel? = null
 
     companion object {
         private val typeMap = mapOf(
@@ -80,8 +83,7 @@ abstract class UnityShortNamesManagerBase : LuaShortNamesManager() {
     }
 
     private fun DataInputStream.readType(): ITy {
-        val kind = readByte().toInt()
-        return when (kind) {
+        return when (readByte().toInt()) {
             TypeKind.Array.ordinal -> { // array
                 val base = readType()
                 TyArray(base)
@@ -105,24 +107,29 @@ abstract class UnityShortNamesManagerBase : LuaShortNamesManager() {
 
     protected fun createSocket() {
         val server = ServerSocketChannel.open()
-        server.bind(InetSocketAddress(996))
+        server.bind(InetSocketAddress(UnitySettings.getInstance().port))
+        myServer = server
         while (true) {
-            val client = server.accept()
-            if (this.myClient != null) {
-                client.close() // only one client
-                continue
-            }
-            val stream = client.socket().getInputStream()
-            this.myClient = client
-            ApplicationManager.getApplication().executeOnPooledThread {
-                processClient(stream)
+            try {
+                val client = server.accept()
+                if (this.myClient != null) {
+                    client.close() // only one client
+                    continue
+                }
+                val stream = client.socket().getInputStream()
+                this.myClient = client
+                ApplicationManager.getApplication().executeOnPooledThread {
+                    processClient(stream)
+                }
+            } catch (e: AsynchronousCloseException) {
+                break
             }
         }
     }
 
     private fun processClient(stream: InputStream) {
         try {
-            println("-- connected")
+            // println("-- connected")
             while (true) {
                 val streamSize = stream.readSize()
                 val proto = stream.readSize()
@@ -223,13 +230,20 @@ abstract class UnityShortNamesManagerBase : LuaShortNamesManager() {
     protected open fun onParseLibrary() {
     }
 
+    protected fun stop() {
+        close()
+        reset()
+        myServer?.close()
+        myServer = null
+    }
+
     protected fun close() {
         myClient?.close()
         myClient = null
     }
 
     private fun onClose() {
-        println("-- closed")
+        // println("-- closed")
         myClient = null
         reset()
     }

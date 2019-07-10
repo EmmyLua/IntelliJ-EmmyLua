@@ -21,16 +21,17 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.project.impl.ProjectLifecycleListener
+import com.tang.intellij.lua.unity.UnitySettings
+import com.tang.intellij.lua.unity.UnitySettingsListener
 
-class UnityShortNamesManager : UnityShortNamesManagerBase(), ProjectLifecycleListener {
+class UnityShortNamesManager : UnityShortNamesManagerBase(), ProjectLifecycleListener, UnitySettingsListener {
 
     init {
         val application = ApplicationManager.getApplication()
         val connect = application.messageBus.connect()
         connect.subscribe(ProjectLifecycleListener.TOPIC, this)
-        application.executeOnPooledThread {
-            createSocket()
-        }
+        connect.subscribe(UnitySettings.TOPIC, this)
+        start()
     }
 
     override val project: Project
@@ -45,5 +46,17 @@ class UnityShortNamesManager : UnityShortNamesManagerBase(), ProjectLifecycleLis
         for (project in ProjectManager.getInstance().openProjects) {
             DaemonCodeAnalyzer.getInstance(project).restart()
         }
+    }
+
+    private fun start() {
+        val application = ApplicationManager.getApplication()
+        application.executeOnPooledThread {
+            createSocket()
+        }
+    }
+
+    override fun onUnitySettingsChanged() {
+        stop()
+        start()
     }
 }

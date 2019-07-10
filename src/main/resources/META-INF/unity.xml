@@ -26,6 +26,14 @@
         <!-- runner & debugger -->
         <programRunner implementation="com.tang.intellij.lua.debugger.unity.LuaUnityDebuggerRunner"/>
         <configurationType implementation="com.tang.intellij.lua.debugger.unity.LuaUnityConfigurationType"/>
+
+        <applicationService serviceImplementation="com.tang.intellij.lua.unity.UnitySettings"/>
+
+        <applicationConfigurable instance="com.tang.intellij.lua.unity.UnitySettingsPanel"
+                          displayName="Unity Settings"
+                          id="preferences.UnitySettings"
+                          parentId="preferences.Lua">
+        </applicationConfigurable>
     </extensions>
 
     <extensions defaultExtensionNs="com.tang.intellij.lua">
