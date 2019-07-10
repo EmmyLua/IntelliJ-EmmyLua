@@ -28,6 +28,7 @@ import com.intellij.openapi.options.SettingsEditorGroup
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.JDOMExternalizerUtil
 import com.tang.intellij.lua.debugger.LuaCommandLineState
+import com.tang.intellij.lua.debugger.LuaConfigurationFactory
 import com.tang.intellij.lua.debugger.LuaRunConfiguration
 import com.tang.intellij.lua.lang.LuaIcons
 import org.jdom.Element
@@ -75,7 +76,7 @@ enum class EmmyWinArch(val desc: String) {
     }
 }
 
-class EmmyDebuggerConfigurationFactory(val type: EmmyDebugConfigurationType) : ConfigurationFactory(type) {
+class EmmyDebuggerConfigurationFactory(val type: EmmyDebugConfigurationType) : LuaConfigurationFactory(type) {
     override fun createTemplateConfiguration(project: Project): RunConfiguration {
         return EmmyDebugConfiguration(project, this)
     }
