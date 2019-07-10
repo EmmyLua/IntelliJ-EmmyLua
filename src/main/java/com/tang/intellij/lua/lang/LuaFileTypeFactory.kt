@@ -20,8 +20,8 @@ import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ * Created by tangzx on 2015/11/15.
+ * Email:love.tangzx@qq.com
  */
 class LuaFileTypeFactory : FileTypeFactory() {
     override fun createFileTypes(fileTypeConsumer: FileTypeConsumer) {

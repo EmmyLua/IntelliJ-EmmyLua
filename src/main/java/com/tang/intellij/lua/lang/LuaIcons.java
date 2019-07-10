@@ -24,8 +24,8 @@ import com.intellij.ui.RowIcon;
 import javax.swing.*;
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ * Created by tangzx on 2015/11/15.
+ * Email:love.tangzx@qq.com
  */
 public class LuaIcons {
     public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");

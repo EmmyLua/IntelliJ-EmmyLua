@@ -20,8 +20,8 @@ import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.lang.LuaLanguage;
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ * Created by tangzx on 2015/11/15.
+ * Email:love.tangzx@qq.com
  */
 public class LuaTokenType extends IElementType {
     public LuaTokenType(String debugName) {

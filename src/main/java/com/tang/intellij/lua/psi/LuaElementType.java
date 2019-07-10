@@ -38,8 +38,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ * Created by tangzx on 2015/11/15.
+ * Email:love.tangzx@qq.com
  */
 public class LuaElementType extends IElementType {
     public LuaElementType(String debugName) {

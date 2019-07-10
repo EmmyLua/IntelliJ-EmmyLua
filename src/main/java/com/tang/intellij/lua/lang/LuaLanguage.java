@@ -19,8 +19,8 @@ package com.tang.intellij.lua.lang;
 import com.intellij.lang.Language;
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ * Created by tangzx on 2015/11/15.
+ * Email:love.tangzx@qq.com
  */
 public class LuaLanguage extends Language {
 

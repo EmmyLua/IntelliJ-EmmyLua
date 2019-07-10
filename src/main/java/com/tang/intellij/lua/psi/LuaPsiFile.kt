@@ -33,8 +33,8 @@ import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.stubs.LuaFileStub
 
 /**
- * Created by TangZhiXu on 2015/11/15.
- * Email:272669294@qq.com
+ * Created by tangzx on 2015/11/15.
+ * Email:love.tangzx@qq.com
  */
 open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileViewProvider, LuaLanguage.INSTANCE), LuaTypeGuessable, LuaDeclarationScope {
 
