@@ -29,10 +29,8 @@
                     icon="/icons/lua.png"
                     factoryClass="com.tang.intellij.lua.luacheck.LuaCheckToolWindowFactory"
                     canCloseContents="true"/>
-        <projectService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckView"
-                        serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckView"/>
-        <applicationService serviceInterface="com.tang.intellij.lua.luacheck.LuaCheckSettings"
-                            serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
+        <projectService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckView"/>
+        <applicationService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
 
         <!--CreateFromTemplate-->
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
@@ -164,8 +162,7 @@
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaFunctionParamSigMacro"/>
 
         <!--lua settings-->
-        <applicationService serviceInterface="com.tang.intellij.lua.project.LuaSettings"
-                            serviceImplementation="com.tang.intellij.lua.project.LuaSettings"/>
+        <applicationService serviceImplementation="com.tang.intellij.lua.project.LuaSettings"/>
         <applicationConfigurable groupId="language"
                                  displayName="EmmyLua"
                                  id="preferences.Lua"
@@ -234,7 +231,7 @@
 
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
-                displayName="Duplicate Class"
+                displayName="Duplicate class"
                 enabledByDefault="true"
                 level="ERROR"
                 groupName="Lua"/>
@@ -244,7 +241,7 @@
                 enabledByDefault="true"
                 groupName="Lua"/>
         <localInspection
-                displayName="Remove Unused"
+                displayName="Remove unused"
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.RemoveUnusedLocal"/>

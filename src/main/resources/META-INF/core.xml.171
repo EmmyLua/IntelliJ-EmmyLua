@@ -231,7 +231,7 @@
 
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.DuplicateClassDeclaration"
-                displayName="Duplicate Class"
+                displayName="Duplicate class"
                 enabledByDefault="true"
                 level="ERROR"
                 groupName="Lua"/>
@@ -241,7 +241,7 @@
                 enabledByDefault="true"
                 groupName="Lua"/>
         <localInspection
-                displayName="Remove Unused"
+                displayName="Remove unused"
                 enabledByDefault="true"
                 groupName="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.RemoveUnusedLocal"/>
