@@ -40,7 +40,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 <YYINITIAL> {
     "\""    { yybegin(STRING_CONTENT); return STRING; }
     "'"     { yybegin(STRING_CONTENT); return STRING; }
-    \[=*\[  { /*yybegin(BLOCK_STRING_CONTENT); */return STRING; }
+    \[=*\[  { yybegin(BLOCK_STRING_CONTENT); return STRING; }
     [^]     { return STRING; }
 }
 
@@ -54,8 +54,5 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 }
 
 <BLOCK_STRING_CONTENT> {
-    [^\\\n]+    { return STRING; }
-    \\\d+       { return VALID_STRING_ESCAPE_TOKEN; }
-    \\\S        { return VALID_STRING_ESCAPE_TOKEN; }
     [^]         { return STRING; }
 }
