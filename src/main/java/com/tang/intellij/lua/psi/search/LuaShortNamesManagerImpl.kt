@@ -54,7 +54,7 @@ class LuaShortNamesManagerImpl : LuaShortNamesManager() {
     }
 
     override fun findAlias(name: String, context: SearchContext): LuaTypeAlias? {
-        return LuaAliasIndex.instance.get(name, context.project, context.scope)?.firstOrNull()
+        return LuaAliasIndex.find(name, context)
     }
 
     override fun processAllAlias(project: Project, processor: Processor<String>): Boolean {
