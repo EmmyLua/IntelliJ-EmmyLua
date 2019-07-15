@@ -198,8 +198,8 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
 
     private String getDebuggerFolder() {
         if (SystemInfoRt.isWindows)
-            return LuaFileUtil.getPluginVirtualFile("debugger/emmy/windows");
-        return LuaFileUtil.getPluginVirtualFile("debugger/emmy/unix");
+            return LuaFileUtil.INSTANCE.getPluginVirtualFile("debugger/emmy/windows");
+        return LuaFileUtil.INSTANCE.getPluginVirtualFile("debugger/emmy/unix");
     }
 
     private void updateCodeImpl() {

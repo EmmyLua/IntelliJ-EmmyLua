@@ -68,7 +68,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
 
     fun launch(program: String, configuration: LuaAppRunConfiguration) {
         //this.captureStd = !configuration.showConsole
-        val pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory()
+        val pluginVirtualDirectory = LuaFileUtil.pluginVirtualDirectory
         val workingDir = configuration.workingDir
         try {
             if (pluginVirtualDirectory != null) {
@@ -77,7 +77,7 @@ class LuaAppAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSess
                 }
 
                 // check arch
-                val archExe = LuaFileUtil.getArchExeFile()
+                val archExe = LuaFileUtil.archExeFile
                 val processBuilder = ProcessBuilder(archExe!!)
                 val isX86: Boolean
                 val archChecker = processBuilder.command(archExe, "arch", "-file", program).start()

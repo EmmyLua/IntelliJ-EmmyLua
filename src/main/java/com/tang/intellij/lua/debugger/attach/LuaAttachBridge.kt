@@ -61,11 +61,11 @@ class LuaAttachBridge(process: LuaAttachDebugProcessBase, session: XDebugSession
 
     fun attach(processInfo: ProcessInfo) {
         val pid = processInfo.pid.toString()
-        val pluginVirtualDirectory = LuaFileUtil.getPluginVirtualDirectory()
+        val pluginVirtualDirectory = LuaFileUtil.pluginVirtualDirectory
         try {
             if (pluginVirtualDirectory != null) {
                 // check arch
-                val archExe = LuaFileUtil.getArchExeFile()
+                val archExe = LuaFileUtil.archExeFile
                 val processBuilder = ProcessBuilder(archExe!!)
                 val isX86: Boolean
                 val archChecker = processBuilder.command(archExe, "arch", "-pid", pid).start()

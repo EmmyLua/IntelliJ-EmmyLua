@@ -132,7 +132,7 @@ public class LuaAppSettingsEditor extends SettingsEditor<LuaAppRunConfiguration>
                                              @NotNull CompletionResultSet result) {
             ProjectRootManager.getInstance(project).getFileIndex().iterateContent(virtualFile -> {
                 if (!virtualFile.isDirectory() && virtualFile.getFileType() == LuaFileType.INSTANCE) {
-                    String url = LuaFileUtil.getShortPath(project, virtualFile);
+                    String url = LuaFileUtil.INSTANCE.getShortPath(project, virtualFile);
                     result.addElement(LookupElementBuilder.create(url).withIcon(LuaIcons.FILE));
                 }
                 return true;

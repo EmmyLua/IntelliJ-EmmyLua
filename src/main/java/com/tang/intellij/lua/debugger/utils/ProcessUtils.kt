@@ -41,7 +41,7 @@ fun getDisplayName(processInfo: ProcessInfo, detailInfo: ProcessDetailInfo): Str
 
 fun listProcesses(): Map<Int, ProcessDetailInfo> {
     val processMap = mutableMapOf<Int, ProcessDetailInfo>()
-    val archExe = LuaFileUtil.getArchExeFile() ?: return processMap
+    val archExe = LuaFileUtil.archExeFile ?: return processMap
     val commandLine = GeneralCommandLine(archExe)
     //commandLine.charset = Charset.forName("UTF-8")
     commandLine.addParameters("list_processes")

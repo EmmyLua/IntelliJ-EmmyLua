@@ -52,7 +52,7 @@ class LuaLocalAttachDebuggerProvider : XLocalAttachDebuggerProvider {
             return emptyList()
 
         if (userDataHolder.getUserData(DETAIL_KEY) == null) {
-            val archExe = LuaFileUtil.getArchExeFile()
+            val archExe = LuaFileUtil.archExeFile
             if (archExe == null) {
                 ApplicationManager.getApplication().invokeLater {
                     val notification = Notification(
