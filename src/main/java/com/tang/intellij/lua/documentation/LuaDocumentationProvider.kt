@@ -53,14 +53,14 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
                 }
             }
         }
-        return super.getQuickNavigateInfo(element, originalElement)
+        return super<AbstractDocumentationProvider>.getQuickNavigateInfo(element, originalElement)
     }
 
     override fun getDocumentationElementForLookupItem(psiManager: PsiManager, obj: Any, element: PsiElement?): PsiElement? {
         if (obj is LuaDocumentationLookupElement) {
             return obj.getDocumentationElement(SearchContext.get(psiManager.project))
         }
-        return super.getDocumentationElementForLookupItem(psiManager, obj, element)
+        return super<AbstractDocumentationProvider>.getDocumentationElementForLookupItem(psiManager, obj, element)
     }
 
     override fun getDocumentationElementForLink(psiManager: PsiManager, link: String, context: PsiElement?): PsiElement? {
@@ -95,7 +95,7 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
             }
         }
         if (sb.isNotEmpty()) return sb.toString()
-        return super.generateDoc(element, originalElement)
+        return super<AbstractDocumentationProvider>.generateDoc(element, originalElement)
     }
 
     private fun renderClassMember(sb: StringBuilder, classMember: LuaClassMember) {
