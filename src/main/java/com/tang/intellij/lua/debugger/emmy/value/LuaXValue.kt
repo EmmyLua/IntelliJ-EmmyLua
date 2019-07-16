@@ -135,7 +135,7 @@ class TableXValue(v: VariableValue, val frame: EmmyDebugStackFrame) : LuaXValue(
     override fun computeChildren(node: XCompositeNode) {
         val ev = this.frame.evaluator
         if (ev != null) {
-            ev.eval(evalExpr, object : XDebuggerEvaluator.XEvaluationCallback {
+            ev.eval(evalExpr, value.cacheId, object : XDebuggerEvaluator.XEvaluationCallback {
                 override fun errorOccurred(err: String) {
                     node.setErrorMessage(err)
                 }

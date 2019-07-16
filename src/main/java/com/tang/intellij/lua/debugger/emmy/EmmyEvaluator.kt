@@ -39,13 +39,13 @@ class EmmyEvaluator(val frame: EmmyDebugStackFrame, val process: EmmyDebugProces
         }
     }
 
-    fun eval(express: String, xEvaluationCallback: XEvaluationCallback, depth: Int = 1) {
-        val req = EvalReq(express, frame.data.level, depth)
+    fun eval(express: String, cacheId: Int, xEvaluationCallback: XEvaluationCallback, depth: Int = 1) {
+        val req = EvalReq(express, frame.data.level, cacheId, depth)
         process.send(req)
         callbackMap[req.seq] = xEvaluationCallback
     }
 
     override fun eval(express: String, xEvaluationCallback: XEvaluationCallback, xSourcePosition: XSourcePosition?) {
-        eval(express, xEvaluationCallback)
+        eval(express, 0, xEvaluationCallback)
     }
 }

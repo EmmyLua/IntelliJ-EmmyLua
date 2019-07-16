@@ -100,6 +100,7 @@ class VariableValue(val name: String,
                     val value: String,
                     val valueType: Int,
                     val valueTypeName: String,
+                    val cacheId: Int,
                     val children: List<VariableValue>?) {
     val nameTypeValue: LuaValueType get() {
         return LuaValueType.values().find { it.ordinal == nameType } ?: LuaValueType.TSTRING
@@ -131,7 +132,7 @@ class Stack(
 
 class BreakNotify(val stacks: List<Stack>)
 
-class EvalReq(val expr: String, val stackLevel: Int, val depth: Int = 1) : Message(MessageCMD.EvalReq) {
+class EvalReq(val expr: String, val stackLevel: Int, val cacheId: Int, val depth: Int) : Message(MessageCMD.EvalReq) {
     val seq = makeSeq()
 }
 
