@@ -99,7 +99,7 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
             get() = ServiceManager.getService(LuaSettings::class.java)
 
         fun isConstructorName(name: String): Boolean {
-            return instance.constructorNames.contains(name.toLowerCase())
+            return instance.constructorNames.contains(name)
         }
     }
 }
