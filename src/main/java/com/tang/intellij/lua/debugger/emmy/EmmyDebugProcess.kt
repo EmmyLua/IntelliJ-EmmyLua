@@ -99,18 +99,16 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
     }
 
     override fun registerBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
-        val project = session.project
         val file = sourcePosition.file
-        val shortPath = LuaFileUtil.getShortPath(project, file)
+        val shortPath = file.canonicalPath
         if (shortPath != null) {
             send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
         }
     }
 
     override fun unregisterBreakpoint(sourcePosition: XSourcePosition, breakpoint: XLineBreakpoint<*>) {
-        val project = session.project
         val file = sourcePosition.file
-        val shortPath = LuaFileUtil.getShortPath(project, file)
+        val shortPath = file.canonicalPath
         if (shortPath != null) {
             send(RemoveBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
         }
