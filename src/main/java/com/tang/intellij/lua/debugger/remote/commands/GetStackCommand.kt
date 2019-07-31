@@ -17,11 +17,9 @@
 package com.tang.intellij.lua.debugger.remote.commands
 
 import com.intellij.xdebugger.frame.XStackFrame
-import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.LuaExecutionStack
 import com.tang.intellij.lua.debugger.remote.LuaMobStackFrame
 import com.tang.intellij.lua.debugger.remote.value.LuaRValue
-import com.tang.intellij.lua.psi.LuaFileUtil
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.lib.jse.JsePlatform
 import java.util.*
@@ -78,14 +76,7 @@ class GetStackCommand : DefaultCommand("STACK --{maxlevel=0}", 1) {
                 val funcName = stackInfo.get(1)
                 val fileName = stackInfo.get(2)
                 val line = stackInfo.get(4)
-
-                var position: XSourcePositionImpl? = null
-                val virtualFile = LuaFileUtil.findFile(debugProcess.session.project, fileName.toString())
-                if (virtualFile != null) {
-                    val nLine = line.toint()
-                    position = XSourcePositionImpl.create(virtualFile, nLine - 1)
-                }
-
+                val position = debugProcess.findSourcePosition(fileName.toString(), line.toint())
                 var functionName = funcName.toString()
                 if (funcName.isnil())
                     functionName = "main"

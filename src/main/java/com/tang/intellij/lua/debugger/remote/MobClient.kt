@@ -76,7 +76,7 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
         } catch (e: Exception) {
             e.message?.let { listener.error(it) }
         } finally {
-            listener.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+            onClosed()
         }
     }
 
@@ -143,12 +143,19 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
             streamWriter?.write("done\n")
         } catch (ignored: IOException) {
         }
-
-        isStopped = true
         currentCommandWaitForResp = null
         try {
             socket.close()
         } catch (ignored: Exception) {
+        }
+        onClosed()
+        isStopped = true
+    }
+
+    private fun onClosed() {
+        if (!isStopped) {
+            isStopped = true
+            listener.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
         }
     }
 

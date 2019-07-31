@@ -19,18 +19,16 @@ package com.tang.intellij.lua.debugger.remote.commands
 import com.tang.intellij.lua.debugger.remote.MobClient
 import com.tang.intellij.lua.lexer.LuaLexerAdapter
 import com.tang.intellij.lua.psi.LuaTypes
-import java.io.IOException
 
 /**
  *
  * Created by tangzx on 2016/12/31.
  */
-open class DefaultCommand @JvmOverloads constructor(private val commandline: String, private val requireRespLines: Int = 1) : DebugCommand() {
+open class DefaultCommand(private val commandline: String, private val requireRespLines: Int = 1) : DebugCommand() {
     internal var handleLines: Int = 0
 
-    var lineBuffer = StringBuffer(1024 * 32)
+    private var lineBuffer = StringBuffer(1024 * 32)
 
-    @Throws(IOException::class)
     override fun write(writer: MobClient) {
         writer.write(commandline)
     }
