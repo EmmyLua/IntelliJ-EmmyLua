@@ -198,7 +198,7 @@ class LuaStructureVisitor : LuaVisitor() {
             val name = tableField.name
 
             if (name != null) {
-                val expr = tableField.exprList[0]
+                val expr = tableField.exprList.firstOrNull()
 
                 val child = if (expr is LuaClosureExpr) {
                     if (exprOwner is LuaClassElement) {
