@@ -367,6 +367,7 @@ private class LuaDeclarationTreePsi(file: PsiFile) : LuaDeclarationTreeBase(file
     }
 
     override fun getPosition(psi: PsiElement): Int {
+        if (psi is PsiFile) return 0
         return psi.node.startOffset
     }
 }
