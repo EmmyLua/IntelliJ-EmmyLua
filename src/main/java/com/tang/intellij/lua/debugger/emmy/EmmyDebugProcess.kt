@@ -18,17 +18,14 @@ package com.tang.intellij.lua.debugger.emmy
 
 import com.google.gson.Gson
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.util.Processor
 import com.intellij.xdebugger.XDebugSession
+import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
 import com.intellij.xdebugger.frame.XSuspendContext
 import com.intellij.xdebugger.impl.XDebugSessionImpl
-import com.tang.intellij.lua.debugger.LuaDebugProcess
-import com.tang.intellij.lua.debugger.LuaDebuggerEditorsProvider
-import com.tang.intellij.lua.debugger.LuaExecutionStack
-import com.tang.intellij.lua.debugger.LuaSuspendContext
+import com.tang.intellij.lua.debugger.*
 import com.tang.intellij.lua.psi.LuaFileManager
 import com.tang.intellij.lua.psi.LuaFileUtil
 import java.io.File
@@ -59,20 +56,26 @@ class EmmyDebugProcess(session: XDebugSession) : LuaDebugProcess(session), ITran
 
     override fun onConnect(suc: Boolean) {
         if (suc) {
-            // send init
-            val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/emmyHelper.lua")
-            val code = File(path).readText()
-            val extList = LuaFileManager.getInstance().extensions
-            transporter?.send(InitMessage(code, extList))
-            // send bps
-            processBreakpoint(Processor { bp ->
-                bp.sourcePosition?.let {
-                    registerBreakpoint(it, bp)
+            ApplicationManager.getApplication().runReadAction {
+                // send init
+                val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/emmyHelper.lua")
+                if (path != null) {
+                    val code = File(path).readText()
+                    val extList = LuaFileManager.getInstance().extensions
+                    transporter?.send(InitMessage(code, extList))
                 }
-                true
-            })
-            // send ready
-            transporter?.send(Message(MessageCMD.ReadyReq))
+                // send bps
+                val breakpoints = XDebuggerManager.getInstance(session.project)
+                        .breakpointManager
+                        .getBreakpoints(LuaLineBreakpointType::class.java)
+                breakpoints.forEach { breakpoint ->
+                    breakpoint.sourcePosition?.let { position ->
+                        registerBreakpoint(position, breakpoint)
+                    }
+                }
+                // send ready
+                transporter?.send(Message(MessageCMD.ReadyReq))
+            }
         }
         else stop()
     }

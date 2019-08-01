@@ -121,6 +121,7 @@ abstract class SocketChannelTransporter : Transporter() {
                 break
             }
         }
+        send(StopSign())
         println(">>> stop receive")
     }
 
