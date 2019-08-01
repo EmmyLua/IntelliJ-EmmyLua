@@ -22,6 +22,7 @@ import com.intellij.execution.configurations.ConfigurationType
 import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RunProfileState
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.options.SettingsEditorGroup
@@ -82,7 +83,7 @@ class EmmyDebuggerConfigurationFactory(val type: EmmyDebugConfigurationType) : L
     }
 }
 
-class EmmyDebugConfiguration(project: Project, factory: EmmyDebuggerConfigurationFactory) : LuaRunConfiguration(project, factory) {
+class EmmyDebugConfiguration(project: Project, factory: EmmyDebuggerConfigurationFactory) : LuaRunConfiguration(project, factory), RunConfigurationWithSuppressedDefaultRunAction {
     var type = EmmyDebugTransportType.TCP_CLIENT
 
     var host = "localhost"

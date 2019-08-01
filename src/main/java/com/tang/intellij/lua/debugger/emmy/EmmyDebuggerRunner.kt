@@ -29,12 +29,12 @@ import com.tang.intellij.lua.debugger.LuaRunner
 
 class EmmyDebuggerRunner : LuaRunner() {
     companion object {
-        const val ID = "lue.emmy.runner"
+        const val ID = "lua.emmy.runner"
     }
     override fun getRunnerId() = ID
 
     override fun canRun(executorId: String, runProfile: RunProfile): Boolean {
-        return DefaultDebugExecutor.EXECUTOR_ID == executorId && runProfile is EmmyDebugConfiguration;
+        return DefaultDebugExecutor.EXECUTOR_ID == executorId && runProfile is EmmyDebugConfiguration
     }
 
     override fun doExecute(state: RunProfileState, environment: ExecutionEnvironment): RunContentDescriptor {
