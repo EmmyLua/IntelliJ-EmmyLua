@@ -116,8 +116,45 @@ if (isWin) {
     }
 }
 
+task downloadEmmyDebugger(type: Download) {
+    src ([
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/1.0.1/emmy_core.so",
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/1.0.1/emmy_core@x64.zip",
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/1.0.1/emmy_core@x86.zip"
+    ])
+    dest "temp"
+}
+
+task unzipEmmyDebugger(type: Copy, dependsOn: downloadEmmyDebugger) {
+    from(zipTree("temp/emmy_core@x64.zip")) {
+        include "lib/emmy_core.dll"
+        into "x64"
+    }
+    from(zipTree("temp/emmy_core@x86.zip")) {
+        include "lib/emmy_core.dll"
+        into "x86"
+    }
+    destinationDir file("temp")
+}
+
+task installEmmyDebugger(dependsOn: unzipEmmyDebugger, type: Copy) {
+    from("temp/x64/lib/") {
+        include "emmy_core.dll"
+        into "debugger/emmy/windows/x64"
+    }
+    from("temp/x86/lib/") {
+        include "emmy_core.dll"
+        into "debugger/emmy/windows/x86"
+    }
+    from("temp") {
+        include "emmy_core.so"
+        into "debugger/emmy/unix"
+    }
+    destinationDir file("src/main/resources")
+}
+
 // apply patchs before build plugin
-task buildPluginWithBunch() {
+task buildPluginWithBunch(dependsOn: installEmmyDebugger) {
     finalizedBy buildPlugin
     doLast {
         // reset
