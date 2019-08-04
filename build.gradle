@@ -100,23 +100,6 @@ def RES_DIR = "src/main/resources"
 
 buildPlugin.baseName = cfg.archiveName
 
-def isWin = Os.isFamily(Os.FAMILY_WINDOWS)
-
-if (isWin) {
-    task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], type: Copy) {
-        from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
-        destinationDir file("${RES_DIR}/debugger/windows")
-    }
-
-    buildPlugin.dependsOn(copyAttachDebugger)
-    buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
-        into "/${project.name}/classes/"
-    }
-    buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
-        into "/${project.name}"
-    }
-}
-
 task downloadEmmyDebugger(type: Download) {
     src ([
             "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/1.0.1/emmy_core.so",
@@ -154,8 +137,25 @@ task installEmmyDebugger(dependsOn: unzipEmmyDebugger, type: Copy) {
     destinationDir file("src/main/resources")
 }
 
+def isWin = Os.isFamily(Os.FAMILY_WINDOWS)
+
+if (isWin) {
+    task copyAttachDebugger(dependsOn: ["debugger:attach:windows:buildProduct"], type: Copy) {
+        from(fileTree(dir: 'debugger/attach/windows/build/', includes: ['x64/**', 'x86/**']))
+        destinationDir file("${RES_DIR}/debugger/windows")
+    }
+
+    buildPlugin.dependsOn([copyAttachDebugger, installEmmyDebugger])
+    buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
+        into "/${project.name}/classes/"
+    }
+    buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
+        into "/${project.name}"
+    }
+}
+
 // apply patchs before build plugin
-task buildPluginWithBunch(dependsOn: installEmmyDebugger) {
+task buildPluginWithBunch() {
     finalizedBy buildPlugin
     doLast {
         // reset
