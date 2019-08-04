@@ -139,6 +139,7 @@ task installEmmyDebugger(dependsOn: unzipEmmyDebugger, type: Copy) {
         into "debugger/emmy/unix"
     }
     from("legacy") {
+        include "**/*"
         into "debugger/windows"
     }
     destinationDir file("src/main/resources")
