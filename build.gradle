@@ -102,10 +102,10 @@ buildPlugin.baseName = cfg.archiveName
 
 task downloadEmmyDebugger(type: Download) {
     src ([
-            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/1.0.1/emmy_core.so",
-            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/1.0.1/emmy_core@x64.zip",
-            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/1.0.1/emmy_core@x86.zip",
-            "https://github.com/EmmyLua/EmmyLuaLegacyDebugger/releases/download/1.0.0/debugger.zip"
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core.so",
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x64.zip",
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x86.zip",
+            "https://github.com/EmmyLua/EmmyLuaLegacyDebugger/releases/download/${emmyLegacyDebuggerVersion}/debugger.zip"
     ])
     dest "temp"
 }
