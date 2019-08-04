@@ -138,7 +138,7 @@ task installEmmyDebugger(dependsOn: unzipEmmyDebugger, type: Copy) {
         include "emmy_core.so"
         into "debugger/emmy/unix"
     }
-    from("legacy") {
+    from("temp/legacy") {
         include "**/*"
         into "debugger/windows"
     }
