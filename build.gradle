@@ -39,11 +39,11 @@ if (System.env['APPVEYOR']) {
     version = System.env['APPVEYOR_BUILD_VERSION']
     exec {
         executable "git"
-        args ["config", "--global", "user.email", "love.tangzx@qq.com"]
+        args "config", "--global", "user.email", "love.tangzx@qq.com"
     }
     exec {
         executable "git"
-        args ["config", "--global", "user.name", "tangzx"]
+        args "config", "--global", "user.name", "tangzx"
     }
 }
 
@@ -52,7 +52,8 @@ ext {
         def os = new ByteArrayOutputStream()
         exec {
             executable "git"
-            args ["rev-parse", "HEAD"]
+            args "rev-parse"
+            args "HEAD"
             standardOutput = os
         }
         return os.toString().substring(0, 7)
@@ -160,22 +161,22 @@ task buildPluginWithBunch(dependsOn: installEmmyDebugger) {
         // reset
         exec {
             executable "git"
-            args ["reset", "HEAD", "--hard"]
+            args "reset", "HEAD", "--hard"
         }
         // clean untracked files
         exec {
             executable "git"
-            args ["clean", "-d", "-f"]
+            args "clean", "-d", "-f"
         }
         // switch
         exec {
             executable isWin ? "bunch/bin/bunch.bat" : "bunch/bin/bunch"
-            args ["switch", ".", IDEA_VER]
+            args "switch", ".", IDEA_VER
         }
         // reset to HEAD
         exec {
             executable "git"
-            args ["reset", rev]
+            args "reset", rev
         }
     }
 }
