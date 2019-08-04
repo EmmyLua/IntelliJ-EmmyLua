@@ -33,7 +33,7 @@ sourceSets {
         }
     }
 }
-
+def isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 // Appveyor CI
 if (System.env['APPVEYOR']) {
     version = System.env['APPVEYOR_BUILD_VERSION']
