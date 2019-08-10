@@ -199,7 +199,9 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
     private String getDebuggerFolder() {
         if (SystemInfoRt.isWindows)
             return LuaFileUtil.INSTANCE.getPluginVirtualFile("debugger/emmy/windows");
-        return LuaFileUtil.INSTANCE.getPluginVirtualFile("debugger/emmy/unix");
+        if (SystemInfoRt.isMac)
+            return LuaFileUtil.INSTANCE.getPluginVirtualFile("debugger/emmy/mac");
+        return LuaFileUtil.INSTANCE.getPluginVirtualFile("debugger/emmy/linux");
     }
 
     private void updateCodeImpl() {
@@ -211,6 +213,10 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
                     .append("/")
                     .append(arch.getDesc())
                     .append("/?.dll'\n");
+        } else if (SystemInfoRt.isMac) {
+            sb.append("package.cpath = package.cpath .. ';")
+                    .append(getDebuggerFolder())
+                    .append("/?.dylib'\n");
         } else {
             sb.append("package.cpath = package.cpath .. ';")
                     .append(getDebuggerFolder())
@@ -261,7 +267,7 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
         onChanged();
     }
 
-    class IntegerDocument extends PlainDocument {
+    static class IntegerDocument extends PlainDocument {
         public void insertString(int offset, String s, AttributeSet attributeSet) throws BadLocationException {
             try {
                 Integer.parseInt(s);
