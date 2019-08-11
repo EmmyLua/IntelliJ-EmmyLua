@@ -28,7 +28,7 @@ import javax.swing.*;
  * Email:love.tangzx@qq.com
  */
 public class LuaIcons {
-    public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");
+    public static final Icon FILE = IconLoader.getIcon("/icons/lua.svg");
     public static final Icon CSHARP = IconLoader.getIcon("/icons/csharp.svg");
     public static final Icon CPP = IconLoader.getIcon("/icons/cpp.svg");
     public static final Icon CLASS = AllIcons.Nodes.Class;
