@@ -19,7 +19,7 @@ package com.tang.intellij.lua.debugger
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.CommandLineState
-import com.intellij.execution.process.OSProcessHandler
+import com.intellij.execution.process.ColoredProcessHandler
 import com.intellij.execution.process.ProcessHandler
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.execution.ui.ConsoleView
@@ -33,7 +33,7 @@ class LuaCommandLineState(environment: ExecutionEnvironment) : CommandLineState(
     @Throws(ExecutionException::class)
     override fun startProcess(): ProcessHandler {
         val runProfile = environment.runProfile as LuaRunConfiguration
-        return OSProcessHandler(runProfile.createCommandLine()!!)
+        return ColoredProcessHandler(runProfile.createCommandLine()!!)
     }
 
     @Throws(ExecutionException::class)
