@@ -1,3 +1,4 @@
+![logo](/snapshot/logo.png)
 # EmmyLua for IntelliJ IDEA
 
 [![Online EmmyLua Doc](https://img.shields.io/badge/emmy-doc-46BC99.svg?style=flat-square)](https://emmylua.github.io)
