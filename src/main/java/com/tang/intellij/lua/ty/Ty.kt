@@ -409,7 +409,7 @@ class TyUnion : Ty(TyKind.Union) {
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
         val u = TyUnion()
-        childSet.forEach { u.childSet.add(it.substitute(substitutor)) }
+        childSet.forEach { u.addChild(it.substitute(substitutor)) }
         return u
     }
 
@@ -419,6 +419,16 @@ class TyUnion : Ty(TyKind.Union) {
 
     override fun acceptChildren(visitor: ITyVisitor) {
         childSet.forEach { it.accept(visitor) }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return other is TyUnion && other.hashCode() == hashCode()
+    }
+
+    override fun hashCode(): Int {
+        var code = 0
+        childSet.forEach { code = code * 31 + it.hashCode() }
+        return code
     }
 
     companion object {
@@ -452,16 +462,6 @@ class TyUnion : Ty(TyKind.Union) {
                 fn(it)
                 true
             }
-        }
-
-        fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
-            if (ty is TyUnion) {
-                val list = ty.childSet.sorted()
-                for (iTy in list) {
-                    if (!process(iTy))
-                        break
-                }
-            } else process(ty)
         }
 
         fun union(t1: ITy, t2: ITy): ITy {
