@@ -464,6 +464,18 @@ class TyUnion : Ty(TyKind.Union) {
             }
         }
 
+        // used by ver.2017
+        @Suppress("unused")
+        fun eachPerfect(ty: ITy, process: (ITy) -> Boolean) {
+            if (ty is TyUnion) {
+                val list = ty.childSet.sorted()
+                for (iTy in list) {
+                    if (!process(iTy))
+                        break
+                }
+            } else process(ty)
+        }
+
         fun union(t1: ITy, t2: ITy): ITy {
             return when {
                 isInvalid(t1) -> t2
