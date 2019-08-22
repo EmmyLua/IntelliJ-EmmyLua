@@ -17,7 +17,7 @@
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.2.9</version>
+    <version>1.3.0</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
@@ -69,6 +69,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.3.0</strong>
+    <ul>
+        <li>[NEW]New debugger Emmy Debugger(experimental)</li>
+        <li>[NEW]New log and file icons...</li>
+        <li>Bug fix #256 #260 #262 #267 #268 ...</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
     <strong>1.2.9</strong>
     <ul>
         <li>Optimize performance</li>
@@ -87,20 +94,6 @@
         <li>[NEW]New annotation @alias, usage: @alias ALIAS_NAME TYPE</li>
         <li>[FIX]Lua 5.0 - 5.2 Math std fixes (#225 by @Christopher-St)</li>
         <li>Bug fix #206 #207 #201 #46 #210 #212 #211 #215 #216 #223 #220 EmmyLua-ErrorReport#38 ...</li>
-        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
-    </ul>
-    <strong>1.2.6</strong>
-    <ul>
-        <li>[NEW]Code completion for breakpoint condition</li>
-        <li>[NEW]Compatible with IDEA2018.3</li>
-        <li>[NEW]New inspection "Unresolved symbol in emmy doc"</li>
-        <li>[NEW]New inspection "Unresolved class"</li>
-        <li>[NEW]Shebang file type detector</li>
-        <li>[NEW]String literal paste provider</li>
-        <li>[NEW]New annotator: @vararg TYPE</li>
-        <li>[NEW]Arguments history completion</li>
-        <li>[NEW]Unity attach debugger support (By @taigacon)</li>
-        <li>Bug fix #178 #168 #186 #192 #196 #198 #199 #195 #116 ...</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
     ]]>

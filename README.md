@@ -88,7 +88,7 @@ QQ交流群：1群：`29850775` 2群：`529914962`
 
 ## Road map
 - [ ] Attach debugger rewriting
-- [ ] Remote debugger rewriting
+- [x] Remote debugger rewriting
 - [ ] Data follow inspections
 - [ ] Ctrl follow inspections
 - [ ] `@interface` support
@@ -96,16 +96,15 @@ QQ交流群：1群：`29850775` 2群：`529914962`
 
 ## Build environment requirements
 
-- Visual Studio 2015
 - JDK 1.8
 - Setup environment variables as following:
 
         JAVA_HOME="path to JDK 1.8"
-        IDEA_HOME="path to IDEA 172+"
+        IDEA_HOME_182="path to IDEA 182+"
         
 ## Building
 
-  `./gradlew buildPlugin`
+  `./gradlew -b build_versions.gradle build_182`
 
 ## Developed By
 

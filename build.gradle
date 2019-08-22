@@ -36,7 +36,11 @@ sourceSets {
 def isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 // Appveyor CI
 if (System.env['APPVEYOR']) {
-    version = System.env['APPVEYOR_BUILD_VERSION']
+    if (System.env['APPVEYOR_REPO_TAG_NAME']) {
+        version = System.env['APPVEYOR_REPO_TAG_NAME']
+    } else {
+        version = System.env['APPVEYOR_BUILD_VERSION']
+    }
     exec {
         executable "git"
         args "config", "--global", "user.email", "love.tangzx@qq.com"
