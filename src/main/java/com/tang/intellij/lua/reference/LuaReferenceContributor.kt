@@ -19,6 +19,8 @@ package com.tang.intellij.lua.reference
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.*
 import com.intellij.util.ProcessingContext
+import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 
 /**
@@ -60,7 +62,7 @@ class LuaReferenceContributor : PsiReferenceContributor() {
             val expr = psiElement as LuaCallExpr
             val nameRef = expr.expr
             if (nameRef is LuaNameExpr) {
-                if (nameRef.getText() == "require") {
+                if (LuaSettings.isImporterName(nameRef.getText()) || nameRef.getText() == Constants.WORD_REQUIRE) {
                     return arrayOf(LuaRequireReference(expr))
                 }
             }

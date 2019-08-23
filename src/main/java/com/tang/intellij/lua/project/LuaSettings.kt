@@ -21,6 +21,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaLanguageLevel
 import java.nio.charset.Charset
 
@@ -30,6 +31,9 @@ import java.nio.charset.Charset
  */
 @State(name = "LuaSettings", storages = [(Storage("emmy.xml"))])
 class LuaSettings : PersistentStateComponent<LuaSettings> {
+    //自定义require函数，参考constructorNames
+    var importerNames: Array<String> = arrayOf("require")
+
     var constructorNames: Array<String> = arrayOf("new", "get")
 
     //Doc文档严格模式，对不合法的注解报错
@@ -92,7 +96,13 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     val attachDebugDefaultCharset: Charset get() {
         return Charset.forName(attachDebugDefaultCharsetName) ?: Charset.forName("UTF-8")
     }
-
+    var importerNamesString: String
+        get() {
+            return importerNames.joinToString(";")
+        }
+        set(value) {
+            importerNames = value.split(";").map { it.trim() }.toTypedArray()
+        }
     companion object {
 
         val instance: LuaSettings
@@ -100,6 +110,10 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
 
         fun isConstructorName(name: String): Boolean {
             return instance.constructorNames.contains(name)
+        }
+
+        fun isImporterName(name: String): Boolean {
+            return instance.importerNames.contains(name) || name == Constants.WORD_REQUIRE
         }
     }
 }

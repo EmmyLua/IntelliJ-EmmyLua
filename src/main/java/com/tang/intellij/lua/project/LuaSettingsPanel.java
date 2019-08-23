@@ -54,6 +54,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox captureStd;
     private JComboBox<String> defaultCharset;
     private JComboBox<LuaLanguageLevel> languageLevel;
+    private JTextField importerNames;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -66,6 +67,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         recognizeGlobalNameAsCheckBox.setSelected(settings.isRecognizeGlobalNameAsType());
         additionalRoots.setRoots(settings.getAdditionalSourcesRoot());
         enableGenericCheckBox.setSelected(settings.getEnableGeneric());
+        importerNames.setText(settings.getImporterNamesString());
 
         captureStd.setSelected(settings.getAttachDebugCaptureStd());
         captureOutputDebugString.setSelected(settings.getAttachDebugCaptureOutput());
@@ -102,6 +104,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     @Override
     public boolean isModified() {
         return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
+                !StringUtil.equals(settings.getImporterNamesString(),importerNames.getText())||
                 settings.isStrictDoc() != strictDoc.isSelected() ||
                 settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
                 settings.isShowWordsInFile() != showWordsInFile.isSelected() ||
@@ -120,6 +123,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     public void apply() {
         settings.setConstructorNamesString(constructorNames.getText());
         constructorNames.setText(settings.getConstructorNamesString());
+        settings.setImporterNamesString(importerNames.getText());
+        importerNames.setText(settings.getImporterNamesString());
         settings.setStrictDoc(strictDoc.isSelected());
         settings.setSmartCloseEnd(smartCloseEnd.isSelected());
         settings.setShowWordsInFile(showWordsInFile.isSelected());
