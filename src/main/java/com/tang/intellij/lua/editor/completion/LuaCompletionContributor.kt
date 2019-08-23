@@ -128,7 +128,7 @@ class LuaCompletionContributor : CompletionContributor() {
                 .withParent(
                         psiElement(LuaTypes.LITERAL_EXPR).withParent(
                                 psiElement(LuaArgs::class.java).afterSibling(
-                                        psiElement().withName(Constants.WORD_REQUIRE)
+                                        psiElement().withName(Constants.WORD_REQUIRE, *LuaSettings.instance.importerNames)
                                 )
                         )
                 )
