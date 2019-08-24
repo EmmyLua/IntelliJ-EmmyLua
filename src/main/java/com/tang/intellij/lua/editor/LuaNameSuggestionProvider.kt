@@ -43,7 +43,7 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
     private fun collectNames(type: ITy, context: SearchContext, collector: (name: String, suffix: String, preferLonger: Boolean) -> Unit) {
         when (type) {
             is ITyClass -> {
-                if (!type.isAnonymous)
+                if (!type.isAnonymous && type !is TyDocTable)
                     collector(fixName(type.className), "", false)
                 TyClass.processSuperClass(type, context) { superType ->
                     if (!superType.isAnonymous)
@@ -75,11 +75,11 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
                     val p2 = p1.parent as? LuaCallExpr
                     if (p2 != null) {
                         val ty = p2.guessParentType(SearchContext.get(ele.project))
-                        TyUnion.each(ty) {
-                            if (it is ITyFunction) {
-                                it.process(Processor { sig ->
-                                    sig.params.getOrNull(paramIndex)?.let {
-                                        set.add(it.name)
+                        TyUnion.each(ty) { iTy ->
+                            if (iTy is ITyFunction) {
+                                iTy.process(Processor { sig ->
+                                    sig.params.getOrNull(paramIndex)?.let { paramInfo ->
+                                        set.add(paramInfo.name)
                                     }
                                     return@Processor false
                                 })
