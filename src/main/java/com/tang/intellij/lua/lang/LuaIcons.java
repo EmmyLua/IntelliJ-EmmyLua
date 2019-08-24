@@ -28,9 +28,9 @@ import javax.swing.*;
  * Email:love.tangzx@qq.com
  */
 public class LuaIcons {
-    public static final Icon FILE = IconLoader.getIcon("/icons/lua.svg");
-    public static final Icon CSHARP = IconLoader.getIcon("/icons/csharp.svg");
-    public static final Icon CPP = IconLoader.getIcon("/icons/cpp.svg");
+    public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");
+    public static final Icon CSHARP = IconLoader.getIcon("/icons/csharp.png");
+    public static final Icon CPP = IconLoader.getIcon("/icons/cpp.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon Alias = AllIcons.Nodes.AbstractClass;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;
@@ -52,7 +52,7 @@ public class LuaIcons {
     public static final Icon PROTECTED = AllIcons.Nodes.C_protected;
     public static final Icon PRIVATE = AllIcons.Nodes.C_private;
 
-    public static final Icon MODULE = IconLoader.getIcon("/icons/module.svg");
+    public static final Icon MODULE = IconLoader.getIcon("/icons/module.png");
 
     public static final Icon STRING_ARG_HISTORY = AllIcons.Vcs.History;
 
