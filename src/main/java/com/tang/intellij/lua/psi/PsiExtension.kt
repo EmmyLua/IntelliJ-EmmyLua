@@ -67,7 +67,7 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
             if (receiver != null)
                 return infer(receiver, context)
         }
-    } else if (p1 is LuaListArgs) {
+    } else if (p1 is LuaArgs) {
         val p2 = p1.parent
         if (p2 is LuaCallExpr) {
             val idx = p1.getIndexFor(this)
@@ -153,7 +153,9 @@ fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
     return list.getOrNull(index)
 }
 
-fun LuaListArgs.getIndexFor(psi: LuaExpr): Int {
+fun LuaArgs.getIndexFor(psi: LuaExpr): Int {
+    if (this is LuaSingleArg)
+        return 0
     var idx = 0
     LuaPsiTreeUtilEx.processChildren(this, Processor {
         if (it is LuaExpr) {
