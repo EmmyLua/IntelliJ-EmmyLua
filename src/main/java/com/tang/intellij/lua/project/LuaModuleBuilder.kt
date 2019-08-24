@@ -16,7 +16,7 @@
 
 package com.tang.intellij.lua.project
 
-import com.intellij.ide.util.projectWizard.*
+import com.intellij.ide.util.projectWizard.ModuleBuilder
 import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.projectRoots.Sdk
@@ -24,17 +24,15 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
-import org.jetbrains.annotations.NonNls
 import java.io.File
-import java.util.*
 
 /**
  * lua ModuleBuilder
  * Created by tangzx on 2016/12/24.
  */
-class LuaModuleBuilder : ModuleBuilder(), SourcePathsBuilder {
+class LuaModuleBuilder : ModuleBuilder() {
     private var selectedSDK: Sdk? = null
-    private var sourcePaths: MutableList<Pair<String, String>>? = null
+    private var sourcePaths = mutableListOf<Pair<String, String>>()
 
     @Throws(ConfigurationException::class)
     override fun setupRootModel(rootModel: ModifiableRootModel) {
@@ -63,7 +61,7 @@ class LuaModuleBuilder : ModuleBuilder(), SourcePathsBuilder {
 
     override fun getModuleType(): ModuleType<LuaModuleBuilder> = LuaModuleType.instance
 
-    override fun modifyProjectTypeStep(settingsStep: SettingsStep): ModuleWizardStep? {
+    /*override fun modifyProjectTypeStep(settingsStep: SettingsStep): ModuleWizardStep? {
         return object : SdkSettingsStep(settingsStep, this, { sdkTypeId -> LuaSdkType.instance === sdkTypeId }) {
 
             override fun updateDataModel() {
@@ -71,24 +69,12 @@ class LuaModuleBuilder : ModuleBuilder(), SourcePathsBuilder {
                 selectedSDK = myJdkComboBox.selectedJdk
             }
         }
-    }
+    }*/
 
-    @Throws(ConfigurationException::class)
-    override fun getSourcePaths(): List<Pair<String, String>>? {
-        if (sourcePaths == null) {
-            sourcePaths = ArrayList()
-            val path = contentEntryPath + File.separator + "src"
-            File(path).mkdirs()
-            sourcePaths!!.add(Pair.create(path, ""))
-        }
+    private fun getSourcePaths(): List<Pair<String, String>>? {
+        val path = contentEntryPath + File.separator + "src"
+        File(path).mkdirs()
+        sourcePaths.add(Pair.create(path, ""))
         return sourcePaths
-    }
-
-    override fun setSourcePaths(list: MutableList<Pair<String, String>>) {
-        this.sourcePaths = list
-    }
-
-    override fun addSourcePath(pair: Pair<String, String>) {
-        sourcePaths!!.add(pair)
     }
 }
