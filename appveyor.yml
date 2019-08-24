@@ -7,6 +7,6 @@ environment:
   JETBRAINS_PASSWORD:
     secure: 7ol4pMcA1+XRRuuO6SQhGg==
 build_script:
-  - cmd: gradlew -b build_versions.gradle buildAll
+  - cmd: gradlew buildAll
 artifacts:
   - path: build/distributions/*.zip
