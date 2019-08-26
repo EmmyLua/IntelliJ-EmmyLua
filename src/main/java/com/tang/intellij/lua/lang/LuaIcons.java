@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.lang;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.LayeredIcon;
 import com.intellij.ui.RowIcon;
@@ -28,9 +29,9 @@ import javax.swing.*;
  * Email:love.tangzx@qq.com
  */
 public class LuaIcons {
-    public static final Icon FILE = IconLoader.getIcon("/icons/lua.svg");
-    public static final Icon CSHARP = IconLoader.getIcon("/icons/csharp.svg");
-    public static final Icon CPP = IconLoader.getIcon("/icons/cpp.svg");
+    public static final Icon FILE = loadSvgOrPng("/icons/lua.png");
+    public static final Icon CSHARP = loadSvgOrPng("/icons/csharp.png");
+    public static final Icon CPP = loadSvgOrPng("/icons/cpp.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon Alias = AllIcons.Nodes.AbstractClass;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;
@@ -52,7 +53,7 @@ public class LuaIcons {
     public static final Icon PROTECTED = AllIcons.Nodes.C_protected;
     public static final Icon PRIVATE = AllIcons.Nodes.C_private;
 
-    public static final Icon MODULE = IconLoader.getIcon("/icons/module.svg");
+    public static final Icon MODULE = loadSvgOrPng("/icons/module.png");
 
     public static final Icon STRING_ARG_HISTORY = AllIcons.Vcs.History;
 
@@ -61,6 +62,19 @@ public class LuaIcons {
     public static final Icon PROJECT = IconLoader.getIcon("/icons/lua_project.svg");
 
     public static final Icon STRING_LITERAL = AllIcons.Nodes.Aspect;
+
+    private static Icon loadSvgOrPng(String pngPath) {
+        ApplicationInfo info = ApplicationInfo.getInstance();
+        try {
+            int major = Integer.parseInt(info.getMajorVersion());
+            if (major >= 2018 && pngPath.endsWith(".png")) {
+                String svgPath = pngPath.substring(0, pngPath.length() - 4) + ".svg";
+                return IconLoader.getIcon(svgPath);
+            }
+        } catch (NumberFormatException ignored) {
+        }
+        return IconLoader.getIcon(pngPath);
+    }
 
     public static class Debugger {
         public static class Actions {

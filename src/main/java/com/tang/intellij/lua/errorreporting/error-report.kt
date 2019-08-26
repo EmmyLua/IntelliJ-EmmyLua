@@ -39,7 +39,6 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.util.Consumer
-import org.apache.commons.codec.binary.Base64
 import org.eclipse.egit.github.core.Issue
 import org.eclipse.egit.github.core.Label
 import org.eclipse.egit.github.core.RepositoryId
@@ -104,7 +103,7 @@ private object AnonymousFeedback {
 	private fun findFirstDuplicate(uniqueTitle: String, service: IssueService, repo: RepositoryId): Issue? {
 		val searchParameters = HashMap<String, String>(2)
 		searchParameters[IssueService.FILTER_STATE] = IssueService.STATE_OPEN
-		return service.pageIssues(repo, searchParameters).flatMap { it }.firstOrNull { it.title == uniqueTitle }
+		return service.pageIssues(repo, searchParameters).flatten().firstOrNull { it.title == uniqueTitle }
 	}
 
 	private fun createNewGibHubIssue(details: MutableMap<String, String>) = Issue().apply {
@@ -132,7 +131,7 @@ private fun decrypt(file: URL): String {
 	cipher.init(Cipher.DECRYPT_MODE,
 		SecretKeySpec(key.toByteArray(charset("UTF-8")), "AES"),
 		IvParameterSpec(initVector.toByteArray(charset("UTF-8"))))
-	return String(cipher.doFinal(Base64.decodeBase64(file.openStream().use {
+	return String(cipher.doFinal(Base64.getDecoder().decode(file.openStream().use {
 		ObjectInputStream(it).use(ObjectInputStream::readObject) as String
 	})))
 }
@@ -149,7 +148,7 @@ private fun encrypt(value: String): String {
 	cipher.init(Cipher.ENCRYPT_MODE,
 		SecretKeySpec(key.toByteArray(charset("UTF-8")), "AES"),
 		IvParameterSpec(initVector.toByteArray(charset("UTF-8"))))
-	return Base64.encodeBase64String(cipher.doFinal(value.toByteArray()))
+	return Base64.getEncoder().encodeToString(cipher.doFinal(value.toByteArray()))
 }
 
 class GitHubErrorReporter : ErrorReportSubmitter() {

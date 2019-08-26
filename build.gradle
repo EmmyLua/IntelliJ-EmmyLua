@@ -13,178 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import org.apache.tools.ant.taskdefs.condition.Os
-
-plugins {
-    id 'org.jetbrains.intellij' version "0.3.11"
-    id "org.jetbrains.kotlin.jvm" version "1.2.31"
-    id "de.undercouch.download" version "3.4.3"
-}
-
-dependencies {
-    compile fileTree(dir: "libs", includes: ["*.jar"])
-}
-
-sourceSets {
-    main {
-        java.srcDirs 'gen'
-        resources {
-            exclude "debugger/**"
-        }
-    }
-}
-def isWin = Os.isFamily(Os.FAMILY_WINDOWS)
-// Appveyor CI
-if (System.env['APPVEYOR']) {
-    if (System.env['APPVEYOR_REPO_TAG_NAME']) {
-        version = System.env['APPVEYOR_REPO_TAG_NAME']
-    } else {
-        version = System.env['APPVEYOR_BUILD_VERSION']
-    }
-    exec {
-        executable "git"
-        args "config", "--global", "user.email", "love.tangzx@qq.com"
-    }
-    exec {
-        executable "git"
-        args "config", "--global", "user.name", "tangzx"
-    }
-}
-
-ext {
-    getRev = {
-        def os = new ByteArrayOutputStream()
-        exec {
-            executable "git"
-            args "rev-parse"
-            args "HEAD"
-            standardOutput = os
-        }
-        return os.toString().substring(0, 7)
-    }
-
-    setDefaultProperty = { name, defaultValue ->
-        if (!this.hasProperty(name))
-            ext[name] = defaultValue
-    }
-}
-
-setDefaultProperty("IDEA_VER", "182")
-
-version = "${version}-IDEA${IDEA_VER}"
-
-def cfg = [
-    ideaSDKVersion: ideaSDKVersion,
-    sinceBuild: sinceBuild,
-    untilBuild: untilBuild,
-    archiveName: archiveName
+def versions = [:]
+versions["182"] = [
+    ideaSDKVersion: "IC-182.2371.4",
+    sinceBuild: "182",
+    untilBuild: "192.*",
+    archiveName: "IntelliJ-EmmyLua"
 ]
-def rev = getRev()
+versions["172"] = [
+    ideaSDKVersion: "IC-172.4574.19",
+    sinceBuild: "172",
+    untilBuild: "181.*",
+    archiveName: "IntelliJ-EmmyLua"
+]
+versions["171"] = [
+    ideaSDKVersion: "IC-171.4694.73",
+    sinceBuild: "171",
+    untilBuild: "171.*",
+    archiveName: "IntelliJ-EmmyLua"
+]
 
-intellij {
-    type 'IU'
-    updateSinceUntilBuild false
-    downloadSources false
-    version = cfg.ideaSDKVersion
-    localPath System.env["IDEA_HOME_${IDEA_VER}"]
-}
-
-patchPluginXml {
-    sinceBuild cfg.sinceBuild
-    untilBuild cfg.untilBuild
-}
-
-publishPlugin {
-    username System.env['JETBRAINS_USERNAME']
-    password System.env['JETBRAINS_PASSWORD']
-    channels 'EAP'
-}
-
-def RES_DIR = "src/main/resources"
-
-buildPlugin.baseName = cfg.archiveName
-
-task downloadEmmyDebugger(type: Download) {
-    src ([
-            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core.so",
-            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core.dylib",
-            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x64.zip",
-            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x86.zip",
-            "https://github.com/EmmyLua/EmmyLuaLegacyDebugger/releases/download/${emmyLegacyDebuggerVersion}/debugger.zip"
-    ])
-    dest "temp"
-}
-
-task unzipEmmyDebugger(type: Copy, dependsOn: downloadEmmyDebugger) {
-    from(zipTree("temp/emmy_core@x64.zip")) {
-        include "emmy_core.dll"
-        into "x64"
-    }
-    from(zipTree("temp/emmy_core@x86.zip")) {
-        include "emmy_core.dll"
-        into "x86"
-    }
-    from(zipTree("temp/debugger.zip")) {
-        into "legacy"
-    }
-    destinationDir file("temp")
-}
-
-task installEmmyDebugger(dependsOn: unzipEmmyDebugger, type: Copy) {
-    from("temp/x64/") {
-        include "emmy_core.dll"
-        into "debugger/emmy/windows/x64"
-    }
-    from("temp/x86/") {
-        include "emmy_core.dll"
-        into "debugger/emmy/windows/x86"
-    }
-    from("temp") {
-        include "emmy_core.so"
-        into "debugger/emmy/linux"
-    }
-    from("temp") {
-        include "emmy_core.dylib"
-        into "debugger/emmy/mac"
-    }
-    from("temp/legacy") {
-        include "**/*"
-        into "debugger/windows"
-    }
-    destinationDir file("src/main/resources")
-}
-
-buildPlugin.dependsOn([installEmmyDebugger])
-buildPlugin.from(fileTree(dir: RES_DIR, includes: ['debugger/**'])) {
-    into "/${project.name}/classes/"
-}
-buildPlugin.from(fileTree(dir: RES_DIR, include: '!!DONT_UNZIP_ME!!.txt')) {
-    into "/${project.name}"
-}
-
-// apply patchs before build plugin
-task buildPluginWithBunch() {
-    finalizedBy buildPlugin
-    doLast {
-        // reset
-        exec {
-            executable "git"
-            args "reset", "HEAD", "--hard"
-        }
-        // clean untracked files
-        exec {
-            executable "git"
-            args "clean", "-d", "-f"
-        }
-        // switch
-        exec {
-            executable isWin ? "bunch/bin/bunch.bat" : "bunch/bin/bunch"
-            args "switch", ".", IDEA_VER
-        }
-        // reset to HEAD
-        exec {
-            executable "git"
-            args "reset", rev
-        }
+versions.each { shortVer, cfg ->
+    task "build_${shortVer}"(type: GradleBuild) {
+        tasks = ["buildPluginWithBunch", "test"]
+        buildFile = 'build_plugin.gradle'
+        startParameter.setProjectProperties([
+            "IDEA_VER": shortVer
+        ] + cfg)
     }
 }
+
+task buildAll(dependsOn: [build_182, build_172, build_171])

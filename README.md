@@ -104,7 +104,7 @@ QQ交流群：1群：`29850775` 2群：`529914962`
         
 ## Building
 
-  `./gradlew -b build_versions.gradle build_182`
+  `./gradlew build_182`
 
 ## Developed By
 
