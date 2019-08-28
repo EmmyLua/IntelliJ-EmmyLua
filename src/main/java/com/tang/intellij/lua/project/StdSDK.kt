@@ -19,6 +19,7 @@ package com.tang.intellij.lua.project
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ApplicationComponent
 import com.intellij.openapi.projectRoots.ProjectJdkTable
+import com.intellij.openapi.projectRoots.Sdk
 import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 
 /**
@@ -28,13 +29,7 @@ import com.intellij.openapi.projectRoots.impl.ProjectJdkImpl
 class StdSDK : ApplicationComponent {
 
     override fun initComponent() {
-        val pjt = ProjectJdkTable.getInstance()
-        //清除旧的std sdk，不用了，用predefined代替
-        val mySdk = pjt.findJdk(StdSDK.NAME)
-        if (mySdk == null) {
-            val sdk = ProjectJdkImpl(StdSDK.NAME, LuaSdkType.instance)
-            ApplicationManager.getApplication().runWriteAction { pjt.addJdk(sdk) }
-        }
+        sdk
     }
 
     override fun disposeComponent() {
@@ -45,5 +40,16 @@ class StdSDK : ApplicationComponent {
 
     companion object {
         private const val NAME = "Lua"
+
+        val sdk: Sdk get() {
+            val jdkTable = ProjectJdkTable.getInstance()
+            //清除旧的std sdk，不用了，用predefined代替
+            var value = jdkTable.findJdk(NAME)
+            if (value == null) {
+                value = ProjectJdkImpl(NAME, LuaSdkType.instance)
+                ApplicationManager.getApplication().runWriteAction { jdkTable.addJdk(value) }
+            }
+            return value
+        }
     }
 }
