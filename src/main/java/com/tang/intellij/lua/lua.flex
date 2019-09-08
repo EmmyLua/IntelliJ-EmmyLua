@@ -68,7 +68,11 @@ n=[0-9]+
 h=[0-9a-fA-F]+
 exp=[Ee]([+-]?{n})?
 ppp=[Pp][+-]{n}
-NUMBER=(0[xX]({h}|{h}[.]{h})({exp}|{ppp})?|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.])
+// 123ULL/123LL
+// 0x123FFULL/0x123FFLL
+JIT_EXT_NUMBER=(0[xX]{h}|{n})U?LL
+HEX_NUMBER=0[xX]({h}|{h}[.]{h})({exp}|{ppp})?
+NUMBER={JIT_EXT_NUMBER}|{HEX_NUMBER}|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.]
 
 //Comments
 REGION_START =--(region|\{\{\{)([^\r\n]*)*
