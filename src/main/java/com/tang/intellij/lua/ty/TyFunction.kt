@@ -26,6 +26,7 @@ import com.tang.intellij.lua.stubs.readParamInfoArray
 import com.tang.intellij.lua.stubs.readTyNullable
 import com.tang.intellij.lua.stubs.writeParamInfoArray
 import com.tang.intellij.lua.stubs.writeTyNullable
+import kotlin.math.abs
 
 interface IFunSignature {
     val colonCall: Boolean
@@ -69,8 +70,8 @@ fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (i
         if (!processor(index++, pi)) return
     }
 
-    for (i in 0 until params.size) {
-        if (!processor(index++, params[i])) return
+    for (element in params) {
+        if (!processor(index++, element)) return
     }
 }
 
@@ -143,7 +144,7 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
     }
 
     override fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean {
-        for (i in 0 until params.size) {
+        for (i in params.indices) {
             val p1 = params[i]
             val p2 = other.params.getOrNull(i) ?: return false
             if (!p1.ty.subTypeOf(p2.ty, context, strict))
@@ -221,7 +222,7 @@ fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
     var sgi: IFunSignature? = null
     var perfectN = Int.MAX_VALUE
     process(Processor {
-        val offset = Math.abs(it.params.size - nArgs)
+        val offset = abs(it.params.size - nArgs)
         if (offset < perfectN) {
             perfectN = offset
             sgi = it
@@ -262,7 +263,7 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.subTypeOf(other, context, strict) || other == Ty.FUNCTION)
+        if (super.subTypeOf(other, context, strict) || other == FUNCTION)
             return true // Subtype of function primitive.
 
         var matched = false
@@ -308,7 +309,7 @@ class TyPsiFunction(private val colonCall: Boolean, val psi: LuaFuncBodyOwner, f
                  * -- will crash after type `test`
                  */
                 if (returnTy is TyPsiFunction && returnTy.psi == psi) {
-                    returnTy = Ty.UNKNOWN
+                    returnTy = UNKNOWN
                 }
 
                 returnTy
