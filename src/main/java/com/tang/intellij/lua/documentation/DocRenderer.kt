@@ -43,7 +43,13 @@ fun renderTy(sb: StringBuilder, ty: ITy, tyRenderer: ITyRenderer) {
 }
 
 fun renderSignature(sb: StringBuilder, signature: IFunSignature, tyRenderer: ITyRenderer) {
-    val sig = signature.params.map { "${it.name}: ${tyRenderer.render(it.ty)}" }
+    val sig = mutableListOf<String>()
+    signature.params.forEach {
+        sig.add("${it.name}: ${tyRenderer.render(it.ty)}")
+    }
+    signature.varargTy?.let {
+        sig.add("...: ${tyRenderer.render(it)}")
+    }
     sb.append("(${sig.joinToString(", <br>        ")}): ")
     tyRenderer.render(signature.returnTy, sb)
 }
