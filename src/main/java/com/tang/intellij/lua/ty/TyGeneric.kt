@@ -66,6 +66,13 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     override fun accept(visitor: ITyVisitor) {
         visitor.visitGeneric(this)
     }
+
+    override fun substitute(substitutor: ITySubstitutor): ITy {
+        return TySerializedGeneric(
+                params.map { it.substitute(substitutor) }.toTypedArray(),
+                base.substitute(substitutor)
+        )
+    }
 }
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {
