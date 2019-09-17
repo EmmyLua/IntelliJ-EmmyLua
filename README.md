@@ -14,7 +14,7 @@ Version | CI status
 --------|----------
 IDEA 171|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 IDEA 172-181|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
-IDEA 182|[![Build status](https://ci.appveyor.com/api/projects/status/xvahlg1ceiy16dxl?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua-7n83m)
+IDEA 182+|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua-7n83m)
 
 QQ交流群：1群：`29850775` 2群：`529914962`
 (最新版本以及部分视频演示在群文件中下载)
