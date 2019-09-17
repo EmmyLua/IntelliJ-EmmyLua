@@ -26,7 +26,6 @@ import com.tang.intellij.lua.stubs.readParamInfoArray
 import com.tang.intellij.lua.stubs.readTyNullable
 import com.tang.intellij.lua.stubs.writeParamInfoArray
 import com.tang.intellij.lua.stubs.writeTyNullable
-import kotlin.math.abs
 
 interface IFunSignature {
     val colonCall: Boolean
@@ -222,7 +221,7 @@ fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
     var sgi: IFunSignature? = null
     var perfectN = Int.MAX_VALUE
     process(Processor {
-        val offset = abs(it.params.size - nArgs)
+        val offset = Math.abs(it.params.size - nArgs)
         if (offset < perfectN) {
             perfectN = offset
             sgi = it
