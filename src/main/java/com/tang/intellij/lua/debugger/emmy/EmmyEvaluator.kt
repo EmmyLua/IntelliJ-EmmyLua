@@ -20,7 +20,7 @@ import com.intellij.xdebugger.XSourcePosition
 import com.tang.intellij.lua.debugger.LuaDebuggerEvaluator
 import com.tang.intellij.lua.debugger.emmy.value.LuaXValue
 
-class EmmyEvaluator(val frame: EmmyDebugStackFrame, val process: EmmyDebugProcess) : LuaDebuggerEvaluator(), IEvalResultHandler {
+class EmmyEvaluator(val frame: EmmyDebugStackFrame, val process: EmmyDebugProcessBase) : LuaDebuggerEvaluator(), IEvalResultHandler {
 
     private val callbackMap = mutableMapOf<Int, XEvaluationCallback>()
 

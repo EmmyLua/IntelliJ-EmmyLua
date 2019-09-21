@@ -43,6 +43,12 @@ enum class MessageCMD {
 
     // lua -> ide
     BreakNotify,
+    AttachedNotify,
+
+    StartHookReq,
+    StartHookRsp,
+
+    LogNotify,
 }
 
 interface IMessage {
@@ -143,3 +149,7 @@ class BreakPoint(val file: String, val line: Int)
 class AddBreakPointReq(val breakPoints: List<BreakPoint>) : Message(MessageCMD.AddBreakPointReq)
 
 class RemoveBreakPointReq(val breakPoints: List<BreakPoint>) : Message(MessageCMD.RemoveBreakPointReq)
+
+class LogNotify(val type: Int, val message: String)
+
+class AttachedNotify(val state: Long)

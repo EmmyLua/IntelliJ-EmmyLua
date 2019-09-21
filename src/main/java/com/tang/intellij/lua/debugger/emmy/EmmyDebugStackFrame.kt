@@ -26,7 +26,7 @@ import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.tang.intellij.lua.debugger.emmy.value.LuaXValue
 import com.tang.intellij.lua.psi.LuaFileUtil
 
-class EmmyDebugStackFrame(val data: Stack, val process: EmmyDebugProcess) : XStackFrame() {
+class EmmyDebugStackFrame(val data: Stack, val process: EmmyDebugProcessBase) : XStackFrame() {
     private val values = XValueChildrenList()
     private var evaluator: EmmyEvaluator? = null
     private val sourcePosition by lazy {

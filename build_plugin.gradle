@@ -117,11 +117,11 @@ task downloadEmmyDebugger(type: Download) {
 
 task unzipEmmyDebugger(type: Copy, dependsOn: downloadEmmyDebugger) {
     from(zipTree("temp/emmy_core@x64.zip")) {
-        include "emmy_core.dll"
+        //include "emmy_core.dll"
         into "x64"
     }
     from(zipTree("temp/emmy_core@x86.zip")) {
-        include "emmy_core.dll"
+        //include "emmy_core.dll"
         into "x86"
     }
     from(zipTree("temp/debugger.zip")) {
@@ -132,11 +132,11 @@ task unzipEmmyDebugger(type: Copy, dependsOn: downloadEmmyDebugger) {
 
 task installEmmyDebugger(dependsOn: unzipEmmyDebugger, type: Copy) {
     from("temp/x64/") {
-        include "emmy_core.dll"
+        //include "emmy_core.dll"
         into "debugger/emmy/windows/x64"
     }
     from("temp/x86/") {
-        include "emmy_core.dll"
+        //include "emmy_core.dll"
         into "debugger/emmy/windows/x86"
     }
     from("temp") {
