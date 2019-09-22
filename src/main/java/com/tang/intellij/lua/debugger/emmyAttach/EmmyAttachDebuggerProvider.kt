@@ -30,14 +30,14 @@ import com.tang.intellij.lua.debugger.utils.ProcessDetailInfo
 import com.tang.intellij.lua.debugger.utils.listProcesses
 import com.tang.intellij.lua.psi.LuaFileUtil
 
-class EmmyAttachDebuggerProvider : XAttachDebuggerProvider {
+class EmmyAttachDebuggerProvider : XLocalAttachDebuggerProvider {
     companion object {
         val DETAIL_KEY = Key.create<Map<Int, ProcessDetailInfo>>("LuaLocalAttachDebuggerProvider.key")
     }
 
     private var processMap = mapOf<Int, ProcessDetailInfo>()
 
-    override fun getAvailableDebuggers(project: Project, xAttachHost: XAttachHost, processInfo: ProcessInfo, userDataHolder: UserDataHolder): List<XAttachDebugger> {
+    override fun getAvailableDebuggers(project: Project, processInfo: ProcessInfo, userDataHolder: UserDataHolder): List<XLocalAttachDebugger> {
         if (!SystemInfoRt.isWindows)
             return emptyList()
         if (userDataHolder.getUserData(DETAIL_KEY) == null) {

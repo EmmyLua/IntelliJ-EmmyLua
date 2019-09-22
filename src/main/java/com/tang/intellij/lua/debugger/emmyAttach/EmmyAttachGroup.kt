@@ -19,16 +19,15 @@ package com.tang.intellij.lua.debugger.emmyAttach
 import com.intellij.execution.process.ProcessInfo
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolder
-import com.intellij.xdebugger.attach.XAttachPresentationGroup
+import com.intellij.xdebugger.attach.XLocalAttachGroup
 import com.tang.intellij.lua.debugger.utils.getDisplayName
 import com.tang.intellij.lua.lang.LuaIcons
-import com.tang.intellij.lua.lang.LuaLanguage
 import sun.awt.shell.ShellFolder
 import java.io.File
 import javax.swing.Icon
 import javax.swing.ImageIcon
 
-class EmmyAttachGroup : XAttachPresentationGroup<ProcessInfo> {
+class EmmyAttachGroup : XLocalAttachGroup {
 
     companion object {
         val instance = EmmyAttachGroup()
@@ -59,7 +58,7 @@ class EmmyAttachGroup : XAttachPresentationGroup<ProcessInfo> {
         return LuaIcons.FILE
     }
 
-    override fun getGroupName() = LuaLanguage.INSTANCE.id
+    override fun getGroupName() = "EmmyLua Attach Debugger"
 
     override fun compare(a: ProcessInfo, b: ProcessInfo): Int {
         return a.executableName.toLowerCase().compareTo(b.executableName.toLowerCase())

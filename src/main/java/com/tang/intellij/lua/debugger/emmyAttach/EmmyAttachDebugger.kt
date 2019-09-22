@@ -22,16 +22,15 @@ import com.intellij.xdebugger.XDebugProcess
 import com.intellij.xdebugger.XDebugProcessStarter
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.XDebuggerManager
-import com.intellij.xdebugger.attach.XAttachDebugger
-import com.intellij.xdebugger.attach.XAttachHost
+import com.intellij.xdebugger.attach.XLocalAttachDebugger
 import com.tang.intellij.lua.debugger.utils.ProcessDetailInfo
 import com.tang.intellij.lua.debugger.utils.getDisplayName
 
 class EmmyAttachDebugger(
         private val processInfo: ProcessInfo,
         private val detailInfo: ProcessDetailInfo
-) : XAttachDebugger {
-    override fun attachDebugSession(project: Project, xAttachHost: XAttachHost, processInfo: ProcessInfo) {
+) : XLocalAttachDebugger {
+    override fun attachDebugSession(project: Project, processInfo: ProcessInfo) {
         val displayName = "PID:${processInfo.pid}($debuggerDisplayName)"
         XDebuggerManager.getInstance(project).startSessionAndShowTab(displayName, null, object : XDebugProcessStarter() {
             override fun start(xDebugSession: XDebugSession): XDebugProcess =
