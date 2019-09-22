@@ -25,8 +25,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.openapi.util.UserDataHolder
-import com.intellij.xdebugger.attach.LocalAttachHost
-import com.intellij.xdebugger.attach.XAttachHost
 import com.intellij.xdebugger.attach.XLocalAttachDebugger
 import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
 import com.tang.intellij.lua.debugger.utils.ProcessDetailInfo
@@ -69,10 +67,6 @@ class EmmyAttachDebuggerProvider : XLocalAttachDebuggerProvider {
             return list
         }
         return emptyList()
-    }
-
-    override fun isAttachHostApplicable(xAttachHost: XAttachHost): Boolean {
-        return xAttachHost is LocalAttachHost
     }
 
     override fun getAttachGroup() = EmmyAttachGroup.instance
