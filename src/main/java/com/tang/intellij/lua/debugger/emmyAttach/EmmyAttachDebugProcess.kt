@@ -81,8 +81,8 @@ class EmmyAttachDebugProcess(session: XDebugSession, private val processInfo: Pr
 
             override fun onTextAvailable(processEvent: ProcessEvent, key: Key<*>) {
                 when (key) {
-                    ProcessOutputType.STDERR -> print(processEvent.text, LogConsoleType.NORMAL, ConsoleViewContentType.ERROR_OUTPUT)
-                    ProcessOutputType.STDOUT -> print(processEvent.text, LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+                    ProcessOutputTypes.STDERR -> print(processEvent.text, LogConsoleType.NORMAL, ConsoleViewContentType.ERROR_OUTPUT)
+                    ProcessOutputTypes.STDOUT -> print(processEvent.text, LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
                 }
             }
         })
