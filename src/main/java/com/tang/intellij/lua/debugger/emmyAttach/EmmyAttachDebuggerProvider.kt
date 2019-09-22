@@ -25,7 +25,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.openapi.util.UserDataHolder
-import com.intellij.xdebugger.attach.*
+import com.intellij.xdebugger.attach.LocalAttachHost
+import com.intellij.xdebugger.attach.XAttachHost
+import com.intellij.xdebugger.attach.XLocalAttachDebugger
+import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
 import com.tang.intellij.lua.debugger.utils.ProcessDetailInfo
 import com.tang.intellij.lua.debugger.utils.listProcesses
 import com.tang.intellij.lua.psi.LuaFileUtil
@@ -72,7 +75,5 @@ class EmmyAttachDebuggerProvider : XLocalAttachDebuggerProvider {
         return xAttachHost is LocalAttachHost
     }
 
-    override fun getPresentationGroup(): XAttachPresentationGroup<ProcessInfo> {
-        return EmmyAttachGroup.instance
-    }
+    override fun getAttachGroup() = EmmyAttachGroup.instance
 }
