@@ -60,9 +60,8 @@ class EmmyAttachGroup : XLocalAttachGroup {
 
     override fun getGroupName() = "EmmyLua Attach Debugger"
 
-    override fun compare(a: ProcessInfo, b: ProcessInfo): Int {
-        return a.executableName.toLowerCase().compareTo(b.executableName.toLowerCase())
-    }
+    override fun compare(project: Project, a: ProcessInfo, b: ProcessInfo, userDataHolder: UserDataHolder) =
+            a.executableName.toLowerCase().compareTo(b.executableName.toLowerCase())
 
     override fun getOrder(): Int {
         return 0
