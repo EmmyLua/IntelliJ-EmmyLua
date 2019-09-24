@@ -64,12 +64,20 @@ fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRender
             sb.append(markdownToHtml(docStrBuilder.toString()))
             docStrBuilder.setLength(0)
         }
+        var seenString = false
         while (child != null) {
             val elementType = child.node.elementType
             if (elementType == LuaDocTypes.STRING) {
+                seenString = true
                 docStrBuilder.append(child.text)
-                docStrBuilder.append("\n")
-            } else {
+            }
+            else if (elementType == LuaDocTypes.DASHES) {
+                if (seenString) {
+                    docStrBuilder.append("\n")
+                }
+            }
+            else if (child is LuaDocPsiElement) {
+                seenString = false
                 when (child) {
                     is LuaDocTagClass -> {
                         flushDocString()
