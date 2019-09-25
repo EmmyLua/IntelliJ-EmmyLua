@@ -191,14 +191,15 @@ public class LuaParserUtil extends GeneratedParserUtilBase {
             }
 
             while (!skips.contains(type)) {
-//                if (BRACE_R_SET.contains(type)) {
-//                    return false;
-//                }
                 if (types.contains(type)) {
                     if (level != 0)
                         builder.advanceLexer();
                     return true;
                 }
+                // bug fix https://github.com/EmmyLua/IntelliJ-EmmyLua/issues/276
+                // todo: optimize it
+                if (type == UNTIL)
+                    return true;
                 boolean isMatched = matchStart(false, builder, level + 1, type);
                 if (!isMatched)
                     break;
