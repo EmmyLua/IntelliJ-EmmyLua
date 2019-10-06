@@ -27,7 +27,7 @@ import java.nio.charset.Charset
 
 /**
  *
- * Created by Administrator on 2017/6/12.
+ * Created by tangzx on 2017/6/12.
  */
 @State(name = "LuaSettings", storages = [(Storage("emmy.xml"))])
 class LuaSettings : PersistentStateComponent<LuaSettings> {

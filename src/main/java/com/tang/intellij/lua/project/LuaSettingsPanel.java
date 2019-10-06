@@ -35,8 +35,7 @@ import java.util.Objects;
 import java.util.SortedMap;
 
 /**
- *
- * Created by Administrator on 2017/6/12.
+ * Created by tangzx on 2017/6/12.
  */
 public class LuaSettingsPanel implements SearchableConfigurable, Configurable.NoScroll {
     private LuaSettings settings;
@@ -104,7 +103,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     @Override
     public boolean isModified() {
         return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
-                !StringUtil.equals(settings.getImporterNamesString(),importerNames.getText())||
+                !StringUtil.equals(settings.getImporterNamesString(), importerNames.getText()) ||
                 settings.isStrictDoc() != strictDoc.isSelected() ||
                 settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
                 settings.isShowWordsInFile() != showWordsInFile.isSelected() ||
@@ -135,7 +134,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setEnableGeneric(enableGenericCheckBox.isSelected());
         settings.setAttachDebugCaptureOutput(captureOutputDebugString.isSelected());
         settings.setAttachDebugCaptureStd(captureStd.isSelected());
-        settings.setAttachDebugDefaultCharsetName((String)Objects.requireNonNull(defaultCharset.getSelectedItem()));
+        settings.setAttachDebugDefaultCharsetName((String) Objects.requireNonNull(defaultCharset.getSelectedItem()));
         LuaLanguageLevel selectedLevel = (LuaLanguageLevel) Objects.requireNonNull(languageLevel.getSelectedItem());
         if (selectedLevel != settings.getLanguageLevel()) {
             settings.setLanguageLevel(selectedLevel);
