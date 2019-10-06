@@ -30,6 +30,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.SortedMap;
@@ -54,6 +57,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JComboBox<String> defaultCharset;
     private JComboBox<LuaLanguageLevel> languageLevel;
     private JTextField importerNames;
+    private JTextField tooLargerFileThreshold;
 
     public LuaSettingsPanel(LuaSettings settings) {
         this.settings = settings;
@@ -67,6 +71,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         additionalRoots.setRoots(settings.getAdditionalSourcesRoot());
         enableGenericCheckBox.setSelected(settings.getEnableGeneric());
         importerNames.setText(settings.getImporterNamesString());
+        tooLargerFileThreshold.setDocument(new IntegerDocument());
+        tooLargerFileThreshold.setText(String.valueOf(settings.getTooLargerFileThreshold()));
 
         captureStd.setSelected(settings.getAttachDebugCaptureStd());
         captureOutputDebugString.setSelected(settings.getAttachDebugCaptureOutput());
@@ -104,6 +110,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     public boolean isModified() {
         return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
                 !StringUtil.equals(settings.getImporterNamesString(), importerNames.getText()) ||
+                settings.getTooLargerFileThreshold() != getTooLargerFileThreshold() ||
                 settings.isStrictDoc() != strictDoc.isSelected() ||
                 settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
                 settings.isShowWordsInFile() != showWordsInFile.isSelected() ||
@@ -124,6 +131,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         constructorNames.setText(settings.getConstructorNamesString());
         settings.setImporterNamesString(importerNames.getText());
         importerNames.setText(settings.getImporterNamesString());
+        settings.setTooLargerFileThreshold(getTooLargerFileThreshold());
         settings.setStrictDoc(strictDoc.isSelected());
         settings.setSmartCloseEnd(smartCloseEnd.isSelected());
         settings.setShowWordsInFile(showWordsInFile.isSelected());
@@ -145,6 +153,27 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
             for (Project project : ProjectManager.getInstance().getOpenProjects()) {
                 DaemonCodeAnalyzer.getInstance(project).restart();
             }
+        }
+    }
+
+    private int getTooLargerFileThreshold() {
+        int value;
+        try {
+            value = Integer.parseInt(tooLargerFileThreshold.getText());
+        } catch (NumberFormatException e) {
+            value = settings.getTooLargerFileThreshold();
+        }
+        return value;
+    }
+
+    static class IntegerDocument extends PlainDocument {
+        public void insertString(int offset, String s, AttributeSet attributeSet) throws BadLocationException {
+            try {
+                Integer.parseInt(s);
+            } catch (Exception ex) {
+                return;
+            }
+            super.insertString(offset, s, attributeSet);
         }
     }
 }
