@@ -44,7 +44,6 @@ import com.tang.intellij.lua.ty.*
  * this table should be `MyClass`
  *
  * 2.
- *
  * ---@param callback fun(sender: any, type: string):void
  * local function addListener(type, callback)
  *      ...
@@ -53,6 +52,16 @@ import com.tang.intellij.lua.ty.*
  * addListener(function() end)
  *
  * this closure should be `fun(sender: any, type: string):void`
+ *
+ * 3.
+ * ---@class MyClass
+ * ---@field foo Bar
+ * local a = {}
+ *
+ * ---@type MyClass
+ * local tbl = {
+ *     foo = ?? -- foo should be type of `Bar`
+ * }
  */
 private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
     val p1 = parent
@@ -83,6 +92,18 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
                 }
             }
             return ret
+        }
+    } else if (p1 is LuaTableField) {
+        val fieldName = p1.name
+        val tbl = p1.parent
+        if (fieldName != null && tbl is LuaTableExpr) {
+            var fieldType: ITy = Ty.UNKNOWN
+            val tyTbl = tbl.shouldBe(context)
+            tyTbl.eachTopClass(Processor { cls ->
+                cls.findMemberType(fieldName, context)?.let { fieldType = fieldType.union(it) }
+                true
+            })
+            return fieldType
         }
     }
     return Ty.UNKNOWN
