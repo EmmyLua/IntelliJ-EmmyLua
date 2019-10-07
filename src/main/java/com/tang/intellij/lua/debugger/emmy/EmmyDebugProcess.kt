@@ -25,11 +25,6 @@ interface IEvalResultHandler {
 open class EmmyDebugProcess(session: XDebugSession) : EmmyDebugProcessBase(session), ITransportHandler {
     private val configuration = session.runProfile as EmmyDebugConfiguration
 
-    override fun sessionInitialized() {
-        super.sessionInitialized()
-        setupTransporter()
-    }
-
     override fun setupTransporter() {
         val transporter: Transporter = when (configuration.type) {
             EmmyDebugTransportType.PIPE_CLIENT -> PipelineClientTransporter(configuration.pipeName)
