@@ -409,7 +409,7 @@ class TyUnion : Ty(TyKind.Union) {
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
         val u = TyUnion()
-        childSet.forEach { u.union(it.substitute(substitutor)) }
+        childSet.forEach { u.union2(it.substitute(substitutor)) }
         return u
     }
 
