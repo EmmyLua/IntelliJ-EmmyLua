@@ -66,9 +66,6 @@ interface ITy : Comparable<ITy> {
 
     fun union(ty: ITy): ITy
 
-    @Deprecated("use `displayName` instead")
-    fun createTypeString(): String
-
     fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
 
     fun getSuperClass(context: SearchContext): ITy?
@@ -134,11 +131,6 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     override fun union(ty: ITy): ITy {
         return TyUnion.union(this, ty)
-    }
-
-    override fun createTypeString(): String {
-        val s = toString()
-        return if (s.isEmpty()) Constants.WORD_ANY else s
     }
 
     override fun toString(): String {

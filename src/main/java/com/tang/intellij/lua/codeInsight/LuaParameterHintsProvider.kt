@@ -86,7 +86,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             if (PARAMETER_TYPE_HINT.get()) {
                 val type = psi.guessType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
-                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", psi.textOffset + psi.textLength))
+                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.displayName}", psi.textOffset + psi.textLength))
                 }
             }
         }
@@ -94,7 +94,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             if (LOCAL_VARIABLE_HINT.get()) {
                 val type = psi.guessType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
-                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", psi.textOffset + psi.textLength))
+                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.displayName}", psi.textOffset + psi.textLength))
                 }
             }
         }
@@ -103,7 +103,7 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
             if (FUNCTION_HINT.get() && paren != null) {
                 val type = psi.guessReturnType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
-                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.createTypeString()}", paren.textOffset + paren.textLength))
+                    return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.displayName}", paren.textOffset + paren.textLength))
                 }
             }
         }
