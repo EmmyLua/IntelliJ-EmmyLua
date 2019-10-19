@@ -236,6 +236,15 @@ private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaRecursiveV
                 }
             }, psi)
         }
+        if (psi is LuaForBStat) { // for _, a in ipairs(a) do end
+            return push(object : Scope(this, pos, curScope){
+                override fun walkUp(pos: Int, lev: Int, process: (declaration: Declaration) -> Boolean) {
+                    if (lev == 0) {
+                        this.parent?.walkUp(pos, lev, process)
+                    } else super.walkUp(pos, lev, process)
+                }
+            }, psi)
+        }
         return push(Scope(this, pos, curScope), psi)
     }
 
