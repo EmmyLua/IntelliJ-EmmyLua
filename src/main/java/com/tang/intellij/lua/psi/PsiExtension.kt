@@ -452,6 +452,14 @@ val LuaFuncDef.forwardDeclaration: PsiElement? get() {
     }
 }
 
+val LuaCallExpr.prefixExpr: LuaExpr? get() {
+    val expr = this.expr
+    if (expr is LuaIndexExpr) {
+        return expr.prefixExpr
+    }
+    return null
+}
+
 val LuaCallExpr.argList: List<LuaExpr> get() {
     val args = this.args
     return when (args) {

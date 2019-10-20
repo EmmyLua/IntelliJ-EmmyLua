@@ -112,11 +112,18 @@ private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, context:SearchContext)
 
 fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): ITySubstitutor? {
     if (sig.isGeneric()) {
-        val list = this.argList.map { it.guessType(context) }
+        val list = mutableListOf<ITy>()
+        // self type
+        if (this.isMethodColonCall) {
+            this.prefixExpr?.let { prefix ->
+                list.add(prefix.guessType(context))
+            }
+        }
+        this.argList.map { list.add(it.guessType(context)) }
         val map = mutableMapOf<String, ITy>()
         var processedIndex = -1
         sig.tyParameters.forEach { map[it.name] = Ty.UNKNOWN }
-        sig.processArgs(this) { index, param ->
+        sig.processArgs { index, param ->
             val arg = list.getOrNull(index)
             if (arg != null) {
                 GenericAnalyzer(arg, param.ty).analyze(map)

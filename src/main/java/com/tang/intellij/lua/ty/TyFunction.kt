@@ -62,6 +62,15 @@ fun IFunSignature.processArgs(thisTy: ITy?, colonStyle: Boolean, processor: (ind
     }
 }
 
+fun IFunSignature.processArgs(processor: (index:Int, param: LuaParamInfo) -> Boolean) {
+    var index = 0
+    if (colonCall)
+        index++
+    for (i in params.indices) {
+        if (!processor(index++, params[i])) return
+    }
+}
+
 fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     var index = 0
     if (colonCall) {
