@@ -18,7 +18,10 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocTableDef
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass
@@ -351,5 +354,26 @@ class TyDocTable(val table: LuaDocTableDef) : TyClass(getDocTableTypeName(table)
 class TySerializedDocTable(name: String) : TySerializedClass(name) {
     override fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
         return this
+    }
+}
+
+object TyClassSerializer : TySerializer<ITyClass>() {
+    override fun deserializeTy(flags: Int, stream: StubInputStream): ITyClass {
+        val className = stream.readName()
+        val varName = stream.readName()
+        val superName = stream.readName()
+        val aliasName = stream.readName()
+        return createSerializedClass(StringRef.toString(className),
+                StringRef.toString(varName),
+                StringRef.toString(superName),
+                StringRef.toString(aliasName),
+                flags)
+    }
+
+    override fun serializeTy(ty: ITyClass, stream: StubOutputStream) {
+        stream.writeName(ty.className)
+        stream.writeName(ty.varName)
+        stream.writeName(ty.superClassName)
+        stream.writeName(ty.aliasName)
     }
 }

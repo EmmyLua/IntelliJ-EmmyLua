@@ -20,12 +20,9 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
-import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.readSignatures
-import com.tang.intellij.lua.stubs.writeSignatures
 
 enum class TyKind {
     Unknown,
@@ -204,6 +201,17 @@ abstract class Ty(override val kind: TyKind) : ITy {
         val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, "function")
         val NIL = TyNil()
 
+        private val serializerMap = mapOf<TyKind, ITySerializer>(
+                TyKind.Array to TyArraySerializer,
+                TyKind.Class to TyClassSerializer,
+                TyKind.Function to TyFunctionSerializer,
+                TyKind.Generic to TyGenericSerializer,
+                TyKind.GenericParam to TyGenericParamSerializer,
+                TyKind.StringLiteral to TyStringLiteralSerializer,
+                TyKind.Tuple to TyTupleSerializer,
+                TyKind.Union to TyUnionSerializer
+        )
+
         private fun getPrimitive(mark: Byte): Ty {
             return when (mark.toInt()) {
                 TyPrimitiveKind.Boolean.ordinal -> BOOLEAN
@@ -241,44 +249,19 @@ abstract class Ty(override val kind: TyKind) : ITy {
             return ty == null || ty is TyUnknown || ty is TyNil || ty is TyVoid
         }
 
+        private fun getSerializer(kind: TyKind): ITySerializer? {
+            return serializerMap[kind]
+        }
+
         fun serialize(ty: ITy, stream: StubOutputStream) {
             stream.writeByte(ty.kind.ordinal)
             stream.writeInt(ty.flags)
             when(ty) {
-                is ITyArray -> {
-                    serialize(ty.base, stream)
+                is ITyPrimitive -> stream.writeByte(ty.primitiveKind.ordinal)
+                else -> {
+                    val serializer = getSerializer(ty.kind)
+                    serializer?.serialize(ty, stream)
                 }
-                is ITyFunction -> {
-                    FunSignature.serialize(ty.mainSignature, stream)
-                    stream.writeSignatures(ty.signatures)
-                }
-                is TyParameter -> {
-                    stream.writeName(ty.name)
-                    stream.writeName(ty.superClassName)
-                }
-                is ITyPrimitive -> {
-                    stream.writeByte(ty.primitiveKind.ordinal)
-                }
-                is ITyClass -> {
-                    stream.writeName(ty.className)
-                    stream.writeName(ty.varName)
-                    stream.writeName(ty.superClassName)
-                    stream.writeName(ty.aliasName)
-                }
-                is TyUnion -> {
-                    stream.writeInt(ty.size)
-                    TyUnion.each(ty) { serialize(it, stream) }
-                }
-                is ITyGeneric -> {
-                    serialize(ty.base, stream)
-                    stream.writeByte(ty.params.size)
-                    ty.params.forEach { serialize(it, stream) }
-                }
-                is TyTuple -> {
-                    stream.writeByte(ty.list.size)
-                    ty.list.forEach { serialize(it, stream) }
-                }
-                is TyStringLiteral -> stream.writeUTF(ty.content)
             }
         }
 
@@ -286,59 +269,13 @@ abstract class Ty(override val kind: TyKind) : ITy {
             val kind = getKind(stream.readByte().toInt())
             val flags = stream.readInt()
             return when (kind) {
-                TyKind.Array -> {
-                    val base = deserialize(stream)
-                    TyArray(base)
-                }
-                TyKind.Function -> {
-                    val mainSig = FunSignature.deserialize(stream)
-                    val arr = stream.readSignatures()
-                    TySerializedFunction(mainSig, arr, flags)
-                }
-                TyKind.Class -> {
-                    val className = stream.readName()
-                    val varName = stream.readName()
-                    val superName = stream.readName()
-                    val aliasName = stream.readName()
-                    createSerializedClass(StringRef.toString(className),
-                            StringRef.toString(varName),
-                            StringRef.toString(superName),
-                            StringRef.toString(aliasName),
-                            flags)
-                }
                 TyKind.Primitive -> getPrimitive(stream.readByte())
-                TyKind.Union -> {
-                    var union:ITy = TyUnion()
-                    val size = stream.readInt()
-                    for (i in 0 until size) {
-                        union = TyUnion.union(union, deserialize(stream))
-                    }
-                    union
-                }
-                TyKind.Generic -> {
-                    val base = deserialize(stream)
-                    val size = stream.readByte()
-                    val params = mutableListOf<ITy>()
-                    for (i in 0 until size) {
-                        params.add(deserialize(stream))
-                    }
-                    TySerializedGeneric(params.toTypedArray(), base)
-                }
                 TyKind.Nil -> NIL
                 TyKind.Void -> VOID
-                TyKind.Tuple -> {
-                    val size = stream.readByte().toInt()
-                    val list = mutableListOf<ITy>()
-                    for (i in 0 until size) list.add(deserialize(stream))
-                    TyTuple(list)
+                else -> {
+                    val serializer = getSerializer(kind)
+                    serializer?.deserialize(flags, stream) ?: UNKNOWN
                 }
-                TyKind.GenericParam -> {
-                    val name = StringRef.toString(stream.readName())
-                    val base = StringRef.toString(stream.readName())
-                    TyParameter(name, base)
-                }
-                TyKind.StringLiteral -> TyStringLiteral(stream.readUTF())
-                else -> TyUnknown()
             }
         }
     }

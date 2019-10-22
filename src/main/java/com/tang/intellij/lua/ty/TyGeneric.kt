@@ -16,6 +16,9 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.psi.LuaClassMember
@@ -32,6 +35,19 @@ class TyParameter(val name:String, base: String? = null) : TySerializedClass(nam
     }
 
     override fun doLazyInit(searchContext: SearchContext) {}
+}
+
+object TyGenericParamSerializer : TySerializer<TyParameter>() {
+    override fun deserializeTy(flags: Int, stream: StubInputStream): TyParameter {
+        val name = StringRef.toString(stream.readName())
+        val base = StringRef.toString(stream.readName())
+        return TyParameter(name, base)
+    }
+
+    override fun serializeTy(ty: TyParameter, stream: StubOutputStream) {
+        stream.writeName(ty.name)
+        stream.writeName(ty.superClassName)
+    }
 }
 
 interface ITyGeneric : ITy {
@@ -103,3 +119,21 @@ class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {
 }
 
 class TySerializedGeneric(override val params: Array<ITy>, override val base: ITy) : TyGeneric()
+
+object TyGenericSerializer : TySerializer<ITyGeneric>() {
+    override fun deserializeTy(flags: Int, stream: StubInputStream): ITyGeneric {
+        val base = Ty.deserialize(stream)
+        val size = stream.readByte()
+        val params = mutableListOf<ITy>()
+        for (i in 0 until size) {
+            params.add(Ty.deserialize(stream))
+        }
+        return TySerializedGeneric(params.toTypedArray(), base)
+    }
+
+    override fun serializeTy(ty: ITyGeneric, stream: StubOutputStream) {
+        Ty.serialize(ty.base, stream)
+        stream.writeByte(ty.params.size)
+        ty.params.forEach { Ty.serialize(it, stream) }
+    }
+}

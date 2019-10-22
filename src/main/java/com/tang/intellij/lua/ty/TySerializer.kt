@@ -19,16 +19,23 @@ package com.tang.intellij.lua.ty
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 
-class TyStringLiteral(val content: String) : Ty(TyKind.StringLiteral) {
-    override fun toString() = content
+interface ITySerializer {
+    fun serialize(ty: ITy, stream: StubOutputStream)
+    fun deserialize(flags: Int, stream: StubInputStream): ITy
 }
 
-object TyStringLiteralSerializer : TySerializer<TyStringLiteral>() {
-    override fun deserializeTy(flags: Int, stream: StubInputStream): TyStringLiteral {
-        return TyStringLiteral(stream.readUTF())
+abstract class TySerializer<T : ITy> : ITySerializer {
+    override fun serialize(ty: ITy, stream: StubOutputStream) {
+        @Suppress("UNCHECKED_CAST")
+        val t = ty as T
+        serializeTy(t, stream)
     }
 
-    override fun serializeTy(ty: TyStringLiteral, stream: StubOutputStream) {
-        stream.writeUTF(ty.content)
+    override fun deserialize(flags: Int, stream: StubInputStream): ITy {
+        return deserializeTy(flags, stream)
     }
+
+    abstract fun deserializeTy(flags: Int, stream: StubInputStream): T
+
+    protected abstract fun serializeTy(ty: T, stream: StubOutputStream)
 }

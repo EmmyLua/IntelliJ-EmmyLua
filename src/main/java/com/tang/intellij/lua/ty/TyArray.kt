@@ -16,6 +16,8 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.search.SearchContext
 
 interface ITyArray : ITy {
@@ -46,5 +48,16 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
 
     override fun acceptChildren(visitor: ITyVisitor) {
         base.accept(visitor)
+    }
+}
+
+object TyArraySerializer : TySerializer<ITyArray>() {
+    override fun serializeTy(ty: ITyArray, stream: StubOutputStream) {
+        Ty.serialize(ty.base, stream)
+    }
+
+    override fun deserializeTy(flags: Int, stream: StubInputStream): ITyArray {
+        val base = Ty.deserialize(stream)
+        return TyArray(base)
     }
 }

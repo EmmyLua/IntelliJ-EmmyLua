@@ -16,6 +16,8 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.search.SearchContext
 
 class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
@@ -67,5 +69,19 @@ class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
             return true
         }
         return super.equals(other)
+    }
+}
+
+object TyTupleSerializer : TySerializer<TyTuple>() {
+    override fun deserializeTy(flags: Int, stream: StubInputStream): TyTuple {
+        val size = stream.readByte().toInt()
+        val list = mutableListOf<ITy>()
+        for (i in 0 until size) list.add(Ty.deserialize(stream))
+        return TyTuple(list)
+    }
+
+    override fun serializeTy(ty: TyTuple, stream: StubOutputStream) {
+        stream.writeByte(ty.list.size)
+        ty.list.forEach { serialize(it, stream) }
     }
 }

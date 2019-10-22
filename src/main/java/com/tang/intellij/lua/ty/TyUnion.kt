@@ -16,6 +16,8 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.search.SearchContext
 
 class TyUnion : Ty(TyKind.Union) {
@@ -26,7 +28,7 @@ class TyUnion : Ty(TyKind.Union) {
     val size:Int
         get() = childSet.size
 
-    private fun union2(ty: ITy): TyUnion {
+    fun append(ty: ITy): TyUnion {
         if (ty is TyUnion) {
             ty.childSet.forEach { addChild(it) }
         }
@@ -44,7 +46,7 @@ class TyUnion : Ty(TyKind.Union) {
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
         val u = TyUnion()
-        childSet.forEach { u.union2(it.substitute(substitutor)) }
+        childSet.forEach { u.append(it.substitute(substitutor)) }
         return u
     }
 
@@ -115,8 +117,8 @@ class TyUnion : Ty(TyKind.Union) {
             return when {
                 isInvalid(t1) -> t2
                 isInvalid(t2) -> t1
-                t1 is TyUnion -> t1.union2(t2)
-                t2 is TyUnion -> t2.union2(t1)
+                t1 is TyUnion -> t1.append(t2)
+                t2 is TyUnion -> t2.append(t1)
                 else -> {
                     val u = TyUnion()
                     u.addChild(t1)
@@ -143,5 +145,21 @@ class TyUnion : Ty(TyKind.Union) {
             }
             return clazz ?: global ?: anonymous
         }
+    }
+}
+
+object TyUnionSerializer : TySerializer<TyUnion>() {
+    override fun serializeTy(ty: TyUnion, stream: StubOutputStream) {
+        stream.writeInt(ty.size)
+        TyUnion.each(ty) { Ty.serialize(it, stream) }
+    }
+
+    override fun deserializeTy(flags: Int, stream: StubInputStream): TyUnion {
+        val union = TyUnion()
+        val size = stream.readInt()
+        for (i in 0 until size) {
+            union.append(Ty.deserialize(stream))
+        }
+        return union
     }
 }

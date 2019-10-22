@@ -22,10 +22,7 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.readParamInfoArray
-import com.tang.intellij.lua.stubs.readTyNullable
-import com.tang.intellij.lua.stubs.writeParamInfoArray
-import com.tang.intellij.lua.stubs.writeTyNullable
+import com.tang.intellij.lua.stubs.*
 
 interface IFunSignature {
     val colonCall: Boolean
@@ -344,5 +341,18 @@ class TySerializedFunction(override val mainSignature: IFunSignature,
                            flags: Int = 0) : TyFunction() {
     init {
         this.flags = flags
+    }
+}
+
+object TyFunctionSerializer : TySerializer<ITyFunction>() {
+    override fun deserializeTy(flags: Int, stream: StubInputStream): ITyFunction {
+        val mainSig = FunSignature.deserialize(stream)
+        val arr = stream.readSignatures()
+        return TySerializedFunction(mainSig, arr, flags)
+    }
+
+    override fun serializeTy(ty: ITyFunction, stream: StubOutputStream) {
+        FunSignature.serialize(ty.mainSignature, stream)
+        stream.writeSignatures(ty.signatures)
     }
 }
