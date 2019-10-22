@@ -101,3 +101,5 @@
 
 ---
 ---@class void
+
+---@class self

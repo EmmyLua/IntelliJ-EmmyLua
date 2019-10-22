@@ -17,6 +17,9 @@
 package com.tang.intellij.lua.ty
 
 import com.intellij.openapi.project.Project
+import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.psi.LuaCallExpr
+import com.tang.intellij.lua.psi.prefixExpr
 import com.tang.intellij.lua.search.SearchContext
 
 interface ITySubstitutor {
@@ -137,5 +140,17 @@ class TyAliasSubstitutor private constructor(val project: Project) : ITySubstitu
     override fun substitute(ty: ITy): ITy {
         return ty
     }
+}
 
+class TySelfSubstitutor(val project: Project, val call: LuaCallExpr) : TySubstitutor() {
+    private val selfType: ITy by lazy {
+        call.prefixExpr?.guessType(SearchContext.get(project)) ?: Ty.UNKNOWN
+    }
+
+    override fun substitute(clazz: ITyClass): ITy {
+        if (clazz.className == Constants.WORD_SELF) {
+            return selfType
+        }
+        return super.substitute(clazz)
+    }
 }

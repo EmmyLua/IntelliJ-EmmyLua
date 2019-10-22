@@ -151,12 +151,9 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
 }
 
 private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy? {
-    var resultSig = sig
     val substitutor = createSubstitutor(sig, context)
-    if (substitutor != null) {
-        resultSig = sig.substitute(substitutor)
-    }
-    val returnTy = resultSig.returnTy
+    var returnTy = if (substitutor != null) sig.returnTy.substitute(substitutor) else sig.returnTy
+    returnTy = returnTy.substitute(TySelfSubstitutor(project, this))
     return if (returnTy is TyTuple) {
         if (context.guessTuple())
             returnTy
