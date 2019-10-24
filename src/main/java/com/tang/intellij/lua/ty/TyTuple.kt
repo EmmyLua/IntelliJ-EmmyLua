@@ -82,6 +82,6 @@ object TyTupleSerializer : TySerializer<TyTuple>() {
 
     override fun serializeTy(ty: TyTuple, stream: StubOutputStream) {
         stream.writeByte(ty.list.size)
-        ty.list.forEach { serialize(it, stream) }
+        ty.list.forEach { Ty.serialize(it, stream) }
     }
 }
