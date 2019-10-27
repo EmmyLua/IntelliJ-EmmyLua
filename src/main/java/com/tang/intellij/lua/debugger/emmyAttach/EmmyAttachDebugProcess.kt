@@ -91,15 +91,10 @@ class EmmyAttachDebugProcess(session: XDebugSession, private val processInfo: Pr
         return handler.exitCode == 0
     }
 
-    override fun onConnect(suc: Boolean) {
-        this.transporter?.send(Message(MessageCMD.StartHookReq))
-    }
-
     override fun onReceiveMessage(cmd: MessageCMD, json: String) {
         if (cmd == MessageCMD.AttachedNotify) {
             val msg = Gson().fromJson(json, AttachedNotify::class.java)
             println("Attached to lua state 0x${msg.state.toString(16)}", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
-            super.onConnect(true)
         }
         else super.onReceiveMessage(cmd, json)
     }
