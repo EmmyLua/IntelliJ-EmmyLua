@@ -20,10 +20,12 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
 import com.intellij.lang.findUsages.LanguageFindUsages
+import com.intellij.patterns.PatternCondition
 import com.intellij.patterns.PlatformPatterns.psiElement
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.tree.TokenSet
 import com.intellij.util.ProcessingContext
-import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.project.LuaSettings
@@ -128,7 +130,7 @@ class LuaCompletionContributor : CompletionContributor() {
                 .withParent(
                         psiElement(LuaTypes.LITERAL_EXPR).withParent(
                                 psiElement(LuaArgs::class.java).afterSibling(
-                                        psiElement().withName(Constants.WORD_REQUIRE, *LuaSettings.instance.importerNames)
+                                        psiElement().with(ImportNamesPatternCondition())
                                 )
                         )
                 )
@@ -160,5 +162,15 @@ class LuaCompletionContributor : CompletionContributor() {
                 true
             }
         }
+    }
+}
+
+class ImportNamesPatternCondition : PatternCondition<PsiElement>("importNames"){
+    override fun accepts(psi: PsiElement, context: ProcessingContext?): Boolean {
+        val name = (psi as? PsiNamedElement)?.name
+        if (name != null) {
+            return LuaSettings.isImporterName(name)
+        }
+        return true
     }
 }
