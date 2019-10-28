@@ -20,11 +20,13 @@ import com.intellij.codeInspection.LocalInspectionTool
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
+import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.codeInsight.ctrlFlow.DataFlowRunner
 import com.tang.intellij.lua.codeInsight.ctrlFlow.instructions.BranchingInstruction
 import com.tang.intellij.lua.codeInsight.ctrlFlow.instructions.CheckNotNilInstruction
 import com.tang.intellij.lua.codeInsight.ctrlFlow.instructions.InstructionVisitor
 import com.tang.intellij.lua.psi.LuaBlock
+import com.tang.intellij.lua.psi.LuaDoStat
 import com.tang.intellij.lua.psi.LuaPsiElement
 import com.tang.intellij.lua.psi.LuaVisitor
 
@@ -35,10 +37,11 @@ class DataFlowInspection : LocalInspectionTool() {
         this.holder = holder
         return object : LuaVisitor() {
             override fun visitPsiElement(o: LuaPsiElement) {
-                if (o is LuaBlock) {
+                if (o is LuaDoStat) {
                     val runner = DataFlowRunner()
                     val visitor = DataFlowInstructionVisitor()
-                    analyzeBlock(o, runner, visitor)
+                    val block = PsiTreeUtil.getChildOfType(o, LuaBlock::class.java)
+                    if (block != null) analyzeBlock(block, runner, visitor)
                 } else
                     super.visitPsiElement(o)
             }

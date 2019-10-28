@@ -18,9 +18,11 @@ package com.tang.intellij.lua.codeInsight.ctrlFlow
 
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
 import com.tang.intellij.lua.codeInsight.ctrlFlow.instructions.*
 import com.tang.intellij.lua.codeInsight.ctrlFlow.values.*
 import com.tang.intellij.lua.psi.*
+import com.thaiopensource.xml.dtd.om.Def
 
 class CtrlFlowProcessor(val factory: VMValueFactory) : LuaRecursiveVisitor() {
 
@@ -175,23 +177,30 @@ class CtrlFlowProcessor(val factory: VMValueFactory) : LuaRecursiveVisitor() {
     }
 
     override fun visitIfStat(o: LuaIfStat) {
-        with(o) {
-            val condition = PsiTreeUtil.findChildOfType(o, LuaExpr::class.java)
-            if (condition != null) {
-                // push condition
-                condition.accept(this)
-                val elseOffset = DeferredOffset(0)
-                addInstruction(ConditionGotoInstruction(elseOffset, condition, true))
-                // true body
-                var cur: PsiElement? = condition
-                while (cur != null) {
-                    cur = cur.nextSibling
-                    if (cur is LuaBlock)
-                        cur.accept(this)
+        var cur: PsiElement? = o.firstChild
+        var waitCondition = false
+        var nextOffset: DeferredOffset? = null
+        while (cur != null) {
+            if (cur is LuaBlock)
+                cur.accept(this)
+            else if (cur is LuaExpr) {
+                if (waitCondition) {
+                    waitCondition = false
+                    cur.accept(this)
+                    nextOffset = DeferredOffset(0)
+                    addInstruction(ConditionGotoInstruction(nextOffset, cur, true))
                 }
-                elseOffset.offset = instructions.size
+            } else if (cur.elementType == LuaTypes.IF || cur.elementType == LuaTypes.ELSEIF) {
+                waitCondition = true
+                nextOffset?.offset = instructions.size
+            } else if (cur.elementType == LuaTypes.ELSE) {
+                waitCondition = false
+                nextOffset?.offset = instructions.size
+                nextOffset = null
             }
+            cur = cur.nextSibling
         }
+        nextOffset?.offset = instructions.size
     }
 
     override fun visitIndexExpr(o: LuaIndexExpr) {
