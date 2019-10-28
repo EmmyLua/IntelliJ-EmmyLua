@@ -56,7 +56,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox captureStd;
     private JComboBox<String> defaultCharset;
     private JComboBox<LuaLanguageLevel> languageLevel;
-    private JTextField importerNames;
+    private JTextField requireFunctionNames;
     private JTextField tooLargerFileThreshold;
 
     public LuaSettingsPanel(LuaSettings settings) {
@@ -70,7 +70,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         recognizeGlobalNameAsCheckBox.setSelected(settings.isRecognizeGlobalNameAsType());
         additionalRoots.setRoots(settings.getAdditionalSourcesRoot());
         enableGenericCheckBox.setSelected(settings.getEnableGeneric());
-        importerNames.setText(settings.getImporterNamesString());
+        requireFunctionNames.setText(settings.getRequireLikeFunctionNamesString());
         tooLargerFileThreshold.setDocument(new IntegerDocument());
         tooLargerFileThreshold.setText(String.valueOf(settings.getTooLargerFileThreshold()));
 
@@ -109,7 +109,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     @Override
     public boolean isModified() {
         return !StringUtil.equals(settings.getConstructorNamesString(), constructorNames.getText()) ||
-                !StringUtil.equals(settings.getImporterNamesString(), importerNames.getText()) ||
+                !StringUtil.equals(settings.getRequireLikeFunctionNamesString(), requireFunctionNames.getText()) ||
                 settings.getTooLargerFileThreshold() != getTooLargerFileThreshold() ||
                 settings.isStrictDoc() != strictDoc.isSelected() ||
                 settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
@@ -129,8 +129,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     public void apply() {
         settings.setConstructorNamesString(constructorNames.getText());
         constructorNames.setText(settings.getConstructorNamesString());
-        settings.setImporterNamesString(importerNames.getText());
-        importerNames.setText(settings.getImporterNamesString());
+        settings.setRequireLikeFunctionNamesString(requireFunctionNames.getText());
+        requireFunctionNames.setText(settings.getRequireLikeFunctionNamesString());
         settings.setTooLargerFileThreshold(getTooLargerFileThreshold());
         settings.setStrictDoc(strictDoc.isSelected());
         settings.setSmartCloseEnd(smartCloseEnd.isSelected());

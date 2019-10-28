@@ -130,7 +130,7 @@ class LuaCompletionContributor : CompletionContributor() {
                 .withParent(
                         psiElement(LuaTypes.LITERAL_EXPR).withParent(
                                 psiElement(LuaArgs::class.java).afterSibling(
-                                        psiElement().with(ImportNamesPatternCondition())
+                                        psiElement().with(RequireLikePatternCondition())
                                 )
                         )
                 )
@@ -165,12 +165,9 @@ class LuaCompletionContributor : CompletionContributor() {
     }
 }
 
-class ImportNamesPatternCondition : PatternCondition<PsiElement>("importNames"){
+class RequireLikePatternCondition : PatternCondition<PsiElement>("requireLike"){
     override fun accepts(psi: PsiElement, context: ProcessingContext?): Boolean {
         val name = (psi as? PsiNamedElement)?.name
-        if (name != null) {
-            return LuaSettings.isImporterName(name)
-        }
-        return true
+        return if (name != null) LuaSettings.isRequireLikeFunctionName(name) else false
     }
 }

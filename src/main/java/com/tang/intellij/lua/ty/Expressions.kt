@@ -170,7 +170,7 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     // xxx()
     val expr = luaCallExpr.expr
     // 从 require 'xxx' 中获取返回类型
-    if (expr is LuaNameExpr && LuaSettings.isImporterName(expr.name)) {
+    if (expr is LuaNameExpr && LuaSettings.isRequireLikeFunctionName(expr.name)) {
         var filePath: String? = null
         val string = luaCallExpr.firstStringArg
         if (string is LuaLiteralExpr) {

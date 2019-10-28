@@ -61,7 +61,7 @@ class LuaReferenceContributor : PsiReferenceContributor() {
             val expr = psiElement as LuaCallExpr
             val nameRef = expr.expr
             if (nameRef is LuaNameExpr) {
-                if (LuaSettings.isImporterName(nameRef.getText())) {
+                if (LuaSettings.isRequireLikeFunctionName(nameRef.getText())) {
                     return arrayOf(LuaRequireReference(expr))
                 }
             }

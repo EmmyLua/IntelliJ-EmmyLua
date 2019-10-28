@@ -32,7 +32,7 @@ import java.nio.charset.Charset
 @State(name = "LuaSettings", storages = [(Storage("emmy.xml"))])
 class LuaSettings : PersistentStateComponent<LuaSettings> {
     //自定义require函数，参考constructorNames
-    var importerNames: Array<String> = arrayOf("require")
+    var requireLikeFunctionNames: Array<String> = arrayOf("require")
 
     var constructorNames: Array<String> = arrayOf("new", "get")
 
@@ -96,12 +96,12 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     val attachDebugDefaultCharset: Charset get() {
         return Charset.forName(attachDebugDefaultCharsetName) ?: Charset.forName("UTF-8")
     }
-    var importerNamesString: String
+    var requireLikeFunctionNamesString: String
         get() {
-            return importerNames.joinToString(";")
+            return requireLikeFunctionNames.joinToString(";")
         }
         set(value) {
-            importerNames = value.split(";").map { it.trim() }.toTypedArray()
+            requireLikeFunctionNames = value.split(";").map { it.trim() }.toTypedArray()
         }
     companion object {
 
@@ -112,8 +112,8 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
             return instance.constructorNames.contains(name)
         }
 
-        fun isImporterName(name: String): Boolean {
-            return instance.importerNames.contains(name) || name == Constants.WORD_REQUIRE
+        fun isRequireLikeFunctionName(name: String): Boolean {
+            return instance.requireLikeFunctionNames.contains(name) || name == Constants.WORD_REQUIRE
         }
     }
 }
