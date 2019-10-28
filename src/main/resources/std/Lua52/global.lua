@@ -186,9 +186,9 @@ function next(table, index) end
 ---
 --- See function `next` for the caveats of modifying the table during its
 --- traversal.
----@generic V
----@param t table<string, V>|V[]
----@return fun(tbl: table<string, V>):string, V
+---@generic K, V
+---@param t table<K, V>|V[]
+---@return fun(tbl: table<K, V>):K, V
 function pairs(t) end
 
 ---
