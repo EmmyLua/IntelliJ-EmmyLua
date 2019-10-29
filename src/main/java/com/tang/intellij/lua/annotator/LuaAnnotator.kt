@@ -52,6 +52,7 @@ class LuaAnnotator : Annotator {
             isModuleFile = if (psiFile is LuaPsiFile) { psiFile.moduleName != null } else false
             psiElement.accept(luaVisitor)
         }
+        isModuleFile = false
         myHolder = null
     }
 

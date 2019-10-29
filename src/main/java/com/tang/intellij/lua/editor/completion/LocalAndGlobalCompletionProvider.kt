@@ -111,10 +111,9 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
 
         //global
         val project = cur.project
-//        if (has(GLOBAL_FUN) || has(GLOBAL_VAR)) {
-//            addClass(TyClass.G, TyClass.G, project, MemberCompletionMode.Dot, completionResultSet, completionResultSet.prefixMatcher, null)
-//        }
-        addClass(TyClass.G, TyClass.G, project, MemberCompletionMode.Dot, completionResultSet, completionResultSet.prefixMatcher, null)
+        if (has(GLOBAL_FUN) || has(GLOBAL_VAR)) {
+            addClass(TyClass.G, TyClass.G, project, MemberCompletionMode.Dot, completionResultSet, completionResultSet.prefixMatcher, null)
+        }
         //key words
         if (has(KEY_WORDS)) {
             for (keyWordToken in KEYWORD_TOKENS.types) {
