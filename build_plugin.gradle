@@ -106,7 +106,8 @@ buildPlugin.baseName = cfg.archiveName
 
 task downloadEmmyDebugger(type: Download) {
     src ([
-            "https://github.com/ElPsyCongree/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x64.zip"
+            "https://github.com/ElPsyCongree/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x64.zip",
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x86.zip"
     ])
     dest "temp"
 }
