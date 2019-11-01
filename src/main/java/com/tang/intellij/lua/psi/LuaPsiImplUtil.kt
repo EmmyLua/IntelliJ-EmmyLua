@@ -51,6 +51,10 @@ fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
     return owner
 }
 
+fun getModuleName(owner: LuaLiteralExprImpl): String? {
+    return owner.moduleName
+}
+
 fun setName(owner: LuaLiteralExprImpl, name: String): PsiElement {
     val oldId = owner.nameIdentifier
     if (oldId != null) {
@@ -199,6 +203,7 @@ fun guessParentType(funcDef: LuaFuncDef, searchContext: SearchContext): ITyClass
 fun guessParentType(callExpr: LuaCallExpr, context: SearchContext): ITy {
     return callExpr.expr.guessType(context)
 }
+
 
 /**
  * 获取第一个字符串参数
