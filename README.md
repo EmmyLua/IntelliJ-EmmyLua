@@ -12,8 +12,6 @@
 
 Version | CI status
 --------|----------
-IDEA 171|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/ElPsyCongree/intellij-emmylua)
-IDEA 172-181|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/ElPsyCongreeintellij-emmylua)
 IDEA 182+|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/ElPsyCongree/intellij-emmylua)
 
 QQ交流群：1群：`29850775` 2群：`529914962`
