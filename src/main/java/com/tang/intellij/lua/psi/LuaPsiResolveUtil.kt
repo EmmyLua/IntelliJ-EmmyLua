@@ -96,6 +96,14 @@ fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
             resolveResult = it
             false
         })
+
+        // 如果不是_G并且seeall了就再找一遍
+        if(moduleName != Constants.WORD_G && nameExpr.moduleSeeAll) {
+            LuaClassMemberIndex.process(Constants.WORD_G, refName, context, Processor {
+                resolveResult = it
+                false
+            })
+        }
     }
 
     return resolveResult
@@ -114,6 +122,14 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
             list.add(it)
             true
         })
+
+        // 如果不是_G并且seeall了就再找一遍
+        if(module != Constants.WORD_G && ref.moduleSeeAll) {
+            LuaClassMemberIndex.process(Constants.WORD_G, refName, context, Processor {
+                list.add(it)
+                true
+            })
+        }
     }
     return list.toTypedArray()
 }

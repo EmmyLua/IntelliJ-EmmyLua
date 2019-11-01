@@ -33,6 +33,7 @@ import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.psi.impl.LuaLiteralExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -101,6 +102,10 @@ fun getVisibility(tagField: LuaDocTagField): Visibility {
 
     val v = tagField.accessModifier?.let { Visibility.get(it.text) }
     return v ?: Visibility.PUBLIC
+}
+
+fun getVisibility(tagField: LuaLiteralExprImpl): Visibility {
+    return Visibility.PUBLIC
 }
 
 /**

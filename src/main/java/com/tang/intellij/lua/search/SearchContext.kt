@@ -26,6 +26,7 @@ import com.tang.intellij.lua.ext.ILuaTypeInfer
 import com.tang.intellij.lua.psi.LuaTypeGuessable
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyLazyClass
 import java.util.*
 
 /**
@@ -56,6 +57,10 @@ class SearchContext private constructor(val project: Project) {
 
         fun infer(psi: LuaTypeGuessable, context: SearchContext): ITy {
             return with(context, Ty.UNKNOWN) { it.inferAndCache(psi) }
+        }
+
+        fun NewTyClass(moduleName: String): ITy {
+            return TyLazyClass(moduleName)
         }
 
         private fun <T> with(ctx: SearchContext, defaultValue: T, action: (ctx: SearchContext) -> T): T {

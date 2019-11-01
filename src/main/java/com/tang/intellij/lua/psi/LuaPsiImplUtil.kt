@@ -33,6 +33,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagVararg
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
+import com.tang.intellij.lua.psi.impl.LuaLiteralExprImpl
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMemberStub
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
@@ -48,6 +49,20 @@ fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
         return newId
     }
     return owner
+}
+
+fun setName(owner: LuaLiteralExprImpl, name: String): PsiElement {
+    val oldId = owner.nameIdentifier
+    if (oldId != null) {
+        val newId = LuaElementFactory.createLiteral(owner.project, "\"" + name + "\"")
+        oldId.replace(newId)
+        return newId
+    }
+    return owner
+}
+
+fun getName(owner: LuaLiteralExprImpl): String {
+    return owner.stringValue
 }
 
 fun getNameIdentifier(nameDef: LuaNameDef): PsiElement {
@@ -450,6 +465,13 @@ fun getNameIdentifier(tableField: LuaTableField): PsiElement? {
     if (id != null)
         return id
     return tableField.idExpr
+}
+
+fun getNameIdentifier(literalExpr: LuaLiteralExprImpl): PsiElement? {
+    val id = literalExpr.id
+    if (id != null)
+        return id
+    return null
 }
 
 fun guessParentType(tableField: LuaTableField, context: SearchContext): ITy {

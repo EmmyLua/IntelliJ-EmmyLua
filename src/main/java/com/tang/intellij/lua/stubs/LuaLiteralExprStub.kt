@@ -21,8 +21,12 @@ import com.intellij.psi.stubs.IndexSink
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaLiteralExprImpl
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
+import org.apache.http.Consts
 
 class LuaLiteralElementType
     : LuaStubElementType<LuaLiteralExprStub, LuaLiteralExpr>("LITERAL_EXPR") {
@@ -55,7 +59,14 @@ class LuaLiteralElementType
     }
 
     override fun indexStub(stub: LuaLiteralExprStub, sink: IndexSink) {
-
+        val psi = stub.psi
+        if (psi is LuaPsiElement) {
+            val moduleName = psi.moduleName
+            if (moduleName != null) {
+                LuaClassMemberIndex.indexStub(sink, Constants.WORD_G, moduleName)
+                sink.occurrence(StubKeys.SHORT_NAME, moduleName)
+            }
+        }
     }
 
     override fun createPsi(stub: LuaLiteralExprStub): LuaLiteralExpr {

@@ -37,6 +37,8 @@ class LuaAnnotator : Annotator {
     private val luaVisitor = LuaElementVisitor()
     private val docVisitor = LuaDocElementVisitor()
     private var isModuleFile: Boolean = false
+    private var isModuleSeeAll: Boolean = false
+    private var luaPsiElement: LuaPsiElement? = null
 
     companion object {
         private val STD_MARKER = Key.create<Boolean>("lua.std.marker")
@@ -50,9 +52,10 @@ class LuaAnnotator : Annotator {
         } else if (psiElement is LuaPsiElement) {
             val psiFile = psiElement.containingFile
             isModuleFile = if (psiFile is LuaPsiFile) { psiFile.moduleName != null } else false
+            isModuleSeeAll = if (psiFile is LuaPsiFile) { psiFile.moduleSeeAll == true } else false
+            luaPsiElement = psiElement
             psiElement.accept(luaVisitor)
         }
-        isModuleFile = false
         myHolder = null
     }
 
