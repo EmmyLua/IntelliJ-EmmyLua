@@ -26,6 +26,7 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.stubs.StubElement
+import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
@@ -34,9 +35,12 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.psi.impl.LuaLiteralExprImpl
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMemberStub
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
+import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.*
 import java.util.*
 import javax.swing.Icon
@@ -51,8 +55,17 @@ fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
     return owner
 }
 
-fun getModuleName(owner: LuaLiteralExprImpl): String? {
-    return owner.moduleName
+fun isModuleName(owner: LuaLiteralExprImpl): Boolean {
+    val name = owner.stringValue
+    val context = SearchContext.get(owner.project)
+    val list = LuaShortNamesManager.getInstance(owner.project).getClassMembers("_G", context)
+    for (member in list) {
+        if(member is LuaLiteralExpr && name == member.stringValue) {
+            return true
+        }
+    }
+
+    return false
 }
 
 fun setName(owner: LuaLiteralExprImpl, name: String): PsiElement {
