@@ -21,6 +21,7 @@ package com.tang.intellij.lua.psi
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.icons.AllIcons
 import com.intellij.navigation.ItemPresentation
+import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.search.GlobalSearchScope
@@ -28,6 +29,7 @@ import com.intellij.psi.search.SearchScope
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.stubs.StubIndex
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.LuaDocTagVararg
@@ -58,7 +60,7 @@ fun setName(owner: PsiNameIdentifierOwner, name: String): PsiElement {
 fun isModuleName(owner: LuaLiteralExprImpl): Boolean {
     val name = owner.stringValue
     val context = SearchContext.get(owner.project)
-    val list = LuaShortNamesManager.getInstance(owner.project).getClassMembers("_G", context)
+    val list = LuaShortNamesManager.getInstance(owner.project).getClassMembers("_MODULE", context)
     for (member in list) {
         if(member is LuaLiteralExpr && name == member.stringValue) {
             return true
@@ -284,6 +286,22 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
 }
 
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
+    if (indexExpr.name != null) {
+        val iName = indexExpr.name.toString()
+        val name = indexExpr.text.toString().replace("." + iName, "")
+        val context = SearchContext.get(indexExpr.project)
+        val list = LuaShortNamesManager.getInstance(indexExpr.project).getClassMembers("_MODULE", context)
+        var isModuleExpr = false
+        for (member in list) {
+            if(member is LuaLiteralExpr && name == member.stringValue) {
+                isModuleExpr = true
+                break
+            }
+        }
+        if (isModuleExpr) {
+            return TyLazyClass(name.toString())
+        }
+    }
     val expr = PsiTreeUtil.getStubChildOfType(indexExpr, LuaExpr::class.java)
     return expr?.guessType(context) ?: Ty.UNKNOWN
 }

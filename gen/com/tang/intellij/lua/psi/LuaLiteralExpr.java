@@ -7,6 +7,6 @@ import com.intellij.psi.PsiElement;
 import com.tang.intellij.lua.stubs.LuaExprStubElement;
 import com.tang.intellij.lua.stubs.LuaLiteralExprStub;
 
-public interface LuaLiteralExpr extends LuaExpr, LuaExprStubElement<LuaLiteralExprStub> {
+public interface LuaLiteralExpr extends LuaExpr,LuaModuleClassField, LuaExprStubElement<LuaLiteralExprStub> {
 
 }

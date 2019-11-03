@@ -24,7 +24,7 @@ import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.stubs.LuaExprStub;
 
-public class LuaLiteralExprImpl extends LuaLiteralExprMixin implements LuaLiteralExpr, LuaModuleClassField, LuaExprStubElement<LuaLiteralExprStub> {
+public class LuaLiteralExprImpl extends LuaLiteralExprMixin implements LuaLiteralExpr, LuaExprStubElement<LuaLiteralExprStub> {
 
   public LuaLiteralExprImpl(@NotNull LuaLiteralExprStub stub, @NotNull IStubElementType<?, ?> nodeType) {
     super(stub, nodeType);
@@ -42,6 +42,7 @@ public class LuaLiteralExprImpl extends LuaLiteralExprMixin implements LuaLitera
   public PsiElement getId() {
     return this;
   }
+
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtilKt.getNameIdentifier(this);
@@ -75,6 +76,10 @@ public class LuaLiteralExprImpl extends LuaLiteralExprMixin implements LuaLitera
   public PsiElement setName(@NotNull String name) {
     LuaPsiImplUtilKt.setName(this, name);
     return this;
+  }
+
+  public boolean getIsModule() {
+    return LuaPsiImplUtilKt.isModuleName(this);
   }
 
   @NotNull

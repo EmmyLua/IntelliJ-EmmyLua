@@ -87,6 +87,7 @@ class LookupElementFactory {
                                      type:ITy?,
                                      bold: Boolean): LuaLookupElement {
             val element = LuaFieldLookupElement(name, field, type, bold)
+            /*
             if (!LuaRefactoringUtil.isLuaIdentifier(name)) {
                 element.lookupString = "['$name']"
                 val baseHandler = element.handler
@@ -95,7 +96,7 @@ class LookupElementFactory {
                     // remove '.'
                     insertionContext.document.deleteString(insertionContext.startOffset - 1, insertionContext.startOffset)
                 }
-            }
+            }*/
             element.setTailText("  [$clazzName]")
             return element
         }

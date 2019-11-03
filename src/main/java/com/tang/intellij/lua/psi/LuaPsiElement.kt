@@ -41,6 +41,13 @@ val LuaPsiElement.moduleSeeAll: Boolean get() {
     return false
 }
 
+val LuaPsiElement.modulePsi: LuaPsiElement? get() {
+    val file = containingFile
+    if (file is LuaPsiFile)
+        return (file.modulePsi as LuaPsiElement)
+    return null
+}
+
 val LuaPsiElement.languageLevel: LuaLanguageLevel get() {
     val file = containingFile
     if (file is LuaPsiFile)
