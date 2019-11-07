@@ -109,7 +109,7 @@ task downloadEmmyDebugger(type: Download) {
             "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core.so",
             "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core.dylib",
             "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x86.zip",
-            "https://github.com/ElPsyCongree/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x64.zip",			
+            "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x64.zip",			
             "https://github.com/EmmyLua/EmmyLuaLegacyDebugger/releases/download/${emmyLegacyDebuggerVersion}/debugger.zip"
     ])
     dest "temp"
