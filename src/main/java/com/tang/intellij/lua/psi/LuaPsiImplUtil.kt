@@ -289,7 +289,6 @@ fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
     if (indexExpr.name != null) {
         val iName = indexExpr.name.toString()
         val name = indexExpr.text.toString().replace("." + iName, "")
-        val context = SearchContext.get(indexExpr.project)
         val list = LuaShortNamesManager.getInstance(indexExpr.project).getClassMembers("_MODULE", context)
         var isModuleExpr = false
         for (member in list) {
