@@ -222,8 +222,7 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
                     .append(getDebuggerFolder())
                     .append("/?.so'\n");
         }
-        sb.append("local st,dbg = pcall(function return require('emmy_core') end)\n");
-        sb.append("if not st then print(dbg) return end\n");
+        sb.append("local dbg = require('emmy_core')\n");
         EmmyDebugTransportType type = getType();
         if (type == EmmyDebugTransportType.PIPE_CLIENT) {
             sb.append("dbg.pipeListen('").append(getPipeName()).append("')\n");
