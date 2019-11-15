@@ -64,9 +64,7 @@ class LuaLiteralElementType
             val moduleName = psi.moduleName
             if (moduleName != null && stub.string == moduleName) {
                 LuaClassMemberIndex.indexStub(sink, Constants.WORD_G, moduleName)
-                if (moduleName.contains(".")) {
-                    LuaClassMemberIndex.indexStub(sink, "_MODULE", moduleName)
-                }
+                LuaClassMemberIndex.indexStub(sink, "_MODULE", moduleName)
                 sink.occurrence(StubKeys.SHORT_NAME, moduleName)
             }
         }
