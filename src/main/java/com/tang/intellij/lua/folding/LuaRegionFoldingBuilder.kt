@@ -73,7 +73,7 @@ class LuaRegionFoldingBuilder : FoldingBuilderEx() {
                         val startNode = localFoldingStack.pop() as ASTNode
                         val startOffset = startNode.textRange.startOffset
                         val range = TextRange(startOffset, child.textRange.endOffset)
-                        startNode.psi.putUserData(CompositeFoldingBuilder.FOLDING_BUILDER, this)
+                        // startNode.psi.putUserData(CompositeFoldingBuilder.FOLDING_BUILDER, this)
                         descriptors.add(FoldingDescriptor(startNode, range))
                         val nodeSet = ourCustomRegionElements.get()
                         nodeSet.add(startNode)
