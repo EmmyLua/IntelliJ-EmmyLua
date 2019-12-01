@@ -23,10 +23,11 @@ import com.intellij.xdebugger.attach.XLocalAttachGroup
 import com.tang.intellij.lua.debugger.utils.getDisplayName
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.LuaLanguage
-import sun.awt.shell.ShellFolder
+// import sun.awt.shell.ShellFolder
 import java.io.File
 import javax.swing.Icon
 import javax.swing.ImageIcon
+import javax.swing.filechooser.FileSystemView;
 
 
 /**
@@ -46,8 +47,10 @@ class LuaLocalAttachGroup : XLocalAttachGroup {
             if (detail != null) {
                 val file = File(detail.path)
                 if (file.exists()) {
-                    val sf = ShellFolder.getShellFolder(file)
-                    return ImageIcon(sf.getIcon(false))
+//                    val sf = ShellFolder.getShellFolder(file)
+//                    return ImageIcon(sf.getIcon(false))
+                    val sf = FileSystemView.getFileSystemView()
+                    return sf.getSystemIcon(file)
                 }
             }
         }
