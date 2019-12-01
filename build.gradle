@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 def versions = [:]
+versions["193"] = [
+    ideaSDKVersion: "IC-193.5233.102",
+    sinceBuild: "193",
+    untilBuild: "194.*",
+    archiveName: "IntelliJ-EmmyLua"
+]
 versions["182"] = [
     ideaSDKVersion: "IC-182.2371.4",
     sinceBuild: "182",

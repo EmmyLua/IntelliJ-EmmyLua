@@ -69,7 +69,7 @@ ext {
     }
 }
 
-setDefaultProperty("IDEA_VER", "182")
+setDefaultProperty("IDEA_VER", "193")
 
 version = "${version}-IDEA${IDEA_VER}"
 
