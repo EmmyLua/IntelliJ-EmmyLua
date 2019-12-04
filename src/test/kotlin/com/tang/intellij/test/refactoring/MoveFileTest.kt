@@ -29,7 +29,8 @@ class MoveFileTest : MultiFileTestCase() {
     fun testMoveFile() {
         val fileToMove = "A.lua"
         val targetDirName = "to"
-        doTest { rootDir, _ ->
+        doTest { rootDir,
+             rootAfter ->
             val child = rootDir.findFileByRelativePath(fileToMove)
             assertNotNull("File $fileToMove not found", child)
             val file = myPsiManager.findFile(child!!)!!
