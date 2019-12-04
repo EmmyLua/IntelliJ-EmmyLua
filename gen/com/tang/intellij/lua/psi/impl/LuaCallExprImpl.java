@@ -3,7 +3,6 @@ package com.tang.intellij.lua.psi.impl;
 
 import java.util.List;
 
-import com.google.errorprone.annotations.Var;
 import com.tang.intellij.lua.ty.TyAliasSubstitutor;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
