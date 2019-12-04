@@ -285,6 +285,14 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
     return Ty.UNKNOWN
 }
 
+fun getStringValue(typeName: LuaLiteralExpr): String {
+    return typeName.stringValue;
+}
+
+fun newType(typeName: String): ITy {
+    return TyLazyClass(typeName);
+}
+
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {
     if (indexExpr.name != null) {
         val iName = indexExpr.name.toString()

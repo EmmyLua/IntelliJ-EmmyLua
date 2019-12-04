@@ -2,6 +2,9 @@
 package com.tang.intellij.lua.psi.impl;
 
 import java.util.List;
+
+import com.google.errorprone.annotations.Var;
+import com.tang.intellij.lua.ty.TyAliasSubstitutor;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -53,7 +56,22 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
 
   @NotNull
   public ITy guessParentType(@NotNull SearchContext context) {
-    return LuaPsiImplUtilKt.guessParentType(this, context);
+    ITy t = LuaPsiImplUtilKt.guessParentType(this, context);
+    return t;
+  }
+
+  @Override
+  @NotNull
+  public ITy guessType(SearchContext context) {
+    ITy ty = SearchContext.Companion.infer(this, context);
+    String typeName = ty.getDisplayName();
+    if(typeName.contains("usefirststring")) {
+      LuaLiteralExpr l = (LuaLiteralExpr) getFirstStringArg();
+      typeName = typeName.replace("usefirststring", LuaPsiImplUtilKt.getStringValue(l));
+      ty = LuaPsiImplUtilKt.newType(typeName);
+    }
+    ty = TyAliasSubstitutor.Companion.substitute(ty, context);
+    return ty;
   }
 
   @Nullable
