@@ -187,7 +187,8 @@ elseif xlua then
     emmy = xluaDebugger
 end
 
-_G.emmyHelper = emmy
-if _G.emmyHelperInit then
-    _G.emmyHelperInit()
+rawset(_G, 'emmyHelper', emmy)
+local emmyHelperInit = rawget(_G, 'emmyHelperInit')
+if emmyHelperInit then
+    emmyHelperInit()
 end

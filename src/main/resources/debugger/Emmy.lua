@@ -100,7 +100,7 @@ function cocosLuaDebugger.GetValueAsText(ty, obj, depth, typeNameOverride, displ
     end
 end
 
-emmy = {}
+local emmy = {}
 
 if tolua then
 	if tolua.gettag then
@@ -128,6 +128,8 @@ function emmy.Reload(fileName)
     end
 end
 
+rawset(_G, 'emmy', emmy)
+local emmy_init = rawget(_G, 'emmy_init')
 if emmy_init then
     emmy_init()
 end
