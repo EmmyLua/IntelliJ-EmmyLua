@@ -23,7 +23,7 @@ versions["193"] = [
 versions["182"] = [
     ideaSDKVersion: "IC-182.2371.4",
     sinceBuild: "182",
-    untilBuild: "195.*",
+    untilBuild: "193.*",
     archiveName: "IntelliJ-EmmyLua"
 ]
 versions["172"] = [
