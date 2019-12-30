@@ -2,6 +2,7 @@ out
 build
 temp
 publish_tmp
+.DS_Store
 .idea
 !.idea/IntelliJ-Lua.iml
 !.idea/modules.xml
