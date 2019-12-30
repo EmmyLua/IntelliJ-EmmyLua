@@ -77,7 +77,8 @@ def cfg = [
     ideaSDKVersion: ideaSDKVersion,
     sinceBuild: sinceBuild,
     untilBuild: untilBuild,
-    archiveName: archiveName
+    archiveName: archiveName,
+    explicitJavaDependency: project.hasProperty('explicitJavaDependency') ? explicitJavaDependency : "true",
 ]
 def rev = getRev()
 
@@ -87,6 +88,10 @@ intellij {
     downloadSources false
     version = cfg.ideaSDKVersion
     localPath System.env["IDEA_HOME_${IDEA_VER}"]
+
+    if (cfg.explicitJavaDependency != "false") {
+        plugins 'java'
+    }
 }
 
 patchPluginXml {

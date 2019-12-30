@@ -24,25 +24,28 @@ versions["193"] = [
     ideaSDKVersion: "IC-193.5233.102",
     sinceBuild: "193",
     untilBuild: "194.*",
-    archiveName: "IntelliJ-EmmyLua"
+    archiveName: "IntelliJ-EmmyLua",
 ]
 versions["182"] = [
     ideaSDKVersion: "IC-182.2371.4",
     sinceBuild: "182",
     untilBuild: "193.*",
-    archiveName: "IntelliJ-EmmyLua"
+    archiveName: "IntelliJ-EmmyLua",
+    explicitJavaDependency: "false",
 ]
 versions["172"] = [
     ideaSDKVersion: "IC-172.4574.19",
     sinceBuild: "172",
     untilBuild: "181.*",
-    archiveName: "IntelliJ-EmmyLua"
+    archiveName: "IntelliJ-EmmyLua",
+    explicitJavaDependency: "false",
 ]
 versions["171"] = [
     ideaSDKVersion: "IC-171.4694.73",
     sinceBuild: "171",
     untilBuild: "171.*",
-    archiveName: "IntelliJ-EmmyLua"
+    archiveName: "IntelliJ-EmmyLua",
+    explicitJavaDependency: "false",
 ]
 
 versions.each { shortVer, cfg ->
