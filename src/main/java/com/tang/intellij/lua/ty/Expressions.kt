@@ -22,6 +22,7 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.comment.psi.impl.LuaDocTagTypeImpl
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
@@ -33,6 +34,19 @@ import com.tang.intellij.lua.search.SearchContext
 fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
     if (expr == null)
         return Ty.UNKNOWN
+
+    if (expr.comment != null) {
+        val types = PsiTreeUtil.getChildrenOfTypeAsList(expr.comment, LuaDocTagTypeImpl::class.java)
+
+        if (types.size == 1) {
+            val castType = types.get(0).ty?.getType()
+
+            if (castType != null) {
+                return castType
+            }
+        }
+    }
+
     if (expr is LuaIndexExpr || expr is LuaNameExpr) {
         val tree = LuaDeclarationTree.get(expr.containingFile)
         val declaration = tree.find(expr)?.firstDeclaration?.psi

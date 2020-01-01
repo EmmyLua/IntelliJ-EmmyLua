@@ -19,8 +19,7 @@ package com.tang.intellij.lua.psi.parser
 import com.intellij.lang.PsiBuilder
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
-import com.tang.intellij.lua.psi.LuaParserUtil.MY_LEFT_COMMENT_BINDER
-import com.tang.intellij.lua.psi.LuaParserUtil.MY_RIGHT_COMMENT_BINDER
+import com.tang.intellij.lua.psi.LuaParserUtil.*
 import com.tang.intellij.lua.psi.LuaTypes.*
 
 object LuaExpressionParser {
@@ -58,20 +57,24 @@ object LuaExpressionParser {
         return parseExpr(builder, ExprType.T_OR, l)
     }
 
-    private fun parseExpr(builder: PsiBuilder, type: ExprType, l:Int): PsiBuilder.Marker? = when (type) {
-        ExprType.T_OR -> parseBinary(builder, type.ops, ExprType.T_AND, l)
-        ExprType.T_AND -> parseBinary(builder, type.ops, ExprType.T_CONDITION, l)
-        ExprType.T_CONDITION -> parseBinary(builder, type.ops, ExprType.T_BIT_OR, l)
-        ExprType.T_BIT_OR -> parseBinary(builder, type.ops, ExprType.T_BIT_TILDE, l)
-        ExprType.T_BIT_TILDE -> parseBinary(builder, type.ops, ExprType.T_BIT_AND, l)
-        ExprType.T_BIT_AND -> parseBinary(builder, type.ops, ExprType.T_BIT_SHIFT, l)
-        ExprType.T_BIT_SHIFT -> parseBinary(builder, type.ops, ExprType.T_CONCAT, l)
-        ExprType.T_CONCAT -> parseBinary(builder, type.ops, ExprType.T_ADDITIVE, l)
-        ExprType.T_ADDITIVE -> parseBinary(builder, type.ops, ExprType.T_MULTIPLICATIVE, l)
-        ExprType.T_MULTIPLICATIVE -> parseBinary(builder, type.ops, ExprType.T_EXP, l)
-        ExprType.T_EXP -> parseBinary(builder, type.ops, ExprType.T_UNARY, l)
-        ExprType.T_UNARY -> parseUnary(builder, type.ops, ExprType.T_VALUE, l)
-        ExprType.T_VALUE -> parseValue(builder, l)
+    private fun parseExpr(builder: PsiBuilder, type: ExprType, l:Int): PsiBuilder.Marker? {
+        val marker = when (type) {
+            ExprType.T_OR -> parseBinary(builder, type.ops, ExprType.T_AND, l)
+            ExprType.T_AND -> parseBinary(builder, type.ops, ExprType.T_CONDITION, l)
+            ExprType.T_CONDITION -> parseBinary(builder, type.ops, ExprType.T_BIT_OR, l)
+            ExprType.T_BIT_OR -> parseBinary(builder, type.ops, ExprType.T_BIT_TILDE, l)
+            ExprType.T_BIT_TILDE -> parseBinary(builder, type.ops, ExprType.T_BIT_AND, l)
+            ExprType.T_BIT_AND -> parseBinary(builder, type.ops, ExprType.T_BIT_SHIFT, l)
+            ExprType.T_BIT_SHIFT -> parseBinary(builder, type.ops, ExprType.T_CONCAT, l)
+            ExprType.T_CONCAT -> parseBinary(builder, type.ops, ExprType.T_ADDITIVE, l)
+            ExprType.T_ADDITIVE -> parseBinary(builder, type.ops, ExprType.T_MULTIPLICATIVE, l)
+            ExprType.T_MULTIPLICATIVE -> parseBinary(builder, type.ops, ExprType.T_EXP, l)
+            ExprType.T_EXP -> parseBinary(builder, type.ops, ExprType.T_UNARY, l)
+            ExprType.T_UNARY -> parseUnary(builder, type.ops, ExprType.T_VALUE, l)
+            ExprType.T_VALUE -> parseValue(builder, l)
+        }
+        marker?.setCustomEdgeTokenBinders(MY_LEFT_COMMENT_BINDER, null)
+        return marker
     }
 
     private fun parseBinary(builder: PsiBuilder, ops: TokenSet, next: ExprType, l:Int): PsiBuilder.Marker? {

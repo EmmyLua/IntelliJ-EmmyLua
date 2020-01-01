@@ -9,6 +9,7 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.psi.LuaTypes.*;
 import com.tang.intellij.lua.psi.*;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.stubs.LuaExprStubImpl;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
@@ -35,6 +36,12 @@ public class LuaExprImpl extends LuaExprMixin implements LuaExpr {
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public LuaComment getComment() {
+    return LuaPsiImplUtilKt.getComment(this);
   }
 
 }

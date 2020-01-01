@@ -113,6 +113,8 @@
   hooks("fieldList") = [leftBinder="GREEDY_LEFT_BINDER" rightBinder="GREEDY_RIGHT_BINDER"]
   extends(".*Expr") = expr
   extends(".*Stat") = statement
+  hooks(".*Expr") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
+  hooks("exprList") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
   hooks(".*Stat") = [leftBinder="MY_LEFT_COMMENT_BINDER"]
 }
 
@@ -373,8 +375,10 @@ expr ::= <<parseExpr>> {
     mixin = "com.tang.intellij.lua.psi.impl.LuaExprMixin"
     stubClass = "com.tang.intellij.lua.stubs.LuaExprStub"
     implements = [
+        "com.tang.intellij.lua.psi.LuaCommentOwner"
         "com.tang.intellij.lua.psi.LuaTypeGuessable"
     ]
+    methods = [getComment]
 }
 
 parenExpr ::= '(' expr ')' {
