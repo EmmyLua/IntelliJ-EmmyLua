@@ -46,16 +46,28 @@ class LuaEnterInDocHandler : EnterHandlerDelegate {
         //inside comment
         val comment = PsiTreeUtil.findElementOfClassAtOffset(psiFile, caretOffset - 1, LuaComment::class.java, false)
         if (comment != null && caretOffset > comment.textOffset) {
-            val children = comment.node.getChildren(TokenSet.create(LuaDocTypes.DASHES))
-            val last = children[children.size - 1]
-            //在最后一个 --- 之前才有效
-            if (caretOffset > last.startOffset && comment.owner == null)
-                return null
+            val commentTokens = comment.node.getChildren(TokenSet.create(LuaDocTypes.DASHES, LuaDocTypes.BLOCK_END))
+            var block = true
+
+            if (commentTokens.size > 0) {
+                val last = commentTokens[commentTokens.size - 1]
+
+                //在最后一个 --- 之前才有效
+                if (caretOffset > last.startOffset && comment.owner == null)
+                    return null
+
+                block = last.elementType == LuaDocTypes.BLOCK_END
+            }
 
             val document = editor.document
 
-            document.insertString(caretOffset, "\n---")
-            editor.caretModel.moveToOffset(caretOffset + 4)
+            if (block) {
+                document.insertString(caretOffset, "\n")
+                editor.caretModel.moveToOffset(caretOffset + 1)
+            } else {
+                document.insertString(caretOffset, "\n---")
+                editor.caretModel.moveToOffset(caretOffset + 4)
+            }
 
             val project = comment.project
             val textRange = comment.textRange

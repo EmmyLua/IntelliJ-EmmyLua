@@ -27,6 +27,7 @@ public class LuaStatementImpl extends ASTWrapperPsiElement implements LuaStateme
     else super.accept(visitor);
   }
 
+  @Override
   @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtilKt.getComment(this);

@@ -32,6 +32,7 @@ public class LuaGotoStatImpl extends LuaStatementImpl implements LuaGotoStat {
     return findChildByType(ID);
   }
 
+  @Override
   @NotNull
   public PsiReference[] getReferences() {
     return LuaPsiImplUtilKt.getReferences(this);

@@ -78,6 +78,7 @@ NUMBER={JIT_EXT_NUMBER}|{HEX_NUMBER}|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.]
 REGION_START =--(region|\{\{\{)([^\r\n]*)*
 REGION_END =--(endregion|\}\}\})([^\r\n]*)*
 BLOCK_COMMENT=--\[=*\[[\s\S]*(\]=*\])?
+DOC_BLOCK_COMMENT=--\[=*\[---+[\s\S]*(\]=*\])?
 SHORT_COMMENT=--[^\r\n]*
 DOC_COMMENT=----*[^\r\n]*(\r?\n{LINE_WS}*----*[^\r\n]*)*
 
@@ -182,6 +183,13 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
 }
 
 <xBLOCK_COMMENT> {
+    {DOC_BLOCK_COMMENT}           {
+        int redundant = checkBlockRedundant();
+        if (redundant != -1) {
+            yypushback(redundant);
+            yybegin(YYINITIAL);return DOC_BLOCK_COMMENT; }
+        else { yybegin(YYINITIAL);return DOC_BLOCK_COMMENT; }
+    }
     {BLOCK_COMMENT}           {
         int redundant = checkBlockRedundant();
         if (redundant != -1) {

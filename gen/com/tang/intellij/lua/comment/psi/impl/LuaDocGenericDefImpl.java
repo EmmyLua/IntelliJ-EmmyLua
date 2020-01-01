@@ -38,21 +38,25 @@ public class LuaDocGenericDefImpl extends ASTWrapperPsiElement implements LuaDoc
     return notNullChild(findChildByType(ID));
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaDocPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String newName) {
     return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return LuaDocPsiImplUtilKt.getName(this);
   }
 
+  @Override
   public int getTextOffset() {
     return LuaDocPsiImplUtilKt.getTextOffset(this);
   }

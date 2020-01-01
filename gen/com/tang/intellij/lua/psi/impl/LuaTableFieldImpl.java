@@ -53,59 +53,71 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     return findChildByType(ID);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return LuaPsiImplUtilKt.getName(this);
   }
 
+  @Override
   public int getTextOffset() {
     return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
+  @Override
   @NotNull
   public String toString() {
     return LuaPsiImplUtilKt.toString(this);
   }
 
+  @Override
   @Nullable
   public String getFieldName() {
     return LuaPsiImplUtilKt.getFieldName(this);
   }
 
+  @Override
   @NotNull
   public ItemPresentation getPresentation() {
     return LuaPsiImplUtilKt.getPresentation(this);
   }
 
+  @Override
   @NotNull
   public ITy guessParentType(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
+  @Override
   @NotNull
   public Visibility getVisibility() {
     return LuaPsiImplUtilKt.getVisibility(this);
   }
 
+  @Override
   public boolean isDeprecated() {
     return LuaPsiImplUtilKt.isDeprecated(this);
   }
 
+  @Override
   @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtilKt.getComment(this);
   }
 
+  @Override
   @Nullable
   public LuaExpr getIdExpr() {
     return LuaPsiImplUtilKt.getIdExpr(this);

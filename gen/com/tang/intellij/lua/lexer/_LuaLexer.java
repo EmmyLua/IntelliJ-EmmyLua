@@ -90,11 +90,12 @@ public class _LuaLexer implements FlexLexer {
     "\6\4\1\0\1\61\1\70\1\0\1\5\6\0\2\4"+
     "\1\71\1\72\5\4\1\73\1\74\1\4\1\75\2\0"+
     "\1\76\1\5\2\0\1\77\1\100\3\4\1\101\1\102"+
-    "\1\103\1\4\1\104\1\105\1\0\1\5\2\0\1\106"+
-    "\1\107\1\110\1\4\3\0\1\4\1\0\1\111\2\0";
+    "\1\103\1\4\1\104\1\105\1\0\2\76\1\5\2\0"+
+    "\1\106\1\107\1\110\1\4\1\0\1\76\2\0\1\4"+
+    "\1\111\1\0\1\112\2\0";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[186];
+    int [] result = new int[190];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -140,12 +141,12 @@ public class _LuaLexer implements FlexLexer {
     "\0\u184e\0\u188b\0\u18c8\0\u1905\0\u1942\0\u0225\0\u0225\0\u197f"+
     "\0\u14f8\0\u19bc\0\u19f9\0\u1a36\0\u1a73\0\u1ab0\0\u1aed\0\u1b2a"+
     "\0\u1b67\0\u1ba4\0\u1be1\0\u1c1e\0\u0225\0\u0225\0\u0225\0\u1c5b"+
-    "\0\u0225\0\u0225\0\u1c98\0\u1cd5\0\u1d12\0\u1d4f\0\u0225\0\u0225"+
-    "\0\u0225\0\u1d8c\0\u1dc9\0\u1e06\0\u1e43\0\u1e80\0\u1ebd\0\u0225"+
-    "\0\u1efa\0\u1f37";
+    "\0\u0225\0\u0225\0\u1c98\0\u1cd5\0\u1d12\0\u1d4f\0\u1d8c\0\u1dc9"+
+    "\0\u0225\0\u0225\0\u0225\0\u1e06\0\u1e43\0\u1e80\0\u1ebd\0\u1efa"+
+    "\0\u1f37\0\u1f74\0\u1fb1\0\u0225\0\u1fee\0\u202b";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[186];
+    int [] result = new int[190];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -297,28 +298,30 @@ public class _LuaLexer implements FlexLexer {
     "\3\12\1\251\10\12\24\0\4\12\1\0\5\12\2\0"+
     "\1\12\1\252\4\12\1\0\1\12\7\0\1\12\1\0"+
     "\14\12\22\0\1\233\75\0\1\233\13\0\1\253\55\0"+
-    "\75\234\5\0\2\235\1\254\1\0\1\207\1\235\6\0"+
-    "\1\254\5\0\1\235\11\0\2\235\3\0\1\235\1\0"+
-    "\1\235\1\0\1\207\45\0\1\255\71\0\1\256\54\0"+
-    "\1\240\2\0\72\240\1\241\2\0\72\241\4\0\4\12"+
-    "\1\0\5\12\2\0\5\12\1\257\1\0\1\12\7\0"+
-    "\1\12\1\0\14\12\24\0\4\12\1\0\5\12\2\0"+
-    "\6\12\1\0\1\12\7\0\1\12\1\0\10\12\1\260"+
-    "\3\12\24\0\4\12\1\0\5\12\2\0\6\12\1\0"+
-    "\1\12\7\0\1\12\1\0\5\12\1\261\6\12\24\0"+
-    "\4\12\1\0\5\12\2\0\3\12\1\262\2\12\1\0"+
-    "\1\12\7\0\1\12\1\0\14\12\37\0\1\263\62\0"+
-    "\2\235\1\254\1\150\1\207\1\235\4\0\1\150\1\0"+
-    "\1\254\5\0\1\235\11\0\2\235\3\0\1\235\1\0"+
-    "\1\235\1\0\1\207\46\0\1\264\71\0\1\265\57\0"+
-    "\4\12\1\0\5\12\2\0\4\12\1\266\1\12\1\0"+
-    "\1\12\7\0\1\12\1\0\14\12\37\0\1\204\102\0"+
-    "\1\240\71\0\1\267\56\0\4\12\1\0\5\12\2\0"+
-    "\5\12\1\270\1\0\1\12\7\0\1\12\1\0\14\12"+
-    "\43\0\1\271\75\0\1\272\75\0\1\241\47\0";
+    "\17\254\1\255\55\254\5\0\2\235\1\256\1\0\1\207"+
+    "\1\235\6\0\1\256\5\0\1\235\11\0\2\235\3\0"+
+    "\1\235\1\0\1\235\1\0\1\207\45\0\1\257\71\0"+
+    "\1\260\54\0\1\240\2\0\72\240\1\241\2\0\72\241"+
+    "\4\0\4\12\1\0\5\12\2\0\5\12\1\261\1\0"+
+    "\1\12\7\0\1\12\1\0\14\12\24\0\4\12\1\0"+
+    "\5\12\2\0\6\12\1\0\1\12\7\0\1\12\1\0"+
+    "\10\12\1\262\3\12\24\0\4\12\1\0\5\12\2\0"+
+    "\6\12\1\0\1\12\7\0\1\12\1\0\5\12\1\263"+
+    "\6\12\24\0\4\12\1\0\5\12\2\0\3\12\1\264"+
+    "\2\12\1\0\1\12\7\0\1\12\1\0\14\12\37\0"+
+    "\1\265\55\0\114\254\1\266\55\254\5\0\2\235\1\256"+
+    "\1\150\1\207\1\235\4\0\1\150\1\0\1\256\5\0"+
+    "\1\235\11\0\2\235\3\0\1\235\1\0\1\235\1\0"+
+    "\1\207\46\0\1\267\71\0\1\270\57\0\4\12\1\0"+
+    "\5\12\2\0\4\12\1\271\1\12\1\0\1\12\7\0"+
+    "\1\12\1\0\14\12\37\0\1\204\55\0\17\254\1\272"+
+    "\55\254\25\0\1\240\71\0\1\273\56\0\4\12\1\0"+
+    "\5\12\2\0\5\12\1\274\1\0\1\12\7\0\1\12"+
+    "\1\0\14\12\20\0\75\272\23\0\1\275\75\0\1\276"+
+    "\75\0\1\241\47\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[8052];
+    int [] result = new int[8296];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -362,11 +365,11 @@ public class _LuaLexer implements FlexLexer {
     "\1\0\15\1\1\11\1\0\1\11\12\1\11\11\4\0"+
     "\1\1\2\0\1\11\2\1\1\11\4\0\21\1\1\0"+
     "\2\1\1\0\1\1\6\0\15\1\2\0\2\1\2\0"+
-    "\13\1\1\0\1\1\2\0\4\1\3\0\1\1\1\0"+
-    "\1\1\2\0";
+    "\13\1\1\0\3\1\2\0\4\1\1\0\1\1\2\0"+
+    "\2\1\1\0\1\1\2\0";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[186];
+    int [] result = new int[190];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -511,7 +514,7 @@ public class _LuaLexer implements FlexLexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
+   * @return      {@code false}, iff there was new input.
    *
    * @exception   java.io.IOException  if any I/O-Error occurs
    */
@@ -547,7 +550,7 @@ public class _LuaLexer implements FlexLexer {
 
 
   /**
-   * Returns the character at position <tt>pos</tt> from the
+   * Returns the character at position {@code pos} from the
    * matched text.
    *
    * It is equivalent to yytext().charAt(pos), but faster
@@ -707,304 +710,304 @@ public class _LuaLexer implements FlexLexer {
             { yybegin(YYINITIAL); return SHEBANG_CONTENT;
             } 
             // fall through
-          case 74: break;
+          case 75: break;
           case 2: 
             { return TokenType.BAD_CHARACTER;
             } 
             // fall through
-          case 75: break;
+          case 76: break;
           case 3: 
             { return TokenType.WHITE_SPACE;
             } 
             // fall through
-          case 76: break;
+          case 77: break;
           case 4: 
             { return ID;
             } 
             // fall through
-          case 77: break;
+          case 78: break;
           case 5: 
             { return NUMBER;
             } 
             // fall through
-          case 78: break;
+          case 79: break;
           case 6: 
             { return PLUS;
             } 
             // fall through
-          case 79: break;
+          case 80: break;
           case 7: 
             { return DOT;
             } 
             // fall through
-          case 80: break;
+          case 81: break;
           case 8: 
             { return MINUS;
             } 
             // fall through
-          case 81: break;
+          case 82: break;
           case 9: 
             { return LCURLY;
             } 
             // fall through
-          case 82: break;
+          case 83: break;
           case 10: 
             { return RCURLY;
             } 
             // fall through
-          case 83: break;
+          case 84: break;
           case 11: 
             { return LBRACK;
             } 
             // fall through
-          case 84: break;
+          case 85: break;
           case 12: 
             { return ASSIGN;
             } 
             // fall through
-          case 85: break;
+          case 86: break;
           case 13: 
             { return RBRACK;
             } 
             // fall through
-          case 86: break;
+          case 87: break;
           case 14: 
             { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength());
             } 
             // fall through
-          case 87: break;
+          case 88: break;
           case 15: 
             { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength());
             } 
             // fall through
-          case 88: break;
+          case 89: break;
           case 16: 
             { return GETN;
             } 
             // fall through
-          case 89: break;
+          case 90: break;
           case 17: 
             { return GT;
             } 
             // fall through
-          case 90: break;
+          case 91: break;
           case 18: 
             { return LT;
             } 
             // fall through
-          case 91: break;
+          case 92: break;
           case 19: 
             { return BIT_TILDE;
             } 
             // fall through
-          case 92: break;
+          case 93: break;
           case 20: 
             { return MULT;
             } 
             // fall through
-          case 93: break;
+          case 94: break;
           case 21: 
             { return MOD;
             } 
             // fall through
-          case 94: break;
+          case 95: break;
           case 22: 
             { return DIV;
             } 
             // fall through
-          case 95: break;
+          case 96: break;
           case 23: 
             { return LPAREN;
             } 
             // fall through
-          case 96: break;
+          case 97: break;
           case 24: 
             { return RPAREN;
             } 
             // fall through
-          case 97: break;
+          case 98: break;
           case 25: 
             { return COMMA;
             } 
             // fall through
-          case 98: break;
+          case 99: break;
           case 26: 
             { return SEMI;
             } 
             // fall through
-          case 99: break;
+          case 100: break;
           case 27: 
             { return COLON;
             } 
             // fall through
-          case 100: break;
+          case 101: break;
           case 28: 
             { return EXP;
             } 
             // fall through
-          case 101: break;
+          case 102: break;
           case 29: 
             { return BIT_AND;
             } 
             // fall through
-          case 102: break;
+          case 103: break;
           case 30: 
             { return BIT_OR;
             } 
             // fall through
-          case 103: break;
+          case 104: break;
           case 31: 
             { yybegin(YYINITIAL); return STRING;
             } 
             // fall through
-          case 104: break;
+          case 105: break;
           case 32: 
             { yypushback(yylength()); yybegin(xCOMMENT);
             } 
             // fall through
-          case 105: break;
+          case 106: break;
           case 33: 
             { return CONCAT;
             } 
             // fall through
-          case 106: break;
+          case 107: break;
           case 34: 
             { boolean block = checkBlock();
         if (block) { yypushback(yylength()); yybegin(xBLOCK_COMMENT); }
         else { yypushback(yylength()); yybegin(xCOMMENT); }
             } 
             // fall through
-          case 107: break;
+          case 108: break;
           case 35: 
             { return IN;
             } 
             // fall through
-          case 108: break;
+          case 109: break;
           case 36: 
             { return IF;
             } 
             // fall through
-          case 109: break;
+          case 110: break;
           case 37: 
             { return OR;
             } 
             // fall through
-          case 110: break;
+          case 111: break;
           case 38: 
             { return DO;
             } 
             // fall through
-          case 111: break;
+          case 112: break;
           case 39: 
             { yybegin(xBLOCK_STRING); yypushback(yylength()); checkBlock();
             } 
             // fall through
-          case 112: break;
+          case 113: break;
           case 40: 
             { return EQ;
             } 
             // fall through
-          case 113: break;
+          case 114: break;
           case 41: 
             { yybegin(xSHEBANG); return SHEBANG;
             } 
             // fall through
-          case 114: break;
+          case 115: break;
           case 42: 
             { return GE;
             } 
             // fall through
-          case 115: break;
+          case 116: break;
           case 43: 
             { return BIT_RTRT;
             } 
             // fall through
-          case 116: break;
+          case 117: break;
           case 44: 
             { return LE;
             } 
             // fall through
-          case 117: break;
+          case 118: break;
           case 45: 
             { return BIT_LTLT;
             } 
             // fall through
-          case 118: break;
+          case 119: break;
           case 46: 
             { return NE;
             } 
             // fall through
-          case 119: break;
+          case 120: break;
           case 47: 
             { return DOUBLE_DIV;
             } 
             // fall through
-          case 120: break;
+          case 121: break;
           case 48: 
             { return DOUBLE_COLON;
             } 
             // fall through
-          case 121: break;
+          case 122: break;
           case 49: 
             { yybegin(YYINITIAL);return SHORT_COMMENT;
             } 
             // fall through
-          case 122: break;
+          case 123: break;
           case 50: 
             { return ELLIPSIS;
             } 
             // fall through
-          case 123: break;
+          case 124: break;
           case 51: 
             { return END;
             } 
             // fall through
-          case 124: break;
+          case 125: break;
           case 52: 
             { return NIL;
             } 
             // fall through
-          case 125: break;
+          case 126: break;
           case 53: 
             { return NOT;
             } 
             // fall through
-          case 126: break;
+          case 127: break;
           case 54: 
             { return AND;
             } 
             // fall through
-          case 127: break;
+          case 128: break;
           case 55: 
             { return FOR;
             } 
             // fall through
-          case 128: break;
+          case 129: break;
           case 56: 
             { yybegin(YYINITIAL);return DOC_COMMENT;
             } 
             // fall through
-          case 129: break;
+          case 130: break;
           case 57: 
             { return ELSE;
             } 
             // fall through
-          case 130: break;
+          case 131: break;
           case 58: 
             { if (level.getVersion() < LuaLanguageLevel.LUA52.getVersion()) return ID; else return GOTO;
             } 
             // fall through
-          case 131: break;
+          case 132: break;
           case 59: 
             { return TRUE;
             } 
             // fall through
-          case 132: break;
+          case 133: break;
           case 60: 
             { return THEN;
             } 
             // fall through
-          case 133: break;
+          case 134: break;
           case 61: 
             { int redundant = checkBlockRedundant();
         if (redundant != -1) {
@@ -1015,7 +1018,7 @@ public class _LuaLexer implements FlexLexer {
         }
             } 
             // fall through
-          case 134: break;
+          case 135: break;
           case 62: 
             { int redundant = checkBlockRedundant();
         if (redundant != -1) {
@@ -1024,62 +1027,71 @@ public class _LuaLexer implements FlexLexer {
         else { yybegin(YYINITIAL);return BLOCK_COMMENT; }
             } 
             // fall through
-          case 135: break;
+          case 136: break;
           case 63: 
             { return REGION;
             } 
             // fall through
-          case 136: break;
+          case 137: break;
           case 64: 
             { return ENDREGION;
             } 
             // fall through
-          case 137: break;
+          case 138: break;
           case 65: 
             { return BREAK;
             } 
             // fall through
-          case 138: break;
+          case 139: break;
           case 66: 
             { return LOCAL;
             } 
             // fall through
-          case 139: break;
+          case 140: break;
           case 67: 
             { return FALSE;
             } 
             // fall through
-          case 140: break;
+          case 141: break;
           case 68: 
             { return UNTIL;
             } 
             // fall through
-          case 141: break;
+          case 142: break;
           case 69: 
             { return WHILE;
             } 
             // fall through
-          case 142: break;
+          case 143: break;
           case 70: 
             { return RETURN;
             } 
             // fall through
-          case 143: break;
+          case 144: break;
           case 71: 
             { return REPEAT;
             } 
             // fall through
-          case 144: break;
+          case 145: break;
           case 72: 
             { return ELSEIF;
             } 
             // fall through
-          case 145: break;
+          case 146: break;
           case 73: 
+            { int redundant = checkBlockRedundant();
+        if (redundant != -1) {
+            yypushback(redundant);
+            yybegin(YYINITIAL);return DOC_BLOCK_COMMENT; }
+        else { yybegin(YYINITIAL);return DOC_BLOCK_COMMENT; }
+            } 
+            // fall through
+          case 147: break;
+          case 74: 
             { return FUNCTION;
             } 
             // fall through
-          case 146: break;
+          case 148: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

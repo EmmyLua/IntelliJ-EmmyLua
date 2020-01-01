@@ -39,6 +39,7 @@ public class LuaDocTagSeeImpl extends ASTWrapperPsiElement implements LuaDocTagS
     return findChildByType(ID);
   }
 
+  @Override
   @Nullable
   public PsiReference getReference() {
     return LuaDocPsiImplUtilKt.getReference(this);

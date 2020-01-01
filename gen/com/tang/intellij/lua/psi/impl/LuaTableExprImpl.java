@@ -49,6 +49,7 @@ public class LuaTableExprImpl extends LuaTableExprMixin implements LuaTableExpr 
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaTableFieldSep.class);
   }
 
+  @Override
   @Nullable
   public LuaTableField findField(@NotNull String fieldName) {
     return LuaPsiImplUtilKt.findField(this, fieldName);

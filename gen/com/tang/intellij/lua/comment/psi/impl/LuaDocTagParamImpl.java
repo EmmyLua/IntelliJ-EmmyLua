@@ -45,6 +45,7 @@ public class LuaDocTagParamImpl extends ASTWrapperPsiElement implements LuaDocTa
     return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
   }
 
+  @Override
   @NotNull
   public ITy getType() {
     return LuaDocPsiImplUtilKt.getType(this);

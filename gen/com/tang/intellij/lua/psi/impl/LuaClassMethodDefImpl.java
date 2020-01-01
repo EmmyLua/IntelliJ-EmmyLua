@@ -53,68 +53,82 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
     return PsiTreeUtil.getStubChildOfType(this, LuaFuncBody.class);
   }
 
+  @Override
   @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtilKt.getComment(this);
   }
 
+  @Override
   @NotNull
   public ITy guessParentType(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
+  @Override
   @NotNull
   public Visibility getVisibility() {
     return LuaPsiImplUtilKt.getVisibility(this);
   }
 
+  @Override
   public boolean isDeprecated() {
     return LuaPsiImplUtilKt.isDeprecated(this);
   }
 
+  @Override
   @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtilKt.getParamNameDefList(this);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return LuaPsiImplUtilKt.getName(this);
   }
 
+  @Override
   public int getTextOffset() {
     return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
+  @Override
   @NotNull
   public String toString() {
     return LuaPsiImplUtilKt.toString(this);
   }
 
+  @Override
   @NotNull
   public ITy guessReturnType(@NotNull SearchContext searchContext) {
     return LuaPsiImplUtilKt.guessReturnType(this, searchContext);
   }
 
+  @Override
   @NotNull
   public LuaParamInfo[] getParams() {
     return LuaPsiImplUtilKt.getParams(this);
   }
 
+  @Override
   public boolean isStatic() {
     return LuaPsiImplUtilKt.isStatic(this);
   }
 
+  @Override
   @NotNull
   public ItemPresentation getPresentation() {
     return LuaPsiImplUtilKt.getPresentation(this);
