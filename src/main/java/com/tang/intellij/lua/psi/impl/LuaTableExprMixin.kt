@@ -20,6 +20,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.lang.ASTNode
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
+import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.LuaExpr
 import com.tang.intellij.lua.stubs.LuaTableExprStub
 
@@ -33,4 +34,8 @@ open class LuaTableExprMixin : StubBasedPsiElementBase<LuaTableExprStub>, LuaExp
     constructor(node: ASTNode) : super(node)
 
     constructor(stub: LuaTableExprStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
+
+    override fun getComment(): LuaComment? {
+        return com.tang.intellij.lua.psi.getComment(this)
+    }
 }

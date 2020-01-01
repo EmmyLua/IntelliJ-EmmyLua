@@ -46,7 +46,19 @@ object LuaCommentUtil {
     }
 
     fun findComment(element: LuaCommentOwner): LuaComment? {
-        return PsiTreeUtil.getChildOfType(element, LuaComment::class.java)
+        val firstChild = element.firstChild // Left bound comment
+
+        if (firstChild is LuaComment) {
+            return firstChild
+        }
+
+        val lastChild = element.lastChild // Right bound comment
+
+        if (lastChild is LuaComment) {
+            return lastChild
+        }
+
+        return null
     }
 
     fun insertTemplate(commentOwner: LuaCommentOwner, editor: Editor, action:(TemplateManager, Template) -> Unit) {

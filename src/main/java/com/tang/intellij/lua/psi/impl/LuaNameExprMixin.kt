@@ -21,6 +21,7 @@ import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
+import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.LuaClassField
 import com.tang.intellij.lua.psi.LuaExpr
 import com.tang.intellij.lua.psi.Visibility
@@ -39,6 +40,10 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaE
     internal constructor(node: ASTNode) : super(node)
 
     internal constructor(stub: LuaNameExprStub, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
+
+    override fun getComment(): LuaComment? {
+        return com.tang.intellij.lua.psi.getComment(this)
+    }
 
     override fun getReference(): PsiReference? {
         return references.firstOrNull()

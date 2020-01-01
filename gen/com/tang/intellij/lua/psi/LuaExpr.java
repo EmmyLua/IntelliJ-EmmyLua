@@ -6,7 +6,11 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.StubBasedPsiElement;
 import com.tang.intellij.lua.stubs.LuaExprStub;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
 
-public interface LuaExpr extends LuaTypeGuessable, StubBasedPsiElement<LuaExprStub> {
+public interface LuaExpr extends LuaCommentOwner, LuaTypeGuessable, StubBasedPsiElement<LuaExprStub> {
+
+  @Nullable
+  LuaComment getComment();
 
 }

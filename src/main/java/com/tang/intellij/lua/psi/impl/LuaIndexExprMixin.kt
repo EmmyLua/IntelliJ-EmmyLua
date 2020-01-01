@@ -48,13 +48,13 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
      *
      * get comment for `field`
      */
-    val comment: LuaComment? get() {
+    override fun getComment(): LuaComment? {
         val p = parent
         if (p is LuaVarList) {
             val stat = p.parent as LuaStatement
             return stat.comment
         }
-        return null
+        return super.getComment()
     }
 
     override val visibility: Visibility get() {

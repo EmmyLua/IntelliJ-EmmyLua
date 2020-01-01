@@ -23,6 +23,7 @@ import com.intellij.psi.PsiReferenceService
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
+import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.psi.LuaExpr
 import com.tang.intellij.lua.stubs.LuaExprStub
 
@@ -32,6 +33,10 @@ abstract class LuaExprStubMixin<T: LuaExprStub<*>> : StubBasedPsiElementBase<T>,
     constructor(node: ASTNode) : super(node)
 
     constructor(stub: T, nodeType: IElementType, node: ASTNode) : super(stub, nodeType, node)
+
+    override fun getComment(): LuaComment? {
+        return com.tang.intellij.lua.psi.getComment(this)
+    }
 
     override fun getReferences(): Array<PsiReference> {
         return ReferenceProvidersRegistry.getReferencesFromProviders(this, PsiReferenceService.Hints.NO_HINTS)

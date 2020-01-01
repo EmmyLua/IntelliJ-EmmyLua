@@ -374,6 +374,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
                     if (isAssignment) {
                         expectExprList(b, l + 1)
+
                         val m = c.precede()
                         doneStat(b, m, ASSIGN_STAT)
                         return m

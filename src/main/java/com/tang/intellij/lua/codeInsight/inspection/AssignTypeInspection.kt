@@ -66,13 +66,10 @@ class AssignTypeInspection : StrictInspection() {
                                     }
                                 }
                             } else {
-                                // Local/global var assignments, only check type if there is no comment defining it
-                                if (o.comment == null) {
-                                    val fieldType = field.guessType(searchContext)
+                                val fieldType = field.guessType(searchContext)
 
-                                    if (!valueType.subTypeOf(fieldType, searchContext, false)) {
-                                        myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
-                                    }
+                                if (!valueType.subTypeOf(fieldType, searchContext, false)) {
+                                    myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                 }
                             }
                         }

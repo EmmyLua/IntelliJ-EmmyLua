@@ -51,6 +51,7 @@ internal fun expectExprList(b: PsiBuilder, l: Int, error: Boolean = true): PsiBu
     if (firstExpr != null) {
         val m = firstExpr.precede()
         m.done(EXPR_LIST)
+        m.setCustomEdgeTokenBinders(MY_LEFT_COMMENT_BINDER, null)
         return m
     } else if (error) b.error("Expression expected")
     return null

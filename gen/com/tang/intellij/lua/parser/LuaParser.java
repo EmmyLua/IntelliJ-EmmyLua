@@ -142,6 +142,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = binaryOp(b, l + 1);
     p = r; // pin = 1
     r = r && expr(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -215,6 +216,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _LEFT_, CALL_EXPR, "<call expr>");
     r = args(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -336,6 +338,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = consumeToken(b, FUNCTION);
     r = r && funcBody(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, m, CLOSURE_EXPR, r);
     return r;
   }
@@ -404,6 +407,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, EXPR_LIST, "<expr list>");
     r = expr(b, l + 1);
     r = r && exprList_1(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -717,6 +721,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = indexExpr_0(b, l + 1);
     if (!r) r = parseTokens(b, 1, DOT, ID);
     if (!r) r = parseTokens(b, 1, COLON, ID);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -806,6 +811,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, NUMBER);
     if (!r) r = consumeToken(b, STRING);
     if (!r) r = consumeToken(b, ELLIPSIS);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -910,6 +916,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, ID);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, m, NAME_EXPR, r);
     return r;
   }
@@ -1057,6 +1064,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, expr(b, l + 1));
     r = p && consumeToken(b, RPAREN) && r;
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1066,10 +1074,13 @@ public class LuaParser implements PsiParser, LightPsiParser {
   static boolean prefixExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefixExpr")) return false;
     boolean r;
+    Marker m = enter_section_(b);
     r = parenExpr(b, l + 1);
     if (!r) r = nameExpr(b, l + 1);
     if (!r) r = tableExpr(b, l + 1);
     if (!r) r = literalExpr(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1081,6 +1092,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b);
     r = prefixExpr(b, l + 1);
     r = r && primaryExpr_1(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1256,6 +1268,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, STRING);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, m, LITERAL_EXPR, r);
     return r;
   }
@@ -1265,8 +1278,11 @@ public class LuaParser implements PsiParser, LightPsiParser {
   static boolean suffixExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "suffixExpr")) return false;
     boolean r;
+    Marker m = enter_section_(b);
     r = indexExpr(b, l + 1);
     if (!r) r = callExpr(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1281,6 +1297,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, fieldList(b, l + 1));
     r = p && consumeToken(b, RCURLY) && r;
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1375,6 +1392,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     r = unaryOp(b, l + 1);
     p = r; // pin = 1
     r = r && unaryExpr_1(b, l + 1);
+    register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1383,8 +1401,10 @@ public class LuaParser implements PsiParser, LightPsiParser {
   private static boolean unaryExpr_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unaryExpr_1")) return false;
     boolean r;
+    Marker m = enter_section_(b);
     r = unaryExpr(b, l + 1);
     if (!r) r = primaryExpr(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
