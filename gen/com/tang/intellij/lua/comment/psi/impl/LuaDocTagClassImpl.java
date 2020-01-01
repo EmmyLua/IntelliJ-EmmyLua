@@ -51,40 +51,48 @@ public class LuaDocTagClassImpl extends StubBasedPsiElementBase<LuaDocTagClassSt
     return notNullChild(findChildByType(ID));
   }
 
+  @Override
   @NotNull
   public ITyClass getType() {
     return LuaDocPsiImplUtilKt.getType(this);
   }
 
+  @Override
   @NotNull
   public ItemPresentation getPresentation() {
     return LuaDocPsiImplUtilKt.getPresentation(this);
   }
 
+  @Override
   @NotNull
   public PsiElement getNameIdentifier() {
     return LuaDocPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String newName) {
     return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 
+  @Override
   @NotNull
   public String getName() {
     return LuaDocPsiImplUtilKt.getName(this);
   }
 
+  @Override
   public int getTextOffset() {
     return LuaDocPsiImplUtilKt.getTextOffset(this);
   }
 
+  @Override
   @NotNull
   public String toString() {
     return LuaDocPsiImplUtilKt.toString(this);
   }
 
+  @Override
   public boolean isDeprecated() {
     return LuaDocPsiImplUtilKt.isDeprecated(this);
   }

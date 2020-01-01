@@ -31,20 +31,24 @@ public class LuaLabelStatImpl extends LuaStatementImpl implements LuaLabelStat {
     return findChildByType(ID);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   public int getTextOffset() {
     return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return LuaPsiImplUtilKt.getName(this);

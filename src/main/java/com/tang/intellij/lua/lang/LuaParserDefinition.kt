@@ -94,6 +94,7 @@ class LuaParserDefinition : ParserDefinition {
         val COMMENTS = TokenSet.create(
                 LuaTypes.SHORT_COMMENT,
                 LuaTypes.BLOCK_COMMENT,
+                LuaTypes.DOC_BLOCK_COMMENT,
                 LuaTypes.DOC_COMMENT,
                 LuaTypes.REGION,
                 LuaTypes.ENDREGION
@@ -205,7 +206,7 @@ fun createType(string: String): IElementType {
 }
 
 fun createToken(string: String): IElementType {
-    return if (string == "DOC_COMMENT") LuaElementType.DOC_COMMENT else LuaTokenType(string)
+    return if (string == "DOC_COMMENT" || string == "DOC_BLOCK_COMMENT") LuaElementType.DOC_COMMENT else LuaTokenType(string)
 }
 
 fun createDocType(string: String): IElementType {

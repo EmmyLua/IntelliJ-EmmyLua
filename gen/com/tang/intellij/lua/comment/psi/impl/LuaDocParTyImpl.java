@@ -32,6 +32,7 @@ public class LuaDocParTyImpl extends LuaDocTyImpl implements LuaDocParTy {
     return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
   }
 
+  @Override
   @NotNull
   public ITy getType() {
     return LuaDocPsiImplUtilKt.getType(this);

@@ -44,8 +44,11 @@ public interface LuaDocTypes {
 
   IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
+  IElementType BLOCK_BEGIN = new LuaDocTokenType("BLOCK_BEGIN");
+  IElementType BLOCK_END = new LuaDocTokenType("BLOCK_END");
   IElementType COMMA = new LuaDocTokenType(",");
   IElementType DASHES = new LuaDocTokenType("DASHES");
+  IElementType EOL = new LuaDocTokenType("EOL");
   IElementType EQ = new LuaDocTokenType("=");
   IElementType EXTENDS = new LuaDocTokenType(":");
   IElementType FUN = new LuaDocTokenType("fun");

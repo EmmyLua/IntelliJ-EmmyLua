@@ -439,6 +439,12 @@ public class _LuaLexer implements FlexLexer {
         return false;
     }
 
+    private boolean checkDocBlock() {
+        return checkAhead('-', nBrackets + 2)
+            && checkAhead('-', nBrackets + 3)
+            && checkAhead('-', nBrackets + 4);
+    }
+
     private int checkBlockEnd() {
         int pos = zzMarkedPos;
         int end = zzEndRead;
@@ -515,7 +521,7 @@ public class _LuaLexer implements FlexLexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
+   * @return      {@code false}, iff there was new input.
    *
    * @exception   java.io.IOException  if any I/O-Error occurs
    */
@@ -551,7 +557,7 @@ public class _LuaLexer implements FlexLexer {
 
 
   /**
-   * Returns the character at position <tt>pos</tt> from the
+   * Returns the character at position {@code pos} from the
    * matched text.
    *
    * It is equivalent to yytext().charAt(pos), but faster
@@ -877,9 +883,10 @@ public class _LuaLexer implements FlexLexer {
           case 33: 
             { boolean block = checkBlock();
         if (block) {
+            boolean docBlock = checkDocBlock();
             yypushback(yylength());
             zzMarkedPos += checkBlockEnd();
-            return BLOCK_COMMENT;
+            return docBlock ? DOC_BLOCK_COMMENT : BLOCK_COMMENT;
         }
         else { yypushback(yylength()); yybegin(xCOMMENT); }
             } 

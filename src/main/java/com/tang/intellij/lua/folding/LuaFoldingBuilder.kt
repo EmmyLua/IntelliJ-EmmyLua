@@ -82,7 +82,7 @@ class LuaFoldingBuilder : FoldingBuilderEx() {
         val type = astNode.elementType
         return when(type) {
             LuaTypes.BLOCK -> HOLDER_TEXT
-            LuaTypes.DOC_COMMENT -> "/** ... */"
+            LuaTypes.DOC_COMMENT -> "--[[--- ... ]]"
             LuaTypes.BLOCK_COMMENT -> "--[[ ... ]]"
             LuaTypes.TABLE_EXPR -> "{ ... }"
             LuaTypes.STRING -> "[[ ... ]]"

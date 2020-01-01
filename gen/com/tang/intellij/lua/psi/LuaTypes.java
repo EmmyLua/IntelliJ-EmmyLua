@@ -67,6 +67,7 @@ public interface LuaTypes {
   IElementType CONCAT = LuaParserDefinitionKt.createToken("..");
   IElementType DIV = LuaParserDefinitionKt.createToken("/");
   IElementType DO = LuaParserDefinitionKt.createToken("do");
+  IElementType DOC_BLOCK_COMMENT = LuaParserDefinitionKt.createToken("DOC_BLOCK_COMMENT");
   IElementType DOC_COMMENT = LuaParserDefinitionKt.createToken("DOC_COMMENT");
   IElementType DOT = LuaParserDefinitionKt.createToken(".");
   IElementType DOUBLE_COLON = LuaParserDefinitionKt.createToken("::");

@@ -50,6 +50,7 @@ public class LuaLocalDefImpl extends StubBasedPsiElementBase<LuaPlaceholderStub>
     return PsiTreeUtil.getStubChildOfType(this, LuaNameList.class);
   }
 
+  @Override
   @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtilKt.getComment(this);

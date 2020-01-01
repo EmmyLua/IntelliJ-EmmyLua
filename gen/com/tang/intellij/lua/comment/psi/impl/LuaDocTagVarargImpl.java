@@ -39,6 +39,7 @@ public class LuaDocTagVarargImpl extends ASTWrapperPsiElement implements LuaDocT
     return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
   }
 
+  @Override
   @NotNull
   public ITy getType() {
     return LuaDocPsiImplUtilKt.getType(this);

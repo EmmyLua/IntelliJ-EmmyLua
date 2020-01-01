@@ -90,6 +90,7 @@
         EXP = "^"
 
         SHORT_COMMENT="SHORT_COMMENT"
+        DOC_BLOCK_COMMENT="DOC_BLOCK_COMMENT"
         DOC_COMMENT="DOC_COMMENT"
         BLOCK_COMMENT="BLOCK_COMMENT"
         ID="regexp:[A-Za-z_][A-Za-z0-9_]*"

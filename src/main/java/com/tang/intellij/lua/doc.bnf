@@ -54,6 +54,8 @@
         PRIVATE = 'private'
         PROTECTED = 'protected'
         PUBLIC = 'public'
+        BLOCK_BEGIN = 'BLOCK_BEGIN'
+        BLOCK_END = 'BLOCK_END'
         DASHES = 'DASHES'
         STRING_BEGIN = 'STRING_BEGIN'
         STRING = 'STRING'
@@ -80,10 +82,10 @@
   ]
 }
 
-doc ::= (DASHES after_dash?)*
+doc ::= (BLOCK_BEGIN EOL* (after_dash(EOL+ after_dash?)*)? EOL? BLOCK_END)|(DASHES after_dash?)?(EOL DASHES after_dash?)*
 
-private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
-private after_dash_recover ::= !(DASHES)
+private after_dash ::= doc_item | STRING { recoverWhile=eol_recover }
+private eol_recover ::= !(EOL|BLOCK_END)
 private doc_item ::= '@' (tag_param
     | tag_alias
     | tag_suppress
@@ -244,7 +246,7 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTagClassStub"
     methods = [
         getType
-        
+
         getPresentation
         getNameIdentifier
         setName

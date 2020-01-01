@@ -36,6 +36,12 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
         return false;
     }
 
+    private boolean checkDocBlock() {
+        return checkAhead('-', nBrackets + 2)
+            && checkAhead('-', nBrackets + 3)
+            && checkAhead('-', nBrackets + 4);
+    }
+
     private int checkBlockEnd() {
         int pos = zzMarkedPos;
         int end = zzEndRead;
@@ -89,6 +95,7 @@ NUMBER={JIT_EXT_NUMBER}|{HEX_NUMBER}|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.]
 REGION_START =--(region|\{\{\{)([^\r\n]*)*
 REGION_END =--(endregion|\}\}\})([^\r\n]*)*
 BLOCK_COMMENT=--\[=*\[[\s\S]*(\]=*\])?
+DOC_BLOCK_COMMENT=--\[=*\[---+[\s\S]*(\]=*\])?
 SHORT_COMMENT=--[^\r\n]*
 DOC_COMMENT=----*[^\r\n]*(\r?\n{LINE_WS}*----*[^\r\n]*)*
 
@@ -113,9 +120,10 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "--"                        {
         boolean block = checkBlock();
         if (block) {
+            boolean docBlock = checkDocBlock();
             yypushback(yylength());
             zzMarkedPos += checkBlockEnd();
-            return BLOCK_COMMENT;
+            return docBlock ? DOC_BLOCK_COMMENT : BLOCK_COMMENT;
         }
         else { yypushback(yylength()); yybegin(xCOMMENT); }
    }

@@ -53,45 +53,54 @@ public class LuaLocalFuncDefImpl extends StubBasedPsiElementBase<LuaLocalFuncDef
     return findChildByType(ID);
   }
 
+  @Override
   @Nullable
   public LuaComment getComment() {
     return LuaPsiImplUtilKt.getComment(this);
   }
 
+  @Override
   @NotNull
   public List<LuaParamNameDef> getParamNameDefList() {
     return LuaPsiImplUtilKt.getParamNameDefList(this);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return LuaPsiImplUtilKt.getName(this);
   }
 
+  @Override
   public int getTextOffset() {
     return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
+  @Override
   @NotNull
   public SearchScope getUseScope() {
     return LuaPsiImplUtilKt.getUseScope(this);
   }
 
+  @Override
   @NotNull
   public ITy guessReturnType(@NotNull SearchContext searchContext) {
     return LuaPsiImplUtilKt.guessReturnType(this, searchContext);
   }
 
+  @Override
   @NotNull
   public LuaParamInfo[] getParams() {
     return LuaPsiImplUtilKt.getParams(this);

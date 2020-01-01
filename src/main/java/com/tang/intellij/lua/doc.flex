@@ -35,6 +35,11 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
         _typeLevel = 0;
         _typeReq = true;
     }
+
+    private int nBrackets = -1;
+    private boolean checkAhead(char c, int offset) {
+        return this.zzMarkedPos + offset < this.zzBuffer.length() && this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
+    }
 %}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,15 +49,18 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 WHITE_SPACE=({LINE_WS}|{EOL})+
-STRING=[^\r\n\t\f]*
+STRING=([^\r\n\t\f\]]|\]=*[^\]])*
 ID=[:jletter:] ([:jletterdigit:]|\.)*
 AT=@
 //三个-以上
 DOC_DASHES = --+
+BLOCK_BEGIN = --\[=*\[---+
+BLOCK_END = \]=*\]
 //Strings
 DOUBLE_QUOTED_STRING=\"([^\\\"]|\\\S|\\[\r\n])*\"?  //\"([^\\\"\r\n]|\\[^\r\n])*\"?
 SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 
+%state xBODY
 %state xTAG
 %state xTAG_WITH_ID
 %state xTAG_NAME
@@ -72,16 +80,32 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 %%
 
 <YYINITIAL> {
-    {EOL}                      { yybegin(YYINITIAL); return com.intellij.psi.TokenType.WHITE_SPACE;}
+    {BLOCK_BEGIN}              { nBrackets = yylength() - 7; yybegin(xBODY); return BLOCK_BEGIN; }
+    .                          { yybegin(xBODY); yypushback(yylength()); }
+}
+
+<xBODY> {
+    {EOL}                      { yybegin(xBODY); return EOL;}
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
-    {DOC_DASHES}               { return DASHES; }
+    {BLOCK_END}                {
+        if (yylength() - 2 == nBrackets) {
+      	    nBrackets = -1;
+            return BLOCK_END;
+        }
+    }
+    {DOC_DASHES}               { if (nBrackets == -1) return DASHES; }
     "@"                        { yybegin(xTAG_NAME); return AT; }
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
 <xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
-    {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
+    {BLOCK_END}                {
+        if (yylength() - 2 == nBrackets) {
+      	    nBrackets = -1;
+            return BLOCK_END;
+        }
+    }
 }
 
 <xTAG_NAME> {
@@ -108,19 +132,19 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 <xSUPPRESS> {
     {ID}                       { return ID; }
     ","                        { return COMMA; }
-    [^]                        { yybegin(YYINITIAL); yypushback(yylength()); }
+    [^]                        { yybegin(xBODY); yypushback(yylength()); }
 }
 
 <xALIAS> {
     {ID}                       { beginType(); return ID; }
-    [^]                        { yybegin(YYINITIAL); yypushback(yylength()); }
+    [^]                        { yybegin(xBODY); yypushback(yylength()); }
 }
 
 <xGENERIC> {
     {ID}                       { return ID; }
     ":"                        { return EXTENDS;}
     ","                        { return COMMA; }
-    [^]                        { yybegin(YYINITIAL); yypushback(yylength()); }
+    [^]                        { yybegin(xBODY); yypushback(yylength()); }
 }
 
 <xCLASS> {
@@ -184,7 +208,12 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 }
 
 <xCOMMENT_STRING> {
-    {STRING}                   { yybegin(YYINITIAL); return STRING; }
+    {STRING}                   { yybegin(xBODY); return STRING; }
+    {BLOCK_END}                { return STRING; }
+}
+
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
+    {EOL}                      { yybegin(xBODY); return EOL; }
 }
 
 [^]                            { return com.intellij.psi.TokenType.BAD_CHARACTER; }
