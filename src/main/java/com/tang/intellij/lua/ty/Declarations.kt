@@ -140,8 +140,12 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
                 }
             }
 
+            if (type is TyStringLiteral) {
+                type = Ty.STRING // Variables that aren't explicitly doc-typed as a literal, are best treated as a string primitive.
+            }
+
             //anonymous
-            if (type !is ITyPrimitive)
+            if (type !is TyStringLiteral && type !is ITyPrimitive)
                 type = type.union(TyClass.createAnonymousType(this))
             else if (type == Ty.TABLE)
                 type = type.union(TyClass.createAnonymousType(this))

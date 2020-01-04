@@ -283,7 +283,7 @@ fun getType(luaDocParTy: LuaDocParTy): ITy {
 
 fun getType(stringLiteral: LuaDocStringLiteralTy): ITy {
     val text = stringLiteral.text
-    return TyStringLiteral(if (text.length >= 2) text.substring(1, text.length - 1) else "")
+    return TyStringLiteral.getTy(if (text.length >= 2) text.substring(1, text.length - 1) else "")
 }
 
 fun getType(unionTy: LuaDocUnionTy): ITy {

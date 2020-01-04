@@ -19,8 +19,18 @@ package com.tang.intellij.lua.ty
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.search.SearchContext
+import java.util.concurrent.ConcurrentHashMap
 
-class TyStringLiteral(val content: String) : Ty(TyKind.StringLiteral) {
+
+class TyStringLiteral private constructor(val content: String) : Ty(TyKind.StringLiteral) {
+    companion object {
+        private val stringLiterals = ConcurrentHashMap<String, TyStringLiteral>()
+
+        fun getTy(content: String): TyStringLiteral {
+            return stringLiterals.getOrPut(content, { TyStringLiteral(content) })
+        }
+    }
+
     override fun toString() = content
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
@@ -30,7 +40,7 @@ class TyStringLiteral(val content: String) : Ty(TyKind.StringLiteral) {
 
 object TyStringLiteralSerializer : TySerializer<TyStringLiteral>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): TyStringLiteral {
-        return TyStringLiteral(stream.readUTF())
+        return TyStringLiteral.getTy(stream.readUTF())
     }
 
     override fun serializeTy(ty: TyStringLiteral, stream: StubOutputStream) {

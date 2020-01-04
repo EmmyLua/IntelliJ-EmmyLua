@@ -18,12 +18,14 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiElement
+import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.impl.LuaDocTagTypeImpl
 import com.tang.intellij.lua.ext.recursionGuard
+import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaNameExprMixin
@@ -319,7 +321,7 @@ private fun isGlobal(nameExpr: LuaNameExpr):Boolean {
 private fun LuaLiteralExpr.infer(): ITy {
     return when (this.kind) {
         LuaLiteralKind.Bool -> Ty.BOOLEAN
-        LuaLiteralKind.String -> Ty.STRING
+        LuaLiteralKind.String -> TyStringLiteral.getTy("'" + LuaString.getContent(firstChild.text).value + "'")
         LuaLiteralKind.Number -> Ty.NUMBER
         LuaLiteralKind.Varargs -> {
             val o = PsiTreeUtil.getParentOfType(this, LuaFuncBodyOwner::class.java)
