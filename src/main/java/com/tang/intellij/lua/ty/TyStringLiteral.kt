@@ -18,9 +18,14 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.tang.intellij.lua.search.SearchContext
 
 class TyStringLiteral(val content: String) : Ty(TyKind.StringLiteral) {
     override fun toString() = content
+
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return other == STRING || super.subTypeOf(other, context, strict)
+    }
 }
 
 object TyStringLiteralSerializer : TySerializer<TyStringLiteral>() {
