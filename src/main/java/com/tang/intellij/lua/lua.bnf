@@ -251,6 +251,8 @@ funcDef ::= 'function' ID funcBody {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassMethod"
+        "com.tang.intellij.lua.psi.LuaCommentOwner"
+        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
     ]
@@ -288,7 +290,9 @@ classMethodDef ::= 'function' classMethodName funcBody {
     pin = 2
     implements = [
         "com.tang.intellij.lua.psi.LuaClassMethod"
+        "com.tang.intellij.lua.psi.LuaCommentOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
+        "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.psi.LuaStatement"
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaClassMethodStub"
@@ -314,6 +318,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
     pin = 2
     implements = [
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
+        "com.tang.intellij.lua.psi.LuaCommentOwner"
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
         "com.intellij.psi.PsiNameIdentifierOwner"
@@ -341,6 +346,7 @@ localDef ::= 'local' nameList ('=' exprList)? {
         "com.tang.intellij.lua.psi.LuaDeclaration"
         "com.tang.intellij.lua.psi.LuaStatement"
         "com.tang.intellij.lua.psi.LuaDeclarationScope"
+        "com.tang.intellij.lua.psi.LuaCommentOwner"
     ]
     methods = [getComment assign = 'ASSIGN']
 }

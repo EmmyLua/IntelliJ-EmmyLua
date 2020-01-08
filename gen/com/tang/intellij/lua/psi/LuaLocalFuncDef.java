@@ -12,7 +12,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaDeclaration, LuaStatement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaLocalFuncDefStub> {
+public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaCommentOwner, LuaDeclaration, LuaStatement, PsiNameIdentifierOwner, StubBasedPsiElement<LuaLocalFuncDefStub> {
 
   @Nullable
   LuaFuncBody getFuncBody();

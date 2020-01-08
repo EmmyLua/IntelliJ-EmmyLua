@@ -20,13 +20,13 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.PsiTreeUtil
-import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
-import com.tang.intellij.lua.psi.LuaElementFactory
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
+import java.util.*
 
 /**
 
@@ -51,10 +51,20 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
         // generic in docFunction
         val fn = PsiTreeUtil.getParentOfType(myElement, LuaDocFunctionTy::class.java)
         var genericDefList: Collection<LuaDocGenericDef>? = fn?.genericDefList
+
         if (genericDefList == null || genericDefList.isEmpty()) {
-            // generic in comments ?
-            val comment = LuaCommentUtil.findContainer(myElement)
-            genericDefList = comment.findTags(LuaDocGenericDef::class.java)
+            val ancestorDefList = LinkedList<LuaDocGenericDef>()
+
+            val parents = PsiTreeUtil.collectParents(myElement, LuaCommentOwner::class.java, false, {t -> false})
+            parents.forEach { o ->
+                val genericDefs = o.comment?.findTags(LuaDocGenericDef::class.java)
+
+                if (genericDefs != null) {
+                    ancestorDefList.addAll(genericDefs)
+                }
+            }
+
+            genericDefList = ancestorDefList
         }
 
         for (genericDef in genericDefList) {

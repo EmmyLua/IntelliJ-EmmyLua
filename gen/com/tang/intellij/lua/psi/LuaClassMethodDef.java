@@ -11,7 +11,7 @@ import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 
-public interface LuaClassMethodDef extends LuaClassMethod, LuaDeclaration, LuaStatement, StubBasedPsiElement<LuaClassMethodStub> {
+public interface LuaClassMethodDef extends LuaClassMethod, LuaCommentOwner, LuaDeclaration, LuaFuncBodyOwner, LuaStatement, StubBasedPsiElement<LuaClassMethodStub> {
 
   @NotNull
   LuaClassMethodName getClassMethodName();

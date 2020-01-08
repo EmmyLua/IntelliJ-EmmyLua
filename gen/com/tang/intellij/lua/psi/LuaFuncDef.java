@@ -13,7 +13,7 @@ import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.tang.intellij.lua.ty.ITyClass;
 
-public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement, StubBasedPsiElement<LuaFuncStub> {
+public interface LuaFuncDef extends LuaClassMethod, LuaCommentOwner, LuaFuncBodyOwner, LuaDeclaration, LuaStatement, StubBasedPsiElement<LuaFuncStub> {
 
   @Nullable
   LuaFuncBody getFuncBody();
