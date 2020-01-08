@@ -545,7 +545,7 @@ fun getName(nameExpr: LuaNameExpr): String {
     val stub = nameExpr.stub
     if (stub != null)
         return stub.name
-    return nameExpr.text
+    return nameExpr.id.text
 }
 
 fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchContext): ITy {

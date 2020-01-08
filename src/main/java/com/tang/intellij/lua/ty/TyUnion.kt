@@ -41,7 +41,16 @@ class TyUnion : Ty(TyKind.Union) {
     }
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return super.subTypeOf(other, context, strict) || childSet.any { type -> type.subTypeOf(other, context, strict) }
+        return super.subTypeOf(other, context, strict) || childSet.all { type -> type.subTypeOf(other, context, strict) }
+    }
+
+    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        childSet.forEach {
+            if (it.assignableFrom(other, context, strict)) {
+                return true
+            }
+        }
+        return false
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {

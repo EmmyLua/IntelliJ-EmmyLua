@@ -65,6 +65,8 @@ interface ITy : Comparable<ITy> {
 
     fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
 
+    fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean
+
     fun getSuperClass(context: SearchContext): ITy?
 
     fun visitSuper(searchContext: SearchContext, processor: Processor<ITyClass>)
@@ -149,11 +151,15 @@ abstract class Ty(override val kind: TyKind) : ITy {
         // Everything is subset of any
         if (other.kind == TyKind.Unknown) return !strict
 
-        // Handle unions, subtype if subtype of any of the union components.
-        if (other is TyUnion) return other.getChildTypes().any { type -> subTypeOf(type, context, strict) }
+        // Handle unions, subtype if subtype of all of the union components.
+        if (other is TyUnion) return other.getChildTypes().all { type -> subTypeOf(type, context, strict) }
 
         // Classes are equal
         return this == other
+    }
+
+    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return other.subTypeOf(this, context, strict)
     }
 
     override fun getSuperClass(context: SearchContext): ITy? {
@@ -293,6 +299,10 @@ class TyUnknown : Ty(TyKind.Unknown) {
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return !strict
+    }
+
+    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return true
     }
 }
 

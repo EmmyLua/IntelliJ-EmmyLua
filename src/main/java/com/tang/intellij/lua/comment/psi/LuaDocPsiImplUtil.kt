@@ -50,6 +50,12 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
+    val resolvedDef = nameRef.reference.resolve()
+
+    if (resolvedDef is LuaDocGenericDef) {
+        return TyParameter(nameRef.text, resolvedDef.classNameRef?.text)
+    }
+
     return Ty.create(nameRef.text)
 }
 

@@ -29,6 +29,26 @@ class TyParameter(val name:String, base: String? = null) : TySerializedClass(nam
     override val kind: TyKind
         get() = TyKind.GenericParam
 
+    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        val superCls = getSuperClass(context)
+
+        if (superCls != null) {
+            return superCls.subTypeOf(other, context, strict)
+        }
+
+        return false
+    }
+
+    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        val superCls = getSuperClass(context)
+
+        if (superCls != null) {
+            return superCls.assignableFrom(other, context, strict)
+        }
+
+        return true
+    }
+
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         val superType = getSuperClass(context) as? ITyClass ?: return
         superType.processMembers(context, processor, deep)
@@ -71,12 +91,29 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
 
     override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         if (super.subTypeOf(other, context, strict)) return true
-        if (other !is TyGeneric && base.subTypeOf(other, context, strict)) return true
-        return other is TyGeneric
-                && base.subTypeOf(other.base, context, strict) // Base should be subtype of other base
-                && params.size == other.params.size // Equal amount of params
-                && params.indices.all { i -> params[i].subTypeOf(other.params[i], context, strict) } // Params need to be subtypes
 
+        if (other is TyGeneric) {
+            return base.subTypeOf(other.base, context, strict) // Base should be subtype of other base
+                    && params.size == other.params.size // Equal amount of params
+                    && params.indices.all { i -> // Params are equal
+                        val param = params[i]
+                        val otherParam = other.params[i]
+                        return param == otherParam
+                                || (!strict && (param.kind == TyKind.Unknown || otherParam.kind == TyKind.Unknown))
+                    }
+        } else {
+            return base.subTypeOf(other, context, strict)
+        }
+    }
+
+    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (other is TyGeneric) {
+            return base.assignableFrom(other.base, context, strict) // Base should be assignable from the other base
+                    && params.size == other.params.size // Equal amount of params
+                    && params.indices.all { i -> params[i].assignableFrom(other.params[i], context, strict) } // Params are assignable from other params
+        }
+
+        return base.assignableFrom(other, context, strict)
     }
 
     override fun accept(visitor: ITyVisitor) {

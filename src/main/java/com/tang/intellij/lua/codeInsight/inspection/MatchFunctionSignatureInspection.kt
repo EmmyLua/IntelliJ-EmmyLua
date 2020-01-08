@@ -91,7 +91,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                         }
 
                         val type = typeInfo.ty
-                        if (!type.subTypeOf(pi.ty, searchContext, false))
+                        if (!pi.ty.assignableFrom(type, searchContext, false))
                             myHolder.registerProblem(typeInfo.param, "Type mismatch. Required: '${pi.ty}' Found: '$type'")
                         true
                     }
