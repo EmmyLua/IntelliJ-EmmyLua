@@ -40,8 +40,13 @@ class ReturnTypeInspection : StrictInspection() {
                     val abstractType = if (bodyOwner is LuaClassMethodDef) {
                         guessSuperReturnTypes(bodyOwner, context)
                     } else {
-                        val returnDef = (bodyOwner as? LuaCommentOwner)?.comment?.tagReturn
-                        returnDef?.type
+                        var comment = (bodyOwner as? LuaCommentOwner)?.comment
+
+                        if (comment == null) {
+                            comment = (bodyOwner.parent?.parent as? LuaDeclaration)?.comment // Doc comment may appear on declarations
+                        }
+
+                        comment?.tagReturn?.type
                     }
                     val concreteType = guessReturnType(o, -1, context)
                     var abstractTypes = toList(abstractType)

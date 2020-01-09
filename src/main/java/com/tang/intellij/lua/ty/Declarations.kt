@@ -60,14 +60,16 @@ fun inferReturnTy(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
 }
 
 private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchContext): ITy {
-    if (owner is LuaCommentOwner) {
-        val comment = LuaCommentUtil.findComment(owner)
-        if (comment != null) {
-            val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocTagReturn::class.java)
-            if (returnDef != null) {
-                //return returnDef.resolveTypeAt(searchContext.index)
-                return returnDef.type
-            }
+    val comment = if (owner is LuaCommentOwner)
+        owner.comment
+    else
+        (owner.parent?.parent as? LuaDeclaration)?.comment // Doc comment may appear on declarations
+
+    if (comment != null) {
+        val returnDef = PsiTreeUtil.findChildOfType(comment, LuaDocTagReturn::class.java)
+        if (returnDef != null) {
+            //return returnDef.resolveTypeAt(searchContext.index)
+            return returnDef.type
         }
     }
 
@@ -226,7 +228,14 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
         // from comment
         val commentOwner = PsiTreeUtil.getParentOfType(paramNameDef, LuaCommentOwner::class.java)
         if (commentOwner != null) {
-            val docTy = commentOwner.comment?.getParamDef(paramName)?.type
+            var comment = commentOwner.comment
+
+            if (comment == null) {
+                comment = (commentOwner.parent?.parent as? LuaDeclaration)?.comment // Doc comment may appear on declarations
+            }
+
+            val docTy = comment?.getParamDef(paramName)?.type
+
             if (docTy != null)
                 return docTy
         }
