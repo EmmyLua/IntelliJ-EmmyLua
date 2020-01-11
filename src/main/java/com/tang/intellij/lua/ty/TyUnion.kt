@@ -28,6 +28,25 @@ class TyUnion : Ty(TyKind.Union) {
     val size:Int
         get() = childSet.size
 
+    override val booleanType: ITy
+        get() {
+            var resolvedType: ITy? = null
+            childSet.forEach {
+                when (it.booleanType) {
+                    Ty.TRUE -> {
+                        if (resolvedType == Ty.FALSE) return Ty.BOOLEAN
+                        resolvedType = Ty.TRUE
+                    }
+                    Ty.FALSE -> {
+                        if (resolvedType == Ty.TRUE) return Ty.BOOLEAN
+                        resolvedType = Ty.FALSE
+                    }
+                    else -> return Ty.BOOLEAN
+                }
+            }
+            return resolvedType ?: Ty.BOOLEAN
+        }
+
     fun append(ty: ITy): TyUnion {
         if (ty is TyUnion) {
             ty.childSet.forEach { addChild(it) }
@@ -40,17 +59,9 @@ class TyUnion : Ty(TyKind.Union) {
         return childSet.add(ty)
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return super.subTypeOf(other, context, strict) || childSet.all { type -> type.subTypeOf(other, context, strict) }
-    }
-
-    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        childSet.forEach {
-            if (it.assignableFrom(other, context, strict)) {
-                return true
-            }
-        }
-        return false
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.covariantWith(other, context, strict)
+                || childSet.any { type -> type.covariantWith(other, context, strict) }
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
@@ -100,6 +111,10 @@ class TyUnion : Ty(TyKind.Union) {
                     if (child != null && !process(child))
                         break
                 }
+            } else if (ty == Ty.BOOLEAN) {
+                if (process(Ty.TRUE)) {
+                    process(Ty.FALSE)
+                }
             } else process(ty)
         }
 
@@ -124,6 +139,7 @@ class TyUnion : Ty(TyKind.Union) {
 
         fun union(t1: ITy, t2: ITy): ITy {
             return when {
+                t1 == t2 -> t1
                 isInvalid(t1) -> t2
                 isInvalid(t2) -> t1
                 t1 is TyUnion -> t1.append(t2)

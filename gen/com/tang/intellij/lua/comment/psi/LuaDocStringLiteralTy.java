@@ -12,6 +12,6 @@ public interface LuaDocStringLiteralTy extends LuaDocTy {
   ITy getType();
 
   @NotNull
-  PsiElement getContent();
+  PsiElement getValue();
 
 }

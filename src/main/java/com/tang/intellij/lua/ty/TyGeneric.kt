@@ -23,30 +23,24 @@ import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
+import java.util.concurrent.ConcurrentHashMap
 
-class TyParameter(val name:String, base: String? = null) : TySerializedClass(name, name, base) {
+class TyParameter private constructor(val name: String, base: String? = null) : TySerializedClass(name, name, base) {
+    companion object {
+        private val stringLiterals = ConcurrentHashMap<String, TyParameter>()
+
+        fun getTy(name: String, base: String? = null): TyParameter {
+            val id = "$name:${base ?: ""}"
+            return stringLiterals.getOrPut(id, { TyParameter(name, base) })
+        }
+    }
 
     override val kind: TyKind
         get() = TyKind.GenericParam
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        val superCls = getSuperClass(context)
-
-        if (superCls != null) {
-            return superCls.subTypeOf(other, context, strict)
-        }
-
-        return false
-    }
-
-    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        val superCls = getSuperClass(context)
-
-        if (superCls != null) {
-            return superCls.assignableFrom(other, context, strict)
-        }
-
-        return true
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.covariantWith(other, context, strict)
+                || getSuperClass(context)?.covariantWith(other, context, strict) != false
     }
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
@@ -61,7 +55,7 @@ object TyGenericParamSerializer : TySerializer<TyParameter>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): TyParameter {
         val name = StringRef.toString(stream.readName())
         val base = StringRef.toString(stream.readName())
-        return TyParameter(name, base)
+        return TyParameter.getTy(name, base)
     }
 
     override fun serializeTy(ty: TyParameter, stream: StubOutputStream) {
@@ -89,31 +83,24 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         return displayName.hashCode()
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.subTypeOf(other, context, strict)) return true
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (super.covariantWith(other, context, strict)) return true
 
-        if (other is TyGeneric) {
-            return base.subTypeOf(other.base, context, strict) // Base should be subtype of other base
-                    && params.size == other.params.size // Equal amount of params
-                    && params.indices.all { i -> // Params are equal
-                        val param = params[i]
-                        val otherParam = other.params[i]
-                        return param == otherParam
-                                || (!strict && (param.kind == TyKind.Unknown || otherParam.kind == TyKind.Unknown))
-                    }
-        } else {
-            return base.subTypeOf(other, context, strict)
-        }
-    }
-
-    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (other is TyGeneric) {
-            return base.assignableFrom(other.base, context, strict) // Base should be assignable from the other base
-                    && params.size == other.params.size // Equal amount of params
-                    && params.indices.all { i -> params[i].assignableFrom(other.params[i], context, strict) } // Params are assignable from other params
+        if (other is TyArray) {
+            return (base as? TyPrimitive)?.primitiveKind == TyPrimitiveKind.Table
+                    && params.size == 2
+                    && params[0].covariantWith(Ty.NUMBER, context, strict)
+                    && params[1].covariantWith(other.base, context, strict)
         }
 
-        return base.assignableFrom(other, context, strict)
+        return other is TyGeneric
+                && base.contravariantWith(other.base, context, strict)
+                && params.size == other.params.size
+                && params.indices.all { i -> // Params are covariant
+                    val param = params[i]
+                    val otherParam = other.params[i]
+                    return param.covariantWith(otherParam, context, strict)
+                }
     }
 
     override fun accept(visitor: ITyVisitor) {

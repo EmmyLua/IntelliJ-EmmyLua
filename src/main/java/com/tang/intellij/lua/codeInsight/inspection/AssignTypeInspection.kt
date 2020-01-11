@@ -61,14 +61,14 @@ class AssignTypeInspection : StrictInspection() {
                                 if (parent is TyClass) {
                                     val fieldType = parent.findMemberType(name, searchContext) ?: Ty.NIL
 
-                                    if (!fieldType.assignableFrom(valueType, searchContext, false)) {
+                                    if (!fieldType.covariantWith(valueType, searchContext, false)) {
                                         myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                     }
                                 }
                             } else {
                                 val fieldType = field.guessType(searchContext)
 
-                                if (!fieldType.assignableFrom(valueType, searchContext, false)) {
+                                if (!fieldType.covariantWith(valueType, searchContext, false)) {
                                     myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                 }
                             }

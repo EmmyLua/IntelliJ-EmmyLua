@@ -19,7 +19,10 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
-import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.LuaCallExpr
+import com.tang.intellij.lua.psi.LuaExpr
+import com.tang.intellij.lua.psi.LuaIndexExpr
+import com.tang.intellij.lua.psi.LuaVisitor
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
@@ -49,11 +52,18 @@ class MatchFunctionSignatureInspection : StrictInspection() {
 
                     val searchContext = SearchContext.get(o.project)
                     val prefixExpr = o.expr
-                    val type = prefixExpr.guessType(searchContext)
+                    var type = prefixExpr.guessType(searchContext)
 
-                    if (type is TyFunction) {
-                        val perfectSig = type.findPerfectSignature(o)
-                        annotateCall(o, perfectSig, searchContext)
+                    if (type is TyUnion && type.size == 2 && type.getChildTypes().last().isAnonymous) {
+                        type = type.getChildTypes().first()
+                    }
+
+                    if (type is ITyFunction) {
+                        val match = type.matchSignature(o, searchContext)
+
+                        match.problems?.forEach { signature, problems ->
+                            problems.forEach { myHolder.registerProblem(it.element, it.problem) }
+                        }
                     } else if (prefixExpr is LuaIndexExpr) {
                         // Get parent type
                         val parentType = prefixExpr.guessParentType(searchContext)
@@ -64,41 +74,6 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                         }
                     } else if (type == Ty.NIL) {
                         myHolder.registerProblem(o, "Unknown function '%s'.".format(prefixExpr.lastChild.text))
-                    }
-                }
-
-                private fun annotateCall(call: LuaCallExpr, signature: IFunSignature, searchContext: SearchContext) {
-                    val concreteParams = call.argList
-                    val concreteTypes = mutableListOf<ConcreteTypeInfo>()
-                    concreteParams.forEachIndexed { index, luaExpr ->
-                        val ty = luaExpr.guessType(searchContext)
-                        if (ty is TyTuple) {
-                            if (index == concreteParams.lastIndex) {
-                                concreteTypes.addAll(ty.list.map { ConcreteTypeInfo(luaExpr, it) })
-                            } else {
-                                concreteTypes.add(ConcreteTypeInfo(luaExpr, ty.list.first()))
-                            }
-                        } else concreteTypes.add(ConcreteTypeInfo(luaExpr, ty))
-                    }
-
-                    var nArgs = 0
-                    signature.processArgs(call) { i, pi ->
-                        nArgs = i + 1
-                        val typeInfo = concreteTypes.getOrNull(i)
-                        if (typeInfo == null) {
-                            myHolder.registerProblem(call.lastChild.lastChild, "Missing argument: ${pi.name}: ${pi.ty}")
-                            return@processArgs true
-                        }
-
-                        val type = typeInfo.ty
-                        if (!pi.ty.assignableFrom(type, searchContext, false))
-                            myHolder.registerProblem(typeInfo.param, "Type mismatch. Required: '${pi.ty}' Found: '$type'")
-                        true
-                    }
-                    if (nArgs < concreteParams.size && !signature.hasVarargs()) {
-                        for (i in nArgs until concreteParams.size) {
-                            myHolder.registerProblem(concreteParams[i], "Too many arguments.")
-                        }
                     }
                 }
             }

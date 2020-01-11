@@ -47,7 +47,11 @@
         RPAREN = ")"
         LCURLY = "{"
         RCURLY = "}"
+        SNIPPET = "SNIPPET"
         STRING_LITERAL = "STRING_LITERAL"
+        TRUE_LITERAL = "TRUE_LITERAL"
+        FALSE_LITERAL = "FALSE_LITERAL"
+        NUMBER_LITERAL = "NUMBER_LITERAL"
         ARR = '[]'
         FUN = 'fun'
         VARARG = 'vararg'
@@ -101,7 +105,7 @@ private doc_item ::= '@' (tag_param
     | access_modifier
     | tag_generic_list)
 
-ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty | string_literal_ty {
+ty ::= union_ty | function_ty | table_ty | generic_ty | arr_ty | general_ty | par_ty | snippet_ty | primitive_literal_ty {
     implements = ['com.tang.intellij.lua.comment.psi.LuaDocType']
 }
 
@@ -115,10 +119,19 @@ par_ty ::= '(' ty ')' {
     pin = 1
     methods = [getType]
 }
-string_literal_ty ::= STRING_LITERAL{
-    methods = [getType content = 'STRING_LITERAL']
+snippet_ty ::= SNIPPET{
+    methods = [getType content = 'SNIPPET']
 }
-
+boolean_literal_ty ::= BOOLEAN_LITERAL{
+    methods = [getType value = 'BOOLEAN_LITERAL']
+}
+number_literal_ty ::= NUMBER_LITERAL{
+    methods = [getType value = 'NUMBER_LITERAL']
+}
+string_literal_ty ::= STRING_LITERAL{
+    methods = [getType value = 'STRING_LITERAL']
+}
+private primitive_literal_ty ::= string_literal_ty | boolean_literal_ty | number_literal_ty
 private fieldList ::= (tableField (',' tableField)* (',')?)?
 
 private tableField2 ::= ID ':' ty { pin = 1 }

@@ -59,6 +59,18 @@ BLOCK_END = \]=*\]
 //Strings
 DOUBLE_QUOTED_STRING=\"([^\\\"]|\\\S|\\[\r\n])*\"?  //\"([^\\\"\r\n]|\\[^\r\n])*\"?
 SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
+//Number
+n=[0-9]+
+h=[0-9a-fA-F]+
+exp=[Ee]([+-]?{n})?
+ppp=[Pp][+-]{n}
+// 123ULL/123LL
+// 0x123FFULL/0x123FFLL
+JIT_EXT_NUMBER=(0[xX]{h}|{n})U?LL
+HEX_NUMBER=0[xX]({h}|{h}[.]{h})({exp}|{ppp})?
+NUMBER={JIT_EXT_NUMBER}|{HEX_NUMBER}|({n}|{n}[.]{n}){exp}?|[.]{n}|{n}[.]
+// Boolean
+BOOLEAN=true|false
 
 %state xBODY
 %state xTAG
@@ -76,6 +88,7 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 %state xSUPPRESS
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
+%state xBACKTICK_QUOTED_STRING
 
 %%
 
@@ -183,6 +196,9 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
     "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
     "\""                       { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
     "'"                        { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
+    "`"                        { yybegin(xBACKTICK_QUOTED_STRING); yypushback(yylength()); }
+    {BOOLEAN}                  { return BOOLEAN_LITERAL; }
+    {NUMBER}                   { return NUMBER_LITERAL; }
     "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
     "vararg"                   { _typeReq = true; return VARARG; }
@@ -195,6 +211,10 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 
 <xSINGLE_QUOTED_STRING> {
     {SINGLE_QUOTED_STRING}    { yybegin(xTYPE_REF); return STRING_LITERAL; }
+}
+
+<xBACKTICK_QUOTED_STRING> {
+    {SINGLE_QUOTED_STRING}    { yybegin(xTYPE_REF); return SNIPPET; }
 }
 
 <xTAG> {

@@ -18,6 +18,10 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
+  public void visitBooleanLiteralTy(@NotNull LuaDocBooleanLiteralTy o) {
+    visitTy(o);
+  }
+
   public void visitClassNameRef(@NotNull LuaDocClassNameRef o) {
     visitPsiElement(o);
   }
@@ -46,12 +50,20 @@ public class LuaDocVisitor extends PsiElementVisitor {
     visitTy(o);
   }
 
+  public void visitNumberLiteralTy(@NotNull LuaDocNumberLiteralTy o) {
+    visitTy(o);
+  }
+
   public void visitParTy(@NotNull LuaDocParTy o) {
     visitTy(o);
   }
 
   public void visitParamNameRef(@NotNull LuaDocParamNameRef o) {
     visitPsiElement(o);
+  }
+
+  public void visitSnippetTy(@NotNull LuaDocSnippetTy o) {
+    visitTy(o);
   }
 
   public void visitStringLiteralTy(@NotNull LuaDocStringLiteralTy o) {

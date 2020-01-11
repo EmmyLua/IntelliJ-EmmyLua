@@ -93,7 +93,7 @@ fun StubInputStream.readTyParams(): Array<TyParameter> {
     for (i in 0 until size) {
         val name = StringRef.toString(readName())
         val base = StringRef.toString(readName())
-        list.add(TyParameter(name, base))
+        list.add(TyParameter.getTy(name, base))
     }
     return list.toTypedArray()
 }

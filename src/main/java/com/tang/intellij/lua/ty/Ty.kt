@@ -20,6 +20,7 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
+import com.sun.xml.bind.v2.runtime.reflect.opt.Const
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.search.SearchContext
@@ -36,7 +37,8 @@ enum class TyKind {
     Void,
     Tuple,
     GenericParam,
-    StringLiteral
+    PrimitiveLiteral,
+    Snippet
 }
 enum class TyPrimitiveKind {
     String,
@@ -61,11 +63,13 @@ interface ITy : Comparable<ITy> {
 
     val flags: Int
 
+    val booleanType: ITy
+
     fun union(ty: ITy): ITy
 
-    fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
+    fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean
 
-    fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean
+    fun contravariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean
 
     fun getSuperClass(context: SearchContext): ITy?
 
@@ -117,6 +121,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
     override val displayName: String
         get() = TyRenderer.SIMPLE.render(this)
 
+    override val booleanType: ITy = Ty.TRUE
+
     fun addFlag(flag: Int) {
         flags = flags or flag
     }
@@ -147,19 +153,28 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return list.joinToString("|")
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        // Everything is subset of any
-        if (other.kind == TyKind.Unknown) return !strict
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (this == other
+                || (other.kind == TyKind.Unknown && !strict)
+                || (other.kind == TyKind.Nil && !LuaSettings.instance.isNilStrict)) {
+            return true
+        }
 
-        // Handle unions, subtype if subtype of all of the union components.
-        if (other is TyUnion) return other.getChildTypes().all { type -> subTypeOf(type, context, strict) }
+        if (other is TyUnion || other == Ty.BOOLEAN) {
+            var covariant = true
+            TyUnion.process(other, {
+                covariant = covariantWith(it, context, strict)
+                covariant
+            })
+            return covariant
+        }
 
-        // Classes are equal
-        return this == other
+        val otherSuper = other.getSuperClass(context)
+        return otherSuper != null && covariantWith(otherSuper, context, strict)
     }
 
-    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return other.subTypeOf(this, context, strict)
+    override fun contravariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return other.covariantWith(this, context, strict)
     }
 
     override fun getSuperClass(context: SearchContext): ITy? {
@@ -200,11 +215,13 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
         val UNKNOWN = TyUnknown()
         val VOID = TyVoid()
-        val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
-        val STRING = TyPrimitiveClass(TyPrimitiveKind.String, "string")
-        val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
-        val TABLE = TyPrimitive(TyPrimitiveKind.Table, "table")
-        val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, "function")
+        val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, Constants.WORD_BOOLEAN)
+        val TRUE = TyPrimitiveLiteral.getTy(TyPrimitiveKind.Boolean, Constants.WORD_TRUE)
+        val FALSE = TyPrimitiveLiteral.getTy(TyPrimitiveKind.Boolean, Constants.WORD_FALSE)
+        val STRING = TyPrimitiveClass(TyPrimitiveKind.String, Constants.WORD_STRING)
+        val NUMBER = TyPrimitive(TyPrimitiveKind.Number, Constants.WORD_NUMBER)
+        val TABLE = TyPrimitive(TyPrimitiveKind.Table, Constants.WORD_TABLE)
+        val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, Constants.WORD_FUNCTION)
         val NIL = TyNil()
 
         private val serializerMap = mapOf<TyKind, ITySerializer>(
@@ -213,7 +230,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 TyKind.Function to TyFunctionSerializer,
                 TyKind.Generic to TyGenericSerializer,
                 TyKind.GenericParam to TyGenericParamSerializer,
-                TyKind.StringLiteral to TyStringLiteralSerializer,
+                TyKind.PrimitiveLiteral to TyPrimitiveLiteralSerializer,
+                TyKind.Snippet to TySnippetSerializer,
                 TyKind.Tuple to TyTupleSerializer,
                 TyKind.Union to TyUnionSerializer
         )
@@ -239,6 +257,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 Constants.WORD_VOID -> VOID
                 Constants.WORD_ANY -> UNKNOWN
                 Constants.WORD_BOOLEAN -> BOOLEAN
+                Constants.WORD_TRUE -> TRUE
+                Constants.WORD_FALSE -> FALSE
                 Constants.WORD_STRING -> STRING
                 Constants.WORD_NUMBER -> NUMBER
                 Constants.WORD_TABLE -> TABLE
@@ -252,7 +272,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         }
 
         fun isInvalid(ty: ITy?): Boolean {
-            return ty == null || ty is TyUnknown || ty is TyNil || ty is TyVoid
+            return ty == null || ty is TyUnknown || ty is TyVoid
         }
 
         private fun getSerializer(kind: TyKind): ITySerializer? {
@@ -263,7 +283,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
             stream.writeByte(ty.kind.ordinal)
             stream.writeInt(ty.flags)
             when(ty) {
-                is ITyPrimitive -> stream.writeByte(ty.primitiveKind.ordinal)
+                is TyPrimitive -> stream.writeByte(ty.primitiveKind.ordinal)
                 else -> {
                     val serializer = getSerializer(ty.kind)
                     serializer?.serialize(ty, stream)
@@ -297,26 +317,23 @@ class TyUnknown : Ty(TyKind.Unknown) {
         return Constants.WORD_ANY.hashCode()
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return !strict
-    }
-
-    override fun assignableFrom(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return true
     }
 }
 
 class TyNil : Ty(TyKind.Nil) {
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override val booleanType = Ty.FALSE
 
-        return super.subTypeOf(other, context, strict) || other is TyNil || !LuaSettings.instance.isNilStrict
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return other.kind == TyKind.Nil
     }
 }
 
 class TyVoid : Ty(TyKind.Void) {
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return false
     }
 }

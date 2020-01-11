@@ -30,6 +30,8 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
+import com.tang.intellij.lua.lang.type.LuaNumber
+import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.Visibility
@@ -53,7 +55,7 @@ fun resolveType(nameRef: LuaDocClassNameRef): ITy {
     val resolvedDef = nameRef.reference.resolve()
 
     if (resolvedDef is LuaDocGenericDef) {
-        return TyParameter(nameRef.text, resolvedDef.classNameRef?.text)
+        return TyParameter.getTy(nameRef.text, resolvedDef.classNameRef?.text)
     }
 
     return Ty.create(nameRef.text)
@@ -281,9 +283,21 @@ fun getType(luaDocParTy: LuaDocParTy): ITy {
     return luaDocParTy.ty?.getType() ?: Ty.UNKNOWN
 }
 
+fun getType(booleanLiteral: LuaDocBooleanLiteralTy): ITy {
+    return TyPrimitiveLiteral.getTy(TyPrimitiveKind.Boolean, booleanLiteral.value.text)
+}
+
+fun getType(numberLiteral: LuaDocNumberLiteralTy): ITy {
+    val n = LuaNumber.getValue(numberLiteral.value.text)
+    return if (n != null) TyPrimitiveLiteral.getTy(TyPrimitiveKind.Number, n.toString()) else Ty.UNKNOWN
+}
+
 fun getType(stringLiteral: LuaDocStringLiteralTy): ITy {
-    val text = stringLiteral.text
-    return TyStringLiteral.getTy(if (text.length >= 2) text.substring(1, text.length - 1) else "")
+    return TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, LuaString.getContent(stringLiteral.value.text).value)
+}
+
+fun getType(snippet: LuaDocSnippetTy): ITy {
+    return TySnippet(snippet.content.text)
 }
 
 fun getType(unionTy: LuaDocUnionTy): ITy {

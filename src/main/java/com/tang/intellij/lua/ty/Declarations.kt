@@ -20,7 +20,6 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
 import com.tang.intellij.lua.ext.recursionGuard
@@ -142,12 +141,12 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
                 }
             }
 
-            if (type is TyStringLiteral) {
-                type = Ty.STRING // Variables that aren't explicitly doc-typed as a literal, are best treated as a string primitive.
+            if (type is TyPrimitiveLiteral) {
+                type = type.primitiveType
             }
 
             //anonymous
-            if (type !is TyStringLiteral && type !is ITyPrimitive)
+            if (type !is ITyPrimitive)
                 type = type.union(TyClass.createAnonymousType(this))
             else if (type == Ty.TABLE)
                 type = type.union(TyClass.createAnonymousType(this))

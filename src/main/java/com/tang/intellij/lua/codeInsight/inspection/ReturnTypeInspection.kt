@@ -66,7 +66,7 @@ class ReturnTypeInspection : StrictInspection() {
                         }
                     } else {
                         for (i in 0 until concreteTypes.size) {
-                            if (!abstractTypes[i].assignableFrom(concreteTypes[i], context, false)) {
+                            if (!abstractTypes[i].covariantWith(concreteTypes[i], context, false)) {
                                 val abstractString = abstractTypes.joinToString(", ") { it.displayName }
                                 val concreteString = concreteTypes.joinToString(", ") { it.displayName }
                                 myHolder.registerProblem(o, "Type mismatch. Expected: '$abstractString' Found: '$concreteString'")

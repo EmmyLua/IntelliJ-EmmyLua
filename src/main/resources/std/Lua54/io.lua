@@ -73,7 +73,7 @@ function io.lines(filename, ...) end
 --- some systems to open the file in binary mode.
 ---@overload fun(filename:string):file
 ---@param filename string
----@param mode string | '"r"' | '"w"' | '"a"' | '"r+"' | '"w+"' | '"a+"' | '"rb"' | '"wb"' | '"ab"' | '"rb+"' | '"wb+"' | '"ab+"'
+---@param mode string | "r" | "w" | "a" | "r+" | "w+" | "a+" | "rb" | "wb" | "ab" | "rb+" | "wb+" | "ab+"
 ---@return file
 function io.open(filename, mode) return file end
 
@@ -92,7 +92,7 @@ function io.output(file) end
 --- or to write data to this program (if `mode` is "`w`").
 ---@overload fun(prog:string):file
 ---@param prog string
----@param mode string | '"r"' | '"w"'
+---@param mode string | "r" | "w"
 ---@return file
 function io.popen(prog, mode) end
 
@@ -192,7 +192,7 @@ function file:read(...) end
 --- file (and returns 0); and the call `file:seek("end")` sets the position
 --- to the end of the file, and returns its size.
 ---@overload fun()
----@param whence string | '"set"' | '"cur"' | '"end"'
+---@param whence string | "set" | "cur" | "end"
 ---@param offset number
 function file:seek(whence, offset) end
 
@@ -209,7 +209,7 @@ function file:seek(whence, offset) end
 --- For the last two cases, `size` specifies the size of the buffer, in
 --- bytes. The default is an appropriate size.
 ---@overload fun(mode:string)
----@param mode string | '"no"' | '"full"' | '"line"'
+---@param mode string | "no" | "full" | "line"
 ---@param size number
 function file:setvbuf(mode, size) end
 

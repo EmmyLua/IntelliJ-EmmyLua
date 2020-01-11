@@ -11,6 +11,7 @@ public interface LuaDocTypes {
 
   IElementType ACCESS_MODIFIER = LuaParserDefinitionKt.createDocType("ACCESS_MODIFIER");
   IElementType ARR_TY = LuaParserDefinitionKt.createDocType("ARR_TY");
+  IElementType BOOLEAN_LITERAL_TY = LuaParserDefinitionKt.createDocType("BOOLEAN_LITERAL_TY");
   IElementType CLASS_NAME_REF = LuaParserDefinitionKt.createDocType("CLASS_NAME_REF");
   IElementType COMMENT_STRING = LuaParserDefinitionKt.createDocType("COMMENT_STRING");
   IElementType FUNCTION_PARAM = LuaParserDefinitionKt.createDocType("FUNCTION_PARAM");
@@ -18,8 +19,10 @@ public interface LuaDocTypes {
   IElementType GENERAL_TY = LuaParserDefinitionKt.createDocType("GENERAL_TY");
   IElementType GENERIC_DEF = LuaParserDefinitionKt.createDocType("GENERIC_DEF");
   IElementType GENERIC_TY = LuaParserDefinitionKt.createDocType("GENERIC_TY");
+  IElementType NUMBER_LITERAL_TY = LuaParserDefinitionKt.createDocType("NUMBER_LITERAL_TY");
   IElementType PARAM_NAME_REF = LuaParserDefinitionKt.createDocType("PARAM_NAME_REF");
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
+  IElementType SNIPPET_TY = LuaParserDefinitionKt.createDocType("SNIPPET_TY");
   IElementType STRING_LITERAL_TY = LuaParserDefinitionKt.createDocType("STRING_LITERAL_TY");
   IElementType TABLE_DEF = LuaParserDefinitionKt.createDocType("TABLE_DEF");
   IElementType TABLE_FIELD = LuaParserDefinitionKt.createDocType("TABLE_FIELD");
@@ -46,17 +49,20 @@ public interface LuaDocTypes {
   IElementType AT = new LuaDocTokenType("@");
   IElementType BLOCK_BEGIN = new LuaDocTokenType("BLOCK_BEGIN");
   IElementType BLOCK_END = new LuaDocTokenType("BLOCK_END");
+  IElementType BOOLEAN_LITERAL = new LuaDocTokenType("BOOLEAN_LITERAL");
   IElementType COMMA = new LuaDocTokenType(",");
   IElementType DASHES = new LuaDocTokenType("DASHES");
   IElementType EOL = new LuaDocTokenType("EOL");
   IElementType EQ = new LuaDocTokenType("=");
   IElementType EXTENDS = new LuaDocTokenType(":");
+  IElementType FALSE_LITERAL = new LuaDocTokenType("FALSE_LITERAL");
   IElementType FUN = new LuaDocTokenType("fun");
   IElementType GT = new LuaDocTokenType(">");
   IElementType ID = new LuaDocTokenType("ID");
   IElementType LCURLY = new LuaDocTokenType("{");
   IElementType LPAREN = new LuaDocTokenType("(");
   IElementType LT = new LuaDocTokenType("<");
+  IElementType NUMBER_LITERAL = new LuaDocTokenType("NUMBER_LITERAL");
   IElementType OR = new LuaDocTokenType("|");
   IElementType PRIVATE = new LuaDocTokenType("PRIVATE");
   IElementType PROTECTED = new LuaDocTokenType("PROTECTED");
@@ -64,6 +70,7 @@ public interface LuaDocTypes {
   IElementType RCURLY = new LuaDocTokenType("}");
   IElementType RPAREN = new LuaDocTokenType(")");
   IElementType SHARP = new LuaDocTokenType("#");
+  IElementType SNIPPET = new LuaDocTokenType("SNIPPET");
   IElementType STRING = new LuaDocTokenType("STRING");
   IElementType STRING_BEGIN = new LuaDocTokenType("STRING_BEGIN");
   IElementType STRING_LITERAL = new LuaDocTokenType("STRING_LITERAL");
@@ -85,6 +92,7 @@ public interface LuaDocTypes {
   IElementType TAG_NAME_SUPPRESS = new LuaDocTokenType("suppress");
   IElementType TAG_NAME_TYPE = new LuaDocTokenType("type");
   IElementType TAG_NAME_VARARG = new LuaDocTokenType("vararg");
+  IElementType TRUE_LITERAL = new LuaDocTokenType("TRUE_LITERAL");
   IElementType VARARG = new LuaDocTokenType("VARARG");
 
   class Factory {
@@ -95,6 +103,9 @@ public interface LuaDocTypes {
       }
       else if (type == ARR_TY) {
         return new LuaDocArrTyImpl(node);
+      }
+      else if (type == BOOLEAN_LITERAL_TY) {
+        return new LuaDocBooleanLiteralTyImpl(node);
       }
       else if (type == CLASS_NAME_REF) {
         return new LuaDocClassNameRefImpl(node);
@@ -117,11 +128,17 @@ public interface LuaDocTypes {
       else if (type == GENERIC_TY) {
         return new LuaDocGenericTyImpl(node);
       }
+      else if (type == NUMBER_LITERAL_TY) {
+        return new LuaDocNumberLiteralTyImpl(node);
+      }
       else if (type == PARAM_NAME_REF) {
         return new LuaDocParamNameRefImpl(node);
       }
       else if (type == PAR_TY) {
         return new LuaDocParTyImpl(node);
+      }
+      else if (type == SNIPPET_TY) {
+        return new LuaDocSnippetTyImpl(node);
       }
       else if (type == STRING_LITERAL_TY) {
         return new LuaDocStringLiteralTyImpl(node);

@@ -170,22 +170,6 @@ abstract class TyClass(override val className: String,
         return null
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        // class extends table
-        if (other == Ty.TABLE) return true
-        if (super.subTypeOf(other, context, strict)) return true
-
-        // Lazy init for superclass
-        this.doLazyInit(context)
-        // Check if any of the superclasses are type
-        var isSubType = false
-        processSuperClass(this, context) { superType ->
-            isSubType = superType == other
-            !isSubType
-        }
-        return isSubType
-    }
-
     override fun substitute(substitutor: ITySubstitutor): ITy {
         return substitutor.substitute(this)
     }
@@ -321,11 +305,6 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun toString(): String = displayName
 
     override fun doLazyInit(searchContext: SearchContext) = Unit
-
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        // Empty list is a table, but subtype of all lists
-        return super.subTypeOf(other, context, strict) || other == Ty.TABLE || (other is TyArray && table.tableFieldList.size == 0)
-    }
 }
 
 fun getDocTableTypeName(table: LuaDocTableDef): String {

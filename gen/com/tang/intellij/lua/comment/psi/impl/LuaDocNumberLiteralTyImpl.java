@@ -11,14 +11,14 @@ import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.ty.ITy;
 
-public class LuaDocStringLiteralTyImpl extends LuaDocTyImpl implements LuaDocStringLiteralTy {
+public class LuaDocNumberLiteralTyImpl extends LuaDocTyImpl implements LuaDocNumberLiteralTy {
 
-  public LuaDocStringLiteralTyImpl(@NotNull ASTNode node) {
+  public LuaDocNumberLiteralTyImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitStringLiteralTy(this);
+    visitor.visitNumberLiteralTy(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -35,7 +35,7 @@ public class LuaDocStringLiteralTyImpl extends LuaDocTyImpl implements LuaDocStr
   @Override
   @NotNull
   public PsiElement getValue() {
-    return notNullChild(findChildByType(STRING_LITERAL));
+    return notNullChild(findChildByType(NUMBER_LITERAL));
   }
 
 }

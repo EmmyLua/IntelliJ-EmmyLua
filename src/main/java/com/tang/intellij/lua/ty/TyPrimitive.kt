@@ -25,12 +25,22 @@ interface ITyPrimitive : ITy {
 // number, boolean, nil, void ...
 class TyPrimitive(override val primitiveKind: TyPrimitiveKind,
                   override val displayName: String) : Ty(TyKind.Primitive), ITyPrimitive {
+
+    override val booleanType = if (primitiveKind == TyPrimitiveKind.Boolean) Ty.BOOLEAN else Ty.TRUE
+
     override fun equals(other: Any?): Boolean {
         return other is TyPrimitive && other.primitiveKind == primitiveKind
     }
 
     override fun hashCode(): Int {
         return primitiveKind.hashCode()
+    }
+
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.covariantWith(other, context, strict)
+                || (other is ITyPrimitive && other.primitiveKind == primitiveKind)
+                || (primitiveKind == TyPrimitiveKind.Table && (other.kind == TyKind.Array || other.kind == TyKind.Class))
+                || (primitiveKind == TyPrimitiveKind.Function && other.kind == TyKind.Function)
     }
 }
 
@@ -44,21 +54,16 @@ class TyPrimitiveClass(override val primitiveKind: TyPrimitiveKind,
 
     override fun doLazyInit(searchContext: SearchContext) { }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        // Everything is subset of any
-        if (other.kind == TyKind.Unknown) return !strict
-
-        // Handle unions, subtype if subtype of any of the union components.
-        if (other is TyUnion) return other.getChildTypes().any { type -> subTypeOf(type, context, strict) }
-
-        return this == other
-    }
-
     override fun equals(other: Any?): Boolean {
         return other is TyPrimitiveClass && other.primitiveKind == primitiveKind
     }
 
     override fun hashCode(): Int {
         return primitiveKind.hashCode()
+    }
+
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.covariantWith(other, context, strict)
+                || (other is ITyPrimitive && other.primitiveKind == primitiveKind)
     }
 }

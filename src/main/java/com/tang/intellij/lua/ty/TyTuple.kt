@@ -39,10 +39,10 @@ class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
         list.forEach { it.accept(visitor) }
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         if (other is TyTuple && other.size == size) {
             for (i in 0 until size) {
-                if (!list[i].subTypeOf(other.list[i], context, strict)) {
+                if (!list[i].contravariantWith(other.list[i], context, strict)) {
                     return false
                 }
             }

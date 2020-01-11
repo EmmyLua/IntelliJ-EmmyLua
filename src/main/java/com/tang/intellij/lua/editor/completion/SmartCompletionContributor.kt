@@ -26,7 +26,7 @@ import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.psi.shouldBe
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.TyStringLiteral
+import com.tang.intellij.lua.ty.TySnippet
 
 class SmartCompletionContributor : CompletionContributor() {
     init {
@@ -36,7 +36,7 @@ class SmartCompletionContributor : CompletionContributor() {
                 val expr = PsiTreeUtil.getParentOfType(id, LuaNameExpr::class.java) ?: return
                 val ty = expr.shouldBe(SearchContext.get(expr.project))
                 ty.each {
-                    if (it is TyStringLiteral) {
+                    if (it is TySnippet) {
                         val lookupElement = LookupElementBuilder.create(it.content)
                                 .withLookupString(it.content)
                                 .withIcon(LuaIcons.STRING_LITERAL)

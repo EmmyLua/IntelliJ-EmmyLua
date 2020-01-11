@@ -177,7 +177,7 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
             override fun substitute(clazz: ITyClass): ITy {
                 val base = map[clazz.className]
                 if (base != null) {
-                    return TyParameter(clazz.className, base)
+                    return TyParameter.getTy(clazz.className, base)
                 }
                 return super.substitute(clazz)
             }

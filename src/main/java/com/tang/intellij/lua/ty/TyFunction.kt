@@ -16,9 +16,11 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
+import com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -107,7 +109,7 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
-            if (params.size != other.params.size)
+            if (params.size != other.params.size || returnTy != other.returnTy)
                 return false
             return params.indices.none { params[it] != other.params.getOrNull(it) }
         }
@@ -115,7 +117,7 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
     }
 
     override fun hashCode(): Int {
-        var code = 0//returnTy.hashCode()
+        var code = returnTy.hashCode()
         params.forEach {
             code += it.ty.hashCode() * 31
         }
@@ -150,12 +152,14 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
 
     override fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean {
         for (i in params.indices) {
-            val p1 = params[i]
-            val p2 = other.params.getOrNull(i) ?: return false
-            if (!p1.ty.subTypeOf(p2.ty, context, strict))
+            val param = params[i]
+            val otherParam = other.params.getOrNull(i) ?: return false
+            if (!otherParam.ty.contravariantWith(param.ty, context, strict)) {
                 return false
+            }
         }
-        return true
+
+        return other.returnTy.covariantWith(returnTy, context, strict)
     }
 }
 
@@ -180,7 +184,7 @@ class FunSignature(colonCall: Boolean,
 
         fun create(colonCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
             val list = mutableListOf<TyParameter>()
-            functionTy.genericDefList.forEach { it.name?.let { name -> list.add(TyParameter(name, it.classNameRef?.text)) } }
+            functionTy.genericDefList.forEach { it.name?.let { name -> list.add(TyParameter.getTy(name, it.classNameRef?.text)) } }
             return FunSignature(
                     colonCall,
                     functionTy.returnType,
@@ -215,37 +219,132 @@ interface ITyFunction : ITy {
 val ITyFunction.isColonCall get() = hasFlag(TyFlags.SELF_FUNCTION)
 
 fun ITyFunction.process(processor: Processor<IFunSignature>) {
-    if (processor.process(mainSignature)) {
-        for (signature in signatures) {
-            if (!processor.process(signature))
-                break
-        }
+    // Overloads will always be more (or as) specific as the main signature, so we visit them first.
+    for (signature in signatures) {
+        if (!processor.process(signature))
+            return
     }
+    processor.process(mainSignature)
 }
 
-fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
-    var sgi: IFunSignature? = null
-    var perfectN = Int.MAX_VALUE
+fun ITyFunction.findCandidateSignatures(nArgs: Int): Collection<IFunSignature> {
+    val candidates = mutableListOf<IFunSignature>()
     process(Processor {
-        val offset = Math.abs(it.params.size - nArgs)
-        if (offset < perfectN) {
-            perfectN = offset
-            sgi = it
-            if (perfectN == 0) return@Processor false
+        if (it.params.size >= nArgs) {
+            candidates.add(it)
         }
         true
     })
-    return sgi ?: mainSignature
+    if (candidates.size == 0) {
+        candidates.add(mainSignature)
+    }
+    return candidates
 }
 
-fun ITyFunction.findPerfectSignature(call: LuaCallExpr): IFunSignature {
+fun ITyFunction.findCandidateSignatures(call: LuaCallExpr): Collection<IFunSignature> {
     val n = call.argList.size
     // 是否是 inst:method() 被用为 inst.method(self) 形式
     val isInstanceMethodUsedAsStaticMethod = isColonCall && call.isMethodDotCall
     if (isInstanceMethodUsedAsStaticMethod)
-        return findPerfectSignature(n - 1)
+        return findCandidateSignatures(n - 1)
     val isStaticMethodUsedAsInstanceMethod = !isColonCall && call.isMethodColonCall
-    return findPerfectSignature(if(isStaticMethodUsedAsInstanceMethod) n + 1 else n)
+    return findCandidateSignatures(if(isStaticMethodUsedAsInstanceMethod) n + 1 else n)
+}
+
+class SignatureProblem(val element: PsiElement, val problem: String) {
+}
+
+class SignatureMatchResult {
+    val problems: MutableMap<IFunSignature, Collection<SignatureProblem>>?
+    val signature: IFunSignature?
+
+    constructor(problems: MutableMap<IFunSignature, Collection<SignatureProblem>>) {
+        this.problems = problems
+        this.signature = null
+    }
+
+    constructor(match: IFunSignature?) {
+        this.problems = null
+        this.signature = match
+    }
+}
+
+fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext): SignatureMatchResult {
+    val concreteParams = call.argList
+    val concreteTypes = mutableListOf<MatchFunctionSignatureInspection.ConcreteTypeInfo>()
+    concreteParams.forEachIndexed { index, luaExpr ->
+        val ty = luaExpr.guessType(searchContext)
+        if (ty is TyTuple) {
+            if (index == concreteParams.lastIndex) {
+                concreteTypes.addAll(ty.list.map { MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, it) })
+            } else {
+                concreteTypes.add(MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, ty.list.first()))
+            }
+        } else concreteTypes.add(MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, ty))
+    }
+
+    val problems = mutableMapOf<IFunSignature, Collection<SignatureProblem>>()
+    val candidates = findCandidateSignatures(call)
+
+    candidates.forEach({
+        var nArgs = 0
+        val signatureProblems = mutableListOf<SignatureProblem>()
+
+        it.processArgs(call) { i, pi ->
+            nArgs = i + 1
+            val typeInfo = concreteTypes.getOrNull(i)
+
+            if (typeInfo == null) {
+                signatureProblems.add(SignatureProblem(call.lastChild.lastChild, "Missing argument: ${pi.name}: ${pi.ty}"))
+                return@processArgs true
+            }
+
+            val paramType = pi.ty
+            val type = typeInfo.ty
+            val assignable: Boolean
+
+            // BEN-TODO:
+            /*if (paramType is TyParameter) {
+                var resolvedParamType: PsiNamedElement? = null
+
+                LuaDeclarationTree.get(call.containingFile).walkUp(call) { decl ->
+                    if (decl.name == paramType.name)
+                        resolvedParamType = decl.firstDeclaration.psi
+                    resolvedParamType == null
+                }
+
+                if (resolvedParamType != null) {
+                    assignable = paramType.covariantWith(type, searchContext, false)
+                } else {
+                    val paramSuperType = paramType.getSuperClass(searchContext)
+                    assignable = paramSuperType == null || paramSuperType.covariantWith(type, searchContext, false)
+                }
+            } else {*/
+                assignable = paramType.covariantWith(type, searchContext, false)
+            //}
+
+            if (!assignable) {
+                signatureProblems.add(SignatureProblem(typeInfo.param, "Type mismatch for argument: ${pi.name}. Required: '${pi.ty}' Found: '$type'"))
+            }
+
+            true
+        }
+
+        if (nArgs < concreteParams.size && !it.hasVarargs()) {
+            for (i in nArgs until concreteParams.size) {
+                signatureProblems.add(SignatureProblem(concreteParams[i], "Too many arguments."))
+            }
+        }
+
+
+        if (signatureProblems.size == 0) {
+            return SignatureMatchResult(it)
+        } else {
+            problems.put(it, signatureProblems)
+        }
+    })
+
+    return SignatureMatchResult(problems)
 }
 
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
@@ -267,15 +366,15 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
         return code
     }
 
-    override fun subTypeOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.subTypeOf(other, context, strict) || other == FUNCTION)
-            return true // Subtype of function primitive.
+    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (super.covariantWith(other, context, strict)) return true
 
         var matched = false
+
         if (other is ITyFunction) {
-            process(Processor { sig1 ->
-                other.process(Processor { sig2 ->
-                    matched = sig2.subTypeOf(sig1, context, strict)
+            process(Processor { sig ->
+                other.process(Processor { otherSig ->
+                    matched = otherSig.subTypeOf(sig, context, strict)
                     !matched
                 })
                 !matched

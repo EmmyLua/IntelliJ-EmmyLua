@@ -73,7 +73,7 @@ function io.lines(filename, ...) end
 --- some systems to open the file in binary mode.
 ---@overload fun(filename:string):file
 ---@param filename string
----@param mode string | '"r"' | '"w"' | '"a"' | '"r+"' | '"w+"' | '"a+"' | '"rb"' | '"wb"' | '"ab"' | '"rb+"' | '"wb+"' | '"ab+"'
+---@param mode string | "r" | "w" | "a" | "r+" | "w+" | "a+" | "rb" | "wb" | "ab" | "rb+" | "wb+" | "ab+"
 ---@return file
 function io.open(filename, mode) return file end
 
@@ -180,7 +180,7 @@ function file:read(...) end
 --- file (and returns 0); and the call `file:seek("end")` sets the position
 --- to the end of the file, and returns its size.
 ---@overload fun()
----@param whence string | '"set"' | '"cur"' | '"end"'
+---@param whence string | "set" | "cur" | "end"
 ---@param offset number
 function file:seek(whence, offset) end
 
