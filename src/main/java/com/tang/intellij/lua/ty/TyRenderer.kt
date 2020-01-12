@@ -74,7 +74,18 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
             }
 
             override fun visitArray(array: ITyArray) {
+                val parenthesesRequired = array.base is TyUnion
+
+                if (parenthesesRequired) {
+                    sb.append("(")
+                }
+
                 array.base.accept(this)
+
+                if (parenthesesRequired) {
+                    sb.append(")")
+                }
+
                 sb.append("[]")
             }
 
