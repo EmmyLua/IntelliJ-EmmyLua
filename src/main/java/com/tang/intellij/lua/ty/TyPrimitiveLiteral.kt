@@ -45,7 +45,7 @@ class TyPrimitiveLiteral private constructor(override val primitiveKind: TyPrimi
         TyPrimitiveKind.Table -> Ty.TABLE
     }
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return this == other // Even with 'Strict nil checks' as false, nil is never assignable to a primitive literal.
     }
 

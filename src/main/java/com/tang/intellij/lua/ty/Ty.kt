@@ -20,7 +20,6 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
-import com.sun.xml.bind.v2.runtime.reflect.opt.Const
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.search.SearchContext
@@ -67,9 +66,9 @@ interface ITy : Comparable<ITy> {
 
     fun union(ty: ITy): ITy
 
-    fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean
+    fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
 
-    fun contravariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean
+    fun covariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
 
     fun getSuperClass(context: SearchContext): ITy?
 
@@ -153,7 +152,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return list.joinToString("|")
     }
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         if (this == other
                 || (other.kind == TyKind.Unknown && !strict)
                 || (other.kind == TyKind.Nil && !LuaSettings.instance.isNilStrict)) {
@@ -161,20 +160,20 @@ abstract class Ty(override val kind: TyKind) : ITy {
         }
 
         if (other is TyUnion || other == Ty.BOOLEAN) {
-            var covariant = true
+            var contravariant = true
             TyUnion.process(other, {
-                covariant = covariantWith(it, context, strict)
-                covariant
+                contravariant = contravariantOf(it, context, strict)
+                contravariant
             })
-            return covariant
+            return contravariant
         }
 
         val otherSuper = other.getSuperClass(context)
-        return otherSuper != null && covariantWith(otherSuper, context, strict)
+        return otherSuper != null && contravariantOf(otherSuper, context, strict)
     }
 
-    override fun contravariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return other.covariantWith(this, context, strict)
+    override fun covariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return other.contravariantOf(this, context, strict)
     }
 
     override fun getSuperClass(context: SearchContext): ITy? {
@@ -317,7 +316,7 @@ class TyUnknown : Ty(TyKind.Unknown) {
         return Constants.WORD_ANY.hashCode()
     }
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return true
     }
 }
@@ -326,14 +325,14 @@ class TyNil : Ty(TyKind.Nil) {
 
     override val booleanType = Ty.FALSE
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return other.kind == TyKind.Nil
     }
 }
 
 class TyVoid : Ty(TyKind.Void) {
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return false
     }
 }

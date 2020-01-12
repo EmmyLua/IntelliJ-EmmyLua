@@ -154,12 +154,12 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
         for (i in params.indices) {
             val param = params[i]
             val otherParam = other.params.getOrNull(i) ?: return false
-            if (!otherParam.ty.contravariantWith(param.ty, context, strict)) {
+            if (!otherParam.ty.covariantOf(param.ty, context, strict)) {
                 return false
             }
         }
 
-        return other.returnTy.covariantWith(returnTy, context, strict)
+        return other.returnTy.contravariantOf(returnTy, context, strict)
     }
 }
 
@@ -320,7 +320,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
                     assignable = paramSuperType == null || paramSuperType.covariantWith(type, searchContext, false)
                 }
             } else {*/
-                assignable = paramType.covariantWith(type, searchContext, false)
+                assignable = paramType.contravariantOf(type, searchContext, false)
             //}
 
             if (!assignable) {
@@ -366,8 +366,8 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
         return code
     }
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.covariantWith(other, context, strict)) return true
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (super.contravariantOf(other, context, strict)) return true
 
         var matched = false
 

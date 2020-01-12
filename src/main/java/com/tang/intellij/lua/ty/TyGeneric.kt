@@ -38,9 +38,9 @@ class TyParameter private constructor(val name: String, base: String? = null) : 
     override val kind: TyKind
         get() = TyKind.GenericParam
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return super.covariantWith(other, context, strict)
-                || getSuperClass(context)?.covariantWith(other, context, strict) != false
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.contravariantOf(other, context, strict)
+                || getSuperClass(context)?.contravariantOf(other, context, strict) != false
     }
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
@@ -83,23 +83,27 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         return displayName.hashCode()
     }
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.covariantWith(other, context, strict)) return true
+    override fun getSuperClass(context: SearchContext): ITy? {
+        return base.getSuperClass(context)
+    }
 
-        if (other is TyArray) {
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        if (super.contravariantOf(other, context, strict)) return true
+
+        if (other is ITyArray) {
             return (base as? TyPrimitive)?.primitiveKind == TyPrimitiveKind.Table
                     && params.size == 2
-                    && params[0].covariantWith(Ty.NUMBER, context, strict)
-                    && params[1].covariantWith(other.base, context, strict)
+                    && params[0].covariantOf(Ty.NUMBER, context, strict)
+                    && params[1].contravariantOf(other.base, context, strict)
         }
 
         return other is TyGeneric
-                && base.contravariantWith(other.base, context, strict)
+                && base.covariantOf(other.base, context, strict)
                 && params.size == other.params.size
                 && params.indices.all { i -> // Params are covariant
                     val param = params[i]
                     val otherParam = other.params[i]
-                    return param.covariantWith(otherParam, context, strict)
+                    return param.contravariantOf(otherParam, context, strict)
                 }
     }
 

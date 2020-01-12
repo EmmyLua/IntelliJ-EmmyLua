@@ -59,9 +59,9 @@ class TyUnion : Ty(TyKind.Union) {
         return childSet.add(ty)
     }
 
-    override fun covariantWith(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return super.covariantWith(other, context, strict)
-                || childSet.any { type -> type.covariantWith(other, context, strict) }
+    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+        return super.contravariantOf(other, context, strict)
+                || childSet.any { type -> type.contravariantOf(other, context, strict) }
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
