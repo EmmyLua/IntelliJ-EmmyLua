@@ -37,6 +37,7 @@ class LuaRunConfigurationProducer : RunConfigurationProducer<LuaAppRunConfigurat
         val element = ref.get()
         val containingFile = element.containingFile as? LuaPsiFile ?: return false
 
+        luaAppRunConfiguration.debuggerType = DebuggerType.Mob
         luaAppRunConfiguration.file = LuaFileUtil.getShortPath(element.project, containingFile.virtualFile)
         luaAppRunConfiguration.name = containingFile.name
 

@@ -151,6 +151,10 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
 
     override fun checkConfiguration() {
         super.checkConfiguration()
+        if (debuggerType == DebuggerType.Attach) {
+            throw RuntimeConfigurationError("Unfortunately, attach debugger is no longer available. Please try remote debugger.")
+        }
+
         val program = program
         if (program.isEmpty()) {
             throw RuntimeConfigurationError("Program doesn't exist.")
