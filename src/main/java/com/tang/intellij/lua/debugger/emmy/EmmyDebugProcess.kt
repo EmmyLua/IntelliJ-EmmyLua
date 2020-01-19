@@ -35,6 +35,11 @@ open class EmmyDebugProcess(session: XDebugSession) : EmmyDebugProcessBase(sessi
         transporter.handler = this
         transporter.logger = this
         this.transporter = transporter
-        transporter.start()
+        try {
+            transporter.start()
+        } catch (e: Exception) {
+            this.error(e.localizedMessage)
+            this.onDisconnect()
+        }
     }
 }
