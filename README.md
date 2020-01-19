@@ -12,7 +12,6 @@
 
 Version | CI status
 --------|----------
-IDEA 171|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 IDEA 172-181|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 IDEA 182+|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 
