@@ -229,22 +229,12 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 TyKind.Function to TyFunctionSerializer,
                 TyKind.Generic to TyGenericSerializer,
                 TyKind.GenericParam to TyGenericParamSerializer,
+                TyKind.Primitive to TyPrimitiveSerializer,
                 TyKind.PrimitiveLiteral to TyPrimitiveLiteralSerializer,
                 TyKind.Snippet to TySnippetSerializer,
                 TyKind.Tuple to TyTupleSerializer,
                 TyKind.Union to TyUnionSerializer
         )
-
-        private fun getPrimitive(mark: Byte): Ty {
-            return when (mark.toInt()) {
-                TyPrimitiveKind.Boolean.ordinal -> BOOLEAN
-                TyPrimitiveKind.String.ordinal -> STRING
-                TyPrimitiveKind.Number.ordinal -> NUMBER
-                TyPrimitiveKind.Table.ordinal -> TABLE
-                TyPrimitiveKind.Function.ordinal -> FUNCTION
-                else -> UNKNOWN
-            }
-        }
 
         private fun getKind(ordinal: Int): TyKind {
             return TyKind.values().firstOrNull { ordinal == it.ordinal } ?: TyKind.Unknown
@@ -281,20 +271,14 @@ abstract class Ty(override val kind: TyKind) : ITy {
         fun serialize(ty: ITy, stream: StubOutputStream) {
             stream.writeByte(ty.kind.ordinal)
             stream.writeInt(ty.flags)
-            when(ty) {
-                is TyPrimitive -> stream.writeByte(ty.primitiveKind.ordinal)
-                else -> {
-                    val serializer = getSerializer(ty.kind)
-                    serializer?.serialize(ty, stream)
-                }
-            }
+            val serializer = getSerializer(ty.kind)
+            serializer?.serialize(ty, stream)
         }
 
         fun deserialize(stream: StubInputStream): ITy {
             val kind = getKind(stream.readByte().toInt())
             val flags = stream.readInt()
             return when (kind) {
-                TyKind.Primitive -> getPrimitive(stream.readByte())
                 TyKind.Nil -> NIL
                 TyKind.Void -> VOID
                 else -> {

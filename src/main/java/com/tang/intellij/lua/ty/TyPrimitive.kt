@@ -16,6 +16,8 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.psi.stubs.StubInputStream
+import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.search.SearchContext
 
 interface ITyPrimitive : ITy {
@@ -65,5 +67,26 @@ class TyPrimitiveClass(override val primitiveKind: TyPrimitiveKind,
     override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
         return super.contravariantOf(other, context, strict)
                 || (other is ITyPrimitive && other.primitiveKind == primitiveKind)
+    }
+}
+
+object TyPrimitiveSerializer : TySerializer<ITy>() {
+    override fun deserializeTy(flags: Int, stream: StubInputStream): ITy {
+        val primitiveKind = stream.readByte()
+        return when (primitiveKind.toInt()) {
+            TyPrimitiveKind.Boolean.ordinal -> Ty.BOOLEAN
+            TyPrimitiveKind.String.ordinal -> Ty.STRING
+            TyPrimitiveKind.Number.ordinal -> Ty.NUMBER
+            TyPrimitiveKind.Table.ordinal -> Ty.TABLE
+            TyPrimitiveKind.Function.ordinal -> Ty.FUNCTION
+            else -> Ty.UNKNOWN
+        }
+    }
+
+    override fun serializeTy(ty: ITy, stream: StubOutputStream) {
+        when (ty) {
+            is TyPrimitive -> stream.writeByte(ty.primitiveKind.ordinal)
+            is TyPrimitiveClass -> stream.writeByte(ty.primitiveKind.ordinal)
+        }
     }
 }
