@@ -154,7 +154,7 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
         for (i in params.indices) {
             val param = params[i]
             val otherParam = other.params.getOrNull(i) ?: return false
-            if (!otherParam.ty.covariantOf(param.ty, context, strict)) {
+            if (!param.ty.contravariantOf(otherParam.ty, context, strict)) {
                 return false
             }
         }
@@ -183,14 +183,20 @@ class FunSignature(colonCall: Boolean,
         }
 
         fun create(colonCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
-            val list = mutableListOf<TyParameter>()
-            functionTy.genericDefList.forEach { it.name?.let { name -> list.add(TyParameter.getTy(name, it.classNameRef?.text)) } }
+            val params = mutableListOf<TyParameter>()
+
+            functionTy.genericDefList.forEach { generic ->
+                generic.name?.let { name ->
+                    params.add(TyParameter(name, generic.classRef?.classNameRef?.text, generic.classRef?.tyList?.map { it.text }?.toTypedArray()))
+                }
+            }
+
             return FunSignature(
                     colonCall,
                     functionTy.returnType,
                     functionTy.varargParam?.type,
                     initParams(functionTy),
-                    list.toTypedArray()
+                    params.toTypedArray()
             )
         }
 
@@ -290,7 +296,10 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
         var nArgs = 0
         val signatureProblems = mutableListOf<SignatureProblem>()
 
-        it.processArgs(call) { i, pi ->
+        val substitutor = call.createSubstitutor(it, searchContext)
+        val signature = if (substitutor != null) it.substitute(substitutor) else it
+
+        signature.processArgs(call) { i, pi ->
             nArgs = i + 1
             val typeInfo = concreteTypes.getOrNull(i)
 
@@ -301,27 +310,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
 
             val paramType = pi.ty
             val type = typeInfo.ty
-            val assignable: Boolean
-
-            // BEN-TODO:
-            /*if (paramType is TyParameter) {
-                var resolvedParamType: PsiNamedElement? = null
-
-                LuaDeclarationTree.get(call.containingFile).walkUp(call) { decl ->
-                    if (decl.name == paramType.name)
-                        resolvedParamType = decl.firstDeclaration.psi
-                    resolvedParamType == null
-                }
-
-                if (resolvedParamType != null) {
-                    assignable = paramType.covariantWith(type, searchContext, false)
-                } else {
-                    val paramSuperType = paramType.getSuperClass(searchContext)
-                    assignable = paramSuperType == null || paramSuperType.covariantWith(type, searchContext, false)
-                }
-            } else {*/
-                assignable = paramType.contravariantOf(type, searchContext, false)
-            //}
+            val assignable: Boolean = paramType.contravariantOf(type, searchContext, false)
 
             if (!assignable) {
                 signatureProblems.add(SignatureProblem(typeInfo.param, "Type mismatch for argument: ${pi.name}. Required: '${pi.ty}' Found: '$type'"))

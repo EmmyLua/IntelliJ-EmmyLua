@@ -24,6 +24,7 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocTagField
+import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaTableField
@@ -54,7 +55,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                 return false
 
             if (deep) {
-                val classDef = LuaClassIndex.find(className, context)
+                val classDef: LuaClass? = LuaClassIndex.find(className, context) ?: LuaGenericIndex.find(className, context)
                 if (classDef != null) {
                     val type = classDef.type
                     // from alias

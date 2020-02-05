@@ -5,11 +5,14 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.tang.intellij.lua.psi.LuaClass;
+import com.intellij.psi.StubBasedPsiElement;
+import com.tang.intellij.lua.stubs.LuaDocGenericDefStub;
 
-public interface LuaDocGenericDef extends PsiNameIdentifierOwner, LuaDocPsiElement {
+public interface LuaDocGenericDef extends PsiNameIdentifierOwner, LuaDocPsiElement, LuaClass, StubBasedPsiElement<LuaDocGenericDefStub> {
 
   @Nullable
-  LuaDocClassNameRef getClassNameRef();
+  LuaDocClassRef getClassRef();
 
   @NotNull
   PsiElement getId();

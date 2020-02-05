@@ -164,7 +164,7 @@ table_ty ::= table_def {
 }
 
 private generic_param_list ::= (ty ',')* ty
-generic_ty ::= general_ty '<' generic_param_list '>' {
+generic_ty ::= class_name_ref '<' generic_param_list '>' {
     methods = [getType]
     pin = 2
 }
@@ -249,7 +249,30 @@ tag_return ::= TAG_NAME_RETURN type_list comment_string? {
 class_name_ref ::= ID {
     methods = [getReference resolveType]
 }
-tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comment_string? {
+
+class_ref ::= class_name_ref ('<' generic_param_list '>')? {
+	methods = [getReference]
+}
+
+generic_def ::= ID (EXTENDS class_ref)? {
+    pin = 1
+    implements = [
+        "com.intellij.psi.PsiNameIdentifierOwner"
+        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+        "com.tang.intellij.lua.psi.LuaClass"
+    ]
+    methods = [
+        getNameIdentifier
+        setName
+        getName
+        getTextOffset
+    ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocGenericDefStub"
+}
+
+private generic_def_list ::= generic_def (',' generic_def)*
+
+tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID ('<' generic_def_list '>')? (EXTENDS class_ref)? comment_string? {
     pin = 2
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
@@ -268,7 +291,7 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
         toString
         isDeprecated
 
-        superClassNameRef = 'class_name_ref'
+        superClassRef = 'class_ref'
         module = 'TAG_NAME_MODULE'
     ]
 }
@@ -291,20 +314,6 @@ tag_see ::= TAG_NAME_SEE class_name_ref (SHARP ID)? {
     pin = 1
     methods = [
         getReference
-    ]
-}
-
-generic_def ::= ID (EXTENDS class_name_ref)? {
-    pin = 1
-    implements = [
-        "com.intellij.psi.PsiNameIdentifierOwner"
-        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
-    ]
-    methods = [
-        getNameIdentifier
-        setName
-        getName
-        getTextOffset
     ]
 }
 

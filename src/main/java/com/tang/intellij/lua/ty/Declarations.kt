@@ -16,17 +16,20 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.codeInsight.CommentUtil
 import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.comment.psi.LuaDocTagField
-import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
+import com.tang.intellij.lua.comment.LuaCommentUtil
+import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.GuardType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
+import java.util.*
 
 fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
     if (element == null)
@@ -110,14 +113,16 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
 
 private fun LuaParamNameDef.infer(context: SearchContext): ITy {
     var type = resolveParamType(this, context)
-    //anonymous
-    if (Ty.isInvalid(type))
+
+    if (Ty.isInvalid(type)) {
         type = TyClass.createAnonymousType(this)
+    }
+
     return type
 }
 
 private fun LuaNameDef.infer(context: SearchContext): ITy {
-    var type: ITy = Ty.UNKNOWN
+    var type: ITy = Ty.VOID
     val parent = this.parent
     if (parent is LuaTableField) {
         val expr = PsiTreeUtil.findChildOfType(parent, LuaExpr::class.java)
@@ -144,12 +149,6 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
             if (type is TyPrimitiveLiteral) {
                 type = type.primitiveType
             }
-
-            //anonymous
-            if (type !is ITyPrimitive)
-                type = type.union(TyClass.createAnonymousType(this))
-            else if (type == Ty.TABLE)
-                type = type.union(TyClass.createAnonymousType(this))
         }
     }
     return type
@@ -286,7 +285,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
         // iterator support
         val type = callExpr?.guessType(context)
         if (type != null) {
-            var result: ITy = Ty.UNKNOWN
+            var result: ITy = Ty.VOID
             TyUnion.each(type) {
                 if (it is ITyFunction) {
                     val returnTy = it.mainSignature.returnTy
@@ -297,7 +296,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     }
                 }
             }
-            if (result != Ty.UNKNOWN)
+            if (!Ty.isInvalid(result) && result != Ty.UNKNOWN)
                 return result
         }
     }
@@ -314,7 +313,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
      * guess type for p1
      */
     if (paramOwner is LuaClosureExpr) {
-        var ret: ITy = Ty.UNKNOWN
+        var ret: ITy = Ty.VOID
         val shouldBe = paramOwner.shouldBe(context)
         shouldBe.each {
             if (it is ITyFunction) {
@@ -322,7 +321,9 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 ret = ret.union(it.mainSignature.getParamTy(paramIndex))
             }
         }
-        return ret
+        if (!Ty.isInvalid(ret)) {
+            return ret
+        }
     }
     return Ty.UNKNOWN
 }

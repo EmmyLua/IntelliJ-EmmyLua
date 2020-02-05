@@ -30,9 +30,7 @@ interface ILuaTypeInfer {
         fun infer(target: LuaTypeGuessable, context: SearchContext): ITy {
             for (typeInfer in EP_NAME.extensions) {
                 ProgressManager.checkCanceled()
-                val iTy = typeInfer.inferType(target, context)
-                if (!Ty.isInvalid(iTy))
-                    return iTy
+                return typeInfer.inferType(target, context)
             }
             return Ty.UNKNOWN
         }

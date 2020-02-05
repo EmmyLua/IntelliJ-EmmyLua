@@ -25,6 +25,7 @@ import com.tang.intellij.lua.psi.LuaVisitor
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TyGeneric
 
 class AssignTypeInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
@@ -56,10 +57,11 @@ class AssignTypeInspection : StrictInspection() {
                             // Field access
                             if (field is LuaIndexExpr) {
                                 // Get owner class
-                                val parent = field.guessParentType(searchContext)
+                                val fieldOwnerType = field.guessParentType(searchContext)
+                                val fieldOwnerClass = if (fieldOwnerType is TyGeneric) fieldOwnerType.base else fieldOwnerType
 
-                                if (parent is TyClass) {
-                                    val fieldType = parent.findMemberType(name, searchContext) ?: Ty.NIL
+                                if (fieldOwnerClass is TyClass) {
+                                    val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
 
                                     if (!fieldType.contravariantOf(valueType, searchContext, false)) {
                                         myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))

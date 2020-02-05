@@ -24,11 +24,11 @@ import java.util.concurrent.ConcurrentHashMap
 
 class TyPrimitiveLiteral private constructor(override val primitiveKind: TyPrimitiveKind, val value: String) : Ty(TyKind.PrimitiveLiteral), ITyPrimitive {
     companion object {
-        private val PrimitiveLiterals = ConcurrentHashMap<String, TyPrimitiveLiteral>()
+        private val primitiveLiterals = ConcurrentHashMap<String, TyPrimitiveLiteral>()
 
         fun getTy(primitiveKind: TyPrimitiveKind, value: String): TyPrimitiveLiteral {
             val id = "$primitiveKind:$value"
-            return PrimitiveLiterals.getOrPut(id, { TyPrimitiveLiteral(primitiveKind, value) })
+            return primitiveLiterals.getOrPut(id, { TyPrimitiveLiteral(primitiveKind, value) })
         }
     }
 
@@ -46,7 +46,7 @@ class TyPrimitiveLiteral private constructor(override val primitiveKind: TyPrimi
     }
 
     override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return this == other // Even with 'Strict nil checks' as false, nil is never assignable to a primitive literal.
+        return this == other || (other is TyUnknown && !strict) // Even with 'Strict nil checks' as false, nil is never assignable to a primitive literal.
     }
 
     override fun equals(other: Any?): Boolean {

@@ -23,6 +23,7 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.LuaDocTableDef
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.project.LuaSettings
@@ -30,11 +31,17 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.readOptionalTyParams
+import com.tang.intellij.lua.stubs.readParamNames
+import com.tang.intellij.lua.stubs.writeOptionalTyParams
+import com.tang.intellij.lua.stubs.writeParamNames
 
 interface ITyClass : ITy {
     val className: String
+    val params: Array<TyParameter>?
     val varName: String
     var superClassName: String?
+    var superClassParams: Array<String>?
     var aliasName: String?
     fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
@@ -69,8 +76,10 @@ fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visi
 }
 
 abstract class TyClass(override val className: String,
+                       override var params: Array<TyParameter>? = null,
                        override val varName: String = "",
-                       override var superClassName: String? = null
+                       override var superClassName: String? = null,
+                       override var superClassParams: Array<String>? = null
 ) : Ty(TyKind.Class), ITyClass {
 
     final override var aliasName: String? = null
@@ -153,11 +162,14 @@ abstract class TyClass(override val className: String,
     }
 
     open fun doLazyInit(searchContext: SearchContext) {
-        val classDef = LuaShortNamesManager.getInstance(searchContext.project).findClass(className, searchContext)
-        if (classDef != null && aliasName == null) {
-            val tyClass = classDef.type
-            aliasName = tyClass.aliasName
-            superClassName = tyClass.superClassName
+        if (aliasName == null) {
+            val classDef = LuaShortNamesManager.getInstance(searchContext.project).findClass(className, searchContext)
+            if (classDef != null) {
+                val tyClass = classDef.type
+                aliasName = tyClass.aliasName
+                superClassName = tyClass.superClassName
+                params = tyClass.params
+            }
         }
     }
 
@@ -168,6 +180,12 @@ abstract class TyClass(override val className: String,
             return Ty.getBuiltin(clsName) ?: LuaShortNamesManager.getInstance(context.project).findClass(clsName, context)?.type
         }
         return null
+    }
+
+    override fun getParams(context: SearchContext): Array<TyParameter>? {
+        lazyInit(context)
+        params?.forEach { it.lazyInit(context) }
+        return params
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
@@ -181,22 +199,18 @@ abstract class TyClass(override val className: String,
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
             val stub = nameDef.stub
             val tyName = stub?.anonymousType ?: getAnonymousType(nameDef)
-            return createSerializedClass(tyName, nameDef.name, null, null, TyFlags.ANONYMOUS)
+            return createSerializedClass(tyName, null, nameDef.name, null, null, null, TyFlags.ANONYMOUS)
+        }
+
+        fun createGlobalType(name: String, store: Boolean = false): ITy {
+            val g = createSerializedClass(getGlobalTypeName(name), null, name, null, null, null, TyFlags.GLOBAL)
+            if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
+                return createSerializedClass(name, null, name, null, null, null, TyFlags.GLOBAL).union(g)
+            return g
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
-            val name = nameExpr.name
-            val g = createSerializedClass(getGlobalTypeName(nameExpr), name, null, null, TyFlags.GLOBAL)
-            if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
-                return createSerializedClass(name, name, null, null, TyFlags.GLOBAL).union(g)
-            return g
-        }
-
-        fun createGlobalType(name: String): ITy {
-            val g = createSerializedClass(getGlobalTypeName(name), name, null, null, TyFlags.GLOBAL)
-            if (LuaSettings.instance.isRecognizeGlobalNameAsType)
-                return createSerializedClass(name, name, null, null, TyFlags.GLOBAL).union(g)
-            return g
+            return createGlobalType(nameExpr.name, store)
         }
 
         fun processSuperClass(start: ITyClass, searchContext: SearchContext, processor: (ITyClass) -> Boolean): Boolean {
@@ -222,21 +236,35 @@ abstract class TyClass(override val className: String,
 class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(tagClass.name) {
 
     init {
-        val supperRef = tagClass.superClassNameRef
-        if (supperRef != null)
-            superClassName = supperRef.text
+        params = tagClass.genericDefList.map {
+            TyParameter(it.id.text, it.classRef?.classNameRef?.text, it.classRef?.tyList?.map { it.text }?.toTypedArray())
+        }.toTypedArray()
+        superClassName = tagClass.superClassRef?.classNameRef?.text
+        superClassParams = tagClass.superClassRef?.tyList?.map { it.text }?.toTypedArray()
         aliasName = tagClass.aliasName
     }
 
     override fun doLazyInit(searchContext: SearchContext) {}
 }
 
+class TyPsiGenericDefClass(luaDocGenericDef: LuaDocGenericDef) : TyClass(luaDocGenericDef.id.text) {
+
+    init {
+        superClassName = luaDocGenericDef.classRef?.classNameRef?.text
+        superClassParams = luaDocGenericDef.classRef?.tyList?.map { it.text }?.toTypedArray()
+    }
+
+    override fun doLazyInit(searchContext: SearchContext) {}
+}
+
 open class TySerializedClass(name: String,
+                             params: Array<TyParameter>? = null,
                              varName: String = name,
-                             supper: String? = null,
+                             superName: String? = null,
+                             superParams: Array<String>? = null,
                              alias: String? = null,
                              flags: Int = 0)
-    : TyClass(name, varName, supper) {
+    : TyClass(name, params, varName, superName, superParams) {
     init {
         aliasName = alias
         this.flags = flags
@@ -251,11 +279,13 @@ open class TySerializedClass(name: String,
 }
 
 //todo Lazy class ty
-class TyLazyClass(name: String) : TySerializedClass(name)
+class TyLazyClass(name: String, params: Array<TyParameter>? = null) : TySerializedClass(name, params)
 
 fun createSerializedClass(name: String,
+                          params: Array<TyParameter>? = null,
                           varName: String = name,
-                          supper: String? = null,
+                          superName: String? = null,
+                          superParams: Array<String>? = null,
                           alias: String? = null,
                           flags: Int = 0): TyClass {
     val list = name.split("|")
@@ -266,7 +296,7 @@ fun createSerializedClass(name: String,
         }
     }
 
-    return TySerializedClass(name, varName, supper, alias, flags)
+    return TySerializedClass(name, params, varName, superName, superParams, alias, flags)
 }
 
 fun getTableTypeName(table: LuaTableExpr): String {
@@ -305,6 +335,25 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun toString(): String = displayName
 
     override fun doLazyInit(searchContext: SearchContext) = Unit
+
+    fun toGeneric(context: SearchContext): ITyGeneric {
+        var keyType: ITy = Ty.VOID
+        var elementType: ITy = Ty.VOID
+
+        table.tableFieldList.forEach {
+            val exprList = it.exprList
+
+            if (exprList.size == 2) {
+                keyType = keyType.union(exprList[0].guessType(context))
+                elementType = elementType.union(exprList[1].guessType(context))
+            } else {
+                keyType = keyType.union(if (it.id != null) Ty.STRING else Ty.NUMBER)
+                elementType = elementType.union(exprList[0].guessType(context))
+            }
+        }
+
+        return TySerializedGeneric(arrayOf(keyType, elementType), Ty.TABLE)
+    }
 }
 
 fun getDocTableTypeName(table: LuaDocTableDef): String {
@@ -339,20 +388,26 @@ class TySerializedDocTable(name: String) : TySerializedClass(name) {
 object TyClassSerializer : TySerializer<ITyClass>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): ITyClass {
         val className = stream.readName()
+        val params = stream.readOptionalTyParams()
         val varName = stream.readName()
         val superName = stream.readName()
+        val superParams = stream.readParamNames()
         val aliasName = stream.readName()
         return createSerializedClass(StringRef.toString(className),
+                params,
                 StringRef.toString(varName),
                 StringRef.toString(superName),
+                superParams,
                 StringRef.toString(aliasName),
                 flags)
     }
 
     override fun serializeTy(ty: ITyClass, stream: StubOutputStream) {
         stream.writeName(ty.className)
+        stream.writeOptionalTyParams(ty.params)
         stream.writeName(ty.varName)
         stream.writeName(ty.superClassName)
+        stream.writeParamNames(ty.superClassParams)
         stream.writeName(ty.aliasName)
     }
 }

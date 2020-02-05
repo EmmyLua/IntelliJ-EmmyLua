@@ -26,7 +26,9 @@ import com.tang.intellij.lua.comment.psi.impl.LuaDocTagClassImpl
 import com.tang.intellij.lua.psi.LuaElementType
 import com.tang.intellij.lua.psi.aliasName
 import com.tang.intellij.lua.stubs.index.StubKeys
+import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.TyParameter
 import com.tang.intellij.lua.ty.createSerializedClass
 
 /**
@@ -40,28 +42,37 @@ class LuaDocTagClassType : LuaStubElementType<LuaDocTagClassStub, LuaDocTagClass
     }
 
     override fun createStub(luaDocTagClass: LuaDocTagClass, stubElement: StubElement<*>): LuaDocTagClassStub {
-        val superClassNameRef = luaDocTagClass.superClassNameRef
-        val superClassName = superClassNameRef?.text
+        val params = luaDocTagClass.genericDefList.map {
+            TyParameter(it.id.text, it.classRef?.classNameRef?.text, it.classRef?.tyList?.map { it.text }?.toTypedArray())
+        }.toTypedArray()
+        val superClassRef = luaDocTagClass.superClassRef
+        val superClassName = superClassRef?.classNameRef?.text
+        val superClassParams = superClassRef?.tyList?.map { it.text }?.toTypedArray()
         val aliasName: String? = luaDocTagClass.aliasName
-
-        return LuaDocTagClassStubImpl(luaDocTagClass.name, aliasName, superClassName, luaDocTagClass.isDeprecated, stubElement)
+        return LuaDocTagClassStubImpl(luaDocTagClass.name, params, aliasName, superClassName, superClassParams, luaDocTagClass.isDeprecated, stubElement)
     }
 
     override fun serialize(luaDocClassStub: LuaDocTagClassStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeName(luaDocClassStub.className)
+        stubOutputStream.writeOptionalTyParams(luaDocClassStub.params)
         stubOutputStream.writeName(luaDocClassStub.aliasName)
         stubOutputStream.writeName(luaDocClassStub.superClassName)
+        stubOutputStream.writeParamNames(luaDocClassStub.superClassParams)
         stubOutputStream.writeBoolean(luaDocClassStub.isDeprecated)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocTagClassStub {
         val className = stubInputStream.readName()
+        val params = stubInputStream.readOptionalTyParams()
         val aliasName = stubInputStream.readName()
         val superClassName = stubInputStream.readName()
+        val superClassParams = stubInputStream.readParamNames()
         val isDeprecated = stubInputStream.readBoolean()
         return LuaDocTagClassStubImpl(StringRef.toString(className)!!,
+                params,
                 StringRef.toString(aliasName),
                 StringRef.toString(superClassName),
+                superClassParams,
                 isDeprecated,
                 stubElement)
     }
@@ -80,22 +91,26 @@ class LuaDocTagClassType : LuaStubElementType<LuaDocTagClassStub, LuaDocTagClass
 
 interface LuaDocTagClassStub : StubElement<LuaDocTagClass> {
     val className: String
+    val params: Array<TyParameter>?
     val aliasName: String?
     val superClassName: String?
-    val classType: TyClass
+    val superClassParams: Array<String>?
+    val classType: ITyClass
     val isDeprecated: Boolean
 }
 
 class LuaDocTagClassStubImpl(override val className: String,
+                             override val params: Array<TyParameter>?,
                              override val aliasName: String?,
                              override val superClassName: String?,
+                             override val superClassParams: Array<String>?,
                              override val isDeprecated: Boolean,
                              parent: StubElement<*>)
     : LuaDocStubBase<LuaDocTagClass>(parent, LuaElementType.CLASS_DEF), LuaDocTagClassStub {
 
     override val classType: TyClass
         get() {
-            val luaType = createSerializedClass(className, className, superClassName)
+            val luaType = createSerializedClass(className, params, className, superClassName, superClassParams)
             luaType.aliasName = aliasName
             return luaType
         }

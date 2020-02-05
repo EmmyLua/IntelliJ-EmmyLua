@@ -99,7 +99,7 @@
         <highlightVisitor implementation="com.tang.intellij.lua.codeInsight.LuaRainbowVisitor"/>
         <highlightUsagesHandlerFactory implementation="com.tang.intellij.lua.codeInsight.highlighting.LuaHighlightUsagesHandlerFactory"/>
         <readWriteAccessDetector implementation="com.tang.intellij.lua.codeInsight.LuaReadWriteAccessDetector"/>
-        
+
         <!--hierarchy-->
         <callHierarchyProvider language="Lua" implementationClass="com.tang.intellij.lua.hierarchy.call.LuaCallHierarchyProvider"/>
 
@@ -127,6 +127,7 @@
         <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMemberIndex"/>
+        <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaGenericIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaSuperClassIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaAliasIndex"/>
@@ -313,6 +314,12 @@
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedClassInspection"/>
+
+        <localInspection
+                displayName="Generic constraint type mismatch in emmy doc"
+                enabledByDefault="true"
+                groupName="Lua > Emmy doc"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.GenericConstraintInspection"/>
     </extensions>
 
     <application-components>
@@ -332,7 +339,7 @@
         <group id="LuaCallHierarchyPopupMenu">
             <reference ref="EditSource"/>
         </group>
-        
+
         <action class="com.tang.intellij.lua.actions.CreateLuaFileAction"
                 text="Lua File"
                 id="lua.newFile">

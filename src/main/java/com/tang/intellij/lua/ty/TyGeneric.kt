@@ -20,21 +20,12 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
-import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
-import java.util.concurrent.ConcurrentHashMap
+import com.tang.intellij.lua.stubs.readParamNames
+import com.tang.intellij.lua.stubs.writeParamNames
 
-class TyParameter private constructor(val name: String, base: String? = null) : TySerializedClass(name, name, base) {
-    companion object {
-        private val stringLiterals = ConcurrentHashMap<String, TyParameter>()
-
-        fun getTy(name: String, base: String? = null): TyParameter {
-            val id = "$name:${base ?: ""}"
-            return stringLiterals.getOrPut(id, { TyParameter(name, base) })
-        }
-    }
-
+class TyParameter(val name: String, base: String? = null, baseParams: Array<String>? = null) : TySerializedClass(name, emptyArray(), name, base, baseParams) {
     override val kind: TyKind
         get() = TyKind.GenericParam
 
@@ -55,12 +46,13 @@ object TyGenericParamSerializer : TySerializer<TyParameter>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): TyParameter {
         val name = StringRef.toString(stream.readName())
         val base = StringRef.toString(stream.readName())
-        return TyParameter.getTy(name, base)
+        return TyParameter(name, base, stream.readParamNames())
     }
 
     override fun serializeTy(ty: TyParameter, stream: StubOutputStream) {
         stream.writeName(ty.name)
         stream.writeName(ty.superClassName)
+        stream.writeParamNames(ty.superClassParams)
     }
 }
 
@@ -91,19 +83,47 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         if (super.contravariantOf(other, context, strict)) return true
 
         if (other is ITyArray) {
-            return (base as? TyPrimitive)?.primitiveKind == TyPrimitiveKind.Table
+            return base == Ty.TABLE
                     && params.size == 2
-                    && params[0].covariantOf(Ty.NUMBER, context, strict)
-                    && params[1].contravariantOf(other.base, context, strict)
+                    && (
+                        params[0] == Ty.NUMBER
+                        || (params[0] is TyUnknown && !strict)
+                    ) && (
+                        params[1] == other.base
+                        || (!strict && params[1].contravariantOf(other.base, context, strict))
+                    )
         }
 
-        return other is TyGeneric
-                && base.covariantOf(other.base, context, strict)
-                && params.size == other.params.size
-                && params.indices.all { i -> // Params are covariant
+        var otherBase: ITy? = null
+        var otherParams: Array<out ITy>? =  null
+
+        if (other is ITyGeneric) {
+            otherBase = other.base
+            otherParams = other.params
+        } else if (other is ITyClass) {
+            otherBase = other
+            otherParams = other.params
+        } else if ((other == Ty.TABLE || other is TyTable) && base == Ty.TABLE && params.size == 2) {
+            if (params[0] is TyUnknown && params[1] is TyUnknown) {
+                return true
+            }
+
+            if (other is TyTable) {
+                val genericTable = other.toGeneric(context)
+                otherBase = genericTable.base
+                otherParams = genericTable.params
+            }
+        }
+
+        return otherBase != null && otherParams != null
+                && base.contravariantOf(otherBase, context, strict)
+                && params.size == otherParams.size
+                && params.indices.all { i -> // Params are always invariant as we don't support use-site variance nor immutable/read-only annotations
                     val param = params[i]
-                    val otherParam = other.params[i]
-                    return param.contravariantOf(otherParam, context, strict)
+                    val otherParam = otherParams[i]
+                    return param.equals(otherParam)
+                            || param is TyUnknown
+                            || (otherParam is TyUnknown && !strict)
                 }
     }
 
@@ -122,19 +142,13 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {
 
     private fun initBaseTy(luaDocGenericTy: LuaDocGenericTy): ITy {
-        val firstTyPsi = luaDocGenericTy.firstChild as LuaDocTy
-        return firstTyPsi.getType()
+        return luaDocGenericTy.classNameRef.resolveType()
     }
 
     private val _baseTy:ITy = initBaseTy(luaDocGenericTy)
 
     private fun initParams(luaDocGenericTy: LuaDocGenericTy): Array<ITy> {
-        val tyList = luaDocGenericTy.tyList
-        val tbl = mutableListOf<ITy>()
-        tyList.forEach { tbl.add(it.getType()) }
-        //第一个是 base
-        tbl.removeAt(0)
-        return tbl.toTypedArray()
+        return luaDocGenericTy.tyList.map { it.getType() }.toTypedArray()
     }
 
     private val _params: Array<ITy> = initParams(luaDocGenericTy)

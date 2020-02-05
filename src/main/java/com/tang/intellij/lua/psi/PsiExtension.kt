@@ -81,7 +81,7 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
         if (p2 is LuaCallExpr) {
             val idx = p1.getIndexFor(this)
             val fTy = infer(p2.expr, context)
-            var ret: ITy = Ty.UNKNOWN
+            var ret: ITy = Ty.VOID
             fTy.each {
                 if (it is ITyFunction) {
                     var sig = it.mainSignature
@@ -91,19 +91,19 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
                     ret = ret.union(sig.getParamTy(idx))
                 }
             }
-            return ret
+            return if (Ty.isInvalid(ret)) Ty.UNKNOWN else ret
         }
     } else if (p1 is LuaTableField) {
         val fieldName = p1.name
         val tbl = p1.parent
         if (fieldName != null && tbl is LuaTableExpr) {
-            var fieldType: ITy = Ty.UNKNOWN
+            var fieldType: ITy = Ty.VOID
             val tyTbl = tbl.shouldBe(context)
             tyTbl.eachTopClass(Processor { cls ->
                 cls.findMemberType(fieldName, context)?.let { fieldType = fieldType.union(it) }
                 true
             })
-            return fieldType
+            return if (Ty.isInvalid(fieldType)) Ty.UNKNOWN else fieldType
         }
     }
     return Ty.UNKNOWN
@@ -272,8 +272,11 @@ val LuaFuncBodyOwner.tyParams: Array<TyParameter> get() {
 
     val list = mutableListOf<TyParameter>()
     if (this is LuaCommentOwner) {
-        val genericDefList = comment?.findTags(LuaDocGenericDef::class.java)
-        genericDefList?.forEach { it.name?.let { name -> list.add(TyParameter.getTy(name, it.classNameRef?.text)) } }
+        comment?.findTags(LuaDocGenericDef::class.java)?.forEach { generic ->
+            generic.name?.let { name ->
+                list.add(TyParameter(name, generic.classRef?.classNameRef?.text, generic.classRef?.tyList?.map { it.text }?.toTypedArray()))
+            }
+        }
     }
     return list.toTypedArray()
 }

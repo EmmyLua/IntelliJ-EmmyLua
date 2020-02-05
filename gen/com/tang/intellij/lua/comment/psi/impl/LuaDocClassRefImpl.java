@@ -8,17 +8,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
-import com.tang.intellij.lua.ty.ITy;
 
-public class LuaDocGenericTyImpl extends LuaDocTyImpl implements LuaDocGenericTy {
+public class LuaDocClassRefImpl extends ASTWrapperPsiElement implements LuaDocClassRef {
 
-  public LuaDocGenericTyImpl(@NotNull ASTNode node) {
+  public LuaDocClassRefImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitGenericTy(this);
+    visitor.visitClassRef(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
@@ -36,12 +36,6 @@ public class LuaDocGenericTyImpl extends LuaDocTyImpl implements LuaDocGenericTy
   @NotNull
   public List<LuaDocTy> getTyList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTy.class);
-  }
-
-  @Override
-  @NotNull
-  public ITy getType() {
-    return LuaDocPsiImplUtilKt.getType(this);
   }
 
 }

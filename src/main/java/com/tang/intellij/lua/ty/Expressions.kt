@@ -53,7 +53,12 @@ fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
         val tree = LuaDeclarationTree.get(expr.containingFile)
         val declaration = tree.find(expr)?.firstDeclaration?.psi
         if (declaration != expr && declaration is LuaTypeGuessable) {
-            return declaration.guessType(context)
+            val declarationType = declaration.guessType(context)
+            return if (declarationType is TyParameter) {
+                // Parameters are contravariant when superClass is contravariant at the call site.
+                // In this context we have an instantiated type, which adheres to regular co/contra-variance.
+                TySerializedClass(declarationType.className, emptyArray(), declarationType.className, declarationType.superClassName, declarationType.superClassParams)
+            } else declarationType
         }
     }
     return inferExprInner(expr, context)
@@ -65,7 +70,7 @@ private fun inferExprInner(expr: LuaPsiElement, context: SearchContext): ITy {
         is LuaBinaryExpr -> expr.infer(context)
         is LuaCallExpr -> expr.infer(context)
         is LuaClosureExpr -> infer(expr, context)
-        is LuaTableExpr -> expr.infer()
+        is LuaTableExpr -> expr.infer(context)
         is LuaParenExpr -> infer(expr.expr, context)
         is LuaNameExpr -> expr.infer(context)
         is LuaLiteralExpr -> expr.infer()
@@ -182,7 +187,7 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
         sig.processArgs { index, param ->
             val arg = list.getOrNull(index)
             if (arg != null) {
-                GenericAnalyzer(arg, param.ty).analyze(map)
+                GenericAnalyzer(arg, param.ty, context).analyze(map)
             }
             processedIndex = index
             true
@@ -191,7 +196,7 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
         val varargTy = sig.varargTy
         if (varargTy != null && processedIndex < list.lastIndex) {
             val argTy = list[processedIndex + 1]
-            GenericAnalyzer(argTy, varargTy).analyze(map)
+            GenericAnalyzer(argTy, varargTy, context).analyze(map)
         }
         sig.tyParameters.forEach {
             val superCls = it.superClassName
@@ -243,7 +248,7 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
         return Ty.UNKNOWN
     }
 
-    var ret: ITy = Ty.UNKNOWN
+    var ret: ITy = Ty.VOID
     val ty = infer(expr, context)//expr.guessType(context)
     TyUnion.each(ty) {
         when (it) {
@@ -267,12 +272,12 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
         }
     }
 
-    return ret
+    return if (Ty.isInvalid(ret)) Ty.UNKNOWN else ret
 }
 
 private fun LuaNameExpr.infer(context: SearchContext): ITy {
     val set = recursionGuard(this, Computable {
-        var type:ITy = Ty.UNKNOWN
+        var type:ITy = Ty.VOID
 
         context.withRecursionGuard(this, GuardType.GlobalName) {
             val multiResolve = multiResolve(this, context)
@@ -326,7 +331,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
                     return memberType
             }
 
-            var type: ITy = def.docTy ?: Ty.UNKNOWN
+            var type: ITy = def.docTy ?: Ty.VOID
             //guess from value expr
             if (Ty.isInvalid(type) /*&& !context.forStub*/) {
                 val stat = def.assignStat
@@ -345,7 +350,7 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
                 //use globalClassTy to store class members, that's very important
                 type = type.union(TyClass.createGlobalType(def, context.forStub))
             }
-            return type
+            return if (Ty.isInvalid(type)) Ty.UNKNOWN else type
         }
         is LuaTypeGuessable -> return def.guessType(context)
         else -> return Ty.UNKNOWN
@@ -383,19 +388,19 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         // xxx[yyy] as an array element?
         if (indexExpr.brack) {
             val tySet = indexExpr.guessParentType(context)
-            var ty: ITy = Ty.UNKNOWN
+            var ty: ITy = Ty.VOID
 
             // Type[]
             TyUnion.each(tySet) {
                 if (it is ITyArray) ty = ty.union(it.base)
             }
-            if (ty !is TyUnknown) return@Computable ty
+            if (!Ty.isInvalid(ty) && ty !is TyUnknown) return@Computable ty
 
             // table<number, Type>
             TyUnion.each(tySet) {
                 if (it is ITyGeneric) ty = ty.union(it.getParamTy(1))
             }
-            if (ty !is TyUnknown) return@Computable ty
+            if (!Ty.isInvalid(ty) && ty !is TyUnknown) return@Computable ty
 
             parentTy = tySet
         }
@@ -407,11 +412,11 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
 
         // xxx.yyy = zzz
         //from value
-        var result: ITy = Ty.UNKNOWN
+        var result: ITy = Ty.VOID
         val assignStat = indexExpr.assignStat
         if (assignStat != null) {
             result = context.withIndex(assignStat.getIndexFor(indexExpr)) {
-                assignStat.valueExprList?.guessTypeAt(context) ?: Ty.UNKNOWN
+                assignStat.valueExprList?.guessTypeAt(context) ?: Ty.VOID
             }
         }
 
@@ -426,10 +431,11 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
                     result = result.union(ty.getParamTy(1))
             }
         }
-        result
+
+        if (Ty.isInvalid(result)) Ty.UNKNOWN else result
     })
 
-    return retTy ?: Ty.UNKNOWN
+    return retTy ?: Ty.VOID
 }
 
 private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchContext): ITy {
@@ -437,7 +443,7 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
     if (type.className == Constants.WORD_G)
         return TyClass.createGlobalType(fieldName)
 
-    var set:ITy = Ty.UNKNOWN
+    var set:ITy = Ty.VOID
 
     LuaShortNamesManager.getInstance(context.project).processAllMembers(type, fieldName, context, Processor {
         set = set.union(it.guessType(context))
@@ -447,16 +453,57 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
     return set
 }
 
-private fun LuaTableExpr.infer(): ITy {
+private fun LuaTableExpr.infer(context: SearchContext): ITy {
     val list = this.tableFieldList
+
+    if (list.size == 0) {
+        return TyTable(this)
+    }
+
     if (list.size == 1) {
-        val valueExpr = list.first().valueExpr
-        if (valueExpr is LuaLiteralExpr && valueExpr.kind == LuaLiteralKind.Varargs) {
-            val func = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaFuncBodyOwner::class.java)
-            val ty = func?.varargType
-            if (ty != null)
-                return TyArray(ty)
+        val field = list.first()
+
+        if (field.id == null) {
+            val exprList = field.exprList
+
+            if (exprList.size == 1) {
+                val valueExpr = exprList[0]
+
+                if (valueExpr is LuaLiteralExpr && valueExpr.kind == LuaLiteralKind.Varargs) {
+                    val func = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaFuncBodyOwner::class.java)
+                    val ty = func?.varargType
+                    if (ty != null) {
+                        return TyArray(ty)
+                    }
+                } else {
+                    return TyArray(valueExpr.guessType(context))
+                }
+            }
+        }
+
+        return TyTable(this)
+    }
+
+    var keyType: ITy = Ty.VOID
+    var elementType: ITy = Ty.VOID
+
+    list.forEach {
+        val exprList = it.exprList
+
+        if (exprList.size == 2) {
+            keyType = keyType.union(exprList[0].guessType(context))
+            elementType = elementType.union(exprList[1].guessType(context))
+        } else {
+            if (it.id != null) {
+                keyType = keyType.union(Ty.STRING)
+            }
+            elementType = elementType.union(exprList[0].guessType(context))
         }
     }
+
+    if (Ty.isInvalid(keyType)) {
+        return if (Ty.isInvalid(elementType)) Ty.UNKNOWN else TyArray(elementType)
+    }
+
     return TyTable(this)
 }

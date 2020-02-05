@@ -32,9 +32,12 @@ import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
 import com.tang.intellij.lua.lang.type.LuaNumber
 import com.tang.intellij.lua.lang.type.LuaString
+import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.LuaClassMember
+import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaElementFactory
 import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -52,12 +55,6 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
-    val resolvedDef = nameRef.reference.resolve()
-
-    if (resolvedDef is LuaDocGenericDef) {
-        return TyParameter.getTy(nameRef.text, resolvedDef.classNameRef?.text)
-    }
-
     return Ty.create(nameRef.text)
 }
 
@@ -161,6 +158,90 @@ fun getType(tagReturn: LuaDocTagReturn): ITy {
     return Ty.VOID
 }
 
+/*
+fun createClassSubstitutor(clazz: LuaDocTagClass): ITySubstitutor? {
+    if (!LuaSettings.instance.enableGeneric)
+        return null
+
+    val classes = mutableListOf<LuaDocTagClass>()
+    val genericMaps = mutableListOf<MutableMap<String, LuaDocGenericDef>>()
+
+    val searchContext = SearchContext.get(clazz.project)
+    val shortNamesManager = LuaShortNamesManager.getInstance(clazz.project)
+
+    // Collect all ancestors
+
+    var ancestor: LuaDocTagClass? = clazz
+    var childGenerics: List<ITy?> = LuaCommentUtil.findContainer(clazz).findTags(LuaDocGenericDef::class.java).map {
+        val name = it.name
+        if (name != null) TyParameter(name) else null
+    }
+
+    while (ancestor != null) {
+        classes.add(ancestor)
+
+        val genericDefs = LuaCommentUtil.findContainer(ancestor).findTags(LuaDocGenericDef::class.java)
+        val generics = mutableListOf<ITy>()
+        val genericsMap = mutableMapOf<String, LuaDocClassRef>()
+
+        genericDefs.forEachIndexed({ index, luaDocGenericDef ->
+            generics.add(generics)
+            resolvedGenerics[luaDocGenericDef.name] = childGenerics[index]
+        })
+        for (def in genericDefs) {
+            if (def.name != null && def.classRef != null) {
+                genericMap[def.name] =
+                val base = def.classRef
+                if (base != null) {
+                    resolvedGenerics[name] = base
+                }
+            }
+        }
+
+        genericMaps.add()
+
+        val superClassName = ancestor.superClassRef?.classNameRef?.text
+        ancestor = if (superClassName != null) shortNamesManager.findClass(superClassName, searchContext) else null
+    }
+
+
+    if (superClassName != null) {
+
+        while (superClassName != null) {
+            var ancestor = shortNamesManager.findClass(superClassName, searchContext)
+            ancestor.
+        }
+
+        val fieldOwnerClass = if (fieldOwnerType is TyGeneric) fieldOwnerType.base else fieldOwnerType
+
+        if (fieldOwnerClass is TyClass) {
+            val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
+            LuaShortNamesManager.getInstance(project).findClass(superClassName)
+            val superClassComment = (LuaShortNamesManager.getInstance(project).findTypeDef(superClassName, SearchContext.get(project)) as? LuaCommentOwner)?.comment
+            val superClassComment = (typeDef as? LuaDoc
+        }
+
+        if (superClassRef != null) {
+
+        }
+    }
+
+    var superClassParams = clazz.superClassRef?.tyList?.map { it.text }
+    if (map.isEmpty())
+        return null
+
+    return object : TySubstitutor() {
+        override fun substitute(clazz: ITyClass): ITy {
+            val base = map[clazz.className]
+            if (base != null) {
+                val params = if (base.tyList.size > 0) base.tyList.map { it.text }.toTypedArray() else null
+                return TyParameter(clazz.className, base.classNameRef.text, params)
+            }
+            return super.substitute(clazz)
+        }
+    }
+}*/
+
 /**
  * 优化：从stub中取名字
  * @param tagClass LuaDocClassDef
@@ -199,6 +280,11 @@ fun getPresentation(tagClass: LuaDocTagClass): ItemPresentation {
 fun getType(tagClass: LuaDocTagClass): ITyClass {
     val stub = tagClass.stub
     return stub?.classType ?: TyPsiDocClass(tagClass)
+}
+
+fun getType(genericDef: LuaDocGenericDef): ITyClass {
+    val stub = genericDef.stub
+    return stub?.classType ?: TyPsiGenericDefClass(genericDef)
 }
 
 fun isDeprecated(tagClass: LuaDocTagClass): Boolean {
@@ -302,11 +388,11 @@ fun getType(snippet: LuaDocSnippetTy): ITy {
 
 fun getType(unionTy: LuaDocUnionTy): ITy {
     val list = unionTy.tyList
-    var retTy: ITy = Ty.UNKNOWN
+    var retTy: ITy = Ty.VOID
     for (ty in list) {
         retTy = retTy.union(ty.getType())
     }
-    return retTy
+    return if (Ty.isInvalid(retTy)) Ty.UNKNOWN else retTy
 }
 
 fun getReference(see: LuaDocTagSee): PsiReference? {

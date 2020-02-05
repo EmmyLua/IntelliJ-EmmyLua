@@ -25,12 +25,13 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaAliasIndex
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.stubs.index.LuaGenericIndex
 import com.tang.intellij.lua.ty.ITyClass
 
 class LuaShortNamesManagerImpl : LuaShortNamesManager() {
 
     override fun findClass(name: String, context: SearchContext): LuaClass? {
-        return LuaClassIndex.find(name, context)
+        return LuaClassIndex.find(name, context) ?: LuaGenericIndex.find(name, context)
     }
 
     override fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {

@@ -41,7 +41,10 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                     is ITyGeneric -> {
                         val list = mutableListOf<String>()
                         ty.params.forEach { list.add(it.displayName) }
-                        sb.append("${ty.base.displayName}<${list.joinToString(", ")}>")
+
+                        val base = ty.base
+                        val baseName = if (base is ITyClass) base.className else base.displayName
+                        sb.append("${baseName}<${list.joinToString(", ")}>")
                     }
                     is TyParameter -> {
 
@@ -113,7 +116,10 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
             clazz.hasFlag(TyFlags.ANONYMOUS_TABLE) -> renderType(Constants.WORD_TABLE)
             clazz.isAnonymous -> "[local ${clazz.varName}]"
             clazz.isGlobal -> "[global ${clazz.varName}]"
-            else -> renderType(clazz.className)
+            else -> {
+                val params = clazz.params
+                if (params != null && params.size > 0) "${clazz.className}<${params.joinToString(", ")}>" else clazz.className
+            }
         }
     }
 

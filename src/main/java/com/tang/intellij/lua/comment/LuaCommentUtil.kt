@@ -20,9 +20,15 @@ import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
 import com.tang.intellij.lua.comment.psi.api.LuaComment
+import com.tang.intellij.lua.psi.LuaAssignStat
+import com.tang.intellij.lua.psi.LuaClosureExpr
 import com.tang.intellij.lua.psi.LuaCommentOwner
+import com.tang.intellij.lua.psi.LuaLocalDef
+import java.util.*
 
 /**
  *
@@ -56,6 +62,14 @@ object LuaCommentUtil {
 
         if (lastChild is LuaComment) {
             return lastChild
+        }
+
+        val grandParent = element.parent?.parent
+
+        if (grandParent is LuaLocalDef) {
+            return grandParent.comment
+        } else if (grandParent is LuaAssignStat && grandParent.varExprList.children.size == 1) {
+            return grandParent.comment
         }
 
         return null

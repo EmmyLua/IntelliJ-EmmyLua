@@ -29,7 +29,7 @@ interface ITySubstitutor {
     fun substitute(ty: ITy): ITy
 }
 
-class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
+class GenericAnalyzer(arg: ITy, private val par: ITy, private val searchContext: SearchContext) : TyVisitor() {
     var cur: ITy = arg
 
     var map:MutableMap<String, ITy>? = null
@@ -42,7 +42,13 @@ class GenericAnalyzer(arg: ITy, private val par: ITy) : TyVisitor() {
 
     override fun visitClass(clazz: ITyClass) {
         map?.get(clazz.className) ?: return
-        map?.merge(clazz.className, cur) { a, b -> a.union(b) }
+        map?.merge(clazz.className, cur) { a, b ->
+            if (a.contravariantOf(clazz, searchContext, false)) {
+                if (clazz.contravariantOf(b, searchContext, false)) b else clazz
+            } else {
+                a
+            }
+        }
     }
 
     override fun visitUnion(u: TyUnion) {

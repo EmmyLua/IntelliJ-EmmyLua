@@ -13,6 +13,7 @@ public interface LuaDocTypes {
   IElementType ARR_TY = LuaParserDefinitionKt.createDocType("ARR_TY");
   IElementType BOOLEAN_LITERAL_TY = LuaParserDefinitionKt.createDocType("BOOLEAN_LITERAL_TY");
   IElementType CLASS_NAME_REF = LuaParserDefinitionKt.createDocType("CLASS_NAME_REF");
+  IElementType CLASS_REF = LuaParserDefinitionKt.createDocType("CLASS_REF");
   IElementType COMMENT_STRING = LuaParserDefinitionKt.createDocType("COMMENT_STRING");
   IElementType FUNCTION_PARAM = LuaParserDefinitionKt.createDocType("FUNCTION_PARAM");
   IElementType FUNCTION_TY = LuaParserDefinitionKt.createDocType("FUNCTION_TY");
@@ -109,6 +110,9 @@ public interface LuaDocTypes {
       }
       else if (type == CLASS_NAME_REF) {
         return new LuaDocClassNameRefImpl(node);
+      }
+      else if (type == CLASS_REF) {
+        return new LuaDocClassRefImpl(node);
       }
       else if (type == COMMENT_STRING) {
         return new LuaDocCommentStringImpl(node);

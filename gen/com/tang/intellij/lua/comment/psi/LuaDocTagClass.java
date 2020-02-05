@@ -17,6 +17,9 @@ public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner
   LuaDocCommentString getCommentString();
 
   @NotNull
+  List<LuaDocGenericDef> getGenericDefList();
+
+  @NotNull
   PsiElement getId();
 
   @NotNull
@@ -39,7 +42,7 @@ public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner
   boolean isDeprecated();
 
   @Nullable
-  LuaDocClassNameRef getSuperClassNameRef();
+  LuaDocClassRef getSuperClassRef();
 
   @Nullable
   PsiElement getModule();

@@ -72,6 +72,8 @@ interface ITy : Comparable<ITy> {
 
     fun getSuperClass(context: SearchContext): ITy?
 
+    fun getParams(context: SearchContext): Array<TyParameter>?
+
     fun visitSuper(searchContext: SearchContext, processor: Processor<ITyClass>)
 
     fun substitute(substitutor: ITySubstitutor): ITy
@@ -180,6 +182,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return null
     }
 
+    override fun getParams(context: SearchContext): Array<TyParameter>? {
+        return null
+    }
+
     override fun visitSuper(searchContext: SearchContext, processor: Processor<ITyClass>) {
         val superType = getSuperClass(searchContext) as? ITyClass ?: return
         if (processor.process(superType))
@@ -261,7 +267,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         }
 
         fun isInvalid(ty: ITy?): Boolean {
-            return ty == null || ty is TyUnknown || ty is TyVoid
+            return ty == null || ty is TyVoid
         }
 
         private fun getSerializer(kind: TyKind): ITySerializer? {

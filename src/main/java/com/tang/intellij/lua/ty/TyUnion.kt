@@ -140,6 +140,7 @@ class TyUnion : Ty(TyKind.Union) {
         fun union(t1: ITy, t2: ITy): ITy {
             return when {
                 t1 == t2 -> t1
+                t1 is TyUnknown || t2 is TyUnknown -> Ty.UNKNOWN
                 isInvalid(t1) -> t2
                 isInvalid(t2) -> t1
                 t1 is TyUnion -> t1.append(t2)

@@ -20,6 +20,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReferenceBase
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocClassNameRef
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
@@ -48,9 +49,15 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
 
     override fun resolve(): PsiElement? {
         val name = myElement.text
+
         // generic in docFunction
         val fn = PsiTreeUtil.getParentOfType(myElement, LuaDocFunctionTy::class.java)
         var genericDefList: Collection<LuaDocGenericDef>? = fn?.genericDefList
+
+        if (genericDefList == null || genericDefList.isEmpty()) {
+            // generic in doc class
+            genericDefList = LuaCommentUtil.findContainer(myElement).tagClass?.genericDefList
+        }
 
         if (genericDefList == null || genericDefList.isEmpty()) {
             val ancestorDefList = LinkedList<LuaDocGenericDef>()
