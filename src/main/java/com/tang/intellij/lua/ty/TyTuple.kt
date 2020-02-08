@@ -39,10 +39,10 @@ class TyTuple(val list: List<ITy>) : Ty(TyKind.Tuple) {
         list.forEach { it.accept(visitor) }
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         if (other is TyTuple && other.size == size) {
             for (i in 0 until size) {
-                if (!list[i].covariantOf(other.list[i], context, strict)) {
+                if (!list[i].covariantOf(other.list[i], context, flags)) {
                     return false
                 }
             }

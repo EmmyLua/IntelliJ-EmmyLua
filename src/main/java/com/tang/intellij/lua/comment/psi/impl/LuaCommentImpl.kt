@@ -162,13 +162,9 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
             return null
 
         val list = findTags(LuaDocGenericDef::class.java)
-        val map = mutableMapOf<String, LuaDocClassRef>()
-        for (def in list) {
-            val name = def.name
-            if (name != null) {
-                val base = def.classRef
-                if (base != null) map[name] = base
-            }
+        val map = mutableMapOf<String, LuaDocGenericDef>()
+        for (genericDef in list) {
+            map[genericDef.id.text] = genericDef
         }
 
         if (map.isEmpty())
@@ -176,12 +172,7 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
 
         return object : TySubstitutor() {
             override fun substitute(clazz: ITyClass): ITy {
-                val base = map[clazz.className]
-                if (base != null) {
-                    val params = if (base.tyList.size > 0) base.tyList.map { it.text }.toTypedArray() else null
-                    return TyParameter(clazz.className, base.classNameRef.text, params)
-                }
-                return super.substitute(clazz)
+                return map[clazz.className]?.let { TyParameter(it) } ?: super.substitute(clazz)
             }
         }
     }

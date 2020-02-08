@@ -39,7 +39,7 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
             return oriName.replace(".", "")
         }
     }
-    
+
     private fun collectNames(type: ITy, context: SearchContext, collector: (name: String, suffix: String, preferLonger: Boolean) -> Unit) {
         when (type) {
             is ITyClass -> {

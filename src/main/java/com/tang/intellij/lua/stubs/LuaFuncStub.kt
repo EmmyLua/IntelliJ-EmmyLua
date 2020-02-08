@@ -75,7 +75,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         stream.writeTyNullable(stub.returnDocTy)
         stream.writeTyNullable(stub.varargTy)
         stream.writeParamInfoArray(stub.params)
-        stream.writeTyParams(stub.tyParams)
+        stream.writeTyParamsNullable(stub.tyParams)
         stream.writeSignatures(stub.overloads)
     }
 
@@ -86,7 +86,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         val retDocTy = stream.readTyNullable()
         val varargTy = stream.readTyNullable()
         val params = stream.readParamInfoArray()
-        val tyParams = stream.readTyParams()
+        val tyParams = stream.readTyParamsNullable()
         val overloads = stream.readSignatures()
         return LuaFuncStubImpl(StringRef.toString(name),
                 StringRef.toString(module),
@@ -125,7 +125,7 @@ class LuaFuncStubImpl(override val name: String,
                       override val returnDocTy: ITy?,
                       override val varargTy: ITy?,
                       override val params: Array<LuaParamInfo>,
-                      override val tyParams: Array<TyParameter>,
+                      override val tyParams: Array<TyParameter>?,
                       override val overloads: Array<IFunSignature>,
                       parent: StubElement<*>)
     : StubBase<LuaFuncDef>(parent, LuaTypes.FUNC_DEF as IStubElementType<*, *>), LuaFuncStub {

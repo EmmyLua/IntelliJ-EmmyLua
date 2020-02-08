@@ -31,17 +31,16 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.readOptionalTyParams
-import com.tang.intellij.lua.stubs.readParamNames
-import com.tang.intellij.lua.stubs.writeOptionalTyParams
-import com.tang.intellij.lua.stubs.writeParamNames
+import com.tang.intellij.lua.stubs.readTyNullable
+import com.tang.intellij.lua.stubs.readTyParamsNullable
+import com.tang.intellij.lua.stubs.writeTyNullable
+import com.tang.intellij.lua.stubs.writeTyParamsNullable
 
 interface ITyClass : ITy {
     val className: String
     val params: Array<TyParameter>?
     val varName: String
-    var superClassName: String?
-    var superClassParams: Array<String>?
+    var superClass: ITy?
     var aliasName: String?
     fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
@@ -55,6 +54,10 @@ interface ITyClass : ITy {
 
     fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
         return this
+    }
+
+    fun getParamTy(index: Int): ITy {
+        return params?.get(index) ?: Ty.UNKNOWN
     }
 }
 
@@ -78,8 +81,7 @@ fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visi
 abstract class TyClass(override val className: String,
                        override var params: Array<TyParameter>? = null,
                        override val varName: String = "",
-                       override var superClassName: String? = null,
-                       override var superClassParams: Array<String>? = null
+                       override var superClass: ITy? = null
 ) : Ty(TyKind.Class), ITyClass {
 
     final override var aliasName: String? = null
@@ -163,11 +165,11 @@ abstract class TyClass(override val className: String,
 
     open fun doLazyInit(searchContext: SearchContext) {
         if (aliasName == null) {
-            val classDef = LuaShortNamesManager.getInstance(searchContext.project).findClass(className, searchContext)
+            val classDef = LuaPsiTreeUtil.findClass(className, searchContext)
             if (classDef != null) {
                 val tyClass = classDef.type
                 aliasName = tyClass.aliasName
-                superClassName = tyClass.superClassName
+                superClass = tyClass.superClass
                 params = tyClass.params
             }
         }
@@ -175,11 +177,7 @@ abstract class TyClass(override val className: String,
 
     override fun getSuperClass(context: SearchContext): ITy? {
         lazyInit(context)
-        val clsName = superClassName
-        if (clsName != null && clsName != className) {
-            return Ty.getBuiltin(clsName) ?: LuaShortNamesManager.getInstance(context.project).findClass(clsName, context)?.type
-        }
-        return null
+        return superClass
     }
 
     override fun getParams(context: SearchContext): Array<TyParameter>? {
@@ -199,13 +197,13 @@ abstract class TyClass(override val className: String,
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
             val stub = nameDef.stub
             val tyName = stub?.anonymousType ?: getAnonymousType(nameDef)
-            return createSerializedClass(tyName, null, nameDef.name, null, null, null, TyFlags.ANONYMOUS)
+            return createSerializedClass(tyName, null, nameDef.name, null, null, TyFlags.ANONYMOUS)
         }
 
         fun createGlobalType(name: String, store: Boolean = false): ITy {
-            val g = createSerializedClass(getGlobalTypeName(name), null, name, null, null, null, TyFlags.GLOBAL)
+            val g = createSerializedClass(getGlobalTypeName(name), null, name, null, null, TyFlags.GLOBAL)
             if (!store && LuaSettings.instance.isRecognizeGlobalNameAsType)
-                return createSerializedClass(name, null, name, null, null, null, TyFlags.GLOBAL).union(g)
+                return createSerializedClass(name, null, name, null, null, TyFlags.GLOBAL).union(g)
             return g
         }
 
@@ -236,22 +234,9 @@ abstract class TyClass(override val className: String,
 class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(tagClass.name) {
 
     init {
-        params = tagClass.genericDefList.map {
-            TyParameter(it.id.text, it.classRef?.classNameRef?.text, it.classRef?.tyList?.map { it.text }?.toTypedArray())
-        }.toTypedArray()
-        superClassName = tagClass.superClassRef?.classNameRef?.text
-        superClassParams = tagClass.superClassRef?.tyList?.map { it.text }?.toTypedArray()
+        params = tagClass.genericDefList.map { TyParameter(it) }.toTypedArray()
+        superClass = tagClass.superClassRef?.let { Ty.create(it) }
         aliasName = tagClass.aliasName
-    }
-
-    override fun doLazyInit(searchContext: SearchContext) {}
-}
-
-class TyPsiGenericDefClass(luaDocGenericDef: LuaDocGenericDef) : TyClass(luaDocGenericDef.id.text) {
-
-    init {
-        superClassName = luaDocGenericDef.classRef?.classNameRef?.text
-        superClassParams = luaDocGenericDef.classRef?.tyList?.map { it.text }?.toTypedArray()
     }
 
     override fun doLazyInit(searchContext: SearchContext) {}
@@ -260,11 +245,10 @@ class TyPsiGenericDefClass(luaDocGenericDef: LuaDocGenericDef) : TyClass(luaDocG
 open class TySerializedClass(name: String,
                              params: Array<TyParameter>? = null,
                              varName: String = name,
-                             superName: String? = null,
-                             superParams: Array<String>? = null,
+                             superClass: ITy? = null,
                              alias: String? = null,
                              flags: Int = 0)
-    : TyClass(name, params, varName, superName, superParams) {
+    : TyClass(name, params, varName, superClass) {
     init {
         aliasName = alias
         this.flags = flags
@@ -284,8 +268,7 @@ class TyLazyClass(name: String, params: Array<TyParameter>? = null) : TySerializ
 fun createSerializedClass(name: String,
                           params: Array<TyParameter>? = null,
                           varName: String = name,
-                          superName: String? = null,
-                          superParams: Array<String>? = null,
+                          superClass: ITy? = null,
                           alias: String? = null,
                           flags: Int = 0): TyClass {
     val list = name.split("|")
@@ -296,7 +279,7 @@ fun createSerializedClass(name: String,
         }
     }
 
-    return TySerializedClass(name, params, varName, superName, superParams, alias, flags)
+    return TySerializedClass(name, params, varName, superClass, alias, flags)
 }
 
 fun getTableTypeName(table: LuaTableExpr): String {
@@ -310,6 +293,10 @@ fun getTableTypeName(table: LuaTableExpr): String {
 
 fun getAnonymousType(nameDef: LuaNameDef): String {
     return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
+}
+
+fun getAnonymousType(genericDef: LuaDocGenericDef): String {
+    return "${genericDef.node.startOffset}@${genericDef.containingFile.name}"
 }
 
 fun getGlobalTypeName(text: String): String {
@@ -388,26 +375,23 @@ class TySerializedDocTable(name: String) : TySerializedClass(name) {
 object TyClassSerializer : TySerializer<ITyClass>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): ITyClass {
         val className = stream.readName()
-        val params = stream.readOptionalTyParams()
+        val params = stream.readTyParamsNullable()
         val varName = stream.readName()
-        val superName = stream.readName()
-        val superParams = stream.readParamNames()
+        val superClass = stream.readTyNullable()
         val aliasName = stream.readName()
         return createSerializedClass(StringRef.toString(className),
                 params,
                 StringRef.toString(varName),
-                StringRef.toString(superName),
-                superParams,
+                superClass,
                 StringRef.toString(aliasName),
                 flags)
     }
 
     override fun serializeTy(ty: ITyClass, stream: StubOutputStream) {
         stream.writeName(ty.className)
-        stream.writeOptionalTyParams(ty.params)
+        stream.writeTyParamsNullable(ty.params)
         stream.writeName(ty.varName)
-        stream.writeName(ty.superClassName)
-        stream.writeParamNames(ty.superClassParams)
+        stream.writeTyNullable(ty.superClass)
         stream.writeName(ty.aliasName)
     }
 }

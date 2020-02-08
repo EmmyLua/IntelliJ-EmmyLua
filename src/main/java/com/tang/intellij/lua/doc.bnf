@@ -262,12 +262,12 @@ generic_def ::= ID (EXTENDS class_ref)? {
         "com.tang.intellij.lua.psi.LuaClass"
     ]
     methods = [
+        getType
         getNameIdentifier
         setName
         getName
         getTextOffset
     ]
-    stubClass = "com.tang.intellij.lua.stubs.LuaDocGenericDefStub"
 }
 
 private generic_def_list ::= generic_def (',' generic_def)*

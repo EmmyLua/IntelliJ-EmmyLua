@@ -262,7 +262,7 @@ val LuaFuncBodyOwner.overloads: Array<IFunSignature> get() {
     return list.toTypedArray()
 }
 
-val LuaFuncBodyOwner.tyParams: Array<TyParameter> get() {
+val LuaFuncBodyOwner.tyParams: Array<TyParameter>? get() {
     if (this is StubBasedPsiElementBase<*>) {
         val stub = this.stub
         if (stub is LuaFuncBodyOwnerStub<*>) {
@@ -272,11 +272,7 @@ val LuaFuncBodyOwner.tyParams: Array<TyParameter> get() {
 
     val list = mutableListOf<TyParameter>()
     if (this is LuaCommentOwner) {
-        comment?.findTags(LuaDocGenericDef::class.java)?.forEach { generic ->
-            generic.name?.let { name ->
-                list.add(TyParameter(name, generic.classRef?.classNameRef?.text, generic.classRef?.tyList?.map { it.text }?.toTypedArray()))
-            }
-        }
+        comment?.findTags(LuaDocGenericDef::class.java)?.forEach { list.add(TyParameter(it)) }
     }
     return list.toTypedArray()
 }

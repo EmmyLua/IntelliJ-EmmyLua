@@ -18,9 +18,11 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.intellij.util.BitUtil
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.comment.psi.LuaDocClassRef
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.search.SearchContext
 
@@ -54,6 +56,12 @@ class TyFlags {
         const val ANONYMOUS_TABLE = 0x8 // local xx = {}, flag of this table `{}`
     }
 }
+class TyVarianceFlags {
+    companion object {
+        const val STRICT_UNKNOWN = 0x1
+        const val ABSTRACT_PARAMS = 0x2
+    }
+}
 
 interface ITy : Comparable<ITy> {
     val kind: TyKind
@@ -66,9 +74,9 @@ interface ITy : Comparable<ITy> {
 
     fun union(ty: ITy): ITy
 
-    fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
+    fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean
 
-    fun covariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean
+    fun covariantOf(other: ITy, context: SearchContext, flags: Int): Boolean
 
     fun getSuperClass(context: SearchContext): ITy?
 
@@ -154,9 +162,9 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return list.joinToString("|")
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         if (this == other
-                || (other.kind == TyKind.Unknown && !strict)
+                || (other.kind == TyKind.Unknown && flags and TyVarianceFlags.STRICT_UNKNOWN == 0)
                 || (other.kind == TyKind.Nil && !LuaSettings.instance.isNilStrict)) {
             return true
         }
@@ -164,18 +172,18 @@ abstract class Ty(override val kind: TyKind) : ITy {
         if (other is TyUnion || other == Ty.BOOLEAN) {
             var contravariant = true
             TyUnion.process(other, {
-                contravariant = contravariantOf(it, context, strict)
+                contravariant = contravariantOf(it, context, flags)
                 contravariant
             })
             return contravariant
         }
 
         val otherSuper = other.getSuperClass(context)
-        return otherSuper != null && contravariantOf(otherSuper, context, strict)
+        return otherSuper != null && contravariantOf(otherSuper, context, flags)
     }
 
-    override fun covariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return other.contravariantOf(this, context, strict)
+    override fun covariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        return other.contravariantOf(this, context, flags)
     }
 
     override fun getSuperClass(context: SearchContext): ITy? {
@@ -266,6 +274,13 @@ abstract class Ty(override val kind: TyKind) : ITy {
             return getBuiltin(name) ?: TyLazyClass(name)
         }
 
+        fun create(classRef: LuaDocClassRef): ITy {
+            val simpleType = Ty.create(classRef.classNameRef.id.text)
+            return if (classRef.tyList.size > 0) {
+                TySerializedGeneric(classRef.tyList.map { it.getType() }.toTypedArray(), simpleType)
+            } else simpleType
+        }
+
         fun isInvalid(ty: ITy?): Boolean {
             return ty == null || ty is TyVoid
         }
@@ -306,7 +321,7 @@ class TyUnknown : Ty(TyKind.Unknown) {
         return Constants.WORD_ANY.hashCode()
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         return true
     }
 }
@@ -315,14 +330,14 @@ class TyNil : Ty(TyKind.Nil) {
 
     override val booleanType = Ty.FALSE
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         return other.kind == TyKind.Nil
     }
 }
 
 class TyVoid : Ty(TyKind.Void) {
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         return false
     }
 }

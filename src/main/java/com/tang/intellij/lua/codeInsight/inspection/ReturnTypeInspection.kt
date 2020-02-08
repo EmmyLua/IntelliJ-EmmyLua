@@ -35,7 +35,7 @@ class ReturnTypeInspection : StrictInspection() {
                     if (o.parent is PsiFile)
                         return
 
-                    val context = SearchContext.get(o.project)
+                    val context = SearchContext.get(o)
                     val bodyOwner = PsiTreeUtil.getParentOfType(o, LuaFuncBodyOwner::class.java) ?: return
                     val abstractType = if (bodyOwner is LuaClassMethodDef) {
                         guessSuperReturnTypes(bodyOwner, context)
@@ -66,7 +66,7 @@ class ReturnTypeInspection : StrictInspection() {
                         }
                     } else {
                         for (i in 0 until concreteTypes.size) {
-                            if (!abstractTypes[i].contravariantOf(concreteTypes[i], context, false)) {
+                            if (!abstractTypes[i].contravariantOf(concreteTypes[i], context, 0)) {
                                 val abstractString = abstractTypes.joinToString(", ") { it.displayName }
                                 val concreteString = concreteTypes.joinToString(", ") { it.displayName }
                                 myHolder.registerProblem(o, "Type mismatch. Expected: '$abstractString' Found: '$concreteString'")

@@ -32,10 +32,10 @@ interface IFunSignature {
     val params: Array<LuaParamInfo>
     val displayName: String
     val paramSignature: String
-    val tyParameters: Array<TyParameter>
+    val tyParameters: Array<TyParameter>?
     val varargTy: ITy?
     fun substitute(substitutor: ITySubstitutor): IFunSignature
-    fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean
+    fun contravariantOf(other: IFunSignature, context: SearchContext, flags: Int): Boolean
 }
 
 fun IFunSignature.processArgs(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
@@ -101,11 +101,11 @@ fun IFunSignature.hasVarargs(): Boolean {
     return this.varargTy != null
 }
 
-fun IFunSignature.isGeneric() = tyParameters.isNotEmpty()
+fun IFunSignature.isGeneric() = tyParameters?.isNotEmpty() == true
 
 abstract class FunSignatureBase(override val colonCall: Boolean,
                                 override val params: Array<LuaParamInfo>,
-                                override val tyParameters: Array<TyParameter> = emptyArray()
+                                override val tyParameters: Array<TyParameter>? = null
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
@@ -150,16 +150,16 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
                 tyParameters)
     }
 
-    override fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean {
-        for (i in params.indices) {
-            val param = params[i]
-            val otherParam = other.params.getOrNull(i) ?: return false
-            if (!param.ty.contravariantOf(otherParam.ty, context, strict)) {
+    override fun contravariantOf(other: IFunSignature, context: SearchContext, flags: Int): Boolean {
+        for (i in other.params.indices) {
+            val param = params.getOrNull(i) ?: return false
+            val otherParam = other.params[i]
+            if (!otherParam.ty.contravariantOf(param.ty, context, flags)) {
                 return false
             }
         }
 
-        return other.returnTy.contravariantOf(returnTy, context, strict)
+        return returnTy.contravariantOf(other.returnTy, context, flags)
     }
 }
 
@@ -167,7 +167,7 @@ class FunSignature(colonCall: Boolean,
                    override val returnTy: ITy,
                    override val varargTy: ITy?,
                    params: Array<LuaParamInfo>,
-                   tyParameters: Array<TyParameter> = emptyArray()
+                   tyParameters: Array<TyParameter>? = null
 ) : FunSignatureBase(colonCall, params, tyParameters) {
 
     companion object {
@@ -183,20 +183,12 @@ class FunSignature(colonCall: Boolean,
         }
 
         fun create(colonCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
-            val params = mutableListOf<TyParameter>()
-
-            functionTy.genericDefList.forEach { generic ->
-                generic.name?.let { name ->
-                    params.add(TyParameter(name, generic.classRef?.classNameRef?.text, generic.classRef?.tyList?.map { it.text }?.toTypedArray()))
-                }
-            }
-
             return FunSignature(
                     colonCall,
                     functionTy.returnType,
                     functionTy.varargParam?.type,
                     initParams(functionTy),
-                    params.toTypedArray()
+                    functionTy.genericDefList.map { TyParameter(it) }.toTypedArray()
             )
         }
 
@@ -263,15 +255,18 @@ class SignatureProblem(val element: PsiElement, val problem: String) {
 class SignatureMatchResult {
     val problems: MutableMap<IFunSignature, Collection<SignatureProblem>>?
     val signature: IFunSignature?
+    val substitutedSignature: IFunSignature?
 
     constructor(problems: MutableMap<IFunSignature, Collection<SignatureProblem>>) {
         this.problems = problems
         this.signature = null
+        this.substitutedSignature = null
     }
 
-    constructor(match: IFunSignature?) {
+    constructor(signature: IFunSignature, substitutedSignature: IFunSignature) {
         this.problems = null
-        this.signature = match
+        this.signature = signature
+        this.substitutedSignature = substitutedSignature
     }
 }
 
@@ -310,7 +305,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
 
             val paramType = pi.ty
             val type = typeInfo.ty
-            val assignable: Boolean = paramType.contravariantOf(type, searchContext, false)
+            val assignable: Boolean = paramType.contravariantOf(type, searchContext, 0)
 
             if (!assignable) {
                 signatureProblems.add(SignatureProblem(typeInfo.param, "Type mismatch for argument: ${pi.name}. Required: '${pi.ty}' Found: '$type'"))
@@ -325,9 +320,8 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
             }
         }
 
-
         if (signatureProblems.size == 0) {
-            return SignatureMatchResult(it)
+            return SignatureMatchResult(it, signature)
         } else {
             problems.put(it, signatureProblems)
         }
@@ -355,15 +349,15 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
         return code
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.contravariantOf(other, context, strict)) return true
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        if (super.contravariantOf(other, context, flags)) return true
 
         var matched = false
 
         if (other is ITyFunction) {
             process(Processor { sig ->
                 other.process(Processor { otherSig ->
-                    matched = otherSig.subTypeOf(sig, context, strict)
+                    matched = sig.contravariantOf(sig, context, flags)
                     !matched
                 })
                 !matched

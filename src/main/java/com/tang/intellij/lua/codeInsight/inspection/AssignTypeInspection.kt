@@ -35,7 +35,7 @@ class AssignTypeInspection : StrictInspection() {
 
                     val assignees = o.varExprList.exprList
                     val values = o.valueExprList?.exprList ?: listOf()
-                    val searchContext = SearchContext.get(o.project)
+                    val searchContext = SearchContext.get(o)
 
                     // Check right number of fields/assignments
                     if (assignees.size > values.size) {
@@ -63,14 +63,14 @@ class AssignTypeInspection : StrictInspection() {
                                 if (fieldOwnerClass is TyClass) {
                                     val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
 
-                                    if (!fieldType.contravariantOf(valueType, searchContext, false)) {
+                                    if (!fieldType.contravariantOf(valueType, searchContext, 0)) {
                                         myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                     }
                                 }
                             } else {
                                 val fieldType = field.guessType(searchContext)
 
-                                if (!fieldType.contravariantOf(valueType, searchContext, false)) {
+                                if (!fieldType.contravariantOf(valueType, searchContext, 0)) {
                                     myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                 }
                             }

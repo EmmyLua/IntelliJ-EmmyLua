@@ -22,6 +22,7 @@ import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.ITyRenderer
 
 inline fun StringBuilder.wrap(prefix: String, postfix: String, crossinline body: () -> Unit) {
@@ -148,16 +149,18 @@ fun renderClassDef(sb: StringBuilder, tag: LuaDocTagClass, tyRenderer: ITyRender
     sb.append("<pre>")
     sb.append("class ")
     sb.wrapTag("b") { tyRenderer.render(cls, sb) }
-    val superClassName = cls.superClassName
-    if (superClassName != null) {
-        sb.append(" : ")
-        sb.appendClassLink(superClassName)
 
-        val superClassParams = cls.superClassParams
-        if (superClassParams != null) {
-            sb.append("<${superClassParams.joinToString(", ")}>")
+    cls.superClass?.let { superClass ->
+        sb.append(" : ")
+
+        if (superClass is ITyClass) {
+            sb.appendClassLink(superClass.className)
+            superClass.params?.let { sb.append("<${it.joinToString(", ")}>") }
+        } else {
+            sb.append(superClass)
         }
     }
+
     sb.append("</pre>")
     renderCommentString(" - ", null, sb, tag.commentString)
 }

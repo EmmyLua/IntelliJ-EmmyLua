@@ -23,11 +23,18 @@ import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
+import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy;
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef;
+import com.tang.intellij.lua.comment.psi.api.LuaComment;
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
 import com.tang.intellij.lua.ty.Ty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -73,13 +80,13 @@ public class LuaPsiTreeUtil {
         return t;
     }
 
-    public static <T extends PsiElement> T getParentOfType(@Nullable PsiElement element, @NotNull Class<T> aClass, @NotNull Class... skips) {
+    public static <T extends PsiElement> T findAncestorOfType(@Nullable PsiElement element, @NotNull Class<T> aClass, @NotNull Class... skips) {
         if (element == null) {
             return null;
         } else {
             element = element.getParent();
 
-            while(element != null && !aClass.isInstance(element) && PsiTreeUtil.instanceOf(element, skips)) {
+            while (element != null && (!aClass.isInstance(element) || PsiTreeUtil.instanceOf(element, skips))) {
                 if (element instanceof PsiFile) {
                     return null;
                 }
@@ -124,6 +131,56 @@ public class LuaPsiTreeUtil {
             current = current.getParent();
         }
         return Ty.Companion.getUNKNOWN();
+    }
+
+    @Nullable
+    public static LuaDocGenericDef findGenericDef(String name, PsiElement current) {
+        LuaDocFunctionTy fn = findAncestorOfType(current, LuaDocFunctionTy.class);
+        List<LuaDocGenericDef> genericDefList = fn != null ? fn.getGenericDefList() : null;
+
+        if (genericDefList != null) {
+            for (LuaDocGenericDef genericDef : genericDefList) {
+                if (name.equals(genericDef.getId().getText()))
+                {
+                    return genericDef;
+                }
+            }
+        }
+
+        LuaCommentOwner commentOwner = findAncestorOfType(current, LuaCommentOwner.class);
+
+        while (commentOwner != null) {
+            LuaComment ancestorComment = commentOwner.getComment();
+            Collection<LuaDocGenericDef> genericDefs = ancestorComment != null ? ancestorComment.findTags(LuaDocGenericDef.class) : null;
+
+            if (genericDefs != null) {
+                for (LuaDocGenericDef genericDef : genericDefs) {
+                    if (name.equals(genericDef.getId().getText()))
+                    {
+                        return genericDef;
+                    }
+                }
+            }
+
+            commentOwner = findAncestorOfType(commentOwner, LuaCommentOwner.class);
+        }
+
+        return null;
+    }
+
+    @Nullable
+    public static LuaClass findClass(String name, SearchContext searchContext) {
+        PsiElement element = searchContext.getElement();
+
+        if (element != null) {
+            LuaDocGenericDef luaDocGenericDef = findGenericDef(name, element);
+
+            if (luaDocGenericDef != null) {
+                return luaDocGenericDef;
+            }
+        }
+
+        return LuaShortNamesManager.Companion.getInstance(searchContext.getProject()).findClass(name, searchContext);
     }
 
     public static void processChildren(PsiElement parent, PsiElementProcessor<PsiElement> processor) {

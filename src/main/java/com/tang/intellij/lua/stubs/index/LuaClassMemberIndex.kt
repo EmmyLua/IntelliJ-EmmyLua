@@ -55,7 +55,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                 return false
 
             if (deep) {
-                val classDef: LuaClass? = LuaClassIndex.find(className, context) ?: LuaGenericIndex.find(className, context)
+                val classDef = LuaClassIndex.find(className, context)
                 if (classDef != null) {
                     val type = classDef.type
                     // from alias
@@ -103,7 +103,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
 
         fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             return if (type is TyParameter)
-                type.superClassName?.let { process(it, fieldName, context, processor) } ?: true
+                (type.superClass as? ITyClass)?.let { process(it.className, fieldName, context, processor) } ?: true
             else process(type.className, fieldName, context, processor)
         }
 

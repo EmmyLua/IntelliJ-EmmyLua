@@ -25,7 +25,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocGeneralTy
 import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.comment.psi.LuaDocType
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
-import com.tang.intellij.lua.psi.search.LuaShortNamesManager
+import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 import com.tang.intellij.lua.search.SearchContext
 
 fun parameterText(count: Int): String {
@@ -37,8 +37,8 @@ class GenericConstraintInspection : LocalInspectionTool() {
         return object : LuaDocVisitor() {
             override fun visitType(o: LuaDocType) {
                 if (o is LuaDocGenericTy) {
-                    val context = SearchContext.get(o.project)
-                    val params = LuaShortNamesManager.getInstance(context.project).findClass(o.classNameRef.text, context)?.type?.params
+                    val context = SearchContext.get(o)
+                    val params = LuaPsiTreeUtil.findClass(o.classNameRef.text, context)?.type?.params
 
                     if (params != null && params.size > 0) {
                         if (params.size != o.tyList.size) {
@@ -48,7 +48,7 @@ class GenericConstraintInspection : LocalInspectionTool() {
                         params.forEachIndexed { index, param ->
                             if (index < o.tyList.size) {
                                 val valueType = o.tyList[index].getType()
-                                if (!param.contravariantOf(valueType, context, false)){
+                                if (!param.contravariantOf(valueType, context, 0)) {
                                     holder.registerProblem(o, "Type mismatch. Required: '%s' Found: '%s'".format(param, valueType))
                                 }
                             }
@@ -62,7 +62,7 @@ class GenericConstraintInspection : LocalInspectionTool() {
                     }
                 } else if (o is LuaDocGeneralTy) {
                     val context = SearchContext.get(o.project)
-                    val params = LuaShortNamesManager.getInstance(context.project).findClass(o.classNameRef.text, context)?.type?.params
+                    val params = LuaPsiTreeUtil.findClass(o.classNameRef.text, context)?.type?.params
 
                     if (params != null && params.size > 0) {
                         holder.registerProblem(o, "\"${o.classNameRef.text}\" requires ${params.size} generic ${parameterText(params.size)}", ProblemHighlightType.ERROR)

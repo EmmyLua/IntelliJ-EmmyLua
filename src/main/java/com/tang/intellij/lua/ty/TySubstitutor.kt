@@ -29,24 +29,61 @@ interface ITySubstitutor {
     fun substitute(ty: ITy): ITy
 }
 
-class GenericAnalyzer(arg: ITy, private val par: ITy, private val searchContext: SearchContext) : TyVisitor() {
-    var cur: ITy = arg
+class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: SearchContext) : TyVisitor() {
+    val map: MutableMap<String, ITy> = mutableMapOf()
 
-    var map:MutableMap<String, ITy>? = null
+    private val substitutor = TyParameterSubstitutor(map)
+    private val constraints : Map<String, ITy>
 
-    fun analyze(result: MutableMap<String, ITy>) {
-        map = result
+    protected var cur: ITy
+
+    init {
+        val constraints = mutableMapOf<String, ITy>()
+
+        params?.forEach {
+            constraints[it.name] = it
+            map[it.name] = Ty.VOID
+        }
+
+        this.constraints = constraints.toMap()
+        this.cur = Ty.VOID
+    }
+
+    fun analyze(arg: ITy, par: ITy) {
+        cur = arg
         warp(cur) { par.accept(this) }
-        map = null
+        cur = Ty.VOID
     }
 
     override fun visitClass(clazz: ITyClass) {
-        map?.get(clazz.className) ?: return
-        map?.merge(clazz.className, cur) { a, b ->
-            if (a.contravariantOf(clazz, searchContext, false)) {
-                if (clazz.contravariantOf(b, searchContext, false)) b else clazz
-            } else {
-                a
+        cur.let {
+            if (it is ITyClass) {
+                it.params?.forEachIndexed { index, iTy ->
+                    warp(iTy) {
+                        clazz.getParamTy(index).accept(this)
+                    }
+                }
+            }
+        }
+
+        if (clazz is TyParameter) {
+            val genericName = clazz.varName
+            val constraint = constraints.get(genericName)
+
+            if (constraint != null) {
+                map.merge(genericName, cur.substitute(substitutor)) { a, b ->
+                    if (constraint.contravariantOf(b, searchContext, TyVarianceFlags.ABSTRACT_PARAMS)) {
+                        if (a.contravariantOf(b, searchContext, 0)) {
+                            a
+                        } else if (b.contravariantOf(a, searchContext, 0)) {
+                            b
+                        } else {
+                            a.union(b)
+                        }
+                    } else {
+                        constraint
+                    }
+                }
             }
         }
     }
@@ -56,7 +93,7 @@ class GenericAnalyzer(arg: ITy, private val par: ITy, private val searchContext:
     }
 
     override fun visitArray(array: ITyArray) {
-        TyUnion.each(cur) {
+        cur.let {
             if (it is ITyArray) {
                 warp(it.base) {
                     array.base.accept(this)
@@ -66,7 +103,7 @@ class GenericAnalyzer(arg: ITy, private val par: ITy, private val searchContext:
     }
 
     override fun visitFun(f: ITyFunction) {
-        TyUnion.each(cur) {
+        cur.let {
             if (it is ITyFunction) {
                 visitSig(it.mainSignature, f.mainSignature)
             }
@@ -74,7 +111,7 @@ class GenericAnalyzer(arg: ITy, private val par: ITy, private val searchContext:
     }
 
     override fun visitGeneric(generic: ITyGeneric) {
-        TyUnion.each(cur) {
+        cur.let {
             if (it is ITyGeneric) {
                 warp(it.base) {
                     generic.base.accept(this)
@@ -83,6 +120,14 @@ class GenericAnalyzer(arg: ITy, private val par: ITy, private val searchContext:
                     warp(iTy) {
                         generic.getParamTy(index).accept(this)
                     }
+                }
+            } else if (it is ITyArray && generic.base == Ty.TABLE && generic.params.size == 2) {
+                warp (Ty.NUMBER) {
+                    generic.params[0].accept(this)
+                }
+
+                warp(it.base) {
+                    generic.params[1].accept(this)
                 }
             }
         }
@@ -158,5 +203,11 @@ class TySelfSubstitutor(val project: Project, val call: LuaCallExpr?, val self: 
             return selfType
         }
         return super.substitute(clazz)
+    }
+}
+
+class TyParameterSubstitutor(val map: Map<String, ITy>) : TySubstitutor() {
+    override fun substitute(clazz: ITyClass): ITy {
+        return if (clazz is TyParameter) map.get(clazz.varName) ?: clazz else clazz
     }
 }

@@ -30,7 +30,7 @@ import com.tang.intellij.lua.ty.*
 interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
     val returnDocTy:ITy?
     val params: Array<LuaParamInfo>
-    val tyParams: Array<TyParameter>
+    val tyParams: Array<TyParameter>?
     val overloads: Array<IFunSignature>
     val varargTy: ITy?
 

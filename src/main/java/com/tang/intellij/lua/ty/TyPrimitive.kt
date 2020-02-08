@@ -38,10 +38,10 @@ class TyPrimitive(override val primitiveKind: TyPrimitiveKind,
         return primitiveKind.hashCode()
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return super.contravariantOf(other, context, strict)
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        return super.contravariantOf(other, context, flags)
                 || (other is ITyPrimitive && other.primitiveKind == primitiveKind)
-                || (!strict && (
+                || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && (
                     (primitiveKind == TyPrimitiveKind.Table && (other.kind == TyKind.Array || other.kind == TyKind.Class))
                     || (primitiveKind == TyPrimitiveKind.Function && other.kind == TyKind.Function)
                 ))
@@ -66,8 +66,8 @@ class TyPrimitiveClass(override val primitiveKind: TyPrimitiveKind,
         return primitiveKind.hashCode()
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return super.contravariantOf(other, context, strict)
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        return super.contravariantOf(other, context, flags)
                 || (other is ITyPrimitive && other.primitiveKind == primitiveKind)
     }
 }

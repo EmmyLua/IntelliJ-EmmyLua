@@ -32,7 +32,7 @@ import java.util.*
 
  * Created by tangzx on 2017/1/14.
  */
-class SearchContext private constructor(val project: Project) {
+class SearchContext {
 
     companion object {
         private val threadLocal = object : ThreadLocal<Stack<SearchContext>>() {
@@ -48,6 +48,11 @@ class SearchContext private constructor(val project: Project) {
             } else {
                 stack.peek()
             }
+        }
+
+        fun get(element: PsiElement): SearchContext {
+            val stack = threadLocal.get()
+            return stack.find { c -> c.element == element } ?: SearchContext(element)
         }
 
         fun infer(psi: LuaTypeGuessable): ITy {
@@ -107,6 +112,8 @@ class SearchContext private constructor(val project: Project) {
         }
     }
 
+    val project: Project
+    val element: PsiElement?
     /**
      * 用于有多返回值的索引设定
      */
@@ -119,6 +126,16 @@ class SearchContext private constructor(val project: Project) {
     private val myGuardList = mutableListOf<InferRecursionGuard>()
     private val myInferCache = mutableMapOf<LuaTypeGuessable, ITy>()
     private var myScope: GlobalSearchScope? = null
+
+    private constructor(project: Project) {
+        this.project = project
+        element = null
+    }
+
+    private constructor(element: PsiElement) {
+        project = element.project
+        this.element = element
+    }
 
     fun <T> withIndex(index: Int, action: () -> T): T {
         val savedIndex = this.index

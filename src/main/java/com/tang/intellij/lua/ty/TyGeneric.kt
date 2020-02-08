@@ -19,24 +19,33 @@ package com.tang.intellij.lua.ty
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.io.StringRef
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.LuaDocGenericTy
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.readParamNames
-import com.tang.intellij.lua.stubs.writeParamNames
+import com.tang.intellij.lua.stubs.readTyNullable
+import com.tang.intellij.lua.stubs.writeTyNullable
 
-class TyParameter(val name: String, base: String? = null, baseParams: Array<String>? = null) : TySerializedClass(name, emptyArray(), name, base, baseParams) {
+class TyParameter(val name: String, varName: String, superClass: ITy? = null) : TySerializedClass(name, emptyArray(), varName, superClass, null, TyFlags.ANONYMOUS) {
+
+    constructor(def: LuaDocGenericDef) : this(def.id.text, def.id.text, def.classRef?.let { Ty.create(it) })
+
     override val kind: TyKind
         get() = TyKind.GenericParam
-
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return super.contravariantOf(other, context, strict)
-                || getSuperClass(context)?.contravariantOf(other, context, strict) != false
-    }
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         val superType = getSuperClass(context) as? ITyClass ?: return
         superType.processMembers(context, processor, deep)
+    }
+
+    override fun toString(): String {
+        return displayName
+    }
+
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        return if (flags and TyVarianceFlags.ABSTRACT_PARAMS != 0) {
+            superClass?.contravariantOf(other, context, flags) ?: true
+        } else super.contravariantOf(other, context, flags)
     }
 
     override fun doLazyInit(searchContext: SearchContext) {}
@@ -45,14 +54,15 @@ class TyParameter(val name: String, base: String? = null, baseParams: Array<Stri
 object TyGenericParamSerializer : TySerializer<TyParameter>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): TyParameter {
         val name = StringRef.toString(stream.readName())
-        val base = StringRef.toString(stream.readName())
-        return TyParameter(name, base, stream.readParamNames())
+        val varName = StringRef.toString(stream.readName())
+        val superClass = stream.readTyNullable()
+        return TyParameter(name, varName, superClass)
     }
 
     override fun serializeTy(ty: TyParameter, stream: StubOutputStream) {
         stream.writeName(ty.name)
-        stream.writeName(ty.superClassName)
-        stream.writeParamNames(ty.superClassParams)
+        stream.writeName(ty.varName)
+        stream.writeTyNullable(ty.superClass)
     }
 }
 
@@ -79,18 +89,18 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         return base.getSuperClass(context)
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.contravariantOf(other, context, strict)) return true
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        if (super.contravariantOf(other, context, flags)) return true
 
         if (other is ITyArray) {
             return base == Ty.TABLE
                     && params.size == 2
                     && (
                         params[0] == Ty.NUMBER
-                        || (params[0] is TyUnknown && !strict)
+                        || (params[0] is TyUnknown && flags and TyVarianceFlags.STRICT_UNKNOWN == 0)
                     ) && (
                         params[1] == other.base
-                        || (!strict && params[1].contravariantOf(other.base, context, strict))
+                        || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && params[1].contravariantOf(other.base, context, flags))
                     )
         }
 
@@ -116,14 +126,15 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         }
 
         return otherBase != null && otherParams != null
-                && base.contravariantOf(otherBase, context, strict)
+                && base.contravariantOf(otherBase, context, flags)
                 && params.size == otherParams.size
                 && params.indices.all { i -> // Params are always invariant as we don't support use-site variance nor immutable/read-only annotations
                     val param = params[i]
                     val otherParam = otherParams[i]
                     return param.equals(otherParam)
                             || param is TyUnknown
-                            || (otherParam is TyUnknown && !strict)
+                            || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && otherParam is TyUnknown)
+                            || (flags and TyVarianceFlags.ABSTRACT_PARAMS != 0 && param is TyParameter && param.contravariantOf(otherParam, context, flags))
                 }
     }
 

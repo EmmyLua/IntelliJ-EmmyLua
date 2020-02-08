@@ -22,6 +22,8 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.comment.LuaCommentUtil
+import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocTagTypeImpl
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.type.LuaNumber
@@ -53,12 +55,7 @@ fun inferExpr(expr: LuaExpr?, context: SearchContext): ITy {
         val tree = LuaDeclarationTree.get(expr.containingFile)
         val declaration = tree.find(expr)?.firstDeclaration?.psi
         if (declaration != expr && declaration is LuaTypeGuessable) {
-            val declarationType = declaration.guessType(context)
-            return if (declarationType is TyParameter) {
-                // Parameters are contravariant when superClass is contravariant at the call site.
-                // In this context we have an instantiated type, which adheres to regular co/contra-variance.
-                TySerializedClass(declarationType.className, emptyArray(), declarationType.className, declarationType.superClassName, declarationType.superClassParams)
-            } else declarationType
+            return declaration.guessType(context)
         }
     }
     return inferExprInner(expr, context)
@@ -181,13 +178,14 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
             }
         }
         this.argList.map { list.add(it.guessType(context)) }
-        val map = mutableMapOf<String, ITy>()
+
+        val genericAnalyzer = GenericAnalyzer(sig.tyParameters, context)
+
         var processedIndex = -1
-        sig.tyParameters.forEach { map[it.name] = Ty.UNKNOWN }
         sig.processArgs { index, param ->
             val arg = list.getOrNull(index)
             if (arg != null) {
-                GenericAnalyzer(arg, param.ty, context).analyze(map)
+                genericAnalyzer.analyze(arg, param.ty)
             }
             processedIndex = index
             true
@@ -196,17 +194,15 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
         val varargTy = sig.varargTy
         if (varargTy != null && processedIndex < list.lastIndex) {
             val argTy = list[processedIndex + 1]
-            GenericAnalyzer(argTy, varargTy, context).analyze(map)
+            genericAnalyzer.analyze(argTy, varargTy)
         }
-        sig.tyParameters.forEach {
-            val superCls = it.superClassName
-            if (Ty.isInvalid(map[it.name]) && superCls != null) map[it.name] = Ty.create(superCls)
+
+        val map = genericAnalyzer.map.toMutableMap()
+        sig.tyParameters?.forEach {
+            val superCls = it.superClass
+            if (superCls != null && Ty.isInvalid(map[it.name])) map[it.name] = superCls
         }
-        return object : TySubstitutor() {
-            override fun substitute(clazz: ITyClass): ITy {
-                return map.getOrElse(clazz.className) { clazz }
-            }
-        }
+        return TyParameterSubstitutor(map)
     }
     return null
 }
@@ -255,8 +251,8 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
             is ITyFunction -> {
                 val match = it.matchSignature(this, context)
 
-                if (match.signature != null) {
-                    ret = ret.union(getReturnTy(match.signature, context))
+                if (match.substitutedSignature != null) {
+                    ret = ret.union(getReturnTy(match.substitutedSignature, context))
                 }
             }
             //constructor : Class table __call

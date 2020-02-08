@@ -79,7 +79,6 @@ class LuaParserDefinition : ParserDefinition {
         if (type === LuaElementType.DOC_COMMENT)
             return LuaCommentImpl(node)
         return if (type is LuaDocElementType
-                || type === LuaElementType.GENERIC_DEF
                 || type === LuaElementType.DOC_TABLE_DEF
                 || type === LuaElementType.DOC_TABLE_FIELD_DEF
                 || type === LuaElementType.CLASS_DEF
@@ -212,7 +211,6 @@ fun createToken(string: String): IElementType {
 
 fun createDocType(string: String): IElementType {
     return when (string) {
-        "GENERIC_DEF" -> LuaElementType.GENERIC_DEF
         "TAG_CLASS" -> LuaElementType.CLASS_DEF
         "TAG_FIELD" -> LuaElementType.CLASS_FIELD_DEF
         "TABLE_DEF" -> LuaElementType.DOC_TABLE_DEF

@@ -38,7 +38,7 @@ class LuaLocalFuncDefElementType
         stream.writeTyNullable(stub.returnDocTy)
         stream.writeTyNullable(stub.varargTy)
         stream.writeParamInfoArray(stub.params)
-        stream.writeTyParams(stub.tyParams)
+        stream.writeTyParamsNullable(stub.tyParams)
         stream.writeSignatures(stub.overloads)
     }
 
@@ -67,7 +67,7 @@ class LuaLocalFuncDefElementType
         val retDocTy = stream.readTyNullable()
         val varargTy = stream.readTyNullable()
         val params = stream.readParamInfoArray()
-        val tyParams = stream.readTyParams()
+        val tyParams = stream.readTyParamsNullable()
         val overloads = stream.readSignatures()
         return LuaLocalFuncDefStub(StringRef.toString(name),
                 retDocTy,
@@ -93,7 +93,7 @@ class LuaLocalFuncDefStub(
         override val returnDocTy: ITy?,
         override val varargTy: ITy?,
         override val params: Array<LuaParamInfo>,
-        override val tyParams: Array<TyParameter>,
+        override val tyParams: Array<TyParameter>?,
         override val overloads: Array<IFunSignature>,
         parent: StubElement<*>?,
         type: LuaStubElementType<*, *>

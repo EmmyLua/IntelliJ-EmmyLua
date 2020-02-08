@@ -64,6 +64,6 @@ class LuaClosureExprStub(
         override val overloads: Array<IFunSignature>,
         parent: StubElement<*>?
 ) : LuaStubBase<LuaClosureExpr>(parent, LuaElementTypes.CLOSURE_EXPR), LuaFuncBodyOwnerStub<LuaClosureExpr>, LuaExprStub<LuaClosureExpr> {
-    override val tyParams: Array<TyParameter>
+    override val tyParams: Array<TyParameter>?
         get() = emptyArray()
 }

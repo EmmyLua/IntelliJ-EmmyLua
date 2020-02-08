@@ -79,56 +79,29 @@ fun StubInputStream.readNames(): Array<String> {
     return list.toTypedArray()
 }
 
-fun StubOutputStream.writeParamNames(paramNames: Array<String>?) {
-    writeByte(paramNames?.size ?: 0)
-    paramNames?.forEach { writeName(it) }
+fun StubOutputStream.writeTyParamsNullable(tyParams: Array<TyParameter>?) {
+    writeByte(if (tyParams != null) tyParams.size else 0)
+    tyParams?.forEach { parameter ->
+        writeName(parameter.name)
+        writeName(parameter.varName)
+        writeTyNullable(parameter.superClass)
+    }
 }
 
-fun StubInputStream.readParamNames(): Array<String>? {
+fun StubInputStream.readTyParamsNullable(): Array<TyParameter>? {
+    val list = mutableListOf<TyParameter>()
     val size = readByte()
 
     if (size == 0.toByte()) {
         return null
     }
 
-    val list = mutableListOf<String>()
-
-    for (i in 0 until size) {
-        list.add(StringRef.toString(readName()))
-    }
-
-    return list.toTypedArray()
-}
-
-fun StubOutputStream.writeTyParams(tyParams: Array<TyParameter>) {
-    writeByte(tyParams.size)
-    tyParams.forEach { parameter ->
-        writeName(parameter.name)
-        writeName(parameter.superClassName)
-        writeParamNames(parameter.superClassParams)
-    }
-}
-
-fun StubInputStream.readTyParams(): Array<TyParameter> {
-    val list = mutableListOf<TyParameter>()
-    val size = readByte()
     for (i in 0 until size) {
         val name = StringRef.toString(readName())
-        val base = StringRef.toString(readName())
-        list.add(TyParameter(name, base, readParamNames()))
+        val varName = StringRef.toString(readName())
+        val superClass = readTyNullable()
+        list.add(TyParameter(name, varName, superClass))
     }
+
     return list.toTypedArray()
-}
-
-fun StubOutputStream.writeOptionalTyParams(tyParams: Array<TyParameter>?) {
-    if (tyParams != null) {
-        writeTyParams(tyParams)
-    } else {
-        writeByte(0)
-    }
-}
-
-fun StubInputStream.readOptionalTyParams(): Array<TyParameter>? {
-    val params = readTyParams()
-    return if (params.size == 0) null else params
 }

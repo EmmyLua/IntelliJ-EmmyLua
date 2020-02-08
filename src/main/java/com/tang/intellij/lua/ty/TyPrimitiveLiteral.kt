@@ -45,8 +45,13 @@ class TyPrimitiveLiteral private constructor(override val primitiveKind: TyPrimi
         TyPrimitiveKind.Table -> Ty.TABLE
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        return this == other || (other is TyUnknown && !strict) // Even with 'Strict nil checks' as false, nil is never assignable to a primitive literal.
+    override fun getSuperClass(context: SearchContext): ITy? {
+        return primitiveType
+    }
+
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        // Even when !LuaSettings.instance.isNilStrict, nil is never assignable to a primitive literal.
+        return this == other || (other is TyUnknown && flags and TyVarianceFlags.STRICT_UNKNOWN == 0)
     }
 
     override fun equals(other: Any?): Boolean {

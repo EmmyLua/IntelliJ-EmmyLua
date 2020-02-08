@@ -34,9 +34,9 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
         return displayName.hashCode()
     }
 
-    override fun contravariantOf(other: ITy, context: SearchContext, strict: Boolean): Boolean {
-        if (super.contravariantOf(other, context, strict)
-                || (other is ITyArray && base.contravariantOf(other.base, context, strict))
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        if (super.contravariantOf(other, context, flags)
+                || (other is ITyArray && base.contravariantOf(other.base, context, flags))
         ) {
             return true
         }

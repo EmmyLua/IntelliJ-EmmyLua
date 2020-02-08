@@ -49,37 +49,7 @@ class LuaClassNameReference(element: LuaDocClassNameRef) : PsiReferenceBase<LuaD
 
     override fun resolve(): PsiElement? {
         val name = myElement.text
-
-        // generic in docFunction
-        val fn = PsiTreeUtil.getParentOfType(myElement, LuaDocFunctionTy::class.java)
-        var genericDefList: Collection<LuaDocGenericDef>? = fn?.genericDefList
-
-        if (genericDefList == null || genericDefList.isEmpty()) {
-            // generic in doc class
-            genericDefList = LuaCommentUtil.findContainer(myElement).tagClass?.genericDefList
-        }
-
-        if (genericDefList == null || genericDefList.isEmpty()) {
-            val ancestorDefList = LinkedList<LuaDocGenericDef>()
-
-            val parents = PsiTreeUtil.collectParents(myElement, LuaCommentOwner::class.java, false, {t -> false})
-            parents.forEach { o ->
-                val genericDefs = o.comment?.findTags(LuaDocGenericDef::class.java)
-
-                if (genericDefs != null) {
-                    ancestorDefList.addAll(genericDefs)
-                }
-            }
-
-            genericDefList = ancestorDefList
-        }
-
-        for (genericDef in genericDefList) {
-            if (genericDef.name == name)
-                return genericDef
-        }
-
-        return LuaShortNamesManager.getInstance(myElement.project).findTypeDef(name, SearchContext.get(myElement.project))
+        return LuaPsiTreeUtil.findGenericDef(name, myElement) ?: LuaShortNamesManager.getInstance(myElement.project).findTypeDef(name, SearchContext.get(myElement.project))
     }
 
     override fun getVariants(): Array<Any> = emptyArray()

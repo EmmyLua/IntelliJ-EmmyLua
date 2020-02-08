@@ -2,32 +2,20 @@
 package com.tang.intellij.lua.comment.psi.impl;
 
 import java.util.List;
-
-import com.tang.intellij.lua.ty.ITyClass;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
-import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.tang.intellij.lua.stubs.LuaDocGenericDefStub;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.tang.intellij.lua.comment.psi.*;
-import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.tree.IElementType;
+import com.tang.intellij.lua.ty.ITyClass;
 
-public class LuaDocGenericDefImpl extends StubBasedPsiElementBase<LuaDocGenericDefStub> implements LuaDocGenericDef {
-
-  public LuaDocGenericDefImpl(@NotNull LuaDocGenericDefStub stub, @NotNull IStubElementType type) {
-    super(stub, type);
-  }
+public class LuaDocGenericDefImpl extends ASTWrapperPsiElement implements LuaDocGenericDef {
 
   public LuaDocGenericDefImpl(@NotNull ASTNode node) {
     super(node);
-  }
-
-  public LuaDocGenericDefImpl(LuaDocGenericDefStub stub, IElementType type, ASTNode node) {
-    super(stub, type, node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
@@ -40,12 +28,6 @@ public class LuaDocGenericDefImpl extends StubBasedPsiElementBase<LuaDocGenericD
   }
 
   @Override
-  @NotNull
-  public ITyClass getType() {
-    return LuaDocPsiImplUtilKt.getType(this);
-  }
-
-  @Override
   @Nullable
   public LuaDocClassRef getClassRef() {
     return PsiTreeUtil.getChildOfType(this, LuaDocClassRef.class);
@@ -55,6 +37,12 @@ public class LuaDocGenericDefImpl extends StubBasedPsiElementBase<LuaDocGenericD
   @NotNull
   public PsiElement getId() {
     return notNullChild(findChildByType(ID));
+  }
+
+  @Override
+  @NotNull
+  public ITyClass getType() {
+    return LuaDocPsiImplUtilKt.getType(this);
   }
 
   @Override

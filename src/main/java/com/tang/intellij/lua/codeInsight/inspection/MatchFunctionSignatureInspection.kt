@@ -50,7 +50,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                 override fun visitCallExpr(o: LuaCallExpr) {
                     super.visitCallExpr(o)
 
-                    val searchContext = SearchContext.get(o.project)
+                    val searchContext = SearchContext.get(o)
                     val prefixExpr = o.expr
                     var type = prefixExpr.guessType(searchContext)
 
