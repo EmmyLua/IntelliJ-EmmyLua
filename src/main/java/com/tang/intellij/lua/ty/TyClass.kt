@@ -38,10 +38,10 @@ import com.tang.intellij.lua.stubs.writeTyParamsNullable
 
 interface ITyClass : ITy {
     val className: String
-    val params: Array<TyParameter>?
     val varName: String
     var superClass: ITy?
     var aliasName: String?
+    var params: Array<TyParameter>?
     fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean = true)
@@ -54,10 +54,6 @@ interface ITyClass : ITy {
 
     fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
         return this
-    }
-
-    fun getParamTy(index: Int): ITy {
-        return params?.get(index) ?: Ty.UNKNOWN
     }
 }
 
@@ -182,7 +178,6 @@ abstract class TyClass(override val className: String,
 
     override fun getParams(context: SearchContext): Array<TyParameter>? {
         lazyInit(context)
-        params?.forEach { it.lazyInit(context) }
         return params
     }
 
@@ -215,27 +210,27 @@ abstract class TyClass(override val className: String,
             val processedName = mutableSetOf<String>()
             var cur: ITy? = start
             while (cur != null) {
-                val cls = cur.getSuperClass(searchContext)
-                if (cls is ITyClass) {
-                    if (!processedName.add(cls.className)) {
+                val superType = cur.getSuperClass(searchContext)
+                val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
+
+                if (superClass != null) {
+                    if (!processedName.add(superClass.className)) {
                         // todo: Infinite inheritance
                         return false
                     }
-                    if (!processor(cls))
+                    if (!processor(superClass))
                         return false
                 }
-                cur = cls
+                cur = superType
             }
             return true
         }
     }
 }
 
-class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(tagClass.name) {
+class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(tagClass.name, tagClass.genericDefList.map { TyParameter(it) }.toTypedArray(), "", tagClass.superClassRef?.let { Ty.create(it) }) {
 
     init {
-        params = tagClass.genericDefList.map { TyParameter(it) }.toTypedArray()
-        superClass = tagClass.superClassRef?.let { Ty.create(it) }
         aliasName = tagClass.aliasName
     }
 

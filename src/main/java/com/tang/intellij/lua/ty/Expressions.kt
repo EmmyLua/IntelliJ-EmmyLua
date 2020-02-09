@@ -22,8 +22,6 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.comment.LuaCommentUtil
-import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.impl.LuaDocTagTypeImpl
 import com.tang.intellij.lua.ext.recursionGuard
 import com.tang.intellij.lua.lang.type.LuaNumber
@@ -421,10 +419,7 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
         if (propName != null) {
             val prefixType = parentTy ?: indexExpr.guessParentType(context)
             prefixType.each { ty ->
-                if (ty is ITyClass)
-                    result = result.union(guessFieldType(propName, ty, context))
-                else if (ty is ITyGeneric && ty.getParamTy(0) == Ty.STRING)
-                    result = result.union(ty.getParamTy(1))
+                result = result.union(guessFieldType(propName, ty, context))
             }
         }
 
@@ -434,19 +429,57 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
     return retTy ?: Ty.VOID
 }
 
-private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchContext): ITy {
-    // _G.var = {}  <==>  var = {}
-    if (type.className == Constants.WORD_G)
-        return TyClass.createGlobalType(fieldName)
+private fun guessFieldType(fieldName: String, type: ITy, context: SearchContext): ITy {
+    val cls = (if (type is TyGeneric) type.base else type) as? TyClass
 
-    var set:ITy = Ty.VOID
+    if (cls != null) {
+        // _G.var = {}  <==>  var = {}
+        if (cls.className == Constants.WORD_G)
+            return TyClass.createGlobalType(fieldName)
 
-    LuaShortNamesManager.getInstance(context.project).processAllMembers(type, fieldName, context, Processor {
-        set = set.union(it.guessType(context))
-        true
-    })
+        val types = mutableListOf<Pair<ITy, ITyClass?>>()
 
-    return set
+        LuaShortNamesManager.getInstance(context.project).processAllMembers(cls, fieldName, context, Processor {
+            val fieldType = it.guessType(context)
+            var fieldClass: ITyClass? = null
+
+            // Generic parameters in fields need to be substituted, keeping in mind ITyGeneric may recursively contain generic parameter.
+            if (fieldType is TyParameter || fieldType is ITyGeneric) {
+                fieldClass = it.guessClassType(context)
+            }
+
+            types.add(Pair(fieldType, fieldClass))
+            true
+        })
+
+        return types.fold(Ty.VOID as ITy, { union, (fieldTy, fieldClass) ->
+            var ty = fieldTy
+
+            if (fieldClass != null) {
+                var generic = type as? ITyGeneric
+
+                while (generic != null && generic.base != fieldClass) {
+                    generic = generic.getSuperClass(context) as? ITyGeneric
+                }
+
+                if (generic != null) {
+                    val paramMap = mutableMapOf<String, ITy>()
+
+                    fieldClass.getParams(context)?.forEachIndexed { index, classParam ->
+                        if (index < generic.params.size) {
+                            paramMap[classParam.varName] = generic.params[index]
+                        }
+                    }
+
+                    ty = ty.substitute(TyParameterSubstitutor(paramMap))
+                }
+            }
+
+            return union.union(ty)
+        })
+    }
+
+    return Ty.VOID
 }
 
 private fun LuaTableExpr.infer(context: SearchContext): ITy {

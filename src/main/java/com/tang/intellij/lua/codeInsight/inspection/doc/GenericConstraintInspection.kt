@@ -27,8 +27,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocType
 import com.tang.intellij.lua.comment.psi.LuaDocVisitor
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.GenericAnalyzer
 
-fun parameterText(count: Int): String {
+fun pluralizedParameter(count: Int): String {
     return if (count == 1) "parameter" else "parameters"
 }
 
@@ -38,21 +39,33 @@ class GenericConstraintInspection : LocalInspectionTool() {
             override fun visitType(o: LuaDocType) {
                 if (o is LuaDocGenericTy) {
                     val context = SearchContext.get(o)
-                    val params = LuaPsiTreeUtil.findClass(o.classNameRef.text, context)?.type?.params
+                    val params = LuaPsiTreeUtil.findClass(o.classNameRef.text, context)?.type?.getParams(context)
 
                     if (params != null && params.size > 0) {
-                        if (params.size != o.tyList.size) {
-                            holder.registerProblem(o, "\"${o.classNameRef.text}\" requires ${params.size} generic ${parameterText(params.size)}", ProblemHighlightType.ERROR)
+                        val args = o.tyList
+                        val genericAnalyzer = GenericAnalyzer(params, context)
+
+                        if (params.size != args.size) {
+                            holder.registerProblem(o, "\"${o.classNameRef.text}\" requires ${params.size} generic ${pluralizedParameter(params.size)}", ProblemHighlightType.ERROR)
                         }
 
                         params.forEachIndexed { index, param ->
-                            if (index < o.tyList.size) {
-                                val valueType = o.tyList[index].getType()
-                                if (!param.contravariantOf(valueType, context, 0)) {
-                                    holder.registerProblem(o, "Type mismatch. Required: '%s' Found: '%s'".format(param, valueType))
+                            if (index < args.size) {
+                                genericAnalyzer.analyze(args[index].getType(), param)
+                            }
+                        }
+
+                        params.forEachIndexed { index, param ->
+                            if (index < args.size) {
+                                val arg = args[index].getType()
+                                val analyzedParamType = genericAnalyzer.map[param.varName]
+
+                                if (analyzedParamType?.contravariantOf(arg, context, 0) == false) {
+                                    holder.registerProblem(o, "Type mismatch. Required: '%s' Found: '%s'".format(param, arg))
                                 }
                             }
                         }
+
                     } else if (o.classNameRef.text == "table") {
                         if (o.tyList.size != 2) {
                             holder.registerProblem(o, "table requires 2 generic parameters", ProblemHighlightType.ERROR)
@@ -62,10 +75,10 @@ class GenericConstraintInspection : LocalInspectionTool() {
                     }
                 } else if (o is LuaDocGeneralTy) {
                     val context = SearchContext.get(o.project)
-                    val params = LuaPsiTreeUtil.findClass(o.classNameRef.text, context)?.type?.params
+                    val params = LuaPsiTreeUtil.findClass(o.classNameRef.text, context)?.type?.getParams(context)
 
                     if (params != null && params.size > 0) {
-                        holder.registerProblem(o, "\"${o.classNameRef.text}\" requires ${params.size} generic ${parameterText(params.size)}", ProblemHighlightType.ERROR)
+                        holder.registerProblem(o, "\"${o.classNameRef.text}\" requires ${params.size} generic ${pluralizedParameter(params.size)}", ProblemHighlightType.ERROR)
                     }
                 }
             }

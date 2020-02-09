@@ -24,7 +24,6 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.comment.psi.LuaDocTagField
-import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaTableField
@@ -66,7 +65,6 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                     if (!notFound)
                         return false
 
-                    // from supper
                     return TyClass.processSuperClass(type, context) {
                         process(it.className, fieldName, context, processor, false)
                     }

@@ -277,6 +277,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
         fun create(classRef: LuaDocClassRef): ITy {
             val simpleType = Ty.create(classRef.classNameRef.id.text)
             return if (classRef.tyList.size > 0) {
+                val params = simpleType.getParams(SearchContext.get(classRef))
+                val args = linkedMapOf<String, ITy>()
                 TySerializedGeneric(classRef.tyList.map { it.getType() }.toTypedArray(), simpleType)
             } else simpleType
         }

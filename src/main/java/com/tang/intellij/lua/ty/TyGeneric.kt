@@ -34,8 +34,13 @@ class TyParameter(val name: String, varName: String, superClass: ITy? = null) : 
         get() = TyKind.GenericParam
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
-        val superType = getSuperClass(context) as? ITyClass ?: return
-        superType.processMembers(context, processor, deep)
+        val superType = getSuperClass(context)
+
+        if (superType is ITyClass) {
+            superType.processMembers(context, processor, deep)
+        } else if (superType is ITyGeneric) {
+            (superType.base as? ITyClass)?.processMembers(context, processor, deep)
+        }
     }
 
     override fun toString(): String {
@@ -71,7 +76,7 @@ interface ITyGeneric : ITy {
     val base: ITy
 
     fun getParamTy(index: Int): ITy {
-        return params.getOrElse(index) { Ty.UNKNOWN }
+        return params.elementAtOrNull(index) ?: Ty.UNKNOWN
     }
 }
 
@@ -86,22 +91,32 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     }
 
     override fun getSuperClass(context: SearchContext): ITy? {
-        return base.getSuperClass(context)
+        val baseParams = base.getParams(context)
+        var superClass = base.getSuperClass(context)
+
+        if (baseParams != null && superClass is ITyGeneric) {
+            val paramMap = mutableMapOf<String, ITy>()
+
+            baseParams.forEachIndexed { index, baseParam ->
+                if (index < params.size) {
+                    paramMap[baseParam.varName] = params[index]
+                }
+            }
+
+            superClass = superClass.substitute(TyParameterSubstitutor(paramMap))
+        }
+
+        return superClass
     }
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
-        if (super.contravariantOf(other, context, flags)) return true
-
         if (other is ITyArray) {
-            return base == Ty.TABLE
-                    && params.size == 2
-                    && (
-                        params[0] == Ty.NUMBER
-                        || (params[0] is TyUnknown && flags and TyVarianceFlags.STRICT_UNKNOWN == 0)
-                    ) && (
-                        params[1] == other.base
-                        || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && params[1].contravariantOf(other.base, context, flags))
-                    )
+            return if (base == Ty.TABLE && params.size == 2) {
+                val keyTy = params.first()
+                val valueTy = params.last()
+                return (keyTy == Ty.NUMBER || (keyTy is TyUnknown && flags and TyVarianceFlags.STRICT_UNKNOWN == 0))
+                        && (valueTy == other.base || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && valueTy.contravariantOf(other.base, context, flags)))
+            } else false
         }
 
         var otherBase: ITy? = null
@@ -112,30 +127,36 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
             otherParams = other.params
         } else if (other is ITyClass) {
             otherBase = other
-            otherParams = other.params
+            otherParams = other.getParams(context)
         } else if ((other == Ty.TABLE || other is TyTable) && base == Ty.TABLE && params.size == 2) {
-            if (params[0] is TyUnknown && params[1] is TyUnknown) {
+            val keyTy = params.first()
+            val valueTy = params.last()
+
+            if (keyTy is TyUnknown && valueTy is TyUnknown) {
                 return true
             }
 
             if (other is TyTable) {
                 val genericTable = other.toGeneric(context)
                 otherBase = genericTable.base
-                otherParams = genericTable.params
+                otherParams = genericTable.getParams(context)
             }
         }
 
-        return otherBase != null && otherParams != null
+        if (otherBase != null && otherParams != null
                 && base.contravariantOf(otherBase, context, flags)
                 && params.size == otherParams.size
-                && params.indices.all { i -> // Params are always invariant as we don't support use-site variance nor immutable/read-only annotations
-                    val param = params[i]
-                    val otherParam = otherParams[i]
+                && params.asSequence().zip(otherParams.asSequence()).all { (param, otherParam) ->
+                    // Params are always invariant as we don't support use-site variance nor immutable/read-only annotations
                     return param.equals(otherParam)
                             || param is TyUnknown
                             || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && otherParam is TyUnknown)
                             || (flags and TyVarianceFlags.ABSTRACT_PARAMS != 0 && param is TyParameter && param.contravariantOf(otherParam, context, flags))
-                }
+                }) {
+            return true
+        }
+
+        return super.contravariantOf(other, context, flags)
     }
 
     override fun accept(visitor: ITyVisitor) {
@@ -152,23 +173,31 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
 
 class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {
 
-    private fun initBaseTy(luaDocGenericTy: LuaDocGenericTy): ITy {
-        return luaDocGenericTy.classNameRef.resolveType()
-    }
-
-    private val _baseTy:ITy = initBaseTy(luaDocGenericTy)
-
-    private fun initParams(luaDocGenericTy: LuaDocGenericTy): Array<ITy> {
-        return luaDocGenericTy.tyList.map { it.getType() }.toTypedArray()
-    }
-
-    private val _params: Array<ITy> = initParams(luaDocGenericTy)
-
-    override val params: Array<ITy>
-        get() = _params
     override val base: ITy
-        get() = _baseTy
+    override val params: Array<ITy>
 
+    init {
+        var base = luaDocGenericTy.classNameRef.resolveType()
+        params = luaDocGenericTy.tyList.map { it.getType() }.toTypedArray()
+
+        if (base is TyClass) {
+            val baseParams = base.getParams(SearchContext.get(luaDocGenericTy.project))
+
+            if (baseParams != null && baseParams.size > 0) {
+                val paramMap = mutableMapOf<String, ITy>()
+
+                baseParams.forEachIndexed { index, baseParam ->
+                    if (index < params.size) {
+                        paramMap[baseParam.varName] = params[index]
+                    }
+                }
+
+                base = base.substitute(TyParameterSubstitutor(paramMap))
+            }
+        }
+
+        this.base = base
+    }
 }
 
 class TySerializedGeneric(override val params: Array<ITy>, override val base: ITy) : TyGeneric()

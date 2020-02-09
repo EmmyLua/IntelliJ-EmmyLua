@@ -57,10 +57,12 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
 
     override fun visitClass(clazz: ITyClass) {
         cur.let {
-            if (it is ITyClass) {
-                it.params?.forEachIndexed { index, iTy ->
-                    warp(iTy) {
-                        clazz.getParamTy(index).accept(this)
+            val clazzParams = clazz.params
+
+            if (clazzParams != null && it is ITyClass) {
+                it.params?.asSequence()?.zip(clazzParams.asSequence())?.forEach { (param, clazzParam) ->
+                    warp(param) {
+                        clazzParam.accept(this)
                     }
                 }
             }
@@ -116,18 +118,19 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
                 warp(it.base) {
                     generic.base.accept(this)
                 }
-                it.params.forEachIndexed { index, iTy ->
-                    warp(iTy) {
-                        generic.getParamTy(index).accept(this)
+
+                it.params.asSequence().zip(generic.params.asSequence()).forEach { (param, genericParam) ->
+                    warp(param) {
+                        genericParam.accept(this)
                     }
                 }
             } else if (it is ITyArray && generic.base == Ty.TABLE && generic.params.size == 2) {
                 warp (Ty.NUMBER) {
-                    generic.params[0].accept(this)
+                    generic.params.first().accept(this)
                 }
 
                 warp(it.base) {
-                    generic.params[1].accept(this)
+                    generic.params.last().accept(this)
                 }
             }
         }
