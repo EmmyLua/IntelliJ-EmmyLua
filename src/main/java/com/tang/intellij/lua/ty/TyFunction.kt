@@ -357,7 +357,7 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
         if (other is ITyFunction) {
             process(Processor { sig ->
                 other.process(Processor { otherSig ->
-                    matched = sig.contravariantOf(sig, context, flags)
+                    matched = sig.contravariantOf(otherSig, context, flags)
                     !matched
                 })
                 !matched
