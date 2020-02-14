@@ -38,6 +38,10 @@ class TyPrimitive(override val primitiveKind: TyPrimitiveKind,
         return primitiveKind.hashCode()
     }
 
+    override fun toString(): String {
+        return displayName
+    }
+
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         return super.contravariantOf(other, context, flags)
                 || (other is ITyPrimitive && other.primitiveKind == primitiveKind)

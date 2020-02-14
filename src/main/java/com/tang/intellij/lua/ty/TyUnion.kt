@@ -56,6 +56,27 @@ class TyUnion : Ty(TyKind.Union) {
     }
 
     private fun addChild(ty: ITy): Boolean {
+        if (ty == Ty.FALSE || ty == Ty.TRUE) {
+            if (childSet.contains(Ty.BOOLEAN)) {
+                return false
+            }
+
+            if (ty == Ty.FALSE) {
+                if (childSet.contains(Ty.TRUE)) {
+                    childSet.remove(Ty.TRUE)
+                    return childSet.add(Ty.BOOLEAN)
+                }
+            } else if (ty == Ty.TRUE) {
+                if (childSet.contains(Ty.FALSE)) {
+                    childSet.remove(Ty.FALSE)
+                    return childSet.add(Ty.BOOLEAN)
+                }
+            }
+        } else if (ty == Ty.BOOLEAN) {
+            childSet.remove(Ty.TRUE)
+            childSet.remove(Ty.FALSE)
+        }
+
         return childSet.add(ty)
     }
 
@@ -150,7 +171,7 @@ class TyUnion : Ty(TyKind.Union) {
                     u.addChild(t1)
                     u.addChild(t2)
                     //if t1 == t2
-                    if (u.childSet.size == 1) t1 else u
+                    if (u.childSet.size == 1) u.childSet.first() else u
                 }
             }
         }

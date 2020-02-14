@@ -176,7 +176,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
             return true
         }
 
-        if (other is TyUnion || other == Ty.BOOLEAN) {
+        if (other is TyUnion) {
             var contravariant = true
             TyUnion.process(other, {
                 contravariant = contravariantOf(it, context, flags)
