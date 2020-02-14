@@ -27,9 +27,7 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TyLazyClass
+import com.tang.intellij.lua.ty.*
 
 /**
  * override supper
@@ -49,8 +47,11 @@ class OverrideCompletionProvider : LuaCompletionProvider() {
                 classType.processMembers(context, { _, m ->
                     m.name?.let { memberNameSet.add(it) }
                 }, false)
-                TyClass.processSuperClass(classType, context) { sup ->
-                    addOverrideMethod(completionParameters, completionResultSet, memberNameSet, sup)
+                Ty.processSuperClass(classType, context) { sup ->
+                    val clazz = (if (sup is ITyGeneric) sup.base else sup) as? ITyClass
+                    if (clazz != null) {
+                        addOverrideMethod(completionParameters, completionResultSet, memberNameSet, clazz)
+                    }
                     true
                 }
             }

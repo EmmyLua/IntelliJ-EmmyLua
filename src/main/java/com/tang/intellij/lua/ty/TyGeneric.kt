@@ -33,7 +33,7 @@ class TyParameter(val name: String, varName: String, superClass: ITy? = null) : 
     override val kind: TyKind
         get() = TyKind.GenericParam
 
-    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
         val superType = getSuperClass(context)
 
         if (superType is ITyClass) {
@@ -168,6 +168,20 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
                 params.map { it.substitute(substitutor) }.toTypedArray(),
                 base.substitute(substitutor)
         )
+    }
+
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
+        base.processMembers(context, { ty, classMember ->
+            processor(this, classMember)
+        }, false)
+
+        // super
+        if (deep) {
+            Ty.processSuperClass(this, context) {
+                it.processMembers(context, processor, false)
+                true
+            }
+        }
     }
 }
 

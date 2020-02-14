@@ -99,8 +99,11 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
         if (fieldName != null && tbl is LuaTableExpr) {
             var fieldType: ITy = Ty.VOID
             val tyTbl = tbl.shouldBe(context)
-            tyTbl.eachTopClass(Processor { cls ->
-                cls.findMemberType(fieldName, context)?.let { fieldType = fieldType.union(it) }
+            tyTbl.eachTopClass(Processor { type ->
+                val cls = (if (type is ITyGeneric) type.base else type) as? ITyClass
+                if (cls != null) {
+                    cls.findMemberType(fieldName, context)?.let { fieldType = fieldType.union(it) }
+                }
                 true
             })
             return if (Ty.isInvalid(fieldType)) Ty.UNKNOWN else fieldType
@@ -481,11 +484,14 @@ fun LuaClassMethod.findOverridingMethod(context: SearchContext): LuaClassMethod?
     val methodName = name ?: return null
     val type = guessClassType(context) ?: return null
     var superMethod: LuaClassMethod? = null
-    TyClass.processSuperClass(type, context) { superType->
+    Ty.processSuperClass(type, context) { superType ->
         ProgressManager.checkCanceled()
-        val superTypeName = superType.className
-        superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
-        superMethod == null
+        val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
+        if (superClass != null) {
+            val superTypeName = superClass.className
+            superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
+            superMethod == null
+        } else true
     }
     return superMethod
 }

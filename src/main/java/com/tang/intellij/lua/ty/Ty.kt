@@ -24,6 +24,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocClassRef
 import com.tang.intellij.lua.project.LuaSettings
+import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
 
 enum class TyKind {
@@ -90,11 +91,17 @@ interface ITy : Comparable<ITy> {
         TyUnion.each(this, fn)
     }
 
-    fun eachTopClass(fn: Processor<ITyClass>)
+    fun eachTopClass(fn: Processor<ITy>)
 
     fun accept(visitor: ITyVisitor)
 
     fun acceptChildren(visitor: ITyVisitor)
+
+    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean = true)
+
+    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit) {
+        processMembers(context, processor, true)
+    }
 }
 
 fun ITy.hasFlag(flag: Int): Boolean = flags and flag == flag
@@ -208,9 +215,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return substitutor.substitute(this)
     }
 
-    override fun eachTopClass(fn: Processor<ITyClass>) {
+    override fun eachTopClass(fn: Processor<ITy>) {
         when (this) {
             is ITyClass -> fn.process(this)
+            is ITyGeneric -> fn.process(this)
             is TyUnion -> {
                 ContainerUtil.process(getChildTypes()) {
                     if (it is ITyClass && !fn.process(it))
@@ -222,6 +230,9 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 list.firstOrNull()?.eachTopClass(fn)
             }
         }
+    }
+
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
     }
 
     companion object {
@@ -309,6 +320,24 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     serializer?.deserialize(flags, stream) ?: UNKNOWN
                 }
             }
+        }
+
+        fun processSuperClass(start: ITy, searchContext: SearchContext, processor: (ITy) -> Boolean): Boolean {
+            val processedName = mutableSetOf<String>()
+            var cur: ITy? = start
+            while (cur != null) {
+                val superType = cur.getSuperClass(searchContext)
+                if (superType != null) {
+                    if (!processedName.add(superType.displayName)) {
+                        // todo: Infinite inheritance
+                        return false
+                    }
+                    if (!processor(superType))
+                        return false
+                }
+                cur = superType
+            }
+            return true
         }
     }
 }

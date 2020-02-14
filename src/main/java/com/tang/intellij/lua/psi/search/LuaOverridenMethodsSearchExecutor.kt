@@ -23,7 +23,9 @@ import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.guessClassType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
-import com.tang.intellij.lua.ty.TyClass
+import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.ITyGeneric
+import com.tang.intellij.lua.ty.Ty
 
 class LuaOverridenMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOverridenMethodsSearch.SearchParameters> {
     override fun execute(searchParameters: LuaOverridenMethodsSearch.SearchParameters, processor: Processor<in LuaClassMethod>): Boolean {
@@ -33,11 +35,14 @@ class LuaOverridenMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOverr
         val type = method.guessClassType(context)
         val methodName = method.name
         if (type != null && methodName != null) {
-            TyClass.processSuperClass(type, context) { superType->
+            Ty.processSuperClass(type, context) { superType->
                 ProgressManager.checkCanceled()
-                val superTypeName = superType.className
-                val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
-                if (superMethod == null) true else processor.process(superMethod)
+                val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
+                if (superClass != null) {
+                    val superTypeName = superClass.className
+                    val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
+                    if (superMethod == null) true else processor.process(superMethod)
+                } else true
             }
         }
         return false

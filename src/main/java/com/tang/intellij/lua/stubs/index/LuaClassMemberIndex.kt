@@ -28,9 +28,7 @@ import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaTableField
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.TyClass
-import com.tang.intellij.lua.ty.TyParameter
+import com.tang.intellij.lua.ty.*
 
 class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
     override fun getKey() = StubKeys.CLASS_MEMBER
@@ -65,8 +63,11 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                     if (!notFound)
                         return false
 
-                    return TyClass.processSuperClass(type, context) {
-                        process(it.className, fieldName, context, processor, false)
+                    return Ty.processSuperClass(type, context) { superType ->
+                        val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
+                        if (superClass != null) {
+                            process(superClass.className, fieldName, context, processor, false)
+                        } else true
                     }
                 }
             }

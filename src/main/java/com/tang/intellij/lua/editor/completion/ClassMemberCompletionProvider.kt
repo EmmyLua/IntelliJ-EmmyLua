@@ -107,25 +107,27 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
     }
 
     protected fun addClass(contextTy: ITy,
-                           luaType:ITyClass,
+                           luaType: ITy,
                            project: Project,
                            completionMode:MemberCompletionMode,
                            completionResultSet: CompletionResultSet,
                            prefixMatcher: PrefixMatcher,
                            handlerProcessor: HandlerProcessor?) {
         val context = SearchContext.get(project)
-        luaType.lazyInit(context)
         luaType.processMembers(context) { curType, member ->
-            ProgressManager.checkCanceled()
-            member.name?.let {
-                if (prefixMatcher.prefixMatches(it) && curType.isVisibleInScope(project, contextTy, member.visibility)) {
-                    addMember(completionResultSet,
-                            member,
-                            curType,
-                            luaType,
-                            completionMode,
-                            project,
-                            handlerProcessor)
+            val curClass = (if (curType is ITyGeneric) curType.base else curType) as? ITyClass
+            if (curClass != null) {
+                ProgressManager.checkCanceled()
+                member.name?.let {
+                    if (prefixMatcher.prefixMatches(it) && curClass.isVisibleInScope(project, contextTy, member.visibility)) {
+                        addMember(completionResultSet,
+                                member,
+                                curType,
+                                luaType,
+                                completionMode,
+                                project,
+                                handlerProcessor)
+                    }
                 }
             }
         }
@@ -133,21 +135,41 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
 
     protected fun addMember(completionResultSet: CompletionResultSet,
                             member: LuaClassMember,
-                            thisType: ITyClass,
-                            callType: ITyClass,
+                            thisType: ITy,
+                            callType: ITy,
                             completionMode: MemberCompletionMode,
                             project: Project,
                             handlerProcessor: HandlerProcessor?) {
-        val type = member.guessType(SearchContext.get(project))
+        val context = SearchContext.get(project)
+        val type = member.guessType(context)
         val bold = thisType == callType
         val className = thisType.displayName
         if (type is ITyFunction) {
             val fn = type.substitute(TySelfSubstitutor(project, null, callType))
             if (fn is ITyFunction)
                 addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, fn, thisType, callType, handlerProcessor)
-        } else if (member is LuaClassField) {
-            if (completionMode != MemberCompletionMode.Colon)
-                addField(completionResultSet, bold, className, member, type, handlerProcessor)
+        } else if (member is LuaClassField && completionMode != MemberCompletionMode.Colon) {
+            var fieldType = type
+
+            if (thisType is ITyGeneric) {
+                val base = thisType.base
+                val baseParams = base.getParams(context)
+                val args = thisType.params
+
+                if (baseParams != null) {
+                    val paramMap = mutableMapOf<String, ITy>()
+
+                    baseParams.forEachIndexed { index, baseParam ->
+                        if (index < args.size) {
+                            paramMap[baseParam.varName] = args[index]
+                        }
+                    }
+
+                    fieldType = type.substitute(TyParameterSubstitutor(paramMap))
+                }
+            }
+
+            addField(completionResultSet, bold, className, member, fieldType, handlerProcessor)
         }
     }
 
@@ -171,8 +193,8 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                             clazzName: String,
                             classMember: LuaClassMember,
                             fnTy: ITyFunction,
-                            thisType: ITyClass,
-                            callType: ITyClass,
+                            thisType: ITy,
+                            callType: ITy,
                             handlerProcessor: HandlerProcessor?) {
         val name = classMember.name
         if (name != null) {

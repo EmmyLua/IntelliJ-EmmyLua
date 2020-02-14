@@ -24,6 +24,8 @@ import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.ITyGeneric
 
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
@@ -123,7 +125,8 @@ fun multiResolve(indexExpr: LuaIndexExpr, context: SearchContext): List<PsiEleme
     val name = indexExpr.name ?: return list
     val type = indexExpr.guessParentType(context)
     type.eachTopClass(Processor { ty ->
-        val m = ty.findMember(name, context)
+        val cls = (if (ty is ITyGeneric) ty.base else type) as? ITyClass
+        val m = cls?.findMember(name, context)
         if (m != null)
             list.add(m)
         true
@@ -147,7 +150,8 @@ fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): 
     val type = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
     type.eachTopClass(Processor { ty ->
-        ret = ty.findMember(idString, context)
+        val cls = (if (ty is ITyGeneric) ty.base else type) as? ITyClass
+        ret = cls?.findMember(idString, context)
         if (ret != null)
             return@Processor false
         true

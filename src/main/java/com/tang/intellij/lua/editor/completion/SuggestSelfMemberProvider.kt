@@ -23,9 +23,7 @@ import com.tang.intellij.lua.psi.LuaClassMethodDef
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 import com.tang.intellij.lua.psi.guessClassType
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyFunction
-import com.tang.intellij.lua.ty.isVisibleInScope
+import com.tang.intellij.lua.ty.*
 
 /**
  * suggest self.xxx
@@ -43,10 +41,11 @@ class SuggestSelfMemberProvider : ClassMemberCompletionProvider() {
             methodDef.guessClassType(searchContext)?.let { type ->
                 val contextTy = LuaPsiTreeUtil.findContextClass(position)
                 type.processMembers(searchContext) { curType, member ->
-                    if (curType.isVisibleInScope(project, contextTy, member.visibility)) {
+                    val curClass = (if (curType is ITyGeneric) curType.base else type) as? ITyClass
+                    if (curClass != null && curClass.isVisibleInScope(project, contextTy, member.visibility)) {
                         addMember(completionResultSet,
                                 member,
-                                curType,
+                                curClass,
                                 type,
                                 MemberCompletionMode.Colon,
                                 project,

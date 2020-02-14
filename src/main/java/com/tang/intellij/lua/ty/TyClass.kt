@@ -44,10 +44,6 @@ interface ITyClass : ITy {
     var params: Array<TyParameter>?
     fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
-    fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean = true)
-    fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
-        processMembers(context, processor, true)
-    }
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
     fun findMemberType(name: String, searchContext: SearchContext): ITy?
     fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember?
@@ -103,7 +99,9 @@ abstract class TyClass(override val className: String,
         return true
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
+        lazyInit(context)
+
         val clazzName = className
         val project = context.project
 
@@ -141,8 +139,9 @@ abstract class TyClass(override val className: String,
     override fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {
         // Travel up the hierarchy to find the lowest member of this type on a superclass (excluding this class)
         var member: LuaClassMember? = null
-        processSuperClass(this, searchContext) {
-            member = it.findMember(name, searchContext)
+        processSuperClass(this, searchContext) { superType ->
+            val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
+            member = superClass?.findMember(name, searchContext)
             member == null
         }
         return member
@@ -204,26 +203,6 @@ abstract class TyClass(override val className: String,
 
         fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
             return createGlobalType(nameExpr.name, store)
-        }
-
-        fun processSuperClass(start: ITyClass, searchContext: SearchContext, processor: (ITyClass) -> Boolean): Boolean {
-            val processedName = mutableSetOf<String>()
-            var cur: ITy? = start
-            while (cur != null) {
-                val superType = cur.getSuperClass(searchContext)
-                val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
-
-                if (superClass != null) {
-                    if (!processedName.add(superClass.className)) {
-                        // todo: Infinite inheritance
-                        return false
-                    }
-                    if (!processor(superClass))
-                        return false
-                }
-                cur = superType
-            }
-            return true
         }
     }
 }
@@ -307,7 +286,7 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
         this.flags = TyFlags.ANONYMOUS or TyFlags.ANONYMOUS_TABLE
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
         for (field in table.tableFieldList) {
             processor(this, field)
         }
@@ -350,7 +329,7 @@ fun getDocTableTypeName(table: LuaDocTableDef): String {
 class TyDocTable(val table: LuaDocTableDef) : TyClass(getDocTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) {}
 
-    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
         table.tableFieldList.forEach {
             processor(this, it)
         }
