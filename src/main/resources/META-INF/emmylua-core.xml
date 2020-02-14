@@ -319,6 +319,12 @@
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.GenericConstraintInspection"/>
+
+        <localInspection
+                displayName="Generic parameter shadowed"
+                enabledByDefault="true"
+                groupName="Lua > Emmy doc"
+                implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.GenericParameterShadowed"/>
     </extensions>
 
     <application-components>
