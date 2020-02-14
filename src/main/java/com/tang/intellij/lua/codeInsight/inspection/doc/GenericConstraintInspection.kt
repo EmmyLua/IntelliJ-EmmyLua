@@ -61,7 +61,7 @@ class GenericConstraintInspection : LocalInspectionTool() {
                                 val analyzedParamType = genericAnalyzer.map[param.varName]
 
                                 if (analyzedParamType?.contravariantOf(arg, context, 0) == false) {
-                                    holder.registerProblem(o, "Type mismatch. Required: '%s' Found: '%s'".format(param, arg))
+                                    holder.registerProblem(o, "Type mismatch. Required: '%s' Found: '%s'".format(param, arg), ProblemHighlightType.ERROR)
                                 }
                             }
                         }
