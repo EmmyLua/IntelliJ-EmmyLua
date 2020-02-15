@@ -423,7 +423,7 @@ private fun LuaIndexExpr.infer(context: SearchContext): ITy {
             }
         }
 
-        if (Ty.isInvalid(result)) Ty.UNKNOWN else result
+        if (Ty.isInvalid(result)) Ty.VOID else result
     })
 
     return retTy ?: Ty.VOID
@@ -451,6 +451,10 @@ private fun guessFieldType(fieldName: String, type: ITy, context: SearchContext)
             types.add(Pair(fieldType, fieldClass))
             true
         })
+
+        if (types.size == 0) {
+            return Ty.NIL // Lua returns nil for access of non-existent fields
+        }
 
         return types.fold(Ty.VOID as ITy, { union, (fieldTy, fieldClass) ->
             var ty = fieldTy

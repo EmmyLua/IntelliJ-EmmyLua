@@ -271,12 +271,12 @@ class SignatureMatchResult {
 }
 
 fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext): SignatureMatchResult {
-    val concreteParams = call.argList
+    val args = call.argList
     val concreteTypes = mutableListOf<MatchFunctionSignatureInspection.ConcreteTypeInfo>()
-    concreteParams.forEachIndexed { index, luaExpr ->
+    args.forEachIndexed { index, luaExpr ->
         val ty = luaExpr.guessType(searchContext)
         if (ty is TyTuple) {
-            if (index == concreteParams.lastIndex) {
+            if (index == args.lastIndex) {
                 concreteTypes.addAll(ty.list.map { MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, it) })
             } else {
                 concreteTypes.add(MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, ty.list.first()))
@@ -288,14 +288,14 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
     val candidates = findCandidateSignatures(call)
 
     candidates.forEach({
-        var nArgs = 0
+        var nParams = 0
         val signatureProblems = mutableListOf<SignatureProblem>()
 
         val substitutor = call.createSubstitutor(it, searchContext)
         val signature = if (substitutor != null) it.substitute(substitutor) else it
 
         signature.processArgs(call) { i, pi ->
-            nArgs = i + 1
+            nParams = i + 1
             val typeInfo = concreteTypes.getOrNull(i)
 
             if (typeInfo == null) {
@@ -304,19 +304,21 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
             }
 
             val paramType = pi.ty
-            val type = typeInfo.ty
-            val assignable: Boolean = paramType.contravariantOf(type, searchContext, 0)
+            val argType = typeInfo.ty
+            val argExpr = args.getOrNull(i)
+            val varianceFlags = if (argExpr is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
+            val assignable: Boolean = paramType.contravariantOf(argType, searchContext, varianceFlags)
 
             if (!assignable) {
-                signatureProblems.add(SignatureProblem(typeInfo.param, "Type mismatch for argument: ${pi.name}. Required: '${pi.ty}' Found: '$type'"))
+                signatureProblems.add(SignatureProblem(typeInfo.param, "Type mismatch for argument: ${pi.name}. Required: '${pi.ty}' Found: '$argType'"))
             }
 
             true
         }
 
-        if (nArgs < concreteParams.size && !it.hasVarargs()) {
-            for (i in nArgs until concreteParams.size) {
-                signatureProblems.add(SignatureProblem(concreteParams[i], "Too many arguments."))
+        if (nParams < args.size && !it.hasVarargs()) {
+            for (i in nParams until args.size) {
+                signatureProblems.add(SignatureProblem(args[i], "Too many arguments."))
             }
         }
 

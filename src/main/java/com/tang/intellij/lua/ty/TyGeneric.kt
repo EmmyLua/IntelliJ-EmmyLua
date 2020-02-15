@@ -115,19 +115,17 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
                 val keyTy = params.first()
                 val valueTy = params.last()
                 return (keyTy == Ty.NUMBER || (keyTy is TyUnknown && flags and TyVarianceFlags.STRICT_UNKNOWN == 0))
-                        && (valueTy == other.base || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && valueTy.contravariantOf(other.base, context, flags)))
+                        && (valueTy == other.base || (flags and TyVarianceFlags.WIDEN_TABLES != 0 && valueTy.contravariantOf(other.base, context, flags)))
             } else false
         }
 
         var otherBase: ITy? = null
         var otherParams: Array<out ITy>? =  null
+        var contravariantParams = false
 
         if (other is ITyGeneric) {
             otherBase = other.base
             otherParams = other.params
-        } else if (other is ITyClass) {
-            otherBase = other
-            otherParams = other.getParams(context)
         } else if ((other == Ty.TABLE || other is TyTable) && base == Ty.TABLE && params.size == 2) {
             val keyTy = params.first()
             val valueTy = params.last()
@@ -139,8 +137,12 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
             if (other is TyTable) {
                 val genericTable = other.toGeneric(context)
                 otherBase = genericTable.base
-                otherParams = genericTable.getParams(context)
+                otherParams = genericTable.params
+                contravariantParams = flags and TyVarianceFlags.WIDEN_TABLES != 0
             }
+        } else if (other is ITyClass) {
+            otherBase = other
+            otherParams = other.getParams(context)
         }
 
         if (otherBase != null && otherParams != null
@@ -148,10 +150,11 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
                 && params.size == otherParams.size
                 && params.asSequence().zip(otherParams.asSequence()).all { (param, otherParam) ->
                     // Params are always invariant as we don't support use-site variance nor immutable/read-only annotations
-                    return param.equals(otherParam)
+                    param.equals(otherParam)
                             || param is TyUnknown
                             || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && otherParam is TyUnknown)
-                            || (flags and TyVarianceFlags.ABSTRACT_PARAMS != 0 && param is TyParameter && param.contravariantOf(otherParam, context, flags))
+                            || ((contravariantParams || (flags and TyVarianceFlags.ABSTRACT_PARAMS != 0 && param is TyParameter))
+                                && param.contravariantOf(otherParam, context, flags))
                 }) {
             return true
         }
@@ -171,7 +174,7 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     }
 
     override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
-        base.processMembers(context, { ty, classMember ->
+        base.processMembers(context, { _, classMember ->
             processor(this, classMember)
         }, false)
 

@@ -21,11 +21,13 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
 import com.tang.intellij.lua.psi.LuaAssignStat
 import com.tang.intellij.lua.psi.LuaIndexExpr
+import com.tang.intellij.lua.psi.LuaTableExpr
 import com.tang.intellij.lua.psi.LuaVisitor
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyGeneric
+import com.tang.intellij.lua.ty.TyVarianceFlags
 
 class AssignTypeInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
@@ -53,6 +55,7 @@ class AssignTypeInspection : StrictInspection() {
                             val name = field.name ?: ""
                             val value = values[i]
                             val valueType = value.guessType(searchContext)
+                            val varianceFlags = if (value is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
 
                             // Field access
                             if (field is LuaIndexExpr) {
@@ -63,14 +66,14 @@ class AssignTypeInspection : StrictInspection() {
                                 if (fieldOwnerClass is TyClass) {
                                     val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
 
-                                    if (!fieldType.contravariantOf(valueType, searchContext, 0)) {
+                                    if (!fieldType.contravariantOf(valueType, searchContext, varianceFlags)) {
                                         myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                     }
                                 }
                             } else {
                                 val fieldType = field.guessType(searchContext)
 
-                                if (!fieldType.contravariantOf(valueType, searchContext, 0)) {
+                                if (!fieldType.contravariantOf(valueType, searchContext, varianceFlags)) {
                                     myHolder.registerProblem(value, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, valueType))
                                 }
                             }
