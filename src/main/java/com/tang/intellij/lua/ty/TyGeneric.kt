@@ -200,7 +200,7 @@ class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {
         if (base is TyClass) {
             val baseParams = base.getParams(SearchContext.get(luaDocGenericTy.project))
 
-            if (baseParams != null && baseParams.size > 0) {
+            if (baseParams != null && baseParams.isNotEmpty()) {
                 val paramMap = mutableMapOf<String, ITy>()
 
                 baseParams.forEachIndexed { index, baseParam ->

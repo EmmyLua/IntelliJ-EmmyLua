@@ -131,13 +131,13 @@ private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, c
             Ty.FALSE -> lty
             else -> {
                 val u = TyUnion()
-                TyUnion.each(lty, {
+                TyUnion.each(lty) {
                     if (it == Ty.BOOLEAN) {
                         u.append(Ty.FALSE)
                     } else if (it.booleanType != Ty.TRUE) {
                         u.append(it)
                     }
-                })
+                }
                 u.append(infer(rhs, context))
             }
         }
@@ -149,13 +149,13 @@ private fun guessAndOrType(binaryExpr: LuaBinaryExpr, operator: IElementType?, c
         Ty.FALSE -> infer(rhs, context)
         else -> {
             val u = TyUnion()
-            TyUnion.each(lty, {
+            TyUnion.each(lty) {
                 if (it == Ty.BOOLEAN) {
                     u.append(Ty.TRUE)
                 } else if (it.booleanType != Ty.FALSE) {
                     u.append(it)
                 }
-            })
+            }
             u.append(infer(rhs, context))
         }
     }

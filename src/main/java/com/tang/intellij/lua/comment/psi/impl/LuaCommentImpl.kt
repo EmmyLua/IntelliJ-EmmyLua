@@ -29,7 +29,6 @@ import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.psi.LuaVisitor
-import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 

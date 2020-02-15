@@ -29,5 +29,4 @@ object StubKeys {
     val CLASS = StubIndexKey.createIndexKey<String, LuaDocTagClass>("lua.index.class")
     val SUPER_CLASS = StubIndexKey.createIndexKey<String, LuaDocTagClass>("lua.index.super_class")
     val ALIAS = StubIndexKey.createIndexKey<String, LuaDocTagAlias>("lua.index.alias")
-    val GENERIC = StubIndexKey.createIndexKey<String, LuaDocGenericDef>("lua.index.generic")
 }

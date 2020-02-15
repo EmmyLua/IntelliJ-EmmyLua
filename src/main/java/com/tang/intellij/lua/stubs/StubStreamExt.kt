@@ -80,7 +80,7 @@ fun StubInputStream.readNames(): Array<String> {
 }
 
 fun StubOutputStream.writeTyParamsNullable(tyParams: Array<TyParameter>?) {
-    writeByte(if (tyParams != null) tyParams.size else 0)
+    writeByte(tyParams?.size ?: 0)
     tyParams?.forEach { parameter ->
         writeName(parameter.name)
         writeName(parameter.varName)

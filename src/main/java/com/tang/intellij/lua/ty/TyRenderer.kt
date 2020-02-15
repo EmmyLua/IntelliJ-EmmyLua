@@ -118,7 +118,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
             clazz.isGlobal -> "[global ${clazz.varName}]"
             else -> {
                 val params = clazz.params
-                if (params != null && params.size > 0) "${clazz.className}<${params.joinToString(", ")}>" else clazz.className
+                if (params != null && params.isNotEmpty()) "${clazz.className}<${params.joinToString(", ")}>" else clazz.className
             }
         }
     }

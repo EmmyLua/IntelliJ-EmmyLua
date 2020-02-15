@@ -269,10 +269,6 @@ fun getAnonymousType(nameDef: LuaNameDef): String {
     return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
 }
 
-fun getAnonymousType(genericDef: LuaDocGenericDef): String {
-    return "${genericDef.node.startOffset}@${genericDef.containingFile.name}"
-}
-
 fun getGlobalTypeName(text: String): String {
     return if (text == Constants.WORD_G) text else "$$text"
 }

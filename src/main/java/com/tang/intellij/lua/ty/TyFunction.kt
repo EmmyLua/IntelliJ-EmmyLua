@@ -287,7 +287,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
     val problems = mutableMapOf<IFunSignature, Collection<SignatureProblem>>()
     val candidates = findCandidateSignatures(call)
 
-    candidates.forEach({
+    candidates.forEach {
         var nParams = 0
         val signatureProblems = mutableListOf<SignatureProblem>()
 
@@ -325,9 +325,9 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
         if (signatureProblems.size == 0) {
             return SignatureMatchResult(it, signature)
         } else {
-            problems.put(it, signatureProblems)
+            problems[it] = signatureProblems
         }
-    })
+    }
 
     return SignatureMatchResult(problems)
 }

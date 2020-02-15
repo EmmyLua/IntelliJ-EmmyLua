@@ -35,7 +35,7 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
     private val substitutor = TyParameterSubstitutor(map)
     private val constraints : Map<String, ITy>
 
-    protected var cur: ITy
+    private var cur: ITy
 
     init {
         val constraints = mutableMapOf<String, ITy>()

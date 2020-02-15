@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.lang.type;
+package com.tang.intellij.lua.lang.type
 
 import java.math.BigDecimal
 import kotlin.math.pow
 
-public class LuaNumber(var value: BigDecimal = BigDecimal(0)) {
+class LuaNumber(var value: BigDecimal = BigDecimal(0)) {
 	companion object {
 
 		/**
@@ -39,12 +39,7 @@ public class LuaNumber(var value: BigDecimal = BigDecimal(0)) {
 
 				if (doubleValue != null && components.size < 3) {
 					if (components.size > 1) {
-						val exponent = components[1].toIntOrNull()
-
-						if (exponent == null) {
-							return null
-						}
-
+						val exponent = components[1].toIntOrNull() ?: return null
 						doubleValue = doubleValue.pow(exponent)
 					}
 

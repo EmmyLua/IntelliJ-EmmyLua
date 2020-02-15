@@ -18,7 +18,6 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
-import com.intellij.util.BitUtil
 import com.intellij.util.Processor
 import com.intellij.util.containers.ContainerUtil
 import com.tang.intellij.lua.Constants
@@ -179,10 +178,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
         if (other is TyUnion) {
             var contravariant = true
-            TyUnion.process(other, {
+            TyUnion.process(other) {
                 contravariant = contravariantOf(it, context, flags)
                 contravariant
-            })
+            }
             return contravariant
         }
 
@@ -289,8 +288,6 @@ abstract class Ty(override val kind: TyKind) : ITy {
         fun create(classRef: LuaDocClassRef): ITy {
             val simpleType = Ty.create(classRef.classNameRef.id.text)
             return if (classRef.tyList.size > 0) {
-                val params = simpleType.getParams(SearchContext.get(classRef))
-                val args = linkedMapOf<String, ITy>()
                 TySerializedGeneric(classRef.tyList.map { it.getType() }.toTypedArray(), simpleType)
             } else simpleType
         }
