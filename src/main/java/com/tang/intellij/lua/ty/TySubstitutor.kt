@@ -124,13 +124,23 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
                         genericParam.accept(this)
                     }
                 }
-            } else if (it is ITyArray && generic.base == Ty.TABLE && generic.params.size == 2) {
-                warp (Ty.NUMBER) {
-                    generic.params.first().accept(this)
-                }
+            } else if (generic.base == Ty.TABLE && generic.params.size == 2) {
+                if (it == Ty.TABLE) {
+                    warp(Ty.UNKNOWN) {
+                        generic.params.first().accept(this)
+                    }
 
-                warp(it.base) {
-                    generic.params.last().accept(this)
+                    warp(Ty.UNKNOWN) {
+                        generic.params.last().accept(this)
+                    }
+                } else if (it is ITyArray) {
+                    warp(Ty.NUMBER) {
+                        generic.params.first().accept(this)
+                    }
+
+                    warp(it.base) {
+                        generic.params.last().accept(this)
+                    }
                 }
             }
         }
