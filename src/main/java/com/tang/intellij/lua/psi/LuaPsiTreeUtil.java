@@ -25,10 +25,12 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy;
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef;
+import com.tang.intellij.lua.comment.psi.LuaDocTagClass;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
+import com.tang.intellij.lua.ty.ITyClass;
 import com.tang.intellij.lua.ty.Ty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -98,6 +100,40 @@ public class LuaPsiTreeUtil {
         }
     }
 
+    @Nullable
+    private static LuaDocGenericDef findCurrentClassGenericDef(LuaClassMethodDef luaClassMethodDef, String name) {
+        SearchContext context = SearchContext.Companion.get(luaClassMethodDef.getProject());
+        ITy parentType = luaClassMethodDef.guessParentType(context);
+
+        if (parentType instanceof ITyClass) {
+            ITyClass cls = (ITyClass) parentType;
+            LuaClass luaClass = LuaShortNamesManager.Companion.getInstance(context.getProject()).findClass(cls.getClassName(), context);
+
+            if (luaClass instanceof LuaDocTagClass) {
+                LuaDocTagClass docTagClass = (LuaDocTagClass) luaClass;
+
+                for (LuaDocGenericDef genericDef : docTagClass.getGenericDefList()) {
+                    if (name.equals(genericDef.getId().getText()))
+                    {
+                        return genericDef;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    private static LuaDocGenericDef findCurrentClassGenericDef(@Nullable LuaCommentOwner commentOwner, String name) {
+        if (commentOwner instanceof LuaClassMethodDef) {
+            LuaClassMethodDef classMethodDef = (LuaClassMethodDef) commentOwner;
+            return findCurrentClassGenericDef(classMethodDef, name);
+        }
+
+        return null;
+    }
+
 
     private static final Class[] WS = {PsiWhiteSpace.class};
     private static final Class[] WS_COMMENTS = {PsiWhiteSpace.class, PsiComment.class};
@@ -162,10 +198,25 @@ public class LuaPsiTreeUtil {
                 }
             }
 
+            LuaDocGenericDef classGenericDef = findCurrentClassGenericDef(commentOwner, name);
+
+            if (classGenericDef != null) {
+                return classGenericDef;
+            }
+
             commentOwner = findAncestorOfType(commentOwner, LuaCommentOwner.class);
         }
 
-        return null;
+        if (current instanceof LuaClassMethodDef) {
+            LuaDocGenericDef classGenericDef = findCurrentClassGenericDef((LuaClassMethodDef) current, name);
+
+            if (classGenericDef != null) {
+                return classGenericDef;
+            }
+        }
+
+        LuaComment currentComment = findAncestorOfType(current, LuaComment.class);
+        return currentComment != null ? findCurrentClassGenericDef(currentComment.getOwner(), name) : null;
     }
 
     @Nullable
