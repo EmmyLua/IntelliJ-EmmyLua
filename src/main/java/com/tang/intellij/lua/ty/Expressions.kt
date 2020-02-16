@@ -166,7 +166,9 @@ private fun guessBinaryOpType(binaryExpr : LuaBinaryExpr, context:SearchContext)
     return if (type is TyPrimitiveLiteral) type.primitiveType else type
 }
 
-fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): ITySubstitutor? {
+fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): ITySubstitutor {
+    val selfSubstitutor = TySelfSubstitutor(context, this)
+
     if (sig.isGeneric()) {
         val list = mutableListOf<ITy>()
         // self type
@@ -200,15 +202,22 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
             val superCls = it.superClass
             if (superCls != null && Ty.isInvalid(map[it.name])) map[it.name] = superCls
         }
-        return TyParameterSubstitutor(map)
+
+        val parameterSubstitutor = TyParameterSubstitutor(map)
+
+        return object : TySubstitutor() {
+            override fun substitute(clazz: ITyClass): ITy {
+                return clazz.substitute(selfSubstitutor).substitute(parameterSubstitutor)
+            }
+        }
     }
-    return null
+
+    return selfSubstitutor
 }
 
 private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy {
     val substitutor = createSubstitutor(sig, context)
-    var returnTy = if (substitutor != null) sig.returnTy.substitute(substitutor) else sig.returnTy
-    returnTy = returnTy.substitute(TySelfSubstitutor(project, this))
+    val returnTy = sig.returnTy.substitute(substitutor)
     return if (returnTy is TyTuple) {
         if (context.guessTuple())
             returnTy

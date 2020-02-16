@@ -86,8 +86,7 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
                 if (it is ITyFunction) {
                     var sig = it.mainSignature
                     val substitutor = p2.createSubstitutor(sig, context)
-                    if (substitutor != null) sig = sig.substitute(substitutor)
-
+                    sig = sig.substitute(substitutor)
                     ret = ret.union(sig.getParamTy(idx))
                 }
             }

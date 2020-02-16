@@ -292,7 +292,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
         val signatureProblems = mutableListOf<SignatureProblem>()
 
         val substitutor = call.createSubstitutor(it, searchContext)
-        val signature = if (substitutor != null) it.substitute(substitutor) else it
+        val signature = it.substitute(substitutor)
 
         signature.processArgs(call) { i, pi ->
             nParams = i + 1

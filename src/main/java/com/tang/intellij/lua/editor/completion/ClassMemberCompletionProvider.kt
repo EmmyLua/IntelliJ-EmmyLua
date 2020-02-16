@@ -145,7 +145,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
         val bold = thisType == callType
         val className = thisType.displayName
         if (type is ITyFunction) {
-            val fn = type.substitute(TySelfSubstitutor(project, null, callType))
+            val fn = type.substitute(TySelfSubstitutor(context, null, callType))
             if (fn is ITyFunction)
                 addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, fn, thisType, callType, handlerProcessor)
         } else if (member is LuaClassField && completionMode != MemberCompletionMode.Colon) {
