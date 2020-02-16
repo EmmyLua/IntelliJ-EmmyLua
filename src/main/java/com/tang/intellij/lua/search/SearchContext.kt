@@ -185,16 +185,17 @@ class SearchContext {
     }
 
     private fun inferAndCache(psi: LuaTypeGuessable): ITy {
-        /*if (inferCache.containsKey(psi)) {
-            println("use cache!!!")
-        }*/
-        return myInferCache.getOrPut(psi) {
+        return if (index == -1) {
+            myInferCache.getOrPut(psi) {
+                ILuaTypeInfer.infer(psi, this)
+            }
+        } else {
             ILuaTypeInfer.infer(psi, this)
         }
     }
 
     fun getTypeFromCache(psi: LuaTypeGuessable): ITy {
-        return myInferCache.getOrElse(psi) { Ty.UNKNOWN }
+        return if (index == -1) myInferCache.getOrElse(psi) { Ty.UNKNOWN } else Ty.UNKNOWN
     }
 
     fun invalidateInferCache() {
