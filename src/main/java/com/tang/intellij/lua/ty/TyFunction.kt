@@ -299,7 +299,16 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
             val typeInfo = concreteTypes.getOrNull(i)
 
             if (typeInfo == null) {
-                signatureProblems.add(SignatureProblem(call.lastChild.lastChild, "Missing argument: ${pi.name}: ${pi.ty}"))
+                var problemElement = call.lastChild.lastChild
+
+                // Some PSI elements injected by IntelliJ (e.g. PsiErrorElementImpl) can be empty and thus cannot be targeted for our own errors.
+                while (problemElement != null && problemElement.textLength == 0) {
+                    problemElement = problemElement.prevSibling
+                }
+
+                problemElement = problemElement ?: call.lastChild
+
+                signatureProblems.add(SignatureProblem(problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
                 return@processArgs true
             }
 
