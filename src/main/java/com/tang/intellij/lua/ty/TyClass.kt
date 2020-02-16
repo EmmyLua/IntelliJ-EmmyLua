@@ -23,7 +23,6 @@ import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
-import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.LuaDocTableDef
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.project.LuaSettings
@@ -44,9 +43,6 @@ interface ITyClass : ITy {
     var params: Array<TyParameter>?
     fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
-    fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
-    fun findMemberType(name: String, searchContext: SearchContext): ITy?
-    fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember?
 
     fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
         return this
@@ -130,21 +126,6 @@ abstract class TyClass(override val className: String,
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
         return LuaShortNamesManager.getInstance(searchContext.project).findMember(this, name, searchContext)
-    }
-
-    override fun findMemberType(name: String, searchContext: SearchContext): ITy? {
-        return infer(findMember(name, searchContext), searchContext)
-    }
-
-    override fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {
-        // Travel up the hierarchy to find the lowest member of this type on a superclass (excluding this class)
-        var member: LuaClassMember? = null
-        processSuperClass(this, searchContext) { superType ->
-            val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
-            member = superClass?.findMember(name, searchContext)
-            member == null
-        }
-        return member
     }
 
     override fun accept(visitor: ITyVisitor) {

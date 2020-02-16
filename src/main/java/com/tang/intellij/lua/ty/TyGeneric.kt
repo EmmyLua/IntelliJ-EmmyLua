@@ -173,6 +173,10 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         )
     }
 
+    override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        return base.findMember(name, searchContext)
+    }
+
     override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
         base.processMembers(context, { _, classMember ->
             processor(this, classMember)

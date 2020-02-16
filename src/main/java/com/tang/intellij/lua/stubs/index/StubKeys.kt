@@ -18,7 +18,6 @@ package com.tang.intellij.lua.stubs.index
 
 import com.intellij.psi.NavigatablePsiElement
 import com.intellij.psi.stubs.StubIndexKey
-import com.tang.intellij.lua.comment.psi.LuaDocGenericDef
 import com.tang.intellij.lua.comment.psi.LuaDocTagAlias
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.psi.LuaClassMember

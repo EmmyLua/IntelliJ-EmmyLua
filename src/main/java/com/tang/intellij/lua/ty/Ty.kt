@@ -97,10 +97,26 @@ interface ITy : Comparable<ITy> {
 
     fun acceptChildren(visitor: ITyVisitor)
 
+    fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
     fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean = true)
+
+    fun findMemberType(name: String, searchContext: SearchContext): ITy? {
+        return infer(findMember(name, searchContext), searchContext)
+    }
 
     fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit) {
         processMembers(context, processor, true)
+    }
+
+    fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        // Travel up the hierarchy to find the lowest member of this type on a superclass (excluding this class)
+        var member: LuaClassMember? = null
+        Ty.processSuperClass(this, searchContext) { superType ->
+            val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
+            member = superClass?.findMember(name, searchContext)
+            member == null
+        }
+        return member
     }
 }
 
@@ -230,6 +246,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 list.firstOrNull()?.eachTopClass(fn)
             }
         }
+    }
+
+    override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        return null
     }
 
     override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
