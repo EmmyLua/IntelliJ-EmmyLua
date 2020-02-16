@@ -20,23 +20,19 @@ import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
-import com.tang.intellij.lua.psi.LuaAssignStat
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaTableExpr
-import com.tang.intellij.lua.psi.LuaVisitor
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
 class AssignTypeInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
-                override fun visitAssignStat(o: LuaAssignStat) {
-                    super.visitAssignStat(o)
+                fun inspectAssignment(assignees: List<LuaTypeGuessable>, expressions: List<LuaExpr>?) {
+                    if (expressions == null || expressions.size == 0) {
+                        return
+                    }
 
-                    val assignees = o.varExprList.exprList
-                    val expressions = o.valueExprList?.exprList ?: listOf()
-                    val searchContext = SearchContext.get(o)
-
+                    val searchContext = SearchContext.get(expressions.first().project)
                     var assigneeIndex = 0
 
                     for (expressionIndex in 0 until expressions.size) {
@@ -56,7 +52,6 @@ class AssignTypeInspection : StrictInspection() {
 
                             val assignee = assignees[assigneeIndex++]
 
-                            // Field access
                             if (assignee is LuaIndexExpr) {
                                 // Get owner class
                                 val fieldOwnerType = assignee.guessParentType(searchContext)
@@ -70,11 +65,15 @@ class AssignTypeInspection : StrictInspection() {
                                         myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, value))
                                     }
                                 }
+                            } else if (assignees.size == 1 && (assignee.parent?.parent as? LuaCommentOwner)?.comment?.tagClass != null) {
+                                if (value !is TyTable) {
+                                    myHolder.registerProblem(expression, "Type mismatch. Required: 'table' Found: '%s'".format(value))
+                                }
                             } else {
-                                val fieldType = assignee.guessType(searchContext)
+                                val variableType = assignee.guessType(searchContext)
 
-                                if (!fieldType.contravariantOf(value, searchContext, varianceFlags)) {
-                                    myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, value))
+                                if (!variableType.contravariantOf(value, searchContext, varianceFlags)) {
+                                    myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(variableType, value))
                                 }
                             }
 
@@ -88,6 +87,20 @@ class AssignTypeInspection : StrictInspection() {
                         for (i in assigneeIndex until assignees.size) {
                             myHolder.registerProblem(assignees[i], "Too many assignees, will be assigned nil.")
                         }
+                    }
+                }
+
+                override fun visitAssignStat(o: LuaAssignStat) {
+                    super.visitAssignStat(o)
+                    inspectAssignment(o.varExprList.exprList, o.valueExprList?.exprList)
+                }
+
+                override fun visitLocalDef(o: LuaLocalDef) {
+                    super.visitLocalDef(o)
+                    val nameList = o.nameList
+
+                    if (nameList != null) {
+                        inspectAssignment(nameList.nameDefList, o.exprList?.exprList)
                     }
                 }
             }
