@@ -48,6 +48,7 @@ public interface LuaDocTypes {
 
   IElementType ARR = new LuaDocTokenType("[]");
   IElementType AT = new LuaDocTokenType("@");
+  IElementType BACKTICK = new LuaDocTokenType("`");
   IElementType BLOCK_BEGIN = new LuaDocTokenType("BLOCK_BEGIN");
   IElementType BLOCK_END = new LuaDocTokenType("BLOCK_END");
   IElementType BOOLEAN_LITERAL = new LuaDocTokenType("BOOLEAN_LITERAL");

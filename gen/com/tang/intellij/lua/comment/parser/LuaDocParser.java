@@ -1308,13 +1308,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // SNIPPET
+  // '`' SNIPPET '`'
   public static boolean snippet_ty(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "snippet_ty")) return false;
-    if (!nextTokenIsSmart(b, SNIPPET)) return false;
+    if (!nextTokenIsSmart(b, BACKTICK)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, SNIPPET);
+    r = consumeTokensSmart(b, 0, BACKTICK, SNIPPET, BACKTICK);
     exit_section_(b, m, SNIPPET_TY, r);
     return r;
   }

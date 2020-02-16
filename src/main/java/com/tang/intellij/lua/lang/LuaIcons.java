@@ -60,7 +60,7 @@ public class LuaIcons {
     public static final Icon ROOT = IconLoader.getIcon("/icons/lua_root.svg");
     public static final Icon PROJECT = IconLoader.getIcon("/icons/lua_project.svg");
 
-    public static final Icon STRING_LITERAL = AllIcons.Nodes.Aspect;
+    public static final Icon SMART_SUGGESTION = AllIcons.Nodes.Aspect;
 
     public static class LineMarker {
         public static final Icon TailCall = IconLoader.getIcon("/icons/tail.png");

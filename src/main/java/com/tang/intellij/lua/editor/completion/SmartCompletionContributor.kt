@@ -26,6 +26,7 @@ import com.tang.intellij.lua.psi.LuaNameExpr
 import com.tang.intellij.lua.psi.LuaTypes
 import com.tang.intellij.lua.psi.shouldBe
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.TyPrimitiveLiteral
 import com.tang.intellij.lua.ty.TySnippet
 
 class SmartCompletionContributor : CompletionContributor() {
@@ -36,11 +37,19 @@ class SmartCompletionContributor : CompletionContributor() {
                 val expr = PsiTreeUtil.getParentOfType(id, LuaNameExpr::class.java) ?: return
                 val ty = expr.shouldBe(SearchContext.get(expr.project))
                 ty.each {
-                    if (it is TySnippet) {
-                        val lookupElement = LookupElementBuilder.create(it.content)
-                                .withLookupString(it.content)
-                                .withIcon(LuaIcons.STRING_LITERAL)
-                        completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 111111999.0))
+                    when (it) {
+                        is TySnippet -> {
+                            val lookupElement = LookupElementBuilder.create(it.toString())
+                                    .withLookupString(it.toString())
+                                    .withIcon(LuaIcons.SMART_SUGGESTION)
+                            completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 111111999.0))
+                        }
+                        is TyPrimitiveLiteral -> {
+                            val lookupElement = LookupElementBuilder.create(it.displayName)
+                                    .withLookupString(it.displayName)
+                                    .withIcon(LuaIcons.SMART_SUGGESTION)
+                            completionResultSet.addElement(PrioritizedLookupElement.withPriority(lookupElement, 111111998.0))
+                        }
                     }
                 }
             }

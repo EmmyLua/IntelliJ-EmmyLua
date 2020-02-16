@@ -48,17 +48,17 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
-WHITE_SPACE=({LINE_WS}|{EOL})+
-STRING=([^\r\n\t\f\]]|\]=*[^\]])*
+STRING=[^\r\n\t\f\]]*
 ID=[:jletter:] ([:jletterdigit:]|\.)*
-AT=@
 //三个-以上
-DOC_DASHES = --+
-BLOCK_BEGIN = --\[=*\[---+
-BLOCK_END = \]=*\]
+DOC_DASHES=--+
+BLOCK_BEGIN=--\[=*\[---+
+BLOCK_END=\]=*\]
 //Strings
-DOUBLE_QUOTED_STRING=\"([^\\\"]|\\\S|\\[\r\n])*\"?  //\"([^\\\"\r\n]|\\[^\r\n])*\"?
-SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
+DOUBLE_QUOTED_STRING=\"([^\\\"]|\\\S|\\[\r\n])*\"
+SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'
+// Snippets
+SNIPPET_CONTENT=([^\\`]|\\\S|\\[\r\n])+
 //Number
 n=[0-9]+
 h=[0-9a-fA-F]+
@@ -211,7 +211,7 @@ BOOLEAN=true|false
     "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
     "\""                       { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
     "'"                        { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
-    "`"                        { yybegin(xBACKTICK_QUOTED_STRING); yypushback(yylength()); }
+    "`"                        { yybegin(xBACKTICK_QUOTED_STRING); return BACKTICK; }
     {BOOLEAN}                  { return BOOLEAN_LITERAL; }
     {NUMBER}                   { return NUMBER_LITERAL; }
     "[]"                       { _typeReq = false; return ARR; }
@@ -229,7 +229,8 @@ BOOLEAN=true|false
 }
 
 <xBACKTICK_QUOTED_STRING> {
-    {SINGLE_QUOTED_STRING}    { yybegin(xTYPE_REF); return SNIPPET; }
+    {SNIPPET_CONTENT}         { return SNIPPET; }
+    "`"                       { yybegin(xTYPE_REF); return BACKTICK; }
 }
 
 <xTAG> {
@@ -244,7 +245,6 @@ BOOLEAN=true|false
 
 <xCOMMENT_STRING> {
     {STRING}                   { yybegin(xBODY); return STRING; }
-    {BLOCK_END}                { return STRING; }
 }
 
 <xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {

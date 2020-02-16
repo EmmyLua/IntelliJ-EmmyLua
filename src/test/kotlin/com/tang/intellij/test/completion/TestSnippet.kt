@@ -16,18 +16,19 @@
 
 package com.tang.intellij.test.completion
 
-class TestStringLiteralType : TestCompletionBase() {
-    fun `test literal type 1`() {
+class TestSnippet : TestCompletionBase() {
+    fun `test snippet`() {
         doTest("""
-            --- test_tuple_1.lua
+            --- test_snippet.lua
 
-            ---@param type 'A' | "B"
+            ---@param type string
+            ---@param func function | `function(event) end`
             local function addListener(type, func)
             end
 
-            addListener(--[[caret]]
+            addListener("someEvent", --[[caret]]
         """) {
-            assertTrue(it.containsAll(listOf("A", "B")))
+            assertTrue(it.contains("function(event) end"))
         }
     }
 }

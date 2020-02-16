@@ -47,6 +47,7 @@
         RPAREN = ")"
         LCURLY = "{"
         RCURLY = "}"
+        BACKTICK = "`"
         SNIPPET = "SNIPPET"
         STRING_LITERAL = "STRING_LITERAL"
         TRUE_LITERAL = "TRUE_LITERAL"
@@ -119,7 +120,7 @@ par_ty ::= '(' ty ')' {
     pin = 1
     methods = [getType]
 }
-snippet_ty ::= SNIPPET{
+snippet_ty ::= '`' SNIPPET '`' {
     methods = [getType content = 'SNIPPET']
 }
 boolean_literal_ty ::= BOOLEAN_LITERAL{
