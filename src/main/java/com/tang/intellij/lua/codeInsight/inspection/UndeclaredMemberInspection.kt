@@ -25,6 +25,7 @@ import com.tang.intellij.lua.psi.LuaVisitor
 import com.tang.intellij.lua.psi.prefixExpr
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.Ty
 
 class UndeclaredMemberInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
@@ -43,10 +44,13 @@ class UndeclaredMemberInspection : StrictInspection() {
                 override fun visitIndexExpr(o: LuaIndexExpr) {
                     val context = SearchContext.get(o)
                     val prefixType = o.prefixExpr.guessType(context)
-                    val memberName = o.id?.text
 
-                    if (memberName != null && !findMember(prefixType, memberName, context)) {
-                        myHolder.registerProblem(o.lastChild, "No such member '%s' found on type '%s'".format(memberName, prefixType))
+                    if (prefixType != Ty.UNKNOWN) {
+                        val memberName = o.id?.text
+
+                        if (memberName != null && !findMember(prefixType, memberName, context)) {
+                            myHolder.registerProblem(o.lastChild, "No such member '%s' found on type '%s'".format(memberName, prefixType))
+                        }
                     }
 
                     super.visitIndexExpr(o)
