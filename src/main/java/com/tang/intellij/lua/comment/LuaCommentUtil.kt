@@ -20,10 +20,9 @@ import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.openapi.editor.Editor
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
+import com.tang.intellij.lua.comment.psi.LuaDocTagType
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.psi.LuaAssignStat
-import com.tang.intellij.lua.psi.LuaCommentOwner
-import com.tang.intellij.lua.psi.LuaLocalDef
+import com.tang.intellij.lua.psi.*
 
 /**
  *
@@ -59,12 +58,20 @@ object LuaCommentUtil {
             return lastChild
         }
 
-        val grandParent = element.parent?.parent
+        if (element is LuaClosureExpr) {
+            val grandParent = element.parent.parent
+            val grandParentComment = if (grandParent is LuaLocalDef) {
+                grandParent.comment
+            } else if (grandParent is LuaAssignStat && grandParent.varExprList.children.size == 1) {
+                grandParent.comment
+            } else {
+                null
+            }
 
-        if (grandParent is LuaLocalDef) {
-            return grandParent.comment
-        } else if (grandParent is LuaAssignStat && grandParent.varExprList.children.size == 1) {
-            return grandParent.comment
+            // If we encounter a closure whose grandparent assignment has an EmmyDoc definition (not declaration), we return that comment.
+            if (grandParentComment?.findTag(LuaDocTagType::class.java) == null) {
+                return grandParentComment
+            }
         }
 
         return null
