@@ -101,7 +101,7 @@ public class LuaPsiTreeUtil {
     }
 
     @Nullable
-    private static LuaDocGenericDef findCurrentClassGenericDef(LuaClassMethodDef luaClassMethodDef, String name) {
+    private static LuaDocGenericDef findContextClassGenericDef(LuaClassMethodDef luaClassMethodDef, String name) {
         SearchContext context = SearchContext.Companion.get(luaClassMethodDef.getProject());
         ITy parentType = luaClassMethodDef.guessParentType(context);
 
@@ -125,10 +125,10 @@ public class LuaPsiTreeUtil {
     }
 
     @Nullable
-    private static LuaDocGenericDef findCurrentClassGenericDef(@Nullable LuaCommentOwner commentOwner, String name) {
+    private static LuaDocGenericDef findContextClassGenericDef(@Nullable LuaCommentOwner commentOwner, String name) {
         if (commentOwner instanceof LuaClassMethodDef) {
             LuaClassMethodDef classMethodDef = (LuaClassMethodDef) commentOwner;
-            return findCurrentClassGenericDef(classMethodDef, name);
+            return findContextClassGenericDef(classMethodDef, name);
         }
 
         return null;
@@ -157,13 +157,37 @@ public class LuaPsiTreeUtil {
     @NotNull
     public static ITy findContextClass(PsiElement current) {
         //todo module ty
-        while (true) {
-            if (current instanceof PsiFile)
-                break;
-            if (current instanceof LuaClassMethod) {
-                LuaClassMethod method = (LuaClassMethod) current;
-                return method.guessParentType(SearchContext.Companion.get(current.getProject()));
+        while (!(current instanceof PsiFile))
+        {
+            LuaFuncBodyOwner funcBodyOwner = null;
+
+            if (current instanceof LuaFuncBodyOwner)
+            {
+                funcBodyOwner = (LuaFuncBodyOwner) current;
             }
+            else if (current instanceof LuaAssignStat)
+            {
+                LuaAssignStat assignStat = (LuaAssignStat) current;
+                LuaExprList luaExprList = assignStat.getValueExprList();
+
+                if (luaExprList != null && luaExprList.getExprList().size() == 1) {
+                    LuaExpr luaExpr = luaExprList.getExprList().get(0);
+
+                    if (luaExpr instanceof LuaFuncBodyOwner) {
+                        funcBodyOwner = (LuaFuncBodyOwner) luaExpr;
+                    }
+                }
+            }
+
+            if (funcBodyOwner != null)
+            {
+                ITy ty = funcBodyOwner.guessParentType(SearchContext.Companion.get(current.getProject()));
+                if (ty != Ty.Companion.getUNKNOWN())
+                {
+                    return ty;
+                }
+            }
+
             current = current.getParent();
         }
         return Ty.Companion.getUNKNOWN();
@@ -198,7 +222,7 @@ public class LuaPsiTreeUtil {
                 }
             }
 
-            LuaDocGenericDef classGenericDef = findCurrentClassGenericDef(commentOwner, name);
+            LuaDocGenericDef classGenericDef = findContextClassGenericDef(commentOwner, name);
 
             if (classGenericDef != null) {
                 return classGenericDef;
@@ -208,7 +232,7 @@ public class LuaPsiTreeUtil {
         }
 
         if (current instanceof LuaClassMethodDef) {
-            LuaDocGenericDef classGenericDef = findCurrentClassGenericDef((LuaClassMethodDef) current, name);
+            LuaDocGenericDef classGenericDef = findContextClassGenericDef((LuaClassMethodDef) current, name);
 
             if (classGenericDef != null) {
                 return classGenericDef;
@@ -216,7 +240,7 @@ public class LuaPsiTreeUtil {
         }
 
         LuaComment currentComment = findAncestorOfType(current, LuaComment.class);
-        return currentComment != null ? findCurrentClassGenericDef(currentComment.getOwner(), name) : null;
+        return currentComment != null ? findContextClassGenericDef(currentComment.getOwner(), name) : null;
     }
 
     @Nullable

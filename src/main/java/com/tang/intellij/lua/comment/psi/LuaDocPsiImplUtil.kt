@@ -26,6 +26,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.StubBasedPsiElement
 import com.intellij.psi.stubs.StubElement
 import com.intellij.psi.util.PsiTreeUtil
+import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.reference.LuaClassNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
@@ -53,6 +54,11 @@ fun getReference(docClassNameRef: LuaDocClassNameRef): PsiReference {
 }
 
 fun resolveType(nameRef: LuaDocClassNameRef): ITy {
+    if (nameRef.id.text == Constants.WORD_SELF) {
+        val contextClass = LuaPsiTreeUtil.findContextClass(nameRef) as? ITyClass
+        return if (contextClass != null) TyClass.createSelfType(contextClass) else Ty.UNKNOWN
+    }
+
     return LuaPsiTreeUtil.findGenericDef(nameRef.text, nameRef)?.type ?: Ty.create(nameRef.text)
 }
 

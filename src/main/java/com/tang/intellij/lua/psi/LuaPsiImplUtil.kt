@@ -144,6 +144,24 @@ fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): 
     return TyUnion.getPerfectClass(ty) ?: Ty.UNKNOWN
 }
 
+fun guessParentType(luaClosureExpr: LuaClosureExpr, context: SearchContext): ITy {
+    val grandParent = luaClosureExpr.parent.parent
+
+    if (grandParent is LuaAssignStat && grandParent.varExprList.exprList.size == 1) {
+        val expr = grandParent.varExprList.exprList[0]
+
+        if (expr is LuaIndexExpr) {
+            return guessParentType(expr, context)
+        }
+    }
+
+    return Ty.UNKNOWN
+}
+
+fun guessParentType(luaLocalFuncDef: LuaLocalFuncDef, context: SearchContext): ITy {
+    return Ty.UNKNOWN
+}
+
 fun getNameIdentifier(funcDef: LuaFuncDef): PsiElement? {
     return funcDef.id
 }

@@ -37,7 +37,10 @@ public interface LuaFuncBodyOwner extends LuaParametersOwner, LuaTypeGuessable {
      * 返回类型
      */
     @NotNull
-    ITy guessReturnType(SearchContext searchContext);
+    ITy guessReturnType(@NotNull SearchContext searchContext);
+
+    @NotNull
+    ITy guessParentType(@NotNull SearchContext context);
 
     @Nullable
     default ITy getVarargType() {

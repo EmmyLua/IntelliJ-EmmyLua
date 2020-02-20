@@ -44,6 +44,9 @@ public interface LuaLocalFuncDef extends LuaFuncBodyOwner, LuaCommentOwner, LuaD
   ITy guessReturnType(@NotNull SearchContext searchContext);
 
   @NotNull
+  ITy guessParentType(@NotNull SearchContext context);
+
+  @NotNull
   LuaParamInfo[] getParams();
 
 }

@@ -59,6 +59,12 @@ public class LuaClosureExprImpl extends LuaClosureExprMixin implements LuaClosur
 
   @Override
   @NotNull
+  public ITy guessParentType(@NotNull SearchContext context) {
+    return LuaPsiImplUtilKt.guessParentType(this, context);
+  }
+
+  @Override
+  @NotNull
   public LuaParamInfo[] getParams() {
     return LuaPsiImplUtilKt.getParams(this);
   }

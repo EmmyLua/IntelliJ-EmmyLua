@@ -185,6 +185,11 @@ abstract class TyClass(override val className: String,
         fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
             return createGlobalType(nameExpr.name, store)
         }
+
+        fun createSelfType(classTy: ITyClass): TyClass {
+            val tyName = getSelfType(classTy)
+            return createSerializedClass(tyName, null, Constants.WORD_SELF, classTy, null, TyFlags.ANONYMOUS)
+        }
     }
 }
 
@@ -248,6 +253,10 @@ fun getTableTypeName(table: LuaTableExpr): String {
 
 fun getAnonymousType(nameDef: LuaNameDef): String {
     return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
+}
+
+fun getSelfType(classTy: ITyClass): String {
+    return "${classTy.className}:${Constants.WORD_SELF}"
 }
 
 fun getGlobalTypeName(text: String): String {

@@ -62,7 +62,7 @@ object LuaCommentUtil {
             val grandParent = element.parent.parent
             val grandParentComment = if (grandParent is LuaLocalDef) {
                 grandParent.comment
-            } else if (grandParent is LuaAssignStat && grandParent.varExprList.children.size == 1) {
+            } else if (grandParent is LuaAssignStat && grandParent.varExprList.exprList.size == 1) {
                 grandParent.comment
             } else {
                 null

@@ -279,6 +279,11 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
 }
 
 private fun LuaNameExpr.infer(context: SearchContext): ITy {
+    if (this.id.text == Constants.WORD_SELF) {
+        val contextClass = LuaPsiTreeUtil.findContextClass(this) as? ITyClass
+        return if (contextClass != null) TyClass.createSelfType(contextClass) else Ty.UNKNOWN
+    }
+
     val set = recursionGuard(this, Computable {
         var type:ITy = Ty.VOID
 

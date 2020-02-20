@@ -332,6 +332,7 @@ localFuncDef ::= 'local' 'function' ID funcBody {
         getTextOffset
         getUseScope
         guessReturnType
+        guessParentType
         getParams
     ]
     stubClass = 'com.tang.intellij.lua.stubs.LuaLocalFuncDefStub'
@@ -465,7 +466,12 @@ closureExpr ::= 'function' funcBody {
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaClosureExprStub>"
     ]
-    methods = [getParamNameDefList guessReturnType getParams]
+    methods = [
+        getParamNameDefList
+        guessReturnType
+        guessParentType
+        getParams
+    ]
     mixin = 'com.tang.intellij.lua.psi.impl.LuaClosureExprMixin'
 }
 
