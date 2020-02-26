@@ -19,7 +19,6 @@ package com.tang.intellij.lua.annotator
 import com.intellij.lang.annotation.Annotation
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
-import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.Constants
@@ -40,7 +39,6 @@ class LuaAnnotator : Annotator {
 
     companion object {
         private val STD_MARKER = Key.create<Boolean>("lua.std.marker")
-        private val UPVALUE = HighlightSeverity("UPVALUE", HighlightSeverity.INFORMATION.myVal + 1)
     }
 
     override fun annotate(psiElement: PsiElement, annotationHolder: AnnotationHolder) {
@@ -144,9 +142,10 @@ class LuaAnnotator : Annotator {
             }
 
             if (res is LuaParamNameDef) {
-                val annotation = createInfoAnnotation(id, "Parameter : \"${res.name}\"")
-                annotation.textAttributes = LuaHighlightingData.PARAMETER
-                checkUpValue(o)
+                if (!checkUpValue(o)) {
+                    val annotation = createInfoAnnotation(id, "Parameter : \"${res.name}\"")
+                    annotation.textAttributes = LuaHighlightingData.PARAMETER
+                }
             } else if (res is LuaFuncDef) {
                 val resolvedFile = res.containingFile
                 if (resolvedFile !is LuaPsiFile || resolvedFile.moduleName == null) {
@@ -157,17 +156,20 @@ class LuaAnnotator : Annotator {
                 }
             } else {
                 if (id.textMatches(Constants.WORD_SELF)) {
-                    val annotation = createInfoAnnotation(id)
-                    annotation.textAttributes = LuaHighlightingData.SELF
-                    checkUpValue(o)
+                    if (!checkUpValue(o)) {
+                        val annotation = createInfoAnnotation(id)
+                        annotation.textAttributes = LuaHighlightingData.SELF
+                    }
                 } else if (res is LuaNameDef) {
-                    val annotation = createInfoAnnotation(id, "Local variable \"${o.name}\"")
-                    annotation.textAttributes = LuaHighlightingData.LOCAL_VAR
-                    checkUpValue(o)
+                    if (!checkUpValue(o)) {
+                        val annotation = createInfoAnnotation(id, "Local variable \"${o.name}\"")
+                        annotation.textAttributes = LuaHighlightingData.LOCAL_VAR
+                    }
                 } else if (res is LuaLocalFuncDef) {
-                    val annotation = createInfoAnnotation(id, "Local function \"${o.name}\"")
-                    annotation.textAttributes = LuaHighlightingData.LOCAL_VAR
-                    checkUpValue(o)
+                    if (!checkUpValue(o)) {
+                        val annotation = createInfoAnnotation(id, "Local function \"${o.name}\"")
+                        annotation.textAttributes = LuaHighlightingData.LOCAL_VAR
+                    }
                 } else {
                     if (isModuleFile) {
                         val annotation = createInfoAnnotation(id, "Module field \"${o.name}\"")
@@ -180,12 +182,13 @@ class LuaAnnotator : Annotator {
             }
         }
 
-        private fun checkUpValue(o: LuaNameExpr) {
+        private fun checkUpValue(o: LuaNameExpr): Boolean {
             val upValue = isUpValue(o, SearchContext.get(o.project))
             if (upValue) {
-                val annotation = myHolder?.createAnnotation(UPVALUE, o.id.textRange, "Up-value \"${o.name}\"")
+                val annotation = myHolder?.createInfoAnnotation(o.id.textRange, "Up-value \"${o.name}\"")
                 annotation?.textAttributes = LuaHighlightingData.UP_VALUE
             }
+            return upValue
         }
 
         override fun visitIndexExpr(o: LuaIndexExpr) {
