@@ -18,7 +18,7 @@ package com.tang.intellij.test.inspections
 
 import com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection
 
-class ReturnTypeInspectionTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
+class ReturnTypeTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
 
     fun `test return 1`() = checkByText("""
         ---@return string

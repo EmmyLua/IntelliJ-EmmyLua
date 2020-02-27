@@ -16,18 +16,28 @@
 
 package com.tang.intellij.test.inspections
 
-import com.tang.intellij.test.LuaTestBase
 import com.intellij.codeInspection.LocalInspectionTool
+import com.tang.intellij.test.LuaTestBase
 import org.intellij.lang.annotations.Language
 
-abstract class LuaInspectionsTestBase(private val inspection: LocalInspectionTool) : LuaTestBase() {
-    private fun enableInspection() =
-            myFixture.enableInspections(inspection.javaClass)
+abstract class LuaInspectionsTestBase(private vararg val inspections: LocalInspectionTool) : LuaTestBase() {
+    override fun getTestDataPath(): String {
+        return "src/test/resources/inspections"
+    }
+
+    protected fun enableInspection() =
+            myFixture.enableInspections(inspections.map { it.javaClass })
 
     protected fun checkByText(
             @Language("Lua") text: String,
             checkWarn: Boolean = true, checkInfo: Boolean = false, checkWeakWarn: Boolean = false) {
         myFixture.configureByText("main.lua", text)
+        enableInspection()
+        myFixture.checkHighlighting(checkWarn, checkInfo, checkWeakWarn)
+    }
+
+    protected fun checkByFile(filename: String, checkWarn: Boolean = true, checkInfo: Boolean = false, checkWeakWarn: Boolean = false) {
+        myFixture.configureByFile(filename)
         enableInspection()
         myFixture.checkHighlighting(checkWarn, checkInfo, checkWeakWarn)
     }
