@@ -71,7 +71,16 @@ class LuaDocTagClassType : LuaStubElementType<LuaDocTagClassStub, LuaDocTagClass
         val classType = luaDocClassStub.classType
         indexSink.occurrence(StubKeys.CLASS, classType.className)
         indexSink.occurrence(StubKeys.SHORT_NAME, classType.className)
-        (classType.superClass as? ITyClass)?.let { indexSink.occurrence(StubKeys.SUPER_CLASS, it.className) }
+        val superClass = classType.superClass
+        when (superClass) {
+            is ITyClass -> indexSink.occurrence(StubKeys.SUPER_CLASS, superClass.className)
+            is ITyGeneric -> {
+                val base = superClass.base
+                if (base is ITyClass) {
+                    indexSink.occurrence(StubKeys.SUPER_CLASS, base.className)
+                }
+            }
+        }
     }
 }
 

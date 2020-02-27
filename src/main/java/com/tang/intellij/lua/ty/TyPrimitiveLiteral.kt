@@ -65,11 +65,12 @@ class TyPrimitiveLiteral private constructor(override val primitiveKind: TyPrimi
 
 object TyPrimitiveLiteralSerializer : TySerializer<TyPrimitiveLiteral>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): TyPrimitiveLiteral {
-        return TyPrimitiveLiteral.getTy(TyPrimitiveKind.valueOf(stream.readUTF()), stream.readUTF())
+        val primitiveKind = stream.readByte().toInt()
+        return TyPrimitiveLiteral.getTy(TyPrimitiveKind.values()[primitiveKind], stream.readUTF())
     }
 
     override fun serializeTy(ty: TyPrimitiveLiteral, stream: StubOutputStream) {
-        stream.writeUTF(ty.primitiveKind.toString())
+        stream.writeByte(ty.primitiveKind.ordinal)
         stream.writeUTF(ty.value)
     }
 }

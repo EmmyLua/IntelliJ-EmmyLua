@@ -93,6 +93,7 @@ object TyPrimitiveSerializer : TySerializer<ITy>() {
         when (ty) {
             is TyPrimitive -> stream.writeByte(ty.primitiveKind.ordinal)
             is TyPrimitiveClass -> stream.writeByte(ty.primitiveKind.ordinal)
+            else -> stream.writeByte(-1)
         }
     }
 }
