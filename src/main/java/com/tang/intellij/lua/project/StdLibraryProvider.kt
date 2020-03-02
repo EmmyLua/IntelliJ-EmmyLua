@@ -39,11 +39,23 @@ class StdLibraryProvider: AdditionalLibraryRootsProvider() {
     override fun getAdditionalProjectLibraries(project: Project): Collection<StdLibrary> {
         val level = LuaSettings.instance.languageLevel
         val std = "std/Lua${level.version}"
-        val jarPath = PathUtil.getJarPathForClass(StdLibraryProvider::class.java)
-        val dir = if (jarPath.endsWith(".jar"))
-            VfsUtil.findFileByURL(URLUtil.getJarEntryURL(File(jarPath), std))
-        else
-            VfsUtil.findFileByIoFile(File("$jarPath/$std"), true)
+        val cls = StdLibraryProvider::class.java
+        val jarPath = PathUtil.getJarPathForClass(cls)
+        var dir: VirtualFile?
+
+        if (jarPath.endsWith(".jar")) {
+            dir = VfsUtil.findFileByURL(URLUtil.getJarEntryURL(File(jarPath), std))
+        } else {
+            dir = VfsUtil.findFileByIoFile(File("$jarPath/$std"), true)
+
+            if (dir == null) {
+                val resourceUrl = cls.classLoader.getResource(std)
+
+                if (resourceUrl != null) {
+                    dir = VfsUtil.findFileByURL(resourceUrl)
+                }
+            }
+        }
 
         if (dir != null) {
             dir.children.forEach {
