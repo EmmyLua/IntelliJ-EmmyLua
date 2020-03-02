@@ -286,6 +286,7 @@
                 displayName="Undeclared member"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                level="ERROR"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.UndeclaredMemberInspection"/>
         <localInspection
                 displayName="Return type"
