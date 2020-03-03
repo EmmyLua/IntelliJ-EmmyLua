@@ -5,4 +5,4 @@ local aNumberOrNil
 local aNumber
 
 aNumberOrNil = nil
-aNumber =  nil -- Expect error if 'Strict nil checks' is enabled
+aNumber =  <error descr="Type mismatch. Required: 'number' Found: 'nil'">nil</error>

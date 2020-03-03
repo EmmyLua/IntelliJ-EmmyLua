@@ -19,4 +19,4 @@ local stringLiteralOrNumber
 
 stringOrNumberVar = stringLiteralOrNumber
 
-stringLiteralOrNumber = stringOrNumberVar -- Expect error as string is not a subtype of "hi" (a string literal).
+stringLiteralOrNumber = <error descr="Type mismatch. Required: '\"hi\"|number' Found: 'string|number'">stringOrNumberVar</error>

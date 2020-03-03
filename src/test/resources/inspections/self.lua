@@ -14,9 +14,9 @@ function SelfA:colonMethod()
     local someSelfA
 
     someSelfA = self
-    self = someSelfA -- Expect error
-    selfTypedVar = someSelfA -- Expect error
-    aNumber = self -- Expect error
+    self = <error descr="Type mismatch. Required: '' Found: 'SelfA'">someSelfA</error>
+    selfTypedVar = <error descr="Type mismatch. Required: '' Found: 'SelfA'">someSelfA</error>
+    aNumber = <error descr="Type mismatch. Required: 'number' Found: ''">self</error>
 
     return self
 end
@@ -30,9 +30,9 @@ function SelfA.dotMethod()
     local someSelfA
 
     someSelfA = self
-    self = someSelfA -- Expect error
-    selfTypedVar = someSelfA -- Expect error
-    aNumber = self -- Expect error
+    self = <error descr="Type mismatch. Required: '' Found: 'SelfA'">someSelfA</error>
+    selfTypedVar = <error descr="Type mismatch. Required: '' Found: 'SelfA'">someSelfA</error>
+    aNumber = <error descr="Type mismatch. Required: 'number' Found: ''">self</error>
 
     return self
 end
@@ -46,9 +46,9 @@ SelfA.lambdaMethod = function()
     local someSelfA
 
     someSelfA = self
-    self = someSelfA -- Expect error
-    selfTypedVar = someSelfA -- Expect error
-    aNumber = self -- Expect error
+    self = <error descr="Type mismatch. Required: '' Found: 'SelfA'">someSelfA</error>
+    selfTypedVar = <error descr="Type mismatch. Required: '' Found: 'SelfA'">someSelfA</error>
+    aNumber = <error descr="Type mismatch. Required: 'number' Found: ''">self</error>
 
     return self
 end
@@ -71,9 +71,9 @@ selfA = SelfB:colonMethod()
 selfA = SelfB:dotMethod()
 selfA = SelfB:lambdaMethod()
 
-selfB = SelfA:colonMethod() -- Expect error
-selfB = SelfA:dotMethod() -- Expect error
-selfB = SelfA:lambdaMethod() -- Expect error
+selfB = <error descr="Type mismatch. Required: 'SelfB' Found: 'SelfA'">SelfA:colonMethod()</error>
+selfB = <error descr="Type mismatch. Required: 'SelfB' Found: 'SelfA'">SelfA:dotMethod()</error>
+selfB = <error descr="Type mismatch. Required: 'SelfB' Found: 'SelfA'">SelfA:lambdaMethod()</error>
 
 selfB = selfB:colonMethod()
 selfB = selfB:dotMethod()
@@ -83,6 +83,6 @@ selfA = selfB:colonMethod()
 selfA = selfB:dotMethod()
 selfA = selfB:lambdaMethod()
 
-selfB = selfA:colonMethod() -- Expect error
-selfB = selfA:dotMethod() -- Expect error
-selfB = selfA:lambdaMethod() -- Expect error
+selfB = <error descr="Type mismatch. Required: 'SelfB' Found: 'SelfA'">selfA:colonMethod()</error>
+selfB = <error descr="Type mismatch. Required: 'SelfB' Found: 'SelfA'">selfA:dotMethod()</error>
+selfB = <error descr="Type mismatch. Required: 'SelfB' Found: 'SelfA'">selfA:lambdaMethod()</error>

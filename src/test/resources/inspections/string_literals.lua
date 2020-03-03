@@ -11,8 +11,8 @@ str = implictlyTypedString
 str = explictlyTypedLiteral
 
 explictlyTypedLiteral = "stringLiteral"
-explictlyTypedLiteral = str -- Expect error
-explictlyTypedLiteral = implictlyTypedString -- Expect error
+explictlyTypedLiteral = <error descr="Type mismatch. Required: '\"stringLiteral\"' Found: 'string'">str</error>
+explictlyTypedLiteral = <error descr="Type mismatch. Required: '\"stringLiteral\"' Found: 'string'">implictlyTypedString</error>
 
 local literalTable = {
     a = "stringLiteral",
@@ -21,4 +21,4 @@ local literalTable = {
 
 str = literalTable.a
 explictlyTypedLiteral = literalTable.a
-explictlyTypedLiteral = literalTable.b -- Expect error
+explictlyTypedLiteral = <error descr="Type mismatch. Required: '\"stringLiteral\"' Found: '\"aDifferentStringLiteral\"'">literalTable.b</error>

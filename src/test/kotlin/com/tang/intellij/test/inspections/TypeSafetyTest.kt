@@ -19,11 +19,13 @@ package com.tang.intellij.test.inspections
 import com.tang.intellij.lua.codeInsight.inspection.AssignTypeInspection
 import com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection
 import com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection
+import com.tang.intellij.lua.codeInsight.inspection.UndeclaredMemberInspection
+import com.tang.intellij.lua.codeInsight.inspection.doc.GenericConstraintInspection
 import com.tang.intellij.lua.codeInsight.inspection.doc.GenericParameterShadowed
 import com.tang.intellij.lua.lang.LuaLanguageLevel
 import com.tang.intellij.lua.project.LuaSettings
 
-class TypeSafetyTest : LuaInspectionsTestBase(AssignTypeInspection(), GenericParameterShadowed(), MatchFunctionSignatureInspection(), ReturnTypeInspection()) {
+class TypeSafetyTest : LuaInspectionsTestBase(AssignTypeInspection(), GenericConstraintInspection(), GenericParameterShadowed(), MatchFunctionSignatureInspection(), ReturnTypeInspection(), UndeclaredMemberInspection()) {
     fun testBoolean() {
         checkByFile("boolean.lua")
     }
@@ -56,9 +58,10 @@ class TypeSafetyTest : LuaInspectionsTestBase(AssignTypeInspection(), GenericPar
         checkByFile("generic_class_constraints.lua")
     }
 
-    fun testGenericClassCovariance() {
+    // TODO: Uncomment once https://youtrack.jetbrains.com/issue/IJSDK-799 is resolved.
+    /*fun testGenericClassCovariance() {
         checkByFile("generic_class_covariance.lua")
-    }
+    }*/
 
     fun testGenericClassFields() {
         checkByFile("generic_class_fields.lua")
@@ -85,5 +88,49 @@ class TypeSafetyTest : LuaInspectionsTestBase(AssignTypeInspection(), GenericPar
         LuaSettings.instance.languageLevel = LuaLanguageLevel.LUA51
         enableInspection()
         myFixture.checkHighlighting(true, false, false)
+        LuaSettings.instance.languageLevel = LuaLanguageLevel.LUA53
+    }
+
+    fun testNumbers() {
+        LuaSettings.instance.languageLevel = LuaLanguageLevel.LUA53
+        checkByFile("numbers.lua")
+    }
+
+    fun testOps() {
+        checkByFile("ops.lua")
+    }
+
+    fun testOverloads() {
+        checkByFile("overloads.lua")
+    }
+
+    fun testSelf() {
+        checkByFile("self.lua")
+    }
+
+    fun testStrictNil() {
+        LuaSettings.instance.isNilStrict = true
+        checkByFile("strict_nil.lua")
+        LuaSettings.instance.isNilStrict = false
+    }
+
+    fun testStringLiterals() {
+        checkByFile("string_literals.lua")
+    }
+
+    fun testTables() {
+        checkByFile("tables.lua")
+    }
+
+    fun testTrailingType() {
+        checkByFile("trailing_type.lua")
+    }
+
+    fun testUnions() {
+        checkByFile("unions.lua")
+    }
+
+    fun testUnknown() {
+        checkByFile("unknown.lua")
     }
 }

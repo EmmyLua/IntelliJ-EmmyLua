@@ -5,4 +5,4 @@ local function wantsNumber(num) end
 
 wantsNumber(a)
 
-local b = "hello" ---@type number @Expect error
+local b = <error descr="Type mismatch. Required: 'number' Found: '\"hello\"'">"hello"</error> ---@type number

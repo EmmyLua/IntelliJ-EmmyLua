@@ -15,5 +15,5 @@ theNumberOne = 1
 theNumberOne = 0x1 -- Hex representation
 theNumberOne = 1.0 -- All numbers are floats in Lua < 5.3. >= 5.3 they're implicitly comparable i.e. (1 == 1.0) == true
 
-theNumberOne = 2 -- Expect error
-theNumberOne = returnsANumber() -- Expect error
+theNumberOne = <error descr="Type mismatch. Required: '1' Found: '2'">2</error>
+theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'number'">returnsANumber()</error>

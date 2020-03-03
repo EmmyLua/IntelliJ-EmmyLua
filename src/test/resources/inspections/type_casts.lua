@@ -8,7 +8,7 @@ end
 function wantsNumber(n)
 end
 
-wantsNumber(stringOrNumber(false)) -- Type mismatch. Required: 'number' Found 'string|number'
+wantsNumber(<error descr="Type mismatch for argument: n. Required: 'number' Found: 'string|number'">stringOrNumber(false)</error>)
 wantsNumber(--[[---@type number]] stringOrNumber(false))
 
 wantsNumber(
@@ -16,7 +16,7 @@ wantsNumber(
         stringOrNumber(false)
 )
 
-wantsNumber(--[[---@type fun(): any]] 1) -- Type mismatch. Required: 'number' Found 'fun(): any'
+wantsNumber(<error descr="Type mismatch for argument: n. Required: 'number' Found: 'fun(): any'">--[[---@type fun(): any]] 1</error>)
 
 ---@param arr any[]
 function wantsArray(arr)
@@ -24,5 +24,5 @@ end
 
 local aString = "aString"
 
-wantsArray(aString) -- Type mismatch. Required: 'any[]' Found 'string'
+wantsArray(<error descr="Type mismatch for argument: arr. Required: 'any[]' Found: 'string'">aString</error>)
 wantsArray(--[[--- @type any[] ]] aString) -- Trailing space used to separate array ']' from the block comment ']]'.
