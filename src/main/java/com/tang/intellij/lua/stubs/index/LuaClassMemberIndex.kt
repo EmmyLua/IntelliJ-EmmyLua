@@ -46,15 +46,15 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return ContainerUtil.process(all, processor)
         }
 
-        fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+        private fun process(cls: ITyClass?, className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean): Boolean {
             val key = "$className*$fieldName"
             if (!process(key, context, processor))
                 return false
 
             if (deep) {
-                val classDef = LuaClassIndex.find(className, context)
-                if (classDef != null) {
-                    val type = classDef.type
+                val type = cls ?: LuaClassIndex.find(className, context)?.type
+
+                if (type != null) {
                     // from alias
                     type.lazyInit(context)
                     val notFound = type.processAlias(Processor {
@@ -66,12 +66,20 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                     return Ty.processSuperClass(type, context) { superType ->
                         val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
                         if (superClass != null) {
-                            process(superClass.className, fieldName, context, processor, false)
+                            process(superClass, fieldName, context, processor, false)
                         } else true
                     }
                 }
             }
             return true
+        }
+
+        fun process(cls: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+            return process(cls, cls.className, fieldName, context, processor, deep)
+        }
+
+        fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+            return process(null, className, fieldName, context, processor, deep)
         }
 
         fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
@@ -102,8 +110,8 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
 
         fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             return if (type is TyParameter)
-                (type.superClass as? ITyClass)?.let { process(it.className, fieldName, context, processor) } ?: true
-            else process(type.className, fieldName, context, processor)
+                (type.superClass as? ITyClass)?.let { process(it, fieldName, context, processor) } ?: true
+            else process(type, fieldName, context, processor)
         }
 
         fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {
