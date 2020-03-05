@@ -26,14 +26,21 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 %{ // User code
     private int _typeLevel = 0;
     private boolean _typeReq = false;
+    private int _nextState;
+
     public _LuaDocLexer() {
         this((java.io.Reader) null);
     }
 
-    private void beginType() {
+    private void beginType(int nextState) {
         yybegin(xTYPE_REF);
         _typeLevel = 0;
         _typeReq = true;
+        _nextState = nextState;
+    }
+
+    private void beginType() {
+        beginType(xBODY);
     }
 
     private int nBrackets = -1;
@@ -173,14 +180,13 @@ BOOLEAN=true|false
 
 <xCLASS_PARAM_LIST> {
     {ID}                       { return ID; }
-    ":"                        { beginType(); return EXTENDS; }
+    ":"                        { beginType(xCLASS_PARAM_LIST); return EXTENDS; }
     ","                        { return COMMA; }
     ">"                        { yybegin(xCLASS_EXTEND); return GT; }
 }
 
 <xCLASS_EXTEND> {
     ":"                        { beginType(); return EXTENDS; }
-    [^]                        { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
 <xPARAM> {
@@ -217,7 +223,7 @@ BOOLEAN=true|false
     "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
     "vararg"                   { _typeReq = true; return VARARG; }
-    "..."|{ID}                 { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(xCOMMENT_STRING); yypushback(yylength()); } }
+    "..."|{ID}                 { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(_nextState); yypushback(yylength()); } }
 }
 
 <xDOUBLE_QUOTED_STRING> {
