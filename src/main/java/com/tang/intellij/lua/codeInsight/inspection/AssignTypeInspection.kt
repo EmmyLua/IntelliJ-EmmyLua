@@ -62,18 +62,18 @@ class AssignTypeInspection : StrictInspection() {
                                     val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
 
                                     if (!fieldType.contravariantOf(value, searchContext, varianceFlags)) {
-                                        myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType, value))
+                                        myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType.displayName, value.displayName))
                                     }
                                 }
                             } else if (assignees.size == 1 && (assignee.parent?.parent as? LuaCommentOwner)?.comment?.tagClass != null) {
                                 if (value !is TyTable) {
-                                    myHolder.registerProblem(expression, "Type mismatch. Required: 'table' Found: '%s'".format(value))
+                                    myHolder.registerProblem(expression, "Type mismatch. Required: 'table' Found: '%s'".format(value.displayName))
                                 }
                             } else {
                                 val variableType = assignee.guessType(searchContext)
 
                                 if (!variableType.contravariantOf(value, searchContext, varianceFlags)) {
-                                    myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(variableType, value))
+                                    myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(variableType.displayName, value.displayName))
                                 }
                             }
 

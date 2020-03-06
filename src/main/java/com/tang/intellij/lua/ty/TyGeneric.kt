@@ -26,9 +26,12 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.readTyNullable
 import com.tang.intellij.lua.stubs.writeTyNullable
 
-class TyParameter(val name: String, varName: String, superClass: ITy? = null) : TySerializedClass(name, emptyArray(), varName, superClass, null, TyFlags.ANONYMOUS) {
+fun genericParameterName(def: LuaDocGenericDef): String {
+    return "${def.id.text}@${def.node.startOffset}@${def.containingFile.name}"
+}
 
-    constructor(def: LuaDocGenericDef) : this(def.id.text, def.id.text, def.classRef?.let { Ty.create(it) })
+class TyParameter(val name: String, varName: String, superClass: ITy? = null) : TySerializedClass(name, emptyArray(), varName, superClass, null) {
+    constructor(def: LuaDocGenericDef) : this(genericParameterName(def), def.id.text, def.classRef?.let { Ty.create(it) })
 
     override val kind: TyKind
         get() = TyKind.GenericParam

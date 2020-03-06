@@ -113,6 +113,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                 clazz.table.tableFieldList.forEach { it.ty?.let { ty-> list.add("${it.name}: ${render(ty.getType())}") } }
                 "{ ${list.joinToString(", ")} }"
             }
+            clazz is TyParameter -> clazz.superClass?.let { "${clazz.varName} : ${it.displayName}" } ?: clazz.varName
             clazz.hasFlag(TyFlags.ANONYMOUS_TABLE) -> renderType(Constants.WORD_TABLE)
             clazz.isAnonymous -> "[local ${clazz.varName}]"
             clazz.isGlobal -> "[global ${clazz.varName}]"
