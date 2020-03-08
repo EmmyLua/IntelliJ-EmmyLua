@@ -34,7 +34,7 @@ class GenericParameterShadowed : LocalInspectionTool() {
 
                 val genericName = o.id.text
                 val container = LuaCommentUtil.findContainer(o)
-                val genericDef = LuaPsiTreeUtil.findGenericDef(genericName, container.parent)
+                val genericDef = LuaPsiTreeUtil.findGenericDef(genericName, container.parent, true)
 
                 if (genericDef != null) {
                     val document = FileDocumentManager.getInstance().getDocument(genericDef.containingFile.virtualFile)
