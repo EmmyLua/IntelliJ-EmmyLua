@@ -51,7 +51,7 @@ local outerFunction = function(a)
         local v
     end
 
-    innerFunction(<error descr="Type mismatch for argument: b. Required: '[local K]' Found: '\"someValue\"'">"someValue"</error>)
+    innerFunction(<error descr="Type mismatch for argument: b. Required: 'K' Found: '\"someValue\"'">"someValue"</error>)
     return a
 end
 

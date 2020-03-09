@@ -25,7 +25,14 @@ import com.tang.intellij.lua.codeInsight.inspection.doc.GenericParameterShadowed
 import com.tang.intellij.lua.lang.LuaLanguageLevel
 import com.tang.intellij.lua.project.LuaSettings
 
-class TypeSafetyTest : LuaInspectionsTestBase(AssignTypeInspection(), GenericConstraintInspection(), GenericParameterShadowed(), MatchFunctionSignatureInspection(), ReturnTypeInspection(), UndeclaredMemberInspection()) {
+class TypeSafetyTest : LuaInspectionsTestBase(
+        AssignTypeInspection(),
+        GenericConstraintInspection(),
+        GenericParameterShadowed(),
+        MatchFunctionSignatureInspection(),
+        ReturnTypeInspection(),
+        UndeclaredMemberInspection()
+) {
     fun testBoolean() {
         checkByFile("boolean.lua")
     }
@@ -70,6 +77,11 @@ class TypeSafetyTest : LuaInspectionsTestBase(AssignTypeInspection(), GenericCon
     fun testGenericClassScope() {
         checkByFile("generic_class_scope.lua")
     }
+
+    // TODO: Uncomment once https://youtrack.jetbrains.com/issue/IJSDK-799 is resolved.
+    /*fun testGenericSelf() {
+        checkByFile("generic_self.lua")
+    }*/
 
     fun testImplicitTypes() {
         checkByFile("implicit_types.lua")

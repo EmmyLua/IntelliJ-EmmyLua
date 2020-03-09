@@ -20,14 +20,14 @@ import com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection
 
 class ReturnTypeTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
 
-    fun `test return 1`() = checkByText("""
+    fun `test return type mismatch`() = checkByText("""
         ---@return string
         local function test()
-            <warning>return 1</warning>
+            <error descr="Type mismatch. Expected: 'string' Found: '1'">return 1</error>
         end
     """)
 
-    fun `test return 2`() = checkByText("""
+    fun `test matching return type`() = checkByText("""
         ---@return string
         local function test()
             return "right"
@@ -36,7 +36,7 @@ class ReturnTypeTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
 
     fun `test non return`() = checkByText("""
         ---@return string
-        local function test<warning>()
-        end</warning>
+        local function test<error descr="Return type 'string' specified but no return values found.">()
+        end</error>
     """)
 }

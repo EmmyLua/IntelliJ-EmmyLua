@@ -25,8 +25,8 @@ local function fn(arg)
     -- T = anonymous type : void (inherits from void because we can make no assumptions about it)
     local var = arg
 
-    anyNumber = <error descr="Type mismatch. Required: 'number' Found: '[local T]'">var</error>
-    anyString = <error descr="Type mismatch. Required: 'string' Found: '[local T]'">var</error>
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: 'T'">var</error>
+    anyString = <error descr="Type mismatch. Required: 'string' Found: 'T'">var</error>
     anything = var
 end
 
@@ -45,16 +45,16 @@ local function fn2(arg)
     local var = arg
 
     anyNumber = var
-    number1 = <error descr="Type mismatch. Required: '1' Found: '[local T]'">var</error>
-    anyString = <error descr="Type mismatch. Required: 'string' Found: '[local T]'">var</error>
+    number1 = <error descr="Type mismatch. Required: '1' Found: 'T : number'">var</error>
+    anyString = <error descr="Type mismatch. Required: 'string' Found: 'T : number'">var</error>
 end
 
 -- T = number
 fn2(anything)
 fn2(anyNumber)
 fn2(number1)
-fn2(<error descr="Type mismatch for argument: arg. Required: '[local T]' Found: 'string'">anyString</error>)
-fn2(<error descr="Type mismatch for argument: arg. Required: '[local T]' Found: '\"string1\"'">string1</error>)
+fn2(<error descr="Type mismatch for argument: arg. Required: 'T : number' Found: 'string'">anyString</error>)
+fn2(<error descr="Type mismatch for argument: arg. Required: 'T : number' Found: '\"string1\"'">string1</error>)
 
 
 
@@ -80,8 +80,8 @@ local function fn4(arg1, arg2)
 
     anyNumber = arg1
     anyNumber = arg2
-    number1 = <error descr="Type mismatch. Required: '1' Found: '[local T]'">arg1</error>
-    number1 = <error descr="Type mismatch. Required: '1' Found: '[local T]'">arg2</error>
+    number1 = <error descr="Type mismatch. Required: '1' Found: 'T : number'">arg1</error>
+    number1 = <error descr="Type mismatch. Required: '1' Found: 'T : number'">arg2</error>
 
     ---@type T
     local t
@@ -97,7 +97,7 @@ end
 fn4(number1, number2)
 
 -- T = number
-fn4(<error descr="Type mismatch for argument: arg1. Required: '[local T]' Found: '1'">number1</error>, <error descr="Type mismatch for argument: arg2. Required: '[local T]' Found: '\"string1\"'">string1</error>)
+fn4(<error descr="Type mismatch for argument: arg1. Required: 'T : number' Found: '1'">number1</error>, <error descr="Type mismatch for argument: arg2. Required: 'T : number' Found: '\"string1\"'">string1</error>)
 
 
 
@@ -236,7 +236,7 @@ local stringStringTable
 -- K = string, T = table<string, string>
 anyString = <error descr="Type mismatch. Required: 'string' Found: 'table<string, string>'">fn9(anyString, stringStringTable)</error>
 stringStringTable = fn9(anyString, stringStringTable)
-stringStringTable = fn9(anyString, <error descr="Type mismatch for argument: arg2. Required: '[local T]' Found: 'table<string, number>'">stringNumberTable</error>)
+stringStringTable = fn9(anyString, <error descr="Type mismatch for argument: arg2. Required: 'T : table<K : string, string>' Found: 'table<string, number>'">stringNumberTable</error>)
 stringStringTable = fn9(string1, stringStringTable)
 
 ---@type table<"string1", string>
