@@ -54,6 +54,7 @@ class TyFlags {
         const val GLOBAL = 0x2
         const val SELF_FUNCTION = 0x4 // xxx.method()
         const val ANONYMOUS_TABLE = 0x8 // local xx = {}, flag of this table `{}`
+        const val SHAPE = 0x10 // variance is considered per field
     }
 }
 class TyVarianceFlags {
@@ -201,8 +202,29 @@ abstract class Ty(override val kind: TyKind) : ITy {
             return contravariant
         }
 
-        val otherSuper = other.getSuperClass(context)
-        return otherSuper != null && contravariantOf(otherSuper, context, flags)
+        if (this.flags and TyFlags.SHAPE != 0) {
+            return processMembers(context, { ty, classMember ->
+                val memberName = classMember.name
+
+                if (memberName == null) {
+                    return@processMembers false
+                }
+
+                val otherMember = other.findMember(memberName, context)
+
+                if (otherMember == null) {
+                    return@processMembers false
+                }
+
+                val memberTy = classMember.guessType(context)
+                val otherMemberTy = otherMember.guessType(context)
+
+                memberTy.contravariantOf(otherMemberTy, context, flags)
+            }, true)
+        } else {
+            val otherSuper = other.getSuperClass(context)
+            return otherSuper != null && contravariantOf(otherSuper, context, flags)
+        }
     }
 
     override fun covariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {

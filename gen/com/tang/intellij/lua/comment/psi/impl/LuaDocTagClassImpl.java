@@ -104,6 +104,11 @@ public class LuaDocTagClassImpl extends StubBasedPsiElementBase<LuaDocTagClassSt
   }
 
   @Override
+  public boolean isShape() {
+    return LuaDocPsiImplUtilKt.isShape(this);
+  }
+
+  @Override
   @Nullable
   public LuaDocClassRef getSuperClassRef() {
     return PsiTreeUtil.getChildOfType(this, LuaDocClassRef.class);
@@ -113,6 +118,12 @@ public class LuaDocTagClassImpl extends StubBasedPsiElementBase<LuaDocTagClassSt
   @Nullable
   public PsiElement getModule() {
     return findChildByType(TAG_NAME_MODULE);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getShape() {
+    return findChildByType(TAG_NAME_SHAPE);
   }
 
 }

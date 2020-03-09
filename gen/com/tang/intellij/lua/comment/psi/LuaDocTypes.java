@@ -91,6 +91,7 @@ public interface LuaDocTypes {
   IElementType TAG_NAME_PUBLIC = new LuaDocTokenType("public");
   IElementType TAG_NAME_RETURN = new LuaDocTokenType("return");
   IElementType TAG_NAME_SEE = new LuaDocTokenType("see");
+  IElementType TAG_NAME_SHAPE = new LuaDocTokenType("shape");
   IElementType TAG_NAME_SUPPRESS = new LuaDocTokenType("suppress");
   IElementType TAG_NAME_TYPE = new LuaDocTokenType("type");
   IElementType TAG_NAME_VARARG = new LuaDocTokenType("vararg");

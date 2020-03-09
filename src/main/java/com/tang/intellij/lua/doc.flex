@@ -135,6 +135,7 @@ BOOLEAN=true|false
     "param"                    { yybegin(xPARAM); return TAG_NAME_PARAM; }
     "vararg"                   { yybegin(xPARAM); return TAG_NAME_VARARG; }
     "class"                    { yybegin(xCLASS); return TAG_NAME_CLASS; }
+    "shape"                    { yybegin(xCLASS); return TAG_NAME_SHAPE; }
     "module"                   { yybegin(xCLASS); return TAG_NAME_MODULE; }
     "return"                   { beginType(); return TAG_NAME_RETURN; }
     "type"                     { beginType(); return TAG_NAME_TYPE;}

@@ -147,7 +147,7 @@ private fun renderReturn(sb: StringBuilder, tagReturn: LuaDocTagReturn, tyRender
 fun renderClassDef(sb: StringBuilder, tag: LuaDocTagClass, tyRenderer: ITyRenderer) {
     val cls = tag.type
     sb.append("<pre>")
-    sb.append("class ")
+    sb.append(if (tag.isShape) "shape " else "class ")
     sb.wrapTag("b") { tyRenderer.render(cls, sb) }
 
     cls.superClass?.let { superClass ->

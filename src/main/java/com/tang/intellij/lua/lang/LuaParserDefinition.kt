@@ -144,6 +144,7 @@ class LuaParserDefinition : ParserDefinition {
                 LuaDocTypes.TAG_NAME_PARAM,
                 LuaDocTypes.TAG_NAME_RETURN,
                 LuaDocTypes.TAG_NAME_CLASS,
+                LuaDocTypes.TAG_NAME_SHAPE,
                 LuaDocTypes.TAG_NAME_MODULE,
                 LuaDocTypes.TAG_NAME_TYPE,
                 LuaDocTypes.TAG_NAME_FIELD,

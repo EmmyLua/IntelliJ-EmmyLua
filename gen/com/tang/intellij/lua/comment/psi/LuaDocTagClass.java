@@ -41,10 +41,15 @@ public interface LuaDocTagClass extends LuaDocPsiElement, PsiNameIdentifierOwner
 
   boolean isDeprecated();
 
+  boolean isShape();
+
   @Nullable
   LuaDocClassRef getSuperClassRef();
 
   @Nullable
   PsiElement getModule();
+
+  @Nullable
+  PsiElement getShape();
 
 }

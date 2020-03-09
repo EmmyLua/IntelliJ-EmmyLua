@@ -72,6 +72,7 @@
         TAG_NAME_PROTECTED = 'protected'
         TAG_NAME_PUBLIC = 'public'
         TAG_NAME_CLASS = 'class'
+        TAG_NAME_SHAPE = 'shape'
         TAG_NAME_FIELD = 'field'
         TAG_NAME_TYPE = 'type'
         TAG_NAME_LANGUAGE = 'language'
@@ -273,7 +274,7 @@ generic_def ::= ID (EXTENDS class_ref)? {
 
 private generic_def_list ::= generic_def (',' generic_def)*
 
-tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID ('<' generic_def_list '>')? (EXTENDS class_ref)? comment_string? {
+tag_class ::= (TAG_NAME_CLASS|TAG_NAME_SHAPE|TAG_NAME_MODULE) ID ('<' generic_def_list '>')? (EXTENDS class_ref)? comment_string? {
     pin = 2
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
@@ -291,9 +292,11 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID ('<' generic_def_list '>')? (E
         getTextOffset
         toString
         isDeprecated
+        isShape
 
         superClassRef = 'class_ref'
         module = 'TAG_NAME_MODULE'
+        shape = 'TAG_NAME_SHAPE'
     ]
 }
 

@@ -150,6 +150,7 @@ abstract class TyClass(override val className: String,
                 aliasName = tyClass.aliasName
                 superClass = tyClass.superClass
                 params = tyClass.params
+                flags = tyClass.flags
             }
         }
     }
@@ -166,6 +167,11 @@ abstract class TyClass(override val className: String,
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
         return substitutor.substitute(this)
+    }
+
+    override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        lazyInit(context)
+        return super.contravariantOf(other, context, flags)
     }
 
     companion object {
@@ -197,6 +203,7 @@ class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(tagClass.name, tagClass.
 
     init {
         aliasName = tagClass.aliasName
+        this.flags = if (tagClass.isShape) TyFlags.SHAPE else 0
     }
 
     override fun doLazyInit(searchContext: SearchContext) {}

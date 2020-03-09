@@ -211,6 +211,11 @@ fun isDeprecated(tagClass: LuaDocTagClass): Boolean {
     return stub?.isDeprecated ?: LuaCommentUtil.findContainer(tagClass).isDeprecated
 }
 
+fun isShape(tagClass: LuaDocTagClass): Boolean {
+    val stub = tagClass.stub
+    return stub?.isShape ?: tagClass.shape != null
+}
+
 /**
  * 猜测类型
  * @param tagType 类型定义
