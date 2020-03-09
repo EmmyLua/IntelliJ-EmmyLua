@@ -46,6 +46,7 @@ class OverrideCompletionProvider : LuaCompletionProvider() {
                 val memberNameSet = mutableSetOf<String>()
                 classType.processMembers(context, { _, m ->
                     m.name?.let { memberNameSet.add(it) }
+                    true
                 }, false)
                 Ty.processSuperClass(classType, context) { sup ->
                     val clazz = (if (sup is ITyGeneric) sup.base else sup) as? ITyClass

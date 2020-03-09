@@ -98,14 +98,14 @@ interface ITy : Comparable<ITy> {
     fun acceptChildren(visitor: ITyVisitor)
 
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
-    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean = true)
+    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean = true): Boolean
 
     fun findMemberType(name: String, searchContext: SearchContext): ITy? {
         return infer(findMember(name, searchContext), searchContext)
     }
 
-    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit) {
-        processMembers(context, processor, true)
+    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean): Boolean {
+        return processMembers(context, processor, true)
     }
 
     fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {
@@ -252,7 +252,8 @@ abstract class Ty(override val kind: TyKind) : ITy {
         return null
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean): Boolean {
+        return true
     }
 
     companion object {
@@ -348,7 +349,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 if (superType != null) {
                     if (!processedName.add(superType.displayName)) {
                         // todo: Infinite inheritance
-                        return false
+                        return true
                     }
                     if (!processor(superType))
                         return false

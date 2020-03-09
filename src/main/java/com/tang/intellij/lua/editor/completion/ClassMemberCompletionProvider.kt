@@ -130,6 +130,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                     }
                 }
             }
+            true
         }
     }
 

@@ -95,7 +95,7 @@ abstract class TyClass(override val className: String,
         return true
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean): Boolean {
         lazyInit(context)
 
         val clazzName = className
@@ -112,16 +112,19 @@ abstract class TyClass(override val className: String,
         })
 
         for (member in list) {
-            processor(this, member)
+            if (!processor(this, member)) {
+                return false
+            }
         }
 
         // super
         if (deep) {
-            processSuperClass(this, context) {
+            return processSuperClass(this, context) {
                 it.processMembers(context, processor, false)
-                true
             }
         }
+
+        return true
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
@@ -269,11 +272,13 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
         this.flags = TyFlags.ANONYMOUS or TyFlags.ANONYMOUS_TABLE
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean): Boolean {
         for (field in table.tableFieldList) {
-            processor(this, field)
+            if (!processor(this, field)) {
+                return false
+            }
         }
-        super.processMembers(context, processor, deep)
+        return super.processMembers(context, processor, deep)
     }
 
     override fun toString(): String = displayName
@@ -312,10 +317,13 @@ fun getDocTableTypeName(table: LuaDocTableDef): String {
 class TyDocTable(val table: LuaDocTableDef) : TyClass(getDocTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) {}
 
-    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean): Boolean {
         table.tableFieldList.forEach {
-            processor(this, it)
+            if (!processor(this, it)) {
+                return false
+            }
         }
+        return true
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {

@@ -85,6 +85,7 @@ class TableCompletionProvider : ClassMemberCompletionProvider() {
                             }
                         }
                     }
+                    true
                 }
                 true
             })

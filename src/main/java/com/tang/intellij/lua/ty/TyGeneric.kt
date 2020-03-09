@@ -36,14 +36,16 @@ class TyParameter(val name: String, varName: String, superClass: ITy? = null) : 
     override val kind: TyKind
         get() = TyKind.GenericParam
 
-    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean): Boolean {
         val superType = getSuperClass(context)
 
         if (superType is ITyClass) {
-            superType.processMembers(context, processor, deep)
+            return superType.processMembers(context, processor, deep)
         } else if (superType is ITyGeneric) {
-            (superType.base as? ITyClass)?.processMembers(context, processor, deep)
+            return (superType.base as? ITyClass)?.processMembers(context, processor, deep) ?: true
         }
+
+        return true
     }
 
     override fun toString(): String {
@@ -180,18 +182,19 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
         return base.findMember(name, searchContext)
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Unit, deep: Boolean) {
-        base.processMembers(context, { _, classMember ->
-            processor(this, classMember)
-        }, false)
+    override fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean): Boolean {
+        if (!base.processMembers(context, { _, classMember -> processor(this, classMember) }, false)) {
+            return false
+        }
 
         // super
         if (deep) {
-            Ty.processSuperClass(this, context) {
+            return Ty.processSuperClass(this, context) {
                 it.processMembers(context, processor, false)
-                true
             }
         }
+
+        return true
     }
 }
 

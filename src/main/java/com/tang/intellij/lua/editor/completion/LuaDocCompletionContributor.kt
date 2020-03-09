@@ -118,7 +118,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
                     classType.processMembers(ctx) { _, member ->
                         if (member is LuaClassField)
                             completionResultSet.addElement(LookupElementBuilder.create(member.name!!).withIcon(LuaIcons.CLASS_FIELD))
-                        Unit
+                        true
                     }
                 }
             }
@@ -134,7 +134,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
                     val ctx = SearchContext.get(seeRefTag.project)
                     classType?.processMembers(ctx) { _, member ->
                         completionResultSet.addElement(LookupElementBuilder.create(member.name!!).withIcon(LuaIcons.CLASS_FIELD))
-                        Unit
+                        true
                     }
                 }
                 completionResultSet.stopHere()
