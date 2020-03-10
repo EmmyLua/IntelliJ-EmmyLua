@@ -47,20 +47,7 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
 
     private fun findTableExprTypeName(field: LuaTableField): String? {
         val table = PsiTreeUtil.getParentOfType(field, LuaTableExpr::class.java)
-        val p1 = table?.parent as? LuaExprList
-        val p2 = p1?.parent as? LuaAssignStat
-        var ty: String? = null
-        if (p2 != null) {
-            val type = SearchContext.withStub(p2.project, field.containingFile, Ty.UNKNOWN) {
-                p2.getExprAt(0)?.guessType(it)
-            }
-            if (type != null) {
-                ty = TyUnion.getPerfectClass(type)?.className
-            }
-        }
-        if (ty == null && table != null)
-            ty = getTableTypeName(table)
-        return ty
+        return if (table != null) getTableTypeName(table) else null
     }
 
     override fun createStub(field: LuaTableField, parentStub: StubElement<*>): LuaTableFieldStub {
