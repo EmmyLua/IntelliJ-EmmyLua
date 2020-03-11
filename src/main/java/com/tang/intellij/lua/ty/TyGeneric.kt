@@ -83,9 +83,22 @@ interface ITyGeneric : ITy {
     fun getParamTy(index: Int): ITy {
         return params.elementAtOrNull(index) ?: Ty.UNKNOWN
     }
+
+    fun getParameterSubstitutor(context: SearchContext): TyParameterSubstitutor {
+        val paramMap = mutableMapOf<String, ITy>()
+        val baseParams = base.getParams(context)
+
+        baseParams?.forEachIndexed { index, baseParam ->
+            if (index < params.size) {
+                paramMap[baseParam.varName] = params[index]
+            }
+        }
+
+        return TyParameterSubstitutor(paramMap)
+    }
 }
 
-abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
+abstract class TyGeneric(final override val params: Array<ITy>, final override val base: ITy) : Ty(TyKind.Generic), ITyGeneric {
 
     override fun equals(other: Any?): Boolean {
         return other is ITyGeneric && other.base == base && other.displayName == displayName
@@ -96,25 +109,36 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     }
 
     override fun getSuperClass(context: SearchContext): ITy? {
-        val baseParams = base.getParams(context)
-        var superClass = base.getSuperClass(context)
-
-        if (baseParams != null && superClass is ITyGeneric) {
-            val paramMap = mutableMapOf<String, ITy>()
-
-            baseParams.forEachIndexed { index, baseParam ->
-                if (index < params.size) {
-                    paramMap[baseParam.varName] = params[index]
-                }
-            }
-
-            superClass = superClass.substitute(TyParameterSubstitutor(paramMap))
-        }
-
-        return superClass
+        return base.getSuperClass(context)?.substitute(getParameterSubstitutor(context))
     }
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
+        if (base is ITyClass) {
+            base.lazyInit(context)
+
+            if (base.flags and TyFlags.SHAPE != 0) {
+                val parameterSubstitutor = getParameterSubstitutor(context)
+                return processMembers(context, { ty, classMember ->
+                    val memberName = classMember.name
+
+                    if (memberName == null) {
+                        return@processMembers false
+                    }
+
+                    val otherMember = other.findMember(memberName, context)
+
+                    if (otherMember == null) {
+                        return@processMembers false
+                    }
+
+                    val memberTy = classMember.guessType(context).substitute(parameterSubstitutor)
+                    val otherMemberTy = otherMember.guessType(context)
+
+                    memberTy.contravariantOf(otherMemberTy, context, flags)
+                }, true)
+            }
+        }
+
         if (other is ITyArray) {
             return if (base == Ty.TABLE && params.size == 2) {
                 val keyTy = params.first()
@@ -198,36 +222,9 @@ abstract class TyGeneric : Ty(TyKind.Generic), ITyGeneric {
     }
 }
 
-class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric() {
+class TyDocGeneric(luaDocGenericTy: LuaDocGenericTy) : TyGeneric(luaDocGenericTy.tyList.map { it.getType() }.toTypedArray(), luaDocGenericTy.classNameRef.resolveType())
 
-    override val base: ITy
-    override val params: Array<ITy>
-
-    init {
-        var base = luaDocGenericTy.classNameRef.resolveType()
-        params = luaDocGenericTy.tyList.map { it.getType() }.toTypedArray()
-
-        if (base is TyClass) {
-            val baseParams = base.getParams(SearchContext.get(luaDocGenericTy.project))
-
-            if (baseParams != null && baseParams.isNotEmpty()) {
-                val paramMap = mutableMapOf<String, ITy>()
-
-                baseParams.forEachIndexed { index, baseParam ->
-                    if (index < params.size) {
-                        paramMap[baseParam.varName] = params[index]
-                    }
-                }
-
-                base = base.substitute(TyParameterSubstitutor(paramMap))
-            }
-        }
-
-        this.base = base
-    }
-}
-
-class TySerializedGeneric(override val params: Array<ITy>, override val base: ITy) : TyGeneric()
+class TySerializedGeneric(params: Array<ITy>, base: ITy) : TyGeneric(params, base)
 
 object TyGenericSerializer : TySerializer<ITyGeneric>() {
     override fun deserializeTy(flags: Int, stream: StubInputStream): ITyGeneric {

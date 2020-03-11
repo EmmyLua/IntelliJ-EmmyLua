@@ -481,15 +481,7 @@ private fun guessFieldType(fieldName: String, type: ITy, context: SearchContext)
                 }
 
                 if (generic != null) {
-                    val paramMap = mutableMapOf<String, ITy>()
-
-                    fieldClass.getParams(context)?.forEachIndexed { index, classParam ->
-                        if (index < generic.params.size) {
-                            paramMap[classParam.varName] = generic.params[index]
-                        }
-                    }
-
-                    ty = ty.substitute(TyParameterSubstitutor(paramMap))
+                    ty = ty.substitute(generic.getParameterSubstitutor(context))
                 }
             }
 

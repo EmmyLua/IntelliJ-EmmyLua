@@ -153,21 +153,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
             var fieldType = type
 
             if (thisType is ITyGeneric) {
-                val base = thisType.base
-                val baseParams = base.getParams(context)
-                val args = thisType.params
-
-                if (baseParams != null) {
-                    val paramMap = mutableMapOf<String, ITy>()
-
-                    baseParams.forEachIndexed { index, baseParam ->
-                        if (index < args.size) {
-                            paramMap[baseParam.varName] = args[index]
-                        }
-                    }
-
-                    fieldType = type.substitute(TyParameterSubstitutor(paramMap))
-                }
+                fieldType = type.substitute(thisType.getParameterSubstitutor(context))
             }
 
             addField(completionResultSet, bold, className, member, fieldType, handlerProcessor)
