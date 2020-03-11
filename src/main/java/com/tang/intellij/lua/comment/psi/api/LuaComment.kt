@@ -34,6 +34,7 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     fun <T : LuaDocPsiElement> findTag(t:Class<T>): T?
     fun <T : LuaDocPsiElement> findTags(t:Class<T>): Collection<T>
     fun findTags(name: String): Collection<LuaDocTagDef>
+    fun findGeneric(name: String): LuaDocGenericDef?
     fun getParamDef(name: String): LuaDocTagParam?
     fun getFieldDef(name: String): LuaDocTagField?
     val tagClass: LuaDocTagClass?

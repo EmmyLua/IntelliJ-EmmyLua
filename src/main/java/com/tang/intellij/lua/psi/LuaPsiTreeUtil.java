@@ -23,8 +23,10 @@ import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
+import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy;
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef;
+import com.tang.intellij.lua.comment.psi.LuaDocPsiElement;
 import com.tang.intellij.lua.comment.psi.LuaDocTagClass;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager;
@@ -101,7 +103,7 @@ public class LuaPsiTreeUtil {
     }
 
     @Nullable
-    private static LuaDocGenericDef findContextClassGenericDef(LuaFuncBodyOwner fundBodyOwner, String name) {
+    private static LuaDocGenericDef findOwnerClassGenericDef(LuaFuncBodyOwner fundBodyOwner, String name) {
         SearchContext context = SearchContext.Companion.get(fundBodyOwner.getProject());
         ITy parentType = fundBodyOwner.guessParentType(context);
 
@@ -125,7 +127,7 @@ public class LuaPsiTreeUtil {
     }
 
     @Nullable
-    private static LuaDocGenericDef findContextClassGenericDef(@Nullable LuaCommentOwner commentOwner, String name) {
+    private static LuaDocGenericDef findOwnerClassGenericDef(@Nullable LuaCommentOwner commentOwner, String name) {
         if (commentOwner instanceof LuaAssignStat) {
             LuaAssignStat assignStat = (LuaAssignStat) commentOwner;
             LuaExprList exprList = assignStat.getValueExprList();
@@ -139,7 +141,7 @@ public class LuaPsiTreeUtil {
 
         if (commentOwner instanceof LuaFuncBodyOwner) {
             LuaFuncBodyOwner funcBodyOwner = (LuaFuncBodyOwner) commentOwner;
-            return findContextClassGenericDef(funcBodyOwner, name);
+            return findOwnerClassGenericDef(funcBodyOwner, name);
         }
 
         return null;
@@ -199,6 +201,15 @@ public class LuaPsiTreeUtil {
 
     @Nullable
     public static LuaDocGenericDef findGenericDef(String name, PsiElement current, boolean ancestralOnly) {
+        if (current instanceof LuaDocPsiElement) {
+            LuaComment comment = LuaCommentUtil.INSTANCE.findContainer((LuaDocPsiElement) current);
+            LuaDocGenericDef genericDef = comment.findGeneric(name);
+
+            if (genericDef != null) {
+                return genericDef;
+            }
+        }
+
         LuaDocFunctionTy fn = findAncestorOfType(current, LuaDocFunctionTy.class);
         List<LuaDocGenericDef> genericDefList = fn != null ? fn.getGenericDefList() : null;
 
@@ -215,18 +226,14 @@ public class LuaPsiTreeUtil {
 
             if (!ancestralOnly) {
                 LuaComment comment = commentOwner.getComment();
-                Collection<LuaDocGenericDef> genericDefs = comment != null ? comment.findTags(LuaDocGenericDef.class) : null;
+                LuaDocGenericDef genericDef = comment != null ? comment.findGeneric(name) : null;
 
-                if (genericDefs != null) {
-                    for (LuaDocGenericDef genericDef : genericDefs) {
-                        if (name.equals(genericDef.getId().getText())) {
-                            return genericDef;
-                        }
-                    }
+                if (genericDef != null) {
+                    return genericDef;
                 }
             }
 
-            LuaDocGenericDef classGenericDef = findContextClassGenericDef(commentOwner, name);
+            LuaDocGenericDef classGenericDef = findOwnerClassGenericDef(commentOwner, name);
 
             if (classGenericDef != null) {
                 return classGenericDef;
@@ -237,17 +244,13 @@ public class LuaPsiTreeUtil {
 
         while (ancestralCommentOwner != null) {
             LuaComment ancestorComment = ancestralCommentOwner.getComment();
-            Collection<LuaDocGenericDef> genericDefs = ancestorComment != null ? ancestorComment.findTags(LuaDocGenericDef.class) : null;
+            LuaDocGenericDef genericDef = ancestorComment != null ? ancestorComment.findGeneric(name) : null;
 
-            if (genericDefs != null) {
-                for (LuaDocGenericDef genericDef : genericDefs) {
-                    if (name.equals(genericDef.getId().getText())) {
-                        return genericDef;
-                    }
-                }
+            if (genericDef != null) {
+                return genericDef;
             }
 
-            LuaDocGenericDef classGenericDef = findContextClassGenericDef(ancestralCommentOwner, name);
+            LuaDocGenericDef classGenericDef = findOwnerClassGenericDef(ancestralCommentOwner, name);
 
             if (classGenericDef != null) {
                 return classGenericDef;

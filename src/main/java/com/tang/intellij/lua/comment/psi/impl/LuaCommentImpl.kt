@@ -56,6 +56,18 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
         return PsiTreeUtil.findChildrenOfType(this, LuaDocTagDef::class.java).filter { it.tagName.text == name }
     }
 
+    override fun findGeneric(name: String): LuaDocGenericDef? {
+        val genericDefs: Collection<LuaDocGenericDef> = findTags(LuaDocGenericDef::class.java)
+
+        for (genericDef in genericDefs) {
+            if (name == genericDef.id.text) {
+                return genericDef
+            }
+        }
+
+        return null
+    }
+
     override fun getTokenType(): IElementType {
         return LuaTypes.DOC_COMMENT
     }
