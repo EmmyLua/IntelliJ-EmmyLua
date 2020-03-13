@@ -12,7 +12,7 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
 %%
 
 %{
-    private LuaLanguageLevel level;
+    private LuaLanguageLevel level = LuaLanguageLevel.LUA54;
     public _LuaLexer(LuaLanguageLevel level) {
         this((Reader) null);
         this.level = level;
@@ -36,16 +36,27 @@ import static com.tang.intellij.lua.psi.LuaTypes.*;
         return false;
     }
 
-    private int checkBlockRedundant() {
-        int redundant = -1;
-        String cs = yytext().toString();
-        StringBuilder s = new StringBuilder("]");
-        for (int i = 0; i < nBrackets; i++) s.append('=');
-        s.append(']');
-        int index = cs.indexOf(s.toString());
-        if (index > 0)
-            redundant = yylength() - index - nBrackets - 2;
-        return redundant;
+    private int checkBlockEnd() {
+        int pos = zzMarkedPos;
+        int end = zzEndRead;
+        while(pos < end) {
+            char c = zzBuffer.charAt(pos);
+            if (c == ']') {
+                pos++;
+                int size = 0;
+                while (pos < zzEndRead && zzBuffer.charAt(pos) == '=') {
+                    size++;
+                    pos++;
+                }
+                if (size == nBrackets && zzBuffer.charAt(pos) == ']') {
+                    pos++;
+                    break;
+                }
+                continue;
+            }
+            pos++;
+        }
+        return pos - zzMarkedPos;
     }
 %}
 
@@ -101,7 +112,11 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   {REGION_END}                { return ENDREGION; }
   "--"                        {
         boolean block = checkBlock();
-        if (block) { yypushback(yylength()); yybegin(xBLOCK_COMMENT); }
+        if (block) {
+            yypushback(yylength());
+            zzMarkedPos += checkBlockEnd();
+            return BLOCK_COMMENT;
+        }
         else { yypushback(yylength()); yybegin(xCOMMENT); }
    }
   "and"                       { return AND; }
@@ -147,7 +162,16 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "<"                         { return LT; }
   "("                         { return LPAREN; }
   ")"                         { return RPAREN; }
-  "["                         { return LBRACK; }
+  "["                         {
+      if (checkAhead('=', 0) || checkAhead('[', 0)) {
+          yypushback(yylength());
+          checkBlock();
+          zzMarkedPos += checkBlockEnd();
+          return STRING;
+      } else {
+          return LBRACK;
+      }
+  }
   "]"                         { return RBRACK; }
   "{"                         { return LCURLY; }
   "}"                         { return RCURLY; }
@@ -164,7 +188,6 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
 
   "\""                        { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
   "'"                         { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
-  \[=*\[                      { yybegin(xBLOCK_STRING); yypushback(yylength()); checkBlock(); }
 
   {ID}                        { return ID; }
   {NUMBER}                    { return NUMBER; }
@@ -181,34 +204,10 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
     {SHORT_COMMENT}           {yybegin(YYINITIAL);return SHORT_COMMENT;}
 }
 
-<xBLOCK_COMMENT> {
-    {BLOCK_COMMENT}           {
-        int redundant = checkBlockRedundant();
-        if (redundant != -1) {
-            yypushback(redundant);
-            yybegin(YYINITIAL);return BLOCK_COMMENT; }
-        else { yybegin(YYINITIAL);return BLOCK_COMMENT; }
-    }
-    [^] { yypushback(yylength()); yybegin(xCOMMENT); }
-}
-
 <xDOUBLE_QUOTED_STRING> {
     {DOUBLE_QUOTED_STRING}    { yybegin(YYINITIAL); return STRING; }
 }
 
 <xSINGLE_QUOTED_STRING> {
     {SINGLE_QUOTED_STRING}    { yybegin(YYINITIAL); return STRING; }
-}
-
-<xBLOCK_STRING> {
-    {LONG_STRING}             {
-        int redundant = checkBlockRedundant();
-        if (redundant != -1) {
-            yypushback(redundant);
-            yybegin(YYINITIAL); return STRING;
-        } else {
-            yybegin(YYINITIAL); return TokenType.BAD_CHARACTER;
-        }
-    }
-    [^] { return TokenType.BAD_CHARACTER; }
 }
