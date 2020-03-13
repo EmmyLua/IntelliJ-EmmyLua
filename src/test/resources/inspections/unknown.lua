@@ -11,7 +11,7 @@ local aString
 local unknown
 
 wantsNumber(aNumber)
-wantsNumber(<error descr="Type mismatch for argument: num. Required: 'number' Found: 'string'">aString</error>)
+wantsNumber(<error descr="Type mismatch. Required: 'number' Found: 'string'">aString</error>)
 wantsNumber(unknown)
 
 aNumber = aNumber

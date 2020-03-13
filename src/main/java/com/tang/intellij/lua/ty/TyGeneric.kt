@@ -118,7 +118,7 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
 
             if (base.flags and TyFlags.SHAPE != 0) {
                 val parameterSubstitutor = getParameterSubstitutor(context)
-                return processMembers(context, { ty, classMember ->
+                return processMembers(context, { _, classMember ->
                     val memberName = classMember.name
 
                     if (memberName == null) {

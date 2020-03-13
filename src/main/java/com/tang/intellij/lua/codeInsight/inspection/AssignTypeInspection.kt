@@ -19,6 +19,7 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -60,9 +61,8 @@ class AssignTypeInspection : StrictInspection() {
                                 if (fieldOwnerClass is TyClass) {
                                     val name = assignee.name ?: ""
                                     val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
-
-                                    if (!fieldType.contravariantOf(value, searchContext, varianceFlags)) {
-                                        myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(fieldType.displayName, value.displayName))
+                                    ProblemUtil.contravariantOf(fieldType, value, searchContext, varianceFlags, expression) { element, message, highlightType ->
+                                        myHolder.registerProblem(element, message, highlightType)
                                     }
                                 }
                             } else if (assignees.size == 1 && (assignee.parent?.parent as? LuaCommentOwner)?.comment?.tagClass != null) {
@@ -71,9 +71,8 @@ class AssignTypeInspection : StrictInspection() {
                                 }
                             } else {
                                 val variableType = assignee.guessType(searchContext)
-
-                                if (!variableType.contravariantOf(value, searchContext, varianceFlags)) {
-                                    myHolder.registerProblem(expression, "Type mismatch. Required: '%s' Found: '%s'".format(variableType.displayName, value.displayName))
+                                ProblemUtil.contravariantOf(variableType, value, searchContext, varianceFlags, expression) { element, message, highlightType ->
+                                    myHolder.registerProblem(element, message, highlightType)
                                 }
                             }
 

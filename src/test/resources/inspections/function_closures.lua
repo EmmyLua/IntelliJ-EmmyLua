@@ -43,19 +43,19 @@ local aString
 
 aBoolean = ClassWithClosureMethods.regularMethod({})
 aString = <error descr="Type mismatch. Required: 'string' Found: 'boolean'">ClassWithClosureMethods.regularMethod({})</error>
-aBoolean = ClassWithClosureMethods.regularMethod(<error descr="Type mismatch for argument: tab. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
+aBoolean = ClassWithClosureMethods.regularMethod(<error descr="Type mismatch. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
 
 aBoolean = ClassWithClosureMethods.closureMethod({})
 aString = <error descr="Type mismatch. Required: 'string' Found: 'boolean'">ClassWithClosureMethods.closureMethod({})</error>
-aBoolean = ClassWithClosureMethods.closureMethod(<error descr="Type mismatch for argument: tab. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
+aBoolean = ClassWithClosureMethods.closureMethod(<error descr="Type mismatch. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
 
 aBoolean = localRegularFunction({})
 aString = <error descr="Type mismatch. Required: 'string' Found: 'boolean'">localRegularFunction({})</error>
-aBoolean = localRegularFunction(<error descr="Type mismatch for argument: tab. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
+aBoolean = localRegularFunction(<error descr="Type mismatch. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
 
 aBoolean = localClosureFunction({})
 aString = <error descr="Type mismatch. Required: 'string' Found: 'boolean'">localClosureFunction({})</error>
-aBoolean = localClosureFunction(<error descr="Type mismatch for argument: tab. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
+aBoolean = localClosureFunction(<error descr="Type mismatch. Required: 'table' Found: '\"not a table\"'">"not a table"</error>)
 
 ---@param param string
 ---@return string
@@ -77,6 +77,6 @@ local closureInternalTypeInspections = function(param)
     if sometimes() then
         return "a string"
     else
-        <error descr="Type mismatch. Expected: 'string' Found: '1'">return 1</error>
+        return <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
     end
 end

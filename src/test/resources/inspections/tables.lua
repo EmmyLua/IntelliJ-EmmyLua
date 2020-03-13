@@ -45,7 +45,7 @@ numberStringTable = {[1] = "three", [3] = "three"}
 local function wantsNumberNumberTable(arg) end
 
 wantsNumberNumberTable(numberNumberTable)
-wantsNumberNumberTable(<error descr="Type mismatch for argument: arg. Required: 'table<number, number>' Found: 'table<number, string>'">numberStringTable</error>)
+wantsNumberNumberTable(<error descr="Type mismatch. Required: 'table<number, number>' Found: 'table<number, string>'">numberStringTable</error>)
 wantsNumberNumberTable({[1] = 1, [3] = 3})
 wantsNumberNumberTable({1, 2, 3})
 

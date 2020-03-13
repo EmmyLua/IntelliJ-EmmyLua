@@ -203,7 +203,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         }
 
         if (this.flags and TyFlags.SHAPE != 0) {
-            return processMembers(context, { ty, classMember ->
+            return processMembers(context, { _, classMember ->
                 val memberName = classMember.name
 
                 if (memberName == null) {

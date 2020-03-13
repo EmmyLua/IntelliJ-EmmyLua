@@ -60,17 +60,15 @@ class ReturnTypeInspection : StrictInspection() {
                     // Check number
                     if (abstractTypes.size > concreteTypes.size) {
                         if (concreteTypes.isEmpty()) {
-                            myHolder.registerProblem(o.lastChild, "Type mismatch. Expected: '%s' Found: 'nil'".format(abstractTypes[0]))
+                            myHolder.registerProblem(o.lastChild, "Type mismatch. Required: '%s' Found: 'nil'".format(abstractTypes[0]))
                         } else {
                             myHolder.registerProblem(o.lastChild, "Incorrect number of return values. Expected %s but found %s.".format(abstractTypes.size, concreteTypes.size))
                         }
                     } else {
                         for (i in 0 until concreteTypes.size) {
-                            if (!abstractTypes[i].contravariantOf(concreteTypes[i], context, 0)) {
-                                val abstractString = abstractTypes.joinToString(", ") { it.displayName }
-                                val concreteString = concreteTypes.joinToString(", ") { it.displayName }
-                                myHolder.registerProblem(o, "Type mismatch. Expected: '$abstractString' Found: '$concreteString'")
-                                break
+                            val element = o.exprList?.getExprAt(i) ?: o
+                            ProblemUtil.contravariantOf(abstractTypes[i], concreteTypes[i], context, 0, element) { highlightElement, message, highlightType ->
+                                myHolder.registerProblem(highlightElement, message, highlightType)
                             }
                         }
                     }

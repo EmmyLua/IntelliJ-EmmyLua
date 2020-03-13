@@ -57,8 +57,11 @@ class GenericConstraintInspection : LocalInspectionTool() {
                             val arg = argElement.getType()
                             val analyzedParamType = genericAnalyzer.map[param.varName]
 
-                            if (analyzedParamType?.contravariantOf(arg, context, TyVarianceFlags.STRICT_UNKNOWN or TyVarianceFlags.ABSTRACT_PARAMS) == false) {
-                                holder.registerProblem(argElement, "Type mismatch. Required: '%s' Found: '%s'".format(param, arg), ProblemHighlightType.ERROR)
+                            if (analyzedParamType != null) {
+                                val varianceFlags = TyVarianceFlags.STRICT_UNKNOWN or TyVarianceFlags.ABSTRACT_PARAMS
+                                ProblemUtil.contravariantOf(analyzedParamType, arg, context, varianceFlags, argElement) { element, message, _ ->
+                                    holder.registerProblem(element, message, ProblemHighlightType.ERROR)
+                                }
                             }
                         }
                     }

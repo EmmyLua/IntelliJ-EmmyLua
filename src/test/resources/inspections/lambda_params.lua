@@ -19,5 +19,5 @@ end
 
 ---@return string
 local badClosureReturn = function()
-    <error descr="Type mismatch. Expected: 'string' Found: '1'">return 1</error>
+    return <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
 end

@@ -53,8 +53,8 @@ end
 fn2(anything)
 fn2(anyNumber)
 fn2(number1)
-fn2(<error descr="Type mismatch for argument: arg. Required: 'T : number' Found: 'string'">anyString</error>)
-fn2(<error descr="Type mismatch for argument: arg. Required: 'T : number' Found: '\"string1\"'">string1</error>)
+fn2(<error descr="Type mismatch. Required: 'T : number' Found: 'string'">anyString</error>)
+fn2(<error descr="Type mismatch. Required: 'T : number' Found: '\"string1\"'">string1</error>)
 
 
 
@@ -97,7 +97,7 @@ end
 fn4(number1, number2)
 
 -- T = number
-fn4(<error descr="Type mismatch for argument: arg1. Required: 'T : number' Found: '1'">number1</error>, <error descr="Type mismatch for argument: arg2. Required: 'T : number' Found: '\"string1\"'">string1</error>)
+fn4(<error descr="Type mismatch. Required: 'T : number' Found: '1'">number1</error>, <error descr="Type mismatch. Required: 'T : number' Found: '\"string1\"'">string1</error>)
 
 
 
@@ -218,7 +218,7 @@ local stringNumberTable
 stringOrNumber = <error descr="Type mismatch. Required: 'string|number' Found: 'table<string, number>'">fn8(anyString, number1, stringNumberTable)</error>
 stringNumberTable = fn8(anyString, number1, stringNumberTable)
 stringNumberTable = fn8(string1, number1, stringNumberTable)
-stringNumberTable = fn8(anyString, number1, <error descr="Type mismatch for argument: arg3. Required: 'table<string|number, number>' Found: 'number[]'">numberArray</error>)
+stringNumberTable = fn8(anyString, number1, <error descr="Type mismatch. Required: 'table<string|number, number>' Found: 'number[]'">numberArray</error>)
 stringNumberTable = <error descr="Type mismatch. Required: 'table<string, number>' Found: 'table<number, number>'">fn8(anyNumber, number1, numberArray)</error>
 
 
@@ -236,7 +236,7 @@ local stringStringTable
 -- K = string, T = table<string, string>
 anyString = <error descr="Type mismatch. Required: 'string' Found: 'table<string, string>'">fn9(anyString, stringStringTable)</error>
 stringStringTable = fn9(anyString, stringStringTable)
-stringStringTable = fn9(anyString, <error descr="Type mismatch for argument: arg2. Required: 'T : table<K : string, string>' Found: 'table<string, number>'">stringNumberTable</error>)
+stringStringTable = fn9(anyString, <error descr="Type mismatch. Required: 'T : table<K : string, string>' Found: 'table<string, number>'">stringNumberTable</error>)
 stringStringTable = fn9(string1, stringStringTable)
 
 ---@type table<"string1", string>

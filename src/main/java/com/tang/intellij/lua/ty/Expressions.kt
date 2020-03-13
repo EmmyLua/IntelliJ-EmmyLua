@@ -256,10 +256,10 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     TyUnion.each(ty) {
         when (it) {
             is ITyFunction -> {
-                val match = it.matchSignature(this, context)
+                val substitutedSignature = it.matchSignature(this, context)?.substitutedSignature
 
-                if (match.substitutedSignature != null) {
-                    ret = ret.union(getReturnTy(match.substitutedSignature, context))
+                if (substitutedSignature != null) {
+                    ret = ret.union(getReturnTy(substitutedSignature, context))
                 }
             }
             //constructor : Class table __call

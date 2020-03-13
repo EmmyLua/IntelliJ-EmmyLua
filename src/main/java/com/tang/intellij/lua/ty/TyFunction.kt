@@ -16,6 +16,8 @@
 
 package com.tang.intellij.lua.ty
 
+import com.intellij.codeInspection.ProblemHighlightType
+import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -249,28 +251,15 @@ fun ITyFunction.findCandidateSignatures(call: LuaCallExpr): Collection<IFunSigna
     return findCandidateSignatures(if(isStaticMethodUsedAsInstanceMethod) n + 1 else n)
 }
 
-class SignatureProblem(val element: PsiElement, val problem: String) {
-}
+class SignatureMatchResult(val signature: IFunSignature, val substitutedSignature: IFunSignature)
 
-class SignatureMatchResult {
-    val problems: MutableMap<IFunSignature, Collection<SignatureProblem>>?
-    val signature: IFunSignature?
-    val substitutedSignature: IFunSignature?
+private class SignatureProblem(
+        val element: PsiElement,
+        val problem: String,
+        val highlightType: ProblemHighlightType = ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+)
 
-    constructor(problems: MutableMap<IFunSignature, Collection<SignatureProblem>>) {
-        this.problems = problems
-        this.signature = null
-        this.substitutedSignature = null
-    }
-
-    constructor(signature: IFunSignature, substitutedSignature: IFunSignature) {
-        this.problems = null
-        this.signature = signature
-        this.substitutedSignature = substitutedSignature
-    }
-}
-
-fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext): SignatureMatchResult {
+fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, problemsHolder: ProblemsHolder? = null): SignatureMatchResult? {
     val args = call.argList
     val concreteTypes = mutableListOf<MatchFunctionSignatureInspection.ConcreteTypeInfo>()
     args.forEachIndexed { index, luaExpr ->
@@ -284,12 +273,13 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
         } else concreteTypes.add(MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, ty))
     }
 
-    val problems = mutableMapOf<IFunSignature, Collection<SignatureProblem>>()
+    val problems = if (problemsHolder != null) mutableMapOf<IFunSignature, Collection<SignatureProblem>>() else null
     val candidates = findCandidateSignatures(call)
 
     candidates.forEach {
         var nParams = 0
-        val signatureProblems = mutableListOf<SignatureProblem>()
+        var candidateFailed = false
+        val signatureProblems = if (problems != null) mutableListOf<SignatureProblem>() else null
 
         val substitutor = call.createSubstitutor(it, searchContext)
         val signature = it.substitute(substitutor)
@@ -308,18 +298,27 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
 
                 problemElement = problemElement ?: call.lastChild
 
-                signatureProblems.add(SignatureProblem(problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
+                candidateFailed = true
+                signatureProblems?.add(SignatureProblem(problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
+
                 return@processArgs true
             }
 
             val paramType = pi.ty
             val argType = typeInfo.ty
-            val argExpr = args.getOrNull(i)
+            val argExpr = args.get(i)
             val varianceFlags = if (argExpr is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
-            val assignable: Boolean = paramType.contravariantOf(argType, searchContext, varianceFlags)
 
-            if (!assignable) {
-                signatureProblems.add(SignatureProblem(typeInfo.param, "Type mismatch for argument: ${pi.name}. Required: '${pi.ty}' Found: '$argType'"))
+            if (problemsHolder != null) {
+                val contravariant = ProblemUtil.contravariantOf(paramType, argType, searchContext, varianceFlags, argExpr) { element, message, highlightProblem ->
+                    signatureProblems?.add(SignatureProblem(element, message, highlightProblem))
+                }
+
+                if (!contravariant) {
+                    candidateFailed = true
+                }
+            } else if (!paramType.contravariantOf(argType, searchContext, varianceFlags)) {
+                candidateFailed = true
             }
 
             true
@@ -327,18 +326,32 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext):
 
         if (nParams < args.size && !it.hasVarargs()) {
             for (i in nParams until args.size) {
-                signatureProblems.add(SignatureProblem(args[i], "Too many arguments."))
+                candidateFailed = true
+                signatureProblems?.add(SignatureProblem(args[i], "Too many arguments."))
             }
         }
 
-        if (signatureProblems.size == 0) {
+        if (!candidateFailed) {
             return SignatureMatchResult(it, signature)
-        } else {
-            problems[it] = signatureProblems
+        }
+
+        if (signatureProblems != null) {
+            problems?.put(it, signatureProblems)
         }
     }
 
-    return SignatureMatchResult(problems)
+    if (problemsHolder != null) {
+        val multipleCandidates = candidates.size > 1
+
+        problems?.forEach { signature, signatureProblems ->
+            signatureProblems.forEach {
+                val problem = if (multipleCandidates) "${it.problem} In: ${signature.displayName}\n" else it.problem
+                problemsHolder.registerProblem(it.element, problem, it.highlightType)
+            }
+        }
+    }
+
+    return null
 }
 
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {

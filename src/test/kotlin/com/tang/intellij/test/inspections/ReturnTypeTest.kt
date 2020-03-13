@@ -23,7 +23,7 @@ class ReturnTypeTest : LuaInspectionsTestBase(ReturnTypeInspection()) {
     fun `test return type mismatch`() = checkByText("""
         ---@return string
         local function test()
-            <error descr="Type mismatch. Expected: 'string' Found: '1'">return 1</error>
+            return <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
         end
     """)
 

@@ -59,11 +59,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     }
 
                     if (type is ITyFunction) {
-                        val match = type.matchSignature(o, searchContext)
-
-                        match.problems?.forEach { _, problems ->
-                            problems.forEach { myHolder.registerProblem(it.element, it.problem) }
-                        }
+                        type.matchSignature(o, searchContext, myHolder)
                     } else if (prefixExpr is LuaIndexExpr) {
                         // Get parent type
                         val parentType = prefixExpr.guessParentType(searchContext)
