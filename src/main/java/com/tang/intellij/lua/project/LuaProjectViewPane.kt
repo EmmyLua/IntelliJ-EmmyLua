@@ -105,7 +105,7 @@ class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project)
 }
 
 private class LuaTreeStructureProvider : TreeStructureProvider {
-    override fun modify(parent: AbstractTreeNode<*>, list: MutableCollection<AbstractTreeNode<Any>>, settings: ViewSettings): MutableCollection<AbstractTreeNode<*>> {
+    override fun modify(parent: AbstractTreeNode<*>, list: MutableCollection<AbstractTreeNode<*>>, settings: ViewSettings): MutableCollection<AbstractTreeNode<*>> {
         val newChildren = mutableListOf<AbstractTreeNode<*>>()
         for (node in list) {
             if (node is PsiFileNode) {

@@ -58,7 +58,7 @@ class ArrayIndexZero : LocalInspectionTool() {
         return object : LuaVisitor() {
             override fun visitIndexExpr(o: LuaIndexExpr) {
                 o.acceptChildren(object : PsiElementVisitor() {
-                    override fun visitElement(element: PsiElement?) {
+                    override fun visitElement(element: PsiElement) {
                         if (element is LuaLiteralExpr && element.text == "0") {
                             holder.registerProblem(element, "0 index", object : LocalQuickFix {
                                 override fun getName() = "Replace with index 1"

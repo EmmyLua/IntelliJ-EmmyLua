@@ -52,7 +52,7 @@ private fun applyDefaultArgs(strArgs: String?): List<String> {
 }
 
 fun runLuaCheck(project: Project, file: VirtualFile) {
-    ToolWindowManager.getInstance(project).getToolWindow("LuaCheck").show {
+    ToolWindowManager.getInstance(project).getToolWindow("LuaCheck")?.show {
         var dir: VirtualFile = file.parent
         val list: MutableList<Pair<String, PsiFile>> = mutableListOf()
         if (file.isDirectory) {
