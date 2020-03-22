@@ -357,7 +357,7 @@ abstract class LuaAttachDebugProcessBase protected constructor(session: XDebugSe
     private fun createEmmyConsole(ui: RunnerLayoutUi) {
         val console = TextConsoleBuilderFactory.getInstance().createBuilder(session.project).console
         val name = "Emmy.log"
-        val consoleContent = ui.createContent(name, console.component, name, AllIcons.Debugger.Console_log, null)
+        val consoleContent = ui.createContent(name, console.component, name, LuaIcons.Debugger.Console, null)
         consoleContent.isCloseable = false
         consoleContent.isPinnable = false
         consoleContent.displayName = name

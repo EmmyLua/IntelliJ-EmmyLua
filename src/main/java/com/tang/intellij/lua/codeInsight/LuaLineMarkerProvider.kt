@@ -178,7 +178,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
                         val returnKeyWord = element.firstChild
                         result.add(LineMarkerInfo(returnKeyWord,
                                 returnKeyWord.textRange,
-                                AllIcons.General.HideRightHover,
+                                LuaIcons.LineMarker.TailCall,
                                 Pass.LINE_MARKERS,
                                 FunctionUtil.constant("Tail call"), null,
                                 GutterIconRenderer.Alignment.CENTER))

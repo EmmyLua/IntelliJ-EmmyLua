@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.debugger.attach
 
-import com.intellij.icons.AllIcons
 import com.intellij.ui.ColoredTextContainer
 import com.intellij.ui.SimpleTextAttributes
 import com.intellij.xdebugger.XSourcePosition
@@ -24,6 +23,7 @@ import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.XCompositeNode
 import com.intellij.xdebugger.frame.XStackFrame
 import com.intellij.xdebugger.frame.XValueChildrenList
+import com.tang.intellij.lua.lang.LuaIcons
 
 /**
  *
@@ -50,7 +50,7 @@ class LuaAttachStackFrame(val proto: DMBreak,
         } else {
             component.append("invalid", SimpleTextAttributes.REGULAR_ATTRIBUTES)
         }
-        component.setIcon(AllIcons.Debugger.StackFrame)
+        component.setIcon(LuaIcons.Debugger.StackFrame)
     }
 
     override fun getEvaluator(): XDebuggerEvaluator? {
