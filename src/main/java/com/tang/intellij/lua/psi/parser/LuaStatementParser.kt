@@ -261,6 +261,7 @@ object LuaStatementParser : GeneratedParserUtilBase() {
             val exprList = b.mark()
             if (LuaExpressionParser.parseExprList(b, l + 1) == null)
                 b.error("Expression expected")
+            exprList.setCustomEdgeTokenBinders(LuaParserUtil.MY_LEFT_COMMENT_BINDER, null)
             exprList.done(EXPR_LIST)
         }
 
