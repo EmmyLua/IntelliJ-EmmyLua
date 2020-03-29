@@ -26,8 +26,6 @@ import com.tang.intellij.lua.ty.TyAliasSubstitutor;
  */
 public interface LuaTypeGuessable extends LuaPsiElement {
     default ITy guessType(SearchContext context) {
-        ITy ty = SearchContext.Companion.infer(this, context);
-        ty = TyAliasSubstitutor.Companion.substitute(ty, context);
-        return ty;
+        return SearchContext.Companion.infer(this, context);
     }
 }

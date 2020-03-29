@@ -190,7 +190,8 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                 val firstParam = it.getFirstParam(thisType, isColonStyle)
                 if (isColonStyle) {
                     if (firstParam == null) return@Processor true
-                    if (!firstParam.ty.contravariantOf(callType, SearchContext.get(classMember.project), TyVarianceFlags.STRICT_UNKNOWN))
+                    val context = SearchContext.get(classMember.project)
+                    if (!firstParam.ty.contravariantOf(callType, context, TyVarianceFlags.STRICT_UNKNOWN))
                         return@Processor true
                 }
 

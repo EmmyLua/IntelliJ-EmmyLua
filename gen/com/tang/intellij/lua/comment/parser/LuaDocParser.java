@@ -728,17 +728,37 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME_ALIAS ID ty
+  // TAG_NAME_ALIAS ID ('<' generic_def_list '>')? ty
   public static boolean tag_alias(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_alias")) return false;
     if (!nextTokenIs(b, TAG_NAME_ALIAS)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, TAG_ALIAS, null);
-    r = consumeTokens(b, 1, TAG_NAME_ALIAS, ID);
-    p = r; // pin = 1
-    r = r && ty(b, l + 1, -1);
+    r = consumeTokens(b, 2, TAG_NAME_ALIAS, ID);
+    p = r; // pin = 2
+    r = r && report_error_(b, tag_alias_2(b, l + 1));
+    r = p && ty(b, l + 1, -1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  // ('<' generic_def_list '>')?
+  private static boolean tag_alias_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_alias_2")) return false;
+    tag_alias_2_0(b, l + 1);
+    return true;
+  }
+
+  // '<' generic_def_list '>'
+  private static boolean tag_alias_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_alias_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, LT);
+    r = r && generic_def_list(b, l + 1);
+    r = r && consumeToken(b, GT);
+    exit_section_(b, m, null, r);
+    return r;
   }
 
   /* ********************************************************** */

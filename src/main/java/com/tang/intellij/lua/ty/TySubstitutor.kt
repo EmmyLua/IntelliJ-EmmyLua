@@ -20,9 +20,11 @@ import com.intellij.openapi.project.Project
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaCallExpr
 import com.tang.intellij.lua.psi.prefixExpr
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 
 interface ITySubstitutor {
+    fun substitute(alias: ITyAlias): ITy
     fun substitute(function: ITyFunction): ITy
     fun substitute(clazz: ITyClass): ITy
     fun substitute(generic: ITyGeneric): ITy
@@ -53,6 +55,10 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
         cur = arg
         warp(cur) { par.accept(this) }
         cur = Ty.VOID
+    }
+
+    override fun visitAlias(alias: ITyAlias) {
+        alias.ty.accept(this)
     }
 
     override fun visitClass(clazz: ITyClass) {
@@ -165,12 +171,19 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
 open class TySubstitutor : ITySubstitutor {
     override fun substitute(ty: ITy) = ty
 
+    override fun substitute(alias: ITyAlias): ITy {
+        return alias
+    }
+
     override fun substitute(clazz: ITyClass): ITy {
         return clazz
     }
 
     override fun substitute(generic: ITyGeneric): ITy {
-        return generic
+        return TySerializedGeneric(
+                generic.params.map { it.substitute(this) }.toTypedArray(),
+                generic.base.substitute(this)
+        )
     }
 
     override fun substitute(function: ITyFunction): ITy {
@@ -180,31 +193,37 @@ open class TySubstitutor : ITySubstitutor {
     }
 }
 
-class TyAliasSubstitutor private constructor(val project: Project) : ITySubstitutor {
-    companion object {
-        fun substitute(ty: ITy, context: SearchContext): ITy {
-            /*if (context.forStub)
-                return ty*/
-            return ty.substitute(TyAliasSubstitutor(context.project))
+class TyAliasSubstitutor private constructor(val context: SearchContext) : TySubstitutor() {
+    val processedNames = mutableSetOf<String>()
+
+    override fun substitute(alias: ITyAlias): ITy {
+        if (alias.params?.size ?: 0 == 0) {
+            return if (processedNames.add(alias.name)) alias.ty.substitute(this) else Ty.VOID
         }
-    }
 
-    override fun substitute(function: ITyFunction): ITy {
-        return TySerializedFunction(function.mainSignature.substitute(this),
-                function.signatures.map { it.substitute(this) }.toTypedArray(),
-                function.flags)
-    }
-
-    override fun substitute(clazz: ITyClass): ITy {
-        return clazz.recoverAlias(SearchContext.get(project), this)
+        return alias
     }
 
     override fun substitute(generic: ITyGeneric): ITy {
-        return generic
+        val base = generic.base.substitute(this)
+
+        if (base is ITyAlias) {
+            return if (processedNames.add(base.name)) {
+                base.ty.substitute(generic.getParameterSubstitutor(context)).substitute(this)
+            } else Ty.VOID
+        }
+
+        return super.substitute(generic)
     }
 
-    override fun substitute(ty: ITy): ITy {
-        return ty
+    override fun substitute(clazz: ITyClass): ITy {
+        return clazz.recoverAlias(context, this)
+    }
+
+    companion object {
+        fun substitute(ty: ITy, context: SearchContext): ITy {
+            return ty.substitute(TyAliasSubstitutor(context))
+        }
     }
 }
 

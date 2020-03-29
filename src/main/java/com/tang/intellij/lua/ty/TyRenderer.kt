@@ -56,6 +56,10 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                 }
             }
 
+            override fun visitAlias(alias: ITyAlias) {
+                sb.append(alias.name)
+            }
+
             override fun visitClass(clazz: ITyClass) {
                 sb.append(renderClass(clazz))
             }

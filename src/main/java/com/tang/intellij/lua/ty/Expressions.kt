@@ -279,12 +279,19 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
 }
 
 private fun LuaNameExpr.infer(context: SearchContext): ITy {
-    if (this.id.text == Constants.WORD_SELF) {
-        val contextClass = LuaPsiTreeUtil.findContextClass(this) as? ITyClass
-        return if (contextClass != null) TyClass.createSelfType(contextClass) else Ty.UNKNOWN
-    }
-
     val set = recursionGuard(this, Computable {
+        if (name == Constants.WORD_SELF) {
+            val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaClassMethodDef::class.java)
+            if (methodDef != null && !methodDef.isStatic) {
+                val methodName = methodDef.classMethodName
+                val expr = methodName.expr
+                val methodClassType = expr.guessType(context) as? ITyClass
+                if (methodClassType != null) {
+                    return@Computable TyClass.createSelfType(methodClassType)
+                }
+            }
+        }
+
         var type:ITy = Ty.VOID
 
         context.withRecursionGuard(this, GuardType.GlobalName) {
@@ -297,26 +304,6 @@ private fun LuaNameExpr.infer(context: SearchContext): ITy {
                     break
             }
             type
-        }
-
-        /**
-         * fixme : optimize it.
-         * function xx:method()
-         *     self.name = '123'
-         * end
-         *
-         * https://github.com/EmmyLua/IntelliJ-EmmyLua/issues/93
-         * the type of 'self' should be same of 'xx'
-         */
-        if (Ty.isInvalid(type)) {
-            if (name == Constants.WORD_SELF) {
-                val methodDef = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaClassMethodDef::class.java)
-                if (methodDef != null && !methodDef.isStatic) {
-                    val methodName = methodDef.classMethodName
-                    val expr = methodName.expr
-                    type = expr.guessType(context)
-                }
-            }
         }
 
         if (Ty.isInvalid(type)) {

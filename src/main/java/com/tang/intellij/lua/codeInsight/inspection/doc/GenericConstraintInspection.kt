@@ -25,6 +25,7 @@ import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.psi.LuaPsiTreeUtil
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.GenericAnalyzer
+import com.tang.intellij.lua.ty.ProblemUtil
 import com.tang.intellij.lua.ty.TyVarianceFlags
 
 fun pluralizedParameter(count: Int): String {
@@ -36,7 +37,7 @@ class GenericConstraintInspection : LocalInspectionTool() {
         return object : LuaDocVisitor() {
             private fun validateGenericArguments(typeElement: LuaDocPsiElement, classNameRef: LuaDocClassNameRef, args: List<LuaDocTy>) {
                 val context = SearchContext.get(classNameRef)
-                val params = LuaPsiTreeUtil.findClass(classNameRef.text, context)?.type?.getParams(context)
+                val params = LuaPsiTreeUtil.findTypeDef(classNameRef.text, context)?.type?.getParams(context)
 
                 if (params != null && params.size > 0) {
                     val genericAnalyzer = GenericAnalyzer(params, context)

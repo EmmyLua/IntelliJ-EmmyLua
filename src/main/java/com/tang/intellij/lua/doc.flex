@@ -94,6 +94,8 @@ BOOLEAN=true|false
 %state xFIELD_ID
 %state xGENERIC
 %state xALIAS
+%state xALIAS_PARAMS
+%state xALIAS_PARAM_LIST
 %state xSUPPRESS
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
@@ -120,7 +122,7 @@ BOOLEAN=true|false
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
-<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_PARAM_LIST, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_PARAM_LIST, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xALIAS_PARAM_LIST, xSUPPRESS> {
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
     {BLOCK_END}                {
         if (yylength() - 2 == nBrackets) {
@@ -159,8 +161,19 @@ BOOLEAN=true|false
 }
 
 <xALIAS> {
-    {ID}                       { beginType(); return ID; }
-    [^]                        { yybegin(xBODY); yypushback(yylength()); }
+    {ID}                       { yybegin(xALIAS_PARAMS); return ID; }
+}
+
+<xALIAS_PARAMS> {
+    "<"                        { yybegin(xALIAS_PARAM_LIST); return LT; }
+    [^]                        { beginType(); yypushback(yylength()); }
+}
+
+<xALIAS_PARAM_LIST> {
+    {ID}                       { return ID; }
+    ":"                        { beginType(xALIAS_PARAM_LIST); return EXTENDS; }
+    ","                        { return COMMA; }
+    ">"                        { beginType(); return GT; }
 }
 
 <xGENERIC> {

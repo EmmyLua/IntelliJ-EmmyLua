@@ -24,6 +24,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
+import com.tang.intellij.lua.ty.ProblemUtil
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyTuple
 

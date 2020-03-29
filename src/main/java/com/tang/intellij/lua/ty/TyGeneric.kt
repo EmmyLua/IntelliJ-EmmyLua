@@ -86,7 +86,8 @@ interface ITyGeneric : ITy {
 
     fun getParameterSubstitutor(context: SearchContext): TyParameterSubstitutor {
         val paramMap = mutableMapOf<String, ITy>()
-        val baseParams = base.getParams(context)
+        val resolvedBase = TyAliasSubstitutor.substitute(base, context)
+        val baseParams = resolvedBase.getParams(context)
 
         baseParams?.forEachIndexed { index, baseParam ->
             if (index < params.size) {
@@ -113,10 +114,22 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
     }
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
-        if (base is ITyClass) {
-            base.lazyInit(context)
+        val resolvedBase = TyAliasSubstitutor.substitute(base, context)
 
-            if (base.flags and TyFlags.SHAPE != 0) {
+        if (resolvedBase is ITyAlias) {
+            TyUnion.each(resolvedBase.ty.substitute(getParameterSubstitutor(context))) {
+                if (it.contravariantOf(other, context, flags)) {
+                    return true
+                }
+            }
+
+            return false
+        }
+
+        if (resolvedBase is ITyClass) {
+            resolvedBase.lazyInit(context)
+
+            if (resolvedBase.flags and TyFlags.SHAPE != 0) {
                 val parameterSubstitutor = getParameterSubstitutor(context)
                 return processMembers(context, { _, classMember ->
                     val memberName = classMember.name
@@ -125,13 +138,13 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
                         return@processMembers false
                     }
 
+                    val memberTy = classMember.guessType(context).substitute(parameterSubstitutor)
                     val otherMember = other.findMember(memberName, context)
 
                     if (otherMember == null) {
-                        return@processMembers false
+                        return@processMembers TyUnion.find(memberTy, TyNil::class.java) != null
                     }
 
-                    val memberTy = classMember.guessType(context).substitute(parameterSubstitutor)
                     val otherMemberTy = otherMember.guessType(context)
 
                     memberTy.contravariantOf(otherMemberTy, context, flags)
@@ -140,7 +153,7 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
         }
 
         if (other is ITyArray) {
-            return if (base == Ty.TABLE && params.size == 2) {
+            return if (resolvedBase == Ty.TABLE && params.size == 2) {
                 val keyTy = params.first()
                 val valueTy = params.last()
                 return (keyTy == Ty.NUMBER || (keyTy is TyUnknown && flags and TyVarianceFlags.STRICT_UNKNOWN == 0))
@@ -155,7 +168,7 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
         if (other is ITyGeneric) {
             otherBase = other.base
             otherParams = other.params
-        } else if ((other == Ty.TABLE || other is TyTable) && base == Ty.TABLE && params.size == 2) {
+        } else if ((other == Ty.TABLE || other is TyTable) && resolvedBase == Ty.TABLE && params.size == 2) {
             val keyTy = params.first()
             val valueTy = params.last()
 
@@ -175,7 +188,7 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
         }
 
         if (otherBase != null && otherParams != null
-                && base.contravariantOf(otherBase, context, flags)
+                && resolvedBase.contravariantOf(otherBase, context, flags)
                 && params.size == otherParams.size
                 && params.asSequence().zip(otherParams.asSequence()).all { (param, otherParam) ->
                     // Params are always invariant as we don't support use-site variance nor immutable/read-only annotations
@@ -196,10 +209,7 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
-        return TySerializedGeneric(
-                params.map { it.substitute(substitutor) }.toTypedArray(),
-                base.substitute(substitutor)
-        )
+        return substitutor.substitute(this)
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {

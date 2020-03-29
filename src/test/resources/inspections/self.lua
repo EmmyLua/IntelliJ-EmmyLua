@@ -27,39 +27,39 @@ end
 ---@return self
 function SelfA.dotMethod()
     ---@type self
-    local selfTypedVar = self
+    local selfTypedVar = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA|[global self]'">self</error>
 
     ---@type SelfA
     local someSelfA
 
-    someSelfA = self
-    self = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA'">someSelfA</error>
+    someSelfA = <error descr="Type mismatch. Required: 'SelfA' Found: 'SelfA|[global self]'">self</error>
+    self = someSelfA
     selfTypedVar = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA'">someSelfA</error>
-    aNumber = <error descr="Type mismatch. Required: 'number' Found: '[local self]'">self</error>
+    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'SelfA|[global self]'">self</error>
 
-    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string'">self.a</error>
+    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string|nil'">self.a</error>
     aString = self.a
 
-    return self
+    return <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA|[global self]'">self</error>
 end
 
 ---@return self
 SelfA.lambdaMethod = function()
     ---@type self
-    local selfTypedVar = self
+    local selfTypedVar = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA|[global self]'">self</error>
 
     ---@type SelfA
     local someSelfA
 
-    someSelfA = self
-    self = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA'">someSelfA</error>
+    someSelfA = <error descr="Type mismatch. Required: 'SelfA' Found: 'SelfA|[global self]'">self</error>
+    self = someSelfA
     selfTypedVar = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA'">someSelfA</error>
-    aNumber = <error descr="Type mismatch. Required: 'number' Found: '[local self]'">self</error>
+    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'SelfA|[global self]'">self</error>
 
-    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string'">self.a</error>
+    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string|nil'">self.a</error>
     aString = self.a
 
-    return self
+    return <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA|[global self]'">self</error>
 end
 
 ---@type SelfA

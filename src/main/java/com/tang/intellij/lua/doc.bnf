@@ -325,8 +325,8 @@ tag_generic_list ::= TAG_NAME_GENERIC generic_def (',' generic_def)* {
     pin = 1
 }
 
-tag_alias ::= TAG_NAME_ALIAS ID ty {
-    pin = 1
+tag_alias ::= TAG_NAME_ALIAS ID ('<' generic_def_list '>')? ty {
+    pin = 2
     implements = [
         "com.tang.intellij.lua.psi.LuaTypeAlias"
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"

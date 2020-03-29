@@ -39,15 +39,21 @@ public class LuaDocTagAliasImpl extends StubBasedPsiElementBase<LuaDocTagAliasSt
   }
 
   @Override
+  @NotNull
+  public List<LuaDocGenericDef> getGenericDefList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocGenericDef.class);
+  }
+
+  @Override
   @Nullable
   public LuaDocTy getTy() {
     return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
   }
 
   @Override
-  @Nullable
+  @NotNull
   public PsiElement getId() {
-    return findChildByType(ID);
+    return notNullChild(findChildByType(ID));
   }
 
   @Override
@@ -63,7 +69,7 @@ public class LuaDocTagAliasImpl extends StubBasedPsiElementBase<LuaDocTagAliasSt
   }
 
   @Override
-  @Nullable
+  @NotNull
   public String getName() {
     return LuaDocPsiImplUtilKt.getName(this);
   }

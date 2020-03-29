@@ -12,10 +12,13 @@ import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaDocTagAlias extends LuaTypeAlias, LuaDocPsiElement, PsiNameIdentifierOwner, LuaDocTag, StubBasedPsiElement<LuaDocTagAliasStub> {
 
+  @NotNull
+  List<LuaDocGenericDef> getGenericDefList();
+
   @Nullable
   LuaDocTy getTy();
 
-  @Nullable
+  @NotNull
   PsiElement getId();
 
   @Nullable
@@ -24,7 +27,7 @@ public interface LuaDocTagAlias extends LuaTypeAlias, LuaDocPsiElement, PsiNameI
   @NotNull
   PsiElement setName(@NotNull String newName);
 
-  @Nullable
+  @NotNull
   String getName();
 
   int getTextOffset();

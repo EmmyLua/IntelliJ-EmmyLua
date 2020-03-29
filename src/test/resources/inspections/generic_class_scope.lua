@@ -10,20 +10,22 @@ function GenericInMethod:colonMethod(arg)
     thing = self.a
 end
 
+---@param object self
 ---@param arg T
-function GenericInMethod.dotMethod(arg)
+function GenericInMethod.dotMethod(object, arg)
     ---@type T
     local thing
 
-    thing = self.a
+    thing = object.a
 end
 
+---@param object self
 ---@param arg T
-GenericInMethod.lambdaMethod = function(arg)
+GenericInMethod.lambdaMethod = function(object, arg)
     ---@type T
     local thing
 
-    thing = self.a
+    thing = object.a
 end
 
 ---@generic <error descr="Generic parameters cannot be shadowed, 'T' was previously defined on line 1">T</error>

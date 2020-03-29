@@ -23,6 +23,7 @@ import com.intellij.psi.PsiWhiteSpace;
 import com.intellij.psi.search.PsiElementProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
+import com.tang.intellij.lua.Constants;
 import com.tang.intellij.lua.comment.LuaCommentUtil;
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy;
 import com.tang.intellij.lua.comment.psi.LuaDocGenericDef;
@@ -169,28 +170,35 @@ public class LuaPsiTreeUtil {
     @NotNull
     public static ITy findContextClass(PsiElement current) {
         //todo module ty
+        SearchContext context = SearchContext.Companion.get(current.getProject());
+
         while (!(current instanceof PsiFile)) {
-            LuaFuncBodyOwner funcBodyOwner = null;
-
             if (current instanceof LuaFuncBodyOwner) {
-                funcBodyOwner = (LuaFuncBodyOwner) current;
-            } else if (current instanceof LuaAssignStat) {
-                LuaAssignStat assignStat = (LuaAssignStat) current;
-                LuaExprList luaExprList = assignStat.getValueExprList();
+                LuaFuncBodyOwner funcBodyOwner = (LuaFuncBodyOwner) current;
+                ITy ty = funcBodyOwner.guessParentType(context);
 
-                if (luaExprList != null && luaExprList.getExprList().size() == 1) {
-                    LuaExpr luaExpr = luaExprList.getExprList().get(0);
-
-                    if (luaExpr instanceof LuaFuncBodyOwner) {
-                        funcBodyOwner = (LuaFuncBodyOwner) luaExpr;
-                    }
-                }
-            }
-
-            if (funcBodyOwner != null) {
-                ITy ty = funcBodyOwner.guessParentType(SearchContext.Companion.get(current.getProject()));
                 if (ty != Ty.Companion.getUNKNOWN()) {
                     return ty;
+                }
+            } else if (current instanceof LuaAssignStat) {
+                LuaAssignStat assignStat = (LuaAssignStat) current;
+                LuaExprList valueExprList = assignStat.getValueExprList();
+
+                if (valueExprList != null && valueExprList.getExprList().size() == 1) {
+                    LuaExpr luaExpr = valueExprList.getExprList().get(0);
+                    LuaExpr varExpr = assignStat.getVarExprList().getExprList().get(0);
+
+                    if (luaExpr instanceof LuaFuncBodyOwner && varExpr instanceof LuaIndexExpr) {
+                        LuaIndexExpr indexExpr = (LuaIndexExpr) varExpr;
+
+                        if (indexExpr.getExprList().size() != 1 || !indexExpr.getFirstChild().getText().equals(Constants.WORD_SELF)) {
+                            ITy ty = indexExpr.guessParentType(context);
+
+                            if (ty != Ty.Companion.getUNKNOWN()) {
+                                return ty;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -268,18 +276,25 @@ public class LuaPsiTreeUtil {
     }
 
     @Nullable
-    public static LuaClass findClass(String name, SearchContext searchContext) {
+    public static LuaDocGenericDef findGenericDef(String name, SearchContext searchContext) {
         PsiElement element = searchContext.getElement();
+        return element != null ? findGenericDef(name, element) : null;
+    }
 
-        if (element != null) {
-            LuaDocGenericDef luaDocGenericDef = findGenericDef(name, element);
+    @Nullable
+    public static LuaClass findClass(String name, SearchContext searchContext) {
+        LuaDocGenericDef luaDocGenericDef = findGenericDef(name, searchContext);
 
-            if (luaDocGenericDef != null) {
-                return luaDocGenericDef;
-            }
-        }
+        return luaDocGenericDef != null ? luaDocGenericDef
+                : LuaShortNamesManager.Companion.getInstance(searchContext.getProject()).findClass(name, searchContext);
+    }
 
-        return LuaShortNamesManager.Companion.getInstance(searchContext.getProject()).findClass(name, searchContext);
+    @Nullable
+    public static LuaTypeDef findTypeDef(String name, SearchContext searchContext) {
+        LuaDocGenericDef luaDocGenericDef = findGenericDef(name, searchContext);
+
+        return luaDocGenericDef != null ? luaDocGenericDef
+                : LuaShortNamesManager.Companion.getInstance(searchContext.getProject()).findTypeDef(name, searchContext);
     }
 
     public static void processChildren(PsiElement parent, PsiElementProcessor<PsiElement> processor) {

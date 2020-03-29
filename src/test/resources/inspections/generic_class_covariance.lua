@@ -19,11 +19,11 @@ local genericC
 genericA = genericB
 genericA = genericC
 
-genericB = <error>genericA</error> -- Expect error
+genericB = <error>genericA</error>
 genericB = genericC
 
-genericC = genericA -- Expect error
-genericC = genericB -- Expect error
+genericC = genericA
+genericC = genericB
 
 
 ---@class ClassA : GenericA<string>
@@ -47,11 +47,11 @@ local classC
 classA = classB
 classA = classC
 
-classB = classA -- Expect error
+classB = classA
 classB = classC
 
-classC = classA -- Expect error
-classC = classB -- Expect error
+classC = classA
+classC = classB
 
 genericA = classA
 genericA = classB
@@ -79,8 +79,8 @@ local classGenC
 classGenA = classGenB
 classGenA = classGenC
 
-classGenB = classGenA -- Expect error
+classGenB = classGenA
 classGenB = classGenC
 
-classGenC = classGenA -- Expect error
-classGenC = classGenB -- Expect error
+classGenC = classGenA
+classGenC = classGenB

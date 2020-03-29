@@ -52,18 +52,19 @@ interface ITyClass : ITy {
 fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visibility): Boolean {
     if (visibility == Visibility.PUBLIC)
         return true
-    var isVisible = false
-    TyUnion.process(contextTy) {
+
+    TyUnion.each(contextTy) {
         if (it is ITyClass) {
-            if (it == this)
-                isVisible = true
-            else if (visibility == Visibility.PROTECTED) {
-                isVisible = LuaClassInheritorsSearch.isClassInheritFrom(GlobalSearchScope.projectScope(project), project, className, it.className)
+            if (it == this || (
+                            visibility == Visibility.PROTECTED
+                            && LuaClassInheritorsSearch.isClassInheritFrom(GlobalSearchScope.projectScope(project), project, className, it.className))
+            ) {
+                return true
             }
         }
-        !isVisible
     }
-    return isVisible
+
+    return false
 }
 
 abstract class TyClass(override val className: String,
@@ -171,7 +172,14 @@ abstract class TyClass(override val className: String,
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         lazyInit(context)
-        return super.contravariantOf(other, context, flags)
+
+        val resolved = TyAliasSubstitutor.substitute(this, context)
+
+        if (resolved != this) {
+            return resolved.contravariantOf(other, context, flags)
+        } else {
+            return super.contravariantOf(other, context, flags)
+        }
     }
 
     companion object {

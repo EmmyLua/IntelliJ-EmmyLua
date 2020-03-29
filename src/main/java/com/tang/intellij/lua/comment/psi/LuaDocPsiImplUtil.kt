@@ -175,6 +175,13 @@ fun getName(tagClass: LuaDocTagClass): String {
     return tagClass.id.text
 }
 
+fun getName(tagAlias: LuaDocTagAlias): String {
+    val stub = tagAlias.stub
+    if (stub != null)
+        return stub.name
+    return tagAlias.id.text
+}
+
 /**
  * for Goto Class
  * @param tagClass class def
@@ -366,6 +373,5 @@ fun getNameIdentifier(g: LuaDocTagAlias): PsiElement? {
 
 fun getType(alias: LuaDocTagAlias): ITy {
     val stub = alias.stub
-    val ty = stub?.type ?: alias.ty?.getType()
-    return ty ?: Ty.UNKNOWN
+    return stub?.type ?: TyAlias(alias.name, alias.genericDefList.map { TyParameter(it) }.toTypedArray(), alias.ty?.getType() ?: Ty.UNKNOWN)
 }

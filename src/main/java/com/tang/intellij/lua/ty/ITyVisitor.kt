@@ -19,6 +19,8 @@ package com.tang.intellij.lua.ty
 interface ITyVisitor {
     fun visitTy(ty: ITy)
 
+    fun visitAlias(alias: ITyAlias)
+
     fun visitClass(clazz: ITyClass)
 
     fun visitFun(f: ITyFunction)
@@ -35,6 +37,10 @@ interface ITyVisitor {
 open class TyVisitor : ITyVisitor {
     override fun visitTy(ty: ITy) {
         ty.acceptChildren(this)
+    }
+
+    override fun visitAlias(alias: ITyAlias) {
+        visitTy(alias)
     }
 
     override fun visitClass(clazz: ITyClass) {

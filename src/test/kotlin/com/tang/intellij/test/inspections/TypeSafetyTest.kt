@@ -33,6 +33,10 @@ class TypeSafetyTest : LuaInspectionsTestBase(
         ReturnTypeInspection(),
         UndeclaredMemberInspection()
 ) {
+    fun testAlias() {
+        checkByFile("alias.lua")
+    }
+
     fun testBoolean() {
         checkByFile("boolean.lua")
     }
@@ -61,6 +65,11 @@ class TypeSafetyTest : LuaInspectionsTestBase(
         checkByFile("function_multiple_returns.lua", true, false, true)
     }
 
+    fun testGenericAlias() {
+        // TODO: There's a bug in IntelliJ's XML descr attribute parsing. Once fixed we should add descr.
+        checkByFile("generic_alias.lua")
+    }
+
     fun testGenericClassConstraints() {
         checkByFile("generic_class_constraints.lua")
     }
@@ -85,6 +94,10 @@ class TypeSafetyTest : LuaInspectionsTestBase(
 
     fun testImplicitTypes() {
         checkByFile("implicit_types.lua")
+    }
+
+    fun testLambdaClass() {
+        checkByFile("lambda_class.lua")
     }
 
     fun testLambdaParams() {
@@ -116,8 +129,16 @@ class TypeSafetyTest : LuaInspectionsTestBase(
         checkByFile("overloads.lua")
     }
 
+    fun testRecursiveAlias() {
+        checkByFile("recursive_alias.lua")
+    }
+
     fun testSelf() {
         checkByFile("self.lua")
+    }
+
+    fun testShape() {
+        checkByFile("shape.lua")
     }
 
     fun testStrictNil() {
@@ -136,6 +157,10 @@ class TypeSafetyTest : LuaInspectionsTestBase(
 
     fun testTrailingType() {
         checkByFile("trailing_type.lua")
+    }
+
+    fun testTypeCasts() {
+        checkByFile("type_casts.lua")
     }
 
     fun testUnions() {

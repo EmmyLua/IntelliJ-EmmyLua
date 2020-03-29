@@ -16,9 +16,7 @@
 
 package com.tang.intellij.lua.ty
 
-import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.codeInspection.ProblemsHolder
-import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
@@ -253,12 +251,6 @@ fun ITyFunction.findCandidateSignatures(call: LuaCallExpr): Collection<IFunSigna
 
 class SignatureMatchResult(val signature: IFunSignature, val substitutedSignature: IFunSignature)
 
-private class SignatureProblem(
-        val element: PsiElement,
-        val problem: String,
-        val highlightType: ProblemHighlightType = ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-)
-
 fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, problemsHolder: ProblemsHolder? = null): SignatureMatchResult? {
     val args = call.argList
     val concreteTypes = mutableListOf<MatchFunctionSignatureInspection.ConcreteTypeInfo>()
@@ -273,13 +265,13 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
         } else concreteTypes.add(MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, ty))
     }
 
-    val problems = if (problemsHolder != null) mutableMapOf<IFunSignature, Collection<SignatureProblem>>() else null
+    val problems = if (problemsHolder != null) mutableMapOf<IFunSignature, Collection<Problem>>() else null
     val candidates = findCandidateSignatures(call)
 
     candidates.forEach {
         var nParams = 0
         var candidateFailed = false
-        val signatureProblems = if (problems != null) mutableListOf<SignatureProblem>() else null
+        val signatureProblems = if (problems != null) mutableListOf<Problem>() else null
 
         val substitutor = call.createSubstitutor(it, searchContext)
         val signature = it.substitute(substitutor)
@@ -299,7 +291,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
                 problemElement = problemElement ?: call.lastChild
 
                 candidateFailed = true
-                signatureProblems?.add(SignatureProblem(problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
+                signatureProblems?.add(Problem(problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
 
                 return@processArgs true
             }
@@ -311,7 +303,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
 
             if (problemsHolder != null) {
                 val contravariant = ProblemUtil.contravariantOf(paramType, argType, searchContext, varianceFlags, argExpr) { element, message, highlightProblem ->
-                    signatureProblems?.add(SignatureProblem(element, message, highlightProblem))
+                    signatureProblems?.add(Problem(element, message, highlightProblem))
                 }
 
                 if (!contravariant) {
@@ -327,7 +319,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
         if (nParams < args.size && !it.hasVarargs()) {
             for (i in nParams until args.size) {
                 candidateFailed = true
-                signatureProblems?.add(SignatureProblem(args[i], "Too many arguments."))
+                signatureProblems?.add(Problem(args[i], "Too many arguments."))
             }
         }
 
@@ -345,7 +337,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
 
         problems?.forEach { signature, signatureProblems ->
             signatureProblems.forEach {
-                val problem = if (multipleCandidates) "${it.problem} In: ${signature.displayName}\n" else it.problem
+                val problem = if (multipleCandidates) "${it.message}. In: ${signature.displayName}\n" else it.message
                 problemsHolder.registerProblem(it.element, problem, it.highlightType)
             }
         }

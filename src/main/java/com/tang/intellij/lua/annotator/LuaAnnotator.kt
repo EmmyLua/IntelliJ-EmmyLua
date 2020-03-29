@@ -229,7 +229,7 @@ class LuaAnnotator : Annotator {
 
         override fun visitTagAlias(o: LuaDocTagAlias) {
             super.visitTagAlias(o)
-            val id = o.id ?: return
+            val id = o.id
             val annotation = createInfoAnnotation(id, null)
             annotation.textAttributes = LuaHighlightingData.TYPE_ALIAS
         }

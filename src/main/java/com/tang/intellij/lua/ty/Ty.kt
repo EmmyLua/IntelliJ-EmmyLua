@@ -32,6 +32,7 @@ enum class TyKind {
     Array,
     Function,
     Class,
+    Alias,
     Union,
     Generic,
     Nil,
@@ -193,13 +194,20 @@ abstract class Ty(override val kind: TyKind) : ITy {
             return true
         }
 
+        val resolvedOther = TyAliasSubstitutor.substitute(other, context)
+
+        if (resolvedOther != other) {
+            return contravariantOf(resolvedOther, context, flags)
+        }
+
         if (other is TyUnion) {
-            var contravariant = true
-            TyUnion.process(other) {
-                contravariant = contravariantOf(it, context, flags)
-                contravariant
+            TyUnion.each(other) {
+                if (!contravariantOf(it, context, flags)) {
+                    return false
+                }
             }
-            return contravariant
+
+            return true
         }
 
         if (this.flags and TyFlags.SHAPE != 0) {
@@ -294,6 +302,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
         private val serializerMap = mapOf<TyKind, ITySerializer>(
                 TyKind.Array to TyArraySerializer,
                 TyKind.Class to TyClassSerializer,
+                TyKind.Alias to TyAliasSerializer,
                 TyKind.Function to TyFunctionSerializer,
                 TyKind.Generic to TyGenericSerializer,
                 TyKind.GenericParam to TyGenericParamSerializer,
@@ -410,6 +419,6 @@ class TyNil : Ty(TyKind.Nil) {
 class TyVoid : Ty(TyKind.Void) {
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
-        return false
+        return other.kind == TyKind.Void
     }
 }

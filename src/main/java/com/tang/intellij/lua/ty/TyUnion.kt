@@ -86,9 +86,9 @@ class TyUnion : Ty(TyKind.Union) {
     }
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
-        val u = TyUnion()
-        childSet.forEach { u.append(it.substitute(substitutor)) }
-        return u
+        var ty: ITy = Ty.VOID
+        childSet.forEach { ty = ty.union(it.substitute(substitutor)) }
+        return ty
     }
 
     override fun accept(visitor: ITyVisitor) {
@@ -113,36 +113,24 @@ class TyUnion : Ty(TyKind.Union) {
         fun <T : ITy> find(ty: ITy, clazz: Class<T>): T? {
             if (clazz.isInstance(ty))
                 return clazz.cast(ty)
-            var ret: T? = null
-            process(ty) {
+            each(ty) {
                 if (clazz.isInstance(it)) {
-                    ret = clazz.cast(it)
-                    return@process false
+                    return clazz.cast(it)
                 }
-                true
             }
-            return ret
+            return null
         }
 
-        fun process(ty: ITy, process: (ITy) -> Boolean) {
+        inline fun each(ty: ITy, fn: (ITy) -> Unit) {
             if (ty is TyUnion) {
-                // why nullable ???
-                val arr: Array<ITy?> = ty.childSet.toTypedArray()
-                for (child in arr) {
-                    if (child != null && !process(child))
-                        break
+                for (child in ty.getChildTypes().toTypedArray()) {
+                    fn(child)
                 }
             } else if (ty == Ty.BOOLEAN) {
-                if (process(Ty.TRUE)) {
-                    process(Ty.FALSE)
-                }
-            } else process(ty)
-        }
-
-        fun each(ty: ITy, fn: (ITy) -> Unit) {
-            process(ty) {
-                fn(it)
-                true
+                fn(Ty.TRUE)
+                fn(Ty.FALSE)
+            } else {
+                fn(ty)
             }
         }
 
@@ -180,7 +168,7 @@ class TyUnion : Ty(TyKind.Union) {
             var clazz: ITyClass? = null
             var anonymous: ITyClass? = null
             var global: ITyClass? = null
-            process(ty) {
+            each(ty) {
                 if (it is ITyClass) {
                     when {
                         it.isAnonymous -> anonymous = it
