@@ -47,6 +47,7 @@ tmpname
 tonumber
 tostring
 tostring
+traceback
 upvalueid
 upvaluejoin
 xpcall
