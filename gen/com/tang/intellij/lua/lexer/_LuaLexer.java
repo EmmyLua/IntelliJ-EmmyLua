@@ -457,7 +457,7 @@ public class _LuaLexer implements FlexLexer {
                     size++;
                     pos++;
                 }
-                if (size == nBrackets && zzBuffer.charAt(pos) == ']') {
+                if (size == nBrackets && pos < zzEndRead && zzBuffer.charAt(pos) == ']') {
                     pos++;
                     break;
                 }
