@@ -301,6 +301,10 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) = Unit
 
     fun toGeneric(context: SearchContext): ITyGeneric {
+        if (isEmpty()) {
+            return TySerializedGeneric(arrayOf(Ty.UNKNOWN, Ty.UNKNOWN), Ty.TABLE)
+        }
+
         var keyType: ITy = Ty.VOID
         var elementType: ITy = Ty.VOID
 
@@ -317,6 +321,10 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
         }
 
         return TySerializedGeneric(arrayOf(keyType, elementType), Ty.TABLE)
+    }
+
+    fun isEmpty(): Boolean {
+        return table.tableFieldList.size == 0
     }
 }
 

@@ -74,3 +74,12 @@ local anyValue
 local tableWithoutEntries = {}
 
 anyValue = tableWithoutEntries.<error descr="No such member 'keyThatDoesNotExist' found on type 'table'">keyThatDoesNotExist</error>
+
+stringArray = {}
+numberArray = {}
+numberNumberTable = {}
+numberStringTable = {}
+explicitUnknown = {}
+implicitUnknown = {}
+explictlyTypedLiteral = <error descr="Type mismatch. Required: '\"stringLiteral\"' Found: 'table'">{}</error>
+wantsNumberNumberTable({})
