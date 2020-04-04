@@ -56,7 +56,8 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
 STRING=[^\r\n\t\f\]]*
-ID=[:jletter:] ([:jletterdigit:]|\.)*
+ID=[:jletter:] ([:jletterdigit:])*
+PROPERTY=[:jletter:] ([:jletterdigit:]|\.)*
 //三个-以上
 DOC_DASHES=--+
 BLOCK_BEGIN=--\[=*\[---+
@@ -155,7 +156,7 @@ BOOLEAN=true|false
 }
 
 <xSUPPRESS> {
-    {ID}                       { return ID; }
+    {PROPERTY}                 { return PROPERTY; }
     ","                        { return COMMA; }
     [^]                        { yybegin(xBODY); yypushback(yylength()); }
 }
@@ -205,7 +206,7 @@ BOOLEAN=true|false
 
 <xPARAM> {
     {ID}                       { beginType(); return ID; }
-    "..."                      { beginType(); return ID; } //varargs
+    "..."                      { beginType(); return ELLIPSIS; } //varargs
 }
 
 <xFIELD> {
@@ -237,7 +238,8 @@ BOOLEAN=true|false
     "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
     "vararg"                   { _typeReq = true; return VARARG; }
-    "..."|{ID}                 { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(_nextState); yypushback(yylength()); } }
+    "..."                      { return ELLIPSIS; }
+    {ID}                       { if (_typeReq || _typeLevel > 0) { _typeReq = false; return ID; } else { yybegin(_nextState); yypushback(yylength()); } }
 }
 
 <xDOUBLE_QUOTED_STRING> {
@@ -260,7 +262,7 @@ BOOLEAN=true|false
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 <xTAG_WITH_ID> {
-    {ID}                       { yybegin(xCOMMENT_STRING); return ID; }
+    {PROPERTY}                 { yybegin(xCOMMENT_STRING); return PROPERTY; }
 }
 
 <xCOMMENT_STRING> {

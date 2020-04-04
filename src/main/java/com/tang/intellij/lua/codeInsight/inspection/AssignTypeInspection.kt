@@ -27,6 +27,35 @@ import com.tang.intellij.lua.ty.*
 class AssignTypeInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
+                private fun inspectAssignee(assignee: LuaTypeGuessable, value: ITy, varianceFlags: Int, expressionElement: LuaExpr, targetAssignee: Boolean, searchContext: SearchContext) {
+                    val targetElement = if (targetAssignee) assignee else null
+
+                    if (assignee is LuaIndexExpr) {
+                        // Get owner class
+                        val fieldOwnerType = assignee.guessParentType(searchContext)
+                        val fieldOwnerClass = if (fieldOwnerType is TyGeneric) fieldOwnerType.base else fieldOwnerType
+
+                        if (fieldOwnerClass is TyClass) {
+                            val name = assignee.name ?: ""
+                            val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
+                            ProblemUtil.contravariantOf(fieldType, value, searchContext, varianceFlags, targetElement, expressionElement) { targetElement, sourceElement, message, highlightType ->
+                                myHolder.registerProblem(sourceElement, message, highlightType)
+                                if (targetElement != null && targetElement != sourceElement) {
+                                    myHolder.registerProblem(targetElement, message, highlightType)
+                                }
+                            }
+                        }
+                    } else {
+                        val variableType = assignee.guessType(searchContext)
+                        ProblemUtil.contravariantOf(variableType, value, searchContext, varianceFlags, targetElement, expressionElement) { targetElement, sourceElement, message, highlightType ->
+                            myHolder.registerProblem(sourceElement, message, highlightType)
+                            if (targetElement != null && targetElement != sourceElement) {
+                                myHolder.registerProblem(targetElement, message, highlightType)
+                            }
+                        }
+                    }
+                }
+
                 fun inspectAssignment(assignees: List<LuaTypeGuessable>, expressions: List<LuaExpr>?) {
                     if (expressions == null || expressions.size == 0) {
                         return
@@ -34,56 +63,57 @@ class AssignTypeInspection : StrictInspection() {
 
                     val searchContext = SearchContext.get(expressions.first().project)
                     var assigneeIndex = 0
+                    var variadicTy: ITy? = null
 
                     for (expressionIndex in 0 until expressions.size) {
                         val expression = expressions[expressionIndex]
                         val expressionType = expression.guessType(searchContext)
                         val varianceFlags = if (expression is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
-                        val values = if (expressionType is TyTuple) expressionType.list else listOf(expressionType)
+                        val multipleResults = expressionType as? TyMultipleResults
+                        val values = if (multipleResults != null) multipleResults.list else listOf(expressionType)
                         val isLastExpression = expressionIndex == expressions.size - 1
 
-                        for (value in values) {
+                        for (valueIndex in 0 until values.size) {
+                            val value = values[valueIndex]
+                            val variadic = isLastExpression && valueIndex == values.size - 1 && multipleResults?.variadic == true
+
+                            if (variadic) {
+                                variadicTy = value
+                            }
+
                             if (assigneeIndex >= assignees.size) {
-                                for (i in expressionIndex until expressions.size) {
-                                    myHolder.registerProblem(expressions[i], "Insufficient assignees, values will be discarded.", ProblemHighlightType.WEAK_WARNING)
+                                if (!variadic) {
+                                    for (i in expressionIndex until expressions.size) {
+                                        myHolder.registerProblem(expressions[i], "Insufficient assignees, values will be discarded.", ProblemHighlightType.WEAK_WARNING)
+                                    }
                                 }
                                 return
                             }
 
                             val assignee = assignees[assigneeIndex++]
 
-                            if (assignee is LuaIndexExpr) {
-                                // Get owner class
-                                val fieldOwnerType = assignee.guessParentType(searchContext)
-                                val fieldOwnerClass = if (fieldOwnerType is TyGeneric) fieldOwnerType.base else fieldOwnerType
-
-                                if (fieldOwnerClass is TyClass) {
-                                    val name = assignee.name ?: ""
-                                    val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
-                                    ProblemUtil.contravariantOf(fieldType, value, searchContext, varianceFlags, expression) { element, message, highlightType ->
-                                        myHolder.registerProblem(element, message, highlightType)
-                                    }
-                                }
-                            } else if (assignees.size == 1 && (assignee.parent?.parent as? LuaCommentOwner)?.comment?.tagClass != null) {
+                            if (assignees.size == 1 && (assignee.parent?.parent as? LuaCommentOwner)?.comment?.tagClass != null) {
                                 if (value !is TyTable) {
                                     myHolder.registerProblem(expression, "Type mismatch. Required: 'table' Found: '%s'".format(value.displayName))
                                 }
                             } else {
-                                val variableType = assignee.guessType(searchContext)
-                                ProblemUtil.contravariantOf(variableType, value, searchContext, varianceFlags, expression) { element, message, highlightType ->
-                                    myHolder.registerProblem(element, message, highlightType)
-                                }
+                                inspectAssignee(assignee, value, varianceFlags, expression, assignees.size > 1, searchContext)
                             }
 
                             if (!isLastExpression) {
-                                break // Multiple (tuple) values are only handled for the last expression
+                                break // Multiple values are only handled for the last expression
                             }
                         }
                     }
 
                     if (assigneeIndex < assignees.size) {
                         for (i in assigneeIndex until assignees.size) {
-                            myHolder.registerProblem(assignees[i], "Too many assignees, will be assigned nil.")
+                            if (variadicTy != null) {
+                                val assignee = assignees[assigneeIndex++]
+                                inspectAssignee(assignee, variadicTy, 0, expressions.last(), assignees.size > 1, searchContext)
+                            } else {
+                                myHolder.registerProblem(assignees[i], "Too many assignees, will be assigned nil.")
+                            }
                         }
                     }
                 }

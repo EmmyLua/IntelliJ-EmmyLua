@@ -62,4 +62,10 @@ public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunction
     return LuaDocPsiImplUtilKt.getReturnType(this);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getVarreturn() {
+    return findChildByType(ELLIPSIS);
+  }
+
 }

@@ -20,4 +20,7 @@ public interface LuaDocTagReturn extends LuaDocTag {
   @NotNull
   ITy getType();
 
+  @Nullable
+  PsiElement getVarreturn();
+
 }

@@ -42,7 +42,8 @@ import com.tang.intellij.lua.search.SearchContext
 
 
 class Problem (
-        val element: PsiElement,
+        val targetElement: PsiElement?,
+        val sourceElement: PsiElement,
         val message: String,
         val highlightType: ProblemHighlightType = ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 )
@@ -96,7 +97,7 @@ object ProblemUtil {
         return false
     }
 
-    private fun contravariantOf(target: ITy, source: ITy, context: SearchContext, varianceFlags: Int, element: PsiElement, tyProblems: MutableMap<String, Collection<Problem>>): Boolean {
+    private fun contravariantOf(target: ITy, source: ITy, context: SearchContext, varianceFlags: Int, targetElement: PsiElement?, sourceElement: PsiElement, tyProblems: MutableMap<String, Collection<Problem>>): Boolean {
         if (target is ITyGeneric) {
             val base = TyAliasSubstitutor.substitute(target.base, context)
 
@@ -105,8 +106,8 @@ object ProblemUtil {
                     val problems = mutableListOf<Problem>()
                     tyProblems[concreteAliasTy.displayName] = problems
 
-                    val isContravariant = contravariantOf(concreteAliasTy, source, context, varianceFlags, element) { element, message, highlightType ->
-                        problems.add(Problem(element, message, highlightType))
+                    val isContravariant = contravariantOf(concreteAliasTy, source, context, varianceFlags, targetElement, sourceElement) {targetElement, sourceElement, message, highlightType ->
+                        problems.add(Problem(targetElement, sourceElement, message, highlightType))
                     }
 
                     if (isContravariant) {
@@ -129,7 +130,7 @@ object ProblemUtil {
 
         var isContravariant = true
 
-        if (base.flags and TyFlags.SHAPE != 0 && element is LuaTableExpr) {
+        if (base.flags and TyFlags.SHAPE != 0 && sourceElement is LuaTableExpr) {
             val parameterSubstitutor = if (target is ITyGeneric) target.getParameterSubstitutor(context) else null
 
             target.processMembers(context, { _, classMember ->
@@ -145,7 +146,7 @@ object ProblemUtil {
                 if (sourceMember == null) {
                     if (TyUnion.find(targetMemberTy, TyNil::class.java) == null) {
                         isContravariant = false
-                        problems.add(Problem(element, "Type mismatch. Missing member: '%s' of: '%s'".format(memberName, target.displayName), ProblemHighlightType.GENERIC_ERROR_OR_WARNING))
+                        problems.add(Problem(targetElement, sourceElement, "Type mismatch. Missing member: '%s' of: '%s'".format(memberName, target.displayName), ProblemHighlightType.GENERIC_ERROR_OR_WARNING))
                     }
 
                     return@processMembers true
@@ -160,12 +161,13 @@ object ProblemUtil {
                 val memberElement = findHighlightElement(sourceMember.node.psi)
 
                 if (memberElement is LuaTableExpr) {
-                    isContravariant = contravariantOf(targetMemberTy, sourceMemberTy, context, varianceFlags, memberElement) { element, message, highlightType ->
-                        problems.add(Problem(element, message, highlightType))
+                    isContravariant = contravariantOf(targetMemberTy, sourceMemberTy, context, varianceFlags, targetElement, memberElement) { targetElement, sourceElement, message, highlightType ->
+                        problems.add(Problem(targetElement, sourceElement, message, highlightType))
                     }
                 } else if (!targetMemberTy.contravariantOf(sourceMemberTy, context, varianceFlags)) {
                     isContravariant = false
-                    problems.add(Problem(memberElement ?: element,
+                    problems.add(Problem(targetElement,
+                            memberElement ?: sourceElement,
                             "Type mismatch. Required: '%s' Found: '%s'".format(targetMemberTy.displayName, sourceMemberTy.displayName),
                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING))
                 }
@@ -173,27 +175,27 @@ object ProblemUtil {
             }, true)
         } else if (!target.contravariantOf(source, context, varianceFlags)) {
             isContravariant = false
-            problems.add(Problem(element, "Type mismatch. Required: '%s' Found: '%s'".format(target.displayName, source.displayName), ProblemHighlightType.GENERIC_ERROR_OR_WARNING))
+            problems.add(Problem(targetElement, sourceElement, "Type mismatch. Required: '%s' Found: '%s'".format(target.displayName, source.displayName), ProblemHighlightType.GENERIC_ERROR_OR_WARNING))
         }
 
         return isContravariant
     }
 
-    fun contravariantOf(target: ITy, source: ITy, context: SearchContext, varianceFlags: Int, element: PsiElement, processProblem: (element: PsiElement, message: String, highlightType: ProblemHighlightType) -> Unit): Boolean {
+    fun contravariantOf(target: ITy, source: ITy, context: SearchContext, varianceFlags: Int, targetElement: PsiElement?, sourceElement: PsiElement, processProblem: (targetElement: PsiElement?, sourceElement: PsiElement, message: String, highlightType: ProblemHighlightType) -> Unit): Boolean {
         val tyProblems = mutableMapOf<String, Collection<Problem>>()
         val resolvedTarget = TyAliasSubstitutor.substitute(target, context)
 
-        if (element is LuaTableExpr && acceptsShape(resolvedTarget, context)) {
+        if (sourceElement is LuaTableExpr && acceptsShape(resolvedTarget, context)) {
             if (source is TyUnion && resolvedTarget.contravariantOf(source, context, varianceFlags)) {
                 return true
             }
 
             TyUnion.each(resolvedTarget) {
-                if (contravariantOf(it, source, context, varianceFlags, element, tyProblems)) {
+                if (contravariantOf(it, source, context, varianceFlags, targetElement, sourceElement, tyProblems)) {
                     return true
                 }
             }
-        } else if (contravariantOf(resolvedTarget, source, context, varianceFlags, element, tyProblems)) {
+        } else if (contravariantOf(resolvedTarget, source, context, varianceFlags, targetElement, sourceElement, tyProblems)) {
             return true
         }
 
@@ -209,7 +211,7 @@ object ProblemUtil {
             var candidateMinDepth = Int.MAX_VALUE
 
             candidateProblems.forEach {
-                val depth = getDepth(it.element, element)
+                val depth = getDepth(it.sourceElement, sourceElement)
 
                 if (depth < candidateMinDepth) {
                     candidateMinDepth = depth
@@ -228,7 +230,7 @@ object ProblemUtil {
 
         bestMatchingCandidates.forEach { candidate ->
             tyProblems[candidate]?.forEach {
-                processProblem(it.element, it.message, it.highlightType)
+                processProblem(it.targetElement, it.sourceElement, it.message, it.highlightType)
             }
         }
 

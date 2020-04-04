@@ -35,6 +35,7 @@
 
   tokens = [
         ID="regexp:[A-Za-z0-9_]+"
+        PROPERTY="regexp:[A-Za-z0-9_.]+"
         AT = '@'
         SHARP = '#'
         EQ = '='
@@ -48,6 +49,7 @@
         LCURLY = "{"
         RCURLY = "}"
         BACKTICK = "`"
+        ELLIPSIS = '...'
         SNIPPET = "SNIPPET"
         STRING_LITERAL = "STRING_LITERAL"
         TRUE_LITERAL = "TRUE_LITERAL"
@@ -174,16 +176,27 @@ generic_ty ::= class_name_ref '<' generic_param_list '>' {
 function_param ::= ID (':' ty)? {
     pin = 1
 }
-vararg_param ::= VARARG ty {
+
+private vararg_ellipsis_param ::= ELLIPSIS ':' ty {
     pin = 1
+}
+private vararg_word_param ::= VARARG ty {
+    pin = 1
+}
+vararg_param ::= vararg_ellipsis_param | vararg_word_param {
     methods = [getType]
 }
+
 private function_param_list::= (function_param ',')* ((function_param|vararg_param) |& ')')
 private function_generic ::= '<' generic_def (',' generic_def)* '>' {
     pin = 1
 }
-function_ty ::= fun function_generic? '(' function_param_list ')' (':' type_list)? {
-    methods = [getType getReturnType]
+function_ty ::= fun function_generic? '(' function_param_list ')' (':' type_list ELLIPSIS?)? {
+    methods = [
+        getType
+        getReturnType
+        varreturn = 'ELLIPSIS'
+    ]
     pin = 1
 }
 
@@ -226,7 +239,7 @@ tag_def ::= TAG_NAME_NAME comment_string? {
 tag_overload ::= TAG_NAME_OVERLOAD function_ty { pin = 1 }
 
 //@language json
-tag_lan ::= TAG_NAME_LANGUAGE ID comment_string? { pin = 1 }
+tag_lan ::= TAG_NAME_LANGUAGE PROPERTY comment_string? { pin = 1 }
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
@@ -243,9 +256,13 @@ tag_vararg ::= TAG_NAME_VARARG ty comment_string? {
 
 //--- return
 type_list ::= ty(',' ty)*
-tag_return ::= TAG_NAME_RETURN type_list comment_string? {
+tag_return ::= TAG_NAME_RETURN type_list ELLIPSIS? comment_string? {
     pin = 1
-    methods = [resolveTypeAt getType]
+    methods = [
+        resolveTypeAt
+        getType
+        varreturn = 'ELLIPSIS'
+    ]
 }
 
 class_name_ref ::= ID {
@@ -342,6 +359,6 @@ tag_alias ::= TAG_NAME_ALIAS ID ('<' generic_def_list '>')? ty {
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTagAliasStub"
 }
 
-tag_suppress ::= TAG_NAME_SUPPRESS ID (',' ID)* {
+tag_suppress ::= TAG_NAME_SUPPRESS ID (',' PROPERTY)* {
     pin = 1
 }

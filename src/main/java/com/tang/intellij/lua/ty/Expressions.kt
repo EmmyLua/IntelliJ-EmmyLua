@@ -192,9 +192,11 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
         }
         // vararg
         val varargTy = sig.varargTy
-        if (varargTy != null && processedIndex < list.lastIndex) {
-            val argTy = list[processedIndex + 1]
-            genericAnalyzer.analyze(argTy, varargTy)
+        if (varargTy != null) {
+            for (i in processedIndex + 1 until list.size) {
+                val argTy = list[i]
+                genericAnalyzer.analyze(argTy, varargTy)
+            }
         }
 
         val map = genericAnalyzer.map.toMutableMap()
@@ -218,11 +220,11 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
 private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy {
     val substitutor = createSubstitutor(sig, context)
     val returnTy = sig.returnTy.substitute(substitutor)
-    return if (returnTy is TyTuple) {
+    return if (returnTy is TyMultipleResults) {
         if (context.guessTuple())
             returnTy
         else
-            returnTy.list.getOrNull(context.index) ?: Ty.NIL
+            returnTy.list.getOrNull(context.index) ?: if (returnTy.variadic) returnTy.list.last() else Ty.NIL
     } else {
         if (context.guessTuple() || context.index == 0)
             returnTy

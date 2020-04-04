@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface LuaDocTagSuppress extends LuaDocTag {
 
+  @Nullable
+  PsiElement getId();
+
 }

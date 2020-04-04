@@ -18,7 +18,7 @@ local classWithAField
 local aString
 
 aNumber, classWithAField = multipleReturns()
-classWithAField, aNumber = <error descr="Type mismatch. Required: 'ClassWithAField' Found: 'number'"><error descr="Type mismatch. Required: 'number' Found: 'ClassWithAField'">multipleReturns()</error></error>
+<error descr="Type mismatch. Required: 'ClassWithAField' Found: 'number'">classWithAField</error>, <error descr="Type mismatch. Required: 'number' Found: 'ClassWithAField'">aNumber</error> = <error descr="Type mismatch. Required: 'ClassWithAField' Found: 'number'"><error descr="Type mismatch. Required: 'number' Found: 'ClassWithAField'">multipleReturns()</error></error>
 aNumber, classWithAField, <error descr="Too many assignees, will be assigned nil.">aString</error> = multipleReturns()
 aNumber = <weak_warning descr="Insufficient assignees, values will be discarded.">multipleReturns()</weak_warning>
 aNumber, aString = multipleReturns(), "some string"

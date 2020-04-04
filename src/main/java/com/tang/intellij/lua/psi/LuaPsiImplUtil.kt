@@ -577,6 +577,7 @@ fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchConte
                     returnExpr.guessTypeAt(context)
             }
         }
+        return Ty.VOID
     }
     return Ty.UNKNOWN
 }

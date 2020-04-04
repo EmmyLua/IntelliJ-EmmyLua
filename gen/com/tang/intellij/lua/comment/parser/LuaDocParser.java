@@ -941,13 +941,13 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME_LANGUAGE ID comment_string?
+  // TAG_NAME_LANGUAGE PROPERTY comment_string?
   public static boolean tag_lan(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_lan")) return false;
     if (!nextTokenIs(b, TAG_NAME_LANGUAGE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, TAG_LAN, null);
-    r = consumeTokens(b, 1, TAG_NAME_LANGUAGE, ID);
+    r = consumeTokens(b, 1, TAG_NAME_LANGUAGE, PROPERTY);
     p = r; // pin = 1
     r = r && tag_lan_2(b, l + 1);
     exit_section_(b, l, m, r, p, null);
@@ -999,7 +999,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME_RETURN type_list comment_string?
+  // TAG_NAME_RETURN type_list ELLIPSIS? comment_string?
   public static boolean tag_return(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_return")) return false;
     if (!nextTokenIs(b, TAG_NAME_RETURN)) return false;
@@ -1008,14 +1008,22 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, TAG_NAME_RETURN);
     p = r; // pin = 1
     r = r && report_error_(b, type_list(b, l + 1));
-    r = p && tag_return_2(b, l + 1) && r;
+    r = p && report_error_(b, tag_return_2(b, l + 1)) && r;
+    r = p && tag_return_3(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
-  // comment_string?
+  // ELLIPSIS?
   private static boolean tag_return_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_return_2")) return false;
+    consumeToken(b, ELLIPSIS);
+    return true;
+  }
+
+  // comment_string?
+  private static boolean tag_return_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_return_3")) return false;
     comment_string(b, l + 1);
     return true;
   }
@@ -1053,7 +1061,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME_SUPPRESS ID (',' ID)*
+  // TAG_NAME_SUPPRESS ID (',' PROPERTY)*
   public static boolean tag_suppress(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_suppress")) return false;
     if (!nextTokenIs(b, TAG_NAME_SUPPRESS)) return false;
@@ -1066,7 +1074,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // (',' ID)*
+  // (',' PROPERTY)*
   private static boolean tag_suppress_2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_suppress_2")) return false;
     while (true) {
@@ -1077,12 +1085,12 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ',' ID
+  // ',' PROPERTY
   private static boolean tag_suppress_2_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_suppress_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 0, COMMA, ID);
+    r = consumeTokens(b, 0, COMMA, PROPERTY);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -1166,12 +1174,39 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // VARARG ty
+  // ELLIPSIS ':' ty
+  static boolean vararg_ellipsis_param(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "vararg_ellipsis_param")) return false;
+    if (!nextTokenIs(b, ELLIPSIS)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeTokens(b, 1, ELLIPSIS, EXTENDS);
+    p = r; // pin = 1
+    r = r && ty(b, l + 1, -1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
+  // vararg_ellipsis_param | vararg_word_param
   public static boolean vararg_param(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "vararg_param")) return false;
+    if (!nextTokenIs(b, "<vararg param>", ELLIPSIS, VARARG)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, VARARG_PARAM, "<vararg param>");
+    r = vararg_ellipsis_param(b, l + 1);
+    if (!r) r = vararg_word_param(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // VARARG ty
+  static boolean vararg_word_param(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "vararg_word_param")) return false;
     if (!nextTokenIs(b, VARARG)) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, VARARG_PARAM, null);
+    Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, VARARG);
     p = r; // pin = 1
     r = r && ty(b, l + 1, -1);
@@ -1235,7 +1270,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // fun function_generic? '(' function_param_list ')' (':' type_list)?
+  // fun function_generic? '(' function_param_list ')' (':' type_list ELLIPSIS?)?
   public static boolean function_ty(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_ty")) return false;
     if (!nextTokenIsSmart(b, FUN)) return false;
@@ -1259,22 +1294,30 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (':' type_list)?
+  // (':' type_list ELLIPSIS?)?
   private static boolean function_ty_5(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_ty_5")) return false;
     function_ty_5_0(b, l + 1);
     return true;
   }
 
-  // ':' type_list
+  // ':' type_list ELLIPSIS?
   private static boolean function_ty_5_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_ty_5_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, EXTENDS);
     r = r && type_list(b, l + 1);
+    r = r && function_ty_5_0_2(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
+  }
+
+  // ELLIPSIS?
+  private static boolean function_ty_5_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_ty_5_0_2")) return false;
+    consumeTokenSmart(b, ELLIPSIS);
+    return true;
   }
 
   // table_def

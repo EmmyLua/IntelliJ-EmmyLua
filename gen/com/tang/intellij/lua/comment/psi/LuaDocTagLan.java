@@ -11,6 +11,6 @@ public interface LuaDocTagLan extends LuaDocTag {
   LuaDocCommentString getCommentString();
 
   @Nullable
-  PsiElement getId();
+  PsiElement getProperty();
 
 }

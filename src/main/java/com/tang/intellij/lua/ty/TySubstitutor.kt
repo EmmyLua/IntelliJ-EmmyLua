@@ -16,11 +16,9 @@
 
 package com.tang.intellij.lua.ty
 
-import com.intellij.openapi.project.Project
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.LuaCallExpr
 import com.tang.intellij.lua.psi.prefixExpr
-import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 
 interface ITySubstitutor {

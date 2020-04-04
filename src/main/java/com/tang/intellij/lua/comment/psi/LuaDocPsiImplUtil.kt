@@ -155,9 +155,10 @@ fun resolveTypeAt(tagReturn: LuaDocTagReturn, index: Int): ITy {
 
 fun getType(tagReturn: LuaDocTagReturn): ITy {
     val tyList = tagReturn.typeList?.tyList
+    val variadic = tagReturn.varreturn != null
     if (tyList != null && tyList.isNotEmpty()) {
         val tupleList = tyList.map { it.getType() }
-        return if (tupleList.size == 1) tupleList.first() else TyTuple(tupleList)
+        return if (tupleList.size == 1 && !variadic) tupleList.first() else TyMultipleResults(tupleList, variadic)
     }
     return Ty.VOID
 }
@@ -283,12 +284,13 @@ fun getType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
 
 fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
     val list = luaDocFunctionTy.typeList?.tyList?.map { it.getType() }
+    val variadic = luaDocFunctionTy.varreturn != null
 
     return when {
         list == null -> Ty.VOID
         list.isEmpty() -> Ty.VOID
-        list.size == 1 -> list.first()
-        else -> TyTuple(list)
+        list.size == 1 && !variadic -> list.first()
+        else -> TyMultipleResults(list, variadic)
     }
 }
 

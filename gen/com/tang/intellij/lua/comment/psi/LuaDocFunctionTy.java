@@ -26,4 +26,7 @@ public interface LuaDocFunctionTy extends LuaDocTy {
   @NotNull
   ITy getReturnType();
 
+  @Nullable
+  PsiElement getVarreturn();
+
 }

@@ -54,6 +54,7 @@ public interface LuaDocTypes {
   IElementType BOOLEAN_LITERAL = new LuaDocTokenType("BOOLEAN_LITERAL");
   IElementType COMMA = new LuaDocTokenType(",");
   IElementType DASHES = new LuaDocTokenType("DASHES");
+  IElementType ELLIPSIS = new LuaDocTokenType("...");
   IElementType EOL = new LuaDocTokenType("EOL");
   IElementType EQ = new LuaDocTokenType("=");
   IElementType EXTENDS = new LuaDocTokenType(":");
@@ -67,6 +68,7 @@ public interface LuaDocTypes {
   IElementType NUMBER_LITERAL = new LuaDocTokenType("NUMBER_LITERAL");
   IElementType OR = new LuaDocTokenType("|");
   IElementType PRIVATE = new LuaDocTokenType("PRIVATE");
+  IElementType PROPERTY = new LuaDocTokenType("PROPERTY");
   IElementType PROTECTED = new LuaDocTokenType("PROTECTED");
   IElementType PUBLIC = new LuaDocTokenType("PUBLIC");
   IElementType RCURLY = new LuaDocTokenType("}");

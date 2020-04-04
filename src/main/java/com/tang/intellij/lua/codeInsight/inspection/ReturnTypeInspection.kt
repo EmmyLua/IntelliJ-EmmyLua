@@ -26,7 +26,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ProblemUtil
 import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyTuple
+import com.tang.intellij.lua.ty.TyMultipleResults
 
 class ReturnTypeInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
@@ -58,18 +58,25 @@ class ReturnTypeInspection : StrictInspection() {
                         abstractTypes += List(concreteTypes.size - abstractTypes.size) { Ty.UNKNOWN }
                     }
 
+                    val requiredReturnCount = if (abstractType is TyMultipleResults) {
+                        if (abstractType.variadic) abstractType.list.size - 1 else abstractType.list.size
+                    } else abstractTypes.size
+
                     // Check number
-                    if (abstractTypes.size > concreteTypes.size) {
+                    if (requiredReturnCount > concreteTypes.size) {
                         if (concreteTypes.isEmpty()) {
                             myHolder.registerProblem(o.lastChild, "Type mismatch. Required: '%s' Found: 'nil'".format(abstractTypes[0]))
                         } else {
-                            myHolder.registerProblem(o.lastChild, "Incorrect number of return values. Expected %s but found %s.".format(abstractTypes.size, concreteTypes.size))
+                            myHolder.registerProblem(o.lastChild, "Incorrect number of return values. Expected %s but found %s.".format(requiredReturnCount, concreteTypes.size))
                         }
                     } else {
                         for (i in 0 until concreteTypes.size) {
                             val element = o.exprList?.getExprAt(i) ?: o
-                            ProblemUtil.contravariantOf(abstractTypes[i], concreteTypes[i], context, 0, element) { highlightElement, message, highlightType ->
-                                myHolder.registerProblem(highlightElement, message, highlightType)
+                            ProblemUtil.contravariantOf(abstractTypes[i], concreteTypes[i], context, 0, null, element) { targetElement, sourceElement, message, highlightType ->
+                                myHolder.registerProblem(sourceElement, message, highlightType)
+                                if (targetElement != null && targetElement != sourceElement) {
+                                    myHolder.registerProblem(targetElement, message, highlightType)
+                                }
                             }
                         }
                     }
@@ -77,7 +84,8 @@ class ReturnTypeInspection : StrictInspection() {
 
                 private fun toList(type: ITy?): List<ITy> {
                     return when (type) {
-                        is TyTuple -> type.list
+                        Ty.VOID -> emptyList()
+                        is TyMultipleResults -> type.list
                         is ITy -> listOf(type)
                         else -> emptyList()
                     }
@@ -121,10 +129,8 @@ class ReturnTypeInspection : StrictInspection() {
                             returnDef?.type
                         }
 
-                        val types = toList(type)
-
-                        if (types.isNotEmpty()) {
-                            myHolder.registerProblem(o, "Return type '%s' specified but no return values found.".format(types.joinToString(",")))
+                        if (type != null) {
+                            myHolder.registerProblem(o, "Return type '%s' specified but no return values found.".format(type.displayName))
                         }
                     }
                 }

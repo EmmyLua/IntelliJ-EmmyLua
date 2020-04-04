@@ -35,7 +35,7 @@ class LuaSuppressManager : InspectionSuppressor {
         if (suppress != null) {
             var child = suppress.firstChild
             while (child != null) {
-                if (child.node.elementType == LuaDocTypes.ID) {
+                if (child.node.elementType == LuaDocTypes.PROPERTY) {
                     if (child.textMatches(toolId)) {
                         return true
                     }

@@ -170,4 +170,12 @@ class TypeSafetyTest : LuaInspectionsTestBase(
     fun testUnknown() {
         checkByFile("unknown.lua")
     }
+
+    fun testVarargs() {
+        checkByFile("varargs.lua")
+    }
+
+    fun testVarreturn() {
+        checkByFile("varreturn.lua")
+    }
 }

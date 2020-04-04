@@ -51,4 +51,10 @@ public class LuaDocTagReturnImpl extends ASTWrapperPsiElement implements LuaDocT
     return LuaDocPsiImplUtilKt.getType(this);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getVarreturn() {
+    return findChildByType(ELLIPSIS);
+  }
+
 }

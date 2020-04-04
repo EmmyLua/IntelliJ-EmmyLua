@@ -33,6 +33,16 @@ fun genericParameterName(def: LuaDocGenericDef): String {
 class TyParameter(val name: String, varName: String, superClass: ITy? = null) : TySerializedClass(name, emptyArray(), varName, superClass, null) {
     constructor(def: LuaDocGenericDef) : this(genericParameterName(def), def.id.text, def.classRef?.let { Ty.create(it) })
 
+    override fun equals(other: Any?): Boolean {
+        return other is TyParameter
+                && super.equals(other)
+                && superClass?.equals(other.superClass) ?: (other.superClass == null)
+    }
+
+    override fun hashCode(): Int {
+        return super.hashCode() * 31 + (superClass?.hashCode() ?: 0)
+    }
+
     override val kind: TyKind
         get() = TyKind.GenericParam
 

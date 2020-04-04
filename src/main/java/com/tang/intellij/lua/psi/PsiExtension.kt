@@ -205,8 +205,22 @@ fun LuaExprList.guessType(context: SearchContext):ITy {
         exprList.first().guessType(context)
     else {
         val list = mutableListOf<ITy>()
-        exprList.forEach { list.add(it.guessType(context)) }
-        TyTuple(list)
+        var variadic = false
+        exprList.forEachIndexed { index, luaExpr ->
+            val ty = luaExpr.guessType(context)
+
+            if (ty is TyMultipleResults) {
+                if (index == exprList.size - 1) {
+                    list.addAll(ty.list)
+                    variadic = ty.variadic
+                } else {
+                    list.addAll(ty.list.take(1))
+                }
+            } else {
+                list.add(ty)
+            }
+        }
+        TyMultipleResults(list, variadic)
     }
 }
 

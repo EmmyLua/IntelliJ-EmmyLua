@@ -109,17 +109,20 @@ abstract class FunSignatureBase(override val colonCall: Boolean,
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
-            if (params.size != other.params.size || returnTy != other.returnTy)
-                return false
-            return params.indices.none { params[it] != other.params.getOrNull(it) }
+            return colonCall == other.colonCall
+                    && params.contentEquals(other.params)
+                    && tyParameters?.let { other.tyParameters?.contentEquals(it) ?: false } ?: (other.tyParameters == null)
         }
         return false
     }
 
     override fun hashCode(): Int {
-        var code = returnTy.hashCode()
+        var code = if (colonCall) 1 else 0
         params.forEach {
-            code += it.ty.hashCode() * 31
+            code = code * 31 + it.hashCode()
+        }
+        tyParameters?.forEach {
+            code = code * 31 + it.hashCode()
         }
         return code
     }
@@ -256,7 +259,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
     val concreteTypes = mutableListOf<MatchFunctionSignatureInspection.ConcreteTypeInfo>()
     args.forEachIndexed { index, luaExpr ->
         val ty = luaExpr.guessType(searchContext)
-        if (ty is TyTuple) {
+        if (ty is TyMultipleResults) {
             if (index == args.lastIndex) {
                 concreteTypes.addAll(ty.list.map { MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, it) })
             } else {
@@ -291,19 +294,19 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
                 problemElement = problemElement ?: call.lastChild
 
                 candidateFailed = true
-                signatureProblems?.add(Problem(problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
+                signatureProblems?.add(Problem(null, problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
 
                 return@processArgs true
             }
 
             val paramType = pi.ty
             val argType = typeInfo.ty
-            val argExpr = args.get(i)
+            val argExpr = args.getOrNull(i) ?: args.last()
             val varianceFlags = if (argExpr is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
 
             if (problemsHolder != null) {
-                val contravariant = ProblemUtil.contravariantOf(paramType, argType, searchContext, varianceFlags, argExpr) { element, message, highlightProblem ->
-                    signatureProblems?.add(Problem(element, message, highlightProblem))
+                val contravariant = ProblemUtil.contravariantOf(paramType, argType, searchContext, varianceFlags, null, argExpr) { _, element, message, highlightProblem ->
+                    signatureProblems?.add(Problem(null, element, message, highlightProblem))
                 }
 
                 if (!contravariant) {
@@ -316,10 +319,32 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
             true
         }
 
-        if (nParams < args.size && !it.hasVarargs()) {
-            for (i in nParams until args.size) {
-                candidateFailed = true
-                signatureProblems?.add(Problem(args[i], "Too many arguments."))
+        if (nParams < args.size) {
+            val varargTy = signature.varargTy
+
+            if (varargTy != null) {
+                for (i in nParams until args.size) {
+                    val argType = concreteTypes.get(i).ty
+                    val argExpr = args.get(i)
+                    val varianceFlags = if (argExpr is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
+
+                    if (problemsHolder != null) {
+                        val contravariant = ProblemUtil.contravariantOf(varargTy, argType, searchContext, varianceFlags, null, argExpr) { _, element, message, highlightProblem ->
+                            signatureProblems?.add(Problem(null, element, message, highlightProblem))
+                        }
+
+                        if (!contravariant) {
+                            candidateFailed = true
+                        }
+                    } else if (!varargTy.contravariantOf(argType, searchContext, varianceFlags)) {
+                        candidateFailed = true
+                    }
+                }
+            } else {
+                for (i in nParams until args.size) {
+                    candidateFailed = true
+                    signatureProblems?.add(Problem(null, args[i], "Too many arguments."))
+                }
             }
         }
 
@@ -338,7 +363,7 @@ fun ITyFunction.matchSignature(call: LuaCallExpr, searchContext: SearchContext, 
         problems?.forEach { signature, signatureProblems ->
             signatureProblems.forEach {
                 val problem = if (multipleCandidates) "${it.message}. In: ${signature.displayName}\n" else it.message
-                problemsHolder.registerProblem(it.element, problem, it.highlightType)
+                problemsHolder.registerProblem(it.sourceElement, problem, it.highlightType)
             }
         }
     }

@@ -26,4 +26,10 @@ public class LuaDocTagSuppressImpl extends ASTWrapperPsiElement implements LuaDo
     else super.accept(visitor);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getId() {
+    return findChildByType(ID);
+  }
+
 }

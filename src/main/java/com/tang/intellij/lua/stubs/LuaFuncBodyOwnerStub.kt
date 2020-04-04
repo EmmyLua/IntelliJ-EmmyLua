@@ -64,7 +64,7 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
     fun guessReturnTy(context: SearchContext): ITy {
         val docTy = returnDocTy
         if (docTy != null){
-            if (docTy is TyTuple && context.index != -1) {
+            if (docTy is TyMultipleResults && context.index != -1) {
                 return docTy.list.getOrElse(context.index) { Ty.UNKNOWN }
             }
             return docTy

@@ -287,7 +287,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
             TyUnion.each(type) {
                 if (it is ITyFunction) {
                     val returnTy = it.mainSignature.returnTy
-                    if (returnTy is TyTuple) {
+                    if (returnTy is TyMultipleResults) {
                         result = result.union(returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN })
                     } else if (paramIndex == 0) {
                         result = result.union(returnTy)

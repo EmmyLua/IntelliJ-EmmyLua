@@ -272,7 +272,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                     true
                 }
             }
-            is TyTuple -> {
+            is TyMultipleResults -> {
                 list.firstOrNull()?.eachTopClass(fn)
             }
         }
@@ -309,7 +309,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 TyKind.Primitive to TyPrimitiveSerializer,
                 TyKind.PrimitiveLiteral to TyPrimitiveLiteralSerializer,
                 TyKind.Snippet to TySnippetSerializer,
-                TyKind.Tuple to TyTupleSerializer,
+                TyKind.Tuple to TyMultipleResultsSerializer,
                 TyKind.Union to TyUnionSerializer
         )
 
