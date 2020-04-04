@@ -27,11 +27,12 @@ string = {}
 --- `string.sub`.
 ---
 --- Note that numerical codes are not necessarily portable across platforms.
----@overload fun(s:string):number
+---@overload fun(s:string, i:number):number...
+---@overload fun(s:string):number...
 ---@param s string
 ---@param i number
 ---@param j number
----@return number
+---@return number...
 function string.byte(s, i, j) end
 
 ---

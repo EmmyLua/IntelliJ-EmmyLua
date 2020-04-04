@@ -392,9 +392,13 @@ function type(v) end
 --- except that the above code can be written only for a fixed number of elements.
 --- By default, `i` is 1 and `j` is the length of the list, as defined by the length
 --- operator (see §2.5.5).
----@overload fun(list:table, i:number):any
----@overload fun(list:table, i:number, j:number):any
----@return any
+---@overload fun<T>(list: T[]): T...
+---@overload fun<T>(list: T[], i: number): T...
+---@generic T
+---@param list T[]
+---@param i number
+---@param j number
+---@return T...
 function unpack(list, i, j)end
 
 ---

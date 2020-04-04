@@ -19,10 +19,10 @@ table = {}
 --- `list[i]..sep..list[i+1] ... sep..list[j]`. The default value for
 --- `sep` is the empty string, the default for `i` is 1, and the default for
 --- `j` is #list. If `i` is greater than `j`, returns the empty string.
----@overload fun(list:table):string
----@overload fun(list:table, sep:string):string
----@overload fun(list:table, sep:string, i:number):string
----@param list table
+---@overload fun(list:(string|number)[]):string
+---@overload fun(list:(string|number)[], sep:string):string
+---@overload fun(list:(string|number)[], sep:string, i:number):string
+---@param list (string|number)[]
 ---@param sep string
 ---@param i number
 ---@param j number
@@ -62,11 +62,11 @@ function table.getn(table) end
 --- elements to `list[pos]`, `list[pos+1]`, `···`, `list[#list]`. The default
 --- value for `pos` is ``#list+1`, so that a call `table.insert(t,x)`` inserts
 --- `x` at the end of list `t`.
----@overload fun(list:table, value:any):number
----@param list table
+---@overload fun<T>(list:T[], value:T):void
+---@generic T
+---@param list T[]
 ---@param pos number
----@param value any
----@return number
+---@param value T
 function table.insert(list, pos, value) end
 
 ---
@@ -79,9 +79,9 @@ function table.insert(list, pos, value) end
 ---
 --- The default value for `pos` is `#list`, so that a call `table.remove(l)`
 --- removes the last element of list `l`.
----@overload fun<V>(list:table<number, V> | V[]):V
+---@overload fun<V>(list:V[]):V
 ---@generic V
----@param list table<number, V>
+---@param list V[]
 ---@param pos number
 ---@return V
 function table.remove(list, pos) end
@@ -100,9 +100,9 @@ function table.remove(list, pos) end
 ---
 --- The sort algorithm is not stable: elements considered equal by the given
 --- order may have their relative positions changed by the sort.
----@overload fun(list:table):number
+---@overload fun(list:V[]):number
 ---@generic V
----@param list table<number, V> | V[]
+---@param list V[]
 ---@param comp fun(a:V, b:V):boolean
 ---@return number
 function table.sort(list, comp) end
