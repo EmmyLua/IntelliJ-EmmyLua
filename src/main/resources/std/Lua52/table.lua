@@ -41,11 +41,17 @@ function table.concat(list, sep, i, j) end
 ---@param value T
 function table.insert(list, pos, value) end
 
+---@shape std__Packed<T>
+---@field [number] T
+---@field n number
+
 ---
 --- Returns a new table with all arguments stored into keys 1, 2, etc. and
 --- with a field "`n`" with the total number of arguments. Note that the
 --- resulting table may not be a sequence, if some arguments are **nil**.
----@return table
+---@generic T
+---@vararg T
+---@return std__Packed<T>
 function table.pack(...) end
 
 ---
@@ -92,6 +98,8 @@ function table.sort(list, comp) end
 --- By default, i is 1 and j is #list.
 ---@overload fun<T>(list: T[]): T...
 ---@overload fun<T>(list: T[], i: number): T...
+---@overload fun<T>(list: std__Packed<T>): T...
+---@overload fun<T>(list: std__Packed<T>, i: number): T...
 ---@generic T
 ---@param list T[]
 ---@param i number

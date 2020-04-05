@@ -44,6 +44,8 @@
         OR = '|'
         GT = ">"
         LT = "<"
+        LBRACK = "["
+        RBRACK = "]"
         LPAREN = "("
         RPAREN = ")"
         LCURLY = "{"
@@ -138,9 +140,10 @@ string_literal_ty ::= STRING_LITERAL{
 private primitive_literal_ty ::= string_literal_ty | boolean_literal_ty | number_literal_ty
 private fieldList ::= (tableField (',' tableField)* (',')?)?
 
+private tableField1 ::= '[' ty ']' ':' ty { pin = 2 }
 private tableField2 ::= ID ':' ty { pin = 1 }
 
-tableField ::= tableField2 {
+tableField ::= tableField1 | tableField2 {
     implements = [
         "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
         "com.tang.intellij.lua.psi.LuaClassField"
@@ -152,8 +155,11 @@ tableField ::= tableField2 {
         setName
         getName
         getNameIdentifier
+        getIndexType
+        getValueType
         guessType
         isDeprecated
+        lbrack = 'LBRACK'
     ]
     stubClass = "com.tang.intellij.lua.stubs.LuaDocTableFieldStub"
 }
@@ -205,7 +211,9 @@ union_ty ::= ty ('|' ty)+ {
 }
 access_modifier ::= PRIVATE | PUBLIC | PROTECTED | TAG_NAME_PRIVATE | TAG_NAME_PUBLIC | TAG_NAME_PROTECTED
 
-tag_field ::= TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string? {
+private tagFieldIndex ::= '[' ty ']' { pin = 2 }
+
+tag_field ::= TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? (ID | tagFieldIndex) ty comment_string? {
     pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaClassField"
@@ -219,11 +227,14 @@ tag_field ::= TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty co
         getNameIdentifier
         setName
         getName
+        getIndexType
+        getValueType
         getTextOffset
         getFieldName
         toString
         getPresentation
         isDeprecated
+        lbrack = 'LBRACK'
     ]
 }
 

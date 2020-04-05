@@ -49,7 +49,7 @@ class ReturnTypeInspection : StrictInspection() {
 
                         comment?.tagReturn?.type
                     }
-                    val concreteType = guessReturnType(o, -1, context)
+                    val concreteType = context.withMultipleResults { guessReturnType(o, context) }
                     var abstractTypes = toList(abstractType)
                     val concreteTypes = toList(concreteType)
 

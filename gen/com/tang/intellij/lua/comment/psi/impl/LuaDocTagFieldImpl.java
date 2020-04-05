@@ -60,9 +60,9 @@ public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocTagFieldSt
   }
 
   @Override
-  @Nullable
-  public LuaDocTy getTy() {
-    return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
+  @NotNull
+  public List<LuaDocTy> getTyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTy.class);
   }
 
   @Override
@@ -102,6 +102,18 @@ public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocTagFieldSt
   }
 
   @Override
+  @Nullable
+  public LuaDocTy getIndexType() {
+    return LuaDocPsiImplUtilKt.getIndexType(this);
+  }
+
+  @Override
+  @Nullable
+  public LuaDocTy getValueType() {
+    return LuaDocPsiImplUtilKt.getValueType(this);
+  }
+
+  @Override
   public int getTextOffset() {
     return LuaDocPsiImplUtilKt.getTextOffset(this);
   }
@@ -127,6 +139,12 @@ public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocTagFieldSt
   @Override
   public boolean isDeprecated() {
     return LuaDocPsiImplUtilKt.isDeprecated(this);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getLbrack() {
+    return findChildByType(LBRACK);
   }
 
 }

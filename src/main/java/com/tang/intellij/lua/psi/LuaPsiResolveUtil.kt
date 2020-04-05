@@ -94,7 +94,7 @@ fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
     if (resolveResult == null || resolveResult is LuaNameExpr) {
         val refName = nameExpr.name
         val moduleName = nameExpr.moduleName ?: Constants.WORD_G
-        LuaClassMemberIndex.process(moduleName, refName, context, Processor {
+        LuaClassMemberIndex.processMember(moduleName, refName, context, Processor {
             resolveResult = it
             false
         })
@@ -112,7 +112,7 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
     } else {
         val refName = ref.name
         val module = ref.moduleName ?: Constants.WORD_G
-        LuaClassMemberIndex.process(module, refName, context, Processor {
+        LuaClassMemberIndex.processMember(module, refName, context, Processor {
             list.add(it)
             true
         })
@@ -120,41 +120,43 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
     return list.toTypedArray()
 }
 
-fun multiResolve(indexExpr: LuaIndexExpr, context: SearchContext): List<PsiElement> {
-    val list = mutableListOf<PsiElement>()
-    val name = indexExpr.name ?: return list
-    val type = indexExpr.guessParentType(context)
-    type.eachTopClass(Processor { ty ->
-        val cls = (if (ty is ITyGeneric) ty.base else type) as? ITyClass
-        val m = cls?.findMember(name, context)
-        if (m != null)
-            list.add(m)
-        true
+fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
+    val memberName = indexExpr.name
+
+    if (memberName != null) {
+        return resolve(indexExpr, memberName, context)
+    }
+
+    val idExpr = indexExpr.idExpr ?: return null
+
+    val parentType = indexExpr.guessParentType(context)
+    val indexTy = idExpr.guessType(context)
+    var member: PsiElement? = null
+
+    parentType.eachTopClass(Processor { ty ->
+        val cls = (if (ty is ITyGeneric) ty.base else ty) as? ITyClass
+        member = cls?.findIndexer(indexTy, context)
+        member == null
     })
-    if (list.isEmpty()) {
+
+    if (member == null) {
         val tree = LuaDeclarationTree.get(indexExpr.containingFile)
         val declaration = tree.find(indexExpr)
         if (declaration != null) {
-            list.add(declaration.psi)
+            return declaration.psi
         }
     }
-    return list
+
+    return member
 }
 
-fun resolve(indexExpr: LuaIndexExpr, context: SearchContext): PsiElement? {
-    val name = indexExpr.name ?: return null
-    return resolve(indexExpr, name, context)
-}
-
-fun resolve(indexExpr: LuaIndexExpr, idString: String, context: SearchContext): PsiElement? {
+fun resolve(indexExpr: LuaIndexExpr, memberName: String, context: SearchContext): PsiElement? {
     val type = indexExpr.guessParentType(context)
     var ret: PsiElement? = null
     type.eachTopClass(Processor { ty ->
-        val cls = (if (ty is ITyGeneric) ty.base else type) as? ITyClass
-        ret = cls?.findMember(idString, context)
-        if (ret != null)
-            return@Processor false
-        true
+        val cls = (if (ty is ITyGeneric) ty.base else ty) as? ITyClass
+        ret = cls?.findMember(memberName, context)
+        ret == null
     })
     if (ret == null) {
         val tree = LuaDeclarationTree.get(indexExpr.containingFile)

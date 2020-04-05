@@ -62,6 +62,7 @@ public interface LuaDocTypes {
   IElementType FUN = new LuaDocTokenType("fun");
   IElementType GT = new LuaDocTokenType(">");
   IElementType ID = new LuaDocTokenType("ID");
+  IElementType LBRACK = new LuaDocTokenType("[");
   IElementType LCURLY = new LuaDocTokenType("{");
   IElementType LPAREN = new LuaDocTokenType("(");
   IElementType LT = new LuaDocTokenType("<");
@@ -71,6 +72,7 @@ public interface LuaDocTypes {
   IElementType PROPERTY = new LuaDocTokenType("PROPERTY");
   IElementType PROTECTED = new LuaDocTokenType("PROTECTED");
   IElementType PUBLIC = new LuaDocTokenType("PUBLIC");
+  IElementType RBRACK = new LuaDocTokenType("]");
   IElementType RCURLY = new LuaDocTokenType("}");
   IElementType RPAREN = new LuaDocTokenType(")");
   IElementType SHARP = new LuaDocTokenType("#");

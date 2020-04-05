@@ -84,8 +84,15 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         flags = BitUtil.set(flags, LuaIndexExprType.FLAG_BRACK, indexExpr.lbrack != null)
         flags = BitUtil.set(flags, LuaIndexExprType.FLAG_ASSIGN, stat != null)
 
+        val idTy = indexExpr.idExpr?.let {
+            SearchContext.withStub(indexExpr.project, indexExpr.containingFile, Ty.UNKNOWN) { context ->
+                it.guessType(context)
+            }
+        }
+
         return LuaIndexExprStubImpl(classNameSet.toTypedArray(),
                 indexExpr.name,
+                idTy,
                 flags,
                 docTy,
                 stubElement,
@@ -95,6 +102,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun serialize(indexStub: LuaIndexExprStub, stubOutputStream: StubOutputStream) {
         stubOutputStream.writeNames(indexStub.classNames)
         stubOutputStream.writeName(indexStub.name)
+        stubOutputStream.writeTyNullable(indexStub.idTy)
         stubOutputStream.writeInt(indexStub.flags)
         stubOutputStream.writeTyNullable(indexStub.docTy)
     }
@@ -102,10 +110,12 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaIndexExprStub {
         val classNames = stubInputStream.readNames()
         val fieldName = stubInputStream.readName()
+        val idTy = stubInputStream.readTyNullable()
         val flags = stubInputStream.readInt()
         val docTy = stubInputStream.readTyNullable()
         return LuaIndexExprStubImpl(classNames,
                 StringRef.toString(fieldName),
+                idTy,
                 flags,
                 docTy,
                 stubElement,
@@ -114,13 +124,20 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
 
     override fun indexStub(indexStub: LuaIndexExprStub, indexSink: IndexSink) {
         val fieldName = indexStub.name
+        val idTy = indexStub.idTy
         val classNames = indexStub.classNames
-        if (indexStub.isAssign && classNames.isNotEmpty() && fieldName != null) {
-            classNames.forEach {
-                LuaClassMemberIndex.indexStub(indexSink, it, fieldName)
-            }
+        if (indexStub.isAssign && classNames.isNotEmpty()) {
+            if (fieldName != null) {
+                classNames.forEach {
+                    LuaClassMemberIndex.indexMemberStub(indexSink, it, fieldName)
+                }
 
-            indexSink.occurrence(StubKeys.SHORT_NAME, fieldName)
+                indexSink.occurrence(StubKeys.SHORT_NAME, fieldName)
+            } else if (idTy != null) {
+                classNames.forEach {
+                    LuaClassMemberIndex.indexIndexerStub(indexSink, it, idTy)
+                }
+            }
         }
     }
 
@@ -134,6 +151,7 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
 interface LuaIndexExprStub : LuaExprStub<LuaIndexExpr>, LuaClassMemberStub<LuaIndexExpr> {
     val classNames: Array<String>
     val name: String?
+    val idTy: ITy?
     val flags: Int
     val brack: Boolean
     val isAssign: Boolean
@@ -141,6 +159,7 @@ interface LuaIndexExprStub : LuaExprStub<LuaIndexExpr>, LuaClassMemberStub<LuaIn
 
 class LuaIndexExprStubImpl(override val classNames: Array<String>,
                            override val name: String?,
+                           override val idTy: ITy?,
                            override val flags: Int,
                            override val docTy: ITy?,
                            stubElement: StubElement<*>,

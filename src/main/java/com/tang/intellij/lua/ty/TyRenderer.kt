@@ -44,7 +44,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
 
                         val base = ty.base
                         val baseName = if (base is ITyClass) base.className else base.displayName
-                        sb.append("${baseName}<${list.joinToString(", ")}>")
+                        sb.append("${baseName}${renderParamsList(list)}")
                     }
                     is TyParameter -> {
 
@@ -107,26 +107,36 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
     }
 
     override fun renderSignature(sb: StringBuilder, signature: IFunSignature) {
-        val sig = signature.params.map { "${it.name}: ${render(it.ty)}" }
+        val sig = mutableListOf<String>()
+        signature.params.forEach {
+            sig.add("${it.name}: ${render(it.ty)}")
+        }
+        signature.varargTy?.let {
+            sig.add("...: ${render(it)}")
+        }
         sb.append("(${sig.joinToString(", ")}): ")
         render(signature.returnTy, sb)
+    }
+
+    open fun renderParamsList(params: Collection<String>?): String {
+        return if (params != null && params.isNotEmpty()) "<${params.joinToString(", ")}>" else ""
     }
 
     open fun renderClass(clazz: ITyClass): String {
         return when {
             clazz is TyDocTable -> {
                 val list = mutableListOf<String>()
-                clazz.table.tableFieldList.forEach { it.ty?.let { ty-> list.add("${it.name}: ${render(ty.getType())}") } }
+                clazz.table.tableFieldList.forEach {
+                    val key = it.indexType?.getType()?.let { indexTy -> "[${render(indexTy)}]"} ?: it.name
+                    it.valueType?.let { ty -> list.add("${key}: ${render(ty.getType())}") }
+                }
                 "{ ${list.joinToString(", ")} }"
             }
             clazz is TyParameter -> clazz.superClass?.let { "${clazz.varName} : ${it.displayName}" } ?: clazz.varName
             clazz.hasFlag(TyFlags.ANONYMOUS_TABLE) -> renderType(Constants.WORD_TABLE)
             clazz.isAnonymous -> "[local ${clazz.varName}]"
             clazz.isGlobal -> "[global ${clazz.varName}]"
-            else -> {
-                val params = clazz.params
-                if (params != null && params.isNotEmpty()) "${clazz.className}<${params.joinToString(", ")}>" else clazz.className
-            }
+            else -> "${clazz.className}${renderParamsList(clazz.params?.map { it.toString() })}"
         }
     }
 

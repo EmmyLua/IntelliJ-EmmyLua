@@ -19,37 +19,34 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
-import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.LuaVisitor
 import com.tang.intellij.lua.psi.prefixExpr
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
+import com.tang.intellij.lua.ty.TyUnion
 
 class UndeclaredMemberInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
-                fun findMember(indexedType: ITy, memberName: String, context: SearchContext): Boolean {
-                    var memberFound = false
-
-                    indexedType.eachTopClass(Processor { topClass ->
-                        memberFound = topClass.findMember(memberName, context) != null
-                        !memberFound
-                    })
-
-                    return memberFound
-                }
-
                 override fun visitIndexExpr(o: LuaIndexExpr) {
                     val context = SearchContext.get(o)
-                    val prefixType = o.prefixExpr.guessType(context)
+                    val prefix = o.prefixExpr.guessType(context)
+                    val memberName = o.name
 
-                    if (prefixType != Ty.UNKNOWN) {
-                        val memberName = o.id?.text
+                    TyUnion.each(prefix) { prefix ->
+                        if (memberName != null) {
+                            if (prefix.guessMemberType(memberName, context) == null) {
+                                myHolder.registerProblem(o, "No such member '%s' found on type '%s'".format(memberName, prefix))
+                            }
+                        } else {
+                            o.idExpr?.guessType(context)?.let { indexTy ->
+                                TyUnion.each(indexTy) {
+                                    if (prefix.guessIndexerType(it, context) == null) {
+                                        myHolder.registerProblem(o, "No such indexer '[%s]' found on type '%s'".format(it.displayName, prefix))
+                                    }
+                                }
 
-                        if (memberName != null && !findMember(prefixType, memberName, context)) {
-                            myHolder.registerProblem(o.lastChild, "No such member '%s' found on type '%s'".format(memberName, prefixType))
+                            }
                         }
                     }
 

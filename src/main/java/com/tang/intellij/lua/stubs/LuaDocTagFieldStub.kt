@@ -43,7 +43,7 @@ class LuaDocTagFieldType : LuaStubElementType<LuaDocTagFieldStub, LuaDocTagField
 
     override fun shouldCreateStub(node: ASTNode): Boolean {
         val element = node.psi as LuaDocTagField
-        if (element.nameIdentifier == null)
+        if (element.name == null && element.indexType == null)
             return false
         if (element.classNameRef != null)
             return true
@@ -52,56 +52,81 @@ class LuaDocTagFieldType : LuaStubElementType<LuaDocTagFieldStub, LuaDocTagField
     }
 
     override fun createStub(tagField: LuaDocTagField, stubElement: StubElement<*>): LuaDocTagFieldStub {
-        val name = tagField.name!!
-        var className: String? = null
+        val name = tagField.name
+        val indexType = tagField.indexType
 
+        val className: String
         val classRef = tagField.classNameRef
+
         if (classRef != null) {
             className = classRef.id.text
         } else {
             val comment = LuaCommentUtil.findContainer(tagField)
-            val classDef = comment.tagClass
-            if (classDef != null) {
-                className = classDef.name
-            }
+            val classDef = comment.tagClass!!
+            className = classDef.name
         }
+
+        val valueTy = tagField.valueType?.getType() ?: Ty.UNKNOWN
 
         var flags = BitUtil.set(0, tagField.visibility.bitMask, true)
         flags = BitUtil.set(flags, FLAG_DEPRECATED, tagField.isDeprecated)
 
-        return LuaDocFieldDefStubImpl(stubElement,
-                flags,
-                name,
-                className,
-                tagField.ty?.getType() ?: Ty.UNKNOWN)
+        return if (name != null) {
+            LuaDocFieldDefStubImpl(stubElement,
+                    className,
+                    name,
+                    flags,
+                    valueTy)
+        } else {
+            LuaDocFieldDefStubImpl(stubElement,
+                    className,
+                    indexType!!.getType(),
+                    flags,
+                    valueTy)
+        }
     }
 
     override fun serialize(stub: LuaDocTagFieldStub, stubOutputStream: StubOutputStream) {
-        stubOutputStream.writeName(stub.name)
         stubOutputStream.writeName(stub.className)
-        Ty.serialize(stub.type, stubOutputStream)
+        stubOutputStream.writeName(stub.name)
+        stubOutputStream.writeTyNullable(stub.indexTy)
         stubOutputStream.writeShort(stub.flags)
+        Ty.serialize(stub.valueTy, stubOutputStream)
     }
 
     override fun deserialize(stubInputStream: StubInputStream, stubElement: StubElement<*>): LuaDocTagFieldStub {
-        val name = stubInputStream.readName()
-        val className = stubInputStream.readName()
-        val type = Ty.deserialize(stubInputStream)
-        val flags = stubInputStream.readShort()
-        return LuaDocFieldDefStubImpl(stubElement,
-                flags.toInt(),
-                StringRef.toString(name)!!,
-                StringRef.toString(className)!!,
-                type)
+        val className = StringRef.toString(stubInputStream.readName())!!
+        val name = StringRef.toString(stubInputStream.readName())
+        val indexType = stubInputStream.readTyNullable()
+        val flags = stubInputStream.readShort().toInt()
+        val valueType = Ty.deserialize(stubInputStream)
+
+        return if (name != null) {
+            LuaDocFieldDefStubImpl(stubElement,
+                    className,
+                    name,
+                    flags,
+                    valueType)
+        } else {
+            LuaDocFieldDefStubImpl(stubElement,
+                    className,
+                    indexType!!,
+                    flags,
+                    valueType)
+        }
     }
 
     override fun indexStub(stub: LuaDocTagFieldStub, indexSink: IndexSink) {
-        val className = stub.className
-        className ?: return
+        val className = stub.className ?: return
+        val memberName = stub.name
 
-        LuaClassMemberIndex.indexStub(indexSink, className, stub.name)
+        if (memberName != null) {
+            LuaClassMemberIndex.indexMemberStub(indexSink, className, memberName)
+            indexSink.occurrence(StubKeys.SHORT_NAME, memberName)
+            return
+        }
 
-        indexSink.occurrence(StubKeys.SHORT_NAME, stub.name)
+        LuaClassMemberIndex.indexIndexerStub(indexSink, className, stub.indexTy!!)
     }
 
     companion object {
@@ -110,26 +135,47 @@ class LuaDocTagFieldType : LuaStubElementType<LuaDocTagFieldStub, LuaDocTagField
 }
 
 interface LuaDocTagFieldStub : LuaClassMemberStub<LuaDocTagField> {
-    val name: String
-
-    val type: ITy
-
     val className: String?
 
+    val name: String?
+    val indexTy: ITy?
+
     val flags: Int
+
+    val valueTy: ITy
+
+    override val docTy: ITy
+        get() = valueTy
 }
 
-class LuaDocFieldDefStubImpl(parent: StubElement<*>,
-                             override val flags: Int,
-                             override val name: String,
-                             override val className: String?,
-                             override val type: ITy)
-    : LuaDocStubBase<LuaDocTagField>(parent, LuaElementType.CLASS_FIELD_DEF), LuaDocTagFieldStub {
-    override val docTy = type
+class LuaDocFieldDefStubImpl : LuaDocStubBase<LuaDocTagField>, LuaDocTagFieldStub {
+    override val className: String
+    override val name: String?
+    override val indexTy: ITy?
+    override val flags: Int
+    override val valueTy: ITy
 
     override val isDeprecated: Boolean
         get() = BitUtil.isSet(flags, LuaDocTagFieldType.FLAG_DEPRECATED)
 
     override val visibility: Visibility
         get() = Visibility.getWithMask(flags)
+
+    constructor(parent: StubElement<*>, className: String, name: String, flags: Int, valueTy: ITy)
+            : super(parent, LuaElementType.CLASS_FIELD_DEF) {
+        this.className = className
+        this.name = name
+        this.indexTy = null
+        this.flags = flags
+        this.valueTy = valueTy
+    }
+
+    constructor(parent: StubElement<*>, className: String, indexType: ITy, flags: Int, valueTy: ITy)
+            : super(parent, LuaElementType.CLASS_FIELD_DEF) {
+        this.className = className
+        this.name = null
+        this.indexTy = indexType
+        this.flags = flags
+        this.valueTy = valueTy
+    }
 }

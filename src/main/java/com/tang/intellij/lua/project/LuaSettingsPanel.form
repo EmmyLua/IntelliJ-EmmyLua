@@ -151,10 +151,18 @@
         <children>
           <component id="4e504" class="javax.swing.JCheckBox" binding="nilStrict">
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
             </constraints>
             <properties>
               <text resource-bundle="LuaBundle" key="ui.settings.strict_nil_checks"/>
+            </properties>
+          </component>
+          <component id="4e505" class="javax.swing.JCheckBox" binding="unknownIndexable">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="2" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text resource-bundle="LuaBundle" key="ui.settings.unknown_indexable"/>
             </properties>
           </component>
         </children>

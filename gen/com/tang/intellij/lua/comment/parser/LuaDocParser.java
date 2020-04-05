@@ -687,15 +687,32 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // tableField2
+  // tableField1 | tableField2
   public static boolean tableField(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tableField")) return false;
-    if (!nextTokenIs(b, ID)) return false;
+    if (!nextTokenIs(b, "<table field>", ID, LBRACK)) return false;
     boolean r;
-    Marker m = enter_section_(b);
-    r = tableField2(b, l + 1);
-    exit_section_(b, m, TABLE_FIELD, r);
+    Marker m = enter_section_(b, l, _NONE_, TABLE_FIELD, "<table field>");
+    r = tableField1(b, l + 1);
+    if (!r) r = tableField2(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
     return r;
+  }
+
+  /* ********************************************************** */
+  // '[' ty ']' ':' ty
+  static boolean tableField1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tableField1")) return false;
+    if (!nextTokenIs(b, LBRACK)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, LBRACK);
+    r = r && ty(b, l + 1, -1);
+    p = r; // pin = 2
+    r = r && report_error_(b, consumeTokens(b, -1, RBRACK, EXTENDS));
+    r = p && ty(b, l + 1, -1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -723,6 +740,21 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, fieldList(b, l + 1));
     r = p && consumeToken(b, RCURLY) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
+  // '[' ty ']'
+  static boolean tagFieldIndex(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tagFieldIndex")) return false;
+    if (!nextTokenIs(b, LBRACK)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_);
+    r = consumeToken(b, LBRACK);
+    r = r && ty(b, l + 1, -1);
+    p = r; // pin = 2
+    r = r && consumeToken(b, RBRACK);
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -853,7 +885,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? ID ty comment_string?
+  // TAG_NAME_FIELD access_modifier? ('<' class_name_ref '>')? (ID | tagFieldIndex) ty comment_string?
   public static boolean tag_field(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_field")) return false;
     if (!nextTokenIs(b, TAG_NAME_FIELD)) return false;
@@ -863,7 +895,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     p = r; // pin = 1
     r = r && report_error_(b, tag_field_1(b, l + 1));
     r = p && report_error_(b, tag_field_2(b, l + 1)) && r;
-    r = p && report_error_(b, consumeToken(b, ID)) && r;
+    r = p && report_error_(b, tag_field_3(b, l + 1)) && r;
     r = p && report_error_(b, ty(b, l + 1, -1)) && r;
     r = p && tag_field_5(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
@@ -893,6 +925,15 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = r && class_name_ref(b, l + 1);
     r = r && consumeToken(b, GT);
     exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // ID | tagFieldIndex
+  private static boolean tag_field_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_field_3")) return false;
+    boolean r;
+    r = consumeToken(b, ID);
+    if (!r) r = tagFieldIndex(b, l + 1);
     return r;
   }
 

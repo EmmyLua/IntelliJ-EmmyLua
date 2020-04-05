@@ -39,16 +39,17 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
     companion object {
         val instance = LuaClassMemberIndex()
 
-        fun process(key: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+        private fun processKey(key: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             if (context.isDumb)
                 return false
             val all = LuaClassMemberIndex.instance.get(key.hashCode(), context.project, context.scope)
             return ContainerUtil.process(all, processor)
         }
 
-        private fun process(cls: ITyClass?, className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean): Boolean {
-            val key = "$className*$fieldName"
-            if (!process(key, context, processor))
+        private fun processClassKey(cls: ITyClass?, className: String, key: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean): Boolean {
+            val classKey = "$className$key"
+
+            if (!processKey(classKey, context, processor))
                 return false
 
             if (deep) {
@@ -58,7 +59,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                     // from alias
                     type.lazyInit(context)
                     val notFound = type.processAlias(Processor {
-                        process(it, fieldName, context, processor, false)
+                        processClassKey(null, it, key, context, processor, deep)
                     })
                     if (!notFound)
                         return false
@@ -66,7 +67,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                     return Ty.processSuperClass(type, context) { superType ->
                         val superClass = (if (superType is ITyGeneric) superType.base else superType) as? ITyClass
                         if (superClass != null) {
-                            process(superClass, fieldName, context, processor, false)
+                            processClassKey(superClass, superClass.className, key, context, processor, deep)
                         } else true
                     }
                 }
@@ -74,19 +75,25 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return true
         }
 
-        fun process(cls: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
-            return process(cls, cls.className, fieldName, context, processor, deep)
+        private fun processClassKey(cls: ITyClass, key: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+            return if (cls is TyParameter)
+                (cls.superClass as? ITyClass)?.let { processClassKey(it, it.className, key, context, processor, deep) } ?: true
+            else processClassKey(cls, cls.className, key, context, processor, deep)
         }
 
-        fun process(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
-            return process(null, className, fieldName, context, processor, deep)
+        fun processMember(cls: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+            return processClassKey(cls, "*$fieldName", context, processor, deep)
         }
 
-        fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
+        fun processMember(className: String, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+            return processClassKey(null, className, "*$fieldName", context, processor, deep)
+        }
+
+        fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
             var perfect: LuaClassMember? = null
             var tagField: LuaDocTagField? = null
             var tableField: LuaTableField? = null
-            processAll(type, fieldName, context, Processor {
+            processMember(type, fieldName, context, Processor {
                 when (it) {
                     is LuaDocTagField -> {
                         tagField = it
@@ -108,24 +115,9 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return perfect
         }
 
-        fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
-            return if (type is TyParameter)
-                (type.superClass as? ITyClass)?.let { process(it, fieldName, context, processor) } ?: true
-            else process(type, fieldName, context, processor)
-        }
-
-        fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {
-            if (process(type.className, context, processor)) {
-                type.lazyInit(context)
-                type.processAlias(Processor {
-                    process(it, context, processor)
-                })
-            }
-        }
-
         fun findMethod(className: String, memberName: String, context: SearchContext, deep: Boolean = true): LuaClassMethod? {
             var target: LuaClassMethod? = null
-            process(className, memberName, context, Processor {
+            processMember(className, memberName, context, Processor {
                 if (it is LuaClassMethod) {
                     target = it
                     return@Processor false
@@ -135,9 +127,79 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return target
         }
 
-        fun indexStub(indexSink: IndexSink, className: String, memberName: String) {
+        fun processAllIndexers(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+            return processClassKey(type, "[]", context, processor)
+        }
+
+        fun processIndexer(type: ITyClass, indexTy: ITy, context: SearchContext, processor: Processor<LuaClassMember>, deep: Boolean = true): Boolean {
+            val exactIndexerKey = "*[${indexTy.displayName}]"
+            var exactIndexerFound = false
+
+            val exactIndexerResult = processClassKey(type, exactIndexerKey, context, Processor {
+                exactIndexerFound = true
+                processor.process(it)
+            }, deep)
+
+            if (exactIndexerFound) {
+                return exactIndexerResult
+            }
+
+            var inexactIndexerTy: ITy? = null
+
+            processAllIndexers(type, context, Processor {
+                val candidateIndexerTy = it.indexType?.getType()
+
+                if (candidateIndexerTy?.contravariantOf(indexTy, context, TyVarianceFlags.STRICT_UNKNOWN) == true) {
+                    if (inexactIndexerTy?.contravariantOf(candidateIndexerTy, context, TyVarianceFlags.STRICT_UNKNOWN) != false) {
+                        inexactIndexerTy = candidateIndexerTy
+                    }
+                }
+
+                true
+            }, deep)
+
+            return inexactIndexerTy?.let {
+                processClassKey(type, "*[${it.displayName}]", context, processor)
+            } ?: false
+        }
+
+        fun findIndexer(type: ITyClass, indexTy: ITy, context: SearchContext, deep: Boolean = true): LuaClassMember? {
+            var target: LuaClassMember? = null
+
+            if (indexTy is TyPrimitiveLiteral && indexTy.primitiveKind == TyPrimitiveKind.String) {
+                findMember(type, indexTy.value, context)?.let {
+                    return it
+                }
+            }
+
+            processIndexer(type, indexTy, context, Processor {
+                target = it
+                false
+            }, deep)
+            return target
+        }
+
+        fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {
+            if (processKey(type.className, context, processor)) {
+                type.lazyInit(context)
+                type.processAlias(Processor {
+                    processKey(it, context, processor)
+                })
+            }
+        }
+
+        fun indexMemberStub(indexSink: IndexSink, className: String, memberName: String) {
             indexSink.occurrence(StubKeys.CLASS_MEMBER, className.hashCode())
             indexSink.occurrence(StubKeys.CLASS_MEMBER, "$className*$memberName".hashCode())
+        }
+
+        fun indexIndexerStub(indexSink: IndexSink, className: String, indexTy: ITy) {
+            if (indexTy is TyPrimitiveLiteral && indexTy.primitiveKind == TyPrimitiveKind.String) {
+                indexMemberStub(indexSink, className, indexTy.value)
+            } else {
+                indexMemberStub(indexSink, className, "[${indexTy.displayName}]")
+                indexSink.occurrence(StubKeys.CLASS_MEMBER, "$className[]".hashCode())
+            }
         }
     }
 }

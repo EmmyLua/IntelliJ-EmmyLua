@@ -96,6 +96,10 @@ class TypeSafetyTest : LuaInspectionsTestBase(
         checkByFile("implicit_types.lua")
     }
 
+    fun testIndexedFields() {
+        checkByFile("indexed_fields.lua")
+    }
+
     fun testLambdaClass() {
         checkByFile("lambda_class.lua")
     }

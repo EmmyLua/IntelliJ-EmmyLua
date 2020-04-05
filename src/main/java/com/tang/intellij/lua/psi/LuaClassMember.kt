@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.psi
 
 import com.intellij.psi.PsiNamedElement
+import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITyClass
@@ -28,8 +29,12 @@ import com.tang.intellij.lua.ty.TyUnion
  */
 interface LuaClassMember : LuaTypeGuessable, PsiNamedElement {
     fun guessParentType(context: SearchContext): ITy
+
     val visibility: Visibility
     val isDeprecated: Boolean
+
+    val indexType: LuaDocTy?
+        get() = null
 }
 
 fun LuaClassMember.guessClassType(context: SearchContext): ITyClass? {

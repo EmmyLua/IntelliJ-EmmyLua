@@ -118,10 +118,12 @@ class SearchContext {
      * 用于有多返回值的索引设定
      */
     val index: Int get() = myIndex
+    val supportsMultipleResults: Boolean get() = myMultipleResults
 
     private var myDumb = false
     private var myForStub = false
-    private var myIndex = -1
+    private var myIndex = 0
+    private var myMultipleResults = false
     private var myInStack = false
     private val myGuardList = mutableListOf<InferRecursionGuard>()
     private val myInferCache = mutableMapOf<LuaTypeGuessable, ITy>()
@@ -137,15 +139,27 @@ class SearchContext {
         this.element = element
     }
 
-    fun <T> withIndex(index: Int, action: () -> T): T {
+    fun <T> withIndex(index: Int, supportMultipleResults: Boolean = false, action: () -> T): T {
         val savedIndex = this.index
+        val savedMultipleResults = this.supportsMultipleResults
         myIndex = index
+        myMultipleResults = supportMultipleResults
         val ret = action()
         myIndex = savedIndex
+        myMultipleResults = savedMultipleResults
         return ret
     }
 
-    fun guessTuple() = index < 0
+    fun <T> withMultipleResults(action: () -> T): T {
+        val savedIndex = this.index
+        val savedMultipleResults = this.supportsMultipleResults
+        myIndex = -1
+        myMultipleResults = true
+        val ret = action()
+        myIndex = savedIndex
+        myMultipleResults = savedMultipleResults
+        return ret
+    }
 
     val scope get(): GlobalSearchScope {
         if (isDumb)

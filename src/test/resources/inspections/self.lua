@@ -37,8 +37,8 @@ function SelfA.dotMethod()
     selfTypedVar = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA'">someSelfA</error>
     aNumber = <error descr="Type mismatch. Required: 'number' Found: 'SelfA|[global self]'">self</error>
 
-    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string|nil'">self.a</error>
-    aString = self.a
+    aNumber = <error descr="No such member 'a' found on type '[global self]'"><error descr="Type mismatch. Required: 'number' Found: 'string'">self.a</error></error>
+    aString = <error descr="No such member 'a' found on type '[global self]'">self.a</error>
 
     return <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA|[global self]'">self</error>
 end
@@ -56,8 +56,8 @@ SelfA.lambdaMethod = function()
     selfTypedVar = <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA'">someSelfA</error>
     aNumber = <error descr="Type mismatch. Required: 'number' Found: 'SelfA|[global self]'">self</error>
 
-    aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string|nil'">self.a</error>
-    aString = self.a
+    aNumber = <error descr="No such member 'a' found on type '[global self]'"><error descr="Type mismatch. Required: 'number' Found: 'string'">self.a</error></error>
+    aString = <error descr="No such member 'a' found on type '[global self]'">self.a</error>
 
     return <error descr="Type mismatch. Required: '[local self]' Found: 'SelfA|[global self]'">self</error>
 end

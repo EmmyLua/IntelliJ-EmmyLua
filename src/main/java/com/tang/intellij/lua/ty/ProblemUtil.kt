@@ -102,7 +102,7 @@ object ProblemUtil {
             val base = TyAliasSubstitutor.substitute(target.base, context)
 
             if (base is ITyAlias) {
-                TyUnion.each(base.ty.substitute(target.getParameterSubstitutor(context))) { concreteAliasTy ->
+                TyUnion.each(base.ty.substitute(target.getMemberSubstitutor(context))) { concreteAliasTy ->
                     val problems = mutableListOf<Problem>()
                     tyProblems[concreteAliasTy.displayName] = problems
 
@@ -131,31 +131,39 @@ object ProblemUtil {
         var isContravariant = true
 
         if (base.flags and TyFlags.SHAPE != 0 && sourceElement is LuaTableExpr) {
-            val parameterSubstitutor = if (target is ITyGeneric) target.getParameterSubstitutor(context) else null
+            val sourceSubstitutor = source.getMemberSubstitutor(context)
+            val targetSubstitutor = target.getMemberSubstitutor(context)
 
-            target.processMembers(context, { _, classMember ->
-                val memberName = classMember.name
+            target.processMembers(context, { _, targetMember ->
+                val indexTy = targetMember.indexType?.getType()
 
-                if (memberName == null) {
-                    return@processMembers true
+                val sourceMember = if (indexTy != null) {
+                    source.findIndexer(indexTy, context)
+                } else {
+                    targetMember.name?.let { source.findMember(it, context) }
                 }
 
-                var targetMemberTy = classMember.guessType(context)
-                val sourceMember = source.findMember(memberName, context)
+                val targetMemberTy = targetMember.guessType(context).let {
+                    if (targetSubstitutor != null) it.substitute(targetSubstitutor) else it
+                }
 
                 if (sourceMember == null) {
                     if (TyUnion.find(targetMemberTy, TyNil::class.java) == null) {
                         isContravariant = false
-                        problems.add(Problem(targetElement, sourceElement, "Type mismatch. Missing member: '%s' of: '%s'".format(memberName, target.displayName), ProblemHighlightType.GENERIC_ERROR_OR_WARNING))
+                        val memberName = targetMember.name ?: "[${targetMember.indexType?.getType()?.displayName}]"
+                        problems.add(Problem(
+                                targetElement,
+                                sourceElement,
+                                "Type mismatch. Missing member: '%s' of: '%s'".format(memberName, target.displayName),
+                                ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+                        ))
                     }
 
                     return@processMembers true
                 }
 
-                val sourceMemberTy = sourceMember.guessType(context)
-
-                if (parameterSubstitutor != null) {
-                    targetMemberTy = targetMemberTy.substitute(parameterSubstitutor)
+                val sourceMemberTy = sourceMember.guessType(context).let {
+                    if (sourceSubstitutor != null) it.substitute(sourceSubstitutor) else it
                 }
 
                 val memberElement = findHighlightElement(sourceMember.node.psi)

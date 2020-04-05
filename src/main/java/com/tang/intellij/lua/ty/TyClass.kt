@@ -132,6 +132,10 @@ abstract class TyClass(override val className: String,
         return LuaShortNamesManager.getInstance(searchContext.project).findMember(this, name, searchContext)
     }
 
+    override fun findIndexer(indexTy: ITy, searchContext: SearchContext): LuaClassMember? {
+        return LuaShortNamesManager.getInstance(searchContext.project).findIndexer(this, indexTy, searchContext)
+    }
+
     override fun accept(visitor: ITyVisitor) {
         visitor.visitClass(this)
     }
@@ -301,30 +305,67 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun doLazyInit(searchContext: SearchContext) = Unit
 
     fun toGeneric(context: SearchContext): ITyGeneric {
-        if (isEmpty()) {
+        if (isEmpty(context)) {
             return TySerializedGeneric(arrayOf(Ty.UNKNOWN, Ty.UNKNOWN), Ty.TABLE)
         }
 
         var keyType: ITy = Ty.VOID
         var elementType: ITy = Ty.VOID
 
-        table.tableFieldList.forEach {
-            val exprList = it.exprList
+        processMembers(context) { prefixTy, classMember ->
+            val name = classMember.name
+            val indexType = classMember.indexType
 
-            if (exprList.size == 2) {
-                keyType = keyType.union(exprList[0].guessType(context))
-                elementType = elementType.union(exprList[1].guessType(context))
+            if (classMember is LuaTableField) {
+                val exprList = classMember.exprList
+
+                if (exprList.size == 2) {
+                    keyType = keyType.union(exprList[0].guessType(context))
+                    elementType = elementType.union(exprList[1].guessType(context))
+                } else if (exprList.size == 1) {
+                    if (name != null) {
+                        keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
+                    } else {
+                        keyType = keyType.union(Ty.NUMBER)
+                    }
+
+                    elementType = elementType.union(exprList[0].guessType(context))
+                }
+            } else if (classMember is LuaIndexExpr) {
+                val idExpr = classMember.idExpr
+
+                if (name != null) {
+                    keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
+                    elementType = elementType.union(prefixTy.guessMemberType(name, context) ?: Ty.UNKNOWN)
+                } else if (idExpr != null) {
+                    val indexTy = idExpr.guessType(context)
+                    keyType = keyType.union(indexTy)
+                    elementType = elementType.union(prefixTy.guessIndexerType(indexTy, context) ?: Ty.UNKNOWN)
+                } else {
+                    keyType = Ty.UNKNOWN
+                    elementType = Ty.UNKNOWN
+                    return@processMembers false
+                }
+            } else if (name != null) {
+                keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
+                elementType = elementType.union(classMember.guessType(context))
+            } else if (indexType != null) {
+                keyType = keyType.union(indexType.getType())
+                elementType = elementType.union(classMember.guessType(context))
             } else {
-                keyType = keyType.union(if (it.id != null) Ty.STRING else Ty.NUMBER)
-                elementType = elementType.union(exprList[0].guessType(context))
+                keyType = Ty.UNKNOWN
+                elementType = Ty.UNKNOWN
+                return@processMembers false
             }
+
+            true
         }
 
         return TySerializedGeneric(arrayOf(keyType, elementType), Ty.TABLE)
     }
 
-    fun isEmpty(): Boolean {
-        return table.tableFieldList.size == 0
+    fun isEmpty(context: SearchContext): Boolean {
+        return processMembers(context) { _, _ -> false }
     }
 }
 
@@ -352,6 +393,29 @@ class TyDocTable(val table: LuaDocTableDef) : TyClass(getDocTableTypeName(table)
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
         return table.tableFieldList.firstOrNull { it.name == name }
     }
+
+    override fun findIndexer(indexTy: ITy, searchContext: SearchContext): LuaClassMember? {
+        var narrowestClassMember: LuaClassMember? = null
+        var narrowestIndexTy: ITy? = null
+
+        table.tableFieldList.forEach {
+            val candidateIndexerTy = it.indexType?.getType()
+
+            if (candidateIndexerTy?.contravariantOf(indexTy, searchContext, TyVarianceFlags.STRICT_UNKNOWN) == true) {
+                if (narrowestIndexTy?.contravariantOf(candidateIndexerTy, searchContext, TyVarianceFlags.STRICT_UNKNOWN) != false) {
+                    narrowestClassMember = it
+                    narrowestIndexTy = candidateIndexerTy
+                }
+            }
+        }
+
+        return narrowestClassMember
+    }
+
+    // TODO: TyDocTable should implement this. However, there's no sensible way
+    //       to do so at present because LuaClassMember inherits from PsiElement.
+    /*override fun substitute(substitutor: ITySubstitutor): ITy {
+    }*/
 }
 
 class TySerializedDocTable(name: String) : TySerializedClass(name) {

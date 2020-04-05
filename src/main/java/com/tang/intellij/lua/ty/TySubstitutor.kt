@@ -41,8 +41,8 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
         val constraints = mutableMapOf<String, ITy>()
 
         params?.forEach {
-            constraints[it.varName] = it
-            map[it.varName] = Ty.UNKNOWN
+            constraints[it.className] = it
+            map[it.className] = Ty.UNKNOWN
         }
 
         this.constraints = constraints.toMap()
@@ -73,7 +73,7 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
         }
 
         if (clazz is TyParameter) {
-            val genericName = clazz.varName
+            val genericName = clazz.className
             val constraint = constraints.get(genericName)
 
             if (constraint != null) {
@@ -147,6 +147,14 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
                     warp(it.base) {
                         generic.params.last().accept(this)
                     }
+                } else if (it is TyTable) {
+                    val generifiedTable = it.toGeneric(searchContext)
+
+                    generifiedTable.params.asSequence().zip(generic.params.asSequence()).forEach { (param, genericParam) ->
+                        warp(param) {
+                            genericParam.accept(this)
+                        }
+                    }
                 }
             }
         }
@@ -207,7 +215,7 @@ class TyAliasSubstitutor private constructor(val context: SearchContext) : TySub
 
         if (base is ITyAlias) {
             return if (processedNames.add(base.name)) {
-                base.ty.substitute(generic.getParameterSubstitutor(context)).substitute(this)
+                base.ty.substitute(generic.getMemberSubstitutor(context)).substitute(this)
             } else Ty.VOID
         }
 
@@ -240,6 +248,59 @@ class TySelfSubstitutor(val context: SearchContext, val call: LuaCallExpr?, val 
 
 class TyParameterSubstitutor(val map: Map<String, ITy>) : TySubstitutor() {
     override fun substitute(clazz: ITyClass): ITy {
-        return if (clazz is TyParameter) map.get(clazz.varName) ?: clazz else clazz
+        return if (clazz is TyParameter) map.get(clazz.className) ?: clazz else clazz
+    }
+}
+
+class TyChainSubstitutor private constructor(a: ITySubstitutor, b: ITySubstitutor) : ITySubstitutor {
+    val substitutors = mutableListOf<ITySubstitutor>()
+
+    init {
+        substitutors.add(a)
+        substitutors.add(b)
+    }
+
+    companion object {
+        fun chain(a: ITySubstitutor?, b: ITySubstitutor?): ITySubstitutor? {
+            return if (a != null) {
+                if (a is TyChainSubstitutor) {
+                    b?.let {
+                        if (it is TyChainSubstitutor) {
+                            a.substitutors.addAll(it.substitutors)
+                        } else {
+                            a.substitutors.add(it)
+                        }
+                    }
+                    a
+                } else {
+                    if (b != null) {
+                        if (b is TyChainSubstitutor) {
+                            b.substitutors.add(0, a)
+                            b
+                        } else TyChainSubstitutor(a, b)
+                    } else a
+                }
+            } else b
+        }
+    }
+
+    override fun substitute(alias: ITyAlias): ITy {
+        return substitutors.fold(alias as ITy) { ty, subsitutor -> ty.substitute(subsitutor) }
+    }
+
+    override fun substitute(function: ITyFunction): ITy {
+        return substitutors.fold(function as ITy) { ty, subsitutor -> ty.substitute(subsitutor) }
+    }
+
+    override fun substitute(clazz: ITyClass): ITy {
+        return substitutors.fold(clazz as ITy) { ty, subsitutor -> ty.substitute(subsitutor) }
+    }
+
+    override fun substitute(generic: ITyGeneric): ITy {
+        return substitutors.fold(generic as ITy) { ty, subsitutor -> ty.substitute(subsitutor) }
+    }
+
+    override fun substitute(ty: ITy): ITy {
+        return substitutors.fold(ty) { substitutedTy, subsitutor -> substitutedTy.substitute(subsitutor) }
     }
 }

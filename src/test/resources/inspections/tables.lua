@@ -73,7 +73,7 @@ local anyValue
 
 local tableWithoutEntries = {}
 
-anyValue = tableWithoutEntries.<error descr="No such member 'keyThatDoesNotExist' found on type 'table'">keyThatDoesNotExist</error>
+anyValue = <error descr="No such member 'keyThatDoesNotExist' found on type 'table'">tableWithoutEntries.keyThatDoesNotExist</error>
 
 stringArray = {}
 numberArray = {}
@@ -83,3 +83,25 @@ explicitUnknown = {}
 implicitUnknown = {}
 explictlyTypedLiteral = <error descr="Type mismatch. Required: '\"stringLiteral\"' Found: 'table'">{}</error>
 wantsNumberNumberTable({})
+
+---@type number
+local thing
+
+---@return table<'a', 1>
+local function returnSpecificTable()
+    if thing == 1 then
+        local anonymousTable1 = {}
+        anonymousTable1.a = 1
+        return anonymousTable1
+    elseif thing == 2 then
+        local anonymousTable2 = {}
+        anonymousTable2.a = 2
+        return <error descr="Type mismatch. Required: 'table<\"a\", 1>' Found: 'table'">anonymousTable2</error>
+    elseif thing == 3 then
+        local anonymousTable3 = {}
+        anonymousTable3.b = 1
+        return <error descr="Type mismatch. Required: 'table<\"a\", 1>' Found: 'table'">anonymousTable3</error>
+    else
+        return {}
+    end
+end

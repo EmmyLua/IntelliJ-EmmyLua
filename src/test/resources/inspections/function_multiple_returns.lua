@@ -32,3 +32,34 @@ classWithAField = implicitClassWithAField
 
 local a, b, <error descr="Too many assignees, will be assigned nil.">c</error> = multipleReturns()
 local d = <weak_warning descr="Insufficient assignees, values will be discarded.">multipleReturns()</weak_warning>
+
+---@param arg1 number
+---@param arg2 string
+---@vararg boolean
+local function acceptsNumberStringVariadicBoolean(arg1, arg2, ...) end
+
+---@param arg1 number
+---@param arg2 string
+local function acceptsNumberString(arg1, arg2) end
+
+---@return number, string, boolean...
+local function returnsNumberStringVariadicBoolean()
+    return 1, "a string", true
+end
+
+---@return string, boolean...
+local function returnStringVariadicBoolean()
+    return "a string", true
+end
+
+---@return number, string, boolean
+local function returnsNumberStringBoolean()
+    return 1, "a string", true
+end
+
+acceptsNumberStringVariadicBoolean(1, "a string", true)
+acceptsNumberStringVariadicBoolean(returnsNumberStringVariadicBoolean())
+acceptsNumberStringVariadicBoolean(returnsNumberStringVariadicBoolean(), <error descr="Type mismatch. Required: 'string' Found: 'true'">true</error>)
+acceptsNumberStringVariadicBoolean(1, returnStringVariadicBoolean())
+acceptsNumberString(<weak_warning descr="1 result is an excess argument.">returnsNumberStringVariadicBoolean()</weak_warning>)
+acceptsNumberString(<weak_warning descr="1 result is an excess argument.">returnsNumberStringBoolean()</weak_warning>)

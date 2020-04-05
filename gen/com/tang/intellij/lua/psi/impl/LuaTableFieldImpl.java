@@ -12,6 +12,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase;
 import com.tang.intellij.lua.stubs.LuaTableFieldStub;
 import com.tang.intellij.lua.psi.*;
 import com.intellij.navigation.ItemPresentation;
+import com.tang.intellij.lua.comment.psi.LuaDocTy;
 import com.tang.intellij.lua.comment.psi.api.LuaComment;
 import com.tang.intellij.lua.search.SearchContext;
 import com.tang.intellij.lua.ty.ITy;
@@ -98,6 +99,12 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
   @NotNull
   public ITy guessParentType(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
+  }
+
+  @Override
+  @Nullable
+  public LuaDocTy getIndexType() {
+    return LuaPsiImplUtilKt.getIndexType(this);
   }
 
   @Override

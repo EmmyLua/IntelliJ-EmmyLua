@@ -14,10 +14,10 @@ import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaDocTableField extends LuaDocPsiElement, LuaClassField, PsiNameIdentifierOwner, StubBasedPsiElement<LuaDocTableFieldStub> {
 
-  @Nullable
-  LuaDocTy getTy();
-
   @NotNull
+  List<LuaDocTy> getTyList();
+
+  @Nullable
   PsiElement getId();
 
   @NotNull
@@ -29,15 +29,24 @@ public interface LuaDocTableField extends LuaDocPsiElement, LuaClassField, PsiNa
   @NotNull
   PsiElement setName(@NotNull String newName);
 
-  @NotNull
+  @Nullable
   String getName();
 
   @Nullable
   PsiElement getNameIdentifier();
 
+  @Nullable
+  LuaDocTy getIndexType();
+
+  @Nullable
+  LuaDocTy getValueType();
+
   @NotNull
   ITy guessType(@NotNull SearchContext context);
 
   boolean isDeprecated();
+
+  @Nullable
+  PsiElement getLbrack();
 
 }

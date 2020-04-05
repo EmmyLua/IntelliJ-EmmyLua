@@ -520,6 +520,7 @@ tableField ::= tableField1 | tableField2 | expr {
         getFieldName
         getPresentation
         guessParentType
+        getIndexType
         getVisibility
         isDeprecated
         getComment

@@ -48,6 +48,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JCheckBox smartCloseEnd;
     private JCheckBox showWordsInFile;
     private JCheckBox nilStrict;
+    private JCheckBox unknownIndexable;
     private JCheckBox recognizeGlobalNameAsCheckBox;
     private LuaAdditionalSourcesRootPanel additionalRoots;
     private JCheckBox enableGenericCheckBox;
@@ -65,6 +66,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         smartCloseEnd.setSelected(settings.isSmartCloseEnd());
         showWordsInFile.setSelected(settings.isShowWordsInFile());
         nilStrict.setSelected(settings.isNilStrict());
+        unknownIndexable.setSelected(settings.isUnknownIndexable());
         recognizeGlobalNameAsCheckBox.setSelected(settings.isRecognizeGlobalNameAsType());
         additionalRoots.setRoots(settings.getAdditionalSourcesRoot());
         enableGenericCheckBox.setSelected(settings.getEnableGeneric());
@@ -113,6 +115,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
                 settings.isSmartCloseEnd() != smartCloseEnd.isSelected() ||
                 settings.isShowWordsInFile() != showWordsInFile.isSelected() ||
                 settings.isNilStrict() != nilStrict.isSelected() ||
+                settings.isUnknownIndexable() != unknownIndexable.isSelected() ||
                 settings.isRecognizeGlobalNameAsType() != recognizeGlobalNameAsCheckBox.isSelected() ||
                 settings.getEnableGeneric() != enableGenericCheckBox.isSelected() ||
                 settings.getAttachDebugCaptureOutput() != captureOutputDebugString.isSelected() ||
@@ -133,6 +136,7 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
         settings.setSmartCloseEnd(smartCloseEnd.isSelected());
         settings.setShowWordsInFile(showWordsInFile.isSelected());
         settings.setNilStrict(nilStrict.isSelected());
+        settings.setUnknownIndexable(unknownIndexable.isSelected());
         settings.setRecognizeGlobalNameAsType(recognizeGlobalNameAsCheckBox.isSelected());
         settings.setAdditionalSourcesRoot(additionalRoots.getRoots());
         settings.setEnableGeneric(enableGenericCheckBox.isSelected());

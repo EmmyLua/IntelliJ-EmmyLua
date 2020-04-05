@@ -30,6 +30,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocAccessModifier
 import com.tang.intellij.lua.comment.psi.LuaDocTagVararg
+import com.tang.intellij.lua.comment.psi.LuaDocTy
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.type.LuaString
@@ -259,11 +260,10 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
         if (exprList.size > 1) {
             val nameSize = context.index + 1
             index = if (nameSize > exprList.size) {
-                val valueSize = exprList.size
-                nameSize - valueSize
+                nameSize - exprList.size
             } else 0
         }
-        return context.withIndex(index) { expr.guessType(context) }
+        return context.withIndex(index, context.supportsMultipleResults) { expr.guessType(context) }
     }
     return Ty.UNKNOWN
 }
@@ -297,13 +297,13 @@ fun getPresentation(indexExpr: LuaIndexExpr): ItemPresentation {
 }
 
 /**
- * xx['id']
+ * x in y[x]
  */
-fun getIdExpr(indexExpr: LuaIndexExpr): LuaLiteralExpr? {
+fun getIdExpr(indexExpr: LuaIndexExpr): LuaExpr? {
     val bracket = indexExpr.lbrack
     if (bracket != null) {
         val nextLeaf = PsiTreeUtil.getNextSiblingOfType(bracket, LuaExpr::class.java)
-        if (nextLeaf is LuaLiteralExpr && nextLeaf.kind == LuaLiteralKind.String)
+        if (nextLeaf is LuaExpr)
             return nextLeaf
     }
     return null
@@ -320,9 +320,10 @@ fun getName(indexExpr: LuaIndexExpr): String? {
         return id.text
 
     // var['name']
-    val idExpr = indexExpr.idExpr
-    if (idExpr != null)
+    val idExpr = indexExpr.idExpr as? LuaLiteralExpr
+    if (idExpr != null && idExpr.kind == LuaLiteralKind.String) {
         return LuaString.getContent(idExpr.text).value
+    }
 
     return null
 }
@@ -330,8 +331,8 @@ fun getName(indexExpr: LuaIndexExpr): String? {
 fun setName(indexExpr: LuaIndexExpr, name: String): PsiElement {
     if (indexExpr.id != null)
         return setName(indexExpr as PsiNameIdentifierOwner, name)
-    val idExpr = indexExpr.idExpr
-    if (idExpr != null) {
+    val idExpr = indexExpr.idExpr as? LuaLiteralExpr
+    if (idExpr != null && idExpr.kind == LuaLiteralKind.String) {
         val text = idExpr.text
         val content = LuaString.getContent(text)
         val newText = text.substring(0, content.start) + name + text.substring(content.end)
@@ -535,6 +536,10 @@ fun getIdExpr(tableField: LuaTableField): LuaExpr? {
     return null
 }
 
+fun getIndexType(tableField: LuaTableField): LuaDocTy? {
+    return null
+}
+
 fun toString(stubElement: StubBasedPsiElement<out StubElement<*>>): String {
     return "STUB:[" + stubElement.javaClass.simpleName + "]"
 }
@@ -566,16 +571,14 @@ fun getName(nameExpr: LuaNameExpr): String {
     return nameExpr.id.text
 }
 
-fun guessReturnType(returnStat: LuaReturnStat?, index: Int, context: SearchContext): ITy {
+fun guessReturnType(returnStat: LuaReturnStat?, context: SearchContext): ITy {
     if (returnStat != null) {
         val returnExpr = returnStat.exprList
         if (returnExpr != null) {
-            return context.withIndex(index) {
-                if (context.guessTuple())
-                    returnExpr.guessType(context)
-                else
-                    returnExpr.guessTypeAt(context)
-            }
+            return if (context.supportsMultipleResults)
+                returnExpr.guessType(context)
+            else
+                returnExpr.guessTypeAt(context)
         }
         return Ty.VOID
     }

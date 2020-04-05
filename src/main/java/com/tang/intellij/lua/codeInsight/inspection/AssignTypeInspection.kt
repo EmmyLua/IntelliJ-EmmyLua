@@ -27,27 +27,31 @@ import com.tang.intellij.lua.ty.*
 class AssignTypeInspection : StrictInspection() {
     override fun buildVisitor(myHolder: ProblemsHolder, isOnTheFly: Boolean, session: LocalInspectionToolSession): PsiElementVisitor =
             object : LuaVisitor() {
-                private fun inspectAssignee(assignee: LuaTypeGuessable, value: ITy, varianceFlags: Int, expressionElement: LuaExpr, targetAssignee: Boolean, searchContext: SearchContext) {
+                private fun inspectAssignee(assignee: LuaTypeGuessable, value: ITy, varianceFlags: Int, expressionElement: LuaExpr, targetAssignee: Boolean, context: SearchContext) {
                     val targetElement = if (targetAssignee) assignee else null
 
                     if (assignee is LuaIndexExpr) {
                         // Get owner class
-                        val fieldOwnerType = assignee.guessParentType(searchContext)
-                        val fieldOwnerClass = if (fieldOwnerType is TyGeneric) fieldOwnerType.base else fieldOwnerType
+                        val fieldOwnerType = assignee.guessParentType(context)
 
-                        if (fieldOwnerClass is TyClass) {
-                            val name = assignee.name ?: ""
-                            val fieldType = fieldOwnerClass.findMemberType(name, searchContext) ?: Ty.NIL
-                            ProblemUtil.contravariantOf(fieldType, value, searchContext, varianceFlags, targetElement, expressionElement) { targetElement, sourceElement, message, highlightType ->
-                                myHolder.registerProblem(sourceElement, message, highlightType)
-                                if (targetElement != null && targetElement != sourceElement) {
-                                    myHolder.registerProblem(targetElement, message, highlightType)
-                                }
+                        val idExpr = assignee.idExpr
+                        val memberName = assignee.name
+
+                        val assigneeMemberType = if (memberName != null) {
+                            fieldOwnerType.guessMemberType(memberName, context)
+                        } else {
+                            idExpr?.let { fieldOwnerType.guessIndexerType(it.guessType(context), context) }
+                        } ?: Ty.NIL
+
+                        ProblemUtil.contravariantOf(assigneeMemberType, value, context, varianceFlags, targetElement, expressionElement) { targetElement, sourceElement, message, highlightType ->
+                            myHolder.registerProblem(sourceElement, message, highlightType)
+                            if (targetElement != null && targetElement != sourceElement) {
+                                myHolder.registerProblem(targetElement, message, highlightType)
                             }
                         }
                     } else {
-                        val variableType = assignee.guessType(searchContext)
-                        ProblemUtil.contravariantOf(variableType, value, searchContext, varianceFlags, targetElement, expressionElement) { targetElement, sourceElement, message, highlightType ->
+                        val variableType = assignee.guessType(context)
+                        ProblemUtil.contravariantOf(variableType, value, context, varianceFlags, targetElement, expressionElement) { targetElement, sourceElement, message, highlightType ->
                             myHolder.registerProblem(sourceElement, message, highlightType)
                             if (targetElement != null && targetElement != sourceElement) {
                                 myHolder.registerProblem(targetElement, message, highlightType)
@@ -66,12 +70,16 @@ class AssignTypeInspection : StrictInspection() {
                     var variadicTy: ITy? = null
 
                     for (expressionIndex in 0 until expressions.size) {
+                        val isLastExpression = expressionIndex == expressions.size - 1
                         val expression = expressions[expressionIndex]
-                        val expressionType = expression.guessType(searchContext)
+                        val expressionType = if (isLastExpression) {
+                            searchContext.withMultipleResults { expression.guessType(searchContext) }
+                        } else {
+                            searchContext.withIndex(0) { expression.guessType(searchContext) }
+                        }
                         val varianceFlags = if (expression is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
                         val multipleResults = expressionType as? TyMultipleResults
                         val values = if (multipleResults != null) multipleResults.list else listOf(expressionType)
-                        val isLastExpression = expressionIndex == expressions.size - 1
 
                         for (valueIndex in 0 until values.size) {
                             val value = values[valueIndex]

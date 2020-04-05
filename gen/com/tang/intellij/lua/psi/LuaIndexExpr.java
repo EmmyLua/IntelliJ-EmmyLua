@@ -34,7 +34,7 @@ public interface LuaIndexExpr extends LuaExpr, PsiNameIdentifierOwner, LuaClassM
   ItemPresentation getPresentation();
 
   @Nullable
-  LuaLiteralExpr getIdExpr();
+  LuaExpr getIdExpr();
 
   //WARNING: toString(...) is skipped
   //matching toString(LuaIndexExpr, ...)

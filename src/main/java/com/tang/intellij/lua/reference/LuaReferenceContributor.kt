@@ -77,8 +77,8 @@ class LuaReferenceContributor : PsiReferenceContributor() {
             if (id != null) {
                 return arrayOf(LuaIndexReference(indexExpr, id))
             }
-            val idExpr = indexExpr.idExpr
-            return if (idExpr != null) {
+            val idExpr = indexExpr.idExpr as? LuaLiteralExpr
+            return if (idExpr != null && idExpr.kind == LuaLiteralKind.String) {
                 arrayOf(LuaIndexBracketReference(indexExpr, idExpr))
             } else PsiReference.EMPTY_ARRAY
         }

@@ -253,3 +253,145 @@ local function fn10()
     local function fn10Nested(arg)
     end
 end
+
+
+---@type fun<K, V>(tab: table<K, V>, func: fun(key: K, value: V))
+local fn11
+
+-- K = 1|2,
+fn11({a = 1, b = 2}, function(key, value)
+    anyString = key
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: '\"a\"|\"b\"'">key</error>
+    anyString = <error descr="Type mismatch. Required: 'string' Found: '1|2'">value</error>
+    anyNumber = value
+end)
+
+fn11(stringNumberTable, function(key, value)
+    anyString = key
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: 'string'">key</error>
+    anyString = <error descr="Type mismatch. Required: 'string' Found: 'number'">value</error>
+    anyNumber = value
+end)
+
+fn11({a = "a", b = "b"}, function(key, value)
+    anyString = key
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: '\"a\"|\"b\"'">key</error>
+    anyString = value
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: '\"a\"|\"b\"'">value</error>
+end)
+
+fn11(stringStringTable, function(key, value)
+    anyString = key
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: 'string'">key</error>
+    anyString = value
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: 'string'">value</error>
+end)
+
+fn11({[1] = "a", [2] = "b"}, function(key, value)
+    anyString = <error descr="Type mismatch. Required: 'string' Found: '1|2'">key</error>
+    anyNumber = key
+    anyString = value
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: '\"a\"|\"b\"'">value</error>
+end)
+
+fn11({"a", "b"}, function(key, value)
+    anyString = <error descr="Type mismatch. Required: 'string' Found: 'number'">key</error>
+    anyNumber = key
+    anyString = value
+    anyNumber = <error descr="Type mismatch. Required: 'number' Found: '\"a\"|\"b\"'">value</error>
+end)
+
+fn11(numberArray, function(key, value)
+    anyString = <error descr="Type mismatch. Required: 'string' Found: 'number'">key</error>
+    anyNumber = key
+    anyString = <error descr="Type mismatch. Required: 'string' Found: 'number'">value</error>
+    anyNumber = value
+end)
+
+
+---@type 1
+local one
+
+---@type 3
+local three
+
+
+---@generic K, V
+---@param a table<K, V>
+---@param b table<K, V>
+---@return table<K, V>
+local function merge(a, b)
+    ---@type table<K, V>
+    local res
+
+    return res
+end
+
+local mergedLiteralArr = merge({1, 2}, {3, 4})
+local mergedLiteralMap = merge({a = 1, b = 2}, {c = 3, d = 4})
+
+mergedLiteralArr[1] = one
+mergedLiteralArr[1] = three
+mergedLiteralArr[1] = <error descr="Type mismatch. Required: '1|2|3|4' Found: '5'">5</error>
+
+mergedLiteralMap.a = one
+mergedLiteralMap.a = three
+mergedLiteralMap.a = <error descr="Type mismatch. Required: '1|2|3|4' Found: '5'">5</error>
+
+<error descr="No such member 'e' found on type 'table<\"a\"|\"b\"|\"c\"|\"d\", 1|2|3|4>'">mergedLiteralMap.e</error> = <error descr="Type mismatch. Required: 'nil' Found: '1'">one</error>
+
+local mergedStringStringMap = merge(stringStringTable, stringStringTable)
+
+mergedStringStringMap.a = "a string"
+mergedStringStringMap.a = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+mergedStringStringMap['a'] = "a string"
+mergedStringStringMap['a'] = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+
+
+---@type fun<K, V>(a: table<K, V>, b: table<K, V>): table<K, V>
+local typeMerge
+
+local typeMergedLiteralArr = typeMerge({1, 2}, {3, 4})
+local typeMergedLiteralMap = typeMerge({a = 1, b = 2}, {c = 3, d = 4})
+
+typeMergedLiteralArr[1] = one
+typeMergedLiteralArr[1] = three
+typeMergedLiteralArr[1] = <error descr="Type mismatch. Required: '1|2|3|4' Found: '5'">5</error>
+
+typeMergedLiteralMap.a = one
+typeMergedLiteralMap.a = three
+typeMergedLiteralMap.a = <error descr="Type mismatch. Required: '1|2|3|4' Found: '5'">5</error>
+
+<error descr="No such member 'e' found on type 'table<\"a\"|\"b\"|\"c\"|\"d\", 1|2|3|4>'">typeMergedLiteralMap.e</error> = <error descr="Type mismatch. Required: 'nil' Found: '1'">one</error>
+
+local typeMergedStringStringMap = typeMerge(stringStringTable, stringStringTable)
+
+typeMergedStringStringMap.a = "a string"
+typeMergedStringStringMap.a = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+typeMergedStringStringMap['a'] = "a string"
+typeMergedStringStringMap['a'] = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+
+
+---@overload fun<K, V>(a: table<K, V>, b: table<K, V>): table<K, V>
+local function overloadMerge(a, b)
+end
+
+local overloadMergedLiteralArr = overloadMerge({1, 2}, {3, 4})
+local overloadMergedLiteralMap = overloadMerge({a = 1, b = 2}, {c = 3, d = 4})
+
+overloadMergedLiteralArr[1] = one
+overloadMergedLiteralArr[1] = three
+overloadMergedLiteralArr[1] = <error descr="Type mismatch. Required: '1|2|3|4' Found: '5'">5</error>
+
+overloadMergedLiteralMap.a = one
+overloadMergedLiteralMap.a = three
+overloadMergedLiteralMap.a = <error descr="Type mismatch. Required: '1|2|3|4' Found: '5'">5</error>
+
+<error descr="No such member 'e' found on type 'table<\"a\"|\"b\"|\"c\"|\"d\", 1|2|3|4>'">overloadMergedLiteralMap.e</error> = <error descr="Type mismatch. Required: 'nil' Found: '1'">one</error>
+
+local overloadMergedStringStringMap = overloadMerge(stringStringTable, stringStringTable)
+
+overloadMergedStringStringMap.a = "a string"
+overloadMergedStringStringMap.a = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+overloadMergedStringStringMap['a'] = "a string"
+overloadMergedStringStringMap['a'] = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>

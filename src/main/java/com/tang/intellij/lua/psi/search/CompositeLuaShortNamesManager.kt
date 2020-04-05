@@ -22,6 +22,7 @@ import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaTypeAlias
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITyClass
 
 class CompositeLuaShortNamesManager : LuaShortNamesManager() {
@@ -39,6 +40,14 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
     override fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
         for (manager in list) {
             val ret = manager.findMember(type, fieldName, context)
+            if (ret != null) return ret
+        }
+        return null
+    }
+
+    override fun findIndexer(type: ITyClass, indexTy: ITy, context: SearchContext): LuaClassMember? {
+        for (manager in list) {
+            val ret = manager.findIndexer(type, indexTy, context)
             if (ret != null) return ret
         }
         return null
@@ -69,9 +78,17 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         return collection
     }
 
-    override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+    override fun processMember(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
         for (manager in list) {
-            if (!manager.processAllMembers(type, fieldName, context, processor))
+            if (!manager.processMember(type, fieldName, context, processor))
+                return false
+        }
+        return true
+    }
+
+    override fun processIndexer(type: ITyClass, indexTy: ITy, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+        for (manager in list) {
+            if (!manager.processIndexer(type, indexTy, context, processor))
                 return false
         }
         return true

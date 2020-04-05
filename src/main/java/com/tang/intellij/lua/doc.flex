@@ -44,6 +44,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
     }
 
     private int nBrackets = -1;
+
     private boolean checkAhead(char c, int offset) {
         return this.zzMarkedPos + offset < this.zzBuffer.length() && this.zzBuffer.charAt(this.zzMarkedPos + offset) == c;
     }
@@ -93,6 +94,7 @@ BOOLEAN=true|false
 %state xCLASS_EXTEND
 %state xFIELD
 %state xFIELD_ID
+%state xFIELD_VALUE
 %state xGENERIC
 %state xALIAS
 %state xALIAS_PARAMS
@@ -114,7 +116,7 @@ BOOLEAN=true|false
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
     {BLOCK_END}                {
         if (yylength() - 2 == nBrackets) {
-      	    nBrackets = -1;
+            nBrackets = -1;
             return BLOCK_END;
         }
     }
@@ -123,11 +125,11 @@ BOOLEAN=true|false
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
-<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_PARAM_LIST, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xALIAS_PARAM_LIST, xSUPPRESS> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_PARAM_LIST, xCLASS_EXTEND, xFIELD, xFIELD_ID, xFIELD_VALUE, xCOMMENT_STRING, xGENERIC, xALIAS, xALIAS_PARAM_LIST, xSUPPRESS> {
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
     {BLOCK_END}                {
         if (yylength() - 2 == nBrackets) {
-      	    nBrackets = -1;
+            nBrackets = -1;
             return BLOCK_END;
         }
     }
@@ -213,10 +215,15 @@ BOOLEAN=true|false
     "private"                  { yybegin(xFIELD_ID); return PRIVATE; }
     "protected"                { yybegin(xFIELD_ID); return PROTECTED; }
     "public"                   { yybegin(xFIELD_ID); return PUBLIC; }
+    "["                        { beginType(xFIELD_VALUE); yypushback(yylength()); }
     {ID}                       { beginType(); return ID; }
 }
 <xFIELD_ID> {
+    "["                        { beginType(xFIELD_VALUE); yypushback(yylength()); }
     {ID}                       { beginType(); return ID; }
+}
+<xFIELD_VALUE> {
+    [^]                        { beginType(); yypushback(yylength()); }
 }
 
 <xTYPE_REF> {
@@ -230,12 +237,22 @@ BOOLEAN=true|false
     ")"                        { _typeLevel--; _typeReq = false; return RPAREN; }
     "{"                        { _typeLevel++; return LCURLY; }
     "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
+    "["                        {
+        if (checkAhead(']', 0)) {
+            _typeReq = false;
+            zzMarkedPos += 1;
+            return ARR;
+        } else {
+            _typeLevel++;
+            return LBRACK;
+        }
+    }
+    "]"                        { _typeLevel--; _typeReq = false; return RBRACK; }
     "\""                       { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
     "'"                        { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
     "`"                        { yybegin(xBACKTICK_QUOTED_STRING); return BACKTICK; }
     {BOOLEAN}                  { return BOOLEAN_LITERAL; }
     {NUMBER}                   { return NUMBER_LITERAL; }
-    "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
     "vararg"                   { _typeReq = true; return VARARG; }
     "..."                      { return ELLIPSIS; }
@@ -269,7 +286,7 @@ BOOLEAN=true|false
     {STRING}                   { yybegin(xBODY); return STRING; }
 }
 
-<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xFIELD_VALUE, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
     {EOL}                      { yybegin(xBODY); return EOL; }
 }
 

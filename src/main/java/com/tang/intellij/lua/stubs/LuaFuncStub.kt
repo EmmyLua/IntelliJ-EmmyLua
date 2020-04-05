@@ -103,7 +103,7 @@ class LuaFuncType : LuaStubElementType<LuaFuncStub, LuaFuncDef>("Global Function
         val name = luaGlobalFuncStub.name
         val moduleName = luaGlobalFuncStub.module
 
-        LuaClassMemberIndex.indexStub(indexSink, moduleName, name)
+        LuaClassMemberIndex.indexMemberStub(indexSink, moduleName, name)
 
         indexSink.occurrence(StubKeys.SHORT_NAME, name)
     }

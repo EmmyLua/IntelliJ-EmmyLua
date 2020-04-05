@@ -83,7 +83,7 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
 
   @Override
   @Nullable
-  public LuaLiteralExpr getIdExpr() {
+  public LuaExpr getIdExpr() {
     return LuaPsiImplUtilKt.getIdExpr(this);
   }
 

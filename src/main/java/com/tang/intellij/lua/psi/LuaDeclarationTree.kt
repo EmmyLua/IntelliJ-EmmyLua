@@ -190,9 +190,12 @@ private open class Scope(
         if (expr is LuaNameExpr) {
             return find(expr)
         } else if (expr is LuaIndexExpr) {
-            val name = expr.name ?: return null
+            val fieldName = expr.name ?: expr.idExpr?.let { idExpr ->
+                (idExpr as? LuaLiteralExpr)?.let { "[${it.text}]" }
+            } ?: return null
+
             val declaration = find(expr.prefixExpr)
-            return declaration?.findField(name)
+            return declaration?.findField(fieldName)
         }
         return null
     }
@@ -335,10 +338,11 @@ private abstract class LuaDeclarationTreeBase(val file: PsiFile) : LuaRecursiveV
                 val flags = find(expr)?.flags ?: DeclarationFlag.Global
                 curScope?.add(createDeclaration(expr.name, expr, flags))
             } else if (expr is LuaIndexExpr) {
-                val name = expr.name
-                if (name != null) {
+                val fieldName = expr.name ?: (expr.idExpr as? LuaLiteralExpr)?.let { "[${it.text}]" }
+
+                if (fieldName != null) {
                     val declaration = curScope?.find(expr.prefixExpr)
-                    declaration?.addField(createDeclaration(name, expr, DeclarationFlag.ClassMember))
+                    declaration?.addField(createDeclaration(fieldName, expr, DeclarationFlag.ClassMember))
                 }
             }
         }

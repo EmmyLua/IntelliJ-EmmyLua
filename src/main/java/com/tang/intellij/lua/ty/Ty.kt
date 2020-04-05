@@ -100,11 +100,23 @@ interface ITy : Comparable<ITy> {
     fun acceptChildren(visitor: ITyVisitor)
 
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
-    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean = true): Boolean
+    fun findIndexer(indexTy: ITy, searchContext: SearchContext): LuaClassMember?
 
-    fun findMemberType(name: String, searchContext: SearchContext): ITy? {
-        return infer(findMember(name, searchContext), searchContext)
+    fun guessMemberType(name: String, searchContext: SearchContext): ITy? {
+        return findMember(name, searchContext)?.guessType(searchContext)?.let {
+            val substitutor = getMemberSubstitutor(searchContext)
+            return if (substitutor != null) it.substitute(substitutor) else it
+        }
     }
+
+    fun guessIndexerType(indexTy: ITy, searchContext: SearchContext): ITy? {
+        return findIndexer(indexTy, searchContext)?.guessType(searchContext)?.let {
+            val substitutor = getMemberSubstitutor(searchContext)
+            return if (substitutor != null) it.substitute(substitutor) else it
+        }
+    }
+
+    fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean, deep: Boolean = true): Boolean
 
     fun processMembers(context: SearchContext, processor: (ITy, LuaClassMember) -> Boolean): Boolean {
         return processMembers(context, processor, true)
@@ -119,6 +131,10 @@ interface ITy : Comparable<ITy> {
             member == null
         }
         return member
+    }
+
+    fun getMemberSubstitutor(context: SearchContext): ITySubstitutor? {
+        return getSuperClass(context)?.getMemberSubstitutor(context)
     }
 }
 
@@ -212,20 +228,23 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
         if (this.flags and TyFlags.SHAPE != 0) {
             return processMembers(context, { _, classMember ->
-                val memberName = classMember.name
+                val indexTy = classMember.indexType?.getType()
 
-                if (memberName == null) {
-                    return@processMembers false
+                val memberTy = if (indexTy != null) {
+                    guessIndexerType(indexTy, context)
+                } else {
+                    classMember.name?.let { guessMemberType(it, context) }
+                } ?: Ty.UNKNOWN
+
+                val otherMemberTy = if (indexTy != null) {
+                    other.guessIndexerType(indexTy, context)
+                } else {
+                    classMember.name?.let { other.guessMemberType(it, context) }
                 }
 
-                val otherMember = other.findMember(memberName, context)
-
-                if (otherMember == null) {
-                    return@processMembers false
+                if (otherMemberTy == null) {
+                    return@processMembers TyUnion.find(memberTy, TyNil::class.java) != null
                 }
-
-                val memberTy = classMember.guessType(context)
-                val otherMemberTy = otherMember.guessType(context)
 
                 memberTy.contravariantOf(otherMemberTy, context, flags)
             }, true)
@@ -279,6 +298,10 @@ abstract class Ty(override val kind: TyKind) : ITy {
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        return null
+    }
+
+    override fun findIndexer(indexTy: ITy, searchContext: SearchContext): LuaClassMember? {
         return null
     }
 
@@ -404,6 +427,14 @@ class TyUnknown : Ty(TyKind.Unknown) {
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         return true
+    }
+
+    override fun guessMemberType(name: String, searchContext: SearchContext): ITy? {
+        return if (LuaSettings.instance.isUnknownIndexable) Ty.UNKNOWN else null
+    }
+
+    override fun guessIndexerType(indexTy: ITy, searchContext: SearchContext): ITy? {
+        return if (LuaSettings.instance.isUnknownIndexable) Ty.UNKNOWN else null
     }
 }
 

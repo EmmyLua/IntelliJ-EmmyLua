@@ -87,7 +87,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
         if (luaNameStub.isGlobal &&luaNameStub.isName) {
             val module = luaNameStub.module
 
-            LuaClassMemberIndex.indexStub(indexSink, module, luaNameStub.name)
+            LuaClassMemberIndex.indexMemberStub(indexSink, module, luaNameStub.name)
 
             indexSink.occurrence(StubKeys.SHORT_NAME, luaNameStub.name)
         }

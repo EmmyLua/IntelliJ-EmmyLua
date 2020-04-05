@@ -152,8 +152,8 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
         } else if (member is LuaClassField && completionMode != MemberCompletionMode.Colon) {
             var fieldType = type
 
-            if (thisType is ITyGeneric) {
-                fieldType = type.substitute(thisType.getParameterSubstitutor(context))
+            thisType.getMemberSubstitutor(context)?.let {
+                fieldType = type.substitute(it)
             }
 
             addField(completionResultSet, bold, className, member, fieldType, handlerProcessor)

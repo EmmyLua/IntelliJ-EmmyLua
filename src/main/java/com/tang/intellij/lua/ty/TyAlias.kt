@@ -51,6 +51,10 @@ class TyAlias(override val name: String,
         return ty.findMember(name, searchContext)
     }
 
+    override fun findIndexer(indexTy: ITy, searchContext: SearchContext): LuaClassMember? {
+        return ty.findIndexer(indexTy, searchContext)
+    }
+
     override fun accept(visitor: ITyVisitor) {
         visitor.visitAlias(this)
     }

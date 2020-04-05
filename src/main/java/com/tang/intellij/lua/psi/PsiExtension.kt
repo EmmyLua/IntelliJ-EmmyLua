@@ -85,7 +85,7 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
             var ret: ITy = Ty.VOID
             fTy.each {
                 if (it is ITyFunction) {
-                    var sig = it.mainSignature
+                    var sig = it.matchSignature(p2, context)?.signature ?: it.mainSignature
                     val substitutor = p2.createSubstitutor(sig, context)
                     sig = sig.substitute(substitutor)
                     ret = ret.union(sig.getParamTy(idx))
@@ -94,16 +94,13 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
             return if (Ty.isInvalid(ret)) Ty.UNKNOWN else ret
         }
     } else if (p1 is LuaTableField) {
-        val fieldName = p1.name
+        val memberName = p1.name
         val tbl = p1.parent
-        if (fieldName != null && tbl is LuaTableExpr) {
+        if (memberName != null && tbl is LuaTableExpr) {
             var fieldType: ITy = Ty.VOID
             val tyTbl = tbl.shouldBe(context)
             tyTbl.eachTopClass(Processor { type ->
-                val cls = (if (type is ITyGeneric) type.base else type) as? ITyClass
-                if (cls != null) {
-                    cls.findMemberType(fieldName, context)?.let { fieldType = fieldType.union(it) }
-                }
+                type.guessMemberType(memberName, context)?.let { fieldType = fieldType.union(it) }
                 true
             })
             return if (Ty.isInvalid(fieldType)) Ty.UNKNOWN else fieldType
@@ -172,6 +169,21 @@ fun LuaAssignStat.getIndexFor(psi: LuaExpr): Int {
         })
     }
     return idx
+}
+
+fun LuaAssignStat.getLastIndex(): Int {
+    val stub = valueExprList?.stub
+    if (stub != null) {
+        return stub.childrenStubs.size
+    }
+    var count = 0
+    LuaPsiTreeUtilEx.processChildren(this.varExprList, Processor{
+        if (it is LuaExpr) {
+            count++
+        }
+        return@Processor true
+    })
+    return count - 1
 }
 
 fun LuaAssignStat.getExprAt(index:Int) : LuaExpr? {
@@ -430,9 +442,7 @@ val LuaTableField.shouldCreateStub: Boolean get() =
     }
 
 private val LuaTableField.innerShouldCreateStub: Boolean get() {
-    if (id == null && idExpr == null)
-        return false
-    if (name == null)
+    if (name == null && (idExpr as? LuaLiteralExpr) == null)
         return false
 
     val tableExpr = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaTableExpr::class.java)

@@ -36,15 +36,33 @@ class TyMultipleResults(val list: List<ITy>, val variadic: Boolean) : Ty(TyKind.
     }
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
-        if (other is TyMultipleResults && other.list.size == list.size) {
-            for (i in 0 until list.size) {
-                if (!list[i].covariantOf(other.list[i], context, flags)) {
+        val requiredSize = if (variadic) list.size - 1 else list.size
+
+        if (other is TyMultipleResults) {
+            if (other.variadic) {
+                if (!variadic) {
+                    return false
+                }
+            } else {
+                if (other.list.size < requiredSize) {
                     return false
                 }
             }
+
+            for (i in 0 until other.list.size) {
+                val otherTy = other.list[i]
+                val thisTy = if (i >= list.size) {
+                    if (variadic) list.last() else return true
+                } else list[i]
+
+                if (!thisTy.covariantOf(otherTy, context, flags)) {
+                    return false
+                }
+            }
+
             return true
         }
-        return false
+        return requiredSize <= 1 && list.first().contravariantOf(other, context, flags)
     }
 
     override fun hashCode(): Int {

@@ -25,6 +25,7 @@ import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaAliasIndex
 import com.tang.intellij.lua.stubs.index.LuaClassIndex
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
+import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITyClass
 
 class LuaShortNamesManagerImpl : LuaShortNamesManager() {
@@ -34,7 +35,11 @@ class LuaShortNamesManagerImpl : LuaShortNamesManager() {
     }
 
     override fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
-        return LuaClassMemberIndex.find(type, fieldName, context)
+        return LuaClassMemberIndex.findMember(type, fieldName, context)
+    }
+
+    override fun findIndexer(type: ITyClass, indexTy: ITy, context: SearchContext): LuaClassMember? {
+        return LuaClassMemberIndex.findIndexer(type, indexTy, context)
     }
 
     override fun processAllClassNames(project: Project, processor: Processor<String>): Boolean {
@@ -49,8 +54,12 @@ class LuaShortNamesManagerImpl : LuaShortNamesManager() {
         return LuaClassMemberIndex.instance.get(clazzName.hashCode(), context.project, context.scope)
     }
 
-    override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
-        return LuaClassMemberIndex.processAll(type, fieldName, context, processor)
+    override fun processMember(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+        return LuaClassMemberIndex.processMember(type, fieldName, context, processor)
+    }
+
+    override fun processIndexer(type: ITyClass, indexTy: ITy, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+        return LuaClassMemberIndex.processIndexer(type, indexTy, context, processor)
     }
 
     override fun findAlias(name: String, context: SearchContext): LuaTypeAlias? {

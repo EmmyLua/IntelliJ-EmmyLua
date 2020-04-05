@@ -61,6 +61,14 @@ class TyPrimitiveLiteral private constructor(override val primitiveKind: TyPrimi
     override fun hashCode(): Int {
         return primitiveKind.hashCode() * 31 * value.hashCode()
     }
+
+    override fun guessMemberType(name: String, searchContext: SearchContext): ITy? {
+        return primitiveType.guessMemberType(name, searchContext)
+    }
+
+    override fun guessIndexerType(indexTy: ITy, searchContext: SearchContext): ITy? {
+        return primitiveType.guessIndexerType(indexTy, searchContext)
+    }
 }
 
 object TyPrimitiveLiteralSerializer : TySerializer<TyPrimitiveLiteral>() {

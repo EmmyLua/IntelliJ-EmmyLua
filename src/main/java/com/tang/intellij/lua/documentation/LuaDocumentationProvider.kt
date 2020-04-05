@@ -40,6 +40,10 @@ class LuaDocumentationProvider : AbstractDocumentationProvider(), DocumentationP
         override fun renderType(t: String): String {
             return if (t.isNotEmpty()) buildString { DocumentationManagerUtil.createHyperlink(this, t, t, true) } else t
         }
+
+        override fun renderParamsList(params: Collection<String>?): String {
+            return if (params != null && params.isNotEmpty()) "&lt;${params.joinToString(", ")}&gt;" else ""
+        }
     }
 
     override fun getQuickNavigateInfo(element: PsiElement?, originalElement: PsiElement?): String? {

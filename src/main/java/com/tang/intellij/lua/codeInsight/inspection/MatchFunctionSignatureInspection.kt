@@ -19,10 +19,7 @@ package com.tang.intellij.lua.codeInsight.inspection
 import com.intellij.codeInspection.LocalInspectionToolSession
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElementVisitor
-import com.tang.intellij.lua.psi.LuaCallExpr
-import com.tang.intellij.lua.psi.LuaExpr
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaVisitor
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 
@@ -63,10 +60,32 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                     } else if (prefixExpr is LuaIndexExpr) {
                         // Get parent type
                         val parentType = prefixExpr.guessParentType(searchContext)
+
                         if (parentType is TyClass) {
-                            val fType = prefixExpr.name?.let { parentType.findSuperMember(it, searchContext) }
-                            if (fType == null)
-                                myHolder.registerProblem(o, "Unknown function '%s'.".format(prefixExpr.lastChild.text))
+                            val memberName = prefixExpr.name
+                            val idExpr = prefixExpr.idExpr
+
+                            if (memberName != null) {
+                                val method = parentType.findSuperMember(memberName, searchContext)?.guessType(searchContext) as? ITyFunction
+
+                                if (method != null) {
+                                    method.matchSignature(o, searchContext, myHolder)
+                                } else {
+                                    myHolder.registerProblem(o, "Unknown function '$memberName'.")
+                                }
+                            } else if (idExpr != null) {
+                                val indexTy = idExpr.guessType(searchContext)
+
+                                TyUnion.each(indexTy) {
+                                    val method = parentType.findIndexer(it, searchContext)?.guessType(searchContext) as? ITyFunction
+
+                                    if (method != null) {
+                                        method.matchSignature(o, searchContext, myHolder)
+                                    } else {
+                                        myHolder.registerProblem(o, "Unknown function '[${it.displayName}]'")
+                                    }
+                                }
+                            }
                         }
                     } else if (type == Ty.NIL) {
                         myHolder.registerProblem(o, "Unknown function '%s'.".format(prefixExpr.lastChild.text))

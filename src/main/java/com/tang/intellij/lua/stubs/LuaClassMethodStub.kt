@@ -135,7 +135,7 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
         val classNames = luaClassMethodStub.classes
         val shortName = luaClassMethodStub.name
         classNames.forEach {
-            LuaClassMemberIndex.indexStub(indexSink, it.className, shortName)
+            LuaClassMemberIndex.indexMemberStub(indexSink, it.className, shortName)
         }
         indexSink.occurrence(StubKeys.SHORT_NAME, shortName)
     }

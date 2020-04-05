@@ -43,12 +43,37 @@ class TyPrimitive(override val primitiveKind: TyPrimitiveKind,
     }
 
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
-        return super.contravariantOf(other, context, flags)
-                || (other is ITyPrimitive && other.primitiveKind == primitiveKind)
-                || (flags and TyVarianceFlags.STRICT_UNKNOWN == 0 && (
-                    (primitiveKind == TyPrimitiveKind.Table && (other.kind == TyKind.Array || other.kind == TyKind.Class))
-                    || (primitiveKind == TyPrimitiveKind.Function && other.kind == TyKind.Function)
-                ))
+        if (super.contravariantOf(other, context, flags)
+                || (other is ITyPrimitive && other.primitiveKind == primitiveKind)) {
+            return true
+        }
+
+        if (flags and TyVarianceFlags.STRICT_UNKNOWN == 0) {
+            if (primitiveKind == TyPrimitiveKind.Function && other.kind == TyKind.Function) {
+                return true
+            }
+
+            if (primitiveKind == TyPrimitiveKind.Table) {
+                val otherBase = if (other is ITyGeneric) other.base else other
+                return other.kind == TyKind.Array
+                        || otherBase.kind == TyKind.Class
+                        || otherBase == Ty.TABLE
+            }
+        }
+
+        return false
+    }
+
+    override fun guessMemberType(name: String, searchContext: SearchContext): ITy? {
+        return if (primitiveKind == TyPrimitiveKind.Table) {
+            Ty.UNKNOWN
+        } else super<Ty>.guessMemberType(name, searchContext)
+    }
+
+    override fun guessIndexerType(indexTy: ITy, searchContext: SearchContext): ITy? {
+        return if (primitiveKind == TyPrimitiveKind.Table) {
+            Ty.UNKNOWN
+        } else super<Ty>.guessIndexerType(indexTy, searchContext)
     }
 }
 

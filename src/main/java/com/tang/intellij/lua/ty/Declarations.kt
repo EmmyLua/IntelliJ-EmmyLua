@@ -77,7 +77,7 @@ private fun inferReturnTyInner(owner: LuaFuncBodyOwner, searchContext: SearchCon
         var type: ITy = Ty.VOID
         owner.acceptChildren(object : LuaRecursiveVisitor() {
             override fun visitReturnStat(o: LuaReturnStat) {
-                val guessReturnType = guessReturnType(o, searchContext.index, searchContext)
+                val guessReturnType = guessReturnType(o, searchContext)
                 TyUnion.each(guessReturnType) {
                     /**
                      * 注意，不能排除anonymous
@@ -137,7 +137,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
                 val nameList = localDef.nameList
                 val exprList = localDef.exprList
                 if (nameList != null && exprList != null) {
-                    type = context.withIndex(localDef.getIndexFor(this)) {
+                    type = context.withIndex(localDef.getIndexFor(this), false) {
                         exprList.guessTypeAt(context)
                     }
                 }
@@ -154,8 +154,8 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
 private fun LuaDocTagField.infer(): ITy {
     val stub = stub
     if (stub != null)
-        return stub.type
-    return ty?.getType() ?: Ty.UNKNOWN
+        return stub.valueTy
+    return valueType?.getType() ?: Ty.UNKNOWN
 }
 
 private fun LuaFuncBodyOwner.infer(context: SearchContext): ITy {
@@ -189,7 +189,7 @@ private fun inferFile(file: LuaPsiFile, context: SearchContext): ITy {
                 val statStub = stub.childrenStubs.lastOrNull { it.psi is LuaReturnStat }
                 val stat = statStub?.psi
                 if (stat is LuaReturnStat)
-                    guessReturnType(stat, 0, context)
+                    context.withIndex(0) { guessReturnType(stat, context) }
                 else null
             } else {
                 val lastChild = file.lastChild
@@ -199,7 +199,7 @@ private fun inferFile(file: LuaPsiFile, context: SearchContext): ITy {
                     false
                 }
                 if (stat != null)
-                    guessReturnType(stat, 0, context)
+                    context.withIndex(0) { guessReturnType(stat, context) }
                 else null
             }
         }

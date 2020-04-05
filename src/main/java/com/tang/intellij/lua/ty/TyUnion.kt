@@ -18,6 +18,7 @@ package com.tang.intellij.lua.ty
 
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
+import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
 
 class TyUnion : Ty(TyKind.Union) {
@@ -89,6 +90,28 @@ class TyUnion : Ty(TyKind.Union) {
         var ty: ITy = Ty.VOID
         childSet.forEach { ty = ty.union(it.substitute(substitutor)) }
         return ty
+    }
+
+    override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
+        return childSet.firstOrNull()?.findMember(name, searchContext)?.let { member ->
+            childSet.asSequence().drop(1).forEach {
+                if (it.findMember(name, searchContext) != member) {
+                    return null
+                }
+            }
+            member
+        }
+    }
+
+    override fun findIndexer(indexTy: ITy, searchContext: SearchContext): LuaClassMember? {
+        return childSet.firstOrNull()?.findIndexer(indexTy, searchContext)?.let { member ->
+            childSet.asSequence().drop(1).forEach {
+                if (it.findIndexer(indexTy, searchContext) != member) {
+                    return null
+                }
+            }
+            member
+        }
     }
 
     override fun accept(visitor: ITyVisitor) {

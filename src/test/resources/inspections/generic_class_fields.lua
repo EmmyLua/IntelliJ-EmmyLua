@@ -41,5 +41,5 @@ aString = genericC.c
 aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string'">genericC.c</error>
 
 aString = genericA.a
-aString = genericA.<error descr="No such member 'b' found on type 'GenericFieldsA<string>'">b</error>
-aString = genericA.<error descr="No such member 'c' found on type 'GenericFieldsA<string>'">c</error>
+aString = <error descr="No such member 'b' found on type 'GenericFieldsA<string>'">genericA.b</error>
+aString = <error descr="No such member 'c' found on type 'GenericFieldsA<string>'">genericA.c</error>

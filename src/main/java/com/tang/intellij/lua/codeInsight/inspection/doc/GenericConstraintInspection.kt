@@ -56,7 +56,7 @@ class GenericConstraintInspection : LocalInspectionTool() {
                         if (index < args.size) {
                             val argElement = args[index]
                             val arg = argElement.getType()
-                            val analyzedParamType = genericAnalyzer.map[param.varName]
+                            val analyzedParamType = genericAnalyzer.map[param.className]
 
                             if (analyzedParamType != null) {
                                 val varianceFlags = TyVarianceFlags.STRICT_UNKNOWN or TyVarianceFlags.ABSTRACT_PARAMS

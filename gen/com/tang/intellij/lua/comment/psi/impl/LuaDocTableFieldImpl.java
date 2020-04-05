@@ -41,15 +41,15 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   }
 
   @Override
-  @Nullable
-  public LuaDocTy getTy() {
-    return PsiTreeUtil.getChildOfType(this, LuaDocTy.class);
+  @NotNull
+  public List<LuaDocTy> getTyList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTy.class);
   }
 
   @Override
-  @NotNull
+  @Nullable
   public PsiElement getId() {
-    return notNullChild(findChildByType(ID));
+    return findChildByType(ID);
   }
 
   @Override
@@ -71,7 +71,7 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   }
 
   @Override
-  @NotNull
+  @Nullable
   public String getName() {
     return LuaDocPsiImplUtilKt.getName(this);
   }
@@ -83,6 +83,18 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   }
 
   @Override
+  @Nullable
+  public LuaDocTy getIndexType() {
+    return LuaDocPsiImplUtilKt.getIndexType(this);
+  }
+
+  @Override
+  @Nullable
+  public LuaDocTy getValueType() {
+    return LuaDocPsiImplUtilKt.getValueType(this);
+  }
+
+  @Override
   @NotNull
   public ITy guessType(@NotNull SearchContext context) {
     return LuaDocPsiImplUtilKt.guessType(this, context);
@@ -91,6 +103,12 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   @Override
   public boolean isDeprecated() {
     return LuaDocPsiImplUtilKt.isDeprecated(this);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getLbrack() {
+    return findChildByType(LBRACK);
   }
 
 }

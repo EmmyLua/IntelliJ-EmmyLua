@@ -57,6 +57,7 @@ infiniteAlias2 = infiniteAlias1
 
 
 ---@alias InfiniteGenericAlias1<T> T|InfiniteGenericAlias2<T>
+
 ---@alias InfiniteGenericAlias2<T> InfiniteGenericAlias1<T>
 
 ---@type InfiniteGenericAlias1<string>

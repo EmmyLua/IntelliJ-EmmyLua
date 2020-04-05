@@ -20,10 +20,7 @@ import com.intellij.codeInsight.documentation.DocumentationManagerUtil
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.ty.IFunSignature
-import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.ITyRenderer
+import com.tang.intellij.lua.ty.*
 
 inline fun StringBuilder.wrap(prefix: String, postfix: String, crossinline body: () -> Unit) {
     this.append(prefix)
@@ -155,7 +152,7 @@ fun renderClassDef(sb: StringBuilder, tag: LuaDocTagClass, tyRenderer: ITyRender
 
         if (superClass is ITyClass) {
             sb.appendClassLink(superClass.className)
-            superClass.params?.let { sb.append("<${it.joinToString(", ")}>") }
+            superClass.params?.let { sb.append("&lt;${it.joinToString(", ")}>") }
         } else {
             sb.append(superClass)
         }
@@ -166,8 +163,9 @@ fun renderClassDef(sb: StringBuilder, tag: LuaDocTagClass, tyRenderer: ITyRender
 }
 
 private fun renderFieldDef(sb: StringBuilder, tagField: LuaDocTagField, tyRenderer: ITyRenderer) {
-    sb.append("${tagField.name}: ")
-    renderTypeUnion(null, null, sb, tagField.ty, tyRenderer)
+    val name = tagField.name ?: "[${tagField.indexType?.getType() ?: Ty.UNKNOWN}]"
+    sb.append("${name}: ")
+    renderTypeUnion(null, null, sb, tagField.valueType, tyRenderer)
     renderCommentString(" - ", null, sb, tagField.commentString)
 }
 
