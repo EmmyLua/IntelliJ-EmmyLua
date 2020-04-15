@@ -20,6 +20,26 @@ local numberArray
 ---@type string[]
 local stringArray
 
+---@type table<string, string>
+local stringStringTable
+
+numberNumberTable[1] = 1
+numberNumberTable[1] = <error descr="Type mismatch. Required: 'number' Found: '\"a string\"'">"a string"</error>
+
+numberStringTable[1] = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+numberStringTable[1] = "a string"
+
+numberArray[1] = 1
+numberArray[1] = <error descr="Type mismatch. Required: 'number' Found: '\"a string\"'">"a string"</error>
+
+stringArray[1] = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+stringArray[1] = "a string"
+
+stringStringTable['a'] = 'a string'
+stringStringTable['a'] = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+stringStringTable.a = 'a string'
+stringStringTable.a = <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
+
 numberNumberTable = numberArray
 numberNumberTable = <error descr="Type mismatch. Required: 'table<number, number>' Found: 'string[]'">stringArray</error>
 numberArray = <error descr="Type mismatch. Required: 'number[]' Found: 'string[]'">stringArray</error>

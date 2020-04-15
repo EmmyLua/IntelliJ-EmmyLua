@@ -57,7 +57,7 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, ParameterInfoType>
             TyUnion.each(type) { ty ->
                 if (ty is ITyFunction) {
                     ty.process(Processor {
-                        if ((it.colonCall && !isColonStyle) || it.params.isNotEmpty()) {
+                        if ((it.colonCall && !isColonStyle) || it.params?.isNotEmpty() == true) {
                             list.add(ParameterInfoType(it, isColonStyle))
                         }
                         true

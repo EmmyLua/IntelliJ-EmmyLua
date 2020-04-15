@@ -108,14 +108,23 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
 
     override fun renderSignature(sb: StringBuilder, signature: IFunSignature) {
         val sig = mutableListOf<String>()
-        signature.params.forEach {
-            sig.add("${it.name}: ${render(it.ty)}")
+        val params = signature.params
+        val varargTy = signature.varargTy
+
+        if (params != null || varargTy != null) {
+            params?.forEach {
+                sig.add("${it.name}: ${render(it.ty)}")
+            }
+            varargTy?.let {
+                sig.add("...: ${render(it)}")
+            }
+            sb.append("(${sig.joinToString(", ")})")
         }
-        signature.varargTy?.let {
-            sig.add("...: ${render(it)}")
+
+        signature.returnTy?.let {
+            sb.append(": ")
+            render(it, sb)
         }
-        sb.append("(${sig.joinToString(", ")}): ")
-        render(signature.returnTy, sb)
     }
 
     open fun renderParamsList(params: Collection<String>?): String {

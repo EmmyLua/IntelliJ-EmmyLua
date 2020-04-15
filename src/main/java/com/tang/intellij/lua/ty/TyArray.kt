@@ -56,6 +56,14 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override fun acceptChildren(visitor: ITyVisitor) {
         base.accept(visitor)
     }
+
+    override fun guessIndexerType(indexTy: ITy, searchContext: SearchContext): ITy? {
+        if (Ty.NUMBER.contravariantOf(indexTy, searchContext, 0)) {
+            return base
+        }
+
+        return super<Ty>.guessIndexerType(indexTy, searchContext)
+    }
 }
 
 object TyArraySerializer : TySerializer<ITyArray>() {

@@ -161,7 +161,9 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
     }
 
     private fun visitSig(arg: IFunSignature, par: IFunSignature) {
-        warp(arg.returnTy) { par.returnTy.accept(this) }
+        arg.returnTy?.let {
+            warp(it) { par.returnTy?.accept(this) }
+        }
     }
 
     private fun warp(ty:ITy, action: () -> Unit) {

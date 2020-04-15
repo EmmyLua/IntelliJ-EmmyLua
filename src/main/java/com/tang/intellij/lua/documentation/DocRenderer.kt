@@ -42,14 +42,22 @@ fun renderTy(sb: StringBuilder, ty: ITy, tyRenderer: ITyRenderer) {
 
 fun renderSignature(sb: StringBuilder, signature: IFunSignature, tyRenderer: ITyRenderer) {
     val sig = mutableListOf<String>()
-    signature.params.forEach {
-        sig.add("${it.name}: ${tyRenderer.render(it.ty)}")
+    val params = signature.params
+    val varargTy = signature.varargTy
+
+    if (params != null || varargTy != null) {
+        params?.forEach {
+            sig.add("${it.name}: ${tyRenderer.render(it.ty)}")
+        }
+        varargTy?.let {
+            sig.add("...: ${tyRenderer.render(it)}")
+        }
+        sb.append("(${sig.joinToString(", <br>        ")})")
     }
-    signature.varargTy?.let {
-        sig.add("...: ${tyRenderer.render(it)}")
+    signature.returnTy?.let {
+        sb.append(": ")
+        tyRenderer.render(it, sb)
     }
-    sb.append("(${sig.joinToString(", <br>        ")}): ")
-    tyRenderer.render(signature.returnTy, sb)
 }
 
 fun renderComment(sb: StringBuilder, comment: LuaComment?, tyRenderer: ITyRenderer) {

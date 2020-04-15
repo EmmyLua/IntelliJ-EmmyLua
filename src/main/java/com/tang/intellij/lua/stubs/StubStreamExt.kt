@@ -38,6 +38,18 @@ fun StubInputStream.readParamInfoArray(): Array<LuaParamInfo> {
     return list.toTypedArray()
 }
 
+fun StubOutputStream.writeParamInfoArrayNullable(params: Array<LuaParamInfo>?) {
+    writeBoolean(params != null)
+    if (params != null) {
+        writeParamInfoArray(params)
+    }
+}
+
+fun StubInputStream.readParamInfoArrayNullable(): Array<LuaParamInfo>? {
+    val notNull = readBoolean()
+    return if (notNull) readParamInfoArray() else null
+}
+
 fun StubOutputStream.writeSignatures(signatures: Array<IFunSignature>) {
     writeByte(signatures.size)
     for (sig in signatures) {

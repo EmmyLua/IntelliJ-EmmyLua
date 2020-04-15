@@ -29,8 +29,8 @@ import com.tang.intellij.lua.stubs.*
 
 interface IFunSignature {
     val colonCall: Boolean
-    val returnTy: ITy
-    val params: Array<LuaParamInfo>
+    val returnTy: ITy?
+    val params: Array<LuaParamInfo>?
     val displayName: String
     val paramSignature: String
     val tyParameters: Array<TyParameter>?
@@ -57,8 +57,10 @@ fun IFunSignature.processArgs(thisTy: ITy?, colonStyle: Boolean, processor: (ind
         if (!processor(index++, pi)) return
     }
 
-    for (i in pIndex until params.size) {
-        if (!processor(index++, params[i])) return
+    params?.let {
+        for (i in pIndex until it.size) {
+            if (!processor(index++, it[i])) return
+        }
     }
 }
 
@@ -66,8 +68,11 @@ fun IFunSignature.processArgs(processor: (index:Int, param: LuaParamInfo) -> Boo
     var index = 0
     if (colonCall)
         index++
-    for (i in params.indices) {
-        if (!processor(index++, params[i])) return
+
+    params?.let {
+        for (i in it.indices) {
+            if (!processor(index++, it[i])) return
+        }
     }
 }
 
@@ -78,8 +83,10 @@ fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (i
         if (!processor(index++, pi)) return
     }
 
-    for (element in params) {
-        if (!processor(index++, element)) return
+    params?.let {
+        for (element in it) {
+            if (!processor(index++, element)) return
+        }
     }
 }
 
@@ -93,7 +100,7 @@ fun IFunSignature.getFirstParam(thisTy: ITy?, colonStyle: Boolean): LuaParamInfo
 }
 
 fun IFunSignature.getParamTy(index: Int): ITy {
-    val info = params.getOrNull(index)
+    val info = params?.getOrNull(index)
     return info?.ty ?: Ty.UNKNOWN
 }
 
@@ -105,109 +112,115 @@ fun IFunSignature.hasVarargs(): Boolean {
 fun IFunSignature.isGeneric() = tyParameters?.isNotEmpty() == true
 
 abstract class FunSignatureBase(override val colonCall: Boolean,
-                                override val params: Array<LuaParamInfo>,
+                                override val params: Array<LuaParamInfo>?,
                                 override val tyParameters: Array<TyParameter>? = null
 ) : IFunSignature {
     override fun equals(other: Any?): Boolean {
         if (other is IFunSignature) {
             return colonCall == other.colonCall
-                    && params.contentEquals(other.params)
+                    && params?.let { other.params?.contentEquals(it) ?: false } ?: (other.params == null)
                     && tyParameters?.let { other.tyParameters?.contentEquals(it) ?: false } ?: (other.tyParameters == null)
+                    && returnTy == other.returnTy
+                    && varargTy == other.varargTy
         }
         return false
     }
 
     override fun hashCode(): Int {
         var code = if (colonCall) 1 else 0
-        params.forEach {
+        params?.forEach {
             code = code * 31 + it.hashCode()
         }
         tyParameters?.forEach {
             code = code * 31 + it.hashCode()
         }
+        code = code * 31 + (returnTy?.hashCode() ?: 0)
+        code = code * 31 + (varargTy?.hashCode() ?: 0)
         return code
     }
 
     override val displayName: String by lazy {
-        val paramSB = mutableListOf<String>()
-        params.forEach {
-            paramSB.add(it.name + ":" + it.ty.displayName)
-        }
-        "fun(${paramSB.joinToString(", ")}):${returnTy.displayName}"
+        val paramsText = params?.map {
+            it.name + ":" + it.ty.displayName
+        }?.let { "(${it.joinToString(", ")})" } ?: ""
+        "fun${paramsText}${returnTy?.let {": " + it.displayName}}"
     }
 
     override val paramSignature: String get() {
-        val list = arrayOfNulls<String>(params.size)
-        for (i in params.indices) {
-            val lpi = params[i]
-            list[i] = lpi.name
-        }
-        return "(" + list.joinToString(", ") + ")"
+        return params?.let {
+            val list = arrayOfNulls<String>(it.size)
+            for (i in it.indices) {
+                val lpi = it[i]
+                list[i] = lpi.name
+            }
+            return "(" + list.joinToString(", ") + ")"
+        } ?: ""
     }
 
     override fun substitute(substitutor: ITySubstitutor): IFunSignature {
-        val list = params.map { it.substitute(substitutor) }
+        val list = params?.map { it.substitute(substitutor) }
         return FunSignature(colonCall,
-                returnTy.substitute(substitutor),
+                returnTy?.substitute(substitutor),
                 varargTy?.substitute(substitutor),
-                list.toTypedArray(),
+                list?.toTypedArray(),
                 tyParameters)
     }
 
     override fun contravariantOf(other: IFunSignature, context: SearchContext, flags: Int): Boolean {
-        for (i in other.params.indices) {
-            val param = params.getOrNull(i) ?: return false
-            val otherParam = other.params[i]
-            if (!otherParam.ty.contravariantOf(param.ty, context, flags)) {
+        params?.let {
+            val otherParams = other.params
+
+            if (otherParams == null) {
                 return false
+            }
+
+            for (i in otherParams.indices) {
+                val param = it.getOrNull(i) ?: return false
+                val otherParam = otherParams[i]
+                if (!otherParam.ty.contravariantOf(param.ty, context, flags)) {
+                    return false
+                }
             }
         }
 
-        return returnTy.contravariantOf(other.returnTy, context, flags)
+        val otherReturnTy = other.returnTy
+
+        return if (otherReturnTy != null) {
+            returnTy?.contravariantOf(otherReturnTy, context, flags) ?: true
+        } else returnTy == null
     }
 }
 
 class FunSignature(colonCall: Boolean,
-                   override val returnTy: ITy,
+                   override val returnTy: ITy?,
                    override val varargTy: ITy?,
-                   params: Array<LuaParamInfo>,
+                   params: Array<LuaParamInfo>?,
                    tyParameters: Array<TyParameter>? = null
 ) : FunSignatureBase(colonCall, params, tyParameters) {
 
     companion object {
-        private fun initParams(func: LuaDocFunctionTy): Array<LuaParamInfo> {
-            val list = mutableListOf<LuaParamInfo>()
-            func.functionParamList.forEach {
-                val p = LuaParamInfo()
-                p.name = it.id.text
-                p.ty = it.ty?.getType() ?: Ty.UNKNOWN
-                list.add(p)
-            }
-            return list.toTypedArray()
-        }
-
         fun create(colonCall: Boolean, functionTy: LuaDocFunctionTy): IFunSignature {
             return FunSignature(
                     colonCall,
                     functionTy.returnType,
-                    functionTy.varargParam?.type,
-                    initParams(functionTy),
+                    functionTy.varargParam,
+                    functionTy.params,
                     functionTy.genericDefList.map { TyParameter(it) }.toTypedArray()
             )
         }
 
         fun serialize(sig: IFunSignature, stream: StubOutputStream) {
             stream.writeBoolean(sig.colonCall)
-            Ty.serialize(sig.returnTy, stream)
+            stream.writeTyNullable(sig.returnTy)
             stream.writeTyNullable(sig.varargTy)
-            stream.writeParamInfoArray(sig.params)
+            stream.writeParamInfoArrayNullable(sig.params)
         }
 
         fun deserialize(stream: StubInputStream): IFunSignature {
             val colonCall = stream.readBoolean()
-            val ret = Ty.deserialize(stream)
+            val ret = stream.readTyNullable()
             val varargTy = stream.readTyNullable()
-            val params = stream.readParamInfoArray()
+            val params = stream.readParamInfoArrayNullable()
             return FunSignature(colonCall, ret, varargTy, params)
         }
     }
@@ -232,7 +245,8 @@ fun ITyFunction.process(processor: Processor<IFunSignature>) {
 fun ITyFunction.findCandidateSignatures(nArgs: Int): Collection<IFunSignature> {
     val candidates = mutableListOf<IFunSignature>()
     process(Processor {
-        if (it.params.size >= nArgs  || it.varargTy != null) {
+        val params = it.params
+        if (params == null || params.size >= nArgs || it.varargTy != null) {
             candidates.add(it)
         }
         true

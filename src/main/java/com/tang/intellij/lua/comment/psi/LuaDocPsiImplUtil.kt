@@ -33,10 +33,7 @@ import com.tang.intellij.lua.comment.reference.LuaDocParamNameReference
 import com.tang.intellij.lua.comment.reference.LuaDocSeeReference
 import com.tang.intellij.lua.lang.type.LuaNumber
 import com.tang.intellij.lua.lang.type.LuaString
-import com.tang.intellij.lua.psi.LuaClassMember
-import com.tang.intellij.lua.psi.LuaElementFactory
-import com.tang.intellij.lua.psi.LuaPsiTreeUtil
-import com.tang.intellij.lua.psi.Visibility
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import javax.swing.Icon
@@ -290,15 +287,29 @@ fun getType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
     return TyDocPsiFunction(luaDocFunctionTy)
 }
 
-fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy {
-    val list = luaDocFunctionTy.typeList?.tyList?.map { it.getType() }
-    val variadic = luaDocFunctionTy.varreturn != null
+fun getParams(luaDocFunctionTy: LuaDocFunctionTy): Array<LuaParamInfo>? {
+    return luaDocFunctionTy.functionParams?.let  {
+        it.functionParamList.map {
+            LuaParamInfo(it.id.text, it.ty?.getType() ?: Ty.UNKNOWN)
+        }.toTypedArray()
+    }
+}
 
-    return when {
-        list == null -> Ty.VOID
-        list.isEmpty() -> Ty.VOID
-        list.size == 1 && !variadic -> list.first()
-        else -> TyMultipleResults(list, variadic)
+fun getVarargParam(luaDocFunctionTy: LuaDocFunctionTy): ITy? {
+    return luaDocFunctionTy.functionParams?.varargParam?.type
+}
+
+fun getReturnType(luaDocFunctionTy: LuaDocFunctionTy): ITy? {
+    return luaDocFunctionTy.functionReturnList?.let {
+        val list = it.typeList?.tyList?.map { it.getType() }
+        val variadic = it.varreturn != null
+
+        return when {
+            list == null -> null
+            list.isEmpty() -> null
+            list.size == 1 && !variadic -> list.first()
+            else -> TyMultipleResults(list, variadic)
+        }
     }
 }
 

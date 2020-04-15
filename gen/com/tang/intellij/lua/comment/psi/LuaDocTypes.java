@@ -16,6 +16,8 @@ public interface LuaDocTypes {
   IElementType CLASS_REF = LuaParserDefinitionKt.createDocType("CLASS_REF");
   IElementType COMMENT_STRING = LuaParserDefinitionKt.createDocType("COMMENT_STRING");
   IElementType FUNCTION_PARAM = LuaParserDefinitionKt.createDocType("FUNCTION_PARAM");
+  IElementType FUNCTION_PARAMS = LuaParserDefinitionKt.createDocType("FUNCTION_PARAMS");
+  IElementType FUNCTION_RETURN_LIST = LuaParserDefinitionKt.createDocType("FUNCTION_RETURN_LIST");
   IElementType FUNCTION_TY = LuaParserDefinitionKt.createDocType("FUNCTION_TY");
   IElementType GENERAL_TY = LuaParserDefinitionKt.createDocType("GENERAL_TY");
   IElementType GENERIC_DEF = LuaParserDefinitionKt.createDocType("GENERIC_DEF");
@@ -125,6 +127,12 @@ public interface LuaDocTypes {
       }
       else if (type == FUNCTION_PARAM) {
         return new LuaDocFunctionParamImpl(node);
+      }
+      else if (type == FUNCTION_PARAMS) {
+        return new LuaDocFunctionParamsImpl(node);
+      }
+      else if (type == FUNCTION_RETURN_LIST) {
+        return new LuaDocFunctionReturnListImpl(node);
       }
       else if (type == FUNCTION_TY) {
         return new LuaDocFunctionTyImpl(node);

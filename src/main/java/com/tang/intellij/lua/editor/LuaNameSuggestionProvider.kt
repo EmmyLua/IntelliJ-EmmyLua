@@ -80,7 +80,7 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
                         TyUnion.each(ty) { iTy ->
                             if (iTy is ITyFunction) {
                                 iTy.process(Processor { sig ->
-                                    sig.params.getOrNull(paramIndex)?.let { paramInfo ->
+                                    sig.params?.getOrNull(paramIndex)?.let { paramInfo ->
                                         set.add(paramInfo.name)
                                     }
                                     return@Processor false

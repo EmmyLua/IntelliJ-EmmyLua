@@ -65,6 +65,10 @@ class TypeSafetyTest : LuaInspectionsTestBase(
         checkByFile("function_multiple_returns.lua", true, false, true)
     }
 
+    fun testFunctionPartiallyTyped() {
+        checkByFile("function_partially_typed.lua")
+    }
+
     fun testGenericAlias() {
         // TODO: There's a bug in IntelliJ's XML descr attribute parsing. Once fixed we should add descr.
         checkByFile("generic_alias.lua")

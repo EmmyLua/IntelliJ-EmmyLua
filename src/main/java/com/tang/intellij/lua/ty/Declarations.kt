@@ -290,7 +290,7 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                     if (returnTy is TyMultipleResults) {
                         result = result.union(returnTy.list.getOrElse(paramIndex) { Ty.UNKNOWN })
                     } else if (paramIndex == 0) {
-                        result = result.union(returnTy)
+                        result = result.union(returnTy ?: Ty.UNKNOWN)
                     }
                 }
             }

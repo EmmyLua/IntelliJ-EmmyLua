@@ -574,6 +574,50 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // '(' function_param_list? ')'
+  public static boolean function_params(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_params")) return false;
+    if (!nextTokenIs(b, LPAREN)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, FUNCTION_PARAMS, null);
+    r = consumeToken(b, LPAREN);
+    p = r; // pin = 1
+    r = r && report_error_(b, function_params_1(b, l + 1));
+    r = p && consumeToken(b, RPAREN) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // function_param_list?
+  private static boolean function_params_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_params_1")) return false;
+    function_param_list(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // ':' type_list '...'?
+  public static boolean function_return_list(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_return_list")) return false;
+    if (!nextTokenIs(b, EXTENDS)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, FUNCTION_RETURN_LIST, null);
+    r = consumeToken(b, EXTENDS);
+    p = r; // pin = 1
+    r = r && report_error_(b, type_list(b, l + 1));
+    r = p && function_return_list_2(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // '...'?
+  private static boolean function_return_list_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_return_list_2")) return false;
+    consumeToken(b, ELLIPSIS);
+    return true;
+  }
+
+  /* ********************************************************** */
   // ID (EXTENDS class_ref)?
   public static boolean generic_def(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "generic_def")) return false;
@@ -1311,7 +1355,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // fun function_generic? '(' function_param_list ')' (':' type_list ELLIPSIS?)?
+  // fun function_generic? function_params? function_return_list?
   public static boolean function_ty(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "function_ty")) return false;
     if (!nextTokenIsSmart(b, FUN)) return false;
@@ -1320,10 +1364,8 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     r = consumeTokenSmart(b, FUN);
     p = r; // pin = 1
     r = r && report_error_(b, function_ty_1(b, l + 1));
-    r = p && report_error_(b, consumeToken(b, LPAREN)) && r;
-    r = p && report_error_(b, function_param_list(b, l + 1)) && r;
-    r = p && report_error_(b, consumeToken(b, RPAREN)) && r;
-    r = p && function_ty_5(b, l + 1) && r;
+    r = p && report_error_(b, function_ty_2(b, l + 1)) && r;
+    r = p && function_ty_3(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1335,29 +1377,17 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // (':' type_list ELLIPSIS?)?
-  private static boolean function_ty_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "function_ty_5")) return false;
-    function_ty_5_0(b, l + 1);
+  // function_params?
+  private static boolean function_ty_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_ty_2")) return false;
+    function_params(b, l + 1);
     return true;
   }
 
-  // ':' type_list ELLIPSIS?
-  private static boolean function_ty_5_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "function_ty_5_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, EXTENDS);
-    r = r && type_list(b, l + 1);
-    r = r && function_ty_5_0_2(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // ELLIPSIS?
-  private static boolean function_ty_5_0_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "function_ty_5_0_2")) return false;
-    consumeTokenSmart(b, ELLIPSIS);
+  // function_return_list?
+  private static boolean function_ty_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "function_ty_3")) return false;
+    function_return_list(b, l + 1);
     return true;
   }
 

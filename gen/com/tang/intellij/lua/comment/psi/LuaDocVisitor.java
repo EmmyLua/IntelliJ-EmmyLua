@@ -5,8 +5,8 @@ import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
 import com.tang.intellij.lua.psi.LuaClassField;
 import com.intellij.psi.PsiNameIdentifierOwner;
-import com.tang.intellij.lua.psi.LuaClass;
 import com.tang.intellij.lua.psi.LuaTypeAlias;
+import com.tang.intellij.lua.psi.LuaClass;
 
 public class LuaDocVisitor extends PsiElementVisitor {
 
@@ -35,6 +35,14 @@ public class LuaDocVisitor extends PsiElementVisitor {
   }
 
   public void visitFunctionParam(@NotNull LuaDocFunctionParam o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFunctionParams(@NotNull LuaDocFunctionParams o) {
+    visitPsiElement(o);
+  }
+
+  public void visitFunctionReturnList(@NotNull LuaDocFunctionReturnList o) {
     visitPsiElement(o);
   }
 

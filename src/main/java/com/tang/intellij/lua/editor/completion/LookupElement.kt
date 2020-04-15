@@ -114,7 +114,7 @@ class TyFunctionLookupElement(name: String,
         typeText = signature.returnTy.displayName
     }*/
 
-    private val lazyTypeText by lazy { signature.returnTy.displayName }
+    private val lazyTypeText by lazy { signature.returnTy?.displayName }
 
     override fun getTypeText() = lazyTypeText
 
@@ -132,7 +132,7 @@ class TyFunctionLookupElement(name: String,
     override fun getItemText() = myItemString ?: lazyItemText
 
     override fun hashCode(): Int {
-        return super.hashCode() * 31 * (signature.params.size + 1)
+        return super.hashCode() * 31 * ((signature.params?.size ?: 0) + 1)
     }
 
     /**

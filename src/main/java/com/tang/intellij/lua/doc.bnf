@@ -197,11 +197,21 @@ private function_param_list::= (function_param ',')* ((function_param|vararg_par
 private function_generic ::= '<' generic_def (',' generic_def)* '>' {
     pin = 1
 }
-function_ty ::= fun function_generic? '(' function_param_list ')' (':' type_list ELLIPSIS?)? {
+function_params ::= '(' function_param_list? ')' {
+    pin = 1
+}
+function_return_list ::= ':' type_list '...'? {
+    pin = 1
+    methods = [
+        varreturn = 'ELLIPSIS'
+    ]
+}
+function_ty ::= fun function_generic? function_params? function_return_list? {
     methods = [
         getType
+        getParams
+        getVarargParam
         getReturnType
-        varreturn = 'ELLIPSIS'
     ]
     pin = 1
 }

@@ -213,7 +213,7 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
 
 private fun LuaCallExpr.getReturnTy(sig: IFunSignature, context: SearchContext): ITy {
     val substitutor = createSubstitutor(sig, context)
-    val returnTy = sig.returnTy.substitute(substitutor)
+    val returnTy = sig.returnTy?.substitute(substitutor) ?: Ty.UNKNOWN
     return if (returnTy is TyMultipleResults) {
         if (context.supportsMultipleResults)
             returnTy
