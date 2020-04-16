@@ -79,7 +79,7 @@ class FindMethodUsagesHandler(val methodDef: LuaClassMethod) : FindUsagesHandler
         return arr.toTypedArray()
     }
 
-    override fun processElementUsages(element: PsiElement, processor: Processor<in UsageInfo>, options: FindUsagesOptions): Boolean {
+    override fun processElementUsages(element: PsiElement, processor: Processor<UsageInfo>, options: FindUsagesOptions): Boolean {
         if (super.processElementUsages(element, processor, options)) {
             ApplicationManager.getApplication().runReadAction {
                 val query = MergeQuery(LuaOverridingMethodsSearch.search(methodDef), LuaOverridenMethodsSearch.search(methodDef))

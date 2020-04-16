@@ -15,8 +15,8 @@
  */
 def versions = [:]
 versions["201"] = [
-    ideaSDKVersion: "IC-201.6487.11-EAP-SNAPSHOT",
-    sinceBuild: "193",
+    ideaSDKVersion: "IC-201.6668.121",
+    sinceBuild: "201",
     untilBuild: "201.*",
     archiveName: "IntelliJ-EmmyLua"
 ]
