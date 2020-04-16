@@ -96,7 +96,7 @@
     ]]>
     </change-notes>
     <idea-version since-build="172" until-build="201.*"/>
-    <xi:include href="core.xml" xpointer="xpointer(/idea-plugin/*)"/>
+    <xi:include href="emmylua-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <extensions defaultExtensionNs="com.intellij">
     </extensions>
 </idea-plugin>

@@ -52,7 +52,7 @@ versions.each { shortVer, cfg ->
     task "build_${shortVer}"(type: GradleBuild) {
         //temporarily remove the "test" task for 201-EAP
         //see https://youtrack.jetbrains.com/issue/IDEA-232880
-        tasks = ["buildPluginWithBunch"]
+        tasks = ["buildPluginWithBunch", "test"]
         buildFile = 'build_plugin.gradle'
         startParameter.setProjectProperties([
             "IDEA_VER": shortVer
