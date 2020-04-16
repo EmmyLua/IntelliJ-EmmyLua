@@ -17,7 +17,7 @@ coroutine = {}
 ---
 --- Creates a new coroutine, with body `f`. `f` must be a Lua function. Returns
 --- this new coroutine, an object with type `"thread"`.
----@param f fun():thread
+---@param f fun
 ---@return thread
 function coroutine.create(f) end
 
@@ -40,16 +40,15 @@ function coroutine.isyieldable() end
 --- values passed to `yield` (when the coroutine yields) or any values returned
 --- by the body function (when the coroutine terminates). If there is any error,
 --- `resume` returns **false** plus the error message.
----@overload fun(co:thread):boolean|any
 ---@param co thread
----@param val1 string
----@return thread|any
-function coroutine.resume(co, val1, ...) end
+---@vararg any
+---@return boolean, any...
+function coroutine.resume(co, ...) end
 
 ---
 --- Returns the running coroutine plus a boolean, true when the running
 --- coroutine is the main one.
----@return thread|boolean
+---@return thread, boolean
 function coroutine.running() end
 
 ---
@@ -60,7 +59,7 @@ function coroutine.running() end
 --- is, it has resumed another coroutine); and "`dead`" if the coroutine has
 --- finished its body function, or if it has stopped with an error.
 ---@param co thread
----@return string
+---@return "running" | "suspended" | "normal" | "dead"
 function coroutine.status(co) end
 
 ---
@@ -69,12 +68,13 @@ function coroutine.status(co) end
 --- passed to the function behave as the extra arguments to `resume`. Returns
 --- the same values returned by `resume`, except the first
 --- boolean. In case of error, propagates the error.
----@param f fun():thread
----@return fun():any
+---@param f fun
+---@return fun
 function coroutine.wrap(f) end
 
 ---
 --- Suspends the execution of the calling coroutine. Any arguments to `yield`
 --- are passed as extra results to `resume`.
----@return any
+---@vararg any
+---@return any...
 function coroutine.yield(...) end
