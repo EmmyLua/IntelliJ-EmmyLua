@@ -30,4 +30,8 @@ abstract class LuaConfigurationFactory(type: ConfigurationType) : ConfigurationF
         if ("Make" == providerID?.toString())
             task?.isEnabled = false
     }
+
+    override fun getId(): String {
+        return name
+    }
 }
