@@ -31,6 +31,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocTagOverload
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
+import com.tang.intellij.lua.search.GuardType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -112,8 +113,10 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
 }
 
 fun LuaExpr.shouldBe(context: SearchContext): ITy {
-    val ty = shouldBeInternal(context)
-    return TyAliasSubstitutor.substitute(ty, context)
+    return context.withInferenceGuard(this) {
+        val ty = shouldBeInternal(context)
+        TyAliasSubstitutor.substitute(ty, context)
+    }
 }
 
 /**

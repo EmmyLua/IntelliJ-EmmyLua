@@ -22,7 +22,8 @@ import com.tang.intellij.lua.psi.LuaNameExpr
 enum class GuardType {
     Unknown,
     GlobalName,
-    RecursionCall
+    RecursionCall,
+    Inference
 }
 
 open class InferRecursionGuard(val psi: PsiElement) {

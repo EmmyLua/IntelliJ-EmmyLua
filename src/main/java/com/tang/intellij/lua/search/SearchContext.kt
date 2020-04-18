@@ -169,11 +169,18 @@ class SearchContext {
         return ret
     }
 
-    fun withRecursionGuard(psi: PsiElement, type: GuardType, action: () -> ITy): ITy {
+    private fun guardExists(psi: PsiElement, type: GuardType): Boolean {
         myGuardList.forEach {
             if (it.check(psi, type)) {
-                return Ty.UNKNOWN
+                return true
             }
+        }
+        return false
+    }
+
+    fun withRecursionGuard(psi: PsiElement, type: GuardType, action: () -> ITy): ITy {
+        if (guardExists(psi, type)) {
+            return Ty.UNKNOWN
         }
         val guard = createGuard(psi, type)
         if (guard != null)
@@ -184,7 +191,21 @@ class SearchContext {
         return result
     }
 
+    fun withInferenceGuard(psi: PsiElement, action: () -> ITy): ITy {
+        val guard = createGuard(psi, GuardType.Inference)
+        if (guard != null)
+            myGuardList.add(guard)
+        val result = action()
+        if (guard != null)
+            myGuardList.remove(guard)
+        return result
+    }
+
     private fun inferAndCache(psi: LuaTypeGuessable): ITy {
+        if (guardExists(psi, GuardType.Inference)) {
+            return Ty.UNKNOWN
+        }
+
         return if (index == -1) {
             myInferCache.getOrPut(psi) {
                 ILuaTypeInfer.infer(psi, this)
