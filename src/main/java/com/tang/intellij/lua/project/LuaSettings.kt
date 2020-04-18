@@ -56,11 +56,6 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     var additionalSourcesRoot = arrayOf<String>()
 
     /**
-     * 使用泛型
-     */
-    var enableGeneric: Boolean = false
-
-    /**
      * (KB)
      */
     var tooLargerFileThreshold = 1024

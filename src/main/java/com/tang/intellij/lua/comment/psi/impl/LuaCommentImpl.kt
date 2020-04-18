@@ -169,9 +169,6 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
     }
 
     override fun createSubstitutor(): ITySubstitutor? {
-        if (!LuaSettings.instance.enableGeneric)
-            return null
-
         val list = findTags(LuaDocGenericDef::class.java)
         val map = mutableMapOf<String, LuaDocGenericDef>()
         for (genericDef in list) {

@@ -68,14 +68,6 @@
               <text resource-bundle="LuaBundle" key="ui.settings.strict_doc"/>
             </properties>
           </component>
-          <component id="e20f9" class="javax.swing.JCheckBox" binding="enableGenericCheckBox" default-binding="true">
-            <constraints>
-              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="LuaBundle" key="ui.settings.enable_generic"/>
-            </properties>
-          </component>
           <component id="f71e8" class="javax.swing.JTextField" binding="requireFunctionNames">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
