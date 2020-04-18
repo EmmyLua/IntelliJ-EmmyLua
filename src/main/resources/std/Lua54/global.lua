@@ -300,7 +300,7 @@ function tostring(v) end
 --- "`number`", "`string`", "`boolean`", "`table`", "`function`", "`thread`",
 --- and "`userdata`".
 ---@param v any
----@return string
+---@return "nil" | "number" | "string" | "boolean" | "table" | "function" | "thread" | "userdata"
 function type(v) end
 
 ---
