@@ -33,6 +33,7 @@ interface LuaClassMember : LuaTypeGuessable, PsiNamedElement {
     val visibility: Visibility
     val isDeprecated: Boolean
 
+    @JvmDefault
     val indexType: LuaDocTy?
         get() = null
 }
