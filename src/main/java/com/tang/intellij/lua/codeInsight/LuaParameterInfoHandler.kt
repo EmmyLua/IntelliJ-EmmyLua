@@ -52,17 +52,16 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, ParameterInfoType>
         if (luaArgs != null) {
             val callExpr = luaArgs.parent as LuaCallExpr
             val isColonStyle = callExpr.isMethodColonCall
-            val type = callExpr.guessParentType(SearchContext.get(context.project))
+            val searchContext = SearchContext.get(context.project)
+            val type = callExpr.guessParentType(searchContext)
             val list = mutableListOf<ParameterInfoType>()
             TyUnion.each(type) { ty ->
-                if (ty is ITyFunction) {
-                    ty.process(Processor {
-                        if ((it.colonCall && !isColonStyle) || it.params?.isNotEmpty() == true) {
-                            list.add(ParameterInfoType(it, isColonStyle))
-                        }
-                        true
-                    })
-                }
+                ty.processSignatures(searchContext, Processor {
+                    if ((it.colonCall && !isColonStyle) || it.params?.isNotEmpty() == true) {
+                        list.add(ParameterInfoType(it, isColonStyle))
+                    }
+                    true
+                })
             }
             context.itemsToShow = list.toTypedArray()
         }

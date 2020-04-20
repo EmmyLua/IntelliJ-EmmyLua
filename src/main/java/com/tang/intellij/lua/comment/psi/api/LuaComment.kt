@@ -20,6 +20,7 @@ import com.intellij.psi.PsiComment
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.psi.LuaCommentOwner
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITySubstitutor
 
@@ -40,6 +41,7 @@ interface LuaComment : PsiComment, LuaDocPsiElement {
     val tagClass: LuaDocTagClass?
     val tagType: LuaDocTagType?
     val tagReturn: LuaDocTagReturn?
+    val overloads: Array<IFunSignature>?
     fun guessType(context: SearchContext): ITy
     fun isOverride(): Boolean
     fun createSubstitutor(): ITySubstitutor?

@@ -101,7 +101,7 @@ class TyFunctionLookupElement(name: String,
                               private val signature: IFunSignature,
                               bold: Boolean,
                               colonStyle: Boolean,
-                              val ty: ITyFunction,
+                              val ty: ITy,
                               icon: Icon
 ) : LuaLookupElement(name, bold, icon) {
     /*init {

@@ -147,8 +147,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
         val className = thisType.displayName
         if (type is ITyFunction) {
             val fn = type.substitute(TySelfSubstitutor(context, null, callType))
-            if (fn is ITyFunction)
-                addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, fn, thisType, callType, handlerProcessor)
+            addFunction(completionResultSet, bold, completionMode != MemberCompletionMode.Dot, className, member, fn, thisType, callType, handlerProcessor)
         } else if (member is LuaClassField && completionMode != MemberCompletionMode.Colon) {
             var fieldType = type
 
@@ -179,23 +178,24 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                             isColonStyle: Boolean,
                             clazzName: String,
                             classMember: LuaClassMember,
-                            fnTy: ITyFunction,
+                            ty: ITy,
                             thisType: ITy,
                             callType: ITy,
                             handlerProcessor: HandlerProcessor?) {
         val name = classMember.name
         if (name != null) {
-            fnTy.process(Processor {
+            val context = SearchContext.get(classMember.project)
+
+            ty.processSignatures(context, Processor {
 
                 val firstParam = it.getFirstParam(thisType, isColonStyle)
                 if (isColonStyle) {
                     if (firstParam == null) return@Processor true
-                    val context = SearchContext.get(classMember.project)
                     if (!firstParam.ty.contravariantOf(callType, context, TyVarianceFlags.STRICT_UNKNOWN))
                         return@Processor true
                 }
 
-                val lookupString = handlerProcessor?.processLookupString(name, classMember, fnTy) ?: name
+                val lookupString = handlerProcessor?.processLookupString(name, classMember, ty) ?: name
 
                 val element = LookupElementFactory.createMethodLookupElement(clazzName,
                         lookupString,
@@ -203,9 +203,9 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                         it,
                         bold,
                         isColonStyle,
-                        fnTy,
+                        ty,
                         LuaIcons.CLASS_METHOD)
-                val ele = handlerProcessor?.process(element, classMember, fnTy) ?: element
+                val ele = handlerProcessor?.process(element, classMember, ty) ?: element
                 completionResultSet.addElement(ele)
                 true
             })

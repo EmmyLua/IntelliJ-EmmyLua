@@ -1,4 +1,5 @@
 ---@class LambdaClass
+---@overload fun(a: number): LambdaClass
 local LambdaClass = {}
 
 setmetatable(LambdaClass,  {
@@ -8,14 +9,16 @@ setmetatable(LambdaClass,  {
 
         ---@return number
         function self.getNumber()
-            return 1
+            return a
         end
 
         return self
     end
 })
 
-local lambdaClass = LambdaClass()
+local missingArg = LambdaClass(<error descr="Missing argument: a: number">)</error>
+local wrongArg = LambdaClass(<error descr="Type mismatch. Required: 'number' Found: '\"one\"'">"one"</error>)
+local lambdaClass = LambdaClass(1)
 
 ---@type number
 local aNumber = lambdaClass.getNumber()

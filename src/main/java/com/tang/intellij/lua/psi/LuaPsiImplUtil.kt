@@ -146,13 +146,17 @@ fun guessParentType(classMethodDef: LuaClassMethodDef, context: SearchContext): 
 }
 
 fun guessParentType(luaClosureExpr: LuaClosureExpr, context: SearchContext): ITy {
-    val grandParent = luaClosureExpr.parent.parent
+    (luaClosureExpr.parent as? LuaTableField)?.let { tableField ->
+        return tableField.guessParentType(context)
+    }
 
-    if (grandParent is LuaAssignStat && grandParent.varExprList.exprList.size == 1) {
-        val expr = grandParent.varExprList.exprList[0]
+    (luaClosureExpr.parent.parent as? LuaAssignStat)?.let { assignment ->
+        if (assignment.varExprList.exprList.size == 1) {
+            val expr = assignment.varExprList.exprList[0]
 
-        if (expr is LuaIndexExpr) {
-            return guessParentType(expr, context)
+            if (expr is LuaIndexExpr) {
+                return expr.guessParentType(context)
+            }
         }
     }
 

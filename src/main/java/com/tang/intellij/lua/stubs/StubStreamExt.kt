@@ -66,6 +66,18 @@ fun StubInputStream.readSignatures(): Array<IFunSignature> {
     return arr.toTypedArray()
 }
 
+fun StubOutputStream.writeSignaturesNullable(signatures: Array<IFunSignature>?) {
+    writeBoolean(signatures != null)
+    if (signatures != null) {
+        writeSignatures(signatures)
+    }
+}
+
+fun StubInputStream.readSignatureNullable(): Array<IFunSignature>? {
+    val notNull = readBoolean()
+    return if (notNull) readSignatures() else null
+}
+
 fun StubInputStream.readTyNullable(): ITy? {
     val notNull = readBoolean()
     return if (notNull) Ty.deserialize(this) else null

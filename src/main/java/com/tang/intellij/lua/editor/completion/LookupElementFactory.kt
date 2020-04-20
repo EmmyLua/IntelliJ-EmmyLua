@@ -27,7 +27,6 @@ import com.tang.intellij.lua.psi.LuaPsiElement
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyFunction
 import javax.swing.Icon
 
 class LookupElementFactory {
@@ -45,7 +44,7 @@ class LookupElementFactory {
                                         psi: LuaPsiElement,
                                         signature: IFunSignature,
                                         bold: Boolean,
-                                        ty: ITyFunction,
+                                        ty: ITy,
                                         icon: Icon): LookupElement {
             val le = TyFunctionLookupElement(name, psi, signature, bold, false, ty, icon)
             le.handler = SignatureInsertHandler(signature)
@@ -58,14 +57,14 @@ class LookupElementFactory {
                                       signature: IFunSignature,
                                       bold: Boolean,
                                       isColonStyle: Boolean,
-                                      fnTy: ITyFunction,
+                                      ty: ITy,
                                       icon: Icon): LuaLookupElement {
             val element = TyFunctionLookupElement(lookupString,
                     classMember,
                     signature,
                     bold,
                     isColonStyle,
-                    fnTy,
+                    ty,
                     classMember.visibility.warpIcon(icon))
 
             if (clazzName == Constants.WORD_STRING)
@@ -84,7 +83,7 @@ class LookupElementFactory {
         fun createFieldLookupElement(clazzName: String,
                                      name: String,
                                      field: LuaClassField,
-                                     type:ITy?,
+                                     type: ITy?,
                                      bold: Boolean): LuaLookupElement {
             val element = LuaFieldLookupElement(name, field, type, bold)
             if (!LuaRefactoringUtil.isLuaIdentifier(name)) {

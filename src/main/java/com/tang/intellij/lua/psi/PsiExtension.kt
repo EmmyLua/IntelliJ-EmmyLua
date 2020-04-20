@@ -31,7 +31,6 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocTagOverload
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
-import com.tang.intellij.lua.search.GuardType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
@@ -85,7 +84,7 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
             var ret: ITy = Ty.VOID
             fTy.each {
                 if (it is ITyFunction) {
-                    var sig = it.matchSignature(p2, context)?.signature ?: it.mainSignature
+                    var sig = it.matchSignature(context, p2)?.signature ?: it.mainSignature
                     val substitutor = p2.createSubstitutor(sig, context)
                     sig = sig.substitute(substitutor)
                     ret = ret.union(sig.getParamTy(idx))
@@ -277,20 +276,7 @@ val LuaFuncBodyOwner.overloads: Array<IFunSignature> get() {
         }
     }
 
-    val list = mutableListOf<IFunSignature>()
-    if (this is LuaCommentOwner) {
-        val comment = comment
-        if (comment != null) {
-            val children = PsiTreeUtil.findChildrenOfAnyType(comment, LuaDocTagOverload::class.java)
-            val colonCall = this is LuaClassMethodDef && !this.isStatic
-            children.forEach {
-                val fty = it.functionTy
-                if (fty != null)
-                    list.add(FunSignature.create(colonCall, fty))
-            }
-        }
-    }
-    return list.toTypedArray()
+    return (this as? LuaCommentOwner)?.comment?.overloads ?: arrayOf()
 }
 
 val LuaFuncBodyOwner.tyParams: Array<TyParameter>? get() {
@@ -371,6 +357,10 @@ val LuaComment.docTy: ITy? get() {
 val LuaComment.ty: ITy? get() {
     val cls = tagClass?.type
     return cls ?: tagType?.type
+}
+
+val LuaDocTagClass.overloads: Array<IFunSignature>? get() {
+    return LuaCommentUtil.findOwner(this)?.comment?.overloads
 }
 
 val LuaDocTagClass.aliasName: String? get() {

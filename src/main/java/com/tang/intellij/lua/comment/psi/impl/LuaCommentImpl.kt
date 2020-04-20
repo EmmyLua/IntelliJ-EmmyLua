@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.comment.psi.impl
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement
+import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.lang.ASTNode
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementVisitor
@@ -25,11 +26,9 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.comment.psi.api.LuaComment
-import com.tang.intellij.lua.project.LuaSettings
-import com.tang.intellij.lua.psi.LuaCommentOwner
-import com.tang.intellij.lua.psi.LuaTypes
-import com.tang.intellij.lua.psi.LuaVisitor
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
 import com.tang.intellij.lua.ty.*
 
 /**
@@ -135,6 +134,23 @@ class LuaCommentImpl(node: ASTNode) : ASTWrapperPsiElement(node), LuaComment {
                 element = element.nextSibling
             }
             return null
+        }
+
+    override val overloads: Array<IFunSignature>?
+        get() {
+            val list = mutableListOf<IFunSignature>()
+            val colonCall = (owner as? LuaClassMethodDef)?.isStatic == false
+            var element: PsiElement? = firstChild
+            while (element != null) {
+                if (element is LuaDocTagOverload) {
+                    val fty = element.functionTy
+                    if (fty != null) {
+                        list.add(FunSignature.create(colonCall, fty))
+                    }
+                }
+                element = element.nextSibling
+            }
+            return if (list.size != 0) list.toTypedArray() else null
         }
 
     override val tagType: LuaDocTagType?

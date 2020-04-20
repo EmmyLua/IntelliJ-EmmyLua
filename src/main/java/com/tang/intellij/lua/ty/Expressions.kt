@@ -265,16 +265,13 @@ private fun LuaCallExpr.infer(context: SearchContext): ITy {
     var ret: ITy = Ty.VOID
     val ty = infer(expr, context)//expr.guessType(context)
     TyUnion.each(ty) {
-        when (it) {
-            is ITyFunction -> {
-                val substitutedSignature = it.matchSignature(this, context)?.substitutedSignature
+        val substitutedSignature = it.matchSignature(context, this)?.substitutedSignature
 
-                if (substitutedSignature != null) {
-                    ret = ret.union(getReturnTy(substitutedSignature, context))
-                }
-            }
+        if (substitutedSignature != null) {
+            ret = ret.union(getReturnTy(substitutedSignature, context))
+        } else if (ty is ITyClass) {
             //constructor : Class table __call
-            is ITyClass -> ret = ret.union(it)
+            ret = ret.union(it)
         }
     }
 

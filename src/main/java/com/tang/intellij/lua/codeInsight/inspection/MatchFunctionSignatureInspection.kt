@@ -55,9 +55,17 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                         type = type.getChildTypes().first()
                     }
 
-                    if (type is ITyFunction) {
-                        type.matchSignature(o, searchContext, myHolder)
-                    } else if (prefixExpr is LuaIndexExpr) {
+                    var problemReported = false
+                    val signatureMatch = type.matchSignature(searchContext, o) { _, sourceElement, message, highlightType ->
+                        myHolder.registerProblem(sourceElement, message, highlightType)
+                        problemReported = true
+                    }
+
+                    if (signatureMatch != null || problemReported) {
+                        return
+                    }
+
+                    if (prefixExpr is LuaIndexExpr) {
                         // Get parent type
                         val parentType = prefixExpr.guessParentType(searchContext)
 
@@ -69,7 +77,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                                 val method = parentType.findSuperMember(memberName, searchContext)?.guessType(searchContext) as? ITyFunction
 
                                 if (method != null) {
-                                    method.matchSignature(o, searchContext, myHolder)
+                                    method.matchSignature(searchContext, o, myHolder)
                                 } else {
                                     myHolder.registerProblem(o, "Unknown function '$memberName'.")
                                 }
@@ -80,7 +88,7 @@ class MatchFunctionSignatureInspection : StrictInspection() {
                                     val method = parentType.findIndexer(it, searchContext)?.guessType(searchContext) as? ITyFunction
 
                                     if (method != null) {
-                                        method.matchSignature(o, searchContext, myHolder)
+                                        method.matchSignature(searchContext, o, myHolder)
                                     } else {
                                         myHolder.registerProblem(o, "Unknown function '[${it.displayName}]'")
                                     }

@@ -80,3 +80,15 @@ local closureInternalTypeInspections = function(param)
         return <error descr="Type mismatch. Required: 'string' Found: '1'">1</error>
     end
 end
+
+local something = {
+    ---@param a boolean
+    ---@param b string
+    tableFun = function(a, b)
+        aBoolean = a
+        aString = <error descr="Type mismatch. Required: 'string' Found: 'boolean'">a</error>
+
+        aBoolean = <error descr="Type mismatch. Required: 'boolean' Found: 'string'">b</error>
+        aString = b
+    end
+}

@@ -59,8 +59,19 @@ object LuaCommentUtil {
         }
 
         if (element is LuaClosureExpr) {
+            val parent = element.parent
+
+            if (parent is LuaTableField) {
+                val tableFieldComment = parent.comment
+
+                // If we encounter a table field with an EmmyDoc, that isn't a type definition, return that comment.
+                if (tableFieldComment?.findTag(LuaDocTagType::class.java) == null) {
+                    return tableFieldComment
+                }
+            }
+
             val grandParent = element.parent.parent
-            val grandParentComment = if (grandParent is LuaLocalDef) {
+            val assignmentComment = if (grandParent is LuaLocalDef) {
                 grandParent.comment
             } else if (grandParent is LuaAssignStat && grandParent.varExprList.exprList.size == 1) {
                 grandParent.comment
@@ -68,9 +79,9 @@ object LuaCommentUtil {
                 null
             }
 
-            // If we encounter a closure whose grandparent assignment has an EmmyDoc definition (not declaration), we return that comment.
-            if (grandParentComment?.findTag(LuaDocTagType::class.java) == null) {
-                return grandParentComment
+            // If we encounter a closure assignment with an EmmyDoc, that isn't a type definition, return that comment.
+            if (assignmentComment?.findTag(LuaDocTagType::class.java) == null) {
+                return assignmentComment
             }
         }
 

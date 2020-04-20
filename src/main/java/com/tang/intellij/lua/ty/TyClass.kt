@@ -30,10 +30,7 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.readTyNullable
-import com.tang.intellij.lua.stubs.readTyParamsNullable
-import com.tang.intellij.lua.stubs.writeTyNullable
-import com.tang.intellij.lua.stubs.writeTyParamsNullable
+import com.tang.intellij.lua.stubs.*
 
 interface ITyClass : ITy {
     val className: String
@@ -41,6 +38,8 @@ interface ITyClass : ITy {
     var superClass: ITy?
     var aliasName: String?
     var params: Array<TyParameter>?
+    var signatures: Array<IFunSignature>?
+
     fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
 
@@ -70,7 +69,8 @@ fun ITyClass.isVisibleInScope(project: Project, contextTy: ITy, visibility: Visi
 abstract class TyClass(override val className: String,
                        override var params: Array<TyParameter>? = null,
                        override val varName: String = "",
-                       override var superClass: ITy? = null
+                       override var superClass: ITy? = null,
+                       override var signatures: Array<IFunSignature>? = null
 ) : Ty(TyKind.Class), ITyClass {
 
     final override var aliasName: String? = null
@@ -128,6 +128,20 @@ abstract class TyClass(override val className: String,
         return true
     }
 
+    override fun processSignatures(context: SearchContext, processor: Processor<IFunSignature>): Boolean {
+        lazyInit(context)
+
+        signatures?.let {
+            for (signature in it) {
+                if (!processor.process(signature)) {
+                    return false
+                }
+            }
+        }
+
+        return true
+    }
+
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
         return LuaShortNamesManager.getInstance(searchContext.project).findMember(this, name, searchContext)
     }
@@ -156,6 +170,7 @@ abstract class TyClass(override val className: String,
                 superClass = tyClass.superClass
                 params = tyClass.params
                 flags = tyClass.flags
+                signatures = tyClass.signatures
             }
         }
     }
@@ -193,11 +208,11 @@ abstract class TyClass(override val className: String,
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
             val stub = nameDef.stub
             val tyName = stub?.anonymousType ?: getAnonymousType(nameDef)
-            return createSerializedClass(tyName, null, nameDef.name, null, null, TyFlags.ANONYMOUS)
+            return createSerializedClass(tyName, null, nameDef.name, null, null, null, TyFlags.ANONYMOUS)
         }
 
         fun createGlobalType(name: String, store: Boolean = false): ITy {
-            return createSerializedClass(getGlobalTypeName(name), null, name, null, null, TyFlags.GLOBAL)
+            return createSerializedClass(getGlobalTypeName(name), null, name, null, null, null, TyFlags.GLOBAL)
         }
 
         fun createGlobalType(nameExpr: LuaNameExpr, store: Boolean): ITy {
@@ -206,13 +221,18 @@ abstract class TyClass(override val className: String,
 
         fun createSelfType(classTy: ITyClass): TyClass {
             val tyName = getSelfType(classTy)
-            return createSerializedClass(tyName, null, Constants.WORD_SELF, classTy, null, TyFlags.ANONYMOUS)
+            return createSerializedClass(tyName, null, Constants.WORD_SELF, classTy, null, null, TyFlags.ANONYMOUS)
         }
     }
 }
 
-class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(tagClass.name, tagClass.genericDefList.map { TyParameter(it) }.toTypedArray(), "", tagClass.superClassRef?.let { Ty.create(it) }) {
-
+class TyPsiDocClass(tagClass: LuaDocTagClass) : TyClass(
+        tagClass.name,
+        tagClass.genericDefList.map { TyParameter(it) }.toTypedArray(),
+        "",
+        tagClass.superClassRef?.let { Ty.create(it) },
+        tagClass.overloads
+) {
     init {
         aliasName = tagClass.aliasName
         this.flags = if (tagClass.isShape) TyFlags.SHAPE else 0
@@ -225,9 +245,10 @@ open class TySerializedClass(name: String,
                              params: Array<TyParameter>? = null,
                              varName: String = name,
                              superClass: ITy? = null,
+                             signatures: Array<IFunSignature>? = null,
                              alias: String? = null,
                              flags: Int = 0)
-    : TyClass(name, params, varName, superClass) {
+    : TyClass(name, params, varName, superClass, signatures) {
     init {
         aliasName = alias
         this.flags = flags
@@ -248,6 +269,7 @@ fun createSerializedClass(name: String,
                           params: Array<TyParameter>? = null,
                           varName: String = name,
                           superClass: ITy? = null,
+                          signatures: Array<IFunSignature>? = null,
                           alias: String? = null,
                           flags: Int = 0): TyClass {
     val list = name.split("|")
@@ -258,7 +280,7 @@ fun createSerializedClass(name: String,
         }
     }
 
-    return TySerializedClass(name, params, varName, superClass, alias, flags)
+    return TySerializedClass(name, params, varName, superClass, signatures, alias, flags)
 }
 
 fun getTableTypeName(table: LuaTableExpr): String {
@@ -430,11 +452,13 @@ object TyClassSerializer : TySerializer<ITyClass>() {
         val params = stream.readTyParamsNullable()
         val varName = stream.readName()
         val superClass = stream.readTyNullable()
+        val signatures = stream.readSignatureNullable()
         val aliasName = stream.readName()
         return createSerializedClass(StringRef.toString(className),
                 params,
                 StringRef.toString(varName),
                 superClass,
+                signatures,
                 StringRef.toString(aliasName),
                 flags)
     }
@@ -444,6 +468,7 @@ object TyClassSerializer : TySerializer<ITyClass>() {
         stream.writeTyParamsNullable(ty.params)
         stream.writeName(ty.varName)
         stream.writeTyNullable(ty.superClass)
+        stream.writeSignaturesNullable(ty.signatures)
         stream.writeName(ty.aliasName)
     }
 }

@@ -76,16 +76,15 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
                     val paramIndex = p1.getIndexFor(ele)
                     val p2 = p1.parent as? LuaCallExpr
                     if (p2 != null) {
-                        val ty = p2.guessParentType(SearchContext.get(ele.project))
+                        val context = SearchContext.get(ele.project)
+                        val ty = p2.guessParentType(context)
                         TyUnion.each(ty) { iTy ->
-                            if (iTy is ITyFunction) {
-                                iTy.process(Processor { sig ->
-                                    sig.params?.getOrNull(paramIndex)?.let { paramInfo ->
-                                        set.add(paramInfo.name)
-                                    }
-                                    return@Processor false
-                                })
-                            }
+                            iTy.processSignatures(context, Processor { sig ->
+                                sig.params?.getOrNull(paramIndex)?.let { paramInfo ->
+                                    set.add(paramInfo.name)
+                                }
+                                return@Processor false
+                            })
                         }
                     }
                 }

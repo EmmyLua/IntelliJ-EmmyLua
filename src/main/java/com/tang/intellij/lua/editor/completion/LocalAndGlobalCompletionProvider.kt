@@ -37,19 +37,19 @@ class LocalAndGlobalCompletionProvider(private val mask: Int) : ClassMemberCompl
     }
 
     private fun addCompletion(name:String, session: CompletionSession, psi: LuaPsiElement) {
+        val ctx = SearchContext.get(psi.project)
         val addTy = {ty: ITyFunction ->
             val icon = if (ty.isGlobal)
                 LuaIcons.GLOBAL_FUNCTION
             else
                 LuaIcons.LOCAL_FUNCTION
 
-            ty.process(Processor {
+            ty.processSignatures(ctx, Processor {
                 val le = LookupElementFactory.createFunctionLookupElement(name, psi, it, false, ty, icon)
                 session.resultSet.addElement(le)
                 true
             })
         }
-        val ctx = SearchContext.get(psi.project)
         when (psi) {
             is LuaFuncBodyOwner -> {
                 addTy(psi.guessType(ctx) as ITyFunction)

@@ -16,12 +16,9 @@
 
 package com.tang.intellij.lua.ty
 
-import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.intellij.util.Processor
-import com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection
 import com.tang.intellij.lua.comment.psi.LuaDocFunctionTy
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
@@ -231,178 +228,6 @@ interface ITyFunction : ITy {
     val signatures: Array<IFunSignature>
 }
 
-val ITyFunction.isColonCall get() = hasFlag(TyFlags.SELF_FUNCTION)
-
-fun ITyFunction.process(processor: Processor<IFunSignature>) {
-    // Overloads will always be more (or as) specific as the main signature, so we visit them first.
-    for (signature in signatures) {
-        if (!processor.process(signature))
-            return
-    }
-    processor.process(mainSignature)
-}
-
-fun ITyFunction.findCandidateSignatures(nArgs: Int): Collection<IFunSignature> {
-    val candidates = mutableListOf<IFunSignature>()
-    process(Processor {
-        val params = it.params
-        if (params == null || params.size >= nArgs || it.varargTy != null) {
-            candidates.add(it)
-        }
-        true
-    })
-    if (candidates.size == 0) {
-        candidates.add(mainSignature)
-    }
-    return candidates
-}
-
-fun ITyFunction.findCandidateSignatures(call: LuaCallExpr): Collection<IFunSignature> {
-    val n = call.argList.size
-    // 是否是 inst:method() 被用为 inst.method(self) 形式
-    val isInstanceMethodUsedAsStaticMethod = isColonCall && call.isMethodDotCall
-    if (isInstanceMethodUsedAsStaticMethod)
-        return findCandidateSignatures(n - 1)
-    val isStaticMethodUsedAsInstanceMethod = !isColonCall && call.isMethodColonCall
-    return findCandidateSignatures(if(isStaticMethodUsedAsInstanceMethod) n + 1 else n)
-}
-
-class SignatureMatchResult(val signature: IFunSignature, val substitutedSignature: IFunSignature)
-
-fun ITyFunction.matchSignature(call: LuaCallExpr, context: SearchContext, problemsHolder: ProblemsHolder? = null): SignatureMatchResult? {
-    val args = call.argList
-    val concreteArgTypes = mutableListOf<MatchFunctionSignatureInspection.ConcreteTypeInfo>()
-    args.forEachIndexed { index, luaExpr ->
-        val ty = if (index == args.lastIndex)
-            context.withMultipleResults { luaExpr.guessType(context) }
-        else
-            context.withIndex(0) { luaExpr.guessType(context) }
-
-        if (!context.supportsMultipleResults && ty is TyMultipleResults) {
-            if (index == args.lastIndex) {
-                concreteArgTypes.addAll(ty.list.map { MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, it) })
-            } else {
-                concreteArgTypes.add(MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, ty.list.first()))
-            }
-        } else concreteArgTypes.add(MatchFunctionSignatureInspection.ConcreteTypeInfo(luaExpr, ty))
-    }
-
-    val problems = if (problemsHolder != null) mutableMapOf<IFunSignature, Collection<Problem>>() else null
-    val candidates = findCandidateSignatures(call)
-
-    candidates.forEach {
-        var nParams = 0
-        var candidateFailed = false
-        val signatureProblems = if (problems != null) mutableListOf<Problem>() else null
-
-        val substitutor = call.createSubstitutor(it, context)
-        val signature = it.substitute(substitutor)
-
-        signature.processArgs(call) { i, pi ->
-            nParams = i + 1
-            val typeInfo = concreteArgTypes.getOrNull(i)
-
-            if (typeInfo == null) {
-                var problemElement = call.lastChild.lastChild
-
-                // Some PSI elements injected by IntelliJ (e.g. PsiErrorElementImpl) can be empty and thus cannot be targeted for our own errors.
-                while (problemElement != null && problemElement.textLength == 0) {
-                    problemElement = problemElement.prevSibling
-                }
-
-                problemElement = problemElement ?: call.lastChild
-
-                candidateFailed = true
-                signatureProblems?.add(Problem(null, problemElement, "Missing argument: ${pi.name}: ${pi.ty}"))
-
-                return@processArgs true
-            }
-
-            val paramType = pi.ty
-            val argType = typeInfo.ty
-            val argExpr = args.getOrNull(i) ?: args.last()
-            val varianceFlags = if (argExpr is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
-
-            if (problemsHolder != null) {
-                val contravariant = ProblemUtil.contravariantOf(paramType, argType, context, varianceFlags, null, argExpr) { _, element, message, highlightProblem ->
-                    signatureProblems?.add(Problem(null, element, message, highlightProblem))
-                }
-
-                if (!contravariant) {
-                    candidateFailed = true
-                }
-            } else if (!paramType.contravariantOf(argType, context, varianceFlags)) {
-                candidateFailed = true
-            }
-
-            true
-        }
-
-        if (nParams < concreteArgTypes.size) {
-            val varargTy = signature.varargTy
-
-            if (varargTy != null) {
-                for (i in nParams until args.size) {
-                    val argType = concreteArgTypes.get(i).ty
-                    val argExpr = args.get(i)
-                    val varianceFlags = if (argExpr is LuaTableExpr) TyVarianceFlags.WIDEN_TABLES else 0
-
-                    if (problemsHolder != null) {
-                        val contravariant = ProblemUtil.contravariantOf(varargTy, argType, context, varianceFlags, null, argExpr) { _, element, message, highlightProblem ->
-                            signatureProblems?.add(Problem(null, element, message, highlightProblem))
-                        }
-
-                        if (!contravariant) {
-                            candidateFailed = true
-                        }
-                    } else if (!varargTy.contravariantOf(argType, context, varianceFlags)) {
-                        candidateFailed = true
-                    }
-                }
-            } else {
-                if (nParams < args.size) {
-                    for (i in nParams until args.size) {
-                        candidateFailed = true
-                        signatureProblems?.add(Problem(null, args[i], "Too many arguments."))
-                    }
-                } else {
-                    // Last argument is TyMultipleResults, just a weak warning.
-                    val excess = nParams - args.size
-                    val message = if (excess == 1) "1 result is an excess argument." else "${excess} results are excess arguments."
-                    signatureProblems?.add(Problem(null, args.last(), message, ProblemHighlightType.WEAK_WARNING))
-                }
-            }
-        }
-
-        if (!candidateFailed) {
-            if (problemsHolder != null) {
-                signatureProblems?.forEach {
-                    problemsHolder.registerProblem(it.sourceElement, it.message, it.highlightType)
-                }
-            }
-
-            return SignatureMatchResult(it, signature)
-        }
-
-        if (signatureProblems != null) {
-            problems?.put(it, signatureProblems)
-        }
-    }
-
-    if (problemsHolder != null) {
-        val multipleCandidates = candidates.size > 1
-
-        problems?.forEach { signature, signatureProblems ->
-            signatureProblems.forEach {
-                val problem = if (multipleCandidates) "${it.message}. In: ${signature.displayName}\n" else it.message
-                problemsHolder.registerProblem(it.sourceElement, problem, it.highlightType)
-            }
-        }
-    }
-
-    return null
-}
-
 abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
 
     override fun equals(other: Any?): Boolean {
@@ -427,15 +252,14 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
 
         var matched = false
 
-        if (other is ITyFunction) {
-            process(Processor { sig ->
-                other.process(Processor { otherSig ->
-                    matched = sig.contravariantOf(otherSig, context, flags)
-                    !matched
-                })
+        processSignatures(context, Processor { sig ->
+            other.processSignatures(context, Processor { otherSig ->
+                matched = sig.contravariantOf(otherSig, context, flags)
                 !matched
             })
-        }
+            !matched
+        })
+
         return matched
     }
 
@@ -445,6 +269,17 @@ abstract class TyFunction : Ty(TyKind.Function), ITyFunction {
 
     override fun accept(visitor: ITyVisitor) {
         visitor.visitFun(this)
+    }
+
+    override fun processSignatures(context: SearchContext, processor: Processor<IFunSignature>): Boolean {
+        // Overloads will always be more (or as) specific as the main signature, so we visit them first.
+        for (signature in signatures) {
+            if (!processor.process(signature)) {
+                return false
+            }
+        }
+
+        return processor.process(mainSignature)
     }
 }
 

@@ -25,6 +25,7 @@ import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaTypeAlias
 import com.tang.intellij.lua.psi.LuaTypeDef
 import com.tang.intellij.lua.search.SearchContext
+import com.tang.intellij.lua.ty.IFunSignature
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.ITyClass
 
