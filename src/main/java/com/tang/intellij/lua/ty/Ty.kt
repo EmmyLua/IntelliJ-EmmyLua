@@ -37,7 +37,7 @@ enum class TyKind {
     Generic,
     Nil,
     Void,
-    Tuple,
+    MultipleResults,
     GenericParam,
     PrimitiveLiteral,
     Snippet
@@ -332,7 +332,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 TyKind.Primitive to TyPrimitiveSerializer,
                 TyKind.PrimitiveLiteral to TyPrimitiveLiteralSerializer,
                 TyKind.Snippet to TySnippetSerializer,
-                TyKind.Tuple to TyMultipleResultsSerializer,
+                TyKind.MultipleResults to TyMultipleResultsSerializer,
                 TyKind.Union to TyUnionSerializer
         )
 

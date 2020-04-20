@@ -96,7 +96,7 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                 sb.append("[]")
             }
 
-            override fun visitTuple(multipleResults: TyMultipleResults) {
+            override fun visitMultipleResults(multipleResults: TyMultipleResults) {
                 val list = multipleResults.list.map { render(it) }
                 sb.append(list.joinToString(", "))
                 if (multipleResults.variadic) {

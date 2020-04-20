@@ -20,7 +20,7 @@ import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
 import com.tang.intellij.lua.search.SearchContext
 
-class TyMultipleResults(val list: List<ITy>, val variadic: Boolean) : Ty(TyKind.Tuple) {
+class TyMultipleResults(val list: List<ITy>, val variadic: Boolean) : Ty(TyKind.MultipleResults) {
 
     override fun substitute(substitutor: ITySubstitutor): ITy {
         val list = list.map { it.substitute(substitutor) }
@@ -28,7 +28,7 @@ class TyMultipleResults(val list: List<ITy>, val variadic: Boolean) : Ty(TyKind.
     }
 
     override fun accept(visitor: ITyVisitor) {
-        visitor.visitTuple(this)
+        visitor.visitMultipleResults(this)
     }
 
     override fun acceptChildren(visitor: ITyVisitor) {

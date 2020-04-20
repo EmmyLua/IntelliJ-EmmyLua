@@ -27,7 +27,7 @@ interface ITyVisitor {
 
     fun visitUnion(u: TyUnion)
 
-    fun visitTuple(multipleResults: TyMultipleResults)
+    fun visitMultipleResults(multipleResults: TyMultipleResults)
 
     fun visitArray(array: ITyArray)
 
@@ -55,7 +55,7 @@ open class TyVisitor : ITyVisitor {
         visitTy(u)
     }
 
-    override fun visitTuple(multipleResults: TyMultipleResults) {
+    override fun visitMultipleResults(multipleResults: TyMultipleResults) {
         visitTy(multipleResults)
     }
 

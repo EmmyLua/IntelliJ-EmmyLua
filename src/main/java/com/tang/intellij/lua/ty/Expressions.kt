@@ -175,7 +175,22 @@ fun LuaCallExpr.createSubstitutor(sig: IFunSignature, context: SearchContext): I
                 list.add(prefix.guessType(context))
             }
         }
-        this.argList.forEach { list.add(it.guessType(context)) }
+
+        for (i in 0 until argList.size - 1) {
+            context.withIndex(0) { list.add(argList[i].guessType(context)) }
+        }
+
+        argList.lastOrNull()?.let {
+            context.withMultipleResults {
+                val lastArgTy = it.guessType(context)
+
+                if (lastArgTy is TyMultipleResults) {
+                    list.addAll(lastArgTy.list)
+                } else {
+                    list.add(lastArgTy)
+                }
+            }
+        }
 
         val genericAnalyzer = GenericAnalyzer(sig.tyParameters, context)
 

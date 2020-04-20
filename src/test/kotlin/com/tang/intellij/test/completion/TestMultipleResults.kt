@@ -16,9 +16,9 @@
 
 package com.tang.intellij.test.completion
 
-class TestTuple : TestCompletionBase() {
+class TestMultipleResults : TestCompletionBase() {
 
-    fun `test tuple 1`() {
+    fun `test multiple results 1`() {
         doTest("""
             --- test_tuple_1.lua
 
@@ -26,10 +26,10 @@ class TestTuple : TestCompletionBase() {
             local obj = { name = "name" }
 
             ---@return number, Type1
-            local function getTuple()
+            local function getMultipleResults()
             end
 
-            local a, b = getTuple()
+            local a, b = getMultipleResults()
             b.--[[caret]]
         """) {
             assertTrue("name" in it)
