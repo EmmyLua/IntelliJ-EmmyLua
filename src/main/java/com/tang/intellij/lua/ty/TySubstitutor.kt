@@ -42,7 +42,6 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
 
         params?.forEach {
             constraints[it.className] = it
-            map[it.className] = Ty.UNKNOWN
         }
 
         this.constraints = constraints.toMap()
@@ -77,20 +76,21 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
             val constraint = constraints.get(genericName)
 
             if (constraint != null) {
-                map.merge(genericName, cur.substitute(substitutor)) { a, b ->
-                    if (constraint.contravariantOf(b, searchContext, TyVarianceFlags.ABSTRACT_PARAMS or TyVarianceFlags.STRICT_UNKNOWN)) {
-                        if (a == Ty.UNKNOWN) {
-                            b
-                        } else if (a.contravariantOf(b, searchContext, 0)) {
-                            a
-                        } else if (b.contravariantOf(a, searchContext, 0)) {
-                            b
-                        } else {
-                            a.union(b)
-                        }
+                val mappedType = map.get(genericName)
+                val currentType = cur.substitute(substitutor)
+
+                map[genericName] = if (constraint.contravariantOf(currentType, searchContext, TyVarianceFlags.ABSTRACT_PARAMS or TyVarianceFlags.STRICT_UNKNOWN)) {
+                    if (mappedType == null) {
+                        currentType
+                    } else if (mappedType.contravariantOf(currentType, searchContext, TyVarianceFlags.STRICT_UNKNOWN)) {
+                        mappedType
+                    } else if (currentType.contravariantOf(mappedType, searchContext, TyVarianceFlags.STRICT_UNKNOWN)) {
+                        currentType
                     } else {
-                        constraint
+                        mappedType.union(currentType)
                     }
+                } else {
+                    constraint
                 }
             }
         }
