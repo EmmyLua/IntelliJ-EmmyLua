@@ -149,6 +149,10 @@ class TypeSafetyTest : LuaInspectionsTestBase(
         checkByFile("shape.lua")
     }
 
+    fun testSnippet() {
+        checkByFile("snippet.lua")
+    }
+
     fun testStrictNil() {
         LuaSettings.instance.isNilStrict = true
         checkByFile("strict_nil.lua")

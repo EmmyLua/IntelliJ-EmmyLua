@@ -400,7 +400,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
         if (other is TyUnion) {
             TyUnion.each(other) {
-                if (!contravariantOf(it, context, flags)) {
+                if (it !is TySnippet && !contravariantOf(it, context, flags)) {
                     return false
                 }
             }
