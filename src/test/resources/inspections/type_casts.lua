@@ -8,7 +8,7 @@ end
 function wantsNumber(n)
 end
 
-wantsNumber(<error descr="Type mismatch. Required: 'number' Found: 'string|number'">stringOrNumber(false)</error>)
+wantsNumber(<error descr="Type mismatch. Required: 'number' Found: 'number|string'">stringOrNumber(false)</error>)
 wantsNumber(--[[---@type number]] stringOrNumber(false))
 
 wantsNumber(

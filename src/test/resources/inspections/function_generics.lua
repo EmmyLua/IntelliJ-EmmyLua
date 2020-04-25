@@ -134,8 +134,8 @@ number1 = <error descr="Type mismatch. Required: '1' Found: '1|2'">fn6(number1, 
 number2 = <error descr="Type mismatch. Required: '2' Found: '1|2'">fn6(number1, number2)</error>
 
 -- T = 1|"string1"
-anyNumber = <error descr="Type mismatch. Required: 'number' Found: '1|\"string1\"'">fn6(number1, string1)</error>
-anyString = <error descr="Type mismatch. Required: 'string' Found: '1|\"string1\"'">fn6(number1, string1)</error>
+anyNumber = <error descr="Type mismatch. Required: 'number' Found: '\"string1\"|1'">fn6(number1, string1)</error>
+anyString = <error descr="Type mismatch. Required: 'string' Found: '\"string1\"|1'">fn6(number1, string1)</error>
 number1OrString1 = fn6(number1, string1)
 
 -- T = number
@@ -198,8 +198,8 @@ local stringOrNumber
 -- T = commonAncestor(arg1, arg2) = number|string
 anything = fn7(number1, string1, stringOrNumberStringOrNumberTable)
 stringOrNumber = fn7(number1, string1, stringOrNumberStringOrNumberTable)
-anyNumber = <error descr="Type mismatch. Required: 'number' Found: 'string|number'">fn7(number1, number2, stringOrNumberStringOrNumberTable)</error>
-anyString = <error descr="Type mismatch. Required: 'string' Found: 'string|number'">fn7(number1, number2, stringOrNumberStringOrNumberTable)</error>
+anyNumber = <error descr="Type mismatch. Required: 'number' Found: 'number|string'">fn7(number1, number2, stringOrNumberStringOrNumberTable)</error>
+anyString = <error descr="Type mismatch. Required: 'string' Found: 'number|string'">fn7(number1, number2, stringOrNumberStringOrNumberTable)</error>
 
 
 ---@generic K, V
@@ -215,10 +215,10 @@ end
 local stringNumberTable
 
 -- K = string, V = number
-stringOrNumber = <error descr="Type mismatch. Required: 'string|number' Found: 'table<string, number>'">fn8(anyString, number1, stringNumberTable)</error>
+stringOrNumber = <error descr="Type mismatch. Required: 'number|string' Found: 'table<string, number>'">fn8(anyString, number1, stringNumberTable)</error>
 stringNumberTable = fn8(anyString, number1, stringNumberTable)
 stringNumberTable = fn8(string1, number1, stringNumberTable)
-stringNumberTable = fn8(anyString, number1, <error descr="Type mismatch. Required: 'table<string|number, number>' Found: 'number[]'">numberArray</error>)
+stringNumberTable = fn8(anyString, number1, <error descr="Type mismatch. Required: 'table<number|string, number>' Found: 'number[]'">numberArray</error>)
 stringNumberTable = <error descr="Type mismatch. Required: 'table<string, number>' Found: 'table<number, number>'">fn8(anyNumber, number1, numberArray)</error>
 
 

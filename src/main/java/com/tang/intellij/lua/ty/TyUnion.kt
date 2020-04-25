@@ -22,7 +22,7 @@ import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.search.SearchContext
 
 class TyUnion : Ty(TyKind.Union) {
-    private val childSet = mutableSetOf<ITy>()
+    private val childSet = sortedSetOf<ITy>(java.util.Comparator {a, b -> a.displayName.compareTo(b.displayName)})
 
     fun getChildTypes() = childSet
 

@@ -120,5 +120,5 @@ local shapeWithOptionalField = {
 
 shapeWithOptionalField = {
     requiredField = 1,
-    optional = <error descr="Type mismatch. Required: 'number|nil' Found: 'string'">aString</error>
+    optional = <error descr="Type mismatch. Required: 'nil|number' Found: 'string'">aString</error>
 }

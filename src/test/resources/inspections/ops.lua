@@ -34,7 +34,7 @@ theNumberOne = 1 or aBoolean
 theNumberOne = nil or 1
 theNumberOne = false or 1
 theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'true'">true or 1</error>
-theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'true|1'">aBoolean or 1</error>
+theNumberOne = <error descr="Type mismatch. Required: '1' Found: '1|true'">aBoolean or 1</error>
 
 -- and
 theNumberOne = 1 and 1
@@ -45,23 +45,23 @@ theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'boolean'">1 an
 theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'nil'">nil and 1</error>
 theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'false'">false and 1</error>
 theNumberOne = true and 1
-theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'false|1'">aBoolean and 1</error>
+theNumberOne = <error descr="Type mismatch. Required: '1' Found: '1|false'">aBoolean and 1</error>
 
 -- combinatorial
 aStringOrNumber = unknownBoolean and "someString" or 1
 aStringOrNumber = "someString" and unknownBoolean and "someString" or 1
-aStringOrNumber = <error descr="Type mismatch. Required: 'string|number' Found: 'true|1'">unknownBoolean or "someString" and 1</error>
+aStringOrNumber = <error descr="Type mismatch. Required: 'number|string' Found: '1|true'">unknownBoolean or "someString" and 1</error>
 aString = 1 and "someString" or unknownBoolean
 trueOrOne = unknownBoolean or "someString" and 1
 
 -- arithmetic
 aNumber = theNumberOne + 1
 theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'number'">theNumberOne + 1</error>
-aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string|number'">aStringOrNumber + 1</error>
+aNumber = <error descr="Type mismatch. Required: 'number' Found: 'number|string'">aStringOrNumber + 1</error>
 
 aNumber = theNumberOne - 1
 theNumberOne = <error descr="Type mismatch. Required: '1' Found: 'number'">theNumberOne - 1</error>
-aNumber = <error descr="Type mismatch. Required: 'number' Found: 'string|number'">aStringOrNumber + 1</error>
+aNumber = <error descr="Type mismatch. Required: 'number' Found: 'number|string'">aStringOrNumber + 1</error>
 
 -- getn
 aNumber = #{}

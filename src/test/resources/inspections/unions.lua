@@ -19,4 +19,17 @@ local stringLiteralOrNumber
 
 stringOrNumberVar = stringLiteralOrNumber
 
-stringLiteralOrNumber = <error descr="Type mismatch. Required: '\"hi\"|number' Found: 'string|number'">stringOrNumberVar</error>
+stringLiteralOrNumber = <error>stringOrNumberVar</error>
+
+---@type table<string, "A" | "B">
+local aOrB
+
+---@type table<string, "B" | "A">
+local bOrA
+
+---@type table<string, "A" | "C">
+local aOrC
+
+aOrB = bOrA
+bOrA = aOrB
+aOrB = <error>aOrC</error>

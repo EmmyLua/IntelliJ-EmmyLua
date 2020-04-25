@@ -46,7 +46,7 @@ local infiniteAlias1
 ---@type InfiniteAlias2
 local infiniteAlias2
 
-infiniteAlias1 = <error descr="Type mismatch. Required: 'string|number' Found: 'table'">{}</error>
+infiniteAlias1 = <error descr="Type mismatch. Required: 'number|string' Found: 'table'">{}</error>
 infiniteAlias1 = 1
 infiniteAlias1 = 'string'
 infiniteAlias1 = infiniteAlias2

@@ -176,6 +176,7 @@ class TypeSafetyTest : LuaInspectionsTestBase(
     }
 
     fun testUnions() {
+        // TODO: As above, there's a bug in IntelliJ's XML descr attribute parsing. Once fixed we should add descr.
         checkByFile("unions.lua")
     }
 
