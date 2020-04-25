@@ -283,6 +283,68 @@ fun createSerializedClass(name: String,
     return TySerializedClass(name, params, varName, superClass, signatures, alias, flags)
 }
 
+fun createTableGenericFromMembers(ty: ITy, context: SearchContext): ITyGeneric {
+    val isEmpty = ty.processMembers(context) { _, _ -> false }
+
+    if (isEmpty) {
+        return TySerializedGeneric(arrayOf(Ty.UNKNOWN, Ty.UNKNOWN), Ty.TABLE)
+    }
+
+    var keyType: ITy = Ty.VOID
+    var elementType: ITy = Ty.VOID
+
+    ty.processMembers(context) { prefixTy, classMember ->
+        val name = classMember.name
+        val indexType = classMember.indexType
+
+        if (classMember is LuaTableField) {
+            val exprList = classMember.exprList
+
+            if (exprList.size == 2) {
+                keyType = keyType.union(exprList[0].guessType(context))
+                elementType = elementType.union(exprList[1].guessType(context))
+            } else if (exprList.size == 1) {
+                if (name != null) {
+                    keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
+                } else {
+                    keyType = keyType.union(Ty.NUMBER)
+                }
+
+                elementType = elementType.union(exprList[0].guessType(context))
+            }
+        } else if (classMember is LuaIndexExpr) {
+            val idExpr = classMember.idExpr
+
+            if (name != null) {
+                keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
+                elementType = elementType.union(prefixTy.guessMemberType(name, context) ?: Ty.UNKNOWN)
+            } else if (idExpr != null) {
+                val indexTy = idExpr.guessType(context)
+                keyType = keyType.union(indexTy)
+                elementType = elementType.union(prefixTy.guessIndexerType(indexTy, context) ?: Ty.UNKNOWN)
+            } else {
+                keyType = Ty.UNKNOWN
+                elementType = Ty.UNKNOWN
+                return@processMembers false
+            }
+        } else if (name != null) {
+            keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
+            elementType = elementType.union(classMember.guessType(context))
+        } else if (indexType != null) {
+            keyType = keyType.union(indexType.getType())
+            elementType = elementType.union(classMember.guessType(context))
+        } else {
+            keyType = Ty.UNKNOWN
+            elementType = Ty.UNKNOWN
+            return@processMembers false
+        }
+
+        true
+    }
+
+    return TySerializedGeneric(arrayOf(keyType, elementType), Ty.TABLE)
+}
+
 fun getTableTypeName(table: LuaTableExpr): String {
     val stub = table.stub
     if (stub != null)
@@ -325,70 +387,6 @@ class TyTable(val table: LuaTableExpr) : TyClass(getTableTypeName(table)) {
     override fun toString(): String = displayName
 
     override fun doLazyInit(searchContext: SearchContext) = Unit
-
-    fun toGeneric(context: SearchContext): ITyGeneric {
-        if (isEmpty(context)) {
-            return TySerializedGeneric(arrayOf(Ty.UNKNOWN, Ty.UNKNOWN), Ty.TABLE)
-        }
-
-        var keyType: ITy = Ty.VOID
-        var elementType: ITy = Ty.VOID
-
-        processMembers(context) { prefixTy, classMember ->
-            val name = classMember.name
-            val indexType = classMember.indexType
-
-            if (classMember is LuaTableField) {
-                val exprList = classMember.exprList
-
-                if (exprList.size == 2) {
-                    keyType = keyType.union(exprList[0].guessType(context))
-                    elementType = elementType.union(exprList[1].guessType(context))
-                } else if (exprList.size == 1) {
-                    if (name != null) {
-                        keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
-                    } else {
-                        keyType = keyType.union(Ty.NUMBER)
-                    }
-
-                    elementType = elementType.union(exprList[0].guessType(context))
-                }
-            } else if (classMember is LuaIndexExpr) {
-                val idExpr = classMember.idExpr
-
-                if (name != null) {
-                    keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
-                    elementType = elementType.union(prefixTy.guessMemberType(name, context) ?: Ty.UNKNOWN)
-                } else if (idExpr != null) {
-                    val indexTy = idExpr.guessType(context)
-                    keyType = keyType.union(indexTy)
-                    elementType = elementType.union(prefixTy.guessIndexerType(indexTy, context) ?: Ty.UNKNOWN)
-                } else {
-                    keyType = Ty.UNKNOWN
-                    elementType = Ty.UNKNOWN
-                    return@processMembers false
-                }
-            } else if (name != null) {
-                keyType = keyType.union(TyPrimitiveLiteral.getTy(TyPrimitiveKind.String, name))
-                elementType = elementType.union(classMember.guessType(context))
-            } else if (indexType != null) {
-                keyType = keyType.union(indexType.getType())
-                elementType = elementType.union(classMember.guessType(context))
-            } else {
-                keyType = Ty.UNKNOWN
-                elementType = Ty.UNKNOWN
-                return@processMembers false
-            }
-
-            true
-        }
-
-        return TySerializedGeneric(arrayOf(keyType, elementType), Ty.TABLE)
-    }
-
-    fun isEmpty(context: SearchContext): Boolean {
-        return processMembers(context) { _, _ -> false }
-    }
 }
 
 fun getDocTableTypeName(table: LuaDocTableDef): String {

@@ -183,16 +183,18 @@ abstract class TyGeneric(final override val params: Array<ITy>, final override v
         if (other is ITyGeneric) {
             otherBase = other.base
             otherParams = other.params
-        } else if ((other == Ty.TABLE || other is TyTable) && resolvedBase == Ty.TABLE && params.size == 2) {
-            val keyTy = params.first()
-            val valueTy = params.last()
-
-            if (keyTy is TyUnknown && valueTy is TyUnknown) {
-                return true
+        } else if (resolvedBase == Ty.TABLE && params.size == 2) {
+            if (other == Ty.TABLE) {
+                return params.first() is TyUnknown && params.last() is TyUnknown
             }
 
-            if (other is TyTable) {
-                val genericTable = other.toGeneric(context)
+            val otherIsShape = other is TyTable || (other as? ITyClass)?.let {
+                it.lazyInit(context)
+                it.flags and TyFlags.SHAPE != 0
+            } == true
+
+            if (otherIsShape) {
+                val genericTable = createTableGenericFromMembers(other, context)
                 otherBase = genericTable.base
                 otherParams = genericTable.params
                 contravariantParams = flags and TyVarianceFlags.WIDEN_TABLES != 0

@@ -147,10 +147,13 @@ class GenericAnalyzer(params: Array<TyParameter>?, private val searchContext: Se
                     warp(it.base) {
                         generic.params.last().accept(this)
                     }
-                } else if (it is TyTable) {
-                    val generifiedTable = it.toGeneric(searchContext)
+                } else if (it is TyTable || (it as? ITyClass)?.let {
+                            it.lazyInit(searchContext)
+                            it.flags and TyFlags.SHAPE != 0
+                        } == true) {
+                    val genericTable = createTableGenericFromMembers(it, searchContext)
 
-                    generifiedTable.params.asSequence().zip(generic.params.asSequence()).forEach { (param, genericParam) ->
+                    genericTable.params.asSequence().zip(generic.params.asSequence()).forEach { (param, genericParam) ->
                         warp(param) {
                             genericParam.accept(this)
                         }

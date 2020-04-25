@@ -37,7 +37,7 @@ class TyArray(override val base: ITy) : Ty(TyKind.Array), ITyArray {
     override fun contravariantOf(other: ITy, context: SearchContext, flags: Int): Boolean {
         if (super.contravariantOf(other, context, flags)
                 || (other is ITyArray && base.contravariantOf(other.base, context, flags))
-                || (other is TyTable && other.isEmpty(context))
+                || (other is TyTable && other.processMembers(context) { _, _ -> false })
         ) {
             return true
         }
