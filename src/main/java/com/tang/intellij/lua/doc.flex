@@ -56,7 +56,7 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 
 EOL="\r"|"\n"|"\r\n"
 LINE_WS=[\ \t\f]
-STRING=[^\r\n\t\f\]]*
+STRING=[^\r\n]*
 ID=[:jletter:] ([:jletterdigit:])*
 PROPERTY=[:jletter:] ([:jletterdigit:]|\.)*
 //三个-以上
