@@ -38,8 +38,6 @@
         <virtualFileSystem implementationClass="com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem" key="lua-dummy"/>
 
         <!--module and library-->
-        <moduleType id="LUA_MODULE" implementationClass="com.tang.intellij.lua.project.LuaModuleType"/>
-        <moduleConfigurationEditorProvider implementation="com.tang.intellij.lua.project.LuaModuleConfigurationEditorProvider"/>
         <sdkType implementation="com.tang.intellij.lua.project.LuaSdkType"/>
         <library.type implementation="com.tang.intellij.lua.project.LuaLibraryType"/>
         <!--<indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>-->
