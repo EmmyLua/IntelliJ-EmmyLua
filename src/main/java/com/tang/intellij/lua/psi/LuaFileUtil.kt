@@ -59,9 +59,6 @@ object LuaFileUtil {
 
     var PREDEFINED_KEY = Key.create<Boolean>("lua.lib.predefined")
 
-    val archExeFile: String?
-        get() = getPluginVirtualFile("debugger/windows/x86/emmy.arch.exe")
-
     fun fileEquals(f1: VirtualFile?, f2: VirtualFile?): Boolean {
         return if (f1 == null || f2 == null) false else f1.path == f2.path
     }

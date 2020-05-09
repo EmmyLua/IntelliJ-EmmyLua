@@ -16,10 +16,14 @@
 
 package com.tang.intellij.lua.debugger.remote.value
 
+import com.intellij.openapi.fileEditor.FileEditorManager
+import com.intellij.openapi.fileEditor.TextEditor
+import com.intellij.psi.PsiManager
 import com.intellij.xdebugger.XDebugSession
 import com.intellij.xdebugger.frame.XNamedValue
 import com.intellij.xdebugger.frame.XNavigatable
-import com.tang.intellij.lua.debugger.attach.value.LuaXValue
+import com.intellij.xdebugger.impl.XSourcePositionImpl
+import com.tang.intellij.lua.psi.LuaDeclarationTree
 import org.luaj.vm2.LuaValue
 
 /**
@@ -35,7 +39,7 @@ abstract class LuaRValue(name: String) : XNamedValue(name) {
     var parent: LuaRValue? = null
 
     override fun computeSourcePosition(xNavigable: XNavigatable) {
-        LuaXValue.computeSourcePosition(xNavigable, name, session)
+        computeSourcePosition(xNavigable, name, session)
     }
 
     companion object {
@@ -55,6 +59,30 @@ abstract class LuaRValue(name: String) : XNamedValue(name) {
             value.session = session
             value.parse(data, describe)
             return value
+        }
+
+        fun computeSourcePosition(xNavigable: XNavigatable, name: String, session: XDebugSession) {
+            val currentPosition = session.currentPosition
+            if (currentPosition != null) {
+                val file = currentPosition.file
+                val project = session.project
+                val psiFile = PsiManager.getInstance(project).findFile(file)
+                val editor = FileEditorManager.getInstance(project).getSelectedEditor(file)
+
+                if (psiFile != null && editor is TextEditor) {
+                    val document = editor.editor.document
+                    val lineEndOffset = document.getLineStartOffset(currentPosition.line)
+                    val element = psiFile.findElementAt(lineEndOffset) ?: return
+                    LuaDeclarationTree.get(psiFile).walkUpLocal(element) {
+                        if (name == it.name) {
+                            val position = XSourcePositionImpl.createByElement(it.psi)
+                            xNavigable.setSourcePosition(position)
+                            return@walkUpLocal false
+                        }
+                        true
+                    }
+                }
+            }
         }
     }
 }

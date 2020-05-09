@@ -29,7 +29,6 @@ import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
-import com.tang.intellij.lua.debugger.DebuggerType;
 import com.tang.intellij.lua.debugger.LuaRunner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -78,9 +77,6 @@ public class LuaAppRunner extends LuaRunner {
             @Override
             public XDebugProcess start(@NotNull XDebugSession xDebugSession) throws ExecutionException {
                 LuaAppRunConfiguration configuration = (LuaAppRunConfiguration) environment.getRunProfile();
-                DebuggerType debuggerType = configuration.getDebuggerType();
-                if (debuggerType == DebuggerType.Attach)
-                    return new LuaAppAttachProcess(xDebugSession);
                 return new LuaAppMobProcess(xDebugSession);
             }
         });
