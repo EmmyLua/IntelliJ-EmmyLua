@@ -56,9 +56,10 @@ class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
                 val parentType = parent.node.elementType
                 if (parentType == LuaTypes.BINARY_OP || parentType == LuaTypes.UNARY_OP) {
                     return object : HighlightUsagesHandlerBase<PsiElement>(editor, psiFile) {
-                        override fun selectTargets(list: MutableList<PsiElement>?, consumer: Consumer<MutableList<PsiElement>>?) { }
+                        override fun selectTargets(list: MutableList<out PsiElement>, consumer: Consumer<in MutableList<out PsiElement>>) {
+                        }
 
-                        override fun computeUsages(list: MutableList<PsiElement>) {
+                        override fun computeUsages(list: MutableList<out PsiElement>) {
                             addOccurrence(parent.parent)
                         }
 
@@ -74,12 +75,12 @@ class LuaHighlightUsagesHandlerFactory : HighlightUsagesHandlerFactoryBase() {
 private class LoopHandler(editor: Editor, psiFile: PsiFile, val psi:PsiElement, val loop: LuaLoop) : HighlightUsagesHandlerBase<PsiElement>(editor, psiFile) {
     override fun getTargets() = arrayListOf(psi)
 
-    override fun computeUsages(list: MutableList<PsiElement>?) {
+    override fun computeUsages(list: MutableList<out PsiElement>) {
         loop.head?.let { addOccurrence(it) }
         loop.end?.let { addOccurrence(it) }
         addOccurrence(psi)
     }
 
-    override fun selectTargets(list: MutableList<PsiElement>?, consumer: Consumer<MutableList<PsiElement>>?) {}
+    override fun selectTargets(list: MutableList<out PsiElement>, consumer: Consumer<in MutableList<out PsiElement>>) {}
 
 }

@@ -38,7 +38,7 @@ class MoveFileTest : MultiFileTestCase() {
             assertNotNull("File $targetDirName not found", child1)
             val targetDirectory = myPsiManager.findDirectory(child1!!)
 
-            MoveFilesOrDirectoriesProcessor(myProject, arrayOf<PsiElement>(file), targetDirectory,
+            MoveFilesOrDirectoriesProcessor(myProject, arrayOf<PsiElement>(file), targetDirectory!!,
                     false, false, null, null).run()
 
             FileDocumentManager.getInstance().saveAllDocuments()

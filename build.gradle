@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 def versions = [:]
-versions["201"] = [
-    ideaSDKVersion: "IC-201.6668.121",
+versions["202"] = [
+    ideaSDKVersion: "IC-202.6397.94",
     sinceBuild: "201",
-    untilBuild: "201.*",
+    untilBuild: "202.*",
     archiveName: "IntelliJ-EmmyLua"
 ]
 versions["193"] = [
@@ -60,4 +60,4 @@ versions.each { shortVer, cfg ->
     }
 }
 
-task buildAll(dependsOn: [build_201, build_182])
+task buildAll(dependsOn: [build_202, build_182])
