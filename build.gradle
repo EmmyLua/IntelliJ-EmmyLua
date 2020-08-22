@@ -13,6 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+plugins {
+    id 'org.jetbrains.intellij' version "0.3.11"
+    id "org.jetbrains.kotlin.jvm" version "1.2.31"
+}
+
 def versions = [:]
 versions["202"] = [
     ideaSDKVersion: "IC-202.6397.94",
@@ -67,3 +73,24 @@ versions.each { shortVer, cfg ->
 }
 
 task buildAll(dependsOn: [build_202])
+
+dependencies {
+    compile fileTree(dir: "libs", includes: ["*.jar"])
+}
+
+sourceSets {
+    main {
+        java.srcDirs 'gen'
+        resources {
+            exclude "debugger/**"
+        }
+    }
+}
+
+intellij {
+    type 'IU'
+    updateSinceUntilBuild false
+    downloadSources false
+    version = "IC-202.6397.94"
+    localPath System.env["IDEA_HOME_202"]
+}
