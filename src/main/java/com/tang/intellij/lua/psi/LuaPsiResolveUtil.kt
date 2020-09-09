@@ -90,8 +90,9 @@ fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
 
     //global
     if (resolveResult == null || resolveResult is LuaNameExpr) {
-        val refName = nameExpr.name
-        val moduleName = nameExpr.moduleName ?: Constants.WORD_G
+        val target = (resolveResult as? LuaNameExpr) ?: nameExpr
+        val refName = target.name
+        val moduleName = target.moduleName ?: Constants.WORD_G
         LuaClassMemberIndex.process(moduleName, refName, context, Processor {
             resolveResult = it
             false
