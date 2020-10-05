@@ -19,6 +19,7 @@ package com.tang.intellij.lua.comment
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
 import com.tang.intellij.lua.comment.psi.api.LuaComment
@@ -72,5 +73,13 @@ object LuaCommentUtil {
         }
 
         templateManager.startTemplate(editor, template)
+    }
+
+    fun findComment(psi: PsiElement): LuaComment? {
+        return PsiTreeUtil.getParentOfType(psi, LuaComment::class.java)
+    }
+
+    fun isComment(psi: PsiElement): Boolean {
+        return findComment(psi) != null
     }
 }

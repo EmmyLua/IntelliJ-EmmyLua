@@ -26,6 +26,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.tree.TokenSet
 import com.intellij.util.ProcessingContext
+import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.project.LuaSettings
@@ -92,13 +93,11 @@ class LuaCompletionContributor : CompletionContributor() {
                 if (element.parent is LuaLabelStat) {
                     suggestWords = false
                     context.dummyIdentifier = ""
-                } else {
+                } else if (!LuaCommentUtil.isComment(element)) {
                     val type = element.node.elementType
-                    when (type) {
-                        in IGNORE_SET -> {
-                            suggestWords = false
-                            context.dummyIdentifier = ""
-                        }
+                    if (type in IGNORE_SET) {
+                        suggestWords = false
+                        context.dummyIdentifier = ""
                     }
                 }
             }
