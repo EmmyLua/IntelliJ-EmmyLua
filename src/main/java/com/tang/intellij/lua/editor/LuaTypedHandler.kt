@@ -32,24 +32,24 @@ import com.tang.intellij.lua.psi.LuaTypes
  */
 class LuaTypedHandler : TypedHandlerDelegate() {
 
-    override fun checkAutoPopup(charTyped: Char, project: Project, editor: Editor, file: PsiFile): TypedHandlerDelegate.Result {
+    override fun checkAutoPopup(charTyped: Char, project: Project, editor: Editor, file: PsiFile): Result {
         if (file.fileType == LuaFileType.INSTANCE) {
             if (charTyped == ':' || charTyped == '@') {
                 AutoPopupController.getInstance(project).autoPopupMemberLookup(editor, null)
-                return TypedHandlerDelegate.Result.STOP
+                return Result.STOP
             }
             if (charTyped == '.') {
                 val element = file.findElementAt(editor.caretModel.offset - 1)
                 when (element?.node?.elementType) {
                     LuaTypes.DOT,
-                    LuaTypes.SHORT_COMMENT -> return TypedHandlerDelegate.Result.STOP
+                    LuaTypes.SHORT_COMMENT -> return Result.STOP
                 }
             }
         }
         return super.checkAutoPopup(charTyped, project, editor, file)
     }
 
-    override fun charTyped(c: Char, project: Project, editor: Editor, file: PsiFile): TypedHandlerDelegate.Result {
+    override fun charTyped(c: Char, project: Project, editor: Editor, file: PsiFile): Result {
         if (file.fileType == LuaFileType.INSTANCE) {
             // function() <caret> end 自动加上end
             if (c == '(') {
@@ -57,8 +57,8 @@ class LuaTypedHandler : TypedHandlerDelegate() {
                 val pos = editor.caretModel.offset
                 val element = file.findElementAt(pos)
                 if (element != null && element.parent is LuaFuncBody) {
-                    editor.document.insertString(pos + 1, " end")
-                    return TypedHandlerDelegate.Result.STOP
+                    editor.document.insertString(pos, ") end")
+                    return Result.STOP
                 }
             }
         }
