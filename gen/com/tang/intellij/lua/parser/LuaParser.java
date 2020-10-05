@@ -24,142 +24,15 @@ public class LuaParser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, EXTENDS_SETS_);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == ARGS) {
-      r = args(b, 0);
-    }
-    else if (t == ASSIGN_STAT) {
-      r = assignStat(b, 0);
-    }
-    else if (t == BINARY_EXPR) {
-      r = binaryExpr(b, 0);
-    }
-    else if (t == BINARY_OP) {
-      r = binaryOp(b, 0);
-    }
-    else if (t == BLOCK) {
-      r = block(b, 0);
-    }
-    else if (t == BREAK_STAT) {
-      r = breakStat(b, 0);
-    }
-    else if (t == CALL_EXPR) {
-      r = callExpr(b, 0);
-    }
-    else if (t == CLASS_METHOD_DEF) {
-      r = classMethodDef(b, 0);
-    }
-    else if (t == CLASS_METHOD_NAME) {
-      r = classMethodName(b, 0);
-    }
-    else if (t == CLOSURE_EXPR) {
-      r = closureExpr(b, 0);
-    }
-    else if (t == DO_STAT) {
-      r = doStat(b, 0);
-    }
-    else if (t == EMPTY_STAT) {
-      r = emptyStat(b, 0);
-    }
-    else if (t == EXPR) {
-      r = expr(b, 0);
-    }
-    else if (t == EXPR_LIST) {
-      r = exprList(b, 0);
-    }
-    else if (t == EXPR_STAT) {
-      r = exprStat(b, 0);
-    }
-    else if (t == FOR_A_STAT) {
-      r = forAStat(b, 0);
-    }
-    else if (t == FOR_B_STAT) {
-      r = forBStat(b, 0);
-    }
-    else if (t == FUNC_BODY) {
-      r = funcBody(b, 0);
-    }
-    else if (t == FUNC_DEF) {
-      r = funcDef(b, 0);
-    }
-    else if (t == GOTO_STAT) {
-      r = gotoStat(b, 0);
-    }
-    else if (t == IF_STAT) {
-      r = ifStat(b, 0);
-    }
-    else if (t == INDEX_EXPR) {
-      r = indexExpr(b, 0);
-    }
-    else if (t == LABEL_STAT) {
-      r = labelStat(b, 0);
-    }
-    else if (t == LIST_ARGS) {
-      r = listArgs(b, 0);
-    }
-    else if (t == LITERAL_EXPR) {
-      r = literalExpr(b, 0);
-    }
-    else if (t == LOCAL_DEF) {
-      r = localDef(b, 0);
-    }
-    else if (t == LOCAL_FUNC_DEF) {
-      r = localFuncDef(b, 0);
-    }
-    else if (t == NAME_DEF) {
-      r = nameDef(b, 0);
-    }
-    else if (t == NAME_EXPR) {
-      r = nameExpr(b, 0);
-    }
-    else if (t == NAME_LIST) {
-      r = nameList(b, 0);
-    }
-    else if (t == PARAM_NAME_DEF) {
-      r = paramNameDef(b, 0);
-    }
-    else if (t == PAREN_EXPR) {
-      r = parenExpr(b, 0);
-    }
-    else if (t == REPEAT_STAT) {
-      r = repeatStat(b, 0);
-    }
-    else if (t == RETURN_STAT) {
-      r = returnStat(b, 0);
-    }
-    else if (t == SHEBANG_LINE) {
-      r = shebang_line(b, 0);
-    }
-    else if (t == SINGLE_ARG) {
-      r = singleArg(b, 0);
-    }
-    else if (t == TABLE_EXPR) {
-      r = tableExpr(b, 0);
-    }
-    else if (t == TABLE_FIELD) {
-      r = tableField(b, 0);
-    }
-    else if (t == TABLE_FIELD_SEP) {
-      r = tableFieldSep(b, 0);
-    }
-    else if (t == UNARY_EXPR) {
-      r = unaryExpr(b, 0);
-    }
-    else if (t == UNARY_OP) {
-      r = unaryOp(b, 0);
-    }
-    else if (t == VAR_LIST) {
-      r = varList(b, 0);
-    }
-    else if (t == WHILE_STAT) {
-      r = whileStat(b, 0);
-    }
-    else {
-      r = parse_root_(t, b, 0);
-    }
+    r = parse_root_(t, b);
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
   }
 
-  protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
+  protected boolean parse_root_(IElementType t, PsiBuilder b) {
+    return parse_root_(t, b, 0);
+  }
+
+  static boolean parse_root_(IElementType t, PsiBuilder b, int l) {
     return luaFile(b, l + 1);
   }
 
@@ -364,10 +237,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
   private static boolean checkFuncPrefix_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "checkFuncPrefix_1")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, DOT);
     if (!r) r = consumeToken(b, COLON);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1154,10 +1025,8 @@ public class LuaParser implements PsiParser, LightPsiParser {
   private static boolean parList_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "parList_recover_0")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, RPAREN);
     if (!r) r = consumeToken(b, IN);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1344,7 +1213,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
   private static boolean stat_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "stat_recover_0")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = consumeToken(b, ID);
     if (!r) r = consumeToken(b, COMMA);
     if (!r) r = consumeToken(b, SEMI);
@@ -1365,7 +1233,6 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, DOUBLE_COLON);
     if (!r) r = consumeToken(b, GOTO);
     if (!r) r = unaryOp(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -1485,11 +1352,9 @@ public class LuaParser implements PsiParser, LightPsiParser {
   private static boolean tableField_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tableField_recover_0")) return false;
     boolean r;
-    Marker m = enter_section_(b);
     r = tableFieldSep(b, l + 1);
     if (!r) r = consumeToken(b, RCURLY);
     if (!r) r = consumeToken(b, LBRACK);
-    exit_section_(b, m, null, r);
     return r;
   }
 

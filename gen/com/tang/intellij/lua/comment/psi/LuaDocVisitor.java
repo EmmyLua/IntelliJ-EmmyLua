@@ -3,8 +3,8 @@ package com.tang.intellij.lua.comment.psi;
 
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElementVisitor;
-import com.tang.intellij.lua.psi.LuaClassField;
 import com.intellij.psi.PsiNameIdentifierOwner;
+import com.tang.intellij.lua.psi.LuaClassField;
 import com.tang.intellij.lua.psi.LuaClass;
 import com.tang.intellij.lua.psi.LuaTypeAlias;
 

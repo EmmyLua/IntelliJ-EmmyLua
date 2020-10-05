@@ -52,40 +52,48 @@ public class LuaIndexExprImpl extends LuaIndexExprMixin implements LuaIndexExpr 
     return findChildByType(ID);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String name) {
     return LuaPsiImplUtilKt.setName(this, name);
   }
 
+  @Override
   @Nullable
   public String getName() {
     return LuaPsiImplUtilKt.getName(this);
   }
 
+  @Override
   public int getTextOffset() {
     return LuaPsiImplUtilKt.getTextOffset(this);
   }
 
+  @Override
   @NotNull
   public ItemPresentation getPresentation() {
     return LuaPsiImplUtilKt.getPresentation(this);
   }
 
+  @Override
   @Nullable
   public LuaLiteralExpr getIdExpr() {
     return LuaPsiImplUtilKt.getIdExpr(this);
   }
 
+  @Override
   @NotNull
   public ITy guessParentType(@NotNull SearchContext context) {
     return LuaPsiImplUtilKt.guessParentType(this, context);
   }
 
+  @Override
   public boolean isDeprecated() {
     return LuaPsiImplUtilKt.isDeprecated(this);
   }

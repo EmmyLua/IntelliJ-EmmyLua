@@ -26,6 +26,7 @@ public class LuaDocStringLiteralTyImpl extends LuaDocTyImpl implements LuaDocStr
     else super.accept(visitor);
   }
 
+  @Override
   @NotNull
   public ITy getType() {
     return LuaDocPsiImplUtilKt.getType(this);

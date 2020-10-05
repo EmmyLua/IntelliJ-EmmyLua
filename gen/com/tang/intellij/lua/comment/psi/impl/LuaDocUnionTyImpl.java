@@ -32,6 +32,7 @@ public class LuaDocUnionTyImpl extends LuaDocTyImpl implements LuaDocUnionTy {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaDocTy.class);
   }
 
+  @Override
   @NotNull
   public ITy getType() {
     return LuaDocPsiImplUtilKt.getType(this);

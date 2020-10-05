@@ -23,85 +23,15 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     boolean r;
     b = adapt_builder_(t, b, this, EXTENDS_SETS_);
     Marker m = enter_section_(b, 0, _COLLAPSE_, null);
-    if (t == ACCESS_MODIFIER) {
-      r = access_modifier(b, 0);
-    }
-    else if (t == CLASS_NAME_REF) {
-      r = class_name_ref(b, 0);
-    }
-    else if (t == COMMENT_STRING) {
-      r = comment_string(b, 0);
-    }
-    else if (t == FUNCTION_PARAM) {
-      r = function_param(b, 0);
-    }
-    else if (t == GENERIC_DEF) {
-      r = generic_def(b, 0);
-    }
-    else if (t == PARAM_NAME_REF) {
-      r = param_name_ref(b, 0);
-    }
-    else if (t == TABLE_FIELD) {
-      r = tableField(b, 0);
-    }
-    else if (t == TABLE_DEF) {
-      r = table_def(b, 0);
-    }
-    else if (t == TAG_ALIAS) {
-      r = tag_alias(b, 0);
-    }
-    else if (t == TAG_CLASS) {
-      r = tag_class(b, 0);
-    }
-    else if (t == TAG_DEF) {
-      r = tag_def(b, 0);
-    }
-    else if (t == TAG_FIELD) {
-      r = tag_field(b, 0);
-    }
-    else if (t == TAG_GENERIC_LIST) {
-      r = tag_generic_list(b, 0);
-    }
-    else if (t == TAG_LAN) {
-      r = tag_lan(b, 0);
-    }
-    else if (t == TAG_OVERLOAD) {
-      r = tag_overload(b, 0);
-    }
-    else if (t == TAG_PARAM) {
-      r = tag_param(b, 0);
-    }
-    else if (t == TAG_RETURN) {
-      r = tag_return(b, 0);
-    }
-    else if (t == TAG_SEE) {
-      r = tag_see(b, 0);
-    }
-    else if (t == TAG_SUPPRESS) {
-      r = tag_suppress(b, 0);
-    }
-    else if (t == TAG_TYPE) {
-      r = tag_type(b, 0);
-    }
-    else if (t == TAG_VARARG) {
-      r = tag_vararg(b, 0);
-    }
-    else if (t == TY) {
-      r = ty(b, 0, -1);
-    }
-    else if (t == TYPE_LIST) {
-      r = type_list(b, 0);
-    }
-    else if (t == VARARG_PARAM) {
-      r = vararg_param(b, 0);
-    }
-    else {
-      r = parse_root_(t, b, 0);
-    }
+    r = parse_root_(t, b);
     exit_section_(b, 0, m, t, r, true, TRUE_CONDITION);
   }
 
-  protected boolean parse_root_(IElementType t, PsiBuilder b, int l) {
+  protected boolean parse_root_(IElementType t, PsiBuilder b) {
+    return parse_root_(t, b, 0);
+  }
+
+  static boolean parse_root_(IElementType t, PsiBuilder b, int l) {
     return doc(b, l + 1);
   }
 

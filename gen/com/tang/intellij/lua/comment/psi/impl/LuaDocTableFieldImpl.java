@@ -52,36 +52,43 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
     return notNullChild(findChildByType(ID));
   }
 
+  @Override
   @NotNull
   public ITy guessParentType(@NotNull SearchContext context) {
     return LuaDocPsiImplUtilKt.guessParentType(this, context);
   }
 
+  @Override
   @NotNull
   public Visibility getVisibility() {
     return LuaDocPsiImplUtilKt.getVisibility(this);
   }
 
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String newName) {
     return LuaDocPsiImplUtilKt.setName(this, newName);
   }
 
+  @Override
   @NotNull
   public String getName() {
     return LuaDocPsiImplUtilKt.getName(this);
   }
 
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaDocPsiImplUtilKt.getNameIdentifier(this);
   }
 
+  @Override
   @NotNull
   public ITy guessType(@NotNull SearchContext context) {
     return LuaDocPsiImplUtilKt.guessType(this, context);
   }
 
+  @Override
   public boolean isDeprecated() {
     return LuaDocPsiImplUtilKt.isDeprecated(this);
   }

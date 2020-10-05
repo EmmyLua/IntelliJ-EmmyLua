@@ -50,11 +50,13 @@ public class LuaDocFunctionTyImpl extends LuaDocTyImpl implements LuaDocFunction
     return PsiTreeUtil.getChildOfType(this, LuaDocVarargParam.class);
   }
 
+  @Override
   @NotNull
   public ITy getType() {
     return LuaDocPsiImplUtilKt.getType(this);
   }
 
+  @Override
   @NotNull
   public ITy getReturnType() {
     return LuaDocPsiImplUtilKt.getReturnType(this);
