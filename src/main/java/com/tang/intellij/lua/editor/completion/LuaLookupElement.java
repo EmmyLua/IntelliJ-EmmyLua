@@ -175,4 +175,10 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
     public int hashCode() {
         return getItemText().hashCode();
     }
+
+    //bug fix: https://github.com/EmmyLua/IntelliJ-EmmyLua/issues/373
+    @Override
+    public boolean isValid() {
+        return true;
+    }
 }
