@@ -26,7 +26,12 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyFunction
 
-class SuggestLuaParametersMacro : Macro() {
+class SuggestLuaParametersMacro(private val position: Position = Position.TemplateHandler) : Macro() {
+
+    enum class Position {
+        TemplateHandler, KeywordInsertHandler, TypedHandler
+    }
+
     override fun getPresentableName(): String {
         return "SuggestLuaParameters()"
     }
@@ -42,7 +47,12 @@ class SuggestLuaParametersMacro : Macro() {
 
     override fun calculateLookupItems(expressions: Array<out Expression>, context: ExpressionContext): Array<LookupElement>? {
         val element = context.psiElementAtStartOffset
-        val func = element?.nextSibling
+        val next = element?.nextSibling
+        val func = when (position) {
+            Position.KeywordInsertHandler -> next?.parent
+            Position.TypedHandler -> next?.parent?.parent
+            else -> next
+        }
 
         if (func is LuaClosureExpr) {
             val ty = func.shouldBe(SearchContext.get(context.project)) as? ITyFunction ?: return null

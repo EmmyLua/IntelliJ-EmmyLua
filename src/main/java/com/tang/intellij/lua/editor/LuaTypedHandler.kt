@@ -18,10 +18,14 @@ package com.tang.intellij.lua.editor
 
 import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.editorActions.TypedHandlerDelegate
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.impl.MacroCallNode
+import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
+import com.tang.intellij.lua.codeInsight.template.macro.SuggestLuaParametersMacro
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.LuaFuncBody
 import com.tang.intellij.lua.psi.LuaTypes
@@ -57,7 +61,10 @@ class LuaTypedHandler : TypedHandlerDelegate() {
                 val pos = editor.caretModel.offset
                 val element = file.findElementAt(pos)
                 if (element != null && element.parent is LuaFuncBody) {
-                    editor.document.insertString(pos, ") end")
+                    val templateManager = TemplateManager.getInstance(project)
+                    val template = templateManager.createTemplate("", "", "\$PARAMETERS\$) \$END\$ end")
+                    template.addVariable("PARAMETERS", MacroCallNode(SuggestLuaParametersMacro(SuggestLuaParametersMacro.Position.TypedHandler)), TextExpression(""), false)
+                    templateManager.startTemplate(editor, template)
                     return Result.STOP
                 }
             }
