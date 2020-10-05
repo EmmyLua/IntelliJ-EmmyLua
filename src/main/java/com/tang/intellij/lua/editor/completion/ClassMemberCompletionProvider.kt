@@ -159,6 +159,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                            handlerProcessor: HandlerProcessor?) {
         val name = field.name
         if (name != null) {
+            this.session?.addWord(name)
             val element = LookupElementFactory.createFieldLookupElement(clazzName, name, field, ty, bold)
             val ele = handlerProcessor?.process(element, field, null) ?: element
             completionResultSet.addElement(ele)
@@ -176,6 +177,7 @@ open class ClassMemberCompletionProvider : LuaCompletionProvider() {
                             handlerProcessor: HandlerProcessor?) {
         val name = classMember.name
         if (name != null) {
+            this.session?.addWord(name)
             fnTy.process(Processor {
 
                 val firstParam = it.getFirstParam(thisType, isColonStyle)
