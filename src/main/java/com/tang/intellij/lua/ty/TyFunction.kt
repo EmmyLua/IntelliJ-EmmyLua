@@ -36,6 +36,17 @@ interface IFunSignature {
     fun subTypeOf(other: IFunSignature, context: SearchContext, strict: Boolean): Boolean
 }
 
+fun IFunSignature.getParamTyEx(callExpr: LuaCallExpr, index: Int): ITy {
+    var t: ITy = Ty.UNKNOWN
+    processArgs(callExpr) { i, param ->
+        if (i == index) {
+            t = param.ty
+            false
+        } else true
+    }
+    return t
+}
+
 fun IFunSignature.processArgs(callExpr: LuaCallExpr, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     val expr = callExpr.expr
     val thisTy = if (expr is LuaIndexExpr) {

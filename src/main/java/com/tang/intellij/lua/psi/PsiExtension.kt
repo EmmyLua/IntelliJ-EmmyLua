@@ -88,7 +88,7 @@ private fun LuaExpr.shouldBeInternal(context: SearchContext): ITy {
                     val substitutor = p2.createSubstitutor(sig, context)
                     if (substitutor != null) sig = sig.substitute(substitutor)
 
-                    ret = ret.union(sig.getParamTy(idx))
+                    ret = ret.union(sig.getParamTyEx(p2, idx))
                 }
             }
             return ret
