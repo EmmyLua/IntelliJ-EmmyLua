@@ -11,7 +11,7 @@ import com.tang.intellij.lua.ty.ITy;
 
 public interface LuaClosureExpr extends LuaExpr, LuaFuncBodyOwner, LuaExprStubElement<LuaClosureExprStub> {
 
-  @NotNull
+  @Nullable
   LuaFuncBody getFuncBody();
 
   @NotNull

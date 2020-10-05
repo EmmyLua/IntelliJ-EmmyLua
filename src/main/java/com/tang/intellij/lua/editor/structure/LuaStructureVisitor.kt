@@ -163,7 +163,7 @@ class LuaStructureVisitor : LuaVisitor() {
 
             if (expr is LuaClosureExpr) {
                 pushContext(child, false)
-                expr.funcBody.accept(this)
+                expr.funcBody?.accept(this)
                 popContext()
             } else if (expr is LuaTableExpr) {
                 handleTableExpr(expr, child)
@@ -186,7 +186,7 @@ class LuaStructureVisitor : LuaVisitor() {
 
                 pushContext(elem)
 
-                arg.funcBody.accept(this)
+                arg.funcBody?.accept(this)
 
                 popContext()
             }

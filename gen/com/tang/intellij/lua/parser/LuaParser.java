@@ -330,12 +330,13 @@ public class LuaParser implements PsiParser, LightPsiParser {
   public static boolean closureExpr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "closureExpr")) return false;
     if (!nextTokenIs(b, FUNCTION)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, CLOSURE_EXPR, null);
     r = consumeToken(b, FUNCTION);
+    p = r; // pin = 1
     r = r && funcBody(b, l + 1);
-    exit_section_(b, m, CLOSURE_EXPR, r);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */

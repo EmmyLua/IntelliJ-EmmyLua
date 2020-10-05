@@ -270,7 +270,11 @@ object LuaStatementParser : GeneratedParserUtilBase() {
 
     fun parseFuncBody(b: PsiBuilder, l: Int): PsiBuilder.Marker {
         val m = b.mark()
-        expectError(b, LPAREN) { "'('" }
+        if (b.tokenType !== LPAREN) {
+            m.error("'(' expected")
+            return m
+        }
+        b.advanceLexer()
 
         // param list
         val def = expectParamName(b, false)

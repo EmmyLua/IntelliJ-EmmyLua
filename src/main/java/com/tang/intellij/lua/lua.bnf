@@ -449,7 +449,7 @@ private prefixExpr ::= parenExpr | nameExpr | tableExpr | literalExpr
 private primaryExpr ::= prefixExpr (suffixExpr*)
 
 closureExpr ::= 'function' funcBody {
-    pin = 2
+    pin = 1
     implements = [
         "com.tang.intellij.lua.psi.LuaFuncBodyOwner"
         "com.tang.intellij.lua.stubs.LuaExprStubElement<com.tang.intellij.lua.stubs.LuaClosureExprStub>"
