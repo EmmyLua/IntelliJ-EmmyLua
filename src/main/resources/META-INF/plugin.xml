@@ -17,7 +17,7 @@
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.3.4</version>
+    <version>1.3.5</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
@@ -69,6 +69,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.3.5</strong>
+    <ul>
+        <li>[FIX] bug fix #371, #373, #359, #357, #337, #338, #344, #298, #355</li>
+        <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
+    </ul>
     <strong>1.3.4</strong>
     <ul>
         <li>[NEW] compatible with IDEA202</li>
@@ -83,18 +88,6 @@
     <strong>1.3.2</strong>
     <ul>
         <li>[REMOVE] Remove attach debugger. Since it blocked by some anti-virus software, was reported as malware :-(</li>
-        <a href="https://emmylua.github.io/changelogs.html?plugin">Full changelog</a>
-    </ul>
-    <strong>1.3.1</strong>
-    <ul>
-        <li>[NEW] support LuaJIT number (fix bug #272)</li>
-        <li>[NEW] compatible with IDEA193</li>
-        <li>[NEW] support line breaks in comments</li>
-        <li>[NEW] settings for require-like function (by @Beenlong)</li>
-        <li>[NEW] add special type: self. (like this in typescript)</li>
-        <li>[IMPROVE] table field completion (fix bug #230)</li>
-        <li>[IMPROVE] improve emmy debugger and attach debugger</li>
-        <li>[FIX] bug fix #273, #276, #278, #288</li>
         <a href="https://emmylua.github.io/changelogs.html?plugin">Full changelog</a>
     </ul>
     ]]>
