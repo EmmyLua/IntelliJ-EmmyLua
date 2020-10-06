@@ -225,13 +225,17 @@ interface ITyFunction : ITy {
 
 val ITyFunction.isColonCall get() = hasFlag(TyFlags.SELF_FUNCTION)
 
-fun ITyFunction.process(processor: Processor<IFunSignature>) {
-    if (processor.process(mainSignature)) {
+fun ITyFunction.process(processor: (IFunSignature) -> Boolean) {
+    if (processor(mainSignature)) {
         for (signature in signatures) {
-            if (!processor.process(signature))
+            if (!processor(signature))
                 break
         }
     }
+}
+
+fun ITyFunction.process(processor: Processor<IFunSignature>) {
+    process { processor.process(it) }
 }
 
 fun ITyFunction.findPerfectSignature(nArgs: Int): IFunSignature {
