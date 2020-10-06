@@ -38,12 +38,15 @@ interface ITyClass : ITy {
     var aliasName: String?
     fun processAlias(processor: Processor<String>): Boolean
     fun lazyInit(searchContext: SearchContext)
+    fun getMemberChain(context: SearchContext): ClassMemberChain
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean = true)
     fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit) {
         processMembers(context, processor, true)
     }
     fun findMember(name: String, searchContext: SearchContext): LuaClassMember?
-    fun findMemberType(name: String, searchContext: SearchContext): ITy?
+    fun findMemberType(name: String, searchContext: SearchContext): ITy? {
+        return infer(findMember(name, searchContext), searchContext)
+    }
     fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember?
 
     fun recoverAlias(context: SearchContext, aliasSubstitutor: TyAliasSubstitutor): ITy {
@@ -96,12 +99,16 @@ abstract class TyClass(override val className: String,
         return true
     }
 
-    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
-        val clazzName = className
-        val project = context.project
+    override fun getMemberChain(context: SearchContext): ClassMemberChain {
+        var superMemberChain: ClassMemberChain? = null
+        // super
+        processSuperClass(this, context) {
+            superMemberChain = it.getMemberChain(context)
+            true
+        }
 
-        val manager = LuaShortNamesManager.getInstance(project)
-        val members = manager.getClassMembers(clazzName, context)
+        val manager = LuaShortNamesManager.getInstance(context.project)
+        val members = manager.getClassMembers(className, context)
         val list = mutableListOf<LuaClassMember>()
         list.addAll(members)
 
@@ -110,35 +117,24 @@ abstract class TyClass(override val className: String,
             list.addAll(classMembers)
         })
 
-        for (member in list) {
-            processor(this, member)
-        }
+        val chain = ClassMemberChain(this, superMemberChain)
+        list.forEach { chain.add(it) }
+        return chain
+    }
 
-        // super
-        if (deep) {
-            processSuperClass(this, context) {
-                it.processMembers(context, processor, false)
-                true
-            }
-        }
+    override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
+        val chain = getMemberChain(context)
+        chain.process(processor)
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
-        return LuaShortNamesManager.getInstance(searchContext.project).findMember(this, name, searchContext)
-    }
-
-    override fun findMemberType(name: String, searchContext: SearchContext): ITy? {
-        return infer(findMember(name, searchContext), searchContext)
+        val chain = getMemberChain(searchContext)
+        return chain.findMember(name)
     }
 
     override fun findSuperMember(name: String, searchContext: SearchContext): LuaClassMember? {
-        // Travel up the hierarchy to find the lowest member of this type on a superclass (excluding this class)
-        var member: LuaClassMember? = null
-        processSuperClass(this, searchContext) {
-            member = it.findMember(name, searchContext)
-            member == null
-        }
-        return member
+        val chain = getMemberChain(searchContext)
+        return chain.superChain?.findMember(name)
     }
 
     override fun accept(visitor: ITyVisitor) {
