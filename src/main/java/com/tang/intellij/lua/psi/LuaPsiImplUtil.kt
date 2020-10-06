@@ -591,6 +591,15 @@ fun getVisibility(classMethodDef: LuaClassMethodDef): Visibility {
     return getVisibility(classMethodDef as LuaClassMember)
 }
 
+fun getWorth(classMember: LuaClassMember): Int {
+    return when (classMember) {
+        is LuaTableField -> LuaClassMember.WORTH_TABLE_FIELD
+        is LuaClassMethodDef,
+        is LuaFuncDef -> LuaClassMember.WORTH_METHOD_DEF
+        else -> LuaClassMember.WORTH_ASSIGN
+    }
+}
+
 fun getExpr(exprStat: LuaExprStat): LuaExpr {
     return PsiTreeUtil.getStubChildOfType(exprStat, LuaExpr::class.java)!!
 }

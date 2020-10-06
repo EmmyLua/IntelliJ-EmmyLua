@@ -36,6 +36,8 @@ public interface LuaDocTagField extends LuaClassField, LuaDocPsiElement, PsiName
   @NotNull
   Visibility getVisibility();
 
+  int getWorth();
+
   @Nullable
   PsiElement getNameIdentifier();
 

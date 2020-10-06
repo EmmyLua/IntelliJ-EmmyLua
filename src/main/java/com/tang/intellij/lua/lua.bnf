@@ -263,6 +263,7 @@ funcDef ::= 'function' ID funcBody {
         guessReturnType
         guessParentType
         getVisibility
+        getWorth
         isDeprecated
         getParams
         getReferences
@@ -293,6 +294,7 @@ classMethodDef ::= 'function' classMethodName funcBody {
         getComment
         guessParentType
         getVisibility
+        getWorth
         isDeprecated
         getParamNameDefList
         getNameIdentifier
@@ -504,6 +506,7 @@ tableField ::= tableField1 | tableField2 | expr {
         getPresentation
         guessParentType
         getVisibility
+        getWorth
         isDeprecated
         getComment
         getIdExpr

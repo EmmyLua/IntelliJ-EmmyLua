@@ -121,6 +121,11 @@ public class LuaFuncDefImpl extends StubBasedPsiElementBase<LuaFuncStub> impleme
   }
 
   @Override
+  public int getWorth() {
+    return LuaPsiImplUtilKt.getWorth(this);
+  }
+
+  @Override
   public boolean isDeprecated() {
     return LuaPsiImplUtilKt.isDeprecated(this);
   }

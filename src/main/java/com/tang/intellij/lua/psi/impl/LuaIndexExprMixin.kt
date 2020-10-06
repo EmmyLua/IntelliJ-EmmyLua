@@ -65,4 +65,7 @@ abstract class LuaIndexExprMixin : LuaExprStubMixin<LuaIndexExprStub>, LuaExpr, 
             Visibility.get(it.text)
         } ?: Visibility.PUBLIC
     }
+
+    override val worth: Int
+        get() = LuaClassMember.WORTH_ASSIGN
 }

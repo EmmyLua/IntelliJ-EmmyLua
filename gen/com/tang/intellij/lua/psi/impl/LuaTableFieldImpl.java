@@ -107,6 +107,11 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
   }
 
   @Override
+  public int getWorth() {
+    return LuaPsiImplUtilKt.getWorth(this);
+  }
+
+  @Override
   public boolean isDeprecated() {
     return LuaPsiImplUtilKt.isDeprecated(this);
   }

@@ -65,6 +65,11 @@ public class LuaDocTableFieldImpl extends StubBasedPsiElementBase<LuaDocTableFie
   }
 
   @Override
+  public int getWorth() {
+    return LuaDocPsiImplUtilKt.getWorth(this);
+  }
+
+  @Override
   @NotNull
   public PsiElement setName(@NotNull String newName) {
     return LuaDocPsiImplUtilKt.setName(this, newName);

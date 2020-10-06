@@ -72,6 +72,11 @@ public class LuaClassMethodDefImpl extends StubBasedPsiElementBase<LuaClassMetho
   }
 
   @Override
+  public int getWorth() {
+    return LuaPsiImplUtilKt.getWorth(this);
+  }
+
+  @Override
   public boolean isDeprecated() {
     return LuaPsiImplUtilKt.isDeprecated(this);
   }

@@ -84,6 +84,11 @@ public class LuaDocTagFieldImpl extends StubBasedPsiElementBase<LuaDocTagFieldSt
   }
 
   @Override
+  public int getWorth() {
+    return LuaDocPsiImplUtilKt.getWorth(this);
+  }
+
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaDocPsiImplUtilKt.getNameIdentifier(this);

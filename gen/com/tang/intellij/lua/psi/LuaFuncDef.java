@@ -50,6 +50,8 @@ public interface LuaFuncDef extends LuaClassMethod, LuaDeclaration, LuaStatement
   @NotNull
   Visibility getVisibility();
 
+  int getWorth();
+
   boolean isDeprecated();
 
   @NotNull

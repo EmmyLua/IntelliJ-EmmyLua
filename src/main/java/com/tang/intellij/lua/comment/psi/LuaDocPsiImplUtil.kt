@@ -307,6 +307,8 @@ fun getVisibility(f: LuaDocTableField): Visibility {
     return Visibility.PUBLIC
 }
 
+fun getWorth(m: LuaClassMember): Int = LuaClassMember.WORTH_DOC
+
 fun getNameIdentifier(f: LuaDocTableField): PsiElement? {
     return f.id
 }

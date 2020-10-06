@@ -26,6 +26,8 @@ public interface LuaDocTableField extends LuaDocPsiElement, LuaClassField, PsiNa
   @NotNull
   Visibility getVisibility();
 
+  int getWorth();
+
   @NotNull
   PsiElement setName(@NotNull String newName);
 

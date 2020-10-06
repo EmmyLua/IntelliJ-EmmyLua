@@ -56,6 +56,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
                 stat != null,
                 isGlobal,
                 docTy,
+                luaNameExpr.worth,
                 stubElement,
                 this)
     }
@@ -66,6 +67,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
         stream.writeBoolean(stub.isName)
         stream.writeBoolean(stub.isGlobal)
         stream.writeTyNullable(stub.docTy)
+        stream.writeInt(stub.worth)
     }
 
     override fun deserialize(stream: StubInputStream, stubElement: StubElement<*>): LuaNameExprStub {
@@ -74,11 +76,13 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
         val isName = stream.readBoolean()
         val isGlobal = stream.readBoolean()
         val docTy = stream.readTyNullable()
+        val worth = stream.readInt()
         return LuaNameExprStubImpl(StringRef.toString(nameRef),
                 StringRef.toString(moduleRef),
                 isGlobal,
                 isName,
                 docTy,
+                worth,
                 stubElement,
                 this)
     }
@@ -94,7 +98,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
     }
 }
 
-interface LuaNameExprStub : LuaExprStub<LuaNameExpr>, LuaDocTyStub {
+interface LuaNameExprStub : LuaExprStub<LuaNameExpr>, LuaDocTyStub, WorthElement {
     val name: String
     val module: String
     val isName: Boolean
@@ -107,6 +111,7 @@ class LuaNameExprStubImpl(
         override val isName: Boolean,
         override val isGlobal: Boolean,
         override val docTy: ITy?,
+        override val worth: Int,
         parent: StubElement<*>,
         elementType: LuaStubElementType<*, *>
 ) : LuaStubBase<LuaNameExpr>(parent, elementType), LuaNameExprStub

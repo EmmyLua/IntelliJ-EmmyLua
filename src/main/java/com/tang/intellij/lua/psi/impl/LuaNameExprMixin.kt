@@ -22,6 +22,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.stubs.IStubElementType
 import com.intellij.psi.tree.IElementType
 import com.tang.intellij.lua.psi.LuaClassField
+import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.LuaExpr
 import com.tang.intellij.lua.psi.Visibility
 import com.tang.intellij.lua.search.SearchContext
@@ -51,4 +52,7 @@ abstract class LuaNameExprMixin : StubBasedPsiElementBase<LuaNameExprStub>, LuaE
 
     override val visibility: Visibility
         get() = Visibility.PUBLIC
+
+    override val worth: Int
+        get() = LuaClassMember.WORTH_ASSIGN
 }
