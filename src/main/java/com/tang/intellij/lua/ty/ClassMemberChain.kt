@@ -36,16 +36,17 @@ class ClassMemberChain(val ty: ITyClass, var superChain: ClassMemberChain?) {
         return members.getOrElse(name) { superChain?.findMember(name) }
     }
 
-    private fun process(processor: (ITyClass, String, LuaClassMember) -> Unit) {
+    private fun process(deep: Boolean, processor: (ITyClass, String, LuaClassMember) -> Unit) {
         for ((t, u) in members) {
             processor(ty, t, u)
         }
-        superChain?.process(processor)
+        if (deep)
+            superChain?.process(deep, processor)
     }
 
-    fun process(processor: (ITyClass, LuaClassMember) -> Unit) {
+    fun process(deep: Boolean, processor: (ITyClass, LuaClassMember) -> Unit) {
         val cache = mutableSetOf<String>()
-        process { clazz, name, member ->
+        process(deep) { clazz, name, member ->
             if (cache.add(name))
                 processor(clazz, member)
         }

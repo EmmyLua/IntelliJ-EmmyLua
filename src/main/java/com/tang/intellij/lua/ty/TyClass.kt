@@ -124,7 +124,7 @@ abstract class TyClass(override val className: String,
 
     override fun processMembers(context: SearchContext, processor: (ITyClass, LuaClassMember) -> Unit, deep: Boolean) {
         val chain = getMemberChain(context)
-        chain.process(processor)
+        chain.process(deep, processor)
     }
 
     override fun findMember(name: String, searchContext: SearchContext): LuaClassMember? {
