@@ -49,8 +49,8 @@ class SuggestLuaParametersMacro(private val position: Position = Position.Templa
         val element = context.psiElementAtStartOffset
         val next = element?.nextSibling
         val func = when (position) {
+            Position.TypedHandler,
             Position.KeywordInsertHandler -> next?.parent
-            Position.TypedHandler -> next?.parent?.parent
             else -> next
         }
 
