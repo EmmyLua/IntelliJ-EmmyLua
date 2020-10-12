@@ -42,6 +42,15 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
         return LuaFileType.INSTANCE
     }
 
+    val uid: String get() {
+        val stub = greenStub
+        if (stub is LuaFileStub)
+            return stub.uid
+        val file = originalFile
+        val hashCode = file.viewProvider.contents.hashCode()
+        return "$name[$hashCode]"
+    }
+
     val tooLarger: Boolean get() {
         val fileLimit = LuaSettings.instance.tooLargerFileThreshold * 1024
         val fileSize = viewProvider.virtualFile.length

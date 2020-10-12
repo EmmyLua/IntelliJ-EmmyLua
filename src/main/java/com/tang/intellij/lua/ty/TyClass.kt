@@ -17,6 +17,7 @@
 package com.tang.intellij.lua.ty
 
 import com.intellij.openapi.project.Project
+import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.stubs.StubInputStream
 import com.intellij.psi.stubs.StubOutputStream
@@ -281,17 +282,24 @@ fun createSerializedClass(name: String,
     return TySerializedClass(name, varName, supper, alias, flags)
 }
 
+private val PsiFile.uid: String get() {
+    if (this is LuaPsiFile)
+        return this.uid
+
+    return name
+}
+
 fun getTableTypeName(table: LuaTableExpr): String {
     val stub = table.stub
     if (stub != null)
         return stub.tableTypeName
 
-    val fileName = table.containingFile.name
+    val fileName = table.containingFile.uid
     return "$fileName@(${table.node.startOffset})table"
 }
 
 fun getAnonymousType(nameDef: LuaNameDef): String {
-    return "${nameDef.node.startOffset}@${nameDef.containingFile.name}"
+    return "${nameDef.node.startOffset}@${nameDef.containingFile.uid}"
 }
 
 fun getGlobalTypeName(text: String): String {
@@ -329,7 +337,7 @@ fun getDocTableTypeName(table: LuaDocTableDef): String {
     if (stub != null)
         return stub.className
 
-    val fileName = table.containingFile.name
+    val fileName = table.containingFile.uid
     return "10|$fileName|${table.node.startOffset}"
 }
 

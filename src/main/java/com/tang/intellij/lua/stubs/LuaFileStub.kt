@@ -61,7 +61,7 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
             override fun createStubForFile(file: PsiFile): StubElement<*> {
                 if (file is LuaPsiFile){
                     isTooLarger = file.tooLarger
-                    return LuaFileStub(file, file.moduleName)
+                    return LuaFileStub(file)
                 }
                 return super.createStubForFile(file)
             }
@@ -74,6 +74,7 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
 
     override fun serialize(stub: LuaFileStub, dataStream: StubOutputStream) {
         dataStream.writeName(stub.module)
+        dataStream.writeUTFFast(stub.uid)
         if (LOG.isTraceEnabled) {
             println("--------- START: ${stub.psi.name}")
             println(stub.printTree())
@@ -83,7 +84,8 @@ class LuaFileElementType : IStubFileElementType<LuaFileStub>(LuaLanguage.INSTANC
 
     override fun deserialize(dataStream: StubInputStream, parentStub: StubElement<*>?): LuaFileStub {
         val moduleRef = dataStream.readName()
-        return LuaFileStub(null, StringRef.toString(moduleRef))
+        val uid = dataStream.readUTFFast()
+        return LuaFileStub(null, StringRef.toString(moduleRef), uid)
     }
 
     override fun getExternalId() = "lua.file"
@@ -93,10 +95,13 @@ class LuaFileStub : PsiFileStubImpl<LuaPsiFile> {
     private var file: LuaPsiFile? = null
     private var moduleName:String? = null
 
-    constructor(file: LuaPsiFile) : this(file, null)
+    val uid: String
 
-    constructor(file: LuaPsiFile?, module:String?) : super(file) {
+    constructor(file: LuaPsiFile) : this(file, file.moduleName, file.uid)
+
+    constructor(file: LuaPsiFile?, module:String?, uid: String) : super(file) {
         this.file = file
+        this.uid = uid
         moduleName = module
     }
 
