@@ -101,25 +101,18 @@ abstract class TyClass(override val className: String,
     }
 
     override fun getMemberChain(context: SearchContext): ClassMemberChain {
-        var superMemberChain: ClassMemberChain? = null
-        // super
-        processSuperClass(this, context) {
-            superMemberChain = it.getMemberChain(context)
-            true
-        }
-
+        val superClazz = getSuperClass(context) as? ITyClass
+        val chain = ClassMemberChain(this, superClazz?.getMemberChain(context))
         val manager = LuaShortNamesManager.getInstance(context.project)
         val members = manager.getClassMembers(className, context)
-        val list = mutableListOf<LuaClassMember>()
-        list.addAll(members)
+        members.forEach { chain.add(it) }
 
         processAlias(Processor { alias ->
             val classMembers = manager.getClassMembers(alias, context)
-            list.addAll(classMembers)
+            classMembers.forEach { chain.add(it) }
+            true
         })
 
-        val chain = ClassMemberChain(this, superMemberChain)
-        list.forEach { chain.add(it) }
         return chain
     }
 
