@@ -20,6 +20,7 @@ import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.io.FileUtil
+import com.intellij.openapi.util.text.Strings
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.CachedValue
@@ -47,7 +48,8 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
         if (stub is LuaFileStub)
             return stub.uid
         val file = originalFile
-        val hashCode = file.viewProvider.contents.hashCode()
+        val contents = file.viewProvider.contents
+        val hashCode = Strings.stringHashCode(contents, 0, contents.length)
         return "$name[$hashCode]"
     }
 
