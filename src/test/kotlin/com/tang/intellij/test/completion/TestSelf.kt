@@ -35,7 +35,7 @@ class TestSelf : TestCompletionBase() {
             local foo = b:create()
             foo.--[[caret]]
         """) {
-            assertTrue(it.contains("bb"))
+            assertTrue("bb" in it)
         }
     }
 }

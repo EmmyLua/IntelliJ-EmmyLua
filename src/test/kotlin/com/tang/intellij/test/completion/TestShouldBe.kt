@@ -16,8 +16,6 @@
 
 package com.tang.intellij.test.completion
 
-import junit.framework.Assert
-
 class TestShouldBe : TestCompletionBase() {
 
     fun `test issue #298`() {
@@ -36,7 +34,7 @@ class TestShouldBe : TestCompletionBase() {
                 a--[[caret]]
             }
         """.trimIndent()) {
-            Assert.assertTrue(it.contains("aaa = "))
+            assertTrue("aaa = " in it)
         }
     }
 

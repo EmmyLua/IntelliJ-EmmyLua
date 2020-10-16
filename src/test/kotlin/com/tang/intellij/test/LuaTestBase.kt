@@ -17,7 +17,7 @@
 package com.tang.intellij.test
 
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.intellij.lang.annotations.Language
 
 /*
@@ -36,7 +36,7 @@ import org.intellij.lang.annotations.Language
  * limitations under the License.
  */
 
-abstract class LuaTestBase : LightPlatformCodeInsightFixtureTestCase() {
+abstract class LuaTestBase : BasePlatformTestCase() {
     protected fun checkByDirectory(@Language("Lua") before: String, @Language("Lua") after: String, action: () -> Unit) {
         fileTreeFromText(before).create()
         action()
@@ -44,7 +44,7 @@ abstract class LuaTestBase : LightPlatformCodeInsightFixtureTestCase() {
         fileTreeFromText(after).assertEquals(myFixture.findFileInTempDir(""))
     }
 
-    protected fun FileTree.create(): TestProject =
+    private fun FileTree.create(): TestProject =
             create(myFixture.project, myFixture.findFileInTempDir(""))
 
     protected fun FileTree.createAndOpenFileWithCaretMarker(): TestProject {

@@ -16,9 +16,6 @@
 
 package com.tang.intellij.test.completion
 
-import com.intellij.codeInsight.completion.CompletionType
-import java.util.*
-
 /**
  *
  * Created by tangzx on 2017/4/23.
@@ -27,49 +24,33 @@ class TestCompletion : TestCompletionBase() {
 
     fun testLocalCompletion() {
         myFixture.configureByFiles("testCompletion.lua")
-        myFixture.complete(CompletionType.BASIC, 1)
-        val strings = myFixture.lookupElementStrings
-
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("a", "b", "func1")))
+        doTestWithResult(listOf("a", "b", "func1"))
     }
 
     fun testGlobalCompletion() {
         //test 1
         myFixture.configureByFiles("globals.lua")
         myFixture.configureByText("test.lua", "<caret>")
-        myFixture.complete(CompletionType.BASIC, 1)
-        var strings = myFixture.lookupElementStrings
 
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("gVar1", "gVar2")))
+        doTestWithResult(listOf("gVar1", "gVar2"))
 
         //test 2
         myFixture.configureByFiles("globals.lua")
         myFixture.configureByText("test.lua", "gVar2.<caret>")
-        myFixture.complete(CompletionType.BASIC, 1)
-        strings = myFixture.lookupElementStrings
 
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("aaa", "bbb", "ccc")))
+        doTestWithResult(listOf("aaa", "bbb", "ccc"))
     }
 
     fun testSelfCompletion() {
         myFixture.configureByFiles("testSelf.lua")
-        myFixture.complete(CompletionType.BASIC, 1)
-        val strings = myFixture.lookupElementStrings
 
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("self:aaa", "self:abb")))
+        doTestWithResult(listOf("self:aaa", "self:abb"))
     }
 
     fun testParamCompletion() {
         myFixture.configureByFiles("testParam.lua")
-        myFixture.complete(CompletionType.BASIC, 1)
-        val strings = myFixture.lookupElementStrings
 
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("param1", "param2")))
+        doTestWithResult(listOf("param1", "param2"))
     }
 
     fun testAnnotation() {
@@ -83,45 +64,30 @@ class TestCompletion : TestCompletionBase() {
 
         // fields and methods
         myFixture.configureByText("test.lua", code + "instance.<caret>")
-        myFixture.completeBasic()
-        var strings = myFixture.lookupElementStrings
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("name", "method", "staticMethod")))
+        doTestWithResult(listOf("name", "method", "staticMethod"))
 
 
         // methods
         myFixture.configureByText("test.lua", code + "instance:<caret>")
-        myFixture.completeBasic()
-        strings = myFixture.lookupElementStrings
-        assertNotNull(strings)
-        assertTrue(strings!!.contains("method"))
+        doTestWithResult("method")
     }
 
     fun testAnnotationArray() {
-        myFixture.configureByFiles("class.lua", "testAnnotationArray.lua")
-        myFixture.complete(CompletionType.BASIC, 1)
-        val strings = myFixture.lookupElementStrings
+        myFixture.configureByFiles("testAnnotationArray.lua", "class.lua")
 
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("name", "age", "sayHello")))
+        doTestWithResult(listOf("name", "age", "sayHello"))
     }
 
     fun testAnnotationFun() {
-        myFixture.configureByFiles("class.lua", "testAnnotationFun.lua")
-        myFixture.complete(CompletionType.BASIC)
-        val strings = myFixture.lookupElementStrings
+        myFixture.configureByFiles("testAnnotationFun.lua", "class.lua")
 
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("name", "age", "sayHello")))
+        doTestWithResult(listOf("name", "age", "sayHello"))
     }
 
     fun testAnnotationDict() {
-        myFixture.configureByFiles("class.lua", "testAnnotationDict.lua")
-        myFixture.complete(CompletionType.BASIC)
-        val strings = myFixture.lookupElementStrings
+        myFixture.configureByFiles("testAnnotationDict.lua", "class.lua")
 
-        assertNotNull(strings)
-        assertTrue(strings!!.containsAll(Arrays.asList("name", "age", "sayHello")))
+        doTestWithResult(listOf("name", "age", "sayHello"))
     }
 
     fun testAnonymous() {
@@ -136,7 +102,7 @@ class TestCompletion : TestCompletionBase() {
             local v = test()
             v.--[[caret]]
         """) {
-            assertTrue(it.contains("pp"))
+            assertTrue("pp" in it)
         }
     }
 
@@ -151,7 +117,7 @@ class TestCompletion : TestCompletionBase() {
              local a = getData()
              a.--[[caret]]
         """) {
-            assertTrue(it.contains("name"))
+            assertTrue("name" in it)
         }
     }
 }

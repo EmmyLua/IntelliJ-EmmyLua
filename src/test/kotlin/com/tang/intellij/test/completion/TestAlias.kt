@@ -32,7 +32,7 @@ class TestAlias : TestCompletionBase() {
                 value.--[[caret]]
             end)
         """) {
-            assertTrue(it.contains("sayHello"))
+            assertTrue("sayHello" in it)
         }
     }
 }
