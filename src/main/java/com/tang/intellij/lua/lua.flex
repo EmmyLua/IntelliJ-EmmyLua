@@ -122,6 +122,7 @@ LONG_STRING=\[=*\[[\s\S]*\]=*\]
   "and"                       { return AND; }
   "break"                     { return BREAK; }
   "do"                        { return DO; }
+  "defer"                     { return DO; }
   "else"                      { return ELSE; }
   "elseif"                    { return ELSEIF; }
   "end"                       { return END; }
