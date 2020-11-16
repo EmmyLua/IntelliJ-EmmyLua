@@ -10,6 +10,9 @@ import com.tang.intellij.lua.stubs.LuaPlaceholderStub;
 public interface LuaNameList extends LuaPsiElement, StubBasedPsiElement<LuaPlaceholderStub> {
 
   @NotNull
+  List<LuaAttribute> getAttributeList();
+
+  @NotNull
   List<LuaNameDef> getNameDefList();
 
 }

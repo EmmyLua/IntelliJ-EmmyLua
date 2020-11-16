@@ -39,6 +39,12 @@ public class LuaNameListImpl extends StubBasedPsiElementBase<LuaPlaceholderStub>
 
   @Override
   @NotNull
+  public List<LuaAttribute> getAttributeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, LuaAttribute.class);
+  }
+
+  @Override
+  @NotNull
   public List<LuaNameDef> getNameDefList() {
     return PsiTreeUtil.getStubChildrenOfTypeAsList(this, LuaNameDef.class);
   }

@@ -11,6 +11,7 @@ public interface LuaTypes {
 
   IElementType ARGS = LuaParserDefinitionKt.createType("ARGS");
   IElementType ASSIGN_STAT = LuaParserDefinitionKt.createType("ASSIGN_STAT");
+  IElementType ATTRIBUTE = LuaParserDefinitionKt.createType("ATTRIBUTE");
   IElementType BINARY_EXPR = LuaParserDefinitionKt.createType("BINARY_EXPR");
   IElementType BINARY_OP = LuaParserDefinitionKt.createType("BINARY_OP");
   IElementType BLOCK = LuaParserDefinitionKt.createType("BLOCK");
@@ -124,6 +125,9 @@ public interface LuaTypes {
       IElementType type = node.getElementType();
       if (type == ASSIGN_STAT) {
         return new LuaAssignStatImpl(node);
+      }
+      else if (type == ATTRIBUTE) {
+        return new LuaAttributeImpl(node);
       }
       else if (type == BINARY_EXPR) {
         return new LuaBinaryExprImpl(node);
