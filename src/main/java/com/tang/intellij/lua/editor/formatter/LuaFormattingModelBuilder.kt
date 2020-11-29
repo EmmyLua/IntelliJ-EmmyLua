@@ -57,10 +57,11 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .before(ELSEIF).lineBreakInCode()
                 .after(LOCAL).spaces(1) //local<SPACE>
                 .around(COLON).none()
+                .around(CONCAT).spaces(if (luaCodeStyleSettings.SPACE_AROUND_CONCAT_OPERATOR) 1 else 0)
                 .before(COMMA).spaces(if (commonSettings.SPACE_BEFORE_COMMA) 1 else 0)
                 .after(COMMA).spaces(if (commonSettings.SPACE_AFTER_COMMA) 1 else 0) //,<SPACE>
-                .between(LCURLY, TABLE_FIELD).spaces(1) // {<SPACE>1, 2 }
-                .between(TABLE_FIELD, RCURLY).spaces(1) // { 1, 2<SPACE>}
+                .between(LCURLY, TABLE_FIELD).spaces(if (luaCodeStyleSettings.SPACE_INSIDE_INLINE_TABLE) 1 else 0) // {<SPACE>1, 2 }
+                .between(TABLE_FIELD, RCURLY).spaces(if (luaCodeStyleSettings.SPACE_INSIDE_INLINE_TABLE) 1 else 0) // { 1, 2<SPACE>}
                 .before(TABLE_FIELD_SEP).none() // { 1<SPACE>, 2 }
                 .after(TABLE_FIELD_SEP).spaces(if (luaCodeStyleSettings.SPACE_AFTER_TABLE_FIELD_SEP) 1 else 0) // { 1,<SPACE>2 }
                 .before(BLOCK).blankLines(0)
