@@ -1,3 +1,4 @@
+local inlineEmmy = { name = "Emmy", age = 7, longLongProperty = 123 }
 local emmy = {
     name = "Emmy",
     age = 7,
