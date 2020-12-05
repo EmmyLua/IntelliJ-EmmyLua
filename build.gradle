@@ -20,6 +20,12 @@ plugins {
 }
 
 def versions = [:]
+versions["203"] = [
+    ideaSDKVersion: "IU-203.5981.155",
+    sinceBuild: "201",
+    untilBuild: "203.*",
+    archiveName: "IntelliJ-EmmyLua"
+]
 versions["202"] = [
     ideaSDKVersion: "IC-202.6397.94",
     sinceBuild: "201",
@@ -72,7 +78,7 @@ versions.each { shortVer, cfg ->
     }
 }
 
-task buildAll(dependsOn: [build_202])
+task buildAll(dependsOn: [build_203])
 
 dependencies {
     compile fileTree(dir: "libs", includes: ["*.jar"])
