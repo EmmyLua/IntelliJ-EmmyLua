@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.jetbrains.intellij' version "0.3.11"
-    id "org.jetbrains.kotlin.jvm" version "1.2.31"
+    id 'org.jetbrains.intellij' version "0.6.5"
+    id "org.jetbrains.kotlin.jvm" version "1.4.20"
 }
 
 def versions = [:]
@@ -91,6 +91,6 @@ intellij {
     type 'IU'
     updateSinceUntilBuild false
     downloadSources false
-    version = "IC-202.6397.94"
-    localPath System.env["IDEA_HOME_202"]
+    version = "IU-203.5981.155"
+    localPath System.env["IDEA_HOME_203"]
 }

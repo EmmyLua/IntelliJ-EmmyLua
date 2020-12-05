@@ -154,19 +154,19 @@ private fun encrypt(value: String): String {
 class GitHubErrorReporter : ErrorReportSubmitter() {
 	override fun getReportActionText() = ErrorReportBundle.message("report.error.to.plugin.vendor")
 	override fun submit(
-			events: Array<IdeaLoggingEvent>,
-			info: String?,
-			parent: Component,
-			consumer: Consumer<SubmittedReportInfo>): Boolean {
+			events: Array<out IdeaLoggingEvent>?,
+			additionalInfo: String?,
+			parentComponent: Component,
+			consumer: Consumer<in SubmittedReportInfo>): Boolean {
 		// TODO improve
-		val event = events.firstOrNull { it.throwable != null } ?: return false
-		return doSubmit(event, parent, consumer, info)
+		val event = events?.firstOrNull { it.throwable != null } ?: return false
+		return doSubmit(event, parentComponent, consumer, additionalInfo)
 	}
 
 	private fun doSubmit(
 			event: IdeaLoggingEvent,
 			parent: Component,
-			callback: Consumer<SubmittedReportInfo>,
+			callback: Consumer<in SubmittedReportInfo>,
 			description: String?): Boolean {
 		val dataContext = DataManager.getInstance().getDataContext(parent)
 		val bean = GitHubErrorBean(
@@ -198,7 +198,7 @@ class GitHubErrorReporter : ErrorReportSubmitter() {
 	}
 
 	internal class CallbackWithNotification(
-		private val consumer: Consumer<SubmittedReportInfo>,
+		private val consumer: Consumer<in SubmittedReportInfo>,
 		private val project: Project?) : Consumer<SubmittedReportInfo> {
 		override fun consume(reportInfo: SubmittedReportInfo) {
 			consumer.consume(reportInfo)
