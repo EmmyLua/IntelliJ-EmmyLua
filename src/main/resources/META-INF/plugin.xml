@@ -42,7 +42,7 @@
             <li>Attach Debugger(Windows only)</li>
             <li>Remote Debugger(Mobdebug.lua)</li>
         </ul>
-        <li>Lua 5.3 support</li>
+        <li>Lua 5.4 support</li>
         <li>Find usages</li>
         <li>Rename</li>
         <li>Go to definition</li>
@@ -71,6 +71,9 @@
     <change-notes><![CDATA[
     <strong>1.3.5</strong>
     <ul>
+        <li>[NEW] compatible with IDEA203</li>
+        <li>[NEW] Lua 5.4 syntax support</li>
+        <li>[NEW] Additional code style settings <a href="https://github.com/EmmyLua/IntelliJ-EmmyLua/pull/379">see pr#379</a> (by @pouwelsjochem)</li>
         <li>[FIX] bug fix #371, #373, #359, #357, #337, #338, #344, #298, #355</li>
         <a href="https://tangzx.github.io/emmydoc/changelogs.html?plugin">Full changelog</a>
     </ul>
