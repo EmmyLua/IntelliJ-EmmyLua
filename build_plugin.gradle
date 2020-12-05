@@ -21,6 +21,11 @@ plugins {
     id "de.undercouch.download" version "3.4.3"
 }
 
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
 dependencies {
     compile fileTree(dir: "libs", includes: ["*.jar"])
 }
