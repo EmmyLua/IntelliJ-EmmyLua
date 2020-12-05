@@ -25,6 +25,11 @@ dependencies {
     compile fileTree(dir: "libs", includes: ["*.jar"])
 }
 
+compileJava {
+    sourceCompatibility = 11
+    targetCompatibility = 11
+}
+
 sourceSets {
     main {
         java.srcDirs 'gen'
