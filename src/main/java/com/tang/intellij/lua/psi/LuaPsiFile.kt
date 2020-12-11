@@ -20,7 +20,6 @@ import com.intellij.extapi.psi.PsiFileBase
 import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.text.Strings
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.CachedValue
@@ -32,6 +31,7 @@ import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.stubs.LuaFileStub
+import com.tang.intellij.lua.util.Strings
 
 /**
  * Created by tangzx on 2015/11/15.
