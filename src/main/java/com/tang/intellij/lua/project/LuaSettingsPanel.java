@@ -41,7 +41,7 @@ import java.util.SortedMap;
  * Created by tangzx on 2017/6/12.
  */
 public class LuaSettingsPanel implements SearchableConfigurable, Configurable.NoScroll {
-    private LuaSettings settings;
+    private final LuaSettings settings;
     private JPanel myPanel;
     private JTextField constructorNames;
     private JCheckBox strictDoc;
@@ -59,8 +59,8 @@ public class LuaSettingsPanel implements SearchableConfigurable, Configurable.No
     private JTextField requireFunctionNames;
     private JTextField tooLargerFileThreshold;
 
-    public LuaSettingsPanel(LuaSettings settings) {
-        this.settings = settings;
+    public LuaSettingsPanel() {
+        this.settings = LuaSettings.Companion.getInstance();
         constructorNames.setText(settings.getConstructorNamesString());
         strictDoc.setSelected(settings.isStrictDoc());
         smartCloseEnd.setSelected(settings.isSmartCloseEnd());
