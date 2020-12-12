@@ -18,6 +18,7 @@ package com.tang.intellij.lua.annotator
 
 import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.project.LuaSettings
@@ -29,9 +30,14 @@ class LargerFileAnnotator : Annotator {
             val file = psiElement.virtualFile
             val fileLimit = StringUtil.formatFileSize(LuaSettings.instance.tooLargerFileThreshold * 1024L)
             val fileSize = StringUtil.formatFileSize(file.length)
-            annotationHolder.createWarningAnnotation(psiElement,
+            annotationHolder
+                .newAnnotation(
+                    HighlightSeverity.WARNING,
                     "The file size ($fileSize) exceeds configured limit ($fileLimit). Code insight features are not available."
-            ).isFileLevelAnnotation = true
+                )
+                .range(psiElement)
+                .fileLevel()
+                .create()
         }
     }
 }
