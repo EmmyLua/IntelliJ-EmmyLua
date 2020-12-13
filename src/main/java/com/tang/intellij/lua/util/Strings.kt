@@ -44,3 +44,5 @@ class Strings {
         }
     }
 }
+
+fun StringBuilder.appendLine(line: String): StringBuilder = append(line).append("\n")

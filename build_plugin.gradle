@@ -37,7 +37,7 @@ compileJava {
 
 sourceSets {
     main {
-        java.srcDirs 'gen'
+        java.srcDirs 'gen', 'src/main/compat'
         resources {
             exclude "debugger/**"
         }

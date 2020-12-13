@@ -16,7 +16,7 @@
 
 package com.tang.intellij.lua.psi
 
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.PluginId
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.FileIndexFacade
@@ -29,7 +29,6 @@ import com.intellij.util.SmartList
 import com.tang.intellij.lua.ext.ILuaFileResolver
 import com.tang.intellij.lua.project.LuaSourceRootManager
 import java.io.File
-import java.util.*
 
 /**
  *
@@ -39,13 +38,13 @@ object LuaFileUtil {
 
     val pluginFolder: File?
         get() {
-            val descriptor = PluginManager.getPlugin(PluginId.getId("com.tang"))
+            val descriptor = PluginManagerCore.getPlugin(PluginId.getId("com.tang"))
             return descriptor?.path
         }
 
     val pluginVirtualDirectory: VirtualFile?
         get() {
-            val descriptor = PluginManager.getPlugin(PluginId.getId("com.tang"))
+            val descriptor = PluginManagerCore.getPlugin(PluginId.getId("com.tang"))
             if (descriptor != null) {
                 val pluginPath = descriptor.path
 
