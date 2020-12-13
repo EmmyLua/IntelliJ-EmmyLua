@@ -97,7 +97,8 @@ intellij {
     updateSinceUntilBuild false
     downloadSources false
     version = cfg.ideaSDKVersion
-    localPath System.env["IDEA_HOME_${IDEA_VER}"]
+    localPath System.getenv("IDEA_HOME_${IDEA_VER}")
+    sandboxDirectory "${project.buildDir}/${IDEA_VER}/idea-sandbox"
 
     if (cfg.explicitJavaDependency != "false") {
         plugins 'java'
