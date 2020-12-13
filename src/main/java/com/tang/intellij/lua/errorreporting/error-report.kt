@@ -151,9 +151,9 @@ private fun encrypt(value: String): String {
 	return Base64.getEncoder().encodeToString(cipher.doFinal(value.toByteArray()))
 }
 
-class GitHubErrorReporter : ErrorReportSubmitter() {
+class GitHubErrorReporter : LuaErrorReportSubmitter() {
 	override fun getReportActionText() = ErrorReportBundle.message("report.error.to.plugin.vendor")
-	override fun submit(
+	override fun doSubmit(
 			events: Array<out IdeaLoggingEvent>?,
 			additionalInfo: String?,
 			parentComponent: Component,

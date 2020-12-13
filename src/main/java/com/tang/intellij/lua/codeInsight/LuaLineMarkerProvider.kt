@@ -19,6 +19,7 @@ package com.tang.intellij.lua.codeInsight
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzerSettings
 import com.intellij.codeInsight.daemon.LineMarkerInfo
 import com.intellij.codeInsight.daemon.LineMarkerProvider
+import com.intellij.codeInsight.daemon.createLineMarkerInfo
 import com.intellij.codeInsight.daemon.impl.LineMarkersPass
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
 import com.intellij.icons.AllIcons
@@ -80,7 +81,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             // OverridenMethod
             val search = LuaOverridingMethodsSearch.search(methodDef)
             if (search.findFirst() != null && classMethodNameId != null) {
-                result.add(LineMarkerInfo(
+                result.add(createLineMarkerInfo(
                     classMethodNameId,
                     classMethodNameId.textRange,
                     AllIcons.Gutter.OverridenMethod,
@@ -109,7 +110,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             val query = LuaClassInheritorsSearch.search(GlobalSearchScope.allScope(project), project, classType.className)
             if (query.findFirst() != null) {
                 val id = element.id
-                result.add(LineMarkerInfo(
+                result.add(createLineMarkerInfo(
                     id,
                     id.textRange,
                     AllIcons.Gutter.OverridenMethod,
@@ -130,7 +131,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
             // class 标记
             val id = element.id
             val startOffset = id.textOffset
-            val classIcon = LineMarkerInfo(
+            val classIcon = createLineMarkerInfo(
                 id,
                 TextRange(startOffset, startOffset),
                 LuaIcons.CLASS,
@@ -152,7 +153,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
                         val bodyOwner = PsiTreeUtil.getParentOfType(cur, LuaFuncBodyOwner::class.java)
                         if (bodyOwner === resolve) {
                             val anchor = PsiTreeUtil.firstChild(element)
-                            result.add(LineMarkerInfo<PsiElement>(
+                            result.add(createLineMarkerInfo(
                                 anchor,
                                 anchor.textRange,
                                 AllIcons.Gutter.RecursiveMethod,
@@ -173,7 +174,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
                 for (psiElement in exprList.children) {
                     if (psiElement is LuaCallExpr) {
                         val returnKeyWord = element.firstChild
-                        result.add(LineMarkerInfo(
+                        result.add(createLineMarkerInfo(
                             returnKeyWord,
                             returnKeyWord.textRange,
                             LuaIcons.LineMarker.TailCall,

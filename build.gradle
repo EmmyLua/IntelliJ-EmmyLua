@@ -86,17 +86,19 @@ dependencies {
 
 sourceSets {
     main {
-        java.srcDirs 'gen'
+        java.srcDirs 'gen', 'src/main/compat'
         resources {
             exclude "debugger/**"
         }
     }
 }
 
+def ver = "203"
+
 intellij {
     type 'IU'
     updateSinceUntilBuild false
     downloadSources false
-    version = "IU-203.5981.155"
-    localPath System.env["IDEA_HOME_203"]
+    version = versions[ver].ideaSDKVersion
+    localPath System.getenv("IDEA_HOME_${ver}")
 }
