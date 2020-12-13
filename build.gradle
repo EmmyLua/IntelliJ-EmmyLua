@@ -22,13 +22,13 @@ plugins {
 def versions = [:]
 versions["203"] = [
     ideaSDKVersion: "IU-203.5981.155",
-    sinceBuild: "201",
+    sinceBuild: "203",
     untilBuild: "203.*",
     archiveName: "IntelliJ-EmmyLua"
 ]
 versions["202"] = [
     ideaSDKVersion: "IC-202.6397.94",
-    sinceBuild: "201",
+    sinceBuild: "202",
     untilBuild: "202.*",
     archiveName: "IntelliJ-EmmyLua"
 ]
@@ -78,7 +78,7 @@ versions.each { shortVer, cfg ->
     }
 }
 
-task buildAll(dependsOn: [build_203])
+task buildAll(dependsOn: [build_201, build_202, build_203])
 
 dependencies {
     compile fileTree(dir: "libs", includes: ["*.jar"])
@@ -93,12 +93,12 @@ sourceSets {
     }
 }
 
-def ver = "203"
+def developVersion = "203"
 
 intellij {
     type 'IU'
     updateSinceUntilBuild false
     downloadSources false
-    version = versions[ver].ideaSDKVersion
-    localPath System.getenv("IDEA_HOME_${ver}")
+    version = versions[developVersion].ideaSDKVersion
+    localPath System.getenv("IDEA_HOME_${developVersion}")
 }

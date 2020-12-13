@@ -16,9 +16,9 @@
 
 package com.tang.intellij.lua.codeInsight
 
+import com.intellij.codeInsight.daemon.AbstractLineMarkerProvider
 import com.intellij.codeInsight.daemon.DaemonCodeAnalyzerSettings
 import com.intellij.codeInsight.daemon.LineMarkerInfo
-import com.intellij.codeInsight.daemon.LineMarkerProvider
 import com.intellij.codeInsight.daemon.createLineMarkerInfo
 import com.intellij.codeInsight.daemon.impl.LineMarkersPass
 import com.intellij.codeInsight.navigation.NavigationGutterIconBuilder
@@ -45,7 +45,7 @@ import com.tang.intellij.lua.ty.TyClass
  * line marker
  * Created by tangzx on 2016/12/11.
  */
-class LuaLineMarkerProvider : LineMarkerProvider {
+class LuaLineMarkerProvider : AbstractLineMarkerProvider() {
 
     private val daemonSettings = DaemonCodeAnalyzerSettings.getInstance()
     private val colorsManager = EditorColorsManager.getInstance()
@@ -194,7 +194,7 @@ class LuaLineMarkerProvider : LineMarkerProvider {
         return null
     }
 
-    override fun collectSlowLineMarkers(list: List<PsiElement>, collection: MutableCollection<in LineMarkerInfo<*>>) {
+    override fun collectSlowLineMarkersExt(list: List<PsiElement>, collection: MutableCollection<in LineMarkerInfo<*>>) {
         for (element in list) {
             ProgressManager.checkCanceled()
             collectNavigationMarkers(element, collection)
