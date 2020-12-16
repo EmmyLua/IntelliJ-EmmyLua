@@ -57,7 +57,7 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .before(ELSEIF).lineBreakInCode()
                 .after(LOCAL).spaces(1) //local<SPACE>
                 .around(COLON).none()
-                .around(CONCAT).spaces(if (luaCodeStyleSettings.SPACE_AROUND_CONCAT_OPERATOR) 1 else 0)
+                //.around(CONCAT).spaces(if (luaCodeStyleSettings.SPACE_AROUND_CONCAT_OPERATOR) 1 else 0)
                 .before(COMMA).spaces(if (commonSettings.SPACE_BEFORE_COMMA) 1 else 0)
                 .after(COMMA).spaces(if (commonSettings.SPACE_AFTER_COMMA) 1 else 0) //,<SPACE>
                 .between(LCURLY, TABLE_FIELD).spaces(if (luaCodeStyleSettings.SPACE_INSIDE_INLINE_TABLE) 1 else 0) // {<SPACE>1, 2 }
@@ -68,7 +68,7 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .afterInside(RPAREN, FUNC_BODY).lineBreakInCode()
                 .between(FUNCTION, FUNC_BODY).none()
                 .between(FUNCTION, NAME_DEF).spaces(1) //function<SPACE>name()
-                .around(BINARY_OP).spaces(if (commonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS) 1 else 0)
+                .around(BINARY_OP).spaces(if (luaCodeStyleSettings.SPACE_AROUND_BINARY_OPERATOR) 1 else 0)
                 .around(UNARY_OP).none()
                 .around(ASSIGN).lineBreakOrForceSpace(false, commonSettings.SPACE_AROUND_ASSIGNMENT_OPERATORS) // = 号两头不能换行
                 .around(LuaParserDefinition.KEYWORD_TOKENS).spaces(1)

@@ -47,6 +47,6 @@ class LuaBinaryExprBlock internal constructor(psi: LuaBinaryExpr,
             if (child1.node.findChildByType(AND_NOT_OR) != null || child2.node.findChildByType(AND_NOT_OR) != null)
                 return Spacing.createSpacing(1, 1, 0, true, 1)
         }
-        return Spacing.createSpacing(1, 1, 0, true, 1)
+        return super.getSpacing(child1, child2)
     }
 }
