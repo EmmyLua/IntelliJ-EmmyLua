@@ -30,11 +30,6 @@ dependencies {
     compile fileTree(dir: "libs", includes: ["*.jar"])
 }
 
-compileJava {
-    sourceCompatibility = 11
-    targetCompatibility = 11
-}
-
 sourceSets {
     main {
         java.srcDirs 'gen', 'src/main/compat'
@@ -89,6 +84,7 @@ def cfg = [
     untilBuild: untilBuild,
     archiveName: archiveName,
     explicitJavaDependency: project.hasProperty('explicitJavaDependency') ? explicitJavaDependency : "true",
+    targetCompatibilityLevel: targetCompatibilityLevel
 ]
 def rev = getRev()
 
@@ -105,14 +101,19 @@ intellij {
     }
 }
 
+compileJava {
+    sourceCompatibility = cfg.targetCompatibilityLevel
+    targetCompatibility = cfg.targetCompatibilityLevel
+}
+
 patchPluginXml {
     sinceBuild cfg.sinceBuild
     untilBuild cfg.untilBuild
 }
 
 publishPlugin {
-    username System.env['JETBRAINS_USERNAME']
-    password System.env['JETBRAINS_PASSWORD']
+    username System.getenv('JETBRAINS_USERNAME')
+    password System.getenv('JETBRAINS_PASSWORD')
     channels 'EAP'
 }
 

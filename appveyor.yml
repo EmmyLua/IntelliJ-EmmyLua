@@ -8,8 +8,14 @@ environment:
     secure: 7ol4pMcA1+XRRuuO6SQhGg==
 build_script:
   - cmd: >-
+      set JAVA_HOME=C:\Program Files\Java\jdk1.8.0
+
+      gradlew build_201
+
+      gradlew build_202
+
       set JAVA_HOME=C:\Program Files\Java\jdk11
 
-      gradlew buildAll
+      gradlew build_203
 artifacts:
   - path: build/distributions/*.zip
