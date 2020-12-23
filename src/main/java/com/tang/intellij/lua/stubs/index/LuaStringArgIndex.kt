@@ -30,7 +30,7 @@ import com.tang.intellij.lua.psi.*
 import java.io.DataInput
 import java.io.DataOutput
 
-class LuaStringArgIndex : FileBasedIndexExtension<String, LuaStringArgIndex.LuaCallOccurrence>(), PsiDependentIndex {
+class LuaStringArgIndex : FileBasedIndexExtension<String, LuaStringArgIndex.LuaCallOccurrence>() {
 
     companion object {
         val NAME: ID<String, LuaCallOccurrence> = ID.create("lua.call.string.param")
