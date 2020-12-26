@@ -66,6 +66,7 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
 
                         // keep when reformatting
                         "KEEP_SIMPLE_BLOCKS_IN_ONE_LINE",
+                        "KEEP_MULTIPLE_EXPRESSIONS_IN_ONE_LINE",
 
                         //align group declarations
                         "ALIGN_CONSECUTIVE_VARIABLE_DECLARATIONS"
