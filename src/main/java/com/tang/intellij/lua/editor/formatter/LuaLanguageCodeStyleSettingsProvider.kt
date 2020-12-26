@@ -64,6 +64,8 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                         "CALL_PARAMETERS_WRAP",
                         "ALIGN_MULTILINE_PARAMETERS_IN_CALLS",
 
+                        "ALIGN_MULTILINE_CHAINED_METHODS",
+
                         // keep when reformatting
                         "KEEP_SIMPLE_BLOCKS_IN_ONE_LINE",
                         "KEEP_MULTIPLE_EXPRESSIONS_IN_ONE_LINE",
