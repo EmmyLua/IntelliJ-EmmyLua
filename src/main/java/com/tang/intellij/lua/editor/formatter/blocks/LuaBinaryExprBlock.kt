@@ -46,6 +46,10 @@ class LuaBinaryExprBlock internal constructor(psi: LuaBinaryExpr,
         if (child1 is LuaScriptBlock && child2 is LuaScriptBlock) {
             if (child1.node.findChildByType(AND_NOT_OR) != null || child2.node.findChildByType(AND_NOT_OR) != null)
                 return Spacing.createSpacing(1, 1, 0, true, 1)
+            if (child1.node.findChildByType(CONCAT) != null || child2.node.findChildByType(CONCAT) != null) {
+                val spaces = if (ctx.luaSettings.SPACE_AROUND_CONCAT_OPERATOR) 1 else 0
+                return Spacing.createSpacing(spaces, spaces, 0, true, 1)
+            }
         }
         return super.getSpacing(child1, child2)
     }
