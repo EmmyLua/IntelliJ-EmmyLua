@@ -27,11 +27,7 @@ import com.tang.intellij.lua.lang.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import java.util.*
-import com.intellij.codeInsight.hints.settings.ParameterNameHintsSettings
-import com.intellij.ide.plugins.PluginManager
-import com.intellij.openapi.diagnostic.Logger
 import com.tang.intellij.lua.LuaBundle
-import com.tang.intellij.lua.psi.impl.LuaCallExprImpl
 import com.tang.intellij.lua.psi.impl.LuaListArgsImpl
 import java.util.stream.Collectors
 
@@ -42,8 +38,6 @@ import java.util.stream.Collectors
 class LuaParameterHintsProvider : InlayParameterHintsProvider {
 
     companion object {
-        private val log: Logger = Logger.getInstance("JOCHEM")
-
         private val ARGS_HINT = Option("lua.hints.show_args_type",
                 "Show argument name hints",
                 true)
