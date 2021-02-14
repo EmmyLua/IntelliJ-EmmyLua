@@ -16,10 +16,12 @@ public class LuaLabelStatImpl extends LuaStatementImpl implements LuaLabelStat {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull LuaVisitor visitor) {
     visitor.visitLabelStat(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

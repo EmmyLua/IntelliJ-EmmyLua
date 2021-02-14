@@ -16,10 +16,12 @@ public class LuaRepeatStatImpl extends LuaStatementImpl implements LuaRepeatStat
     super(node);
   }
 
+  @Override
   public void accept(@NotNull LuaVisitor visitor) {
     visitor.visitRepeatStat(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

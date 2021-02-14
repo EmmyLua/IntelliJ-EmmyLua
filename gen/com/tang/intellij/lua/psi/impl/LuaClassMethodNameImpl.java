@@ -32,6 +32,7 @@ public class LuaClassMethodNameImpl extends StubBasedPsiElementBase<LuaPlacehold
     visitor.visitClassMethodName(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

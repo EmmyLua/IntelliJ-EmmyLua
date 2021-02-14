@@ -17,10 +17,12 @@ public class LuaGotoStatImpl extends LuaStatementImpl implements LuaGotoStat {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull LuaVisitor visitor) {
     visitor.visitGotoStat(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

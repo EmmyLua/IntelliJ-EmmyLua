@@ -36,6 +36,7 @@ public class LuaTableFieldImpl extends StubBasedPsiElementBase<LuaTableFieldStub
     visitor.visitTableField(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

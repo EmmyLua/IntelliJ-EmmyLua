@@ -638,7 +638,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _LEFT_, INDEX_EXPR, null);
     r = consumeToken(b, DOT);
-    r = r && repeat(b, l + 1, checkFuncPrefix_parser_, 1);
+    r = r && repeat(b, l + 1, LuaParser::checkFuncPrefix, 1);
     r = r && consumeToken(b, ID);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -985,7 +985,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = parList_0(b, l + 1);
     if (!r) r = consumeToken(b, ELLIPSIS);
-    exit_section_(b, l, m, r, false, parList_recover_parser_);
+    exit_section_(b, l, m, r, false, LuaParser::parList_recover);
     return r;
   }
 
@@ -1216,7 +1216,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = gotoStat(b, l + 1);
     if (!r) r = assignStat(b, l + 1);
     if (!r) r = exprStat(b, l + 1);
-    exit_section_(b, l, m, r, false, stat_recover_parser_);
+    exit_section_(b, l, m, r, false, LuaParser::stat_recover);
     return r;
   }
 
@@ -1320,7 +1320,7 @@ public class LuaParser implements PsiParser, LightPsiParser {
     if (!r) r = expr(b, l + 1);
     register_hook_(b, LEFT_BINDER, MY_LEFT_COMMENT_BINDER);
     register_hook_(b, RIGHT_BINDER, MY_RIGHT_COMMENT_BINDER);
-    exit_section_(b, l, m, r, false, tableField_recover_parser_);
+    exit_section_(b, l, m, r, false, LuaParser::tableField_recover);
     return r;
   }
 
@@ -1484,24 +1484,4 @@ public class LuaParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  static final Parser checkFuncPrefix_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return checkFuncPrefix(b, l + 1);
-    }
-  };
-  static final Parser parList_recover_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return parList_recover(b, l + 1);
-    }
-  };
-  static final Parser stat_recover_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return stat_recover(b, l + 1);
-    }
-  };
-  static final Parser tableField_recover_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return tableField_recover(b, l + 1);
-    }
-  };
 }

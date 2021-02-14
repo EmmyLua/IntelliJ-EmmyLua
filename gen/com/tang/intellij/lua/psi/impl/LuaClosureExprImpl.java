@@ -34,6 +34,7 @@ public class LuaClosureExprImpl extends LuaClosureExprMixin implements LuaClosur
     visitor.visitClosureExpr(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

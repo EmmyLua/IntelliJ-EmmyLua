@@ -17,10 +17,12 @@ public class LuaDocTableTyImpl extends LuaDocTyImpl implements LuaDocTableTy {
     super(node);
   }
 
+  @Override
   public void accept(@NotNull LuaDocVisitor visitor) {
     visitor.visitTableTy(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);

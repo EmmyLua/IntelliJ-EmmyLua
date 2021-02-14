@@ -36,6 +36,7 @@ public class LuaLocalFuncDefImpl extends StubBasedPsiElementBase<LuaLocalFuncDef
     visitor.visitLocalFuncDef(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

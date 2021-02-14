@@ -28,6 +28,8 @@ import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.GuardType
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
+import com.tang.intellij.lua.stubs.index.LuaAliasIndex
+import com.tang.intellij.lua.stubs.index.LuaGlobalparamIndex
 
 fun infer(element: LuaTypeGuessable?, context: SearchContext): ITy {
     if (element == null)
@@ -310,7 +312,14 @@ private fun resolveParamType(paramNameDef: LuaParamNameDef, context: SearchConte
                 ret = ret.union(it.mainSignature.getParamTy(paramIndex))
             }
         }
-        return ret
+        if (ret != Ty.UNKNOWN)
+            return ret
     }
+
+    val globalparam = LuaGlobalparamIndex.find(paramName, context);
+    if (globalparam != null) {
+        return globalparam.type;
+    }
+
     return Ty.UNKNOWN
 }

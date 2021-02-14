@@ -32,6 +32,7 @@ public abstract class LuaArgsImpl extends StubBasedPsiElementBase<LuaPlaceholder
     visitor.visitArgs(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

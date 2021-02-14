@@ -31,6 +31,7 @@ public class LuaDoStatImpl extends LuaStatMixin<LuaPlaceholderStub> implements L
     visitor.visitDoStat(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

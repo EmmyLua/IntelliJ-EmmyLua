@@ -21,6 +21,7 @@ public class LuaDocTagDefImpl extends ASTWrapperPsiElement implements LuaDocTagD
     visitor.visitTagDef(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);
