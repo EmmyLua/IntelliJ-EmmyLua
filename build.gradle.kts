@@ -219,6 +219,7 @@ fun setupVersion(ver: String) {
 
 project(":") {
     repositories {
+        maven(url = "https://www.jetbrains.com/intellij-repository/releases")
         mavenCentral()
         jcenter()
     }
