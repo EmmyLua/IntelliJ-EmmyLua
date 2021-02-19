@@ -35,7 +35,7 @@ data class BuildData(
 )
 
 val buildDataList = mapOf(
-    "211" to BuildData(
+    "203" to BuildData(
         ideaSDKVersion = "IC-211.5787.15",
         sinceBuild = "203",
         untilBuild = "211.*",
@@ -43,13 +43,6 @@ val buildDataList = mapOf(
         targetCompatibilityLevel = JavaVersion.VERSION_11,
         explicitJavaDependency = true,
         instrumentCodeCompilerVersion = "203.7148.70"
-    ),
-    "203" to BuildData(
-        ideaSDKVersion = "IC-203.5981.155",
-        sinceBuild = "203",
-        untilBuild = "203.*",
-        archiveName = "IntelliJ-EmmyLua",
-        targetCompatibilityLevel = JavaVersion.VERSION_11
     ),
     "202" to BuildData(
         ideaSDKVersion = "IC-202.6397.94",
@@ -184,32 +177,6 @@ fun setupVersion(ver: String) {
         targetCompatibility = versionData.targetCompatibilityLevel
     }
 
-    task("buildPluginWithBunch${ver}") {
-        finalizedBy("buildPlugin")
-        doLast {
-            // reset
-            exec {
-                executable = "git"
-                args("reset", "HEAD", "--hard")
-            }
-            // clean untracked files
-            exec {
-                executable = "git"
-                args("clean", "-d", "-f")
-            }
-            // switch
-            exec {
-                executable = if (isWin) "bunch/bin/bunch.bat" else "bunch/bin/bunch"
-                args("switch", ".", ver)
-            }
-            // reset to HEAD
-            exec {
-                executable = "git"
-                args("reset", getRev())
-            }
-        }
-    }
-
     tasks {
         buildPlugin {
             //dependsOn("installEmmyDebugger")
@@ -276,6 +243,33 @@ project(":") {
 
 buildDataList.forEach {
     val ver = it.key
+
+    task("buildPluginWithBunch${ver}") {
+        finalizedBy("buildPlugin")
+        doLast {
+            // reset
+            exec {
+                executable = "git"
+                args("reset", "HEAD", "--hard")
+            }
+            // clean untracked files
+            exec {
+                executable = "git"
+                args("clean", "-d", "-f")
+            }
+            // switch
+            exec {
+                executable = if (isWin) "bunch/bin/bunch.bat" else "bunch/bin/bunch"
+                args("switch", ".", ver)
+            }
+            // reset to HEAD
+            exec {
+                executable = "git"
+                args("reset", getRev())
+            }
+        }
+    }
+
     task("build_${ver}") {
         finalizedBy(if (isCI) "buildPluginWithBunch${ver}" else "buildPlugin")
         doLast {
