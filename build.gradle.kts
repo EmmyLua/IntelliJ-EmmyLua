@@ -258,6 +258,11 @@ project(":") {
 
     dependencies {
         implementation(fileTree(baseDir = "libs") { include("*.jar") })
+        implementation("com.google.code.gson:gson:2.8.6")
+        implementation("org.scala-sbt.ipcsocket:ipcsocket:1.3.0")
+        implementation("org.luaj:luaj-jse:3.0.1")
+        implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5")
+        implementation("net.java.dev.jna:jna:5.3.1")
     }
 
     sourceSets {
