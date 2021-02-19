@@ -184,7 +184,7 @@ fun setupVersion(ver: String) {
         targetCompatibility = versionData.targetCompatibilityLevel
     }
 
-    task("buildPluginWithBunch") {
+    task("buildPluginWithBunch${ver}") {
         finalizedBy("buildPlugin")
         doLast {
             // reset
@@ -262,7 +262,6 @@ project(":") {
         implementation("org.scala-sbt.ipcsocket:ipcsocket:1.3.0")
         implementation("org.luaj:luaj-jse:3.0.1")
         implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5")
-        implementation("net.java.dev.jna:jna:5.3.1")
     }
 
     sourceSets {
@@ -276,11 +275,11 @@ project(":") {
 }
 
 buildDataList.forEach {
-    val shortVer = it.key
-    task("build_${shortVer}") {
-        finalizedBy(if (isCI) "buildPluginWithBunch" else "buildPlugin")
+    val ver = it.key
+    task("build_${ver}") {
+        finalizedBy(if (isCI) "buildPluginWithBunch${ver}" else "buildPlugin")
         doLast {
-            setupVersion(shortVer)
+            setupVersion(ver)
         }
     }
 }
