@@ -36,7 +36,7 @@ data class BuildData(
 
 val buildDataList = mapOf(
     "203" to BuildData(
-        ideaSDKVersion = "IC-211.5787.15",
+        ideaSDKVersion = "IC-211.5787.15-EAP-SNAPSHOT",
         sinceBuild = "203",
         untilBuild = "211.*",
         archiveName = "IntelliJ-EmmyLua",
