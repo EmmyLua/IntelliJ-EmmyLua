@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import de.undercouch.gradle.tasks.download.*
 import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
-import de.undercouch.gradle.tasks.download.*
 
 plugins {
     id("org.jetbrains.intellij").version("0.6.5")
@@ -25,73 +25,78 @@ plugins {
 }
 
 data class BuildData(
+    val ideaSDKShortVersion: String,
     val ideaSDKVersion: String,
     val sinceBuild: String,
     val untilBuild: String,
-    val archiveName: String,
-    val targetCompatibilityLevel: JavaVersion,
+    val archiveName: String = "IntelliJ-EmmyLua",
+    val targetCompatibilityLevel: JavaVersion = JavaVersion.VERSION_11,
     val explicitJavaDependency: Boolean = true,
-    val instrumentCodeCompilerVersion: String? = null
+    val bunch: String = ideaSDKShortVersion
 )
 
-val buildDataList = mapOf(
-    "203" to BuildData(
+val buildDataList = listOf(
+    BuildData(
+        ideaSDKShortVersion = "211",
         ideaSDKVersion = "IC-211.5787.15-EAP-SNAPSHOT",
-        sinceBuild = "203",
+        sinceBuild = "211",
         untilBuild = "211.*",
-        archiveName = "IntelliJ-EmmyLua",
-        targetCompatibilityLevel = JavaVersion.VERSION_11,
-        explicitJavaDependency = true,
-        instrumentCodeCompilerVersion = "203.7148.70"
+        bunch = "203"
     ),
-    "202" to BuildData(
+    BuildData(
+        ideaSDKShortVersion = "203",
+        ideaSDKVersion = "IC-203.5981.155",
+        sinceBuild = "203",
+        untilBuild = "203.*"
+    ),
+    BuildData(
+        ideaSDKShortVersion = "202",
         ideaSDKVersion = "IC-202.6397.94",
         sinceBuild = "202",
         untilBuild = "202.*",
-        archiveName = "IntelliJ-EmmyLua",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
-    "201" to BuildData(
+    BuildData(
+        ideaSDKShortVersion = "201",
         ideaSDKVersion = "IC-201.8743.12",
         sinceBuild = "201",
         untilBuild = "201.*",
-        archiveName = "IntelliJ-EmmyLua",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
-    "193" to BuildData(
+    BuildData(
+        ideaSDKShortVersion = "193",
         ideaSDKVersion = "IC-193.5233.102",
         sinceBuild = "193",
         untilBuild = "194.*",
-        archiveName = "IntelliJ-EmmyLua",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
-    "182" to BuildData(
+    BuildData(
+        ideaSDKShortVersion = "182",
         ideaSDKVersion = "IC-182.2371.4",
         sinceBuild = "182",
         untilBuild = "193.*",
-        archiveName = "IntelliJ-EmmyLua",
         explicitJavaDependency = false,
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
-    "172" to BuildData(
+    BuildData(
+        ideaSDKShortVersion = "172",
         ideaSDKVersion = "IC-172.4574.19",
         sinceBuild = "172",
         untilBuild = "181.*",
-        archiveName = "IntelliJ-EmmyLua",
         explicitJavaDependency = false,
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
-    "171" to BuildData(
+    BuildData(
+        ideaSDKShortVersion = "171",
         ideaSDKVersion = "IC-171.4694.73",
         sinceBuild = "171",
         untilBuild = "171.*",
-        archiveName = "IntelliJ-EmmyLua",
         explicitJavaDependency = false,
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     )
 )
 
-val developVersion = "203"
+val developVersion = "211"
 
 val emmyDebuggerVersion = "1.0.16"
 
@@ -169,9 +174,7 @@ task("installEmmyDebugger", type = Copy::class) {
     destinationDir = file("src/main/resources")
 }
 
-fun setupVersion(ver: String) {
-    val versionData = buildDataList[ver]!!
-
+fun setupVersion(versionData: BuildData) {
     configure<JavaPluginConvention> {
         sourceCompatibility = versionData.targetCompatibilityLevel
         targetCompatibility = versionData.targetCompatibilityLevel
@@ -199,12 +202,6 @@ fun setupVersion(ver: String) {
             setSinceBuild(versionData.sinceBuild)
             setUntilBuild(versionData.untilBuild)
         }
-
-        versionData.instrumentCodeCompilerVersion?.let {
-            instrumentCode {
-                setCompilerVersion(it)
-            }
-        }
     }
 
     intellij {
@@ -212,8 +209,8 @@ fun setupVersion(ver: String) {
         updateSinceUntilBuild = false
         downloadSources = false
         version = versionData.ideaSDKVersion
-        localPath = System.getenv("IDEA_HOME_${ver}")
-        sandboxDirectory = "${project.buildDir}/${ver}/idea-sandbox"
+        localPath = System.getenv("IDEA_HOME_${versionData.ideaSDKShortVersion}")
+        sandboxDirectory = "${project.buildDir}/${versionData.ideaSDKShortVersion}/idea-sandbox"
     }
 }
 
@@ -239,12 +236,11 @@ project(":") {
         }
     }
 
-    setupVersion(developVersion)
+    setupVersion(buildDataList.first())
 }
 
-buildDataList.forEach {
-    val ver = it.key
-
+buildDataList.forEach { versionData->
+    val ver = versionData.ideaSDKShortVersion
     task("buildPluginWithBunch${ver}") {
         finalizedBy("buildPlugin")
         doLast {
@@ -274,7 +270,7 @@ buildDataList.forEach {
     task("build_${ver}") {
         finalizedBy(if (isCI) "buildPluginWithBunch${ver}" else "buildPlugin")
         doLast {
-            setupVersion(ver)
+            setupVersion(versionData)
         }
     }
 }
