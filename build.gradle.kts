@@ -30,6 +30,7 @@ data class BuildData(
     val sinceBuild: String,
     val untilBuild: String,
     val archiveName: String = "IntelliJ-EmmyLua",
+    val jvmTarget: String = "1.8",
     val targetCompatibilityLevel: JavaVersion = JavaVersion.VERSION_11,
     val explicitJavaDependency: Boolean = true,
     val bunch: String = ideaSDKShortVersion
@@ -54,6 +55,7 @@ val buildDataList = listOf(
         ideaSDKVersion = "IC-202.6397.94",
         sinceBuild = "202",
         untilBuild = "202.*",
+        jvmTarget = "1.6",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
     BuildData(
@@ -61,6 +63,7 @@ val buildDataList = listOf(
         ideaSDKVersion = "IC-201.8743.12",
         sinceBuild = "201",
         untilBuild = "201.*",
+        jvmTarget = "1.6",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
     BuildData(
@@ -68,6 +71,7 @@ val buildDataList = listOf(
         ideaSDKVersion = "IC-193.5233.102",
         sinceBuild = "193",
         untilBuild = "194.*",
+        jvmTarget = "1.6",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
     BuildData(
@@ -76,6 +80,7 @@ val buildDataList = listOf(
         sinceBuild = "182",
         untilBuild = "193.*",
         explicitJavaDependency = false,
+        jvmTarget = "1.6",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
     BuildData(
@@ -84,6 +89,7 @@ val buildDataList = listOf(
         sinceBuild = "172",
         untilBuild = "181.*",
         explicitJavaDependency = false,
+        jvmTarget = "1.6",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     ),
     BuildData(
@@ -92,11 +98,14 @@ val buildDataList = listOf(
         sinceBuild = "171",
         untilBuild = "171.*",
         explicitJavaDependency = false,
+        jvmTarget = "1.6",
         targetCompatibilityLevel = JavaVersion.VERSION_1_8
     )
 )
 
-val developVersion = "211"
+val buildVersion = System.getProperty("IDEA_VER") ?: "211"
+
+val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
 val emmyDebuggerVersion = "1.0.16"
 
@@ -174,46 +183,6 @@ task("installEmmyDebugger", type = Copy::class) {
     destinationDir = file("src/main/resources")
 }
 
-fun setupVersion(versionData: BuildData) {
-    configure<JavaPluginConvention> {
-        sourceCompatibility = versionData.targetCompatibilityLevel
-        targetCompatibility = versionData.targetCompatibilityLevel
-    }
-
-    tasks {
-        buildPlugin {
-            //dependsOn("installEmmyDebugger")
-            archiveBaseName.set(versionData.archiveName)
-            from(fileTree(resDir) { include("debugger/**") }) {
-                into("/${project.name}/classes/")
-            }
-            from(fileTree(resDir) { include("!!DONT_UNZIP_ME!!.txt") }) {
-                into("/${project.name}")
-            }
-        }
-
-        compileKotlin {
-            kotlinOptions {
-                jvmTarget = "1.8"
-            }
-        }
-
-        patchPluginXml {
-            setSinceBuild(versionData.sinceBuild)
-            setUntilBuild(versionData.untilBuild)
-        }
-    }
-
-    intellij {
-        type = "IC"
-        updateSinceUntilBuild = false
-        downloadSources = false
-        version = versionData.ideaSDKVersion
-        localPath = System.getenv("IDEA_HOME_${versionData.ideaSDKShortVersion}")
-        sandboxDirectory = "${project.buildDir}/${versionData.ideaSDKShortVersion}/idea-sandbox"
-    }
-}
-
 project(":") {
     repositories {
         maven(url = "https://www.jetbrains.com/intellij-repository/releases")
@@ -236,14 +205,14 @@ project(":") {
         }
     }
 
-    setupVersion(buildDataList.first())
-}
+    configure<JavaPluginConvention> {
+        sourceCompatibility = buildVersionData.targetCompatibilityLevel
+        targetCompatibility = buildVersionData.targetCompatibilityLevel
+    }
 
-buildDataList.forEach { versionData->
-    val ver = versionData.ideaSDKShortVersion
-    task("buildPluginWithBunch${ver}") {
-        finalizedBy("buildPlugin")
+    task("bunch") {
         doLast {
+            val rev = getRev()
             // reset
             exec {
                 executable = "git"
@@ -257,20 +226,46 @@ buildDataList.forEach { versionData->
             // switch
             exec {
                 executable = if (isWin) "bunch/bin/bunch.bat" else "bunch/bin/bunch"
-                args("switch", ".", ver)
+                args("switch", ".", buildVersionData.bunch)
             }
             // reset to HEAD
             exec {
                 executable = "git"
-                args("reset", getRev())
+                args("reset", rev)
             }
         }
     }
 
-    task("build_${ver}") {
-        finalizedBy(if (isCI) "buildPluginWithBunch${ver}" else "buildPlugin")
-        doLast {
-            setupVersion(versionData)
+    tasks {
+        buildPlugin {
+            dependsOn("bunch", "installEmmyDebugger")
+            archiveBaseName.set(buildVersionData.archiveName)
+            from(fileTree(resDir) { include("debugger/**") }) {
+                into("/${project.name}/classes/")
+            }
+            from(fileTree(resDir) { include("!!DONT_UNZIP_ME!!.txt") }) {
+                into("/${project.name}")
+            }
         }
+
+        compileKotlin {
+            kotlinOptions {
+                jvmTarget = buildVersionData.jvmTarget
+            }
+        }
+
+        patchPluginXml {
+            setSinceBuild(buildVersionData.sinceBuild)
+            setUntilBuild(buildVersionData.untilBuild)
+        }
+    }
+
+    intellij {
+        type = "IC"
+        updateSinceUntilBuild = false
+        downloadSources = false
+        version = buildVersionData.ideaSDKVersion
+        localPath = System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}")
+        sandboxDirectory = "${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox"
     }
 }

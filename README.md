@@ -99,7 +99,7 @@ QQ交流群：1群：`29850775` 2群：`529914962`
         
 ## Building
 
-  `./gradlew build_203`
+  `./gradlew buildPlugin -DIDEA_VER=203`
 
 ## Developed By
 
