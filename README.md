@@ -1,6 +1,7 @@
 ![logo](/snapshot/logo.png)
 # EmmyLua for IntelliJ IDEA
 
+[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 [![Online EmmyLua Doc](https://img.shields.io/badge/emmy-doc-46BC99.svg?style=flat-square)](https://emmylua.github.io)
 [![在线文档](https://img.shields.io/badge/emmy-中文-46BC99.svg?style=flat-square)](https://emmylua.github.io/zh_CN)
 [![Jetbrains plugin](https://img.shields.io/jetbrains/plugin/d/9768-emmylua.svg?style=flat-square)](https://plugins.jetbrains.com/plugin/9768-emmylua)
@@ -9,11 +10,6 @@
 [![Join the chat at gitter](https://img.shields.io/badge/chat-on%20gitter-46BC99.svg?style=flat-square)](https://gitter.im/emmylua/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 [![加入QQ群](https://img.shields.io/badge/chat-QQ(1)群-46BC99.svg?style=flat-square)](https://jq.qq.com/?_wv=1027&k=5Br83i5)
 [![加入QQ群](https://img.shields.io/badge/chat-QQ(2)群-46BC99.svg?style=flat-square)](https://jq.qq.com/?_wv=1027&k=5EeI0Sm)
-
-Version | CI status
---------|----------
-IDEA 172-181|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
-IDEA 182+|[![Build status](https://ci.appveyor.com/api/projects/status/m25uajpqa2fft8ah?svg=true)](https://ci.appveyor.com/project/EmmyLua/intellij-emmylua)
 
 QQ交流群：1群：`29850775` 2群：`529914962`
 (最新版本以及部分视频演示在群文件中下载)
@@ -95,15 +91,15 @@ QQ交流群：1群：`29850775` 2群：`529914962`
 
 ## Build environment requirements
 
-- JDK 1.8
+- JDK 11
 - Setup environment variables as following:
 
-        JAVA_HOME="path to JDK 1.8"
-        IDEA_HOME_182="path to IDEA 182+"
+        JAVA_HOME="path to JDK 11"
+        IDEA_HOME_203="path to IDEA 203+"
         
 ## Building
 
-  `./gradlew build_182`
+  `./gradlew build_203`
 
 ## Developed By
 
