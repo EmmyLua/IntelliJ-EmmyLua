@@ -109,6 +109,8 @@ val buildVersion = System.getProperty("IDEA_VER") ?: "211"
 
 val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
+version = "${version}-IDEA${buildVersion}"
+
 val emmyDebuggerVersion = "1.0.16"
 
 val resDir = "src/main/resources"
