@@ -33,13 +33,15 @@ data class BuildData(
     val jvmTarget: String = "1.8",
     val targetCompatibilityLevel: JavaVersion = JavaVersion.VERSION_11,
     val explicitJavaDependency: Boolean = true,
-    val bunch: String = ideaSDKShortVersion
+    val bunch: String = ideaSDKShortVersion,
+    // https://github.com/JetBrains/gradle-intellij-plugin/issues/403#issuecomment-542890849
+    val instrumentCodeCompilerVersion: String = ideaSDKVersion
 )
 
 val buildDataList = listOf(
     BuildData(
         ideaSDKShortVersion = "211",
-        ideaSDKVersion = "IC-211.5787.15-EAP-SNAPSHOT",
+        ideaSDKVersion = "LATEST-EAP-SNAPSHOT",
         sinceBuild = "211",
         untilBuild = "211.*",
         bunch = "203"
@@ -257,6 +259,10 @@ project(":") {
         patchPluginXml {
             setSinceBuild(buildVersionData.sinceBuild)
             setUntilBuild(buildVersionData.untilBuild)
+        }
+
+        instrumentCode {
+            setCompilerVersion(buildVersionData.instrumentCodeCompilerVersion)
         }
     }
 
