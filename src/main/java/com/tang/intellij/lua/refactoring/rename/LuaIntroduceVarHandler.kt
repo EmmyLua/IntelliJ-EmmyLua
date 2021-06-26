@@ -128,7 +128,7 @@ class LuaIntroduceVarHandler : RefactoringActionHandler {
                 }
             }
 
-            localDef = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(localDef)
+            localDef = CodeInsightUtilCore.forcePsiPostprocessAndRestoreElement(localDef) ?: return
             val nameDef = PsiTreeUtil.findChildOfType(localDef, LuaNameDef::class.java)
             if (nameDef != null)
                 operation.editor.caretModel.moveToOffset(nameDef.textOffset)

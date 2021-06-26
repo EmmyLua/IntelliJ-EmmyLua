@@ -52,7 +52,7 @@ class LuaCallHierarchyBrowser(element: PsiElement) : CallHierarchyBrowserBase(el
         return tree
     }
 
-    override fun createTrees(trees: MutableMap<String, JTree>) {
+    override fun createTrees(trees: CreateTreesMap) {
         val group = ActionManager.getInstance().getAction(GROUP_LUA_CALL_HIERARCHY_POPUP) as ActionGroup
 
         val callerTree = createHierarchyTree(group)

@@ -40,8 +40,15 @@ data class BuildData(
 
 val buildDataList = listOf(
     BuildData(
-        ideaSDKShortVersion = "211",
+        ideaSDKShortVersion = "212",
         ideaSDKVersion = "LATEST-EAP-SNAPSHOT",
+        sinceBuild = "212",
+        untilBuild = "212.*",
+        bunch = "203"
+    ),
+    BuildData(
+        ideaSDKShortVersion = "211",
+        ideaSDKVersion = "IC-211.7142.45",
         sinceBuild = "211",
         untilBuild = "211.*",
         bunch = "203"
@@ -105,7 +112,7 @@ val buildDataList = listOf(
     )
 )
 
-val buildVersion = System.getProperty("IDEA_VER") ?: "211"
+val buildVersion = System.getProperty("IDEA_VER") ?: "212"
 
 val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
