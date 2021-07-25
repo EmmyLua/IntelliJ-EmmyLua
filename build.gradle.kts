@@ -26,6 +26,7 @@ plugins {
 
 data class BuildData(
     val ideaSDKShortVersion: String,
+    // https://www.jetbrains.com/intellij-repository/releases
     val ideaSDKVersion: String,
     val sinceBuild: String,
     val untilBuild: String,
