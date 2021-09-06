@@ -104,7 +104,12 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
         val file = sourcePosition.file
         val shortPath = file.canonicalPath
         if (shortPath != null) {
-            send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
+            if(breakpoint.isLogMessage){
+                send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line+1,null, breakpoint.logExpressionObject?.expression))))
+            }
+            else {
+                send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1, breakpoint.conditionExpression?.expression))))
+            }
         }
     }
 
