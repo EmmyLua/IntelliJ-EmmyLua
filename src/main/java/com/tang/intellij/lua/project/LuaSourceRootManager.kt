@@ -68,10 +68,25 @@ class LuaSourceRootManager(val project: Project) : PersistentStateComponent<LuaS
             //val contentRoots = moduleRootManager.contentRootUrls
             //list.addAll(contentRoots)
         }
+        for (s in getAdditionalSourceRoots()) {
+            list.add(s.url)
+        }
         return list
     }
 
     fun getSourceRoots(): List<VirtualFile> {
+        val list = mutableListOf<VirtualFile>()
+        for (url in state.rootList) {
+            val file = VirtualFileManager.getInstance().findFileByUrl(url)
+            if (file != null)
+                list.add(file)
+        }
+        list.addAll(getModuleSourceRoots())
+        list.addAll(getAdditionalSourceRoots())
+        return list
+    }
+
+    fun getModuleSourceRoots():List<VirtualFile>{
         val list = mutableListOf<VirtualFile>()
         val modules = ModuleManager.getInstance(project).modules
         for (module in modules) {
@@ -79,16 +94,33 @@ class LuaSourceRootManager(val project: Project) : PersistentStateComponent<LuaS
             list.addAll(moduleRootManager.sourceRoots)
             //list.addAll(moduleRootManager.contentRoots)
         }
-        for (url in state.rootList) {
-            val file = VirtualFileManager.getInstance().findFileByUrl(url)
+        return list
+    }
+
+    fun getAdditionalSourceRoots():List<VirtualFile>{
+        val list = mutableListOf<VirtualFile>()
+        for (s in LuaSettings.instance.additionalSourcesRoot) {
+            val file = VirtualFileManager.getInstance().findFileByUrl("file://$s")
             if (file != null)
                 list.add(file)
         }
         return list
     }
 
+    fun getAdditionalSourceRootUrls():List<String>{
+        val list = mutableListOf<String>()
+        for (s in LuaSettings.instance.additionalSourcesRoot) {
+            val file = VirtualFileManager.getInstance().findFileByUrl("file://$s")
+            if (file != null)
+                list.add(file.url)
+        }
+        return list
+    }
+
     fun isSourceRoot(dir: VirtualFile): Boolean {
-        return state.rootList.contains(dir.url)
+        if (state.rootList.contains(dir.url)) return true
+        if (getAdditionalSourceRootUrls().contains(dir.url)) return true
+        return false
     }
 
     fun isInSource(file: VirtualFile): Boolean {
@@ -96,6 +128,10 @@ class LuaSourceRootManager(val project: Project) : PersistentStateComponent<LuaS
             return true
         val url = file.url
         for (rootUrl in state.rootList) {
+            if (url.startsWith(rootUrl))
+                return true
+        }
+        for (rootUrl in getAdditionalSourceRootUrls()) {
             if (url.startsWith(rootUrl))
                 return true
         }
