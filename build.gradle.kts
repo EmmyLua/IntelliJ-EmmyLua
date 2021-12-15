@@ -19,7 +19,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("0.6.5")
+    id("org.jetbrains.intellij").version("1.3.0")
     id("org.jetbrains.kotlin.jvm").version("1.4.20")
     id("de.undercouch.download").version("3.4.3")
 }
@@ -267,21 +267,21 @@ project(":") {
         }
 
         patchPluginXml {
-            setSinceBuild(buildVersionData.sinceBuild)
-            setUntilBuild(buildVersionData.untilBuild)
+            sinceBuild.set(buildVersionData.sinceBuild)
+            untilBuild.set(buildVersionData.untilBuild)
         }
 
         instrumentCode {
-            setCompilerVersion(buildVersionData.instrumentCodeCompilerVersion)
+            compilerVersion.set(buildVersionData.instrumentCodeCompilerVersion)
         }
     }
 
     intellij {
-        type = "IC"
-        updateSinceUntilBuild = false
-        downloadSources = false
-        version = buildVersionData.ideaSDKVersion
-        localPath = System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}")
-        sandboxDirectory = "${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox"
+        type.set("IU")
+        updateSinceUntilBuild.set(false)
+        downloadSources.set(false)
+        version.set(buildVersionData.ideaSDKVersion)
+        localPath.set(System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}"))
+        sandboxDir.set("${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox")
     }
 }
