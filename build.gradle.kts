@@ -284,13 +284,15 @@ project(":") {
         }
 
         withType<org.jetbrains.intellij.tasks.PrepareSandboxTask> {
-            copy {
-                from("src/main/resources/std")
-                into("$destinationDir/${pluginName.get()}/std")
-            }
-            copy {
-                from("src/main/resources/debugger")
-                into("$destinationDir/${pluginName.get()}/debugger")
+            doLast {
+                copy {
+                    from("src/main/resources/std")
+                    into("$destinationDir/${pluginName.get()}/std")
+                }
+                copy {
+                    from("src/main/resources/debugger")
+                    into("$destinationDir/${pluginName.get()}/debugger")
+                }
             }
         }
     }
