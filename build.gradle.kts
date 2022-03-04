@@ -315,7 +315,7 @@ project(":") {
 
     tasks {
         buildPlugin {
-            dependsOn("bunch", "installEmmyDebugger")
+            dependsOn("bunch", "installEmmyDebugger", "installEmmyLuaCodeStyle")
             archiveBaseName.set(buildVersionData.archiveName)
             from(fileTree(resDir) { include("!!DONT_UNZIP_ME!!.txt") }) {
                 into("/${project.name}")
