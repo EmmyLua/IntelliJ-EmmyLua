@@ -65,16 +65,23 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         if(exePath == null){
             return null;
         }
+        val project = request.context.project
+        val params = mutableListOf<String>(
+            "format",
+            "-f",
+            path,
+        )
+        if(project.basePath != null){
+            val editorconfig = project.basePath + "/.editorconfig"
+            params.add("-c")
+            params.add(editorconfig)
+        }
 
         try {
             val commandLine = GeneralCommandLine()
                 .withExePath(exePath)
                 .withParameters(
-                    listOf(
-                        "format",
-                        "-f",
-                        path
-                    )
+                    params
                 )
             val handler = OSProcessHandler(commandLine.withCharset(StandardCharsets.UTF_8))
 
