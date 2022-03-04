@@ -25,7 +25,9 @@ import com.intellij.execution.process.ProcessEvent
 import com.intellij.formatting.service.AsyncDocumentFormattingService
 import com.intellij.formatting.service.AsyncFormattingRequest
 import com.intellij.formatting.service.FormattingService
+import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.psi.PsiFile
+import com.tang.intellij.lua.psi.LuaFileUtil.getPluginVirtualFile
 import com.tang.intellij.lua.psi.LuaPsiFile
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -50,8 +52,20 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
             return null
         }
         val path = request.ioFile!!.path
-        val exePath =
-            "C:\\Users\\zc\\Desktop\\github\\EmmyLuaCodeStyle\\out\\build\\x64-Debug\\CodeFormat\\Debug\\CodeFormat.exe"
+        var exePath: String? = null
+        if (SystemInfoRt.isWindows)
+            exePath = getPluginVirtualFile("formatter/emmy/win32-x64/bin/CodeFormat.exe")
+        else if(SystemInfoRt.isLinux){
+            exePath = getPluginVirtualFile("formatter/emmy/linux-x64/bin/CodeFormat")
+        }
+        else if(SystemInfoRt.isMac){
+            exePath = getPluginVirtualFile("formatter/emmy/darwin-x64/bin/CodeFormat")
+        }
+
+        if(exePath == null){
+            return null;
+        }
+
         try {
             val commandLine = GeneralCommandLine()
                 .withExePath(exePath)
