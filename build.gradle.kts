@@ -42,7 +42,7 @@ data class BuildData(
 val buildDataList = listOf(
     BuildData(
         ideaSDKShortVersion = "213",
-        ideaSDKVersion = "213.5744.223",
+        ideaSDKVersion = "213.6777.52",
         sinceBuild = "212",
         untilBuild = "213.*",
         bunch = "212"
