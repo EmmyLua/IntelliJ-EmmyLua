@@ -26,7 +26,7 @@ import com.intellij.formatting.service.AsyncDocumentFormattingService
 import com.intellij.formatting.service.AsyncFormattingRequest
 import com.intellij.formatting.service.FormattingService
 import com.intellij.psi.PsiFile
-import com.tang.intellij.lua.lang.LuaFileType
+import com.tang.intellij.lua.psi.LuaPsiFile
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -36,26 +36,34 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
     private val FEATURES: MutableSet<FormattingService.Feature> = EnumSet.noneOf(
         FormattingService.Feature::class.java
     )
+
     override fun getFeatures(): MutableSet<FormattingService.Feature> {
         return FEATURES
     }
 
     override fun canFormat(file: PsiFile): Boolean {
-        return file is LuaFileType
+        return file is LuaPsiFile
     }
 
     override fun createFormattingTask(request: AsyncFormattingRequest): FormattingTask? {
-        val context = request.context
-        val exePath = "C:\\Users\\zc\\Downloads\\win32-x64\\bin\\CodeFormat.exe"
-        try{
+        if (request.ioFile == null) {
+            return null
+        }
+        val path = request.ioFile!!.path
+        val exePath =
+            "C:\\Users\\zc\\Desktop\\github\\EmmyLuaCodeStyle\\out\\build\\x64-Debug\\CodeFormat\\Debug\\CodeFormat.exe"
+        try {
             val commandLine = GeneralCommandLine()
                 .withExePath(exePath)
-                .withParameters(listOf(
-                    "format",
-                    "-f",
-                    "C:\\Users\\zc\\Desktop\\learn\\class.lua"
-                ))
+                .withParameters(
+                    listOf(
+                        "format",
+                        "-f",
+                        path
+                    )
+                )
             val handler = OSProcessHandler(commandLine.withCharset(StandardCharsets.UTF_8))
+
             return object : FormattingTask {
                 override fun run() {
                     handler.addProcessListener(object : CapturingProcessAdapter() {
@@ -63,7 +71,10 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                             val exitCode: Int = event.exitCode
                             if (exitCode == 0) {
                                 request.onTextReady(output.stdout)
-                            } else {
+                            } else if(exitCode == -2) {
+//                                request.
+                            }
+                            else{
                                 request.onError("EmmyLuaCodeStyle", output.stderr)
                             }
                         }
@@ -80,8 +91,8 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                     return true
                 }
             }
-        }
-        catch (e: ExecutionException){
+
+        } catch (e: ExecutionException) {
             e.message?.let { request.onError("EmmyLuaCodeStyle", it) };
             return null;
         }
