@@ -119,6 +119,8 @@ val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersi
 
 val emmyDebuggerVersion = "1.1.0"
 
+val emmyLuaCodeStyleVersion = "0.8.6"
+
 val resDir = "src/main/resources"
 
 val isWin = Os.isFamily(Os.FAMILY_WINDOWS)
@@ -194,6 +196,58 @@ task("installEmmyDebugger", type = Copy::class) {
     }
     destinationDir = file("src/main/resources")
 }
+
+task("downloadEmmyLuaCodeStyle", type = Download::class) {
+    src(arrayOf(
+        "https://github.com/CppCXY/EmmyLuaCodeStyle/releases/download/${emmyLuaCodeStyleVersion}/win32-x64.zip",
+        "https://github.com/CppCXY/EmmyLuaCodeStyle/releases/download/${emmyLuaCodeStyleVersion}/linux-x64.zip",
+        "https://github.com/CppCXY/EmmyLuaCodeStyle/releases/download/${emmyLuaCodeStyleVersion}/darwin-x64.zip",
+        "https://github.com/CppCXY/EmmyLuaCodeStyle/releases/download/${emmyLuaCodeStyleVersion}/darwin-arm64.zip"
+    ))
+
+    dest("CodeStyleTemp")
+}
+
+task("unzipEmmyLuaCodeStyle", type = Copy::class) {
+    dependsOn("downloadEmmyLuaCodeStyle")
+    from(zipTree("CodeStyleTemp/win32-x64.zip")) {
+        into("win32-x64")
+    }
+    from(zipTree("CodeStyleTemp/linux-x64.zip")) {
+        into("linux-x64")
+    }
+    from(zipTree("CodeStyleTemp/darwin-x64.zip")) {
+        into("darwin-x64")
+    }
+    from(zipTree("CodeStyleTemp/darwin-arm64.zip")) {
+        into("darwin-arm64")
+    }
+
+    destinationDir = file("CodeStyleTemp")
+}
+
+task("installEmmyLuaCodeStyle", type = Copy::class) {
+    dependsOn("unzipEmmyLuaCodeStyle")
+    from("CodeStyleTemp/win32-x64/bin") {
+        include("CodeFormat.exe")
+        into("formatter/emmy/win32-x64/bin")
+    }
+    from("CodeStyleTemp/linux-x64/bin") {
+        include("CodeFormat")
+        into("formatter/emmy/linux-x64/bin")
+    }
+    from("CodeStyleTemp/darwin-x64/bin") {
+        include("CodeFormat")
+        into("formatter/emmy/darwin-x64/bin")
+    }
+    from("CodeStyleTemp/darwin-arm64/bin") {
+        include("CodeFormat")
+        into("formatter/emmy/darwin-arm64/bin")
+    }
+
+    destinationDir = file("src/main/resources")
+}
+
 
 project(":") {
     repositories {
