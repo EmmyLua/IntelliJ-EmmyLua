@@ -59,7 +59,12 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         else if (SystemInfoRt.isLinux) {
             exePath = getPluginVirtualFile("formatter/emmy/linux-x64/bin/CodeFormat")
         } else if (SystemInfoRt.isMac) {
-            exePath = getPluginVirtualFile("formatter/emmy/darwin-x64/bin/CodeFormat")
+            if(System.getProperty("os.arch") == "arm64") {
+                exePath = getPluginVirtualFile("formatter/emmy/darwin-arm64/bin/CodeFormat")
+            }
+            else{
+                exePath = getPluginVirtualFile("formatter/emmy/darwin-x64/bin/CodeFormat")
+            }
         }
 
         if (exePath == null) {
