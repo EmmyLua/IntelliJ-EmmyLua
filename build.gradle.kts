@@ -205,42 +205,42 @@ task("downloadEmmyLuaCodeStyle", type = Download::class) {
         "https://github.com/CppCXY/EmmyLuaCodeStyle/releases/download/${emmyLuaCodeStyleVersion}/darwin-arm64.zip"
     ))
 
-    dest("CodeStyleTemp")
+    dest("temp/formatter")
 }
 
 task("unzipEmmyLuaCodeStyle", type = Copy::class) {
     dependsOn("downloadEmmyLuaCodeStyle")
-    from(zipTree("CodeStyleTemp/win32-x64.zip")) {
+    from(zipTree("temp/formatter/win32-x64.zip")) {
         into("win32-x64")
     }
-    from(zipTree("CodeStyleTemp/linux-x64.zip")) {
+    from(zipTree("temp/formatter/linux-x64.zip")) {
         into("linux-x64")
     }
-    from(zipTree("CodeStyleTemp/darwin-x64.zip")) {
+    from(zipTree("temp/formatter/darwin-x64.zip")) {
         into("darwin-x64")
     }
-    from(zipTree("CodeStyleTemp/darwin-arm64.zip")) {
+    from(zipTree("temp/formatter/darwin-arm64.zip")) {
         into("darwin-arm64")
     }
 
-    destinationDir = file("CodeStyleTemp")
+    destinationDir = file("temp/formatter")
 }
 
 task("installEmmyLuaCodeStyle", type = Copy::class) {
     dependsOn("unzipEmmyLuaCodeStyle")
-    from("CodeStyleTemp/win32-x64/bin") {
+    from("temp/formatter/win32-x64/bin") {
         include("CodeFormat.exe")
         into("formatter/emmy/win32-x64/bin")
     }
-    from("CodeStyleTemp/linux-x64/bin") {
+    from("temp/formatter/linux-x64/bin") {
         include("CodeFormat")
         into("formatter/emmy/linux-x64/bin")
     }
-    from("CodeStyleTemp/darwin-x64/bin") {
+    from("temp/formatter/darwin-x64/bin") {
         include("CodeFormat")
         into("formatter/emmy/darwin-x64/bin")
     }
-    from("CodeStyleTemp/darwin-arm64/bin") {
+    from("temp/formatter/darwin-arm64/bin") {
         include("CodeFormat")
         into("formatter/emmy/darwin-arm64/bin")
     }
@@ -346,6 +346,10 @@ project(":") {
                 copy {
                     from("src/main/resources/debugger")
                     into("$destinationDir/${pluginName.get()}/debugger")
+                }
+                copy {
+                    from("src/main/resources/formatter")
+                    into("$destinationDir/${pluginName.get()}/formatter")
                 }
             }
         }
