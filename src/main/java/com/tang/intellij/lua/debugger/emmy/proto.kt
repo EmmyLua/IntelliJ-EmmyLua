@@ -144,7 +144,7 @@ class EvalReq(val expr: String, val stackLevel: Int, val cacheId: Int, val depth
 
 class EvalRsp(val seq: Int, val success: Boolean, val error: String?, val value: VariableValue?)
 
-class BreakPoint(val file: String, val line: Int, val condition: String? = null, val logMessage: String? = null, hitCondition: String? = null)
+class BreakPoint(val file: String, val line: Int, val condition: String? = null, val logMessage: String? = null, hitCondition: String? = null, runToHere: Boolean = false)
 
 class AddBreakPointReq(val breakPoints: List<BreakPoint>) : Message(MessageCMD.AddBreakPointReq)
 

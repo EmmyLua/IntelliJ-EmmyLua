@@ -125,6 +125,10 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
         send(DebugActionMessage(DebugAction.Break))
     }
 
+    override fun runToPosition(position: XSourcePosition, context: XSuspendContext?) {
+        send(AddBreakPointReq(listOf(BreakPoint(position.file.path, position.line + 1, null,null,null))))
+    }
+
     private fun onBreak(data: BreakNotify) {
         evalHandlers.clear()
         val frames = data.stacks.map { EmmyDebugStackFrame(it, this) }
