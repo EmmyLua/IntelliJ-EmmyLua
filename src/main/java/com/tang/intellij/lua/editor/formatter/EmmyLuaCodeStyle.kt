@@ -29,6 +29,7 @@ import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.psi.PsiFile
 import com.tang.intellij.lua.psi.LuaFileUtil.getPluginVirtualFile
 import com.tang.intellij.lua.psi.LuaPsiFile
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -36,7 +37,7 @@ import java.util.*
 class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
 
     private val FEATURES: MutableSet<FormattingService.Feature> = EnumSet.noneOf(
-        FormattingService.Feature::class.java
+            FormattingService.Feature::class.java
     )
 
     override fun getFeatures(): MutableSet<FormattingService.Feature> {
@@ -55,34 +56,35 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         var exePath: String? = null
         if (SystemInfoRt.isWindows)
             exePath = getPluginVirtualFile("formatter/emmy/win32-x64/bin/CodeFormat.exe")
-        else if(SystemInfoRt.isLinux){
+        else if (SystemInfoRt.isLinux) {
             exePath = getPluginVirtualFile("formatter/emmy/linux-x64/bin/CodeFormat")
-        }
-        else if(SystemInfoRt.isMac){
+        } else if (SystemInfoRt.isMac) {
             exePath = getPluginVirtualFile("formatter/emmy/darwin-x64/bin/CodeFormat")
         }
 
-        if(exePath == null){
+        if (exePath == null) {
             return null;
         }
         val project = request.context.project
         val params = mutableListOf<String>(
-            "format",
-            "-f",
-            path,
+                "format",
+                "-f",
+                path,
         )
-        if(project.basePath != null){
+        if (project.basePath != null) {
             val editorconfig = project.basePath + "/.editorconfig"
-            params.add("-c")
-            params.add(editorconfig)
+            if (File(editorconfig).exists()) {
+                params.add("-c")
+                params.add(editorconfig)
+            }
         }
 
         try {
             val commandLine = GeneralCommandLine()
-                .withExePath(exePath)
-                .withParameters(
-                    params
-                )
+                    .withExePath(exePath)
+                    .withParameters(
+                            params
+                    )
             val handler = OSProcessHandler(commandLine.withCharset(StandardCharsets.UTF_8))
 
             return object : FormattingTask {
@@ -92,10 +94,9 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                             val exitCode: Int = event.exitCode
                             if (exitCode == 0) {
                                 request.onTextReady(output.stdout)
-                            } else if(exitCode == -2) {
+                            } else if (exitCode == -2) {
 //                                request.
-                            }
-                            else{
+                            } else {
                                 request.onError("EmmyLuaCodeStyle", output.stderr)
                             }
                         }
