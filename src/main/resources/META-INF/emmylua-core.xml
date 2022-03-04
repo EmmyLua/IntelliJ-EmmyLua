@@ -134,9 +134,10 @@
         <lang.surroundDescriptor language="Lua" implementationClass="com.tang.intellij.lua.editor.surroundWith.LuaSurroundDescriptor"/>
 
         <!-- formatting & code style -->
-        <lang.formatter language="Lua" implementationClass="com.tang.intellij.lua.editor.formatter.LuaFormattingModelBuilder"/>
+<!--        <lang.formatter language="Lua" implementationClass="com.tang.intellij.lua.editor.formatter.LuaFormattingModelBuilder"/>-->
         <codeStyleSettingsProvider implementation="com.tang.intellij.lua.editor.formatter.LuaCodeStyleSettingsProvider"/>
         <langCodeStyleSettingsProvider implementation="com.tang.intellij.lua.editor.formatter.LuaLanguageCodeStyleSettingsProvider"/>
+        <formattingService implementation="com.tang.intellij.lua.editor.formatter.EmmyLuaCodeStyle"/>
 
         <!-- runner & debugger -->
         <runConfigurationProducer implementation="com.tang.intellij.lua.debugger.LuaRunConfigurationProducer"/>
