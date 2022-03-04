@@ -211,19 +211,19 @@ task("downloadEmmyLuaCodeStyle", type = Download::class) {
 task("unzipEmmyLuaCodeStyle", type = Copy::class) {
     dependsOn("downloadEmmyLuaCodeStyle")
     from(zipTree("temp/formatter/win32-x64.zip")) {
-        into("win32-x64")
+        into("formatter")
     }
     from(zipTree("temp/formatter/linux-x64.zip")) {
-        into("linux-x64")
+        into("formatter")
     }
     from(zipTree("temp/formatter/darwin-x64.zip")) {
-        into("darwin-x64")
+        into("formatter")
     }
     from(zipTree("temp/formatter/darwin-arm64.zip")) {
-        into("darwin-arm64")
+        into("formatter")
     }
 
-    destinationDir = file("temp/formatter")
+    destinationDir = file("temp")
 }
 
 task("installEmmyLuaCodeStyle", type = Copy::class) {
