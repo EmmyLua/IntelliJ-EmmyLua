@@ -19,7 +19,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("0.6.5")
+    id("org.jetbrains.intellij").version("1.4.0")
     id("org.jetbrains.kotlin.jvm").version("1.4.20")
     id("de.undercouch.download").version("3.4.3")
 }
@@ -41,10 +41,10 @@ data class BuildData(
 
 val buildDataList = listOf(
     BuildData(
-        ideaSDKShortVersion = "212",
-        ideaSDKVersion = "LATEST-EAP-SNAPSHOT",
+        ideaSDKShortVersion = "213",
+        ideaSDKVersion = "213.5744.223",
         sinceBuild = "212",
-        untilBuild = "212.*",
+        untilBuild = "213.*",
         bunch = "212"
     ),
     BuildData(
@@ -113,7 +113,7 @@ val buildDataList = listOf(
     )
 )
 
-val buildVersion = System.getProperty("IDEA_VER") ?: "212"
+val buildVersion = System.getProperty("IDEA_VER") ?: buildDataList.first().ideaSDKShortVersion
 
 val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
@@ -208,18 +208,29 @@ project(":") {
         implementation("org.scala-sbt.ipcsocket:ipcsocket:1.3.0")
         implementation("org.luaj:luaj-jse:3.0.1")
         implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5")
+        implementation("com.jgoodies:forms:1.2.1")
     }
 
     sourceSets {
         main {
             java.srcDirs("gen", "src/main/compat")
             resources.exclude("debugger/**")
+            resources.exclude("std/**")
         }
     }
 
     configure<JavaPluginConvention> {
         sourceCompatibility = buildVersionData.targetCompatibilityLevel
         targetCompatibility = buildVersionData.targetCompatibilityLevel
+    }
+
+    intellij {
+        type.set("IU")
+        updateSinceUntilBuild.set(false)
+        downloadSources.set(false)
+        version.set(buildVersionData.ideaSDKVersion)
+        localPath.set(System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}"))
+        sandboxDir.set("${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox")
     }
 
     task("bunch") {
@@ -252,9 +263,6 @@ project(":") {
         buildPlugin {
             dependsOn("bunch", "installEmmyDebugger")
             archiveBaseName.set(buildVersionData.archiveName)
-            from(fileTree(resDir) { include("debugger/**") }) {
-                into("/${project.name}/classes/")
-            }
             from(fileTree(resDir) { include("!!DONT_UNZIP_ME!!.txt") }) {
                 into("/${project.name}")
             }
@@ -267,21 +275,25 @@ project(":") {
         }
 
         patchPluginXml {
-            setSinceBuild(buildVersionData.sinceBuild)
-            setUntilBuild(buildVersionData.untilBuild)
+            sinceBuild.set(buildVersionData.sinceBuild)
+            untilBuild.set(buildVersionData.untilBuild)
         }
 
         instrumentCode {
-            setCompilerVersion(buildVersionData.instrumentCodeCompilerVersion)
+            compilerVersion.set(buildVersionData.instrumentCodeCompilerVersion)
         }
-    }
 
-    intellij {
-        type = "IC"
-        updateSinceUntilBuild = false
-        downloadSources = false
-        version = buildVersionData.ideaSDKVersion
-        localPath = System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}")
-        sandboxDirectory = "${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox"
+        withType<org.jetbrains.intellij.tasks.PrepareSandboxTask> {
+            doLast {
+                copy {
+                    from("src/main/resources/std")
+                    into("$destinationDir/${pluginName.get()}/std")
+                }
+                copy {
+                    from("src/main/resources/debugger")
+                    into("$destinationDir/${pluginName.get()}/debugger")
+                }
+            }
+        }
     }
 }

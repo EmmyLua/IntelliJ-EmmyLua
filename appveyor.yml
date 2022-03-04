@@ -12,6 +12,6 @@ build_script:
 
       gradlew buildPlugin -DIDEA_VER=211
 
-      gradlew buildPlugin -DIDEA_VER=212
+      gradlew buildPlugin -DIDEA_VER=213
 artifacts:
   - path: build/distributions/*.zip

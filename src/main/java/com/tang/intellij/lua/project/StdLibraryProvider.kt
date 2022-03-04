@@ -27,8 +27,6 @@ import com.intellij.openapi.util.EmptyRunnable
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.stubs.StubIndex
-import com.intellij.util.PathUtil
-import com.intellij.util.io.URLUtil
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.lang.LuaLanguageLevel
 import com.tang.intellij.lua.psi.LuaFileUtil
@@ -38,20 +36,13 @@ import javax.swing.Icon
 class StdLibraryProvider: AdditionalLibraryRootsProvider() {
     override fun getAdditionalProjectLibraries(project: Project): Collection<StdLibrary> {
         val level = LuaSettings.instance.languageLevel
-        val std = "std/Lua${level.version}"
-        val jarPath = PathUtil.getJarPathForClass(StdLibraryProvider::class.java)
-        val dir = if (jarPath.endsWith(".jar"))
-            VfsUtil.findFileByURL(URLUtil.getJarEntryURL(File(jarPath), std))
-        else
-            VfsUtil.findFileByIoFile(File("$jarPath/$std"), true)
+        val std = LuaFileUtil.getPluginVirtualFile("std/Lua${level.version}") ?: return emptyList()
+        val dir = VfsUtil.findFileByIoFile(File(std), true) ?: return emptyList()
 
-        if (dir != null) {
-            dir.children.forEach {
-                it.putUserData(LuaFileUtil.PREDEFINED_KEY, true)
-            }
-            return listOf(StdLibrary(level, dir))
+        dir.children.forEach {
+            it.putUserData(LuaFileUtil.PREDEFINED_KEY, true)
         }
-        return emptyList()
+        return listOf(StdLibrary(level, dir))
     }
 
     companion object {

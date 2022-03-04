@@ -26,12 +26,9 @@ import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaTableFieldImpl
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyUnion
 import com.tang.intellij.lua.ty.getTableTypeName
 
 class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("TABLE_FIELD") {
@@ -47,18 +44,8 @@ class LuaTableFieldType : LuaStubElementType<LuaTableFieldStub, LuaTableField>("
 
     private fun findTableExprTypeName(field: LuaTableField): String? {
         val table = PsiTreeUtil.getParentOfType(field, LuaTableExpr::class.java)
-        val p1 = table?.parent as? LuaExprList
-        val p2 = p1?.parent as? LuaAssignStat
         var ty: String? = null
-        if (p2 != null) {
-            val type = SearchContext.withStub(p2.project, field.containingFile, Ty.UNKNOWN) {
-                p2.getExprAt(0)?.guessType(it)
-            }
-            if (type != null) {
-                ty = TyUnion.getPerfectClass(type)?.className
-            }
-        }
-        if (ty == null && table != null)
+        if (table != null)
             ty = getTableTypeName(table)
         return ty
     }
