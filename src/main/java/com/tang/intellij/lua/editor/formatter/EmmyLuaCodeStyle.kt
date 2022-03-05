@@ -98,6 +98,8 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                     params.add(
                             "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
                     )
+
+                    true
                 }
 
 
