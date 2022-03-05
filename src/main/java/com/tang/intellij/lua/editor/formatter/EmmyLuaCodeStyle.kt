@@ -27,6 +27,7 @@ import com.intellij.formatting.service.AsyncFormattingRequest
 import com.intellij.formatting.service.FormattingService
 import com.intellij.openapi.util.SystemInfoRt
 import com.intellij.psi.PsiFile
+import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.LuaFileUtil.getPluginVirtualFile
 import com.tang.intellij.lua.psi.LuaPsiFile
 import java.io.File
@@ -59,10 +60,9 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         else if (SystemInfoRt.isLinux) {
             exePath = getPluginVirtualFile("formatter/emmy/linux-x64/bin/CodeFormat")
         } else if (SystemInfoRt.isMac) {
-            if(System.getProperty("os.arch") == "arm64") {
+            if (System.getProperty("os.arch") == "arm64") {
                 exePath = getPluginVirtualFile("formatter/emmy/darwin-arm64/bin/CodeFormat")
-            }
-            else{
+            } else {
                 exePath = getPluginVirtualFile("formatter/emmy/darwin-x64/bin/CodeFormat")
             }
         }
@@ -81,6 +81,26 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
             if (File(editorconfig).exists()) {
                 params.add("-c")
                 params.add(editorconfig)
+            } else {
+                val settings = request.context.codeStyleSettings
+                val luaCodeStyleSettings = settings.getCustomSettings(LuaCodeStyleSettings::class.java)
+                val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
+                commonSettings.indentOptions?.let {
+                    params.add(
+                            if (it.USE_TAB_CHARACTER) "--indent_style=tab"
+                            else "--indent_style=space"
+                    )
+                    params.add(
+                            if (it.USE_TAB_CHARACTER) "--tab_width=" + it.INDENT_SIZE.toString()
+                            else "--indent_size=" + it.INDENT_SIZE.toString()
+                    )
+
+                    params.add(
+                            "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
+                    )
+                }
+
+
             }
         }
 
@@ -99,8 +119,6 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                             val exitCode: Int = event.exitCode
                             if (exitCode == 0) {
                                 request.onTextReady(output.stdout)
-                            } else if (exitCode == -2) {
-//                                request.
                             } else {
                                 request.onError("EmmyLuaCodeStyle", output.stderr)
                             }
