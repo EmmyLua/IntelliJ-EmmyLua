@@ -91,7 +91,7 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                             else "--indent_style=space"
                     )
                     params.add(
-                            if (it.USE_TAB_CHARACTER) "--tab_width=" + it.INDENT_SIZE.toString()
+                            if (it.USE_TAB_CHARACTER) "--tab_width=" + it.TAB_SIZE.toString()
                             else "--indent_size=" + it.INDENT_SIZE.toString()
                     )
 
