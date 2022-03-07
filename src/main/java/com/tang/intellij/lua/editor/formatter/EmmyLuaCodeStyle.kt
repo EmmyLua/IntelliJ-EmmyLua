@@ -50,10 +50,8 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
     }
 
     override fun createFormattingTask(request: AsyncFormattingRequest): FormattingTask? {
-        if (request.ioFile == null) {
-            return null
-        }
-        val path = request.ioFile!!.path
+        val targetFile = request.ioFile ?: return null
+        val path = targetFile.path
         var exePath: String? = null
         if (SystemInfoRt.isWindows)
             exePath = getPluginVirtualFile("formatter/emmy/win32-x64/bin/CodeFormat.exe")
@@ -78,7 +76,7 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         )
         if (project.basePath != null) {
             val editorconfig = project.basePath + "/.editorconfig"
-            if (File(editorconfig).exists()) {
+            if (File(editorconfig).exists() && !targetFile.name.startsWith("ij-temp")) {
                 params.add("-c")
                 params.add(editorconfig)
             } else {
@@ -99,10 +97,10 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                             "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
                     )
 
+                    luaCodeStyleSettings.makeCommandLineParams(params)
+
                     true
                 }
-
-
             }
         }
 
