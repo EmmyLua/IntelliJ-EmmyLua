@@ -23,7 +23,7 @@ import com.tang.intellij.lua.lang.LuaLanguage
  * LuaCodeStyleSettings
  * Created by tangzx on 2017/2/22.
  */
-internal class LuaCodeStyleSettings(container: CodeStyleSettings?) :
+class LuaCodeStyleSettings(container: CodeStyleSettings?) :
     CustomCodeStyleSettings(LuaLanguage.INSTANCE.id, container) {
     var call_arg_parentheses = 0
     var quote_style = 0
