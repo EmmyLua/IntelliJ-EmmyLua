@@ -228,38 +228,28 @@ task("unzipEmmyLuaCodeStyle", type = Copy::class) {
 
 task("installEmmyLuaCodeStyle", type = Copy::class) {
     dependsOn("unzipEmmyLuaCodeStyle")
-
-    from(fileTree("temp/formatter/linux-x64/bin")){
-        filesMatching("CodeFormat") {
-            mode = 777
-        }
-    }
-
-    from(fileTree("temp/formatter/darwin-x64/bin")){
-        filesMatching("CodeFormat") {
-            mode = 777
-        }
-    }
-
-    from(fileTree("temp/formatter/darwin-arm64/bin")){
-        filesMatching("CodeFormat") {
-            mode = 777
-        }
-    }
-
     from("temp/formatter/win32-x64/bin") {
         include("CodeFormat.exe")
         into("formatter/emmy/win32-x64/bin")
     }
     from("temp/formatter/linux-x64/bin") {
+        filesMatching("CodeFormat"){
+            mode=755
+        }
         include("CodeFormat")
         into("formatter/emmy/linux-x64/bin")
     }
     from("temp/formatter/darwin-x64/bin") {
+        filesMatching("CodeFormat"){
+            mode=755
+        }
         include("CodeFormat")
         into("formatter/emmy/darwin-x64/bin")
     }
     from("temp/formatter/darwin-arm64/bin") {
+        filesMatching("CodeFormat"){
+            mode=755
+        }
         include("CodeFormat")
         into("formatter/emmy/darwin-arm64/bin")
     }
