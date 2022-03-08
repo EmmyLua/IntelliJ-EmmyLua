@@ -45,27 +45,27 @@ class CodeStyleSettingOptions {
     // 设计上如果等于默认选项则不添加选项
     fun makeCommandLineParams(luaCodeStyleSettings: LuaCodeStyleSettings, params: MutableList<String>) {
         with(luaCodeStyleSettings) {
-            when (call_arg_parentheses) {
+            when (quote_style) {
                 1 -> {
-                    params.add("--call_arg_parentheses=single")
+                    params.add("--quote_style=single")
                 }
                 2 -> {
-                    params.add("--call_arg_parentheses=double")
+                    params.add("--quote_style=double")
                 }
             }
 
-            when (quote_style) {
+            when (call_arg_parentheses) {
                 1 -> {
-                    params.add("--quote_style=remove")
+                    params.add("--call_arg_parentheses=remove")
                 }
                 2 -> {
-                    params.add("--quote_style=remove_table_only")
+                    params.add("--call_arg_parentheses=remove_table_only")
                 }
                 3 -> {
-                    params.add("--quote_style=remove_string_only")
+                    params.add("--call_arg_parentheses=remove_string_only")
                 }
                 4 -> {
-                    params.add("--quote_style=unambiguous_remove_string_only")
+                    params.add("--call_arg_parentheses=unambiguous_remove_string_only")
                 }
             }
 
