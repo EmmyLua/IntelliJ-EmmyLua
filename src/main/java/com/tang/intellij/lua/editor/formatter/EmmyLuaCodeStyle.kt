@@ -76,7 +76,7 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         )
         if (project.basePath != null) {
             val editorconfig = project.basePath + "/.editorconfig"
-            if (File(editorconfig).exists() && !targetFile.name.startsWith("ij-temp")) {
+            if (File(editorconfig).exists() && !targetFile.name.startsWith("ij-format-temp")) {
                 params.add("-c")
                 params.add(editorconfig)
             } else {
