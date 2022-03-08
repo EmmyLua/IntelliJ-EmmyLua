@@ -22,8 +22,6 @@ import com.intellij.application.options.SmartIndentOptionsEditor
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider
-import com.intellij.util.containers.map2Array
-import com.intellij.util.containers.toArray
 import com.tang.intellij.lua.lang.LuaLanguage
 
 /**
@@ -56,6 +54,7 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
 //                consumer.showStandardOptions("SPACE_AROUND_ASSIGNMENT_OPERATORS",
 //                        "SPACE_BEFORE_COMMA",
 //                        "SPACE_AFTER_COMMA")
+
                 consumer.showCustomOption(LuaCodeStyleSettings::class.java,
                         "keep_one_space_between_table_and_bracket",
                         "Space between table and bracket",
@@ -97,15 +96,15 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                         "call_arg_parentheses",
                         "Call arg parentheses",
                         "Function",
-                        CodeStyleSettingsOptions.call_arg_parentheses_names,
-                        CodeStyleSettingsOptions.call_arg_parentheses_values
+                        CodeStyleSettingOptions.call_arg_parentheses_names,
+                        CodeStyleSettingOptions.call_arg_parentheses_values
                 )
                 consumer.showCustomOption(LuaCodeStyleSettings::class.java,
                         "quote_style",
                         "Quote style",
                         "String",
-                        CodeStyleSettingsOptions.quote_style_names,
-                        CodeStyleSettingsOptions.quote_style_values
+                        CodeStyleSettingOptions.quote_style_names,
+                        CodeStyleSettingOptions.quote_style_values
                 )
 
                 consumer.showCustomOption(LuaCodeStyleSettings::class.java,
@@ -150,48 +149,48 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                         "keep_line_after_if_statement",
                         "Keep line after if statement",
                         "Line-layout",
-                        CodeStyleSettingsOptions.line_layout_names,
-                        CodeStyleSettingsOptions.line_layout_values,
+                        CodeStyleSettingOptions.line_layout_names,
+                        CodeStyleSettingOptions.line_layout_values,
                 )
                 consumer.showCustomOption(
                         LuaCodeStyleSettings::class.java,
                         "keep_line_after_do_statement",
                         "Keep line after do statement",
                         "Line-layout",
-                        CodeStyleSettingsOptions.line_layout_names,
-                        CodeStyleSettingsOptions.line_layout_values,
+                        CodeStyleSettingOptions.line_layout_names,
+                        CodeStyleSettingOptions.line_layout_values,
                 )
                 consumer.showCustomOption(
                         LuaCodeStyleSettings::class.java,
                         "keep_line_after_while_statement",
                         "Keep line after while statement",
                         "Line-layout",
-                        CodeStyleSettingsOptions.line_layout_names,
-                        CodeStyleSettingsOptions.line_layout_values,
+                        CodeStyleSettingOptions.line_layout_names,
+                        CodeStyleSettingOptions.line_layout_values,
                 )
                 consumer.showCustomOption(
                         LuaCodeStyleSettings::class.java,
                         "keep_line_after_repeat_statement",
                         "Keep line after repeat statement",
                         "Line-layout",
-                        CodeStyleSettingsOptions.line_layout_names,
-                        CodeStyleSettingsOptions.line_layout_values,
+                        CodeStyleSettingOptions.line_layout_names,
+                        CodeStyleSettingOptions.line_layout_values,
                 )
                 consumer.showCustomOption(
                         LuaCodeStyleSettings::class.java,
                         "keep_line_after_for_statement",
                         "Keep line after for statement",
                         "Line-layout",
-                        CodeStyleSettingsOptions.line_layout_names,
-                        CodeStyleSettingsOptions.line_layout_values,
+                        CodeStyleSettingOptions.line_layout_names,
+                        CodeStyleSettingOptions.line_layout_values,
                 )
                 consumer.showCustomOption(
                         LuaCodeStyleSettings::class.java,
                         "keep_line_after_local_or_assign_statement",
                         "Keep line after local or assign statement",
                         "Line-layout",
-                        CodeStyleSettingsOptions.line_layout_names,
-                        CodeStyleSettingsOptions.line_layout_values,
+                        CodeStyleSettingOptions.line_layout_names,
+                        CodeStyleSettingOptions.line_layout_values,
                 )
 
                 consumer.showCustomOption(
@@ -199,8 +198,8 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                         "keep_line_after_function_define_statement",
                         "Keep line after function define statement",
                         "Line-layout",
-                        CodeStyleSettingsOptions.line_layout_names,
-                        CodeStyleSettingsOptions.line_layout_values,
+                        CodeStyleSettingOptions.line_layout_names,
+                        CodeStyleSettingOptions.line_layout_values,
                 )
 
 

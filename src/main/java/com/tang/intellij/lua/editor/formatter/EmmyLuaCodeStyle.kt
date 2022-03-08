@@ -38,7 +38,7 @@ import java.util.*
 class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
 
     private val FEATURES: MutableSet<FormattingService.Feature> = EnumSet.noneOf(
-            FormattingService.Feature::class.java
+        FormattingService.Feature::class.java
     )
 
     override fun getFeatures(): MutableSet<FormattingService.Feature> {
@@ -70,9 +70,9 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         }
         val project = request.context.project
         val params = mutableListOf<String>(
-                "format",
-                "-f",
-                path,
+            "format",
+            "-f",
+            path,
         )
         if (project.basePath != null) {
             val editorconfig = project.basePath + "/.editorconfig"
@@ -85,19 +85,19 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                 val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
                 commonSettings.indentOptions?.let {
                     params.add(
-                            if (it.USE_TAB_CHARACTER) "--indent_style=tab"
-                            else "--indent_style=space"
+                        if (it.USE_TAB_CHARACTER) "--indent_style=tab"
+                        else "--indent_style=space"
                     )
                     params.add(
-                            if (it.USE_TAB_CHARACTER) "--tab_width=" + it.TAB_SIZE.toString()
-                            else "--indent_size=" + it.INDENT_SIZE.toString()
+                        if (it.USE_TAB_CHARACTER) "--tab_width=" + it.TAB_SIZE.toString()
+                        else "--indent_size=" + it.INDENT_SIZE.toString()
                     )
 
                     params.add(
-                            "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
+                        "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
                     )
 
-                    luaCodeStyleSettings.makeCommandLineParams(params)
+                    CodeStyleSettingOptions.Instance.makeCommandLineParams(luaCodeStyleSettings, params)
 
                     true
                 }
@@ -106,10 +106,10 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
 
         try {
             val commandLine = GeneralCommandLine()
-                    .withExePath(exePath)
-                    .withParameters(
-                            params
-                    )
+                .withExePath(exePath)
+                .withParameters(
+                    params
+                )
             val handler = OSProcessHandler(commandLine.withCharset(StandardCharsets.UTF_8))
 
             return object : FormattingTask {
