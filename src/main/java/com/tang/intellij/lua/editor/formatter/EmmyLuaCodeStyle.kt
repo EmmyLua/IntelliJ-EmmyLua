@@ -68,6 +68,11 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
         if (exePath == null) {
             return null;
         }
+
+        if(!File(exePath).canExecute()) {
+            File(exePath).setExecutable(true)
+        }
+
         val project = request.context.project
         val params = mutableListOf<String>(
             "format",
