@@ -228,6 +228,13 @@ task("unzipEmmyLuaCodeStyle", type = Copy::class) {
 
 task("installEmmyLuaCodeStyle", type = Copy::class) {
     dependsOn("unzipEmmyLuaCodeStyle")
+
+    from(fileTree("temp/formatter")){
+        filesMatching("CodeFormat") {
+            mode = 777
+        }
+    }
+
     from("temp/formatter/win32-x64/bin") {
         include("CodeFormat.exe")
         into("formatter/emmy/win32-x64/bin")
@@ -270,6 +277,7 @@ project(":") {
             java.srcDirs("gen", "src/main/compat")
             resources.exclude("debugger/**")
             resources.exclude("std/**")
+            resources.exclude("formatter/**")
         }
     }
 
