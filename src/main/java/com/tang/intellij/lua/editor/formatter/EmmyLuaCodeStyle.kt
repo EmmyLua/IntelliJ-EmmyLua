@@ -69,7 +69,7 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
             return null;
         }
 
-        if(!File(exePath).canExecute()) {
+        if (!File(exePath).canExecute()) {
             File(exePath).setExecutable(true)
         }
 
@@ -80,33 +80,27 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
             path,
         )
         if (project.basePath != null) {
-            val editorconfig = project.basePath + "/.editorconfig"
-            if (File(editorconfig).exists() && !targetFile.name.startsWith("ij-format-temp")) {
-                params.add("-c")
-                params.add(editorconfig)
-            } else {
-                val settings = request.context.codeStyleSettings
-                val luaCodeStyleSettings = settings.getCustomSettings(LuaCodeStyleSettings::class.java)
-                val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
-                commonSettings.indentOptions?.let {
-                    params.add(
-                        if (it.USE_TAB_CHARACTER) "--indent_style=tab"
-                        else "--indent_style=space"
-                    )
-                    params.add(
-                        if (it.USE_TAB_CHARACTER) "--tab_width=" + it.TAB_SIZE.toString()
-                        else "--indent_size=" + it.INDENT_SIZE.toString()
-                    )
+            params.add("--detect-config-root")
+            params.add("${project.basePath}")
+            val settings = request.context.codeStyleSettings
+            val luaCodeStyleSettings = settings.getCustomSettings(LuaCodeStyleSettings::class.java)
+            val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
+            commonSettings.indentOptions?.let {
+                params.add(
+                    if (it.USE_TAB_CHARACTER) "--indent_style=tab"
+                    else "--indent_style=space"
+                )
+                params.add(
+                    if (it.USE_TAB_CHARACTER) "--tab_width=" + it.TAB_SIZE.toString()
+                    else "--indent_size=" + it.INDENT_SIZE.toString()
+                )
 
-                    params.add(
-                        "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
-                    )
-
-                    CodeStyleSettingOptions.Instance.makeCommandLineParams(luaCodeStyleSettings, params)
-
-                    true
-                }
+                params.add(
+                    "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
+                )
+                true
             }
+            CodeStyleSettingOptions.Instance.makeCommandLineParams(luaCodeStyleSettings, params)
         }
 
         try {
