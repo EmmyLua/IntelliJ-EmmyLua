@@ -80,8 +80,7 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
             path,
         )
         if (project.basePath != null) {
-            params.add("--detect-config-root")
-            params.add("${project.basePath}")
+            params.add("--detect-config")
             val settings = request.context.codeStyleSettings
             val luaCodeStyleSettings = settings.getCustomSettings(LuaCodeStyleSettings::class.java)
             val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
