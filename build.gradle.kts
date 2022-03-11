@@ -119,7 +119,7 @@ val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersi
 
 val emmyDebuggerVersion = "1.1.0"
 
-val emmyLuaCodeStyleVersion = "0.9.3"
+val emmyLuaCodeStyleVersion = "0.9.5"
 
 val resDir = "src/main/resources"
 
