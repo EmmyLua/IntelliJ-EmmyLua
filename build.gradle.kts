@@ -196,8 +196,8 @@ task("installEmmyDebugger", type = Copy::class) {
         include("emmy_core.dll")
         into("debugger/emmy/windows/x86")
     }
-    from("temp") {
-        include("linux/emmy_core.so")
+    from("temp/linux/") {
+        include("emmy_core.so")
         into("debugger/emmy/linux")
     }
     from("temp/mac/x64") {
