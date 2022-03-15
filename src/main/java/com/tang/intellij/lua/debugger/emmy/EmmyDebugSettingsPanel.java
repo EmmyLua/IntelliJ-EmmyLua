@@ -34,6 +34,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 import java.awt.*;
+import java.util.Objects;
 
 public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguration> implements DocumentListener {
     private JComboBox<EmmyDebugTransportType> typeCombox;
@@ -216,6 +217,8 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
         } else if (SystemInfoRt.isMac) {
             sb.append("package.cpath = package.cpath .. ';")
                     .append(getDebuggerFolder())
+                    .append("/")
+                    .append(Objects.equals(System.getProperty("os.arch"), "arm64") ? "arm64": "x64")
                     .append("/?.dylib'\n");
         } else {
             sb.append("package.cpath = package.cpath .. ';")

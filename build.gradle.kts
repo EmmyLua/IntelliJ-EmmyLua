@@ -117,7 +117,7 @@ val buildVersion = System.getProperty("IDEA_VER") ?: buildDataList.first().ideaS
 
 val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
-val emmyDebuggerVersion = "1.1.0"
+val emmyDebuggerVersion = "1.2.5"
 
 val emmyLuaCodeStyleVersion = "0.9.5"
 
@@ -156,10 +156,11 @@ fun getRev(): String {
 
 task("downloadEmmyDebugger", type = Download::class) {
     src(arrayOf(
-        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core.so",
-        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core.dylib",
-        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x64.zip",
-        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/emmy_core@x86.zip"
+        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/darwin-arm64.zip",
+        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/darwin-x64.zip",
+        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/linux-x64.zip",
+        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/win32-x64.zip",
+        "https://github.com/EmmyLua/EmmyLuaDebugger/releases/download/${emmyDebuggerVersion}/win32-x86.zip"
     ))
 
     dest("temp")
@@ -167,32 +168,45 @@ task("downloadEmmyDebugger", type = Download::class) {
 
 task("unzipEmmyDebugger", type = Copy::class) {
     dependsOn("downloadEmmyDebugger")
-    from(zipTree("temp/emmy_core@x64.zip")) {
-        into("x64")
+    from(zipTree("temp/win32-x86.zip")) {
+        into("windows/x64")
     }
-    from(zipTree("temp/emmy_core@x86.zip")) {
-        into("x86")
+    from(zipTree("temp/win32-x64.zip")) {
+        into("windows/x86")
+    }
+    from(zipTree("temp/darwin-x64.zip")) {
+        into("mac/x64")
+    }
+    from(zipTree("temp/darwin-arm64.zip")) {
+        into("mac/arm64")
+    }
+    from(zipTree("temp/linux-x64.zip")) {
+        into("linux")
     }
     destinationDir = file("temp")
 }
 
 task("installEmmyDebugger", type = Copy::class) {
     dependsOn("unzipEmmyDebugger")
-    from("temp/x64/") {
+    from("temp/windows/x64/") {
         include("emmy_core.dll")
         into("debugger/emmy/windows/x64")
     }
-    from("temp/x86/") {
+    from("temp/windows/x86/") {
         include("emmy_core.dll")
         into("debugger/emmy/windows/x86")
     }
     from("temp") {
-        include("emmy_core.so")
+        include("linux/emmy_core.so")
         into("debugger/emmy/linux")
     }
-    from("temp") {
+    from("temp/mac/x64") {
         include("emmy_core.dylib")
-        into("debugger/emmy/mac")
+        into("debugger/emmy/mac/x64")
+    }
+    from("temp/mac/arm64") {
+        include("emmy_core.dylib")
+        into("debugger/emmy/mac/arm64")
     }
     destinationDir = file("src/main/resources")
 }
