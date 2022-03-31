@@ -117,9 +117,9 @@ val buildVersion = System.getProperty("IDEA_VER") ?: buildDataList.first().ideaS
 
 val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
-val emmyDebuggerVersion = "1.2.5"
+val emmyDebuggerVersion = "1.2.7"
 
-val emmyLuaCodeStyleVersion = "0.9.5"
+val emmyLuaCodeStyleVersion = "0.9.7"
 
 val resDir = "src/main/resources"
 
@@ -169,10 +169,10 @@ task("downloadEmmyDebugger", type = Download::class) {
 task("unzipEmmyDebugger", type = Copy::class) {
     dependsOn("downloadEmmyDebugger")
     from(zipTree("temp/win32-x86.zip")) {
-        into("windows/x64")
+        into("windows/x86")
     }
     from(zipTree("temp/win32-x64.zip")) {
-        into("windows/x86")
+        into("windows/x64")
     }
     from(zipTree("temp/darwin-x64.zip")) {
         into("mac/x64")
