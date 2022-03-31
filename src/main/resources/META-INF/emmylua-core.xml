@@ -29,6 +29,9 @@
                     icon="/icons/lua.png"
                     factoryClass="com.tang.intellij.lua.luacheck.LuaCheckToolWindowFactory"
                     canCloseContents="true"/>
+        <!-- file template provider -->
+        <fileTemplateGroup implementation="com.tang.intellij.lua.actions.LuaFileTemplateProvider"/>
+
         <projectService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckView"/>
         <applicationService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
 
