@@ -46,6 +46,7 @@ interface LuaFuncBodyOwnerStub<T : LuaFuncBodyOwner> : StubElement<T> {
                 is LuaIfStat,
                 is LuaForAStat,
                 is LuaForBStat,
+                is LuaFuncBody,
                 is LuaRepeatStat -> {
                     var ret: ITy? = null
                     for (childrenStub in stub.childrenStubs) {
