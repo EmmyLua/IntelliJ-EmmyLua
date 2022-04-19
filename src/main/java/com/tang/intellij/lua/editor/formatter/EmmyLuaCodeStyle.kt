@@ -90,13 +90,30 @@ class EmmyLuaCodeStyle : AsyncDocumentFormattingService() {
                     if (it.USE_TAB_CHARACTER) "--indent_style=tab"
                     else "--indent_style=space"
                 )
-                params.add(
-                    if (it.USE_TAB_CHARACTER) "--tab_width=" + it.TAB_SIZE.toString()
-                    else "--indent_size=" + it.INDENT_SIZE.toString()
-                )
+
+                var tab_size = it.TAB_SIZE
+                var indent_size = it.INDENT_SIZE
+
+                if(tab_size < 0 || tab_size > 8){
+                    tab_size = 8
+                }
+
+                if(indent_size < 0 || indent_size > 8){
+                    indent_size = 4
+                }
 
                 params.add(
-                    "--continuation_indent_size=" + it.CONTINUATION_INDENT_SIZE
+                    if (it.USE_TAB_CHARACTER) "--tab_width=$tab_size"
+                    else "--indent_size=$indent_size"
+                )
+
+                var continuation = it.CONTINUATION_INDENT_SIZE
+                if (continuation > 8 || continuation < 0) {
+                    continuation = 8
+                }
+
+                params.add(
+                    "--continuation_indent_size=$continuation"
                 )
                 true
             }
