@@ -158,7 +158,11 @@ fun getName(funcDef: LuaFuncDef): String? {
 fun getPresentation(funcDef: LuaFuncDef): ItemPresentation {
     return object : ItemPresentation {
         override fun getPresentableText(): String? {
-            return funcDef.name!! + funcDef.paramSignature
+            return if(funcDef.name != null) {
+                funcDef.name + funcDef.paramSignature
+            } else{
+                null
+            }
         }
 
         override fun getLocationString(): String {
