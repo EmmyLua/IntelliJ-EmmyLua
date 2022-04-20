@@ -19,8 +19,8 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("1.4.0")
-    id("org.jetbrains.kotlin.jvm").version("1.4.20")
+    id("org.jetbrains.intellij").version("1.5.3")
+    id("org.jetbrains.kotlin.jvm").version("1.6.0")
     id("de.undercouch.download").version("3.4.3")
 }
 
@@ -44,7 +44,7 @@ val buildDataList = listOf(
         ideaSDKShortVersion = "213",
         ideaSDKVersion = "213.5744.223",
         sinceBuild = "212",
-        untilBuild = "213.*",
+        untilBuild = "*",
         bunch = "212"
     ),
     BuildData(

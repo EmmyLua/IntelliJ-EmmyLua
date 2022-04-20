@@ -32,7 +32,7 @@ import static com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selector
 public class LuaLocalPostfixTemplate extends PostfixTemplateWithExpressionSelector {
 
     public LuaLocalPostfixTemplate() {
-        super("var", "local inst = expr", selectorAllExpressionsWithCurrentOffset());
+        super(null, "var", "local inst = expr", selectorAllExpressionsWithCurrentOffset(), null);
     }
 
     @Override

@@ -28,9 +28,14 @@ import javax.swing.*;
  * Email:love.tangzx@qq.com
  */
 public class LuaIcons {
-    public static final Icon FILE = IconLoader.getIcon("/icons/lua.png");
-    public static final Icon CSHARP = IconLoader.getIcon("/icons/csharp.png");
-    public static final Icon CPP = IconLoader.getIcon("/icons/cpp.png");
+
+    private static Icon getIcon(String path) {
+        return IconLoader.getIcon(path, LuaIcons.class);
+    }
+
+    public static final Icon FILE = getIcon("/icons/lua.png");
+    public static final Icon CSHARP = getIcon("/icons/csharp.png");
+    public static final Icon CPP = getIcon("/icons/cpp.png");
     public static final Icon CLASS = AllIcons.Nodes.Class;
     public static final Icon Alias = AllIcons.Nodes.AbstractClass;
     public static final Icon CLASS_FIELD = AllIcons.Nodes.Field;
@@ -45,30 +50,30 @@ public class LuaIcons {
 
     public static final Icon PARAMETER = AllIcons.Nodes.Parameter;
     public static final Icon WORD = AllIcons.Actions.Edit;
-    public static final Icon ANNOTATION = IconLoader.getIcon("/icons/annotation.png");
-    public static final Icon META_METHOD = IconLoader.getIcon("/icons/meta.png");
+    public static final Icon ANNOTATION = getIcon("/icons/annotation.png");
+    public static final Icon META_METHOD = getIcon("/icons/meta.png");
 
     public static final Icon PUBLIC = AllIcons.Nodes.C_public;
     public static final Icon PROTECTED = AllIcons.Nodes.C_protected;
     public static final Icon PRIVATE = AllIcons.Nodes.C_private;
 
-    public static final Icon MODULE = IconLoader.getIcon("/icons/module.png");
+    public static final Icon MODULE = getIcon("/icons/module.png");
 
     public static final Icon STRING_ARG_HISTORY = AllIcons.Vcs.History;
 
-    public static final Icon LAYER = IconLoader.getIcon("/icons/lua_layer.svg");
-    public static final Icon ROOT = IconLoader.getIcon("/icons/lua_root.svg");
-    public static final Icon PROJECT = IconLoader.getIcon("/icons/lua_project.svg");
+    public static final Icon LAYER = getIcon("/icons/lua_layer.svg");
+    public static final Icon ROOT = getIcon("/icons/lua_root.svg");
+    public static final Icon PROJECT = getIcon("/icons/lua_project.svg");
 
     public static final Icon STRING_LITERAL = AllIcons.Nodes.Aspect;
 
     public static class LineMarker {
-        public static final Icon TailCall = IconLoader.getIcon("/icons/tail.png");
+        public static final Icon TailCall = getIcon("/icons/tail.png");
     }
 
     public static class Debugger {
-        public static final Icon Console = IconLoader.getIcon("/icons/console.svg");
-        public static final Icon StackFrame = IconLoader.getIcon("/icons/frame.svg");
+        public static final Icon Console = getIcon("/icons/console.svg");
+        public static final Icon StackFrame = getIcon("/icons/frame.svg");
         public static class Actions {
             public static final Icon PROFILER = AllIcons.Debugger.Db_primitive;
         }
