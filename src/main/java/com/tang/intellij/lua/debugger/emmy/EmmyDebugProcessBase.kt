@@ -104,7 +104,12 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
         val file = sourcePosition.file
         val shortPath = file.canonicalPath
         if (shortPath != null) {
-            send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1))))
+            if(breakpoint.isLogMessage){
+                send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line+1,null, breakpoint.logExpressionObject?.expression))))
+            }
+            else {
+                send(AddBreakPointReq(listOf(BreakPoint(shortPath, breakpoint.line + 1, breakpoint.conditionExpression?.expression))))
+            }
         }
     }
 
@@ -118,6 +123,10 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
 
     override fun startPausing() {
         send(DebugActionMessage(DebugAction.Break))
+    }
+
+    override fun runToPosition(position: XSourcePosition, context: XSuspendContext?) {
+        send(AddBreakPointReq(listOf(BreakPoint(position.file.path, position.line + 1, null,null,null))))
     }
 
     private fun onBreak(data: BreakNotify) {
