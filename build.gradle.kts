@@ -19,7 +19,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("1.7.0")
+    id("org.jetbrains.intellij").version("1.6.0")
     id("org.jetbrains.kotlin.jvm").version("1.6.0")
     id("de.undercouch.download").version("3.4.3")
 }
@@ -42,8 +42,8 @@ data class BuildData(
 val buildDataList = listOf(
     BuildData(
         ideaSDKShortVersion = "222",
-        ideaSDKVersion = "213.6777.52",
-        sinceBuild = "213",
+        ideaSDKVersion = "222.3345.118",
+        sinceBuild = "222",
         untilBuild = "222.*"
     ),
     BuildData(
