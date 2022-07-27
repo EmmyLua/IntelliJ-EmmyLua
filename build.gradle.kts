@@ -19,8 +19,8 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("1.4.0")
-    id("org.jetbrains.kotlin.jvm").version("1.4.20")
+    id("org.jetbrains.intellij").version("1.7.0")
+    id("org.jetbrains.kotlin.jvm").version("1.6.0")
     id("de.undercouch.download").version("3.4.3")
 }
 
@@ -40,6 +40,12 @@ data class BuildData(
 )
 
 val buildDataList = listOf(
+    BuildData(
+        ideaSDKShortVersion = "222",
+        ideaSDKVersion = "213.6777.52",
+        sinceBuild = "213",
+        untilBuild = "222.*"
+    ),
     BuildData(
         ideaSDKShortVersion = "221",
         ideaSDKVersion = "213.6777.52",
@@ -123,9 +129,9 @@ val buildVersion = System.getProperty("IDEA_VER") ?: buildDataList.first().ideaS
 
 val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
-val emmyDebuggerVersion = "1.2.9"
+val emmyDebuggerVersion = "1.3.0"
 
-val emmyLuaCodeStyleVersion = "0.10.0"
+val emmyLuaCodeStyleVersion = "0.14.0"
 
 val resDir = "src/main/resources"
 
