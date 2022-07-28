@@ -69,6 +69,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.3.7</strong>
+    <ul>
+        <li>[NEW] compatible with IDEA222</li>
+    </ul>
     <strong>1.3.6</strong>
     <ul>
         <li>[NEW] compatible with IDEA212</li>
