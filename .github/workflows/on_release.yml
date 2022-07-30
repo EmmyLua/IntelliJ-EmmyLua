@@ -1,0 +1,51 @@
+name: Publish Plugin
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: read
+
+jobs:
+
+  publish:
+
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true
+      IDEA_PUBLISH_TOKEN: ${{ secrets.IDEA_PUBLISH_TOKEN }}
+
+    steps:
+      - name: Config
+        uses: actions/github-script@v6.1.0
+        with:
+          script: |
+            // refs/tags/v1.3.7
+            const ver = context.ref.substring(11)
+            const sha = context.sha.substring(0, 7)
+            core.exportVariable("CI_BUILD_VERSION", ver)
+            core.info(`ver = ${ver}`)
+            core.info(`sha = ${sha}`)
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Publish 2022.2
+        env:
+          IDEA_VER: 222
+        run: ./gradlew publishPlugin
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: v${{ env.CI_BUILD_VERSION }}
+          path: build/distributions/*.zip

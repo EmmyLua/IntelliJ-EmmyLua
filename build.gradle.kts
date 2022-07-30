@@ -295,6 +295,10 @@ project(":") {
             compilerVersion.set(buildVersionData.instrumentCodeCompilerVersion)
         }
 
+        publishPlugin {
+            token.set(System.getenv("IDEA_PUBLISH_TOKEN"))
+        }
+
         withType<org.jetbrains.intellij.tasks.PrepareSandboxTask> {
             doLast {
                 copy {
