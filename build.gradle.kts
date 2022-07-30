@@ -123,13 +123,11 @@ val resDir = "src/main/resources"
 
 val isWin = Os.isFamily(Os.FAMILY_WINDOWS)
 
-val isCI = System.getenv("APPVEYOR") != null
+val isCI = System.getenv("CI") != null
 
 // CI
 if (isCI) {
-    version =
-        System.getenv("APPVEYOR_REPO_TAG_NAME") ?:
-        System.getenv("APPVEYOR_BUILD_VERSION")
+    version = System.getenv("CI_BUILD_VERSION")
     exec {
         executable = "git"
         args("config", "--global", "user.email", "love.tangzx@qq.com")
