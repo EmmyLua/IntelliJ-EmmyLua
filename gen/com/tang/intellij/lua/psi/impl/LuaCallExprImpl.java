@@ -2,6 +2,8 @@
 package com.tang.intellij.lua.psi.impl;
 
 import java.util.List;
+
+import com.tang.intellij.lua.ty.TyAliasSubstitutor;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -58,9 +60,75 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
   }
 
   @Override
+  @NotNull
+  public ITy guessType(SearchContext context) {
+    ITy ty = SearchContext.Companion.infer(this, context);
+    String typeName = ty.getDisplayName();
+    int start = 0;
+    String newName = "";
+    if ((newName = getStringArgByTypeName(typeName, "UseArgString")) != typeName) {
+      ty = LuaPsiImplUtilKt.newType(newName);
+    }
+    else if((newName = getStringArgByTypeName(typeName, "UseArgName")) != typeName) {
+      ty = LuaPsiImplUtilKt.newType(newName);
+    }
+    else if((newName = getStringArgByTypeName(typeName, "UseArgFullName")) != typeName) {
+      ty = LuaPsiImplUtilKt.newType(newName);
+    }
+    ty = TyAliasSubstitutor.Companion.substitute(ty, context);
+    return ty;
+  }
+
+  @Nullable
+  public String getStringArgByTypeName(String typeName, String argType) {
+    int start = 0;
+    if ((start = typeName.indexOf(argType)) >= 0) {
+      int index = 0;
+      int length = argType.length();
+      String replaceStr = argType;
+      if(start + length < typeName.length())
+      {
+        index = typeName.charAt(start + length) - '1';
+        replaceStr = argType + Integer.toString(index + 1);
+      }
+
+
+      if(index >= 0 && index <= 9)
+      {
+
+        String str = "";
+        if (argType == "UseArgString")
+        {
+          PsiElement p = LuaPsiImplUtilKt.getStringArgByIndex(this, index);
+          str = LuaPsiImplUtilKt.getStringValue(p);
+        }
+        else if (argType == "UseArgName")
+        {
+          PsiElement p = LuaPsiImplUtilKt.getParamNameByIndex(this, index);
+          str = LuaPsiImplUtilKt.getParamStringValue(p);
+        }
+        else if (argType == "UseArgFullName")
+        {
+          PsiElement p = LuaPsiImplUtilKt.getParamNameByIndex(this, index);
+          str = LuaPsiImplUtilKt.getParamAllStringValue(p);
+        }
+        if (str != "") {
+          typeName = typeName.replace(replaceStr, str);
+        }
+      }
+    }
+
+    return typeName;
+  }
+
   @Nullable
   public PsiElement getFirstStringArg() {
-    return LuaPsiImplUtilKt.getFirstStringArg(this);
+    return LuaPsiImplUtilKt.getStringArgByIndex(this, 0);
+  }
+
+  @Nullable
+  public PsiElement getFirstParamArg() {
+    return LuaPsiImplUtilKt.getParamNameByIndex(this, 0);
   }
 
   @Override
