@@ -104,57 +104,57 @@
 
 ---@class self
 
----@UseArgString1
+---@class UseArgString1
 
----@UseArgString2
+---@class UseArgString2
 
----@UseArgString3
+---@class UseArgString3
 
----@UseArgString4
+---@class UseArgString4
 
----@UseArgString5
+---@class UseArgString5
 
----@UseArgString6
+---@class UseArgString6
 
----@UseArgString7
+---@class UseArgString7
 
----@UseArgString8
+---@class UseArgString8
 
----@UseArgString9
+---@class UseArgString9
 
 
----@UseArgName1
+---@class UseArgName1
 
----@UseArgName2
+---@class UseArgName2
 
----@UseArgName3
+---@class UseArgName3
 
----@UseArgName4
+---@class UseArgName4
 
----@UseArgName5
+---@class UseArgName5
 
----@UseArgName6
+---@class UseArgName6
 
----@UseArgName7
+---@class UseArgName7
 
----@UseArgName8
+---@class UseArgName8
 
----@UseArgName9
+---@class UseArgName9
 
----@UseArgFullName1
+---@class UseArgFullName1
 
----@UseArgFullName2
+---@class UseArgFullName2
 
----@UseArgFullName3
+---@class UseArgFullName3
 
----@UseArgFullName4
+---@class UseArgFullName4
 
----@UseArgFullName5
+---@class UseArgFullName5
 
----@UseArgFullName6
+---@class UseArgFullName6
 
----@UseArgFullName7
+---@class UseArgFullName7
 
----@UseArgFullName8
+---@class UseArgFullName8
 
----@UseArgFullName9
+---@class UseArgFullName9
