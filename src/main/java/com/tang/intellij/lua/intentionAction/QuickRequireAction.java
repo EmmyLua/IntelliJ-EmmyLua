@@ -22,21 +22,16 @@ import com.intellij.codeInspection.util.IntentionName;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.util.IncorrectOperationException;
-import com.tang.intellij.lua.project.LuaSourceRootManager;
 import com.tang.intellij.lua.psi.LuaElementFactory;
 import com.tang.intellij.lua.psi.LuaFileUtil;
 import org.jetbrains.annotations.NotNull;
-import org.luaj.vm2.Lua;
 
 public class QuickRequireAction extends BaseIntentionAction {
-    public String name = "";
-    private final Logger logger = Logger.getInstance("QuickRequireAction");
+    public String name;
 
     public QuickRequireAction(String name) {
         this.name = name;
@@ -59,30 +54,26 @@ public class QuickRequireAction extends BaseIntentionAction {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile) throws IncorrectOperationException {
-        logger.info("start invoke");
-        ApplicationManager.getApplication().invokeLater(() -> {
-            logger.info("in invokeLater");
-            WriteCommandAction.writeCommandAction(project).run(() -> {
-                ASTNode node = psiFile.getNode();
-                var elements = node.getChildren(null);
-                ASTNode nodeInsert = elements[0];
-                for (ASTNode element : elements) {
-                    if (hasRequireStatement(element)) {
-                        nodeInsert = element;
-                        break;
-                    }
+        ApplicationManager.getApplication().invokeLater(() -> WriteCommandAction.writeCommandAction(project).run(() -> {
+            ASTNode node = psiFile.getNode();
+            var elements = node.getChildren(null);
+            ASTNode nodeInsert = elements[0];
+            for (ASTNode element : elements) {
+                if (hasRequireStatement(element)) {
+                    nodeInsert = element;
+                    break;
                 }
-                var requirePath = findRequirePath(project, name);
-                if(requirePath == null) {
-                    return;
-                }
-                String text = String.format("local %1$s = require(\"%2$s\")", name, requirePath);
-                var file = LuaElementFactory.INSTANCE.createFile(project, text);
-                var newLineNode = LuaElementFactory.INSTANCE.newLine(project).getNode();
-                node.addChild(newLineNode, nodeInsert);
-                node.addChild(file.getNode().getFirstChildNode(), newLineNode);
-            });
-        });
+            }
+            var requirePath = findRequirePath(project, name);
+            if(requirePath == null) {
+                return;
+            }
+            String text = String.format("local %1$s = require(\"%2$s\")", name, requirePath);
+            var file = LuaElementFactory.INSTANCE.createFile(project, text);
+            var newLineNode = LuaElementFactory.INSTANCE.newLine(project).getNode();
+            node.addChild(newLineNode, nodeInsert);
+            node.addChild(file.getNode().getFirstChildNode(), newLineNode);
+        }));
     }
 
     private boolean hasRequireStatement(ASTNode node){
