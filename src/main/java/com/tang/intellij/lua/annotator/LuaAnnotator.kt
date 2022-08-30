@@ -25,6 +25,7 @@ import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.*
 import com.tang.intellij.lua.highlighting.LuaHighlightingData
+import com.tang.intellij.lua.intentionAction.QuickRequireAction
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 
@@ -199,6 +200,7 @@ class LuaAnnotator : Annotator {
                     } else {
                         newInfoAnnotation(o, "Global variable \"${o.name}\"") {
                             it.textAttributes(LuaHighlightingData.GLOBAL_VAR)
+                            it.withFix(QuickRequireAction(o.name))
                         }
                     }
                 }
