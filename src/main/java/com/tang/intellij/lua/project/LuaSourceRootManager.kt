@@ -23,6 +23,7 @@ import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.impl.ProjectFileIndexFacade
+import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.util.messages.Topic
@@ -81,6 +82,11 @@ class LuaSourceRootManager(val project: Project) : PersistentStateComponent<LuaS
         }
         for (url in state.rootList) {
             val file = VirtualFileManager.getInstance().findFileByUrl(url)
+            if (file != null)
+                list.add(file)
+        }
+        for (url in LuaSettings.instance.additionalSourcesRoot) {
+            val file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(url))
             if (file != null)
                 list.add(file)
         }
