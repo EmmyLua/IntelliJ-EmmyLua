@@ -62,6 +62,7 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
                 registerBreakpoint(position, breakpoint)
             }
         }
+        session.sessionResumed();
         // send ready
         transporter?.send(Message(MessageCMD.ReadyReq))
     }
@@ -162,6 +163,7 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
 
     override fun run() {
         send(DebugActionMessage(DebugAction.Continue))
+        session.sessionResumed();
     }
 
     override fun stop() {
@@ -186,7 +188,6 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
     override fun getEditorsProvider(): XDebuggerEditorsProvider {
         return editorsProvider
     }
-
     fun addEvalResultHandler(handler: IEvalResultHandler) {
         evalHandlers.add(handler)
     }
