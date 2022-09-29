@@ -131,7 +131,6 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
     }
 
     private fun onBreak(data: BreakNotify) {
-        session.setPauseActionSupported(false);
         evalHandlers.clear()
         val frames = data.stacks.map { EmmyDebugStackFrame(it, this) }
         val top = frames.firstOrNull { it.sourcePosition != null }
@@ -164,7 +163,6 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
 
     override fun run() {
         send(DebugActionMessage(DebugAction.Continue))
-        session.setPauseActionSupported(true);
     }
 
     override fun stop() {
