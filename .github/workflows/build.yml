@@ -28,8 +28,8 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Build 2022.2
-        run: ./gradlew buildPlugin -DIDEA_VER=222
+      - name: Build 2022.3
+        run: ./gradlew buildPlugin -DIDEA_VER=223
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.0

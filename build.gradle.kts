@@ -19,7 +19,7 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("1.5.3")
+    id("org.jetbrains.intellij").version("1.9.0")
     id("org.jetbrains.kotlin.jvm").version("1.6.0")
     id("de.undercouch.download").version("3.4.3")
 }
@@ -40,6 +40,13 @@ data class BuildData(
 )
 
 val buildDataList = listOf(
+    BuildData(
+        ideaSDKShortVersion = "223",
+        ideaSDKVersion = "223-EAP-SNAPSHOT",
+        sinceBuild = "212",
+        untilBuild = "223.*",
+        bunch = "212"
+    ),
     BuildData(
         ideaSDKShortVersion = "222",
         ideaSDKVersion = "2022.2",
@@ -211,7 +218,6 @@ project(":") {
     repositories {
         maven(url = "https://www.jetbrains.com/intellij-repository/releases")
         mavenCentral()
-        jcenter()
     }
 
     dependencies {
