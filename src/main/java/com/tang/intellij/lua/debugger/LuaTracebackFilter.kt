@@ -35,11 +35,11 @@ class LuaTracebackFilter(private val project: Project) : Filter {
         //Test.lua:7: in function 'b'
         //Test.lua:11: in main chunk
 
-        val pattern = Pattern.compile("\\s*((/+)?[^<>\\\\|:\"*? ]+):(\\d+):")
+        val pattern = Pattern.compile("\\s*(\\.\\.\\.)?((/+)?[^<>\\\\|:\"*? ]+):(\\d+):")
         val matcher = pattern.matcher(line)
         if (matcher.find()) {
-            val fileName = matcher.group(1)
-            val lineNumber = Integer.parseInt(matcher.group(3))
+            val fileName = matcher.group(2)
+            val lineNumber = Integer.parseInt(matcher.group(4))
             val file = LuaFileUtil.findFile(project, fileName)
             if (file != null) {
                 val hyperlink = OpenFileHyperlinkInfo(project, file, lineNumber - 1)
