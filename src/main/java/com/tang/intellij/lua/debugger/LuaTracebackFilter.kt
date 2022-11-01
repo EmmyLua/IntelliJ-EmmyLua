@@ -44,8 +44,8 @@ class LuaTracebackFilter(private val project: Project) : Filter {
             if (file != null) {
                 val hyperlink = OpenFileHyperlinkInfo(project, file, lineNumber - 1)
                 val textStartOffset = entireLength - line.length
-                val startPos = matcher.start(1)
-                val endPos = matcher.end(3) + 1
+                val startPos = matcher.start(2)
+                val endPos = matcher.end(4) + 1
                 return Filter.Result(startPos + textStartOffset, endPos + textStartOffset, hyperlink)
             }
         }
