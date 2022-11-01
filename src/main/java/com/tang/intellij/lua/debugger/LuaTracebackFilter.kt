@@ -38,7 +38,7 @@ class LuaTracebackFilter(private val project: Project) : Filter {
         val pattern = Pattern.compile("\\s*((/+)?[^<>\\\\|:\"*? ]+):(\\d+):")
         val matcher = pattern.matcher(line)
         if (matcher.find()) {
-            val fileName = matcher.group(1).replace("^\\.\\.\\.", "") // remove leading '...', it confuses finders
+            val fileName = matcher.group(1).replace(Regex("^\\.\\.\\."), "") // remove leading '...', it confuses finders
             val lineNumber = Integer.parseInt(matcher.group(3))
             val file = LuaFileUtil.findFile(project, fileName)
             if (file != null) {
