@@ -92,7 +92,7 @@ class LuaFieldLookupElement(val fieldName: String, val field: LuaClassField, val
         typeText = type.displayName
     }
 
-    override fun renderElement(presentation: LookupElementPresentation?) {
+    override fun renderElement(presentation: LookupElementPresentation) {
         if (icon == null)
             lazyInit()
         super.renderElement(presentation)
