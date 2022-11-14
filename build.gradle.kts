@@ -249,15 +249,15 @@ project(":") {
         doLast {
             val rev = getRev()
             // reset
-            exec {
-                executable = "git"
-                args("reset", "HEAD", "--hard")
-            }
+            //exec {
+                //executable = "git"
+                //args("reset", "HEAD", "--hard")
+            //}
             // clean untracked files
-            exec {
-                executable = "git"
-                args("clean", "-d", "-f")
-            }
+            //exec {
+                //executable = "git"
+                //args("clean", "-d", "-f")
+            //}
             // switch
             exec {
                 executable = if (isWin) "bunch/bin/bunch.bat" else "bunch/bin/bunch"
@@ -291,9 +291,9 @@ project(":") {
             untilBuild.set(buildVersionData.untilBuild)
         }
 
-        instrumentCode {
-            compilerVersion.set(buildVersionData.instrumentCodeCompilerVersion)
-        }
+        //instrumentCode {
+        //    compilerVersion.set(buildVersionData.instrumentCodeCompilerVersion)
+        //}
 
         publishPlugin {
             token.set(System.getenv("IDEA_PUBLISH_TOKEN"))
