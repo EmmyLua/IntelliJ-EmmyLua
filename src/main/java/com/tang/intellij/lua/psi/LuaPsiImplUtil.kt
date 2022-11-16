@@ -387,8 +387,27 @@ fun getNameExprStringValue(valueExpr: PsiElement): String {
     return "";
 }
 
-fun newType(typeName: String): ITy {
-    return TyLazyClass(typeName);
+fun newType(typeName: String, ty: ITy, sourceStr: String, targetStr: String): ITy {
+    if (ty is TyArray) {
+        val t = typeName.substringBefore('[').trim()
+        val ty = TyLazyClass(t)
+        return TyArray(ty);
+    }
+    else if(ty is TySerializedGeneric){
+        val list = mutableListOf<ITy>();
+        ty.params.forEach {
+            var name = it.displayName
+            if(name.contains(sourceStr))
+            {
+                name = name.replace(sourceStr, targetStr)
+            }
+            list.add(newType(name, it, sourceStr, targetStr))
+        }
+        return TySerializedGeneric(list.toTypedArray(), ty.base)
+    }
+    else {
+        return TyLazyClass(typeName);
+    }
 }
 
 fun guessParentType(indexExpr: LuaIndexExpr, context: SearchContext): ITy {

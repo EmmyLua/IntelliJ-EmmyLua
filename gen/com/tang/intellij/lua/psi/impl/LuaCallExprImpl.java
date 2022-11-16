@@ -4,6 +4,7 @@ package com.tang.intellij.lua.psi.impl;
 import java.util.List;
 
 import com.tang.intellij.lua.ty.TyAliasSubstitutor;
+import groovy.lang.Tuple4;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -64,39 +65,52 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
   public ITy guessType(SearchContext context) {
     ITy ty = SearchContext.Companion.infer(this, context);
     String typeName = ty.getDisplayName();
-    int start = 0;
-    String newName = "";
-    if ((newName = getStringArgByTypeName(typeName, "UseArgString")) != typeName) {
-      ty = LuaPsiImplUtilKt.newType(newName);
+    boolean isDynamic = false;
+    Tuple4<Boolean, String, String, String> t;
+    do
+    {
+      t = getStringArgByTypeName(typeName, "UseArgString");
+      isDynamic = t.getV1();
+      if(isDynamic) break;
+
+      t = getStringArgByTypeName(typeName, "UseArgName");
+      isDynamic = t.getV1();
+      if (isDynamic) break;
+
+      t = getStringArgByTypeName(typeName, "UseArgFullName");
+      isDynamic = t.getV1();
+      if (isDynamic) break;
+
+    }while (false);
+
+    if(isDynamic) {
+      ty = LuaPsiImplUtilKt.newType((String)t.getV2(), ty, (String)t.getV3(), (String)t.getV4());
     }
-    else if((newName = getStringArgByTypeName(typeName, "UseArgName")) != typeName) {
-      ty = LuaPsiImplUtilKt.newType(newName);
-    }
-    else if((newName = getStringArgByTypeName(typeName, "UseArgFullName")) != typeName) {
-      ty = LuaPsiImplUtilKt.newType(newName);
-    }
+
     ty = TyAliasSubstitutor.Companion.substitute(ty, context);
     return ty;
   }
 
   @Nullable
-  public String getStringArgByTypeName(String typeName, String argType) {
+  public Tuple4<Boolean, String, String, String> getStringArgByTypeName(String typeName, String argType) {
     int start = 0;
+    int index = 0;
+    String replaceStr = "";
+    String str = "";
+    Boolean result = false;
+
     if ((start = typeName.indexOf(argType)) >= 0) {
-      int index = 0;
       int length = argType.length();
-      String replaceStr = argType;
+      replaceStr = argType;
       if(start + length < typeName.length())
       {
         index = typeName.charAt(start + length) - '1';
         replaceStr = argType + Integer.toString(index + 1);
       }
 
-
       if(index >= 0 && index <= 9)
       {
-
-        String str = "";
+        result = true;
         if (argType == "UseArgString")
         {
           PsiElement p = LuaPsiImplUtilKt.getStringArgByIndex(this, index);
@@ -117,9 +131,9 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
         }
       }
     }
-
-    return typeName;
+    return new Tuple4<Boolean, String, String, String>(result, typeName, replaceStr, str);
   }
+
 
   @Nullable
   public PsiElement getFirstStringArg() {
