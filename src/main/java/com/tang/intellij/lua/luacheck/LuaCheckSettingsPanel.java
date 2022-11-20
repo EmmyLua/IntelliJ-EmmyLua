@@ -85,7 +85,7 @@ public class LuaCheckSettingsPanel implements SearchableConfigurable, Configurab
         luaCheckReleasePageLink.addHyperlinkListener(new HyperlinkAdapter() {
             @Override
             protected void hyperlinkActivated(HyperlinkEvent hyperlinkEvent) {
-                BrowserUtil.browse("https://github.com/mpeterv/luacheck/releases");
+                BrowserUtil.browse("https://github.com/lunarmodules/luacheck");
             }
         });
         commandLineOptionsLink = new HoverHyperlinkLabel(LuaBundle.message("ui.luacheck.command_line_options"));
