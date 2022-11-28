@@ -16,8 +16,8 @@
 
 package com.tang.intellij.lua.codeInsight.template.context
 
+import com.intellij.codeInsight.template.TemplateActionContext
 import com.intellij.codeInsight.template.TemplateContextType
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.util.PsiUtilCore
 import com.tang.intellij.lua.comment.LuaCommentUtil
@@ -29,9 +29,11 @@ import com.tang.intellij.lua.psi.LuaTypes
 
  * Created by tangzx on 2017/2/11.
  */
-class LuaCodeContextType : TemplateContextType("LUA_CODE", "Lua") {
+class LuaCodeContextType : TemplateContextType("LUA_CODE") {
 
-    override fun isInContext(file: PsiFile, offset: Int): Boolean {
+    override fun isInContext(templateActionContext: TemplateActionContext): Boolean {
+        val file = templateActionContext.file
+        val offset = templateActionContext.startOffset
         if (PsiUtilCore.getLanguageAtOffset(file, offset).isKindOf(LuaLanguage.INSTANCE)) {
             val element = file.findElementAt(offset)
             if (element == null || element is PsiWhiteSpace || LuaCommentUtil.isComment(element)) {

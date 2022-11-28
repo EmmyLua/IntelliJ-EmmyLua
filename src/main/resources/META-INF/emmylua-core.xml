@@ -154,9 +154,9 @@
 
         <!--templates-->
         <defaultLiveTemplates file="/liveTemplates/lua.xml"/>
-        <liveTemplateContext contextId="LUA" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaCodeContextType"/>
-        <liveTemplateContext contextId="LUA" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
-        <liveTemplateContext contextId="LUA" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType"/>
+        <liveTemplateContext contextId="LUA_CODE" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaCodeContextType"/>
+        <liveTemplateContext contextId="LUA_IF" baseContextId="LUA_CODE" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
+        <liveTemplateContext contextId="LUA_FUNCTION" baseContextId="LUA_CODE" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestFirstLuaVarNameMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestLuaParametersMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaCurrentFunctionNameMacro"/>
