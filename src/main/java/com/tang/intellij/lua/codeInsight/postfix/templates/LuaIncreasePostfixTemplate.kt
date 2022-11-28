@@ -13,24 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.tang.intellij.lua.codeInsight.postfix.templates
 
+import com.intellij.codeInsight.template.Template
+import com.intellij.codeInsight.template.impl.TextExpression
 import com.intellij.codeInsight.template.postfix.templates.StringBasedPostfixTemplate
 import com.intellij.psi.PsiElement
-import com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorAllExpressionsWithCurrentOffset
+import com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils
 
-abstract class LuaCallPostfixTemplate(private val fn:String) : StringBasedPostfixTemplate(
-    fn,
-    "$fn(expr)",
-    selectorAllExpressionsWithCurrentOffset(),
+/**
+ *
+ * Created by TangZX on 2017/2/7.
+ */
+class LuaIncreasePostfixTemplate : StringBasedPostfixTemplate(
+    "increase",
+    "expr = expr + value",
+    LuaPostfixUtils.selectorTopmost(),
     null
 ) {
+    override fun getTemplateString(psiElement: PsiElement): String {
+        return "\$expr$ = \$expr$ + \$value$"
+    }
 
-    override fun getTemplateString(psiElement: PsiElement) = "$fn(\$expr\$)"
+    override fun getElementToRemove(expr: PsiElement): PsiElement {
+        return expr
+    }
 
-    override fun getElementToRemove(expr: PsiElement) = expr
+    override fun setVariables(template: Template, element: PsiElement) {
+        super.setVariables(template, element)
+        template.addVariable("value", TextExpression("1"), true)
+    }
 }
-
-class LuaToStringPostfixTemplate : LuaCallPostfixTemplate("tostring")
-class LuaToNumberPostfixTemplate : LuaCallPostfixTemplate("tonumber")

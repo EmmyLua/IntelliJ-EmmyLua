@@ -13,24 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.tang.intellij.lua.codeInsight.postfix.templates
 
 import com.intellij.codeInsight.template.postfix.templates.StringBasedPostfixTemplate
 import com.intellij.psi.PsiElement
-import com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorAllExpressionsWithCurrentOffset
+import com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils
 
-abstract class LuaCallPostfixTemplate(private val fn:String) : StringBasedPostfixTemplate(
-    fn,
-    "$fn(expr)",
-    selectorAllExpressionsWithCurrentOffset(),
+/**
+ * if expr then end
+ * Created by tangzx on 2017/2/5.
+ */
+class LuaIfPostfixTemplate : StringBasedPostfixTemplate(
+    "if",
+    "if expr then end",
+    LuaPostfixUtils.selectorTopmost(),
     null
 ) {
+    override fun getTemplateString(psiElement: PsiElement): String {
+        return "if \$expr$ then\n\$END$\nend"
+    }
 
-    override fun getTemplateString(psiElement: PsiElement) = "$fn(\$expr\$)"
-
-    override fun getElementToRemove(expr: PsiElement) = expr
+    override fun getElementToRemove(expr: PsiElement): PsiElement {
+        return expr
+    }
 }
-
-class LuaToStringPostfixTemplate : LuaCallPostfixTemplate("tostring")
-class LuaToNumberPostfixTemplate : LuaCallPostfixTemplate("tonumber")

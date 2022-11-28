@@ -32,7 +32,7 @@ import java.util.Set;
  */
 public class LuaPostfixTemplateProvider implements PostfixTemplateProvider {
 
-    private Set<PostfixTemplate> templates;
+    private final Set<PostfixTemplate> templates;
 
     public LuaPostfixTemplateProvider() {
         templates = ContainerUtil.newHashSet(
