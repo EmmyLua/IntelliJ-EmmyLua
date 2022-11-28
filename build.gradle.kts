@@ -42,7 +42,9 @@ data class BuildData(
 val buildDataList = listOf(
     BuildData(
         ideaSDKShortVersion = "223",
-        ideaSDKVersion = "223-EAP-SNAPSHOT",
+        // 223.7571.123-EAP-SNAPSHOT
+        // LATEST-EAP-SNAPSHOT
+        ideaSDKVersion = "LATEST-EAP-SNAPSHOT",
         sinceBuild = "212",
         untilBuild = "223.*",
         bunch = "212"
@@ -243,11 +245,11 @@ project(":") {
     }
 
     intellij {
-        type.set("IU")
+        type.set("IC")
         updateSinceUntilBuild.set(false)
         downloadSources.set(false)
         version.set(buildVersionData.ideaSDKVersion)
-        localPath.set(System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}"))
+        //localPath.set(System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}"))
         sandboxDir.set("${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox")
     }
 
