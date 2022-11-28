@@ -192,16 +192,35 @@ abstract class Ty(override val kind: TyKind) : ITy {
 
     companion object {
 
-        val UNKNOWN = TyUnknown()
-        val VOID = TyVoid()
-        val BOOLEAN = TyPrimitive(TyPrimitiveKind.Boolean, "boolean")
-        val STRING = TyPrimitiveClass(TyPrimitiveKind.String, "string")
-        val NUMBER = TyPrimitive(TyPrimitiveKind.Number, "number")
-        val TABLE = TyPrimitive(TyPrimitiveKind.Table, "table")
-        val FUNCTION = TyPrimitive(TyPrimitiveKind.Function, "function")
-        val NIL = TyNil()
+        /*
+         * WARNING: There is a risk of a dependency cycle here
+         *
+         * Before Java can use the 'Ty' class,
+         * it needs to create the static values.
+         * However, constructing these values requires using
+         * the 'Ty' class, so Java will get stuck.
+         *
+         * This causes the IDE to get stuck indexing dependencies.
+         * This is the cause of Github issue #510,
+         * and the most likely cause of issues #459 and #482.
+         *
+         * To avoid this problem, use Kotlin `lazy` properties.
+         * https://kotlinlang.org/docs/delegated-properties.html#lazy-properties
+         * This dealys creating the objects until they are actually needed
+         * 
+         * -- Techcable
+         */
 
-        private val serializerMap = mapOf<TyKind, ITySerializer>(
+        val UNKNOWN: TyUnknown by lazy { TyUnknown() }
+        val VOID: TyVoid by lazy { TyVoid() }
+        val BOOLEAN: TyPrimitive by lazy { TyPrimitive(TyPrimitiveKind.Boolean, "boolean") }
+        val STRING: TyPrimitiveClass by lazy { TyPrimitiveClass(TyPrimitiveKind.String, "string") }
+        val NUMBER: TyPrimitive by lazy { TyPrimitive(TyPrimitiveKind.Number, "number") }
+        val TABLE: TyPrimitive by lazy { TyPrimitive(TyPrimitiveKind.Table, "table") }
+        val FUNCTION: TyPrimitive by lazy { TyPrimitive(TyPrimitiveKind.Function, "function") }
+        val NIL: TyNil by lazy { TyNil() }
+
+        private val serializerMap: Map<TyKind, ITySerializer> by lazy { mapOf( 
                 TyKind.Array to TyArraySerializer,
                 TyKind.Class to TyClassSerializer,
                 TyKind.Function to TyFunctionSerializer,
@@ -210,7 +229,7 @@ abstract class Ty(override val kind: TyKind) : ITy {
                 TyKind.StringLiteral to TyStringLiteralSerializer,
                 TyKind.Tuple to TyTupleSerializer,
                 TyKind.Union to TyUnionSerializer
-        )
+        ) }
 
         private fun getPrimitive(mark: Byte): Ty {
             return when (mark.toInt()) {
