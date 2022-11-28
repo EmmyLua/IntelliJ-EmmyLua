@@ -153,10 +153,10 @@
 <!--        <xdebugger.attachDebuggerProvider implementation="com.tang.intellij.lua.debugger.emmyAttach.EmmyAttachDebuggerProvider"/>-->
 
         <!--templates-->
-        <defaultLiveTemplatesProvider implementation="com.tang.intellij.lua.codeInsight.LuaLiveTemplatesProvider"/>
-        <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaCodeContextType"/>
-        <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
-        <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType"/>
+        <defaultLiveTemplates file="/liveTemplates/lua.xml"/>
+        <liveTemplateContext contextId="LUA" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaCodeContextType"/>
+        <liveTemplateContext contextId="LUA" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
+        <liveTemplateContext contextId="LUA" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestFirstLuaVarNameMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestLuaParametersMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaCurrentFunctionNameMacro"/>
