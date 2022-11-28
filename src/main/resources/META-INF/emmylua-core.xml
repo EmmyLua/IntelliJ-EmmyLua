@@ -38,8 +38,6 @@
         <!--CreateFromTemplate-->
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
 
-        <virtualFileSystem implementationClass="com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem" key="lua-dummy"/>
-
         <!--module and library-->
         <sdkType implementation="com.tang.intellij.lua.project.LuaSdkType"/>
         <library.type implementation="com.tang.intellij.lua.project.LuaLibraryType"/>
@@ -178,52 +176,63 @@
 
         <!--intentions-->
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateParameterAnnotationIntention</className>
             <descriptionDirectoryName>CreateParameterAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeAnnotationIntention</className>
             <descriptionDirectoryName>CreateTypeAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateFunctionReturnAnnotationIntention</className>
             <descriptionDirectoryName>CreateFunctionReturnAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateFunctionDocIntention</className>
             <descriptionDirectoryName>CreateFunctionDocIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateFieldFromParameterIntention</className>
             <descriptionDirectoryName>CreateFieldFromParameterIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateMethodIntention</className>
             <descriptionDirectoryName>CreateMethodIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.AppendCallParenIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.RemoveCallParenIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.InvertBooleanIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.SetVisibilityIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.ComputeConstantValueIntention</className>
         </intentionAction>
@@ -235,84 +244,100 @@
                 displayName="Duplicate class"
                 enabledByDefault="true"
                 level="ERROR"
-                groupName="Lua"/>
+                groupName="Lua"
+                language="Lua"/>
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.SimplifyLocalAssignment"
                 displayName="Local assign can be simpler"
                 enabledByDefault="true"
-                groupName="Lua"/>
+                groupName="Lua"
+                language="Lua"/>
         <localInspection
                 displayName="Remove unused"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.RemoveUnusedLocal"/>
         <localInspection
                 displayName="Empty body"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyBody"/>
         <localInspection
                 displayName="Unreachable statement"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
         <localInspection
                 displayName="0 index"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.ArrayIndexZero"/>
         <localInspection
                 displayName="Local name shadowed"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameShadowed"/>
         <localInspection
                 displayName="Lua language level"
                 enabledByDefault="true"
                 groupName="Lua"
                 level="ERROR"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LanguageLevelInspection"/>
         <localInspection
                 displayName="Match function signature"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection"/>
         <localInspection
                 displayName="Undeclared variable"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection"/>
         <localInspection
                 displayName="Return type"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection"/>
         <localInspection
                 displayName="Assign type"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.AssignTypeInspection"/>
         <localInspection
                 displayName="Global name can be local"
                 enabledByDefault="false"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.GlobalNameCanbeLocal"/>
         <localInspection
                 displayName="Lua deprecation"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaDeprecationInspection"/>
 
         <localInspection
                 displayName="Unresolved symbol in emmy doc"
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedSymbolInEmmyDocInspection"/>
 
         <localInspection
                 displayName="Unresolved class in emmy doc"
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedClassInspection"/>
     </extensions>
 
