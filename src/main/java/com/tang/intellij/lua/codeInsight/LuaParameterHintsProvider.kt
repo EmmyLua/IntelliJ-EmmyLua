@@ -34,18 +34,18 @@ import java.util.*
 class LuaParameterHintsProvider : InlayParameterHintsProvider {
     companion object {
         private val ARGS_HINT = Option("lua.hints.show_args_type",
-                "Show argument name hints",
-                true)
+            { "Show argument name hints" },
+            true)
 
         private val LOCAL_VARIABLE_HINT = Option("lua.hints.show_local_var_type",
-                "Show local variable type hints",
-                false)
+            { "Show local variable type hints" },
+            false)
         private val PARAMETER_TYPE_HINT = Option("lua.hints.show_parameter_type",
-                "Show parameter type hints",
-                false)
+            { "Show parameter type hints" },
+            false)
         private val FUNCTION_HINT = Option("lua.hints.show_function_type",
-                "Show function return type hints",
-                false)
+            { "Show function return type hints" },
+            false)
         private const val TYPE_INFO_PREFIX = "@TYPE@"
         private var EXPR_HINT = arrayOf(LuaLiteralExpr::class.java,
                 LuaBinaryExpr::class.java,
