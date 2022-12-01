@@ -19,7 +19,6 @@ package com.tang.intellij.lua.folding
 import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
-import com.intellij.lang.folding.NamedFoldingDescriptor
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.FoldingGroup
 import com.intellij.openapi.util.TextRange
@@ -114,8 +113,8 @@ class LuaFoldingBuilder : FoldingBuilderEx() {
                 return false
 
             val group = FoldingGroup.newGroup("one-liner")
-            descriptors.add(NamedFoldingDescriptor(prev, lRange, group, HOLDER_TEXT))
-            descriptors.add(NamedFoldingDescriptor(next, rRange, group, HOLDER_TEXT))
+            descriptors.add(FoldingDescriptor(prev, lRange, group, HOLDER_TEXT))
+            descriptors.add(FoldingDescriptor(next, rRange, group, HOLDER_TEXT))
 
             return true
         }
