@@ -23,10 +23,10 @@ import com.intellij.psi.codeStyle.SuggestedNameInfo
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.refactoring.rename.NameSuggestionProvider
 import com.intellij.util.Processor
+import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
-import java.util.*
 
 /**
  *
@@ -102,6 +102,9 @@ class LuaNameSuggestionProvider : NameSuggestionProvider {
     }
 
     override fun getSuggestedNames(psi: PsiElement, nameSuggestionContext: PsiElement?, set: MutableSet<String>): SuggestedNameInfo? {
+        if (psi.language !is LuaLanguage)
+            return null
+
         val search = ReferencesSearch.search(psi, psi.useScope)
         search.forEach { getNames(it, set) }
 
