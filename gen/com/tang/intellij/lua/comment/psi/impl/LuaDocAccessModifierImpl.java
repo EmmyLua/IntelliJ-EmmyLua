@@ -21,6 +21,7 @@ public class LuaDocAccessModifierImpl extends ASTWrapperPsiElement implements Lu
     visitor.visitAccessModifier(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);

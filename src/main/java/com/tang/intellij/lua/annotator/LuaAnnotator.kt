@@ -266,6 +266,14 @@ class LuaAnnotator : Annotator {
             }
         }
 
+        override fun visitTagGlobalparam(o: LuaDocTagGlobalparam) {
+            super.visitTagGlobalparam(o)
+            val id = o.id ?: return
+            newInfoAnnotation(id, null) {
+                it.textAttributes(LuaHighlightingData.TYPE_ALIAS)
+            }
+        }
+
         override fun visitClassNameRef(o: LuaDocClassNameRef) {
             newInfoAnnotation(o, null) {
                 it.textAttributes(LuaHighlightingData.CLASS_REFERENCE)

@@ -29,6 +29,7 @@ public interface LuaDocTypes {
   IElementType TAG_DEF = LuaParserDefinitionKt.createDocType("TAG_DEF");
   IElementType TAG_FIELD = LuaParserDefinitionKt.createDocType("TAG_FIELD");
   IElementType TAG_GENERIC_LIST = LuaParserDefinitionKt.createDocType("TAG_GENERIC_LIST");
+  IElementType TAG_GLOBALPARAM = LuaParserDefinitionKt.createDocType("TAG_GLOBALPARAM");
   IElementType TAG_LAN = LuaParserDefinitionKt.createDocType("TAG_LAN");
   IElementType TAG_OVERLOAD = LuaParserDefinitionKt.createDocType("TAG_OVERLOAD");
   IElementType TAG_PARAM = LuaParserDefinitionKt.createDocType("TAG_PARAM");
@@ -69,6 +70,7 @@ public interface LuaDocTypes {
   IElementType TAG_NAME_CLASS = new LuaDocTokenType("class");
   IElementType TAG_NAME_FIELD = new LuaDocTokenType("field");
   IElementType TAG_NAME_GENERIC = new LuaDocTokenType("generic");
+  IElementType TAG_NAME_GLOBALPARAM = new LuaDocTokenType("globalparam");
   IElementType TAG_NAME_LANGUAGE = new LuaDocTokenType("language");
   IElementType TAG_NAME_MODULE = new LuaDocTokenType("module");
   IElementType TAG_NAME_NAME = new LuaDocTokenType("TAG_NAME_NAME");
@@ -146,6 +148,9 @@ public interface LuaDocTypes {
       }
       else if (type == TAG_GENERIC_LIST) {
         return new LuaDocTagGenericListImpl(node);
+      }
+      else if (type == TAG_GLOBALPARAM) {
+        return new LuaDocTagGlobalparamImpl(node);
       }
       else if (type == TAG_LAN) {
         return new LuaDocTagLanImpl(node);

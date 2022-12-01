@@ -21,6 +21,7 @@ public class LuaDocCommentStringImpl extends ASTWrapperPsiElement implements Lua
     visitor.visitCommentString(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);

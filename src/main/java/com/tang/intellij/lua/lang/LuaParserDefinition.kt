@@ -84,7 +84,8 @@ class LuaParserDefinition : ParserDefinition {
                 || type === LuaElementType.CLASS_DEF
                 || type === LuaElementType.CLASS_FIELD_DEF
                 || type === LuaElementType.TYPE_DEF
-                || type === LuaElementType.DOC_ALIAS) {
+                || type === LuaElementType.DOC_ALIAS
+                || type === LuaElementType.DOC_GLOBALPARAM) {
             LuaDocTypes.Factory.createElement(node)
         } else LuaTypes.Factory.createElement(node)
     }
@@ -154,7 +155,8 @@ class LuaParserDefinition : ParserDefinition {
                 LuaDocTypes.TAG_NAME_SEE,
                 LuaDocTypes.TAG_NAME_GENERIC,
                 LuaDocTypes.TAG_NAME_VARARG,
-                LuaDocTypes.TAG_NAME_ALIAS
+                LuaDocTypes.TAG_NAME_ALIAS,
+                LuaDocTypes.TAG_NAME_GLOBALPARAM
         )
         val DOC_KEYWORD_TOKENS = TokenSet.create(
                 LuaDocTypes.FUN,
@@ -215,6 +217,7 @@ fun createDocType(string: String): IElementType {
         "TABLE_DEF" -> LuaElementType.DOC_TABLE_DEF
         "TABLE_FIELD" -> LuaElementType.DOC_TABLE_FIELD_DEF
         "TAG_ALIAS" -> LuaElementType.DOC_ALIAS
+        "TAG_GLOBALPARAM" -> LuaElementType.DOC_GLOBALPARAM
         else -> if ("TAG_TYPE" == string) LuaElementType.TYPE_DEF else LuaDocElementType(string)
     }
 

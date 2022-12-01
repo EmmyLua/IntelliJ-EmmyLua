@@ -34,6 +34,7 @@ public class LuaNameExprImpl extends LuaNameExprMixin implements LuaNameExpr {
     visitor.visitNameExpr(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaVisitor) accept((LuaVisitor)visitor);
     else super.accept(visitor);

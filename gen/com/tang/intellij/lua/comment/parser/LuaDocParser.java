@@ -65,7 +65,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = doc_item(b, l + 1);
     if (!r) r = consumeToken(b, STRING);
-    exit_section_(b, l, m, r, false, after_dash_recover_parser_);
+    exit_section_(b, l, m, r, false, LuaDocParser::after_dash_recover);
     return r;
   }
 
@@ -150,6 +150,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // '@' (tag_param
+  //     | tag_globalparam
   //     | tag_alias
   //     | tag_suppress
   //     | tag_vararg
@@ -175,6 +176,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   // tag_param
+  //     | tag_globalparam
   //     | tag_alias
   //     | tag_suppress
   //     | tag_vararg
@@ -192,6 +194,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "doc_item_1")) return false;
     boolean r;
     r = tag_param(b, l + 1);
+    if (!r) r = tag_globalparam(b, l + 1);
     if (!r) r = tag_alias(b, l + 1);
     if (!r) r = tag_suppress(b, l + 1);
     if (!r) r = tag_vararg(b, l + 1);
@@ -684,6 +687,20 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // TAG_NAME_GLOBALPARAM ID ty
+  public static boolean tag_globalparam(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_globalparam")) return false;
+    if (!nextTokenIs(b, TAG_NAME_GLOBALPARAM)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, TAG_GLOBALPARAM, null);
+    r = consumeTokens(b, 1, TAG_NAME_GLOBALPARAM, ID);
+    p = r; // pin = 1
+    r = r && ty(b, l + 1, -1);
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  /* ********************************************************** */
   // TAG_NAME_LANGUAGE ID comment_string?
   public static boolean tag_lan(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_lan")) return false;
@@ -1078,9 +1095,4 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  static final Parser after_dash_recover_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return after_dash_recover(b, l + 1);
-    }
-  };
 }

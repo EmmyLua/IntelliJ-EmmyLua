@@ -58,6 +58,7 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 %state xTAG_NAME
 %state xCOMMENT_STRING
 %state xPARAM
+%state xGLOBALPARAM
 %state xTYPE_REF
 %state xCLASS
 %state xCLASS_EXTEND
@@ -79,7 +80,7 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
-<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xGLOBALPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
     {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
 }
@@ -88,6 +89,7 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
     "field"                    { yybegin(xFIELD); return TAG_NAME_FIELD; }
     "param"                    { yybegin(xPARAM); return TAG_NAME_PARAM; }
     "vararg"                   { yybegin(xPARAM); return TAG_NAME_VARARG; }
+    "globalparam"              { yybegin(xGLOBALPARAM); return TAG_NAME_GLOBALPARAM; }
     "class"                    { yybegin(xCLASS); return TAG_NAME_CLASS; }
     "module"                   { yybegin(xCLASS); return TAG_NAME_MODULE; }
     "return"                   { beginType(); return TAG_NAME_RETURN; }
@@ -134,6 +136,11 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 <xPARAM> {
     {ID}                       { beginType(); return ID; }
     "..."                      { beginType(); return ID; } //varargs
+}
+
+<xGLOBALPARAM> {
+    {ID}                       { beginType(); return ID; }
+    [^]                        { yybegin(YYINITIAL); yypushback(yylength()); }
 }
 
 <xFIELD> {

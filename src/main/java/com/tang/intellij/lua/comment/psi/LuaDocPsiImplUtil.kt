@@ -119,6 +119,10 @@ fun getType(tagParamDec: LuaDocTagParam): ITy {
     return type ?: Ty.UNKNOWN
 }
 
+fun getType(tagGlobalparamDec: LuaDocTagGlobalparam): ITy {
+    return tagGlobalparamDec.ty?.getType() ?: Ty.UNKNOWN
+}
+
 fun getType(vararg: LuaDocTagVararg): ITy {
     return vararg.ty?.getType() ?: Ty.UNKNOWN
 }
@@ -333,6 +337,10 @@ fun isDeprecated(member: LuaClassMember): Boolean {
 }
 
 fun getNameIdentifier(g: LuaDocTagAlias): PsiElement? {
+    return g.id
+}
+
+fun getNameIdentifier(g: LuaDocTagGlobalparam): PsiElement? {
     return g.id
 }
 

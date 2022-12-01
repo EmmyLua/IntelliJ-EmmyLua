@@ -36,6 +36,7 @@ import com.tang.intellij.lua.lang.type.LuaString
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaClassMemberStub
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
+import com.tang.intellij.lua.stubs.index.LuaGlobalparamIndex
 import com.tang.intellij.lua.ty.*
 import java.util.*
 import javax.swing.Icon
@@ -388,13 +389,23 @@ private fun getParamsInner(funcBodyOwner: LuaFuncBodyOwner): Array<LuaParamInfo>
             val paramInfo = LuaParamInfo()
             val paramName = paramNameList[i].text
             paramInfo.name = paramName
-            // param types
+
+            // get type from param tag in comment
             if (comment != null) {
                 val paramDef = comment.getParamDef(paramName)
                 if (paramDef != null) {
                     paramInfo.ty = paramDef.type
                 }
             }
+
+            // get type from global param
+            if (paramInfo.ty == Ty.UNKNOWN) {
+                val globalparam = LuaGlobalparamIndex.find(paramName, SearchContext.get(funcBodyOwner.project));
+                if (globalparam != null) {
+                    paramInfo.ty = globalparam.type;
+                }
+            }
+
             list.add(paramInfo)
         }
         return list.toTypedArray()

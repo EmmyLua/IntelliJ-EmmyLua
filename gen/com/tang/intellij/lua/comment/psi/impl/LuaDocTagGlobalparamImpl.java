@@ -9,28 +9,28 @@ import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.tang.intellij.lua.comment.psi.LuaDocTypes.*;
 import com.intellij.extapi.psi.StubBasedPsiElementBase;
-import com.tang.intellij.lua.stubs.LuaDocTagAliasStub;
+import com.tang.intellij.lua.stubs.LuaDocTagGlobalparamStub;
 import com.tang.intellij.lua.comment.psi.*;
 import com.tang.intellij.lua.ty.ITy;
 import com.intellij.psi.stubs.IStubElementType;
 import com.intellij.psi.tree.IElementType;
 
-public class LuaDocTagAliasImpl extends StubBasedPsiElementBase<LuaDocTagAliasStub> implements LuaDocTagAlias {
+public class LuaDocTagGlobalparamImpl extends StubBasedPsiElementBase<LuaDocTagGlobalparamStub> implements LuaDocTagGlobalparam {
 
-  public LuaDocTagAliasImpl(@NotNull LuaDocTagAliasStub stub, @NotNull IStubElementType type) {
+  public LuaDocTagGlobalparamImpl(@NotNull LuaDocTagGlobalparamStub stub, @NotNull IStubElementType type) {
     super(stub, type);
   }
 
-  public LuaDocTagAliasImpl(@NotNull ASTNode node) {
+  public LuaDocTagGlobalparamImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  public LuaDocTagAliasImpl(LuaDocTagAliasStub stub, IElementType type, ASTNode node) {
+  public LuaDocTagGlobalparamImpl(LuaDocTagGlobalparamStub stub, IElementType type, ASTNode node) {
     super(stub, type, node);
   }
 
   public void accept(@NotNull LuaDocVisitor visitor) {
-    visitor.visitTagAlias(this);
+    visitor.visitTagGlobalparam(this);
   }
 
   @Override
@@ -52,6 +52,12 @@ public class LuaDocTagAliasImpl extends StubBasedPsiElementBase<LuaDocTagAliasSt
   }
 
   @Override
+  @NotNull
+  public ITy getType() {
+    return LuaDocPsiImplUtilKt.getType(this);
+  }
+
+  @Override
   @Nullable
   public PsiElement getNameIdentifier() {
     return LuaDocPsiImplUtilKt.getNameIdentifier(this);
@@ -67,17 +73,6 @@ public class LuaDocTagAliasImpl extends StubBasedPsiElementBase<LuaDocTagAliasSt
   @Nullable
   public String getName() {
     return LuaDocPsiImplUtilKt.getName(this);
-  }
-
-  @Override
-  public int getTextOffset() {
-    return LuaDocPsiImplUtilKt.getTextOffset(this);
-  }
-
-  @Override
-  @NotNull
-  public ITy getType() {
-    return LuaDocPsiImplUtilKt.getType(this);
   }
 
 }

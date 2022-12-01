@@ -60,6 +60,7 @@
         TAG_NAME_RETURN = 'return'
         TAG_NAME = 'TAG_NAME'
         TAG_NAME_PARAM = 'param'
+        TAG_NAME_GLOBALPARAM = 'globalparam'
         TAG_NAME_VARARG = 'vararg'
         TAG_NAME_PRIVATE = 'private'
         TAG_NAME_PROTECTED = 'protected'
@@ -85,6 +86,7 @@ doc ::= (DASHES after_dash?)*
 private after_dash ::= doc_item | STRING { recoverWhile=after_dash_recover }
 private after_dash_recover ::= !(DASHES)
 private doc_item ::= '@' (tag_param
+    | tag_globalparam
     | tag_alias
     | tag_suppress
     | tag_vararg
@@ -220,6 +222,21 @@ param_name_ref ::= ID {
 tag_param ::= TAG_NAME_PARAM param_name_ref ty comment_string? {
     pin = 1
     methods = [getType]
+}
+tag_globalparam ::= TAG_NAME_GLOBALPARAM ID ty {
+    pin = 1
+    implements = [
+        "com.tang.intellij.lua.comment.psi.LuaDocPsiElement"
+        "com.intellij.psi.PsiNameIdentifierOwner"
+    ]
+    methods = [
+        getType
+
+        getNameIdentifier
+        setName
+        getName
+    ]
+    stubClass = "com.tang.intellij.lua.stubs.LuaDocTagGlobalparamStub"
 }
 tag_vararg ::= TAG_NAME_VARARG ty comment_string? {
     pin = 1

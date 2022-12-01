@@ -32,6 +32,7 @@ public class LuaDocTableDefImpl extends StubBasedPsiElementBase<LuaDocTableDefSt
     visitor.visitTableDef(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);
