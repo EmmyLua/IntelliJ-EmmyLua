@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface LuaDocTagLan extends LuaDocTag {
+public interface LuaDocLanId extends LuaDocPsiElement {
 
   @Nullable
-  LuaDocCommentString getCommentString();
-
-  @Nullable
-  LuaDocLanId getId();
+  PsiElement getId();
 
 }

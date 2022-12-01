@@ -210,8 +210,13 @@ tag_def ::= TAG_NAME_NAME comment_string? {
 //@overload
 tag_overload ::= TAG_NAME_OVERLOAD function_ty { pin = 1 }
 
+lan_id ::= ID | STRING_LITERAL
+
 //@language json
-tag_lan ::= TAG_NAME_LANGUAGE ID comment_string? { pin = 1 }
+tag_lan ::= TAG_NAME_LANGUAGE lan_id comment_string? {
+    pin = 1
+    methods = [id = 'lan_id']
+}
 
 //@param PARAM_NAME CLASS_REF
 param_name_ref ::= ID {
