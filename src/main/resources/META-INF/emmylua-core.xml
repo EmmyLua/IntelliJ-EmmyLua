@@ -341,12 +341,10 @@
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedClassInspection"/>
     </extensions>
 
-    <application-components>
-        <component>
-            <implementation-class>com.tang.intellij.lua.project.StdSDK</implementation-class>
-            <implementation-class>com.tang.intellij.lua.psi.LuaFileManager</implementation-class>
-        </component>
-    </application-components>
+    <applicationListeners>
+        <listener class="com.tang.intellij.lua.psi.LuaFileManager"
+                  topic="com.intellij.openapi.fileTypes.FileTypeListener"/>
+    </applicationListeners>
 
     <project-components>
         <component>

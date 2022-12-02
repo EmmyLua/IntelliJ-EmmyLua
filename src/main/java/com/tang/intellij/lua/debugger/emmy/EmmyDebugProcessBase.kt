@@ -57,7 +57,7 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
         val path = LuaFileUtil.getPluginVirtualFile("debugger/emmy/emmyHelper.lua")
         if (path != null) {
             val code = File(path).readText()
-            val extList = LuaFileManager.getInstance().extensions
+            val extList = LuaFileManager.extensions
             transporter?.send(InitMessage(code, extList))
         }
         // send bps
