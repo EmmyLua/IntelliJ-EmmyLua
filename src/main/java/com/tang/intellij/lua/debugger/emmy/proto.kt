@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "UNUSED_PARAMETER")
 
 package com.tang.intellij.lua.debugger.emmy
 
