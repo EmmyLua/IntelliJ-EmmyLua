@@ -20,15 +20,13 @@ import com.intellij.ide.SelectInTarget
 import com.intellij.ide.impl.ProjectViewSelectInTarget
 import com.intellij.ide.projectView.TreeStructureProvider
 import com.intellij.ide.projectView.ViewSettings
-import com.intellij.ide.projectView.impl.AbstractProjectViewPSIPane
+import com.intellij.ide.projectView.impl.AbstractProjectViewPaneWithAsyncSupport
 import com.intellij.ide.projectView.impl.ProjectAbstractTreeStructureBase
 import com.intellij.ide.projectView.impl.ProjectTreeStructure
 import com.intellij.ide.projectView.impl.ProjectViewTree
 import com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode
 import com.intellij.ide.projectView.impl.nodes.PsiFileNode
-import com.intellij.ide.util.treeView.AbstractTreeBuilder
 import com.intellij.ide.util.treeView.AbstractTreeNode
-import com.intellij.ide.util.treeView.AbstractTreeUpdater
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.tang.intellij.lua.lang.LuaFileType
@@ -38,7 +36,7 @@ import com.tang.intellij.lua.project.nodes.LuaPsiDirectoryNode
 import javax.swing.Icon
 import javax.swing.tree.DefaultTreeModel
 
-class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project), Disposable {
+class LuaProjectViewPane(project: Project) : AbstractProjectViewPaneWithAsyncSupport(project), Disposable {
     private val connection = project.messageBus.connect()
 
     init {
@@ -54,12 +52,6 @@ class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project)
     }
 
     override fun getId() = ID
-
-    override fun createTreeUpdater(builder: AbstractTreeBuilder): AbstractTreeUpdater {
-        return object : AbstractTreeUpdater(builder) {
-
-        }
-    }
 
     override fun getTitle(): String {
         return "EmmyLua Explorer"
@@ -101,7 +93,7 @@ class LuaProjectViewPane(project: Project) : AbstractProjectViewPSIPane(project)
         return LuaProjectTreeView(model)
     }
 
-    private inner class LuaProjectTreeView(model: DefaultTreeModel) : ProjectViewTree(myProject, model)
+    private inner class LuaProjectTreeView(model: DefaultTreeModel) : ProjectViewTree(model)
 }
 
 private class LuaTreeStructureProvider : TreeStructureProvider {
