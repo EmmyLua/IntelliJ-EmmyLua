@@ -30,16 +30,20 @@ import javax.swing.*;
  */
 public class LuaAppConfigurationType implements ConfigurationType {
 
-    private LuaAppConfigurationFactory factory = new LuaAppConfigurationFactory(this);
+    public LuaAppConfigurationFactory getFactory() {
+        return factory;
+    }
+
+    private final LuaAppConfigurationFactory factory = new LuaAppConfigurationFactory(this);
 
     @Override
-    public String getDisplayName() {
+    public @NotNull String getDisplayName() {
         return "Lua Application";
     }
 
     @Override
     public String getConfigurationTypeDescription() {
-        return "Lua Application Runner";
+        return "Lua application runner";
     }
 
     @Override
