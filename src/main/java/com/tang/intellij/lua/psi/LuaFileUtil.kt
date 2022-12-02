@@ -36,21 +36,11 @@ import java.io.File
  */
 object LuaFileUtil {
 
-    val pluginFolder: File?
-        get() {
-            val descriptor = PluginManagerCore.getPlugin(PluginId.getId("com.tang"))
-            return descriptor?.path
-        }
-
-    val pluginVirtualDirectory: VirtualFile?
+    private val pluginVirtualDirectory: VirtualFile?
         get() {
             val descriptor = PluginManagerCore.getPlugin(PluginId.getId("com.tang"))
             if (descriptor != null) {
-                val pluginPath = descriptor.path
-
-                val url = VfsUtil.pathToUrl(pluginPath.absolutePath)
-
-                return VirtualFileManager.getInstance().findFileByUrl(url)
+                return VirtualFileManager.getInstance().findFileByNioPath(descriptor.pluginPath)
             }
 
             return null
