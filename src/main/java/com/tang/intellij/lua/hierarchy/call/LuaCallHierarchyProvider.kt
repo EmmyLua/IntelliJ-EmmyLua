@@ -36,6 +36,6 @@ class LuaCallHierarchyProvider : HierarchyProvider {
     }
 
     override fun browserActivated(hierarchyBrowser: HierarchyBrowser) {
-        (hierarchyBrowser as LuaCallHierarchyBrowser).changeView(CallHierarchyBrowserBase.CALLER_TYPE)
+        (hierarchyBrowser as LuaCallHierarchyBrowser).changeView(CallHierarchyBrowserBase.getCallerType())
     }
 }
