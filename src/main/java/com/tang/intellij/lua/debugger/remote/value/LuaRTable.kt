@@ -21,9 +21,7 @@ import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.*
 import com.intellij.xdebugger.impl.XDebugSessionImpl
 import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess
-import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import java.util.*
 
 /**
  *
@@ -75,9 +73,9 @@ class LuaRTable(name: String) : LuaRValue(name) {
                     node.setErrorMessage(err)
                 }
 
-                override fun evaluated(tableValue: XValue) {
+                override fun evaluated(tv: XValue) {
                     //////////tmp solution,非栈顶帧处理
-                    var tableValue = tableValue
+                    var tableValue = tv
                     if (data != null && !(process.session as XDebugSessionImpl).isTopFrameSelected)
                         tableValue = LuaRValue.create(myName, data as LuaValue, myName, process.session)
                     //////////
