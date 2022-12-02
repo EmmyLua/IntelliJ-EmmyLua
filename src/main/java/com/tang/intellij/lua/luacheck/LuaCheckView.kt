@@ -29,7 +29,7 @@ class LuaCheckView(val project: Project) {
 
     fun init(toolWindow: ToolWindow) {
         panel.init()
-        val contentFactory = ContentFactory.SERVICE.getInstance()
+        val contentFactory = ContentFactory.getInstance()
         val content = contentFactory.createContent(panel, "", false)
         toolWindow.contentManager.addContent(content)
     }
