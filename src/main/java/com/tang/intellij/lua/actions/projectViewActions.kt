@@ -42,7 +42,7 @@ class MarkLuaSourceRootAction : AnAction(), DumbAware {
     }
 
     override fun update(e: AnActionEvent) {
-        e.presentation.isVisible = isVisible(e)
+        e.presentation.isEnabledAndVisible = isVisible(e)
         e.presentation.icon = LuaIcons.ROOT
     }
 
@@ -70,7 +70,7 @@ class UnmarkLuaSourceRootAction : AnAction(), DumbAware {
     }
 
     override fun update(e: AnActionEvent) {
-        e.presentation.isVisible = isVisible(e)
+        e.presentation.isEnabledAndVisible = isVisible(e)
         e.presentation.icon = LuaIcons.ROOT
     }
 

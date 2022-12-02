@@ -31,7 +31,7 @@
                     id="lua.project.markSourceRoot"/>
 
             <action class="com.tang.intellij.lua.actions.UnmarkLuaSourceRootAction"
-                    text="Unmark as Lua Source Root"
+                    text="Unmark Lua Source Root"
                     id="lua.project.unmarkSourceRoot"/>
             <reference ref="lua.LuaCheck"/>
         </group>

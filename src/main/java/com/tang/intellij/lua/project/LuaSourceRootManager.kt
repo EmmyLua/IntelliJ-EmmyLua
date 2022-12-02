@@ -46,13 +46,13 @@ class LuaSourceRootManager(val project: Project) : PersistentStateComponent<LuaS
     fun appendRoot(dir: VirtualFile) {
         state.rootList.add(dir.url)
         project.messageBus.syncPublisher(TOPIC).onChanged()
-        project.save()
+        project.scheduleSave()
     }
 
     fun removeRoot(dir: VirtualFile) {
         state.rootList.removeAll { it == dir.url }
         project.messageBus.syncPublisher(TOPIC).onChanged()
-        project.save()
+        project.scheduleSave()
     }
 
     fun getSourceRootUrls(): List<String> {
