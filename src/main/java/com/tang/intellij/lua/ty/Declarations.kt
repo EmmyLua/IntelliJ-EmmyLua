@@ -157,6 +157,7 @@ private fun LuaDocTagField.infer(): ITy {
     return ty?.getType() ?: Ty.UNKNOWN
 }
 
+@Suppress("UNUSED_PARAMETER")
 private fun LuaFuncBodyOwner.infer(context: SearchContext): ITy {
     if (this is LuaFuncDef)
         return TyPsiFunction(false, this, TyFlags.GLOBAL)

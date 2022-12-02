@@ -79,6 +79,7 @@ fun IFunSignature.processArgs(processor: (index:Int, param: LuaParamInfo) -> Boo
     }
 }
 
+@Suppress("UNUSED_PARAMETER")
 fun IFunSignature.processParams(thisTy: ITy?, colonStyle: Boolean, processor: (index:Int, param: LuaParamInfo) -> Boolean) {
     var index = 0
     if (colonCall) {

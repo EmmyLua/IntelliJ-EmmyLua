@@ -83,6 +83,7 @@ class SearchContext private constructor(val project: Project) {
             return with(ctx, action)
         }
 
+        @Suppress("UNUSED_PARAMETER")
         fun <T> withStub(project: Project, file: PsiFile, defaultValue: T, action: (ctx: SearchContext) -> T): T {
             val context = SearchContext(project)
             return withStub(context, defaultValue, action)
