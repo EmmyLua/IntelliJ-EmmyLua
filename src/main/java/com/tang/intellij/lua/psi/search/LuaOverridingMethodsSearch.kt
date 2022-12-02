@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.psi.search
 
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.psi.search.searches.ExtensibleQueryFactory
 import com.intellij.util.Query
 import com.tang.intellij.lua.psi.LuaClassMethod
@@ -24,7 +25,9 @@ import com.tang.intellij.lua.psi.LuaClassMethod
  *
  * Created by tangzx on 2017/3/29.
  */
-class LuaOverridingMethodsSearch : ExtensibleQueryFactory<LuaClassMethod, LuaOverridingMethodsSearch.SearchParameters>("com.tang.intellij.lua") {
+class LuaOverridingMethodsSearch : ExtensibleQueryFactory<LuaClassMethod, LuaOverridingMethodsSearch.SearchParameters>(
+    ExtensionPointName.create("com.tang.intellij.lua.luaOverridingMethodsSearch")
+) {
 
     class SearchParameters(val method: LuaClassMethod, val isDeep: Boolean)
 

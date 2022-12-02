@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.psi.search
 
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ExtensibleQueryFactory
@@ -27,7 +28,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagClass
  *
  * Created by tangzx on 2017/3/28.
  */
-class LuaClassInheritorsSearch : ExtensibleQueryFactory<LuaDocTagClass, LuaClassInheritorsSearch.SearchParameters>("com.tang.intellij.lua") {
+class LuaClassInheritorsSearch : ExtensibleQueryFactory<LuaDocTagClass, LuaClassInheritorsSearch.SearchParameters>(
+    ExtensionPointName.create("com.tang.intellij.lua.luaClassInheritorsSearch")
+) {
 
     class SearchParameters(val searchScope: GlobalSearchScope, val project: Project, val typeName: String, val isDeep: Boolean)
 

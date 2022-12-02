@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.psi.search
 
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.ExtensibleQueryFactory
@@ -26,7 +27,9 @@ import com.tang.intellij.lua.ty.ITyClass
  *
  * Created by tangzx on 2017/3/29.
  */
-class LuaAllClassesSearch : ExtensibleQueryFactory<ITyClass, LuaAllClassesSearch.SearchParameters>("com.tang.intellij.lua") {
+class LuaAllClassesSearch : ExtensibleQueryFactory<ITyClass, LuaAllClassesSearch.SearchParameters>(
+    ExtensionPointName.create("com.tang.intellij.lua.luaAllClassesSearch")
+) {
 
     class SearchParameters(val searchScope: SearchScope, val project: Project)
 
