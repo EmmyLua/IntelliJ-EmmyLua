@@ -122,8 +122,8 @@
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/Darcula.xml"/>
 
         <!--stub & index-->
-        <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
-        <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
+        <stubElementTypeHolder externalIdPrefix="lua" class="com.tang.intellij.lua.psi.LuaTypes" />
+        <stubElementTypeHolder externalIdPrefix="lua-doc" class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMemberIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
