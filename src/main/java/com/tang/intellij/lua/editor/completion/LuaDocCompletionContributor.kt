@@ -145,7 +145,8 @@ class LuaDocCompletionContributor : CompletionContributor() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 Language.getRegisteredLanguages().forEach {
                     val fileType = it.associatedFileType
-                    var lookupElement = LookupElementBuilder.create(it.id)
+                    val id = "\"${it.id}\""
+                    var lookupElement = LookupElementBuilder.create(id)
                     if (fileType != null)
                         lookupElement = lookupElement.withIcon(fileType.icon)
                     completionResultSet.addElement(lookupElement)

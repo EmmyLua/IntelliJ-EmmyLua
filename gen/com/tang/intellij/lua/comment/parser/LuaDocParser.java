@@ -65,7 +65,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = doc_item(b, l + 1);
     if (!r) r = consumeToken(b, STRING);
-    exit_section_(b, l, m, r, false, after_dash_recover_parser_);
+    exit_section_(b, l, m, r, false, LuaDocParser::after_dash_recover);
     return r;
   }
 
@@ -458,6 +458,19 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // ID | STRING_LITERAL
+  public static boolean lan_id(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "lan_id")) return false;
+    if (!nextTokenIs(b, "<lan id>", ID, STRING_LITERAL)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, LAN_ID, "<lan id>");
+    r = consumeToken(b, ID);
+    if (!r) r = consumeToken(b, STRING_LITERAL);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // ID
   public static boolean param_name_ref(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "param_name_ref")) return false;
@@ -684,15 +697,16 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // TAG_NAME_LANGUAGE ID comment_string?
+  // TAG_NAME_LANGUAGE lan_id comment_string?
   public static boolean tag_lan(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_lan")) return false;
     if (!nextTokenIs(b, TAG_NAME_LANGUAGE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, TAG_LAN, null);
-    r = consumeTokens(b, 1, TAG_NAME_LANGUAGE, ID);
+    r = consumeToken(b, TAG_NAME_LANGUAGE);
     p = r; // pin = 1
-    r = r && tag_lan_2(b, l + 1);
+    r = r && report_error_(b, lan_id(b, l + 1));
+    r = p && tag_lan_2(b, l + 1) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1078,9 +1092,4 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  static final Parser after_dash_recover_parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return after_dash_recover(b, l + 1);
-    }
-  };
 }

@@ -21,6 +21,7 @@ public class LuaDocTypeListImpl extends ASTWrapperPsiElement implements LuaDocTy
     visitor.visitTypeList(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);
