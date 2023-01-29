@@ -23,15 +23,20 @@ import com.intellij.codeInsight.hints.Option
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.lang.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.*
 import java.util.*
+import com.tang.intellij.lua.LuaBundle
+import com.tang.intellij.lua.psi.impl.LuaListArgsImpl
+import java.util.stream.Collectors
 
 /**
 
  * Created by TangZX on 2016/12/14.
  */
 class LuaParameterHintsProvider : InlayParameterHintsProvider {
+
     companion object {
         private val ARGS_HINT = Option("lua.hints.show_args_type",
                 "Show argument name hints",
@@ -81,24 +86,21 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
                     list.add(InlayInfo(paramInfo.name, expr.node.startOffset))
                 true
             }
-        }
-        else if (psi is LuaParamNameDef) {
+        } else if (psi is LuaParamNameDef) {
             if (PARAMETER_TYPE_HINT.get()) {
                 val type = psi.guessType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
                     return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.displayName}", psi.textOffset + psi.textLength))
                 }
             }
-        }
-        else if (psi is LuaNameDef) {
+        } else if (psi is LuaNameDef) {
             if (LOCAL_VARIABLE_HINT.get()) {
                 val type = psi.guessType(SearchContext.get(psi.project))
                 if (!Ty.isInvalid(type)) {
                     return listOf(InlayInfo("$TYPE_INFO_PREFIX${type.displayName}", psi.textOffset + psi.textLength))
                 }
             }
-        }
-        else if (psi is LuaFuncBodyOwner) {
+        } else if (psi is LuaFuncBodyOwner) {
             val paren = psi.funcBody?.rparen
             if (FUNCTION_HINT.get() && paren != null) {
                 val type = psi.guessReturnType(SearchContext.get(psi.project))
@@ -111,13 +113,23 @@ class LuaParameterHintsProvider : InlayParameterHintsProvider {
         return list
     }
 
-    override fun getHintInfo(psiElement: PsiElement): HintInfo? = null
+    override fun getHintInfo(callExpression: PsiElement): HintInfo? {
+        if (callExpression !is LuaCallExpr) {
+            return null
+        } else {
+            val tyFunc = TyUnion.find(callExpression.guessParentType(SearchContext.get(callExpression.getProject())), ITyFunction::class.java) ?: return null;
+            val signature = tyFunc.findPerfectSignature(callExpression)
+            return HintInfo.MethodInfo(callExpression.expr.text, signature.params.map { param -> param.name });
+        }
+    }
+
+    override fun getBlacklistExplanationHTML(): String {
+        return LuaBundle.message("inlay.hints.blacklist.pattern.explanation")
+    }
 
     override fun getDefaultBlackList(): Set<String> {
         return HashSet()
     }
-
-    override fun isBlackListSupported() = false
 
     override fun getSupportedOptions(): List<Option> {
         return listOf(ARGS_HINT, LOCAL_VARIABLE_HINT, PARAMETER_TYPE_HINT, FUNCTION_HINT)
