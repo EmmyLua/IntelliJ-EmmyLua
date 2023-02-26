@@ -39,9 +39,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Publish 2022.3
+      - name: Publish 2023.1-EAP
         env:
-          IDEA_VER: 223
+          IDEA_VER: 231
         run: ./gradlew publishPlugin
 
       - name: Upload artifact
