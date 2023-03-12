@@ -18,11 +18,11 @@ package com.tang.intellij.lua.errorreporting
 
 import com.intellij.CommonBundle
 import com.intellij.diagnostic.AbstractMessage
-import com.intellij.diagnostic.IdeErrorsDialog
-import com.intellij.diagnostic.ReportMessages
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManagerCore
+import com.intellij.ide.plugins.PluginUtil
 import com.intellij.idea.IdeaLogger
+import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -163,7 +163,7 @@ class GitHubErrorReporter : LuaErrorReportSubmitter() {
 				IdeaLogger.ourLastActionId.orEmpty(),
 				description ?: "<No description>",
 				event.message ?: event.throwable.message.toString())
-		IdeErrorsDialog.findPluginId(event.throwable)?.let { pluginId ->
+		PluginUtil.getInstance().findPluginId(event.throwable)?.let { pluginId ->
 			PluginManagerCore.getPlugin(pluginId)?.let { ideaPluginDescriptor ->
 				if (!ideaPluginDescriptor.isBundled) {
 					bean.pluginName = ideaPluginDescriptor.name
@@ -191,10 +191,21 @@ class GitHubErrorReporter : LuaErrorReportSubmitter() {
 		private val project: Project?) : Consumer<SubmittedReportInfo> {
 		override fun consume(reportInfo: SubmittedReportInfo) {
 			consumer.consume(reportInfo)
-			if (reportInfo.status == SubmissionStatus.FAILED) ReportMessages.GROUP.createNotification(ReportMessages.ERROR_REPORT,
-				reportInfo.linkText, NotificationType.ERROR, null).setImportant(false).notify(project)
-			else ReportMessages.GROUP.createNotification(ReportMessages.ERROR_REPORT, reportInfo.linkText,
-				NotificationType.INFORMATION, NotificationListener.URL_OPENING_LISTENER).setImportant(false).notify(project)
+			if (reportInfo.status == SubmissionStatus.FAILED)
+				NotificationGroupManager
+					.getInstance()
+					.getNotificationGroup("Error Report")
+					.createNotification(reportInfo.linkText, NotificationType.ERROR)
+					.setImportant(false)
+					.notify(project)
+			else
+				NotificationGroupManager
+					.getInstance()
+					.getNotificationGroup("Error Report")
+					.createNotification(reportInfo.linkText, NotificationType.INFORMATION)
+					.setListener(NotificationListener.URL_OPENING_LISTENER)
+					.setImportant(false)
+					.notify(project)
 		}
 	}
 }
