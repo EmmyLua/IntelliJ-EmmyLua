@@ -16,7 +16,6 @@
 
 package com.tang.intellij.lua.codeInsight
 
-import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.lang.parameterInfo.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
@@ -34,18 +33,6 @@ data class ParameterInfoType(val sig: IFunSignature, val isColonStyle: Boolean)
  * Created by tangzx on 2016/12/25.
  */
 class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, ParameterInfoType> {
-    override fun couldShowInLookup(): Boolean {
-        return false
-    }
-
-    override fun getParametersForLookup(lookupElement: LookupElement, parameterInfoContext: ParameterInfoContext): Array<Any>? {
-        return emptyArray()
-    }
-
-    override fun getParametersForDocumentation(o: ParameterInfoType, parameterInfoContext: ParameterInfoContext): Array<Any>? {
-        return emptyArray()
-    }
-
     override fun findElementForParameterInfo(context: CreateParameterInfoContext): LuaArgs? {
         val file = context.file
         val luaArgs = PsiTreeUtil.findElementOfClassAtOffset(file, context.offset, LuaArgs::class.java, false)
@@ -83,14 +70,6 @@ class LuaParameterInfoHandler : ParameterInfoHandler<LuaArgs, ParameterInfoType>
             val index = ParameterInfoUtils.getCurrentParameterIndex(args.node, context.offset, LuaTypes.COMMA)
             context.setCurrentParameter(index)
         }
-    }
-
-    override fun getParameterCloseChars(): String? {
-        return ",()"
-    }
-
-    override fun tracksParameterIndex(): Boolean {
-        return true
     }
 
     override fun updateUI(o: ParameterInfoType?, context: ParameterInfoUIContext) {
