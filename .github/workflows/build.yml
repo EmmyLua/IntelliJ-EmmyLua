@@ -1,9 +1,8 @@
 name: Build Plugin
 
-on: push
-#on:
-#  push:
-#    branches: [ "master" ]
+on:
+  push:
+    branches: *
 #  pull_request:
 #    branches: [ "master" ]
 
