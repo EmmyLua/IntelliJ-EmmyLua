@@ -23,17 +23,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="com.tang.intellij.lua.errorreporting.GitHubErrorReporter"/>
 
-        <!--LuaCheck-->
-        <toolWindow id="LuaCheck"
-                    anchor="bottom"
-                    icon="/icons/lua.png"
-                    factoryClass="com.tang.intellij.lua.luacheck.LuaCheckToolWindowFactory"
-                    canCloseContents="true"/>
         <!-- file template provider -->
         <fileTemplateGroup implementation="com.tang.intellij.lua.actions.LuaFileTemplateProvider"/>
-
-        <projectService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckView"/>
-        <applicationService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
 
         <!--CreateFromTemplate-->
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
@@ -169,9 +160,6 @@
             <!--<configurable instance="com.tang.intellij.lua.project.CompletionSettingsPanel"
                           displayName="Emmy Completion"
                           id="preferences.Lua.Completion"/>-->
-            <configurable instance="com.tang.intellij.lua.luacheck.LuaCheckSettingsPanel"
-                          displayName="LuaCheck"
-                          id="preferences.LuaCheck"/>
         </applicationConfigurable>
 
         <!--intentions-->
@@ -368,14 +356,6 @@
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="lua.newFile"/>
         </action>
 
-        <action id="lua.LuaCheck"
-                text="Run LuaCheck"
-                popup="true"
-                icon="/icons/lua.png"
-                class="com.tang.intellij.lua.luacheck.LuaCheckGroup">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
     </actions>
 
     <extensionPoints>
