@@ -165,6 +165,10 @@ abstract class TyClass(override val className: String,
         if (other == Ty.TABLE) return true
         if (super.subTypeOf(other, context, strict)) return true
 
+		if (other is ITyGeneric) {
+			return subTypeOf(other.base, context, strict)
+		}
+
         // Lazy init for superclass
         this.doLazyInit(context)
         // Check if any of the superclasses are type
@@ -189,7 +193,7 @@ abstract class TyClass(override val className: String,
          * to be initialized. So the JVM can't run `createSerializedClass` without
          * having `TyClass`, and it can't use `TyClass` without running `createSerializedClass`.
          * Thus the JVM deadlocks during classloading, resulting in frozen indexing...
-         * 
+         *
          * Workaround this by using Kotlin lazy properties,
          * so `createSerializedClass` is not run until TyClass.G is actually accessed.
          *

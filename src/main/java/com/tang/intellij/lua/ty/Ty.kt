@@ -177,6 +177,11 @@ abstract class Ty(override val kind: TyKind) : ITy {
     override fun eachTopClass(fn: Processor<ITyClass>) {
         when (this) {
             is ITyClass -> fn.process(this)
+            is ITyGeneric -> {
+                if(this.base is ITyClass) {
+                    fn.process(this.base as ITyClass)
+                }
+            }
             is TyUnion -> {
                 ContainerUtil.process(getChildTypes()) {
                     if (it is ITyClass && !fn.process(it))
