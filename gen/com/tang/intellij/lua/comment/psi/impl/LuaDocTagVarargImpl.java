@@ -22,6 +22,7 @@ public class LuaDocTagVarargImpl extends ASTWrapperPsiElement implements LuaDocT
     visitor.visitTagVararg(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);

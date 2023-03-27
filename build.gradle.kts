@@ -19,9 +19,9 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("1.5.3")
-    id("org.jetbrains.kotlin.jvm").version("1.6.0")
-    id("de.undercouch.download").version("3.4.3")
+    id("org.jetbrains.intellij").version("1.10.0")
+    id("org.jetbrains.kotlin.jvm").version("1.7.22")
+    id("de.undercouch.download").version("5.3.0")
 }
 
 data class BuildData(
@@ -41,6 +41,17 @@ data class BuildData(
 
 val buildDataList = listOf(
     BuildData(
+        ideaSDKShortVersion = "223",
+        // 223.7571.123-EAP-SNAPSHOT
+        // LATEST-EAP-SNAPSHOT
+        ideaSDKVersion = "2022.3",
+        sinceBuild = "223",
+        untilBuild = "223.*",
+        bunch = "212",
+        targetCompatibilityLevel = JavaVersion.VERSION_17,
+        jvmTarget = "17"
+    ),
+    BuildData(
         ideaSDKShortVersion = "222",
         ideaSDKVersion = "2022.2",
         sinceBuild = "212",
@@ -53,63 +64,6 @@ val buildDataList = listOf(
         sinceBuild = "211",
         untilBuild = "211.*",
         bunch = "203"
-    ),
-    BuildData(
-        ideaSDKShortVersion = "203",
-        ideaSDKVersion = "IC-203.5981.155",
-        sinceBuild = "203",
-        untilBuild = "203.*"
-    ),
-    BuildData(
-        ideaSDKShortVersion = "202",
-        ideaSDKVersion = "IC-202.6397.94",
-        sinceBuild = "202",
-        untilBuild = "202.*",
-        jvmTarget = "1.6",
-        targetCompatibilityLevel = JavaVersion.VERSION_1_8
-    ),
-    BuildData(
-        ideaSDKShortVersion = "201",
-        ideaSDKVersion = "IC-201.8743.12",
-        sinceBuild = "201",
-        untilBuild = "201.*",
-        jvmTarget = "1.6",
-        targetCompatibilityLevel = JavaVersion.VERSION_1_8
-    ),
-    BuildData(
-        ideaSDKShortVersion = "193",
-        ideaSDKVersion = "IC-193.5233.102",
-        sinceBuild = "193",
-        untilBuild = "194.*",
-        jvmTarget = "1.6",
-        targetCompatibilityLevel = JavaVersion.VERSION_1_8
-    ),
-    BuildData(
-        ideaSDKShortVersion = "182",
-        ideaSDKVersion = "IC-182.2371.4",
-        sinceBuild = "182",
-        untilBuild = "193.*",
-        explicitJavaDependency = false,
-        jvmTarget = "1.6",
-        targetCompatibilityLevel = JavaVersion.VERSION_1_8
-    ),
-    BuildData(
-        ideaSDKShortVersion = "172",
-        ideaSDKVersion = "IC-172.4574.19",
-        sinceBuild = "172",
-        untilBuild = "181.*",
-        explicitJavaDependency = false,
-        jvmTarget = "1.6",
-        targetCompatibilityLevel = JavaVersion.VERSION_1_8
-    ),
-    BuildData(
-        ideaSDKShortVersion = "171",
-        ideaSDKVersion = "IC-171.4694.73",
-        sinceBuild = "171",
-        untilBuild = "171.*",
-        explicitJavaDependency = false,
-        jvmTarget = "1.6",
-        targetCompatibilityLevel = JavaVersion.VERSION_1_8
     )
 )
 
@@ -117,7 +71,7 @@ val buildVersion = System.getProperty("IDEA_VER") ?: buildDataList.first().ideaS
 
 val buildVersionData = buildDataList.find { it.ideaSDKShortVersion == buildVersion }!!
 
-val emmyDebuggerVersion = "1.2.9"
+val emmyDebuggerVersion = "1.3.0"
 
 val resDir = "src/main/resources"
 
@@ -211,7 +165,6 @@ project(":") {
     repositories {
         maven(url = "https://www.jetbrains.com/intellij-repository/releases")
         mavenCentral()
-        jcenter()
     }
 
     dependencies {
@@ -237,11 +190,11 @@ project(":") {
     }
 
     intellij {
-        type.set("IU")
+        type.set("IC")
         updateSinceUntilBuild.set(false)
-        downloadSources.set(false)
+        downloadSources.set(!isCI)
         version.set(buildVersionData.ideaSDKVersion)
-        localPath.set(System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}"))
+        //localPath.set(System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}"))
         sandboxDir.set("${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox")
     }
 

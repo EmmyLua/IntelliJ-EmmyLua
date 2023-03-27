@@ -17,7 +17,7 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaDocTagTypeImpl extends StubBasedPsiElementBase<LuaDocTagTypeStub> implements LuaDocTagType {
 
-  public LuaDocTagTypeImpl(@NotNull LuaDocTagTypeStub stub, @NotNull IStubElementType type) {
+  public LuaDocTagTypeImpl(@NotNull LuaDocTagTypeStub stub, @NotNull IStubElementType<?, ?> type) {
     super(stub, type);
   }
 
@@ -33,6 +33,7 @@ public class LuaDocTagTypeImpl extends StubBasedPsiElementBase<LuaDocTagTypeStub
     visitor.visitTagType(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);

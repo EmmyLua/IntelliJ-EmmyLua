@@ -3,7 +3,7 @@ package com.tang.intellij.lua.comment.lexer;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.tang.intellij.lua.comment.psi.LuaDocTypes;
-
+import java.util.Stack;
 %%
 
 %class _LuaDocLexer
@@ -26,8 +26,19 @@ import com.tang.intellij.lua.comment.psi.LuaDocTypes;
 %{ // User code
     private int _typeLevel = 0;
     private boolean _typeReq = false;
+    private Stack<Integer> _stack = new Stack<>();
     public _LuaDocLexer() {
         this((java.io.Reader) null);
+    }
+
+    private void pushState(int state) {
+        _stack.push(zzLexicalState);
+        yybegin(state);
+    }
+
+    private void popState() {
+        var state = _stack.pop();
+        yybegin(state);
     }
 
     private void beginType() {
@@ -157,8 +168,8 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
     ")"                        { _typeLevel--; _typeReq = false; return RPAREN; }
     "{"                        { _typeLevel++; return LCURLY; }
     "}"                        { _typeLevel--; _typeReq = false; return RCURLY; }
-    "\""                       { yybegin(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
-    "'"                        { yybegin(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
+    "\""                       { pushState(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
+    "'"                        { pushState(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
     "[]"                       { _typeReq = false; return ARR; }
     "fun"                      { return FUN; }
     "vararg"                   { _typeReq = true; return VARARG; }
@@ -166,11 +177,11 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 }
 
 <xDOUBLE_QUOTED_STRING> {
-    {DOUBLE_QUOTED_STRING}    { yybegin(xTYPE_REF); return STRING_LITERAL; }
+    {DOUBLE_QUOTED_STRING}    { popState(); return STRING_LITERAL; }
 }
 
 <xSINGLE_QUOTED_STRING> {
-    {SINGLE_QUOTED_STRING}    { yybegin(xTYPE_REF); return STRING_LITERAL; }
+    {SINGLE_QUOTED_STRING}    { popState(); return STRING_LITERAL; }
 }
 
 <xTAG> {
@@ -180,6 +191,8 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
 <xTAG_WITH_ID> {
+    "\""                       { pushState(xDOUBLE_QUOTED_STRING); yypushback(yylength()); }
+    "'"                        { pushState(xSINGLE_QUOTED_STRING); yypushback(yylength()); }
     {ID}                       { yybegin(xCOMMENT_STRING); return ID; }
 }
 

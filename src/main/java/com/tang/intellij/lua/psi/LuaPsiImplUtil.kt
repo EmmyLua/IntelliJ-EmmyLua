@@ -158,7 +158,10 @@ fun getName(funcDef: LuaFuncDef): String? {
 fun getPresentation(funcDef: LuaFuncDef): ItemPresentation {
     return object : ItemPresentation {
         override fun getPresentableText(): String? {
-            return funcDef.name!! + funcDef.paramSignature
+            val name = funcDef.name
+            return if (name == null)
+                null
+            else name + funcDef.paramSignature
         }
 
         override fun getLocationString(): String {
@@ -227,10 +230,13 @@ fun isFunctionCall(callExpr: LuaCallExpr): Boolean {
     return callExpr.expr is LuaNameExpr
 }
 
-fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
-    val exprList = list.exprStubList
+fun LuaExprList.at(index: Int): LuaExpr? {
+    val exprList = exprStubList
+    return exprList.getOrNull(index) ?: exprList.lastOrNull()
+}
 
-    val expr = exprList.getOrNull(context.index) ?: exprList.lastOrNull()
+fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
+    val expr = list.at(context.index)
     if (expr != null) {
         //local function getValues12() return 1, 2 end
         //local function getValues34() return 3, 4 end
@@ -238,6 +244,7 @@ fun guessTypeAt(list: LuaExprList, context: SearchContext): ITy {
         //local a, b, c = getValues12(), 3, 4 --a = 1, b = 3, c =  4
         //local a, b, c = getValues12(), getValue34() --a = 1, b = 3, c =  4
         var index = context.index
+        val exprList = list.exprStubList
         if (exprList.size > 1) {
             val nameSize = context.index + 1
             index = if (nameSize > exprList.size) {

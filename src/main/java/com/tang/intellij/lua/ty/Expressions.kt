@@ -272,14 +272,17 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
 
             var type: ITy = def.docTy ?: Ty.UNKNOWN
             //guess from value expr
-            if (Ty.isInvalid(type) /*&& !context.forStub*/) {
-                val stat = def.assignStat
-                if (stat != null) {
-                    val exprList = stat.valueExprList
-                    if (exprList != null) {
-                        type = context.withIndex(stat.getIndexFor(def)) {
+            val stat = def.assignStat
+            if (stat != null) {
+                val exprList = stat.valueExprList
+                if (exprList != null) {
+                    val defIndex = stat.getIndexFor(def)
+                    // foo = { ... }
+                    if (Ty.isInvalid(type) || exprList.at(defIndex) is LuaTableExpr) {
+                        val valueTy = context.withIndex(defIndex) {
                             exprList.guessTypeAt(context)
                         }
+                        type = type.union(valueTy)
                     }
                 }
             }
