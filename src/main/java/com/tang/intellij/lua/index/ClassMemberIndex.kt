@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package com.tang.intellij.lua.ext
+package com.tang.intellij.lua.index
 
-import com.intellij.openapi.util.Computable
-import com.intellij.openapi.util.RecursionManager
-import com.intellij.psi.PsiFile
-import com.intellij.util.indexing.FileBasedIndex
+import com.intellij.util.indexing.IndexId
+import com.tang.intellij.lua.psi.LuaClassMember
 
-fun <T> recursionGuard(key: Any, block: Computable<T>, memoize: Boolean = true): T? =
-        RecursionManager.doPreventingRecursion(key, memoize, block)
+class ClassMemberIndex : StubIndex<Int, LuaClassMember>() {
 
-val PsiFile.fileId get() = FileBasedIndex.getFileId(this.originalFile.virtualFile)
+    private val id = IndexId.create<Int, LuaClassMember>("lua.x.memberIndex")
+
+    override fun getKey(): IndexId<Int, LuaClassMember> = id
+
+    companion object {
+        val instance = ClassMemberIndex()
+    }
+}

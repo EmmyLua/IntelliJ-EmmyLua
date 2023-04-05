@@ -305,7 +305,7 @@ private fun isGlobal(nameExpr: LuaNameExpr):Boolean {
     return gs?.isGlobal ?: (resolveLocal(nameExpr, null) == null)
 }
 
-private fun LuaLiteralExpr.infer(): ITy {
+fun LuaLiteralExpr.infer(): ITy {
     return when (this.kind) {
         LuaLiteralKind.Bool -> Ty.BOOLEAN
         LuaLiteralKind.String -> Ty.STRING
@@ -394,7 +394,7 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
     return set
 }
 
-private fun LuaTableExpr.infer(): ITy {
+fun LuaTableExpr.infer(): ITy {
     val list = this.tableFieldList
     if (list.size == 1) {
         val valueExpr = list.first().valueExpr

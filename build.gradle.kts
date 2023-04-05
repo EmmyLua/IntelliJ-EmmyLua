@@ -44,7 +44,7 @@ val buildDataList = listOf(
         ideaSDKShortVersion = "231",
         // 223.7571.123-EAP-SNAPSHOT
         // LATEST-EAP-SNAPSHOT
-        ideaSDKVersion = "LATEST-EAP-SNAPSHOT",
+        ideaSDKVersion = "2023.1",
         sinceBuild = "231",
         untilBuild = "231.*",
         bunch = "212",
