@@ -39,7 +39,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Publish 2023.1-EAP
+      - name: Publish 2023.1
         env:
           IDEA_VER: 231
         run: ./gradlew publishPlugin
