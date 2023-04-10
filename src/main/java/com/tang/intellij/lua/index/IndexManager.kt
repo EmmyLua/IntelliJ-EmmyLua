@@ -19,6 +19,7 @@ package com.tang.intellij.lua.index
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationListener
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
@@ -31,6 +32,9 @@ import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 
 class LuaProjectActivity : ProjectActivity {
@@ -71,7 +75,9 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
     }
 
     override fun afterWriteActionFinished(action: Any) {
-        runScan()
+        runBlocking {
+            runScan()
+        }
     }
 
     fun tryInfer(target: LuaTypeGuessable, searchContext: SearchContext): ITy? {
@@ -88,7 +94,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         return if (lazyTy.solved) lazyTy.trueTy else null
     }
 
-    private fun runScan() {
+    private suspend fun runScan() {
         when (scanType) {
             ScanType.None -> { }
             ScanType.All -> scanAllProject()
@@ -97,7 +103,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         scanType = ScanType.None
     }
 
-    private fun scanChangedFiles() {
+    private suspend fun scanChangedFiles() {
         changedFiles.forEach {
             task.scan(it)
         }
@@ -105,7 +111,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         task.run()
     }
 
-    private fun scanAllProject() {
+    private suspend fun scanAllProject() {
         val startAt = System.currentTimeMillis()
         FileBasedIndex.getInstance().iterateIndexableFiles({ vf ->
             if (vf.fileType == LuaFileType.INSTANCE) {
