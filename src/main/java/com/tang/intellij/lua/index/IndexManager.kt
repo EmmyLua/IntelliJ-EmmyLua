@@ -20,11 +20,11 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationListener
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.indexing.FileBasedIndex
 import com.tang.intellij.lua.ext.fileId
 import com.tang.intellij.lua.lang.LuaFileType
@@ -151,8 +151,8 @@ class IndexReport {
 class IndexTask(private val project: Project) : TypeSolverListener {
 
     private val manager = TypeSolverManager.getInstance(project)
-    private val indexers = ContainerUtil.createConcurrentList<Indexer>()
-    private val additional = ContainerUtil.createConcurrentList<Indexer>()
+    private val indexers = mutableListOf<Indexer>()
+    private val additional = mutableListOf<Indexer>()
     private var running = AtomicBoolean(false)
 
     val isRunning get() = running.get()
@@ -191,7 +191,11 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         val report = IndexReport()
         try {
             run(report)
-        } catch (e: Exception) {
+        }
+        catch (e: ProcessCanceledException) {
+            println(e.message)
+        }
+        catch (e: Exception) {
             println(e.message)
         }
         indexers.clear()
@@ -199,6 +203,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         running.set(false)
     }
 
+    @Synchronized
     private fun run(report: IndexReport) {
         var total = indexers.size
         val context = SearchContext.get(project)
@@ -212,9 +217,13 @@ class IndexTask(private val project: Project) : TypeSolverListener {
             }
 
             indexers.removeAll { it.done }
-            indexers.addAll(additional)
-            report.total += additional.size
-            additional.clear()
+
+            synchronized(additional) {
+                indexers.addAll(additional)
+                report.total += additional.size
+                additional.clear()
+            }
+
             if (indexers.count() == total)
                 break
             total = indexers.count()
@@ -233,7 +242,9 @@ class IndexTask(private val project: Project) : TypeSolverListener {
 
     private fun add(indexer: Indexer) {
         if (isRunning) {
-            additional.add(indexer)
+            synchronized(additional) {
+                additional.add(indexer)
+            }
         } else {
             indexers.add(indexer)
         }
