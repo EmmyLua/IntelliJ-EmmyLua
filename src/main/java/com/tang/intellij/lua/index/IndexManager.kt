@@ -194,6 +194,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         } catch (e: Exception) {
             println(e.message)
         }
+        indexers.clear()
         report.report()
         running.set(false)
     }
@@ -220,7 +221,6 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         }
 
         report.noSolution = indexers.size
-        indexers.clear()
     }
 
     private fun add(solver: TypeSolver) {
