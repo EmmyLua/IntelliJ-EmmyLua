@@ -24,12 +24,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
+import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.indexing.FileBasedIndex
 import com.tang.intellij.lua.ext.fileId
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
+import java.util.concurrent.atomic.AtomicBoolean
 
 class LuaProjectActivity : ProjectActivity {
     override suspend fun execute(project: Project) {
@@ -149,11 +151,11 @@ class IndexReport {
 class IndexTask(private val project: Project) : TypeSolverListener {
 
     private val manager = TypeSolverManager.getInstance(project)
-    private val indexers = mutableListOf<Indexer>()
-    private val additional = mutableListOf<Indexer>()
-    private var running = false
+    private val indexers = ContainerUtil.createConcurrentList<Indexer>()
+    private val additional = ContainerUtil.createConcurrentList<Indexer>()
+    private var running = AtomicBoolean(false)
 
-    val isRunning get() = running
+    val isRunning get() = running.get()
 
     fun scan(psi: LuaTypeGuessable) {
         add(manager.getSolver(psi))
@@ -185,9 +187,18 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         if (indexers.isEmpty())
             return
 
-        running = true
-
+        running.set(true)
         val report = IndexReport()
+        try {
+            run(report)
+        } catch (e: Exception) {
+            println(e.message)
+        }
+        report.report()
+        running.set(false)
+    }
+
+    private fun run(report: IndexReport) {
         var total = indexers.size
         val context = SearchContext.get(project)
 
@@ -209,9 +220,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         }
 
         report.noSolution = indexers.size
-        report.report()
         indexers.clear()
-        running = false
     }
 
     private fun add(solver: TypeSolver) {
