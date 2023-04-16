@@ -24,13 +24,9 @@ import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaIndexExprImpl
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.ITy
-import com.tang.intellij.lua.ty.ITyClass
-import com.tang.intellij.lua.ty.Ty
-import com.tang.intellij.lua.ty.TyUnion
 
 /**
 
@@ -42,41 +38,10 @@ class LuaIndexExprType : LuaStubElementType<LuaIndexExprStub, LuaIndexExpr>("IND
         return LuaIndexExprImpl(indexStub, this)
     }
 
-    /**
-     * a.b.c => true
-     * a.b().c => false
-     * a().b.c => false
-     */
-    private fun LuaIndexExpr.isPure(): Boolean {
-        var prev = this.prefixExpr
-        while (true) {
-            when (prev) {
-                is LuaNameExpr -> return true
-                is LuaIndexExpr -> prev = prev.prefixExpr
-                else -> return false
-            }
-        }
-    }
-
-    /*override fun shouldCreateStub(node: ASTNode): Boolean {
-        val psi = node.psi as LuaIndexExpr
-        return psi.isPure()
-    }*/
-
     override fun createStub(indexExpr: LuaIndexExpr, stubElement: StubElement<*>): LuaIndexExprStub {
         val stat = indexExpr.assignStat
         val docTy = stat?.comment?.docTy
         val classNameSet = mutableSetOf<String>()
-
-        if (stat != null) {
-            val ty = SearchContext.withStub(indexExpr.project, indexExpr.containingFile, Ty.UNKNOWN) {
-                indexExpr.guessParentType(it)
-            }
-            TyUnion.each(ty) {
-                if (it is ITyClass)
-                    classNameSet.add(it.className)
-            }
-        }
         val visibility = indexExpr.visibility
 
         var flags = BitUtil.set(0, visibility.bitMask, true)

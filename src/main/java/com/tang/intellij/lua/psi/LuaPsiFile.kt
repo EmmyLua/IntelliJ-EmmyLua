@@ -31,7 +31,6 @@ import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.lang.LuaLanguage
 import com.tang.intellij.lua.project.LuaSettings
 import com.tang.intellij.lua.stubs.LuaFileStub
-import com.tang.intellij.lua.util.Strings
 
 /**
  * Created by tangzx on 2015/11/15.
@@ -48,8 +47,7 @@ open class LuaPsiFile(fileViewProvider: FileViewProvider) : PsiFileBase(fileView
         if (stub is LuaFileStub)
             return stub.uid
         val file = originalFile
-        val contents = file.viewProvider.contents
-        val hashCode = Strings.stringHashCode(contents, 0, contents.length)
+        val hashCode = file.viewProvider.contents.length
         return "$name[$hashCode]"
     }
 
