@@ -19,8 +19,8 @@ import org.apache.tools.ant.taskdefs.condition.Os
 import java.io.ByteArrayOutputStream
 
 plugins {
-    id("org.jetbrains.intellij").version("1.10.0")
-    id("org.jetbrains.kotlin.jvm").version("1.7.22")
+    id("org.jetbrains.intellij").version("1.13.3")
+    id("org.jetbrains.kotlin.jvm").version("1.8.21")
     id("de.undercouch.download").version("5.3.0")
 }
 
@@ -193,10 +193,10 @@ project(":") {
         }
     }
 
-    configure<JavaPluginConvention> {
+    /*configure<JavaPluginConvention> {
         sourceCompatibility = buildVersionData.targetCompatibilityLevel
         targetCompatibility = buildVersionData.targetCompatibilityLevel
-    }
+    }*/
 
     intellij {
         type.set("IC")
