@@ -25,6 +25,7 @@ import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaNameExprImpl
+import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.ITy
@@ -45,7 +46,7 @@ class LuaNameExprType : LuaStubElementType<LuaNameExprStub, LuaNameExpr>("NAME_E
         val psiFile = luaNameExpr.containingFile
         val name = luaNameExpr.name
         val module = if (psiFile is LuaPsiFile) psiFile.moduleName ?: Constants.WORD_G else Constants.WORD_G
-        val isGlobal = resolveLocal(luaNameExpr) == null
+        val isGlobal = SearchContext.withStub(luaNameExpr.project, psiFile, null) { resolveLocal(luaNameExpr) } == null
 
         val stat = luaNameExpr.assignStat
         val docTy = stat?.comment?.ty

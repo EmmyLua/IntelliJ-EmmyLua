@@ -19,6 +19,7 @@ package com.tang.intellij.lua.search
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.ProjectAndLibrariesScope
 import com.tang.intellij.lua.ext.ILuaTypeInfer
@@ -80,6 +81,30 @@ class SearchContext private constructor(val project: Project) {
         private fun <T> with(project: Project, action: (ctx: SearchContext) -> T): T {
             val ctx = get(project)
             return with(ctx, action)
+        }
+
+        @Suppress("UNUSED_PARAMETER")
+        fun <T> withStub(project: Project, file: PsiFile, defaultValue: T, action: (ctx: SearchContext) -> T): T {
+            val context = SearchContext(project)
+            return withStub(context, defaultValue, action)
+        }
+
+        private fun <T> withStub(ctx: SearchContext, defaultValue: T, action: (ctx: SearchContext) -> T): T {
+            return with(ctx, defaultValue) {
+                val dumb = it.myDumb
+                val stub = it.myForStub
+                it.myDumb = true
+                it.myForStub = true
+                val ret = action(it)
+                it.myDumb = dumb
+                it.myForStub = stub
+                ret
+            }
+        }
+
+        fun invalidateCache(project: Project) {
+            var searchContext = get(project)
+            searchContext.invalidateInferCache()
         }
     }
 
