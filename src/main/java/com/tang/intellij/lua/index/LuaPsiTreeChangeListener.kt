@@ -18,18 +18,20 @@ package com.tang.intellij.lua.index
 
 import com.intellij.psi.PsiTreeChangeAdapter
 import com.intellij.psi.PsiTreeChangeEvent
+import com.tang.intellij.lua.lang.LuaLanguage
 
 class LuaPsiTreeChangeListener(val manager: IndexManager) : PsiTreeChangeAdapter() {
-    override fun childAdded(event: PsiTreeChangeEvent) {
-        super.childAdded(event)
+
+    override fun beforeChildRemoval(event: PsiTreeChangeEvent) {
+        val child = event.child
+        if (child.language == LuaLanguage.INSTANCE)
+            manager.remove(child)
     }
 
-    override fun childRemoved(event: PsiTreeChangeEvent) {
-        super.childRemoved(event)
-    }
-
-    override fun childReplaced(event: PsiTreeChangeEvent) {
-        super.childReplaced(event)
+    override fun beforeChildReplacement(event: PsiTreeChangeEvent) {
+        val child = event.oldChild
+        if (child.language == LuaLanguage.INSTANCE)
+            manager.remove(child)
     }
 
     override fun childrenChanged(event: PsiTreeChangeEvent) {

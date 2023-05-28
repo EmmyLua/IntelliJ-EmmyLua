@@ -19,11 +19,13 @@ package com.tang.intellij.lua.index
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationListener
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProcessCanceledException
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.util.indexing.FileBasedIndex
@@ -32,9 +34,6 @@ import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITy
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.atomic.AtomicBoolean
 
 class LuaProjectActivity : ProjectActivity {
@@ -55,6 +54,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
     private val changedFiles = mutableSetOf<LuaPsiFile>()
     private var scanType = ScanType.All
     private val task = IndexTask(project)
+    private val taskQueue = TaskQueue(project)
 
     init {
         lazyManager.setListener(task)
@@ -74,13 +74,16 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         }
     }
 
-    override fun afterWriteActionFinished(action: Any) {
-        runBlocking {
-            runScan()
-        }
+    fun remove(element: PsiElement) {
+        val file = element.containingFile
+        lazyManager.cleanFile(file.fileId)
     }
 
-    fun tryInfer(target: LuaTypeGuessable, searchContext: SearchContext): ITy? {
+    override fun afterWriteActionFinished(action: Any) {
+        runScan()
+    }
+
+    fun tryInfer(target: LuaTypeGuessable): ITy? {
         val lazyTy = lazyManager.getSolver(target)
         if (lazyTy.solved)
             return lazyTy.trueTy
@@ -89,29 +92,33 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
             lazyTy.request()
         } else {
             task.scan(target)
-            task.run()
+            task.run(EmptyProgressIndicator())
         }
         return if (lazyTy.solved) lazyTy.trueTy else null
     }
 
-    private suspend fun runScan() {
+    private fun runScan() {
         when (scanType) {
             ScanType.None -> { }
-            ScanType.All -> scanAllProject()
+            ScanType.All -> {
+                taskQueue.runReadAction("Lua indexing ...", ::scanAllProject)
+            }
             ScanType.Changed -> scanChangedFiles()
         }
         scanType = ScanType.None
     }
 
-    private suspend fun scanChangedFiles() {
+    private fun scanChangedFiles() {
         changedFiles.forEach {
             task.scan(it)
         }
         changedFiles.clear()
-        task.run()
+        task.run(EmptyProgressIndicator())
     }
 
-    private suspend fun scanAllProject() {
+    private fun scanAllProject(indicator: ProgressIndicator) {
+        indicator.pushState()
+        indicator.text = "Collecting ..."
         val startAt = System.currentTimeMillis()
         FileBasedIndex.getInstance().iterateIndexableFiles({ vf ->
             if (vf.fileType == LuaFileType.INSTANCE) {
@@ -121,10 +128,13 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
             }
             true
         }, project, null)
+        indicator.popState()
 
+        indicator.pushState()
         val dt = System.currentTimeMillis() - startAt
         logger.info("Scan all lua files in project, took $dt ms.")
-        task.run()
+        task.run(indicator)
+        indicator.popState()
     }
 
     override fun dispose() {
@@ -189,14 +199,14 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         })
     }
 
-    fun run() {
+    fun run(indicator: ProgressIndicator) {
         if (indexers.isEmpty())
             return
 
         running.set(true)
         val report = IndexReport()
         try {
-            run(report)
+            run(indicator, report)
         }
         catch (e: ProcessCanceledException) {
             println(e.message)
@@ -210,7 +220,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
     }
 
     @Synchronized
-    private fun run(report: IndexReport) {
+    private fun run(indicator: ProgressIndicator, report: IndexReport) {
         var total = indexers.size
         val context = SearchContext.get(project)
 
@@ -221,6 +231,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
             for (item in indexers) {
                 item.tryIndex(manager, context)
             }
+            indicator.text = "try index: ${report.total}"
 
             indexers.removeAll { it.done }
 

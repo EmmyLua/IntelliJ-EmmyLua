@@ -31,7 +31,7 @@ interface ILuaTypeInfer {
 
         fun infer(target: LuaTypeGuessable, context: SearchContext): ITy {
             val indexManager = IndexManager.getInstance(context.project)
-            val lazyTy = indexManager.tryInfer(target, context)
+            val lazyTy = indexManager.tryInfer(target)
             return lazyTy ?: inferImpl(target, context)
         }
 
