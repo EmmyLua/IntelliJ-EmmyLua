@@ -23,6 +23,6 @@ import com.tang.intellij.lua.psi.Visibility
 
 class LuaClassMethodElement(target: LuaPsiElement, name: String, paramSignature: String, visibility: Visibility = Visibility.PUBLIC)
     : LuaFuncElement(target, name, paramSignature, visibility.warpIcon(LuaIcons.CLASS_METHOD)) {
-    internal constructor(target: LuaClassMethodDef, visibility: Visibility) : this(target, target.name!!, target.paramSignature, visibility)
+    internal constructor(target: LuaClassMethodDef, visibility: Visibility) : this(target, target.name ?: "???", target.paramSignature, visibility)
 }
 
