@@ -24,7 +24,6 @@ class FileIndexStore(private val fileId: Int) {
 
     val invalid get() = _invalid
 
-    // ConcurrentIntObjectMap
     private val solverMap = mutableMapOf<LazyCode, TypeSolver>()
 
     val file get() = ManagingFS.getInstance().findFileById(fileId)

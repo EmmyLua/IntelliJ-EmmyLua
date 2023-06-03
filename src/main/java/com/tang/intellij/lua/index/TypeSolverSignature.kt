@@ -115,8 +115,7 @@ class SimpleSolverSignature(
     override val psi: LuaTypeGuessable,
     override val parent: ISolverSignature?,
     override val lazyCode: LazyCode
-) : ISolverSignature {
-}
+) : ISolverSignature
 
 /**
  * val = x.x
@@ -128,7 +127,7 @@ class IndexSolverSignature(
     override val lazyCode: LazyCode
 ) : ISolverSignature {
     override fun index(ty: TypeSolver, indexSink: IndexSink) {
-        ty.dependence?.trueTy?.eachTopClass {
+        ty.dependence?.result?.eachTopClass {
             indexSink.indexClassMember(it.className, name, psi)
             true
         }

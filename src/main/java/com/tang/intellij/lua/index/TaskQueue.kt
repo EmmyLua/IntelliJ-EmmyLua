@@ -43,11 +43,11 @@ class TaskQueue(val project: Project) {
         QueueProcessor.ThreadToUse.AWT
     ) { isDisposed }
 
-    fun runReadAction(title: String, run: (indicator: ProgressIndicator) -> Unit) {
+    fun runReadAction(title: String, action: (indicator: ProgressIndicator) -> Unit) {
         val task = object: Task.Backgroundable(project, title, false) {
             override fun run(indicator: ProgressIndicator) {
                 DumbService.getInstance(project).runReadActionInSmartMode {
-                    run(indicator)
+                    action(indicator)
                 }
             }
         }

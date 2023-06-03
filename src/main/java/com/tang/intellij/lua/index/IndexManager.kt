@@ -50,14 +50,14 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         Changed
     }
 
-    private val lazyManager = TypeSolverManager.getInstance(project)
+    private val solverManager = TypeSolverManager.getInstance(project)
     private val changedFiles = mutableSetOf<LuaPsiFile>()
     private var scanType = ScanType.All
     private val task = IndexTask(project)
     private val taskQueue = TaskQueue(project)
 
     init {
-        lazyManager.setListener(task)
+        solverManager.setListener(task)
         setupListeners(project)
     }
 
@@ -76,7 +76,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
 
     fun remove(element: PsiElement) {
         val file = element.containingFile
-        lazyManager.cleanFile(file.fileId)
+        solverManager.cleanFile(file.fileId)
     }
 
     override fun afterWriteActionFinished(action: Any) {
@@ -84,17 +84,17 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
     }
 
     fun tryInfer(target: LuaTypeGuessable): ITy? {
-        val lazyTy = lazyManager.getSolver(target)
-        if (lazyTy.solved)
-            return lazyTy.trueTy
+        val typeSolver = solverManager.getSolver(target)
+        if (typeSolver.solved)
+            return typeSolver.result
 
         if (task.isRunning) {
-            lazyTy.request()
+            typeSolver.request()
         } else {
             task.scan(target)
             task.run(EmptyProgressIndicator())
         }
-        return if (lazyTy.solved) lazyTy.trueTy else null
+        return if (typeSolver.solved) typeSolver.result else null
     }
 
     private fun runScan() {
@@ -166,7 +166,7 @@ class IndexReport {
 
 class IndexTask(private val project: Project) : TypeSolverListener {
 
-    private val manager = TypeSolverManager.getInstance(project)
+    private val solverManager = TypeSolverManager.getInstance(project)
     private val indexers = mutableListOf<Indexer>()
     private val additional = mutableListOf<Indexer>()
     private var running = AtomicBoolean(false)
@@ -174,26 +174,26 @@ class IndexTask(private val project: Project) : TypeSolverListener {
     val isRunning get() = running.get()
 
     fun scan(psi: LuaTypeGuessable) {
-        add(manager.getSolver(psi))
+        add(solverManager.getSolver(psi))
     }
 
     fun scan(file: LuaPsiFile) {
-        manager.cleanFile(file.fileId)
+        solverManager.cleanFile(file.fileId)
 
         file.accept(object: LuaStubRecursiveVisitor() {
 
             override fun visitExpr(o: LuaExpr) {
                 if (o is LuaIndexExpr && o.assignStat != null) {
-                    add(manager.getSolver(o))
+                    add(solverManager.getSolver(o))
                 }
                 else if (o is LuaNameExpr && o.assignStat != null) {
-                    add(manager.getSolver(o))
+                    add(solverManager.getSolver(o))
                 }
                 super.visitExpr(o)
             }
 
             override fun visitClassMethodDef(o: LuaClassMethodDef) {
-                add(ClassMethodIndexer(o, manager))
+                add(ClassMethodIndexer(o, solverManager))
                 super.visitClassMethodDef(o)
             }
         })
@@ -229,7 +229,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
             indexers.sortByDescending { it.priority }
 
             for (item in indexers) {
-                item.tryIndex(manager, context)
+                item.tryIndex(solverManager, context)
             }
             indicator.text = "try index: ${report.total}"
 
@@ -253,7 +253,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         if (solver.sig is NullSolverSignature)
             return
 
-        add(GuessableIndexer(solver.sig.psi, manager))
+        add(GuessableIndexer(solver.sig.psi, solverManager))
         solver.dependence?.let { add(it) }
     }
 

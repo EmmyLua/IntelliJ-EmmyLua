@@ -20,11 +20,6 @@ import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnknown
 
-enum class SolverType {
-    Reference,
-    Definition
-}
-
 enum class SolveState {
     Waiting,
     Solved,
@@ -33,19 +28,16 @@ enum class SolveState {
 
 class TypeSolver(val sig: ISolverSignature, val dependence: TypeSolver?, val file: FileIndexStore) {
     private var _priority = 0
-    private var _trueTy: ITy = Ty.UNKNOWN
+    private var _result: ITy = Ty.UNKNOWN
     private var _state = SolveState.Waiting
-    private var _type = SolverType.Definition
 
     val priority get(): Int = _priority
 
-    val trueTy get() = _trueTy
+    val result get() = _result
 
     val solved get() = _state != SolveState.Waiting
 
     val state get() = _state
-
-    val type get() = _type
 
     val invalid get() = file.invalid
 
@@ -57,12 +49,12 @@ class TypeSolver(val sig: ISolverSignature, val dependence: TypeSolver?, val fil
         when (sig) {
             is SolvedSolverSignature -> {
                 _state = SolveState.Solved
-                _trueTy = sig.ty
+                _result = sig.ty
             }
 
             is NullSolverSignature -> {
                 _state = SolveState.NoSolution
-                _trueTy = Ty.UNKNOWN
+                _result = Ty.UNKNOWN
             }
 
             else -> dependence?.request()
@@ -80,16 +72,16 @@ class TypeSolver(val sig: ISolverSignature, val dependence: TypeSolver?, val fil
 
         assert(dependenceSolved)
         _state = SolveState.Solved
-        _trueTy = ty
+        _result = ty
     }
 
     fun markAsNoSolution() {
         _state = SolveState.NoSolution
-        _trueTy = Ty.UNKNOWN
+        _result = Ty.UNKNOWN
     }
 
     fun request(): ITy? {
-        if (solved) return _trueTy
+        if (solved) return _result
 
         dependence?.request()
         _priority++
