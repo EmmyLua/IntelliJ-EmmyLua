@@ -24,6 +24,7 @@ import com.tang.intellij.lua.psi.LuaClassMember
 import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyClass
 
 class ShortNameManager : LuaShortNamesManager() {
     override fun findClass(name: String, context: SearchContext): LuaClass? {
@@ -61,6 +62,12 @@ class ShortNameManager : LuaShortNamesManager() {
     ): Boolean {
         val hashCode = "${type.className}*$fieldName".hashCode()
         val all = ClassMemberIndex.instance.get(hashCode, context.project, context.scope)
-        return ContainerUtil.process(all, processor)
+        if (!ContainerUtil.process(all, processor))
+            return false
+
+        // from supper
+        return TyClass.processSuperClass(type, context) {
+            processAllMembers(it, fieldName, context, processor)
+        }
     }
 }
