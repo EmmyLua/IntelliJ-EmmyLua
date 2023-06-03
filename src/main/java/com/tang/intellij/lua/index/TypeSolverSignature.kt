@@ -16,7 +16,9 @@
 
 package com.tang.intellij.lua.index
 
+import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.psi.PsiElement
+import com.intellij.psi.stubs.ObjectStubBase
 import com.tang.intellij.lua.ext.fileId
 import com.tang.intellij.lua.psi.LuaIndexExpr
 import com.tang.intellij.lua.psi.LuaNameExpr
@@ -61,7 +63,8 @@ class LazyCode(
 
     companion object {
         fun make(psi: LuaIndexExpr): LazyCode {
-            val id = psi.id?.text?.hashCode() ?: 0
+            val name = psi.name
+            val id = name?.hashCode() ?: 0
             return create(psi, id)
         }
 
@@ -77,7 +80,17 @@ class LazyCode(
         }
 
         private fun create(psi: PsiElement, code: Int): LazyCode {
-            return LazyCode(getFileId(psi), psi.textOffset, code, psi.text)
+            var id = 0
+            if (psi is StubBasedPsiElementBase<*>) {
+                val stub = psi.stub
+                if (stub is ObjectStubBase<*>) {
+                    id = stub.stubId
+                }
+            }
+            if (id == 0) {
+                id = psi.textOffset
+            }
+            return LazyCode(getFileId(psi), id, code)
         }
 
         private fun getFileId(psi: PsiElement): Int {

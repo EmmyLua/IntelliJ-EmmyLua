@@ -180,7 +180,7 @@ class IndexTask(private val project: Project) : TypeSolverListener {
     fun scan(file: LuaPsiFile) {
         manager.cleanFile(file.fileId)
 
-        file.accept(object: LuaRecursiveVisitor() {
+        file.accept(object: LuaStubRecursiveVisitor() {
 
             override fun visitExpr(o: LuaExpr) {
                 if (o is LuaIndexExpr && o.assignStat != null) {

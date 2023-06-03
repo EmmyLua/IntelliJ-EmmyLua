@@ -17,12 +17,12 @@
 package com.tang.intellij.lua.index
 
 import com.intellij.openapi.application.ModalityState
-import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.progress.impl.BackgroundableProcessIndicator
 import com.intellij.openapi.progress.impl.ProgressManagerImpl
+import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.QueueProcessor
 import java.util.function.BiConsumer
@@ -46,7 +46,7 @@ class TaskQueue(val project: Project) {
     fun runReadAction(title: String, run: (indicator: ProgressIndicator) -> Unit) {
         val task = object: Task.Backgroundable(project, title, false) {
             override fun run(indicator: ProgressIndicator) {
-                runReadAction {
+                DumbService.getInstance(project).runReadActionInSmartMode {
                     run(indicator)
                 }
             }
