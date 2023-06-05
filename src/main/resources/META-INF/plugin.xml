@@ -17,7 +17,7 @@
 <idea-plugin xmlns:xi="http://www.w3.org/2001/XInclude">
     <id>com.tang</id>
     <name>EmmyLua</name>
-    <version>1.3.6</version>
+    <version>1.4.0</version>
     <vendor email="love.tangzx@qq.com">tangzx</vendor>
     <category>Custom Languages</category>
     <description><![CDATA[
@@ -69,6 +69,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.4.2</strong>
+    <ul>
+        <li>[NEW] rewrite the index system, fix IDE freeze/crash issues!</li>
+        <li>[NEW] compatible with IDEA232</li>
+    </ul>
     <strong>1.3.7</strong>
     <ul>
         <li>[NEW] compatible with IDEA222</li>
@@ -103,7 +108,7 @@
     </ul>
     ]]>
     </change-notes>
-    <idea-version since-build="172" until-build="212.*"/>
+    <idea-version since-build="231" until-build="232.*"/>
     <xi:include href="emmylua-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
     <depends optional="true" config-file="emmylua-project.xml">com.intellij.java</depends>
 </idea-plugin>

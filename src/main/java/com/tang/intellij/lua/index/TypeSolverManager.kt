@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.index
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.psi.PsiElement
@@ -28,7 +29,7 @@ interface TypeSolverListener {
     fun onNewCreated(solver: TypeSolver)
 }
 
-class TypeSolverManager : IndexSink {
+class TypeSolverManager : IndexSink, Disposable {
 
     private val fileStoreMap = mutableMapOf<Int, FileIndexStore>()
     private var listener: TypeSolverListener? = null
@@ -90,6 +91,10 @@ class TypeSolverManager : IndexSink {
             StubKeys.SHORT_NAME -> ShortNameIndex.instance.occurrence(fileId, key, value)
             StubKeys.CLASS_MEMBER -> ClassMemberIndex.instance.occurrence(fileId, key, value)
         }
+    }
+
+    override fun dispose() = fileStoreMap.forEach { (_, u) ->
+        u.clean()
     }
 }
 

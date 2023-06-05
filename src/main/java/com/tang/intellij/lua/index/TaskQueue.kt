@@ -16,6 +16,7 @@
 
 package com.tang.intellij.lua.index
 
+import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -35,12 +36,12 @@ class QueueConsumer : BiConsumer<ContinuableRunnable, Runnable> {
     override fun accept(t: ContinuableRunnable, u: Runnable) = t.run(u)
 }
 
-class TaskQueue(val project: Project) {
+class TaskQueue(val project: Project) : Disposable {
     private var isDisposed = false
     private val processor = QueueProcessor(
         QueueConsumer(),
         true,
-        QueueProcessor.ThreadToUse.AWT
+        QueueProcessor.ThreadToUse.POOLED
     ) { isDisposed }
 
     fun runReadAction(title: String, action: (indicator: ProgressIndicator) -> Unit) {
@@ -68,5 +69,9 @@ class TaskQueue(val project: Project) {
                     ModalityState.NON_MODAL)
             }
         })
+    }
+
+    override fun dispose() {
+        isDisposed = true
     }
 }

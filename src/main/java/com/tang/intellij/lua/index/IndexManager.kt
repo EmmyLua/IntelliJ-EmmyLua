@@ -19,12 +19,14 @@ package com.tang.intellij.lua.index
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationListener
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.ProjectActivity
+import com.intellij.openapi.util.Disposer
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -42,6 +44,7 @@ class LuaProjectActivity : ProjectActivity {
     }
 }
 
+@Service(Service.Level.PROJECT)
 class IndexManager(private val project: Project) : Disposable, ApplicationListener {
 
     enum class ScanType {
@@ -59,6 +62,8 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
     init {
         solverManager.setListener(task)
         setupListeners(project)
+        Disposer.register(this, taskQueue)
+        Disposer.register(this, task)
     }
 
     private fun setupListeners(project: Project) {
@@ -101,7 +106,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         when (scanType) {
             ScanType.None -> { }
             ScanType.All -> {
-                taskQueue.runReadAction("Lua indexing ...", ::scanAllProject)
+                taskQueue.runReadAction("Lua indexing: waiting to start ...", ::scanAllProject)
             }
             ScanType.Changed -> scanChangedFiles()
         }
@@ -138,6 +143,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
     }
 
     override fun dispose() {
+
     }
 
     companion object {
@@ -164,12 +170,13 @@ class IndexReport {
     }
 }
 
-class IndexTask(private val project: Project) : TypeSolverListener {
+class IndexTask(private val project: Project) : TypeSolverListener, Disposable {
 
     private val solverManager = TypeSolverManager.getInstance(project)
     private val indexers = mutableListOf<Indexer>()
     private val additional = mutableListOf<Indexer>()
     private var running = AtomicBoolean(false)
+    private var disposed = false
 
     val isRunning get() = running.get()
 
@@ -209,10 +216,10 @@ class IndexTask(private val project: Project) : TypeSolverListener {
             run(indicator, report)
         }
         catch (e: ProcessCanceledException) {
-            println(e.message)
+            // canceled
         }
         catch (e: Exception) {
-            println(e.message)
+            e.printStackTrace()
         }
         indexers.clear()
         report.report()
@@ -229,6 +236,8 @@ class IndexTask(private val project: Project) : TypeSolverListener {
             indexers.sortByDescending { it.priority }
 
             for (item in indexers) {
+                if (disposed)
+                    throw ProcessCanceledException()
                 item.tryIndex(solverManager, context)
             }
             indicator.text = "try index: ${report.total}"
@@ -271,5 +280,10 @@ class IndexTask(private val project: Project) : TypeSolverListener {
         if (isRunning) {
             add(solver)
         }
+    }
+
+    override fun dispose() {
+        disposed = true
+        solverManager.dispose()
     }
 }

@@ -38,7 +38,6 @@
 
         <!-- New - Index -->
         <postStartupActivity implementation="com.tang.intellij.lua.index.LuaProjectActivity" />
-        <projectService serviceImplementation="com.tang.intellij.lua.index.IndexManager"/>
 
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
