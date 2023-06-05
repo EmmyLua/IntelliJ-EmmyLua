@@ -20,12 +20,11 @@ import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.util.Processor
-import com.tang.intellij.lua.psi.LuaClass
-import com.tang.intellij.lua.psi.LuaClassMember
-import com.tang.intellij.lua.psi.LuaTypeAlias
-import com.tang.intellij.lua.psi.LuaTypeDef
+import com.tang.intellij.lua.comment.psi.LuaDocTagField
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
+import com.tang.intellij.lua.ty.TyParameter
 
 abstract class LuaShortNamesManager {
     companion object {
@@ -43,21 +42,95 @@ abstract class LuaShortNamesManager {
         }
     }
 
-    abstract fun findClass(name: String, context: SearchContext): LuaClass?
+    open fun findClass(name: String, context: SearchContext): LuaClass? = null
 
-    abstract fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember?
+    open fun findMember(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
+        var perfect: LuaClassMember? = null
+        var tagField: LuaDocTagField? = null
+        var tableField: LuaTableField? = null
+        processAllMembers(type, fieldName, context) {
+            when (it) {
+                is LuaDocTagField -> {
+                    tagField = it
+                    false
+                }
 
-    abstract fun processAllClassNames(project: Project, processor: Processor<String>): Boolean
+                is LuaTableField -> {
+                    tableField = it
+                    true
+                }
 
-    abstract fun processClassesWithName(name: String, context: SearchContext, processor: Processor<LuaClass>): Boolean
-
-    abstract fun getClassMembers(clazzName: String, context: SearchContext): Collection<LuaClassMember>
-
-    abstract fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean
-
-    open fun findAlias(name: String, context: SearchContext): LuaTypeAlias? {
-        return null
+                else -> {
+                    if (perfect == null)
+                        perfect = it
+                    true
+                }
+            }
+        }
+        if (tagField != null) return tagField
+        if (tableField != null) return tableField
+        return perfect
     }
+
+    open fun findMethod(
+        className: String,
+        methodName: String,
+        context: SearchContext,
+        visitSuper: Boolean = true
+    ): LuaClassMethod? {
+        var target: LuaClassMethod? = null
+        processAllMembers(className, methodName, context, Processor {
+            if (it is LuaClassMethod) {
+                target = it
+                return@Processor false
+            }
+            true
+        }, visitSuper)
+        return target
+    }
+
+    open fun processAllClassNames(project: Project, processor: Processor<String>): Boolean {
+        return true
+    }
+
+    open fun processClassesWithName(name: String, context: SearchContext, processor: Processor<LuaClass>): Boolean {
+        return true
+    }
+
+    open fun getClassMembers(clazzName: String, context: SearchContext): Collection<LuaClassMember> {
+        return emptyList()
+    }
+
+    fun processAllMembers(
+        type: ITyClass,
+        memberName: String,
+        context: SearchContext,
+        processor: Processor<LuaClassMember>
+    ): Boolean {
+        return if (type is TyParameter)
+            type.superClassName?.let { processAllMembers(it, memberName, context, processor) } ?: true
+        else processAllMembers(type.className, memberName, context, processor)
+    }
+
+    open fun processAllMembers(
+        className: String,
+        fieldName: String,
+        context: SearchContext,
+        processor: Processor<LuaClassMember>,
+        visitSuper: Boolean = true
+    ): Boolean {
+        return true
+    }
+
+    open fun processAllMembers(
+        type: ITyClass,
+        context: SearchContext,
+        processor: Processor<LuaClassMember>
+    ): Boolean {
+        return true
+    }
+
+    open fun findAlias(name: String, context: SearchContext): LuaTypeAlias? = null
 
     open fun processAllAlias(project: Project, processor: Processor<String>): Boolean {
         return true

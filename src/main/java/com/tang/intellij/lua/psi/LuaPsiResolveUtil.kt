@@ -22,8 +22,8 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
@@ -93,7 +93,7 @@ fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
         val target = (resolveResult as? LuaNameExpr) ?: nameExpr
         val refName = target.name
         val moduleName = target.moduleName ?: Constants.WORD_G
-        LuaClassMemberIndex.process(moduleName, refName, context, Processor {
+        LuaShortNamesManager.getInstance(context.project).processAllMembers(moduleName, refName, context, {
             resolveResult = it
             false
         })
@@ -111,7 +111,7 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
     } else {
         val refName = ref.name
         val module = ref.moduleName ?: Constants.WORD_G
-        LuaClassMemberIndex.process(module, refName, context, Processor {
+        LuaShortNamesManager.getInstance(context.project).processAllMembers(module, refName, context, {
             list.add(it)
             true
         })

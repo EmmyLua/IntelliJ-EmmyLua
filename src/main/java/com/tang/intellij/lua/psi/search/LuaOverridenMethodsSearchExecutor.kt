@@ -22,7 +22,6 @@ import com.intellij.util.QueryExecutor
 import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.guessClassType
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.TyClass
 
 class LuaOverridenMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOverridenMethodsSearch.SearchParameters> {
@@ -36,7 +35,7 @@ class LuaOverridenMethodsSearchExecutor : QueryExecutor<LuaClassMethod, LuaOverr
             TyClass.processSuperClass(type, context) { superType->
                 ProgressManager.checkCanceled()
                 val superTypeName = superType.className
-                val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
+                val superMethod = LuaShortNamesManager.getInstance(project).findMethod(superTypeName, methodName, context)
                 if (superMethod == null) true else processor.process(superMethod)
             }
         }

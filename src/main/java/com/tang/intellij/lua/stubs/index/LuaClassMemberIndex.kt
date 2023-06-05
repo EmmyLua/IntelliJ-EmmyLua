@@ -41,10 +41,10 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
     companion object {
         val instance = LuaClassMemberIndex()
 
-        fun process(key: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+        private fun process(key: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             if (context.isDumb)
                 return false
-            val all = LuaClassMemberIndex.instance.get(key.hashCode(), context.project, context.scope)
+            val all = instance.get(key.hashCode(), context.project, context.scope)
             return ContainerUtil.process(all, processor)
         }
 
@@ -74,7 +74,7 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return true
         }
 
-        fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
+        private fun find(type: ITyClass, fieldName: String, context: SearchContext): LuaClassMember? {
             var perfect: LuaClassMember? = null
             var tagField: LuaDocTagField? = null
             var tableField: LuaTableField? = null
@@ -84,10 +84,12 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
                         tagField = it
                         false
                     }
+
                     is LuaTableField -> {
                         tableField = it
                         true
                     }
+
                     else -> {
                         if (perfect == null)
                             perfect = it
@@ -100,22 +102,23 @@ class LuaClassMemberIndex : IntStubIndexExtension<LuaClassMember>() {
             return perfect
         }
 
-        fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+        private fun processAll(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             return if (type is TyParameter)
                 type.superClassName?.let { process(it, fieldName, context, processor) } ?: true
             else process(type.className, fieldName, context, processor)
         }
 
-        fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>) {
+        fun processAll(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
             if (process(type.className, context, processor)) {
                 type.lazyInit(context)
-                type.processAlias(Processor {
+                return type.processAlias(Processor {
                     process(it, context, processor)
                 })
             }
+            return true
         }
 
-        fun findMethod(className: String, memberName: String, context: SearchContext, deep: Boolean = true): LuaClassMethod? {
+        private fun findMethod(className: String, memberName: String, context: SearchContext, deep: Boolean = true): LuaClassMethod? {
             var target: LuaClassMethod? = null
             process(className, memberName, context, Processor {
                 if (it is LuaClassMethod) {
