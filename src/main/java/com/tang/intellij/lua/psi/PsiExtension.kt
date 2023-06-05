@@ -350,9 +350,12 @@ val LuaDocTagClass.aliasName: String? get() {
     val owner = LuaCommentUtil.findOwner(this)
     when (owner) {
         is LuaAssignStat -> {
-            val expr = owner.getExprAt(0)
+            val expr = owner.valueExprList?.getExprAt(0)
+            if (expr is LuaTableExpr)
+                return getTableTypeName(expr)
+            /*val expr = owner.getExprAt(0)
             if (expr is LuaNameExpr)
-                return getGlobalTypeName(expr)
+                return getGlobalTypeName(expr)*/
         }
 
         is LuaLocalDef -> {
