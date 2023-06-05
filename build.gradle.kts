@@ -46,7 +46,7 @@ val buildDataList = listOf(
         // LATEST-EAP-SNAPSHOT
         ideaSDKVersion = "2023.1",
         sinceBuild = "231",
-        untilBuild = "231.*",
+        untilBuild = "232.*",
         bunch = "212",
         targetCompatibilityLevel = JavaVersion.VERSION_17,
         jvmTarget = "17"
