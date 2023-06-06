@@ -175,7 +175,13 @@ fun resolveRequireFile(pathString: String?, project: Project): LuaPsiFile? {
     if (pathString == null)
         return null
     val fileName = pathString.replace('.', '/')
-    val f = LuaFileUtil.findFile(project, fileName)
+    var f = LuaFileUtil.findFile(project, fileName)
+
+    // issue #415, support init.lua
+    if (f == null || f.isDirectory) {
+        f = LuaFileUtil.findFile(project, "$fileName/init")
+    }
+
     if (f != null) {
         val psiFile = PsiManager.getInstance(project).findFile(f)
         if (psiFile is LuaPsiFile)
