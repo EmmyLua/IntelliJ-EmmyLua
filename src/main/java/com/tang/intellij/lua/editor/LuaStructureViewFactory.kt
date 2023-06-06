@@ -26,6 +26,7 @@ import com.intellij.ide.util.treeView.smartTree.SorterUtil
 import com.intellij.lang.PsiStructureViewFactory
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiFile
+import com.tang.intellij.lua.LuaBundle
 import com.tang.intellij.lua.editor.structure.LuaClassFieldElement
 import com.tang.intellij.lua.editor.structure.LuaFileElement
 import com.tang.intellij.lua.editor.structure.LuaFuncElement
@@ -81,7 +82,7 @@ class LuaStructureViewFactory : PsiStructureViewFactory {
         }
 
         override fun getPresentation(): ActionPresentation {
-            return ActionPresentationData(IdeBundle.message("action.sort.alphabetically"), IdeBundle.message("action.sort.alphabetically"), AllIcons.ObjectBrowser.Sorted)
+            return ActionPresentationData(LuaBundle.message("action.sort.alphabetically"), LuaBundle.message("action.sort.alphabetically_desc"), AllIcons.ObjectBrowser.Sorted)
         }
 
         override fun getName(): String {
