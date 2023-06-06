@@ -33,7 +33,7 @@ class LuaShortNamesManagerImpl : LuaShortNamesManager() {
         return LuaClassIndex.find(name, context)
     }
 
-    override fun processAllClassNames(project: Project, processor: Processor<String>): Boolean {
+    override fun processClassNames(project: Project, processor: Processor<String>): Boolean {
         return LuaClassIndex.processKeys(project, processor)
     }
 
@@ -45,11 +45,11 @@ class LuaShortNamesManagerImpl : LuaShortNamesManager() {
         return LuaClassMemberIndex.instance.get(clazzName.hashCode(), context.project, context.scope)
     }
 
-    override fun processAllMembers(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
+    override fun processMembers(type: ITyClass, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
         return LuaClassMemberIndex.processAll(type, context, processor)
     }
 
-    override fun processAllMembers(
+    override fun processMembers(
         className: String,
         fieldName: String,
         context: SearchContext,

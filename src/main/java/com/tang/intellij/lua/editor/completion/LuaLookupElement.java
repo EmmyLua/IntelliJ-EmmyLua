@@ -40,7 +40,7 @@ public class LuaLookupElement extends LookupElement implements Comparable<Lookup
     private boolean itemTextUnderlined;
 
     public static void fillTypes(Project project, Collection<LookupElement> results) {
-        LuaShortNamesManager.Companion.getInstance(project).processAllClassNames(project, key -> {
+        LuaShortNamesManager.Companion.getInstance(project).processClassNames(project, key -> {
             results.add(LookupElementBuilder.create(key).withIcon(LuaIcons.CLASS));
             return true;
         });

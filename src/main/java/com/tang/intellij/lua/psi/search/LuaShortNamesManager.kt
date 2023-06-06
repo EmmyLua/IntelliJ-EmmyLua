@@ -48,7 +48,7 @@ abstract class LuaShortNamesManager {
         var perfect: LuaClassMember? = null
         var tagField: LuaDocTagField? = null
         var tableField: LuaTableField? = null
-        processAllMembers(type, fieldName, context) {
+        processMembers(type, fieldName, context) {
             when (it) {
                 is LuaDocTagField -> {
                     tagField = it
@@ -79,7 +79,7 @@ abstract class LuaShortNamesManager {
         visitSuper: Boolean = true
     ): LuaClassMethod? {
         var target: LuaClassMethod? = null
-        processAllMembers(className, methodName, context, Processor {
+        processMembers(className, methodName, context, Processor {
             if (it is LuaClassMethod) {
                 target = it
                 return@Processor false
@@ -89,8 +89,13 @@ abstract class LuaShortNamesManager {
         return target
     }
 
+    @Deprecated("Use processClassNames instead.", replaceWith = ReplaceWith("processClassNames"))
     open fun processAllClassNames(project: Project, processor: Processor<String>): Boolean {
         return true
+    }
+
+    open fun processClassNames(project: Project, processor: Processor<String>): Boolean {
+        return processAllClassNames(project, processor)
     }
 
     open fun processClassesWithName(name: String, context: SearchContext, processor: Processor<LuaClass>): Boolean {
@@ -101,18 +106,28 @@ abstract class LuaShortNamesManager {
         return emptyList()
     }
 
-    fun processAllMembers(
+    @Deprecated("Use processMembers instead.", replaceWith = ReplaceWith("processMembers"))
+    open fun processAllMembers(
         type: ITyClass,
         memberName: String,
         context: SearchContext,
         processor: Processor<LuaClassMember>
     ): Boolean {
         return if (type is TyParameter)
-            type.superClassName?.let { processAllMembers(it, memberName, context, processor) } ?: true
-        else processAllMembers(type.className, memberName, context, processor)
+            type.superClassName?.let { processMembers(it, memberName, context, processor) } ?: true
+        else processMembers(type.className, memberName, context, processor)
     }
 
-    open fun processAllMembers(
+    open fun processMembers(
+        type: ITyClass,
+        memberName: String,
+        context: SearchContext,
+        processor: Processor<LuaClassMember>
+    ): Boolean {
+        return processAllMembers(type, memberName, context, processor)
+    }
+
+    open fun processMembers(
         className: String,
         fieldName: String,
         context: SearchContext,
@@ -122,12 +137,21 @@ abstract class LuaShortNamesManager {
         return true
     }
 
+    @Deprecated("Use processMembers instead.", replaceWith = ReplaceWith("processMembers"))
     open fun processAllMembers(
         type: ITyClass,
         context: SearchContext,
         processor: Processor<LuaClassMember>
     ): Boolean {
         return true
+    }
+
+    open fun processMembers(
+        type: ITyClass,
+        context: SearchContext,
+        processor: Processor<LuaClassMember>
+    ): Boolean {
+        return processAllMembers(type, context, processor)
     }
 
     open fun findAlias(name: String, context: SearchContext): LuaTypeAlias? = null

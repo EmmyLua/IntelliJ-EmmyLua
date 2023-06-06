@@ -39,7 +39,7 @@ class ShortNameManager : LuaShortNamesManager() {
         return all
     }
 
-    override fun processAllMembers(
+    override fun processMembers(
         type: ITyClass,
         context: SearchContext,
         processor: Processor<LuaClassMember>
@@ -51,11 +51,11 @@ class ShortNameManager : LuaShortNamesManager() {
 
         // from supper
         return TyClass.processSuperClass(type, context) {
-            processAllMembers(it, context, processor)
+            processMembers(it, context, processor)
         }
     }
 
-    override fun processAllMembers(
+    override fun processMembers(
         className: String,
         fieldName: String,
         context: SearchContext,
@@ -71,7 +71,7 @@ class ShortNameManager : LuaShortNamesManager() {
             val ty = TySerializedClass(className)
             // from supper
             return TyClass.processSuperClass(ty, context) {
-                processAllMembers(it, fieldName, context, processor)
+                processMembers(it, fieldName, context, processor)
             }
         }
 

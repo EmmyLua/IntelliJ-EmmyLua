@@ -58,15 +58,15 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         return null
     }
 
-    override fun processAllClassNames(project: Project, processor: Processor<String>): Boolean {
+    override fun processClassNames(project: Project, processor: Processor<String>): Boolean {
         for (ep in list) {
-            if (!ep.processAllClassNames(project, processor))
+            if (!ep.processClassNames(project, processor))
                 return false
         }
         return true
     }
 
-    override fun processAllMembers(
+    override fun processMembers(
         className: String,
         fieldName: String,
         context: SearchContext,
@@ -74,19 +74,19 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         visitSuper: Boolean
     ): Boolean {
         for (manager in list) {
-            if (!manager.processAllMembers(className, fieldName, context, processor, visitSuper))
+            if (!manager.processMembers(className, fieldName, context, processor, visitSuper))
                 return false
         }
         return true
     }
 
-    override fun processAllMembers(
+    override fun processMembers(
         type: ITyClass,
         context: SearchContext,
         processor: Processor<LuaClassMember>
     ): Boolean {
         for (manager in list) {
-            if (!manager.processAllMembers(type, context, processor))
+            if (!manager.processMembers(type, context, processor))
                 return false
         }
         return true

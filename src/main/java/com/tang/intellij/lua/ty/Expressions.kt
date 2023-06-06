@@ -386,7 +386,7 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
 
     var set:ITy = Ty.UNKNOWN
 
-    LuaShortNamesManager.getInstance(context.project).processAllMembers(type, fieldName, context, Processor {
+    LuaShortNamesManager.getInstance(context.project).processMembers(type, fieldName, context, Processor {
         set = set.union(it.guessType(context))
         true
     })

@@ -61,7 +61,7 @@ class OverrideCompletionProvider : LuaCompletionProvider() {
         val project = completionParameters.originalFile.project
         val context = SearchContext.get(project)
         val clazzName = sup.className
-        LuaShortNamesManager.getInstance(project).processAllMembers(TyLazyClass(clazzName), context, Processor { def ->
+        LuaShortNamesManager.getInstance(project).processMembers(TyLazyClass(clazzName), context, Processor { def ->
             if (def is LuaClassMethod) {
                 def.name?.let {
                     if (memberNameSet.add(it)) {
