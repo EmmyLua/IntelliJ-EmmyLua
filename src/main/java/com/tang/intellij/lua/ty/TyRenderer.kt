@@ -40,8 +40,8 @@ open class TyRenderer : TyVisitor(), ITyRenderer {
                     is TyNil -> sb.append(renderType(Constants.WORD_NIL))
                     is ITyGeneric -> {
                         val list = mutableListOf<String>()
-                        ty.params.forEach { list.add(it.displayName) }
-                        sb.append("${ty.base.displayName}<${list.joinToString(", ")}>")
+                        ty.params.forEach { list.add(renderType(it.displayName)) }
+                        sb.append("${renderType(ty.base.displayName)}&lt;${list.joinToString(", ")}&gt;")
                     }
                     is TyParameter -> {
 
