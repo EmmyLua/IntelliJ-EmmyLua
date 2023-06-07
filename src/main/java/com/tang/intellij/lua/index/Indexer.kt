@@ -24,6 +24,7 @@ import com.tang.intellij.lua.ty.TyUnknown
 interface Indexer {
     val priority get() = 0
     val state: IndexState
+    val invalid:Boolean
     fun tryIndex(indexSink: IndexSink, context: SearchContext)
 
     val done get() = state != IndexState.PENDING
@@ -39,6 +40,7 @@ class GuessableIndexer(val psi: LuaTypeGuessable, manager: TypeSolverManager) : 
     private var _state = IndexState.PENDING
     override val state: IndexState get() = _state
     override val priority: Int get() = typeSolver.priority
+    override val invalid: Boolean get() = typeSolver.invalid
 
     override fun tryIndex(indexSink: IndexSink, context: SearchContext) {
         if (typeSolver.invalid) {
@@ -68,6 +70,8 @@ class ClassMethodIndexer(private val psi: LuaClassMethodDef, manager: TypeSolver
     override val state: IndexState get() = _state
 
     override val priority: Int get() = parentSolver.priority - 1
+
+    override val invalid: Boolean get() = !psi.isValid || parentSolver.invalid
 
     override fun tryIndex(indexSink: IndexSink, context: SearchContext) {
         if (name == null) {

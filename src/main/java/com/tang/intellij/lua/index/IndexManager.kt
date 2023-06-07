@@ -19,9 +19,9 @@ package com.tang.intellij.lua.index
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationListener
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.runReadAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
@@ -31,6 +31,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import com.intellij.util.indexing.FileBasedIndex
+import com.intellij.util.messages.Topic
 import com.tang.intellij.lua.ext.fileId
 import com.tang.intellij.lua.lang.LuaFileType
 import com.tang.intellij.lua.psi.*
@@ -53,10 +54,11 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         Changed
     }
 
+    private val listener: LuaIndexListener = project.messageBus.syncPublisher(TOPIC)
     private val solverManager = TypeSolverManager.getInstance(project)
     private val changedFiles = mutableSetOf<LuaPsiFile>()
     private var scanType = ScanType.All
-    private val task = IndexTask(project)
+    private val task = IndexTask(project, listener)
     private val taskQueue = TaskQueue(project)
 
     init {
@@ -97,7 +99,7 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
             typeSolver.request()
         } else {
             task.scan(target)
-            task.run(EmptyProgressIndicator())
+            taskQueue.run(task::run)
         }
         return if (typeSolver.solved) typeSolver.result else null
     }
@@ -106,7 +108,8 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         when (scanType) {
             ScanType.None -> { }
             ScanType.All -> {
-                taskQueue.runReadAction("Lua indexing: waiting to start ...", ::scanAllProject)
+                listener.onStatus(LuaIndexStatus.Waiting)
+                taskQueue.runAfterSmartMode("Lua indexing ...", ::scanAllProject)
             }
             ScanType.Changed -> scanChangedFiles()
         }
@@ -118,21 +121,24 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
             task.scan(it)
         }
         changedFiles.clear()
-        task.run(EmptyProgressIndicator())
+        taskQueue.run(task::run)
     }
 
     private fun scanAllProject(indicator: ProgressIndicator) {
         indicator.pushState()
         indicator.text = "Collecting ..."
+        listener.onStatus(LuaIndexStatus.Collecting)
         val startAt = System.currentTimeMillis()
-        FileBasedIndex.getInstance().iterateIndexableFiles({ vf ->
-            if (vf.fileType == LuaFileType.INSTANCE) {
-                PsiManager.getInstance(project).findFile(vf).let {
-                    if (it is LuaPsiFile) task.scan(it)
+        runReadAction {
+            FileBasedIndex.getInstance().iterateIndexableFiles({ vf ->
+                if (vf.fileType == LuaFileType.INSTANCE) {
+                    PsiManager.getInstance(project).findFile(vf).let {
+                        if (it is LuaPsiFile) task.scan(it)
+                    }
                 }
-            }
-            true
-        }, project, null)
+                true
+            }, project, null)
+        }
         indicator.popState()
 
         indicator.pushState()
@@ -150,11 +156,25 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
         private val logger = Logger.getInstance(IndexManager::class.java)
 
         fun getInstance(project: Project): IndexManager = project.getService(IndexManager::class.java)
+
+        val TOPIC: Topic<LuaIndexListener> = Topic.create("lua index listener", LuaIndexListener::class.java)
     }
+}
+
+enum class LuaIndexStatus {
+    Waiting,
+    Collecting,
+    Analyse,
+    Finished
+}
+
+interface LuaIndexListener {
+    fun onStatus(status: LuaIndexStatus, complete: Int = 0, total: Int = 0)
 }
 
 class IndexReport {
     var total = 0
+    var finished = 0
     var noSolution = 0
 
     private val startAt = System.currentTimeMillis()
@@ -170,7 +190,7 @@ class IndexReport {
     }
 }
 
-class IndexTask(private val project: Project) : TypeSolverListener, Disposable {
+class IndexTask(private val project: Project, private val listener: LuaIndexListener) : TypeSolverListener, Disposable {
 
     private val solverManager = TypeSolverManager.getInstance(project)
     private val indexers = mutableListOf<Indexer>()
@@ -207,13 +227,20 @@ class IndexTask(private val project: Project) : TypeSolverListener, Disposable {
     }
 
     fun run(indicator: ProgressIndicator) {
-        if (indexers.isEmpty())
+        if (indexers.isEmpty() || isRunning)
             return
 
         running.set(true)
         val report = IndexReport()
         try {
-            run(indicator, report)
+            var done = false
+            while (true) {
+                runReadAction {
+                    done = run(indicator, report)
+                }
+                if (done) break
+                Thread.sleep(100)
+            }
         }
         catch (e: ProcessCanceledException) {
             // canceled
@@ -224,31 +251,34 @@ class IndexTask(private val project: Project) : TypeSolverListener, Disposable {
         indexers.clear()
         report.report()
         running.set(false)
+        listener.onStatus(LuaIndexStatus.Finished)
     }
 
     @Synchronized
-    private fun run(indicator: ProgressIndicator, report: IndexReport) {
+    private fun run(indicator: ProgressIndicator, report: IndexReport): Boolean {
         var total = indexers.size
         val context = SearchContext.get(project)
+        val time = System.currentTimeMillis()
 
         report.total = total
         while (total > 0) {
             indexers.sortByDescending { it.priority }
 
             for (item in indexers) {
+                if (item.invalid)
+                    continue
                 if (disposed)
                     throw ProcessCanceledException()
                 item.tryIndex(solverManager, context)
-            }
-            indicator.text = "try index: ${report.total}"
 
-            indexers.removeAll { it.done }
-
-            synchronized(additional) {
-                indexers.addAll(additional)
-                report.total += additional.size
-                additional.clear()
+                val costTime = System.currentTimeMillis() - time
+                if (costTime > 200) {
+                    update(indicator, report)
+                    return false
+                }
             }
+
+            update(indicator, report)
 
             if (indexers.count() == total)
                 break
@@ -256,6 +286,21 @@ class IndexTask(private val project: Project) : TypeSolverListener, Disposable {
         }
 
         report.noSolution = indexers.size
+        return true
+    }
+
+    private fun update(indicator: ProgressIndicator, report: IndexReport) {
+        indexers.removeAll { it.done || it.invalid }
+        val unfinished = indexers.count()
+        report.finished = report.total - unfinished
+        indicator.text = "index: ${report.finished} / ${report.total}"
+        listener.onStatus(LuaIndexStatus.Analyse, report.finished, report.total)
+
+        synchronized(additional) {
+            indexers.addAll(additional)
+            report.total += additional.size
+            additional.clear()
+        }
     }
 
     private fun add(solver: TypeSolver) {
@@ -277,9 +322,7 @@ class IndexTask(private val project: Project) : TypeSolverListener, Disposable {
     }
 
     override fun onNewCreated(solver: TypeSolver) {
-        if (isRunning) {
-            add(solver)
-        }
+        add(solver)
     }
 
     override fun dispose() {

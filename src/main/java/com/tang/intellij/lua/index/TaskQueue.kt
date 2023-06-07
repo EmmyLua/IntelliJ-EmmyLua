@@ -17,7 +17,9 @@
 package com.tang.intellij.lua.index
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
@@ -44,15 +46,20 @@ class TaskQueue(val project: Project) : Disposable {
         QueueProcessor.ThreadToUse.POOLED
     ) { isDisposed }
 
-    fun runReadAction(title: String, action: (indicator: ProgressIndicator) -> Unit) {
+    fun runAfterSmartMode(title: String, action: (indicator: ProgressIndicator) -> Unit) {
         val task = object: Task.Backgroundable(project, title, false) {
             override fun run(indicator: ProgressIndicator) {
-                DumbService.getInstance(project).runReadActionInSmartMode {
-                    action(indicator)
-                }
+                DumbService.getInstance(project).waitForSmartMode()
+                action(indicator)
             }
         }
         run(task)
+    }
+
+    fun run(action: (indicator: ProgressIndicator) -> Unit) {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            action(EmptyProgressIndicator())
+        }
     }
 
     fun run(task: Task.Backgroundable) {
