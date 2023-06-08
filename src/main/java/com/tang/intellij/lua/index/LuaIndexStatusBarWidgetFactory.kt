@@ -39,6 +39,9 @@ class LuaIndexStatusBarWidget(project: Project) : JBLabel(), CustomStatusBarWidg
 
     override fun getComponent(): JComponent = this
 
+    private var _startAt = 0L
+    private var _delayVisible = false
+
     init {
         this.text = "Lua status: None"
 
@@ -54,7 +57,21 @@ class LuaIndexStatusBarWidget(project: Project) : JBLabel(), CustomStatusBarWidg
                 LuaIndexStatus.Analyse -> "Lua status: Analyse(${complete}/${total})"
                 LuaIndexStatus.Finished -> "Lua status: Finished"
             }
-            isVisible = status != LuaIndexStatus.Finished
+            val isVisible = status != LuaIndexStatus.Finished
+            if (isVisible) {
+                if (_delayVisible) {
+                    // delay show
+                    val dt = System.currentTimeMillis() - _startAt
+                    if (dt >= 100) this.isVisible = true
+                } else {
+                    _delayVisible = true
+                    _startAt = System.currentTimeMillis()
+                }
+            }
+            if (!isVisible && _delayVisible) {
+                _delayVisible = false
+                this.isVisible = false
+            }
         }
     }
 }
