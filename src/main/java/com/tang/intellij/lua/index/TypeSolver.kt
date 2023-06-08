@@ -19,6 +19,7 @@ package com.tang.intellij.lua.index
 import com.tang.intellij.lua.ty.ITy
 import com.tang.intellij.lua.ty.Ty
 import com.tang.intellij.lua.ty.TyUnknown
+import kotlin.math.max
 
 enum class SolveState {
     Waiting,
@@ -27,7 +28,7 @@ enum class SolveState {
 }
 
 class TypeSolver(val sig: ISolverSignature, val dependence: TypeSolver?, val file: FileIndexStore) {
-    private var _priority = 0
+    private var _priority = if (sig.lazyCode.isAssign) 100 else 0
     private var _result: ITy = Ty.UNKNOWN
     private var _state = SolveState.Waiting
 
@@ -57,7 +58,7 @@ class TypeSolver(val sig: ISolverSignature, val dependence: TypeSolver?, val fil
                 _result = Ty.UNKNOWN
             }
 
-            else -> dependence?.request()
+            else -> dependence?.request(this)
         }
     }
 
@@ -75,16 +76,17 @@ class TypeSolver(val sig: ISolverSignature, val dependence: TypeSolver?, val fil
         _result = ty
     }
 
-    fun markAsNoSolution() {
-        _state = SolveState.NoSolution
-        _result = Ty.UNKNOWN
+    private fun request(dependency: TypeSolver): ITy? {
+        request()
+        _priority = max(dependency.priority + 1, _priority)
+        return null
     }
 
     fun request(): ITy? {
         if (solved) return _result
 
-        dependence?.request()
         _priority++
+        dependence?.request(this)
         return null
     }
 }

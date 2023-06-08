@@ -20,9 +20,7 @@ import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.psi.PsiElement
 import com.intellij.psi.stubs.ObjectStubBase
 import com.tang.intellij.lua.ext.fileId
-import com.tang.intellij.lua.psi.LuaIndexExpr
-import com.tang.intellij.lua.psi.LuaNameExpr
-import com.tang.intellij.lua.psi.LuaTypeGuessable
+import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.ty.ITy
 
 class LazyCode(
@@ -32,6 +30,8 @@ class LazyCode(
     private val debugString: String? = null) {
 
     private var isGlobal = false
+
+    var isAssign = false
 
     override fun toString(): String {
         if (debugString != null) return debugString
@@ -90,7 +90,16 @@ class LazyCode(
             if (id == 0) {
                 id = psi.textOffset
             }
-            return LazyCode(getFileId(psi), id, code)
+            val hashCode = LazyCode(getFileId(psi), id, code)
+            hashCode.isAssign = when (psi) {
+                is LuaNameExpr -> psi.assignStat != null
+                is LuaIndexExpr -> psi.assignStat != null
+                is LuaClassMethodDef -> true
+                is LuaFuncDef -> true
+                is LuaLocalFuncDef -> true
+                else -> false
+            }
+            return hashCode
         }
 
         private fun getFileId(psi: PsiElement): Int {
