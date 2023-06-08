@@ -56,6 +56,13 @@ class TaskQueue(val project: Project) : Disposable {
         run(task)
     }
 
+    fun runAfterSmartMode(action: (indicator: ProgressIndicator) -> Unit) {
+        ApplicationManager.getApplication().executeOnPooledThread {
+            DumbService.getInstance(project).waitForSmartMode()
+            action(EmptyProgressIndicator())
+        }
+    }
+
     fun run(action: (indicator: ProgressIndicator) -> Unit) {
         ApplicationManager.getApplication().executeOnPooledThread {
             action(EmptyProgressIndicator())

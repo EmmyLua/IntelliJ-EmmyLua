@@ -109,7 +109,8 @@ class IndexManager(private val project: Project) : Disposable, ApplicationListen
             ScanType.None -> { }
             ScanType.All -> {
                 listener.onStatus(LuaIndexStatus.Waiting)
-                taskQueue.runAfterSmartMode("Lua indexing ...", ::scanAllProject)
+                // taskQueue.runAfterSmartMode("Lua indexing ...", ::scanAllProject)
+                taskQueue.runAfterSmartMode(::scanAllProject)
             }
             ScanType.Changed -> scanChangedFiles()
         }
