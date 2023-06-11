@@ -36,9 +36,6 @@
         <additionalLibraryRootsProvider implementation="com.tang.intellij.lua.project.StdLibraryProvider"/>
         <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
 
-        <!-- New - Index -->
-        <postStartupActivity implementation="com.tang.intellij.lua.index.LuaProjectActivity" />
-
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaRegionFoldingBuilder"/>
@@ -385,6 +382,5 @@
         <luaTypeInfer implementation="com.tang.intellij.lua.ty.LuaTypeInfer" id="base"/>
 
         <luaShortNamesManager implementation="com.tang.intellij.lua.psi.search.LuaShortNamesManagerImpl" id="base"/>
-        <luaShortNamesManager implementation="com.tang.intellij.lua.index.ShortNameManager" id="ext"/>
     </extensions>
 </idea-plugin>
