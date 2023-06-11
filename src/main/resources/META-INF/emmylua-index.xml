@@ -16,6 +16,7 @@
 
 <idea-plugin>
     <extensions defaultExtensionNs="com.intellij">
+        <statusBarWidgetFactory id="luaIndexStatus" implementation="com.tang.intellij.lua.index.LuaIndexStatusBarWidgetFactory" order="first"/>
         <postStartupActivity implementation="com.tang.intellij.lua.index.LuaProjectActivity" />
     </extensions>
 

@@ -149,8 +149,6 @@
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaCurrentFunctionNameMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaFunctionParamSigMacro"/>
 
-        <statusBarWidgetFactory id="luaIndexStatus" implementation="com.tang.intellij.lua.index.LuaIndexStatusBarWidgetFactory" order="first"/>
-
         <!--lua settings-->
         <applicationService serviceImplementation="com.tang.intellij.lua.project.LuaSettings"/>
         <applicationConfigurable groupId="language"
