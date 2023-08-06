@@ -110,6 +110,5 @@
     </change-notes>
     <idea-version since-build="231" until-build="232.*"/>
     <xi:include href="emmylua-core.xml" xpointer="xpointer(/idea-plugin/*)"/>
-    <!--<xi:include href="emmylua-index.xml" xpointer="xpointer(/idea-plugin/*)"/>-->
     <depends optional="true" config-file="emmylua-project.xml">com.intellij.java</depends>
 </idea-plugin>
