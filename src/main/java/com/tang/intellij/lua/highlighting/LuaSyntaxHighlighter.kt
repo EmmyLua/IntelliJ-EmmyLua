@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.StringEscapesTokenTypes
 import com.intellij.psi.tree.IElementType
+import com.jetbrains.rd.util.remove
 import com.tang.intellij.lua.comment.psi.LuaDocTokenType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.DOC_KEYWORD_TOKENS
@@ -65,11 +66,13 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
         init {
             ourMap1 = HashMap()
             ourMap2 = HashMap()
+            val operatorsWithOutKeyword = (LuaElementTypes.BINARY_OPS + LuaElementTypes.UNARY_OPS)
+                .remove(LuaTypes.AND).remove(LuaTypes.OR)
 
             fillMap(ourMap1, KEYWORD_TOKENS, LuaHighlightingData.KEYWORD)
             fillMap(ourMap1, LuaHighlightingData.SEMICOLON, LuaTypes.SEMI)
             fillMap(ourMap1, LuaHighlightingData.COMMA, LuaTypes.COMMA)
-            fillMap(ourMap1, LuaHighlightingData.OPERATORS, LuaElementTypes.BINARY_OPS + LuaElementTypes.UNARY_OPS)
+            fillMap(ourMap1, LuaHighlightingData.OPERATORS, operatorsWithOutKeyword)
             fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaTypes.LBRACK, LuaTypes.RBRACK)
             fillMap(ourMap1, LuaHighlightingData.BRACES, LuaTypes.LCURLY, LuaTypes.RCURLY)
             fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaTypes.LPAREN, LuaTypes.RPAREN)
