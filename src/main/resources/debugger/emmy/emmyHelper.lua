@@ -190,7 +190,7 @@ end
 local emmyHelper = rawget(_G, "emmyHelper")
 if emmyHelper == nil then
     rawset(_G, 'emmyHelper', emmy)
-else
+elseif emmy.queryVariable then
     emmyHelper.queryVariable = emmy.queryVariable
 end
 
