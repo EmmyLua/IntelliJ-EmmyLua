@@ -69,6 +69,10 @@
     ]]></description>
 
     <change-notes><![CDATA[
+    <strong>1.4.9</strong>
+    <ul>
+        <li>[NEW] compatible with IDEA233</li>
+    </ul>
     <strong>1.4.2</strong>
     <ul>
         <li>[NEW] rewrite the index system, fix IDE freeze/crash issues!</li>
