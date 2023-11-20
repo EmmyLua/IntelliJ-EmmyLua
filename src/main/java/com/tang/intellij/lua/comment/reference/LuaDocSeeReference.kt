@@ -21,11 +21,10 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiElementResolveResult
 import com.intellij.psi.PsiPolyVariantReferenceBase
 import com.intellij.psi.ResolveResult
-import com.intellij.util.Processor
 import com.tang.intellij.lua.comment.psi.LuaDocTagSee
 import com.tang.intellij.lua.psi.LuaElementFactory
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.ITyClass
 
 class LuaDocSeeReference(see: LuaDocTagSee) :
@@ -49,7 +48,7 @@ class LuaDocSeeReference(see: LuaDocTagSee) :
     override fun multiResolve(incomplete: Boolean): Array<ResolveResult> {
         val list = mutableListOf<ResolveResult>()
         val type = myElement.classNameRef?.resolveType() as ITyClass
-        LuaClassMemberIndex.process(type.className, id.text, SearchContext.get(myElement.project), Processor {
+        LuaShortNamesManager.getInstance(myElement.project).processMembers(type.className, id.text, SearchContext.get(myElement.project), {
             list.add(PsiElementResolveResult(it))
             true
         })

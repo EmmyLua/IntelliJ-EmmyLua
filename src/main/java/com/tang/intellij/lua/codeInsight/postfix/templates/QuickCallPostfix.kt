@@ -20,7 +20,12 @@ import com.intellij.codeInsight.template.postfix.templates.StringBasedPostfixTem
 import com.intellij.psi.PsiElement
 import com.tang.intellij.lua.codeInsight.postfix.LuaPostfixUtils.selectorAllExpressionsWithCurrentOffset
 
-abstract class LuaCallPostfixTemplate(private val fn:String) : StringBasedPostfixTemplate(fn, "$fn(expr)", selectorAllExpressionsWithCurrentOffset()) {
+abstract class LuaCallPostfixTemplate(private val fn:String) : StringBasedPostfixTemplate(
+    fn,
+    "$fn(expr)",
+    selectorAllExpressionsWithCurrentOffset(),
+    null
+) {
 
     override fun getTemplateString(psiElement: PsiElement) = "$fn(\$expr\$)"
 

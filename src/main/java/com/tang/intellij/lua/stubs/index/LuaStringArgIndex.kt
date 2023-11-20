@@ -79,7 +79,7 @@ class LuaStringArgIndex : FileBasedIndexExtension<String, LuaStringArgIndex.LuaC
                 val name = call.expr.name
                 if (name != null && arg is LuaLiteralExpr && arg.kind == LuaLiteralKind.String) {
                     val sv = arg.stringValue
-                    if (sv.length in 2..1024) {
+                    if ('\n' in sv || sv.length in 2..128) {
                         val offset = arg.node.startOffset
                         val occ = map.getOrPut(name) { LuaCallOccurrence(mutableListOf()) }
                         occ.args.add(LuaCallArg(if (isColon) index + 1 else index, sv, offset))

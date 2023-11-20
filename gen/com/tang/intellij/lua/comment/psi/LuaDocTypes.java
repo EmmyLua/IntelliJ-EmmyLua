@@ -18,6 +18,7 @@ public interface LuaDocTypes {
   IElementType GENERAL_TY = LuaParserDefinitionKt.createDocType("GENERAL_TY");
   IElementType GENERIC_DEF = LuaParserDefinitionKt.createDocType("GENERIC_DEF");
   IElementType GENERIC_TY = LuaParserDefinitionKt.createDocType("GENERIC_TY");
+  IElementType LAN_ID = LuaParserDefinitionKt.createDocType("LAN_ID");
   IElementType PARAM_NAME_REF = LuaParserDefinitionKt.createDocType("PARAM_NAME_REF");
   IElementType PAR_TY = LuaParserDefinitionKt.createDocType("PAR_TY");
   IElementType STRING_LITERAL_TY = LuaParserDefinitionKt.createDocType("STRING_LITERAL_TY");
@@ -113,6 +114,9 @@ public interface LuaDocTypes {
       }
       else if (type == GENERIC_TY) {
         return new LuaDocGenericTyImpl(node);
+      }
+      else if (type == LAN_ID) {
+        return new LuaDocLanIdImpl(node);
       }
       else if (type == PARAM_NAME_REF) {
         return new LuaDocParamNameRefImpl(node);

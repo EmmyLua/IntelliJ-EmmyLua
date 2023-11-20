@@ -43,6 +43,7 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
 
     override fun sessionInitialized() {
         super.sessionInitialized()
+        session.setPauseActionSupported(true)
         session.consoleView.addMessageFilter(LuaTracebackFilter(session.project))
     }
 

@@ -29,7 +29,7 @@ class Strings {
         fun stringHashCode(chars: CharSequence, from: Int, to: Int, prefixHash: Int): Int {
             var h = prefixHash
             for (off in from until to) {
-                h = 31 * h + chars[off].toInt()
+                h = 31 * h + chars[off].code
             }
             return h
         }
@@ -38,7 +38,7 @@ class Strings {
         fun stringHashCode(chars: CharArray, from: Int, to: Int): Int {
             var h = 0
             for (off in from until to) {
-                h = 31 * h + chars[off].toInt()
+                h = 31 * h + chars[off].code
             }
             return h
         }

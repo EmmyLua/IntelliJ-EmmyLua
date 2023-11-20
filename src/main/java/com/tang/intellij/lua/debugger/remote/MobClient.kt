@@ -89,7 +89,7 @@ class MobClient(private val socketChannel: SocketChannel, private val listener: 
                 if (readSize > 0) {
                     var begin = 0
                     for (i in 1..readSize + 1) {
-                        if (bf[i - 1].toInt() == '\n'.toInt()) {
+                        if (bf[i - 1].toInt() == '\n'.code) {
                             onResp(String(bf.array(), begin, i))
                             begin = i
                         }

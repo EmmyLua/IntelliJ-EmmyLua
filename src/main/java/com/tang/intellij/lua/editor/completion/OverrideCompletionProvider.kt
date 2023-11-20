@@ -25,8 +25,8 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.ITyClass
 import com.tang.intellij.lua.ty.TyClass
 import com.tang.intellij.lua.ty.TyLazyClass
@@ -61,7 +61,7 @@ class OverrideCompletionProvider : LuaCompletionProvider() {
         val project = completionParameters.originalFile.project
         val context = SearchContext.get(project)
         val clazzName = sup.className
-        LuaClassMemberIndex.processAll(TyLazyClass(clazzName), context, Processor { def ->
+        LuaShortNamesManager.getInstance(project).processMembers(TyLazyClass(clazzName), context, Processor { def ->
             if (def is LuaClassMethod) {
                 def.name?.let {
                     if (memberNameSet.add(it)) {

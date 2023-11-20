@@ -86,7 +86,7 @@ class LuaDocCompletionContributor : CompletionContributor() {
         extend(CompletionType.BASIC, SHOW_CLASS, object : CompletionProvider<CompletionParameters>() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 val project = completionParameters.position.project
-                LuaShortNamesManager.getInstance(project).processAllClassNames(project, Processor{
+                LuaShortNamesManager.getInstance(project).processClassNames(project, Processor{
                     completionResultSet.addElement(LookupElementBuilder.create(it).withIcon(LuaIcons.CLASS))
                     true
                 })
@@ -145,7 +145,8 @@ class LuaDocCompletionContributor : CompletionContributor() {
             override fun addCompletions(completionParameters: CompletionParameters, processingContext: ProcessingContext, completionResultSet: CompletionResultSet) {
                 Language.getRegisteredLanguages().forEach {
                     val fileType = it.associatedFileType
-                    var lookupElement = LookupElementBuilder.create(it.id)
+                    val id = "\"${it.id}\""
+                    var lookupElement = LookupElementBuilder.create(id)
                     if (fileType != null)
                         lookupElement = lookupElement.withIcon(fileType.icon)
                     completionResultSet.addElement(lookupElement)

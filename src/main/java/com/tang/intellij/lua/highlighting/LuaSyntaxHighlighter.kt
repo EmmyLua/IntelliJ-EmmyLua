@@ -22,16 +22,17 @@ import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.psi.StringEscapesTokenTypes
 import com.intellij.psi.tree.IElementType
+import com.jetbrains.rd.util.remove
 import com.tang.intellij.lua.comment.psi.LuaDocTokenType
 import com.tang.intellij.lua.comment.psi.LuaDocTypes
 import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.DOC_KEYWORD_TOKENS
 import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.DOC_TAG_TOKENS
 import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.KEYWORD_TOKENS
 import com.tang.intellij.lua.lang.LuaParserDefinition.Companion.PRIMITIVE_TYPE_SET
+import com.tang.intellij.lua.psi.LuaElementTypes
 import com.tang.intellij.lua.psi.LuaRegionTypes
 import com.tang.intellij.lua.psi.LuaStringTypes
 import com.tang.intellij.lua.psi.LuaTypes
-import java.util.*
 
 /**
  * Created by tangzx
@@ -45,13 +46,13 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
 
     override fun getTokenHighlights(type: IElementType): Array<TextAttributesKey> {
         return when {
-            ourMap1.containsKey(type) -> SyntaxHighlighterBase.pack(ourMap1[type], ourMap2[type])
-            type is LuaDocTokenType -> SyntaxHighlighterBase.pack(LuaHighlightingData.DOC_COMMENT)
-            type === LuaStringTypes.NEXT_LINE -> SyntaxHighlighterBase.pack(DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE)
-            type === StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN -> SyntaxHighlighterBase.pack(DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE)
-            type === StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN -> SyntaxHighlighterBase.pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE)
-            type === LuaStringTypes.INVALID_NEXT_LINE -> SyntaxHighlighterBase.pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE)//for string
-            else -> SyntaxHighlighterBase.pack(null)
+            ourMap1.containsKey(type) -> pack(ourMap1[type], ourMap2[type])
+            type is LuaDocTokenType -> pack(LuaHighlightingData.DOC_COMMENT)
+            type === LuaStringTypes.NEXT_LINE -> pack(DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE)
+            type === StringEscapesTokenTypes.VALID_STRING_ESCAPE_TOKEN -> pack(DefaultLanguageHighlighterColors.VALID_STRING_ESCAPE)
+            type === StringEscapesTokenTypes.INVALID_CHARACTER_ESCAPE_TOKEN -> pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE)
+            type === LuaStringTypes.INVALID_NEXT_LINE -> pack(DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE)//for string
+            else -> pack(null)
         }
     }
 
@@ -65,12 +66,13 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
         init {
             ourMap1 = HashMap()
             ourMap2 = HashMap()
+            val operatorsWithOutKeyword = (LuaElementTypes.BINARY_OPS + LuaElementTypes.UNARY_OPS)
+                .remove(LuaTypes.AND).remove(LuaTypes.OR)
 
-            //key words
             fillMap(ourMap1, KEYWORD_TOKENS, LuaHighlightingData.KEYWORD)
             fillMap(ourMap1, LuaHighlightingData.SEMICOLON, LuaTypes.SEMI)
             fillMap(ourMap1, LuaHighlightingData.COMMA, LuaTypes.COMMA)
-            fillMap(ourMap1, LuaHighlightingData.OPERATORS, LuaTypes.BINARY_OP, LuaTypes.UNARY_OP)
+            fillMap(ourMap1, LuaHighlightingData.OPERATORS, operatorsWithOutKeyword)
             fillMap(ourMap1, LuaHighlightingData.BRACKETS, LuaTypes.LBRACK, LuaTypes.RBRACK)
             fillMap(ourMap1, LuaHighlightingData.BRACES, LuaTypes.LCURLY, LuaTypes.RCURLY)
             fillMap(ourMap1, LuaHighlightingData.PARENTHESES, LuaTypes.LPAREN, LuaTypes.RPAREN)
@@ -96,6 +98,12 @@ class LuaSyntaxHighlighter : SyntaxHighlighterBase() {
             fillMap(ourMap1, LuaHighlightingData.REGION_HEADER, LuaRegionTypes.REGION_START)
             fillMap(ourMap1, LuaHighlightingData.REGION_DESC, LuaRegionTypes.REGION_DESC)
             fillMap(ourMap1, LuaHighlightingData.REGION_HEADER, LuaRegionTypes.REGION_END)
+        }
+
+        private fun fillMap(map: HashMap<IElementType, TextAttributesKey>, key: TextAttributesKey, types: Array<IElementType>) {
+            types.forEach {
+                map[it] = key
+            }
         }
     }
 }

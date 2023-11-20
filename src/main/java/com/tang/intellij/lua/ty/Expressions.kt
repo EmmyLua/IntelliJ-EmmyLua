@@ -272,14 +272,17 @@ private fun getType(context: SearchContext, def: PsiElement): ITy {
 
             var type: ITy = def.docTy ?: Ty.UNKNOWN
             //guess from value expr
-            if (Ty.isInvalid(type) /*&& !context.forStub*/) {
-                val stat = def.assignStat
-                if (stat != null) {
-                    val exprList = stat.valueExprList
-                    if (exprList != null) {
-                        type = context.withIndex(stat.getIndexFor(def)) {
+            val stat = def.assignStat
+            if (stat != null) {
+                val exprList = stat.valueExprList
+                if (exprList != null) {
+                    val defIndex = stat.getIndexFor(def)
+                    // foo = { ... }
+                    if (Ty.isInvalid(type) || exprList.at(defIndex) is LuaTableExpr) {
+                        val valueTy = context.withIndex(defIndex) {
                             exprList.guessTypeAt(context)
                         }
+                        type = type.union(valueTy)
                     }
                 }
             }
@@ -302,7 +305,7 @@ private fun isGlobal(nameExpr: LuaNameExpr):Boolean {
     return gs?.isGlobal ?: (resolveLocal(nameExpr, null) == null)
 }
 
-private fun LuaLiteralExpr.infer(): ITy {
+fun LuaLiteralExpr.infer(): ITy {
     return when (this.kind) {
         LuaLiteralKind.Bool -> Ty.BOOLEAN
         LuaLiteralKind.String -> Ty.STRING
@@ -383,7 +386,7 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
 
     var set:ITy = Ty.UNKNOWN
 
-    LuaShortNamesManager.getInstance(context.project).processAllMembers(type, fieldName, context, Processor {
+    LuaShortNamesManager.getInstance(context.project).processMembers(type, fieldName, context, Processor {
         set = set.union(it.guessType(context))
         true
     })
@@ -391,7 +394,7 @@ private fun guessFieldType(fieldName: String, type: ITyClass, context: SearchCon
     return set
 }
 
-private fun LuaTableExpr.infer(): ITy {
+fun LuaTableExpr.infer(): ITy {
     val list = this.tableFieldList
     if (list.size == 1) {
         val valueExpr = list.first().valueExpr

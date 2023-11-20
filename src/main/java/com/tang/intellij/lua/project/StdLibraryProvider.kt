@@ -19,6 +19,7 @@ package com.tang.intellij.lua.project
 import com.intellij.navigation.ItemPresentation
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.RootsChangeRescanningInfo
 import com.intellij.openapi.project.ex.ProjectManagerEx
 import com.intellij.openapi.roots.AdditionalLibraryRootsProvider
 import com.intellij.openapi.roots.SyntheticLibrary
@@ -50,7 +51,7 @@ class StdLibraryProvider: AdditionalLibraryRootsProvider() {
             WriteAction.run<RuntimeException> {
                 val projects = ProjectManagerEx.getInstanceEx().openProjects
                 for (project in projects) {
-                    ProjectRootManagerEx.getInstanceEx(project).makeRootsChange(EmptyRunnable.getInstance(), false, true)
+                    ProjectRootManagerEx.getInstanceEx(project).makeRootsChange(EmptyRunnable.getInstance(), RootsChangeRescanningInfo.RESCAN_DEPENDENCIES_IF_NEEDED)
                 }
 
                 StubIndex.getInstance().forceRebuild(Throwable("Lua language level changed."))

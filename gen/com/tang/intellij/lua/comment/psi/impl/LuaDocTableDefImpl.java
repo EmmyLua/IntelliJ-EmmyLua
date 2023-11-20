@@ -16,7 +16,7 @@ import com.intellij.psi.tree.IElementType;
 
 public class LuaDocTableDefImpl extends StubBasedPsiElementBase<LuaDocTableDefStub> implements LuaDocTableDef {
 
-  public LuaDocTableDefImpl(@NotNull LuaDocTableDefStub stub, @NotNull IStubElementType type) {
+  public LuaDocTableDefImpl(@NotNull LuaDocTableDefStub stub, @NotNull IStubElementType<?, ?> type) {
     super(stub, type);
   }
 
@@ -32,6 +32,7 @@ public class LuaDocTableDefImpl extends StubBasedPsiElementBase<LuaDocTableDefSt
     visitor.visitTableDef(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);

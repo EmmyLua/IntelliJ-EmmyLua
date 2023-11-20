@@ -21,6 +21,7 @@ public class LuaDocGenericDefImpl extends ASTWrapperPsiElement implements LuaDoc
     visitor.visitGenericDef(this);
   }
 
+  @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof LuaDocVisitor) accept((LuaDocVisitor)visitor);
     else super.accept(visitor);

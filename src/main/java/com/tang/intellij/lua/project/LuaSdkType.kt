@@ -51,8 +51,6 @@ class LuaSdkType : SdkType("Lua SDK") {
 
     override fun getIcon(): Icon = LuaIcons.FILE
 
-    override fun getIconForAddAction(): Icon = LuaIcons.FILE
-
     companion object {
         val instance: LuaSdkType
             get() = SdkType.findInstance(LuaSdkType::class.java)

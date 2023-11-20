@@ -25,7 +25,7 @@ import com.tang.intellij.lua.psi.LuaPsiElement
 
 class UsageTypeProvider : UsageTypeProviderEx {
     companion object {
-        val FUNCTION_CALL = UsageType("Function call")
+        val FUNCTION_CALL = UsageType { "Function call" }
     }
 
     override fun getUsageType(element: PsiElement?, targets: Array<out UsageTarget>): UsageType? {

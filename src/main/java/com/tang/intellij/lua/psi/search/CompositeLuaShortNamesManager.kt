@@ -20,6 +20,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.Processor
 import com.tang.intellij.lua.psi.LuaClass
 import com.tang.intellij.lua.psi.LuaClassMember
+import com.tang.intellij.lua.psi.LuaClassMethod
 import com.tang.intellij.lua.psi.LuaTypeAlias
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.ty.ITyClass
@@ -44,9 +45,48 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
         return null
     }
 
-    override fun processAllClassNames(project: Project, processor: Processor<String>): Boolean {
+    override fun findMethod(
+        className: String,
+        methodName: String,
+        context: SearchContext,
+        visitSuper: Boolean
+    ): LuaClassMethod? {
+        for (manager in list) {
+            val ret = manager.findMethod(className, methodName, context, visitSuper)
+            if (ret != null) return ret
+        }
+        return null
+    }
+
+    override fun processClassNames(project: Project, processor: Processor<String>): Boolean {
         for (ep in list) {
-            if (!ep.processAllClassNames(project, processor))
+            if (!ep.processClassNames(project, processor))
+                return false
+        }
+        return true
+    }
+
+    override fun processMembers(
+        className: String,
+        fieldName: String,
+        context: SearchContext,
+        processor: Processor<LuaClassMember>,
+        visitSuper: Boolean
+    ): Boolean {
+        for (manager in list) {
+            if (!manager.processMembers(className, fieldName, context, processor, visitSuper))
+                return false
+        }
+        return true
+    }
+
+    override fun processMembers(
+        type: ITyClass,
+        context: SearchContext,
+        processor: Processor<LuaClassMember>
+    ): Boolean {
+        for (manager in list) {
+            if (!manager.processMembers(type, context, processor))
                 return false
         }
         return true
@@ -67,14 +107,6 @@ class CompositeLuaShortNamesManager : LuaShortNamesManager() {
             collection.addAll(col)
         }
         return collection
-    }
-
-    override fun processAllMembers(type: ITyClass, fieldName: String, context: SearchContext, processor: Processor<LuaClassMember>): Boolean {
-        for (manager in list) {
-            if (!manager.processAllMembers(type, fieldName, context, processor))
-                return false
-        }
-        return true
     }
 
     override fun findAlias(name: String, context: SearchContext): LuaTypeAlias? {

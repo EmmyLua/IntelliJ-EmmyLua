@@ -170,7 +170,7 @@ fun renderDefinition(sb: StringBuilder, block: () -> Unit) {
 }
 
 private fun renderTagList(sb: StringBuilder, name: String, comment: LuaComment) {
-    val tags = comment.findTags(name.toLowerCase())
+    val tags = comment.findTags(name.lowercase())
     renderTagList(sb, name, tags) { tagDef ->
         tagDef.commentString?.text?.let { sb.append(it) }
     }

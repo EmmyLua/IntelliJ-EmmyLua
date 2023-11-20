@@ -19,7 +19,6 @@ package com.tang.intellij.lua.editor.formatter
 import com.intellij.formatting.*
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.tang.intellij.lua.editor.formatter.blocks.LuaScriptBlock
@@ -32,7 +31,10 @@ import com.tang.intellij.lua.psi.LuaTypes.*
  * Created by tangzx on 2016/12/3.
  */
 class LuaFormattingModelBuilder : FormattingModelBuilder {
-    override fun createModel(element: PsiElement, settings: CodeStyleSettings): FormattingModel {
+
+    override fun createModel(formattingContext: FormattingContext): FormattingModel {
+        val settings = formattingContext.codeStyleSettings
+        val element = formattingContext.psiElement
         val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
         val luaSettings = settings.getCustomSettings(LuaCodeStyleSettings::class.java)
         val ctx = LuaFormatContext(commonSettings, luaSettings, createSpaceBuilder(settings))

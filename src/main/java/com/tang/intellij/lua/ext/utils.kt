@@ -16,8 +16,22 @@
 
 package com.tang.intellij.lua.ext
 
+import com.intellij.extapi.psi.StubBasedPsiElementBase
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.RecursionManager
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
+import com.intellij.util.indexing.FileBasedIndex
 
 fun <T> recursionGuard(key: Any, block: Computable<T>, memoize: Boolean = true): T? =
-        RecursionManager.doPreventingRecursion(key, memoize, block)
+    RecursionManager.doPreventingRecursion(key, memoize, block)
+
+val PsiFile.fileId get() = FileBasedIndex.getFileId(this.originalFile.virtualFile)
+
+val PsiElement.stubOrPsiParent get(): PsiElement {
+    if (this is StubBasedPsiElementBase<*>) {
+        val psi = this.stub?.parentStub?.psi
+        if (psi != null) return psi
+    }
+    return parent
+}

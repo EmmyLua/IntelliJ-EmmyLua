@@ -115,10 +115,10 @@ open class TySubstitutor : ITySubstitutor {
 }
 
 class TyAliasSubstitutor private constructor(val project: Project) : ITySubstitutor {
+    private val alreadyProcessed = hashSetOf<String>()
+
     companion object {
         fun substitute(ty: ITy, context: SearchContext): ITy {
-            /*if (context.forStub)
-                return ty*/
             return ty.substitute(TyAliasSubstitutor(context.project))
         }
     }
@@ -130,6 +130,8 @@ class TyAliasSubstitutor private constructor(val project: Project) : ITySubstitu
     }
 
     override fun substitute(clazz: ITyClass): ITy {
+        if (!alreadyProcessed.add(clazz.className))
+            return clazz
         return clazz.recoverAlias(SearchContext.get(project), this)
     }
 

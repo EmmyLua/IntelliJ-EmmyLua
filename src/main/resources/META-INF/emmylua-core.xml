@@ -23,22 +23,11 @@
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="com.tang.intellij.lua.errorreporting.GitHubErrorReporter"/>
 
-        <!--LuaCheck-->
-        <toolWindow id="LuaCheck"
-                    anchor="bottom"
-                    icon="/icons/lua.png"
-                    factoryClass="com.tang.intellij.lua.luacheck.LuaCheckToolWindowFactory"
-                    canCloseContents="true"/>
         <!-- file template provider -->
         <fileTemplateGroup implementation="com.tang.intellij.lua.actions.LuaFileTemplateProvider"/>
 
-        <projectService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckView"/>
-        <applicationService serviceImplementation="com.tang.intellij.lua.luacheck.LuaCheckSettings"/>
-
         <!--CreateFromTemplate-->
         <createFromTemplateHandler implementation="com.tang.intellij.lua.actions.LuaCreateFromTemplateHandler"/>
-
-        <virtualFileSystem implementationClass="com.tang.intellij.lua.debugger.attach.vfs.MemoryFileSystem" key="lua-dummy"/>
 
         <!--module and library-->
         <sdkType implementation="com.tang.intellij.lua.project.LuaSdkType"/>
@@ -46,8 +35,6 @@
         <!--<indexedRootsProvider implementation="com.tang.intellij.lua.project.LuaPredefinedLibraryProvider"/>-->
         <additionalLibraryRootsProvider implementation="com.tang.intellij.lua.project.StdLibraryProvider"/>
         <directoryProjectGenerator implementation="com.tang.intellij.lua.project.EmmyLuaDirectoryProjectGenerator"/>
-
-
 
         <!--lang-->
         <lang.foldingBuilder language="Lua" implementationClass="com.tang.intellij.lua.folding.LuaFoldingBuilder"/>
@@ -107,8 +94,8 @@
         <!--editor handlers-->
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterAfterUnmatchedBraceHandler" />
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterInDocHandler"/>
-        <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterBetweenBracesHandler"/>
         <enterHandlerDelegate implementation="com.tang.intellij.lua.editor.LuaEnterBetweenRangeBlockHandler"/>
+        <enterBetweenBracesDelegate implementationClass="com.tang.intellij.lua.editor.LuaEnterBetweenBracesHandler" language="Lua"/>
         <backspaceHandlerDelegate implementation="com.tang.intellij.lua.codeInsight.LuaBackspaceHandlerDelegate"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaTypedHandler"/>
         <typedHandler implementation="com.tang.intellij.lua.editor.LuaAutoIndentHandler"/>
@@ -124,8 +111,8 @@
         <additionalTextAttributes scheme="Darcula" file="colorSchemes/Darcula.xml"/>
 
         <!--stub & index-->
-        <stubElementTypeHolder class="com.tang.intellij.lua.psi.LuaTypes" />
-        <stubElementTypeHolder class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
+        <stubElementTypeHolder externalIdPrefix="lua" class="com.tang.intellij.lua.psi.LuaTypes" />
+        <stubElementTypeHolder externalIdPrefix="lua-doc" class="com.tang.intellij.lua.comment.psi.LuaDocTypes"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaClassMemberIndex"/>
         <stubIndex implementation="com.tang.intellij.lua.stubs.index.LuaShortNameIndex"/>
@@ -153,10 +140,10 @@
 <!--        <xdebugger.attachDebuggerProvider implementation="com.tang.intellij.lua.debugger.emmyAttach.EmmyAttachDebuggerProvider"/>-->
 
         <!--templates-->
-        <defaultLiveTemplatesProvider implementation="com.tang.intellij.lua.codeInsight.LuaLiveTemplatesProvider"/>
-        <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaCodeContextType"/>
-        <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
-        <liveTemplateContext implementation="com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType"/>
+        <defaultLiveTemplates file="/liveTemplates/lua.xml"/>
+        <liveTemplateContext contextId="LUA_CODE" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaCodeContextType"/>
+        <liveTemplateContext contextId="LUA_IF" baseContextId="LUA_CODE" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaIfContextType"/>
+        <liveTemplateContext contextId="LUA_FUNCTION" baseContextId="LUA_CODE" implementation="com.tang.intellij.lua.codeInsight.template.context.LuaFunContextType"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestFirstLuaVarNameMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.SuggestLuaParametersMacro"/>
         <liveTemplateMacro implementation="com.tang.intellij.lua.codeInsight.template.macro.LuaCurrentFunctionNameMacro"/>
@@ -171,59 +158,67 @@
             <!--<configurable instance="com.tang.intellij.lua.project.CompletionSettingsPanel"
                           displayName="Emmy Completion"
                           id="preferences.Lua.Completion"/>-->
-            <configurable instance="com.tang.intellij.lua.luacheck.LuaCheckSettingsPanel"
-                          displayName="LuaCheck"
-                          id="preferences.LuaCheck"/>
         </applicationConfigurable>
 
         <!--intentions-->
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateParameterAnnotationIntention</className>
             <descriptionDirectoryName>CreateParameterAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateTypeAnnotationIntention</className>
             <descriptionDirectoryName>CreateTypeAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateFunctionReturnAnnotationIntention</className>
             <descriptionDirectoryName>CreateFunctionReturnAnnotationIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateFunctionDocIntention</className>
             <descriptionDirectoryName>CreateFunctionDocIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateFieldFromParameterIntention</className>
             <descriptionDirectoryName>CreateFieldFromParameterIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.CreateMethodIntention</className>
             <descriptionDirectoryName>CreateMethodIntention</descriptionDirectoryName>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.AppendCallParenIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.RemoveCallParenIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.InvertBooleanIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.SetVisibilityIntention</className>
         </intentionAction>
         <intentionAction>
+            <language>Lua</language>
             <category>Lua</category>
             <className>com.tang.intellij.lua.codeInsight.intention.ComputeConstantValueIntention</className>
         </intentionAction>
@@ -235,93 +230,107 @@
                 displayName="Duplicate class"
                 enabledByDefault="true"
                 level="ERROR"
-                groupName="Lua"/>
+                groupName="Lua"
+                language="Lua"/>
         <localInspection
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.SimplifyLocalAssignment"
                 displayName="Local assign can be simpler"
                 enabledByDefault="true"
-                groupName="Lua"/>
+                groupName="Lua"
+                language="Lua"/>
         <localInspection
                 displayName="Remove unused"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.RemoveUnusedLocal"/>
         <localInspection
                 displayName="Empty body"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.EmptyBody"/>
         <localInspection
                 displayName="Unreachable statement"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.UnreachableStatement"/>
         <localInspection
                 displayName="0 index"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.ArrayIndexZero"/>
         <localInspection
                 displayName="Local name shadowed"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LocalNameShadowed"/>
         <localInspection
                 displayName="Lua language level"
                 enabledByDefault="true"
                 groupName="Lua"
                 level="ERROR"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LanguageLevelInspection"/>
         <localInspection
                 displayName="Match function signature"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.MatchFunctionSignatureInspection"/>
         <localInspection
                 displayName="Undeclared variable"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.UndeclaredVariableInspection"/>
         <localInspection
                 displayName="Return type"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.ReturnTypeInspection"/>
         <localInspection
                 displayName="Assign type"
                 enabledByDefault="false"
                 groupName="Lua > Lint > Type safety"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.AssignTypeInspection"/>
         <localInspection
                 displayName="Global name can be local"
                 enabledByDefault="false"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.GlobalNameCanbeLocal"/>
         <localInspection
                 displayName="Lua deprecation"
                 enabledByDefault="true"
                 groupName="Lua"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.LuaDeprecationInspection"/>
 
         <localInspection
                 displayName="Unresolved symbol in emmy doc"
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedSymbolInEmmyDocInspection"/>
 
         <localInspection
                 displayName="Unresolved class in emmy doc"
                 enabledByDefault="true"
                 groupName="Lua > Emmy doc"
+                language="Lua"
                 implementationClass="com.tang.intellij.lua.codeInsight.inspection.doc.UnresolvedClassInspection"/>
     </extensions>
 
-    <application-components>
-        <component>
-            <implementation-class>com.tang.intellij.lua.project.StdSDK</implementation-class>
-            <implementation-class>com.tang.intellij.lua.psi.LuaFileManager</implementation-class>
-        </component>
-    </application-components>
+    <applicationListeners>
+        <listener class="com.tang.intellij.lua.psi.LuaFileManager"
+                  topic="com.intellij.openapi.fileTypes.FileTypeListener"/>
+    </applicationListeners>
 
     <project-components>
         <component>
@@ -345,14 +354,6 @@
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="lua.newFile"/>
         </action>
 
-        <action id="lua.LuaCheck"
-                text="Run LuaCheck"
-                popup="true"
-                icon="/icons/lua.png"
-                class="com.tang.intellij.lua.luacheck.LuaCheckGroup">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-        </action>
     </actions>
 
     <extensionPoints>

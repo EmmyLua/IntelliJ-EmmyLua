@@ -83,7 +83,7 @@ class LuaAnnotator : Annotator {
 
             if (name != null) {
                 newInfoAnnotation(name, "Local function \"${o.name}\"") {
-                    it.textAttributes(LuaHighlightingData.LOCAL_VAR)
+                    it.textAttributes(LuaHighlightingData.LOCAL_FUNCTION)
                 }
             }
         }
@@ -188,7 +188,7 @@ class LuaAnnotator : Annotator {
                     checkUpValue(o)
                 } else if (res is LuaLocalFuncDef) {
                     newInfoAnnotation(o, "Local function \"${o.name}\"") {
-                        it.textAttributes(LuaHighlightingData.LOCAL_VAR)
+                        it.textAttributes(LuaHighlightingData.LOCAL_FUNCTION)
                     }
                     checkUpValue(o)
                 } else {

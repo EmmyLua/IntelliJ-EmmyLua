@@ -24,6 +24,7 @@ import com.tang.intellij.lua.comment.LuaCommentUtil
 import com.tang.intellij.lua.comment.psi.LuaDocTagField
 import com.tang.intellij.lua.comment.psi.LuaDocTagReturn
 import com.tang.intellij.lua.ext.recursionGuard
+import com.tang.intellij.lua.ext.stubOrPsiParent
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.search.GuardType
 import com.tang.intellij.lua.search.SearchContext
@@ -117,7 +118,7 @@ private fun LuaParamNameDef.infer(context: SearchContext): ITy {
 
 private fun LuaNameDef.infer(context: SearchContext): ITy {
     var type: ITy = Ty.UNKNOWN
-    val parent = this.parent
+    val parent = this.stubOrPsiParent
     if (parent is LuaTableField) {
         val expr = PsiTreeUtil.findChildOfType(parent, LuaExpr::class.java)
         if (expr != null)
@@ -127,7 +128,7 @@ private fun LuaNameDef.infer(context: SearchContext): ITy {
         if (docTy != null)
             return docTy
 
-        val localDef = PsiTreeUtil.getParentOfType(this, LuaLocalDef::class.java)
+        val localDef = PsiTreeUtil.getStubOrPsiParentOfType(this, LuaLocalDef::class.java)
         if (localDef != null) {
             //计算 expr 返回类型
             if (Ty.isInvalid(type) /*&& !context.forStub*/) {
@@ -157,6 +158,7 @@ private fun LuaDocTagField.infer(): ITy {
     return ty?.getType() ?: Ty.UNKNOWN
 }
 
+@Suppress("UNUSED_PARAMETER")
 private fun LuaFuncBodyOwner.infer(context: SearchContext): ITy {
     if (this is LuaFuncDef)
         return TyPsiFunction(false, this, TyFlags.GLOBAL)

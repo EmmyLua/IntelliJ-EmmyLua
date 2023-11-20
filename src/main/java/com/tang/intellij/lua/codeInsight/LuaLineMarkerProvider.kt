@@ -37,8 +37,8 @@ import com.tang.intellij.lua.lang.LuaIcons
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.search.LuaClassInheritorsSearch
 import com.tang.intellij.lua.psi.search.LuaOverridingMethodsSearch
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.TyClass
 
 /**
@@ -66,7 +66,7 @@ class LuaLineMarkerProvider : AbstractLineMarkerProvider() {
                 while (superType != null && superType is TyClass) {
                     ProgressManager.checkCanceled()
                     val superTypeName = superType.className
-                    val superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
+                    val superMethod = LuaShortNamesManager.getInstance(project).findMethod(superTypeName, methodName, context)
                     if (superMethod != null) {
                         val builder = NavigationGutterIconBuilder.create(AllIcons.Gutter.OverridingMethod)
                                 .setTargets(superMethod)

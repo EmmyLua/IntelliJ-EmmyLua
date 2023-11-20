@@ -16,14 +16,16 @@
 
 package com.tang.intellij.lua.codeInsight.template.context
 
+import com.intellij.codeInsight.template.TemplateActionContext
 import com.intellij.codeInsight.template.TemplateContextType
-import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.tang.intellij.lua.psi.LuaFuncBody
 
-class LuaFunContextType : TemplateContextType("LUA_FUNCTION", "function", LuaCodeContextType::class.java) {
+class LuaFunContextType : TemplateContextType("LUA_FUNCTION") {
 
-    override fun isInContext(psiFile: PsiFile, i: Int): Boolean {
+    override fun isInContext(templateActionContext: TemplateActionContext): Boolean {
+        val psiFile = templateActionContext.file
+        val i = templateActionContext.startOffset
         return PsiTreeUtil.findElementOfClassAtOffset(psiFile, i, LuaFuncBody::class.java, false) != null
     }
 }

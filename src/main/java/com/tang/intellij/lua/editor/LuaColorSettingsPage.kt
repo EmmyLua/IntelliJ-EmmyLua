@@ -107,6 +107,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 AttributesDescriptor("Braces and Operators//Dot", LuaHighlightingData.DOT),
                 AttributesDescriptor("Variables//Parameter", LuaHighlightingData.PARAMETER),
                 AttributesDescriptor("Variables//Local variable", LuaHighlightingData.LOCAL_VAR),
+                AttributesDescriptor("Variables//Local function", LuaHighlightingData.LOCAL_FUNCTION),
                 AttributesDescriptor("Variables//Global variable", LuaHighlightingData.GLOBAL_VAR),
                 AttributesDescriptor("Variables//Global function", LuaHighlightingData.GLOBAL_FUNCTION),
                 AttributesDescriptor("Variables//Up value", LuaHighlightingData.UP_VALUE),
@@ -118,9 +119,9 @@ class LuaColorSettingsPage : ColorSettingsPage {
                 AttributesDescriptor("Comments//EmmyDoc//Class name reference", LuaHighlightingData.CLASS_REFERENCE),
                 AttributesDescriptor("Comments//EmmyDoc//Type alias", LuaHighlightingData.TYPE_ALIAS),
                 AttributesDescriptor("Comments//EmmyDoc//Keyword", LuaHighlightingData.DOC_KEYWORD),
-                AttributesDescriptor("Region//Region Header", LuaHighlightingData.REGION_HEADER),
-                AttributesDescriptor("Region//Region Description", LuaHighlightingData.REGION_DESC),
-                AttributesDescriptor("Class Members//Field", LuaHighlightingData.FIELD),
+                AttributesDescriptor("Region//Region header", LuaHighlightingData.REGION_HEADER),
+                AttributesDescriptor("Region//Region description", LuaHighlightingData.REGION_DESC),
+                AttributesDescriptor("Class members//Field", LuaHighlightingData.FIELD),
                 AttributesDescriptor("Class Members//Instance method", LuaHighlightingData.INSTANCE_METHOD),
                 AttributesDescriptor("Class Members//Static method", LuaHighlightingData.STATIC_METHOD),
                 AttributesDescriptor("Std api", LuaHighlightingData.STD_API))
@@ -137,6 +138,7 @@ class LuaColorSettingsPage : ColorSettingsPage {
             ourTags["docTypeAlias"] = LuaHighlightingData.TYPE_ALIAS
             ourTags["docKeyword"] = LuaHighlightingData.DOC_KEYWORD
             ourTags["localVar"] = LuaHighlightingData.LOCAL_VAR
+            ourTags["localFunction"] = LuaHighlightingData.LOCAL_FUNCTION
             ourTags["globalVar"] = LuaHighlightingData.GLOBAL_VAR
             ourTags["globalFunction"] = LuaHighlightingData.GLOBAL_FUNCTION
             ourTags["field"] = LuaHighlightingData.FIELD

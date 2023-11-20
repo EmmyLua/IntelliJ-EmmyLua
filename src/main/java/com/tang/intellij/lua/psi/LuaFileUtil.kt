@@ -36,21 +36,11 @@ import java.io.File
  */
 object LuaFileUtil {
 
-    val pluginFolder: File?
-        get() {
-            val descriptor = PluginManagerCore.getPlugin(PluginId.getId("com.tang"))
-            return descriptor?.path
-        }
-
-    val pluginVirtualDirectory: VirtualFile?
+    private val pluginVirtualDirectory: VirtualFile?
         get() {
             val descriptor = PluginManagerCore.getPlugin(PluginId.getId("com.tang"))
             if (descriptor != null) {
-                val pluginPath = descriptor.path
-
-                val url = VfsUtil.pathToUrl(pluginPath.absolutePath)
-
-                return VirtualFileManager.getInstance().findFileByUrl(url)
+                return VirtualFileManager.getInstance().findFileByNioPath(descriptor.pluginPath)
             }
 
             return null
@@ -65,7 +55,7 @@ object LuaFileUtil {
     fun getAllAvailablePathsForMob(shortPath: String?, file: VirtualFile): List<String> {
         val list = SmartList<String>()
         val fullPath = file.canonicalPath
-        val extensions = LuaFileManager.getInstance().extensions
+        val extensions = LuaFileManager.extensions
         if (fullPath != null) {
             for (ext in extensions) {
                 if (!fullPath.endsWith(ext)) {
@@ -95,7 +85,7 @@ object LuaFileUtil {
         if (fixedShortUrl.startsWith("./") || fixedShortUrl.startsWith(".\\")) {
             fixedShortUrl = fixedShortUrl.substring(2)
         }
-        val extensions = LuaFileManager.getInstance().extensions
+        val extensions = LuaFileManager.extensions
         return ILuaFileResolver.findLuaFile(project, fixedShortUrl, extensions)
     }
 

@@ -31,9 +31,9 @@ import com.tang.intellij.lua.comment.psi.LuaDocTagClass
 import com.tang.intellij.lua.comment.psi.LuaDocTagOverload
 import com.tang.intellij.lua.comment.psi.api.LuaComment
 import com.tang.intellij.lua.lang.type.LuaString
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.LuaFuncBodyOwnerStub
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.ty.*
 
 /**
@@ -350,9 +350,12 @@ val LuaDocTagClass.aliasName: String? get() {
     val owner = LuaCommentUtil.findOwner(this)
     when (owner) {
         is LuaAssignStat -> {
-            val expr = owner.getExprAt(0)
+            val expr = owner.valueExprList?.getExprAt(0)
+            if (expr is LuaTableExpr)
+                return getTableTypeName(expr)
+            /*val expr = owner.getExprAt(0)
             if (expr is LuaNameExpr)
-                return getGlobalTypeName(expr)
+                return getGlobalTypeName(expr)*/
         }
 
         is LuaLocalDef -> {
@@ -488,7 +491,7 @@ fun LuaClassMethod.findOverridingMethod(context: SearchContext): LuaClassMethod?
     TyClass.processSuperClass(type, context) { superType->
         ProgressManager.checkCanceled()
         val superTypeName = superType.className
-        superMethod = LuaClassMemberIndex.findMethod(superTypeName, methodName, context)
+        superMethod = LuaShortNamesManager.getInstance(context.project).findMethod(superTypeName, methodName, context)
         superMethod == null
     }
     return superMethod

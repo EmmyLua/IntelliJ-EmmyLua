@@ -16,8 +16,8 @@
 
 package com.tang.intellij.lua.project
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil
@@ -77,7 +77,7 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
      */
     var languageLevel = LuaLanguageLevel.LUA53
 
-    override fun getState(): LuaSettings? {
+    override fun getState(): LuaSettings {
         return this
     }
 
@@ -106,7 +106,7 @@ class LuaSettings : PersistentStateComponent<LuaSettings> {
     companion object {
 
         val instance: LuaSettings
-            get() = ServiceManager.getService(LuaSettings::class.java)
+            get() = ApplicationManager.getApplication().getService(LuaSettings::class.java)
 
         fun isConstructorName(name: String): Boolean {
             return instance.constructorNames.contains(name)

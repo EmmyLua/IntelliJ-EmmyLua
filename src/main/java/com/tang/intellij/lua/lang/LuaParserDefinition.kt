@@ -70,10 +70,6 @@ class LuaParserDefinition : ParserDefinition {
         return LuaPsiFile(viewProvider)
     }
 
-    override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements {
-        return ParserDefinition.SpaceRequirements.MAY
-    }
-
     override fun createElement(node: ASTNode): PsiElement {
         val type = node.elementType
         if (type === LuaElementType.DOC_COMMENT)

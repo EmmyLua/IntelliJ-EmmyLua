@@ -150,7 +150,7 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         for (i in 1 until chunkParts.size) {
             val chunkPart = chunkParts[i]
             val pathPart = pathParts[i]
-            if (chunkPart.toLowerCase() != pathPart.toLowerCase()) {
+            if (chunkPart.lowercase() != pathPart.lowercase()) {
                 break
             }
             neq = i
@@ -175,7 +175,7 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
     private fun getShortPath(file: VirtualFile): String {
         val myBaseDir = this.baseDir
         val path = file.canonicalPath
-        if (myBaseDir != null && path != null && path.toLowerCase().startsWith(myBaseDir.toLowerCase())) {
+        if (myBaseDir != null && path != null && path.lowercase().startsWith(myBaseDir.lowercase())) {
             return path.substring(myBaseDir.length + 1)
         }
         return LuaFileUtil.getShortPath(session.project, file)

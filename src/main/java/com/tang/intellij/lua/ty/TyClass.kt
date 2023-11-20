@@ -181,8 +181,24 @@ abstract class TyClass(override val className: String,
     }
 
     companion object {
+        /*
+         * WARNING: Risk of classloading deadlock
+         *
+         * Calling `createSerializedClass` uses the type `TyClass`.
+         * However, using the type `TyClass` requires all its static fields
+         * to be initialized. So the JVM can't run `createSerializedClass` without
+         * having `TyClass`, and it can't use `TyClass` without running `createSerializedClass`.
+         * Thus the JVM deadlocks during classloading, resulting in frozen indexing...
+         * 
+         * Workaround this by using Kotlin lazy properties,
+         * so `createSerializedClass` is not run until TyClass.G is actually accessed.
+         *
+         * See issue #510 and Ty.kt for more info on this bug.
+         * -- Techcable
+         */
+
         // for _G
-        val G: TyClass = createSerializedClass(Constants.WORD_G)
+        val G: TyClass by lazy { createSerializedClass(Constants.WORD_G) }
 
         fun createAnonymousType(nameDef: LuaNameDef): TyClass {
             val stub = nameDef.stub

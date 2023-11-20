@@ -22,8 +22,8 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
+import com.tang.intellij.lua.psi.search.LuaShortNamesManager
 import com.tang.intellij.lua.search.SearchContext
-import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 
 fun resolveLocal(ref: LuaNameExpr, context: SearchContext? = null) = resolveLocal(ref.name, ref, context)
 
@@ -93,7 +93,7 @@ fun resolve(nameExpr: LuaNameExpr, context: SearchContext): PsiElement? {
         val target = (resolveResult as? LuaNameExpr) ?: nameExpr
         val refName = target.name
         val moduleName = target.moduleName ?: Constants.WORD_G
-        LuaClassMemberIndex.process(moduleName, refName, context, Processor {
+        LuaShortNamesManager.getInstance(context.project).processMembers(moduleName, refName, context, {
             resolveResult = it
             false
         })
@@ -111,7 +111,7 @@ fun multiResolve(ref: LuaNameExpr, context: SearchContext): Array<PsiElement> {
     } else {
         val refName = ref.name
         val module = ref.moduleName ?: Constants.WORD_G
-        LuaClassMemberIndex.process(module, refName, context, Processor {
+        LuaShortNamesManager.getInstance(context.project).processMembers(module, refName, context, {
             list.add(it)
             true
         })
@@ -175,7 +175,13 @@ fun resolveRequireFile(pathString: String?, project: Project): LuaPsiFile? {
     if (pathString == null)
         return null
     val fileName = pathString.replace('.', '/')
-    val f = LuaFileUtil.findFile(project, fileName)
+    var f = LuaFileUtil.findFile(project, fileName)
+
+    // issue #415, support init.lua
+    if (f == null || f.isDirectory) {
+        f = LuaFileUtil.findFile(project, "$fileName/init")
+    }
+
     if (f != null) {
         val psiFile = PsiManager.getInstance(project).findFile(f)
         if (psiFile is LuaPsiFile)
