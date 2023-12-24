@@ -22,7 +22,6 @@ import com.intellij.util.BitUtil
 import com.intellij.util.io.StringRef
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.psi.impl.LuaClassMethodDefImpl
-import com.tang.intellij.lua.search.SearchContext
 import com.tang.intellij.lua.stubs.index.LuaClassMemberIndex
 import com.tang.intellij.lua.stubs.index.StubKeys
 import com.tang.intellij.lua.ty.*
@@ -40,18 +39,8 @@ class LuaClassMethodType : LuaStubElementType<LuaClassMethodStub, LuaClassMethod
     override fun createStub(methodDef: LuaClassMethodDef, stubElement: StubElement<*>): LuaClassMethodStub {
         val methodName = methodDef.classMethodName
         val id = methodDef.nameIdentifier
-        val expr = methodName.expr
+        // val expr = methodName.expr
         val classNameSet = mutableListOf<ITyClass>()
-
-        val ty = SearchContext.withStub(methodDef.project, methodDef.containingFile, Ty.UNKNOWN) {
-            SearchContext.infer(expr, it)
-        }
-        TyUnion.each(ty) {
-            if (it is ITyClass)
-                classNameSet.add(it)
-        }
-        if (classNameSet.isEmpty()) classNameSet.add(createSerializedClass(expr.text))
-
         var flags = 0
 
         val isStatic = methodName.dot != null
