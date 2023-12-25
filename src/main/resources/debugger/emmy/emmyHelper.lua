@@ -16,6 +16,97 @@
 ---@field createNode fun(): Variable
 local emmy = {}
 
+local function convertStringToHex(str)
+    return (str:gsub('.', function (c)
+        return string.format('%02X', string.byte(c))
+    end))
+end
+
+local printableChars = {
+    [8] = true,   -- Backspace
+    [9] = true,   -- Horizontal tab
+    [10] = true,  -- Line feed
+    [12] = true,  -- Form feed
+    [13] = true,  -- Carriage return
+}
+
+local function isPrintable(charNum)
+    -- Check if charNum is in the range of printable ASCII characters
+    -- or if it's one of the control characters considered printable
+    return (charNum >= 32 and charNum <= 126) or printableChars[charNum] == true
+end
+
+local function convertHexToPrintableASCIIString(hexStr)
+    return (hexStr:gsub('(%x%x)', function(h)
+        local charNum = tonumber(h, 16)
+        return isPrintable(charNum) and string.char(charNum) or "�"
+    end))
+end
+
+local find = string.find
+local function isValidUtf8AndPrintable(str)
+    local i, len = 1, #str
+    local isValidUtf8 = true
+
+    while i <= len do
+        local byte = string.byte(str, i)
+        if i == find(str, "[%z\1-\127]", i) then
+            if not isPrintable(byte) then
+                return false
+            end
+            i = i + 1
+        elseif i == find(str, "[\194-\223][\128-\191]", i) then
+            i = i + 2
+        elseif i == find(str,        "\224[\160-\191][\128-\191]", i)
+                or i == find(str, "[\225-\236][\128-\191][\128-\191]", i)
+                or i == find(str,        "\237[\128-\159][\128-\191]", i)
+                or i == find(str, "[\238-\239][\128-\191][\128-\191]", i) then
+            i = i + 3
+        elseif i == find(str,        "\240[\144-\191][\128-\191][\128-\191]", i)
+                or i == find(str, "[\241-\243][\128-\191][\128-\191][\128-\191]", i)
+                or i == find(str,        "\244[\128-\143][\128-\191][\128-\191]", i) then
+            i = i + 4
+        else
+            isValidUtf8 = false
+            break
+        end
+    end
+
+    return isValidUtf8
+end
+
+local EmmyStringOutputMode = {
+    Auto = "Auto",
+    Concise = "Concise",
+    Complete = "Complete",
+}
+
+local function processNonPrintable(objStr)
+    local hexStr = convertStringToHex(objStr)
+    local printableASCIISStr = convertHexToPrintableASCIIString(hexStr)
+    return string.format("[Hex]:%s  [ASCII]:%s  [tostring]:%s", hexStr, printableASCIISStr, objStr)
+end
+
+local function processString(objStr)
+    local currentOutputMode = rawget(_G , "EmmyStringOutputMode")
+    if currentOutputMode == nil then
+        currentOutputMode = EmmyStringOutputMode.Auto
+    end
+    if currentOutputMode == EmmyStringOutputMode.Auto then
+        if isValidUtf8AndPrintable(objStr) then
+            return objStr
+        else
+            return processNonPrintable(objStr)
+        end
+    elseif currentOutputMode == EmmyStringOutputMode.Concise then
+        return objStr
+    elseif currentOutputMode == EmmyStringOutputMode.Complete then
+        return processNonPrintable(objStr)
+    else
+        return string.format("Error: 'processString' function received an unimplemented 'StringOutputMode': %s. Please use one of the implemented modes: 'Auto'(0), 'Concise'(1), or 'Complete'(2).", tostring(currentOutputMode))
+    end
+end
+
 ---@class Variable
 ---@field query fun(self: Variable, obj: any, depth: number, queryHelper: boolean):void
 ---@field name string
@@ -32,6 +123,9 @@ local toluaHelper = {
                 variable.valueTypeName = cname
                 return true
             end
+        elseif typeName == 'string' then
+            variable.value = processString(tostring(obj))
+            return true
         elseif typeName == 'userdata' then
             local mt = getmetatable(obj)
             if mt == nil then return false end
@@ -135,6 +229,9 @@ local xluaDebugger = {
 
                 return true
             end
+        elseif typeName == 'string' then
+            variable.value = processString(tostring(obj))
+            return true
         end
     end
 }
@@ -172,6 +269,9 @@ local cocosLuaDebugger = {
                     end
                 end
             end
+            return true
+        elseif typeName == 'string' then
+            variable.value = processString(tostring(obj))
             return true
         end
     end
