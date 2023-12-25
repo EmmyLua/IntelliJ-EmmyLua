@@ -207,6 +207,14 @@ public class EmmyDebugSettingsPanel extends SettingsEditor<EmmyDebugConfiguratio
 
     private void updateCodeImpl() {
         StringBuilder sb = new StringBuilder();
+
+        sb.append("local EmmyStringOutputMode = {\n")
+                .append("    Auto = 'Auto',\n")
+                .append("    Concise = 'Concise',\n")
+                .append("    Complete = 'Complete',\n")
+                .append("}\n")
+                .append("rawset(_G, 'EmmyStringOutputMode', EmmyStringOutputMode.Auto)\n");
+
         if (SystemInfoRt.isWindows) {
             EmmyWinArch arch = x64RadioButton.isSelected() ? EmmyWinArch.X64 : EmmyWinArch.X86;
             sb.append("package.cpath = package.cpath .. ';")
