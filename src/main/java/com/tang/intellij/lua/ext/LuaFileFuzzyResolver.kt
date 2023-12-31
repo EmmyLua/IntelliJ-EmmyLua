@@ -21,9 +21,14 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.ProjectAndLibrariesScope
+import com.tang.intellij.lua.search.SearchContext
 
 class LuaFileFuzzyResolver : ILuaFileResolver {
     override fun find(project: Project, shortUrl: String, extNames: Array<String>): VirtualFile? {
+        val context = SearchContext.get(project)
+        if (context.forStub)
+            return null;
+
         var perfect: VirtualFile? = null
         val names = shortUrl.split('/')
         val fileName = names.lastOrNull()
