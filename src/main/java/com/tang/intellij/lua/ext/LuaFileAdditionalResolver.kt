@@ -25,15 +25,23 @@ import com.tang.intellij.lua.project.LuaSettings
 class LuaFileAdditionalResolver : ILuaFileResolver {
     override fun find(project: Project, shortUrl: String, extNames: Array<String>): VirtualFile? {
         val sourcesRoot = LuaSettings.instance.additionalSourcesRoot
+        var firstMatch: VirtualFile? = null
         for (sr in sourcesRoot) {
             for (ext in extNames) {
                 val path = "$sr/$shortUrl$ext"
                 val file = VirtualFileManager.getInstance().findFileByUrl(VfsUtil.pathToUrl(path))
                 if (file != null && !file.isDirectory) {
-                    return file
+                    firstMatch = firstMatch ?: file
+                    val filePath = file.canonicalPath
+                    val projectBasePath = project.basePath
+                    // Is the file in the project folder?
+                    if(filePath != null && projectBasePath != null && filePath.startsWith(projectBasePath))
+                        return file
                 }
             }
         }
-        return null
+        // If no file is found or found files do not in project folder, return the first match (maybe bull)
+        // the same as previous behaviour
+        return firstMatch
     }
 }
