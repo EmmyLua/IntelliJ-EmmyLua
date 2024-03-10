@@ -41,6 +41,15 @@ data class BuildData(
 
 val buildDataList = listOf(
     BuildData(
+        ideaSDKShortVersion = "241",
+        ideaSDKVersion = "241.14494.17-EAP-SNAPSHOT",
+        sinceBuild = "232",
+        untilBuild = "241.*",
+        bunch = "212",
+        targetCompatibilityLevel = JavaVersion.VERSION_17,
+        jvmTarget = "17"
+    ),
+    BuildData(
         ideaSDKShortVersion = "231",
         // 223.7571.123-EAP-SNAPSHOT
         // LATEST-EAP-SNAPSHOT
