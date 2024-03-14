@@ -45,6 +45,7 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
 
     override fun sessionInitialized() {
         super.sessionInitialized()
+        session.setPauseActionSupported(true)
         ApplicationManager.getApplication().executeOnPooledThread {
             setupTransporter()
         }
@@ -69,6 +70,7 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
                 registerBreakpoint(position, breakpoint)
             }
         }
+        session.setPauseActionSupported(true);
         // send ready
         transporter?.send(Message(MessageCMD.ReadyReq))
     }
@@ -208,7 +210,6 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
     override fun getEditorsProvider(): XDebuggerEditorsProvider {
         return editorsProvider
     }
-
     fun addEvalResultHandler(handler: IEvalResultHandler) {
         evalHandlers.add(handler)
     }
