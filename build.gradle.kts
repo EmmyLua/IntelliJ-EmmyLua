@@ -59,29 +59,6 @@ val buildDataList = listOf(
         bunch = "212",
         targetCompatibilityLevel = JavaVersion.VERSION_17,
         jvmTarget = "17"
-    ),
-    BuildData(
-        ideaSDKShortVersion = "223",
-        ideaSDKVersion = "2022.3",
-        sinceBuild = "223",
-        untilBuild = "223.*",
-        bunch = "212",
-        targetCompatibilityLevel = JavaVersion.VERSION_17,
-        jvmTarget = "17"
-    ),
-    BuildData(
-        ideaSDKShortVersion = "222",
-        ideaSDKVersion = "2022.2",
-        sinceBuild = "212",
-        untilBuild = "222.*",
-        bunch = "212"
-    ),
-    BuildData(
-        ideaSDKShortVersion = "211",
-        ideaSDKVersion = "2021.1",
-        sinceBuild = "211",
-        untilBuild = "211.*",
-        bunch = "203"
     )
 )
 
