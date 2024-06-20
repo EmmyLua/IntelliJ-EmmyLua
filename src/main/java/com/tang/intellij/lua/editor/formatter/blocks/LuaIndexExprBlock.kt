@@ -31,14 +31,16 @@ class LuaIndexExprBlock(psi: LuaIndexExpr, wrap: Wrap?, alignment: Alignment?, i
     private val dotAlign = Alignment.createAlignment(true)
 
     private val align: Alignment? get() {
-        val p = parentBlock ?: return dotAlign
-        if (p is LuaIndexExprBlock)
-            return p.align
-        else {
-            if (p.elementType == LuaTypes.CALL_EXPR) {
-                val pp = p.parentBlock
-                if (pp is LuaIndexExprBlock)
-                    return pp.align
+        if (ctx.settings.ALIGN_MULTILINE_CHAINED_METHODS) {
+            val p = parentBlock ?: return dotAlign
+            if (p is LuaIndexExprBlock)
+                return p.align
+            else {
+                if (p.elementType == LuaTypes.CALL_EXPR) {
+                    val pp = p.parentBlock
+                    if (pp is LuaIndexExprBlock)
+                        return pp.align
+                }
             }
         }
         return dotAlign
