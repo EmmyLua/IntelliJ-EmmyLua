@@ -103,3 +103,58 @@
 ---@class void
 
 ---@class self
+
+---@class UseArgString1
+
+---@class UseArgString2
+
+---@class UseArgString3
+
+---@class UseArgString4
+
+---@class UseArgString5
+
+---@class UseArgString6
+
+---@class UseArgString7
+
+---@class UseArgString8
+
+---@class UseArgString9
+
+
+---@class UseArgName1
+
+---@class UseArgName2
+
+---@class UseArgName3
+
+---@class UseArgName4
+
+---@class UseArgName5
+
+---@class UseArgName6
+
+---@class UseArgName7
+
+---@class UseArgName8
+
+---@class UseArgName9
+
+---@class UseArgFullName1
+
+---@class UseArgFullName2
+
+---@class UseArgFullName3
+
+---@class UseArgFullName4
+
+---@class UseArgFullName5
+
+---@class UseArgFullName6
+
+---@class UseArgFullName7
+
+---@class UseArgFullName8
+
+---@class UseArgFullName9
