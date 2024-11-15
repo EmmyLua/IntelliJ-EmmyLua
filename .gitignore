@@ -33,3 +33,4 @@ jflex*.jar
 *.sdf
 *.iobj
 *.ipdb
+.intellijPlatform

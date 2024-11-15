@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-import de.undercouch.gradle.tasks.download.*
+import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import java.io.ByteArrayOutputStream
 
+fun properties(key: String) = providers.gradleProperty(key)
+
 plugins {
-    id("org.jetbrains.intellij").version("1.13.3")
-    id("org.jetbrains.kotlin.jvm").version("1.8.21")
+    id("org.jetbrains.intellij.platform") version "2.0.1"
+    id("org.jetbrains.kotlin.jvm") version "2.0.21"
     id("de.undercouch.download").version("5.3.0")
 }
 
@@ -42,7 +46,7 @@ data class BuildData(
 val buildDataList = listOf(
     BuildData(
         ideaSDKShortVersion = "243",
-        ideaSDKVersion = "243.21565.193",
+        ideaSDKVersion = "2024.3",
         sinceBuild = "243",
         untilBuild = "243.*",
         bunch = "212",
@@ -146,9 +150,15 @@ task("installEmmyDebugger", type = Copy::class) {
 }
 
 project(":") {
+    apply(plugin = "org.jetbrains.intellij.platform")
+
     repositories {
-        maven(url = "https://www.jetbrains.com/intellij-repository/releases")
         mavenCentral()
+        intellijPlatform {
+            defaultRepositories()
+            jetbrainsRuntime()
+            nightly()
+        }
     }
 
     dependencies {
@@ -158,6 +168,18 @@ project(":") {
         implementation("org.luaj:luaj-jse:3.0.1")
         implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5")
         implementation("com.jgoodies:forms:1.2.1")
+
+        intellijPlatform {
+            create("IC", buildVersionData.ideaSDKVersion, useInstaller = properties("useInstaller").get().toBoolean())
+            instrumentationTools()
+            jetbrainsRuntime()
+
+            // some code used in tests was moved to the java plugin and not available in the platform
+            bundledPlugins("com.intellij.java")
+            testFramework(TestFrameworkType.Plugin.Java)
+        }
+        testImplementation("junit:junit:4.13.2")
+        testImplementation("org.opentest4j:opentest4j:1.3.0")
     }
 
     sourceSets {
@@ -166,20 +188,6 @@ project(":") {
             resources.exclude("debugger/**")
             resources.exclude("std/**")
         }
-    }
-
-    /*configure<JavaPluginConvention> {
-        sourceCompatibility = buildVersionData.targetCompatibilityLevel
-        targetCompatibility = buildVersionData.targetCompatibilityLevel
-    }*/
-
-    intellij {
-        type.set("IC")
-        updateSinceUntilBuild.set(false)
-        downloadSources.set(!isCI)
-        version.set(buildVersionData.ideaSDKVersion)
-        //localPath.set(System.getenv("IDEA_HOME_${buildVersionData.ideaSDKShortVersion}"))
-        sandboxDir.set("${project.buildDir}/${buildVersionData.ideaSDKShortVersion}/idea-sandbox")
     }
 
     task("bunch") {
@@ -228,25 +236,18 @@ project(":") {
             untilBuild.set(buildVersionData.untilBuild)
         }
 
-        instrumentCode {
-            compilerVersion.set(buildVersionData.instrumentCodeCompilerVersion)
-        }
-
         publishPlugin {
             token.set(System.getenv("IDEA_PUBLISH_TOKEN"))
         }
 
-        withType<org.jetbrains.intellij.tasks.PrepareSandboxTask> {
-            doLast {
-                copy {
-                    from("src/main/resources/std")
-                    into("$destinationDir/${pluginName.get()}/std")
-                }
-                copy {
-                    from("src/main/resources/debugger")
-                    into("$destinationDir/${pluginName.get()}/debugger")
-                }
-            }
+        withType<PrepareSandboxTask> {
+            inputs.dir("src/main/resources/std")
+            inputs.dir("src/main/resources/debugger")
+
+            intoChild(intellijPlatform.projectName.map { projectName -> "$projectName/std" })
+                .from(file("src/main/resources/std"))
+            intoChild(intellijPlatform.projectName.map { projectName -> "$projectName/debugger" })
+                .from(file("src/main/resources/debugger"))
         }
     }
 }
