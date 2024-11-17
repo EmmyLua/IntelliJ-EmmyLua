@@ -32,7 +32,6 @@ import com.intellij.xdebugger.breakpoints.XBreakpointHandler
 import com.intellij.xdebugger.breakpoints.XBreakpointProperties
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.frame.XSuspendContext
-import com.intellij.xdebugger.impl.XDebugSessionImpl
 import com.intellij.xdebugger.impl.actions.XDebuggerActions
 
 /**
@@ -144,11 +143,13 @@ abstract class LuaDebugProcess protected constructor(session: XDebugSession) : X
                     }
                 } else {
                     ApplicationManager.getApplication().invokeLater {
-                        val se = session
+                        // todo: fix "Internal classes usages" & "Internal methods usages" problem
+                        /*val se = session
                         if (se is XDebugSessionImpl)
                             se.positionReached(LuaSuspendContext(stack), true)
                         else
-                            se.positionReached(LuaSuspendContext(stack))
+                            se.positionReached(LuaSuspendContext(stack))*/
+                        session.positionReached(LuaSuspendContext(stack))
                         session.showExecutionPoint()
                     }
                 }

@@ -34,13 +34,14 @@ open class LuaLibraryRootsComponentDescriptor : LibraryRootsComponentDescriptor(
 
     override fun createAttachFilesChooserDescriptor(libraryName: String?): FileChooserDescriptor {
         return object : FileChooserDescriptor(super.createAttachFilesChooserDescriptor(libraryName)) {
-            override fun isFileVisible(file: VirtualFile, showHiddenFiles: Boolean): Boolean {
+            // todo: fix "Non-extendable method usage violation" problem
+            /*override fun isFileVisible(file: VirtualFile, showHiddenFiles: Boolean): Boolean {
                 if (file.isDirectory)
                     return true
 
                 val ext = file.extension
                 return ext != null && ext.equals("zip", ignoreCase = true)
-            }
+            }*/
         }
     }
 

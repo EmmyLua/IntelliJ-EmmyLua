@@ -26,7 +26,6 @@ import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.XLineBreakpoint
 import com.intellij.xdebugger.evaluation.XDebuggerEditorsProvider
 import com.intellij.xdebugger.frame.XSuspendContext
-import com.intellij.xdebugger.impl.XDebugSessionImpl
 import com.tang.intellij.lua.debugger.*
 import com.tang.intellij.lua.psi.LuaFileManager
 import com.tang.intellij.lua.psi.LuaFileUtil
@@ -170,11 +169,13 @@ abstract class EmmyDebugProcessBase(session: XDebugSession) : LuaDebugProcess(se
             }
         } else {
             ApplicationManager.getApplication().invokeLater {
-                val se = session
+                // todo: fix "Internal classes usages" & "Internal methods usages" problem
+                /*val se = session
                 if (se is XDebugSessionImpl)
                     se.positionReached(LuaSuspendContext(stack), true)
                 else
-                    se.positionReached(LuaSuspendContext(stack))
+                    se.positionReached(LuaSuspendContext(stack))*/
+                session.positionReached(LuaSuspendContext(stack))
                 session.showExecutionPoint()
             }
         }
