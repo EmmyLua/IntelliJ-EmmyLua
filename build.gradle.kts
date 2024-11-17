@@ -43,7 +43,7 @@ val buildDataList = listOf(
     BuildData(
         ideaSDKShortVersion = "243",
         ideaSDKVersion = "243.21565.193",
-        sinceBuild = "232",
+        sinceBuild = "243",
         untilBuild = "243.*",
         bunch = "212",
         targetCompatibilityLevel = JavaVersion.VERSION_17,
