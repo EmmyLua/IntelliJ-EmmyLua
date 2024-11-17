@@ -19,7 +19,6 @@ package com.tang.intellij.lua.debugger.remote.value
 import com.intellij.icons.AllIcons
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator
 import com.intellij.xdebugger.frame.*
-import com.intellij.xdebugger.impl.XDebugSessionImpl
 import com.tang.intellij.lua.debugger.remote.LuaMobDebugProcess
 import org.luaj.vm2.LuaValue
 
@@ -75,11 +74,13 @@ class LuaRTable(name: String) : LuaRValue(name) {
 
                 override fun evaluated(tv: XValue) {
                     //////////tmp solution,非栈顶帧处理
-                    var tableValue = tv
-                    if (data != null && !(process.session as XDebugSessionImpl).isTopFrameSelected)
-                        tableValue = LuaRValue.create(myName, data as LuaValue, myName, process.session)
+                    // todo: fix "Internal classes usages" & "Internal methods usages" problem
+                    //var tableValue = tv
+                    //if (data != null && !(process.session as XDebugSessionImpl).isTopFrameSelected)
+                    //    tableValue = LuaRValue.create(myName, data as LuaValue, myName, process.session)
                     //////////
 
+                    val tableValue = tv
                     val list = XValueChildrenList()
                     val tbl = tableValue as? LuaRTable ?: return
                     val table = tbl.data?.checktable()

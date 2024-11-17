@@ -22,15 +22,11 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Pass
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.RefactoringActionHandler
 import com.intellij.refactoring.introduce.inplace.InplaceVariableIntroducer
 import com.intellij.refactoring.introduce.inplace.OccurrencesChooser
-import com.intellij.refactoring.suggested.createSmartPointer
 import com.tang.intellij.lua.psi.*
 import com.tang.intellij.lua.refactoring.LuaRefactoringUtil
 
