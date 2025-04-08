@@ -29,9 +29,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build 2023.1
+      - name: Build 2024.3
         env:
-          IDEA_VER: 231
+          IDEA_VER: 243
         run: ./gradlew buildPlugin
 
       - name: Upload artifact
