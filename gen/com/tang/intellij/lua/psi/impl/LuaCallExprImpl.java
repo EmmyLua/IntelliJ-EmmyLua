@@ -2,6 +2,9 @@
 package com.tang.intellij.lua.psi.impl;
 
 import java.util.List;
+
+import com.tang.intellij.lua.ty.TyAliasSubstitutor;
+import groovy.lang.Tuple4;
 import org.jetbrains.annotations.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -58,9 +61,88 @@ public class LuaCallExprImpl extends LuaCallExprMixin implements LuaCallExpr {
   }
 
   @Override
+  @NotNull
+  public ITy guessType(SearchContext context) {
+    ITy ty = SearchContext.Companion.infer(this, context);
+    String typeName = ty.getDisplayName();
+    boolean isDynamic = false;
+    Tuple4<Boolean, String, String, String> t;
+    do
+    {
+      t = getStringArgByTypeName(typeName, "UseArgString");
+      isDynamic = t.getV1();
+      if(isDynamic) break;
+
+      t = getStringArgByTypeName(typeName, "UseArgName");
+      isDynamic = t.getV1();
+      if (isDynamic) break;
+
+      t = getStringArgByTypeName(typeName, "UseArgFullName");
+      isDynamic = t.getV1();
+      if (isDynamic) break;
+
+    }while (false);
+
+    if(isDynamic) {
+      ty = LuaPsiImplUtilKt.newType((String)t.getV2(), ty, (String)t.getV3(), (String)t.getV4());
+    }
+
+    ty = TyAliasSubstitutor.Companion.substitute(ty, context);
+    return ty;
+  }
+
+  @Nullable
+  public Tuple4<Boolean, String, String, String> getStringArgByTypeName(String typeName, String argType) {
+    int start = 0;
+    int index = 0;
+    String replaceStr = "";
+    String str = "";
+    Boolean result = false;
+
+    if ((start = typeName.indexOf(argType)) >= 0) {
+      int length = argType.length();
+      replaceStr = argType;
+      if(start + length < typeName.length())
+      {
+        index = typeName.charAt(start + length) - '1';
+        replaceStr = argType + Integer.toString(index + 1);
+      }
+
+      if(index >= 0 && index <= 9)
+      {
+        result = true;
+        if (argType == "UseArgString")
+        {
+          PsiElement p = LuaPsiImplUtilKt.getStringArgByIndex(this, index);
+          str = LuaPsiImplUtilKt.getStringValue(p);
+        }
+        else if (argType == "UseArgName")
+        {
+          PsiElement p = LuaPsiImplUtilKt.getParamNameByIndex(this, index);
+          str = LuaPsiImplUtilKt.getParamStringValue(p);
+        }
+        else if (argType == "UseArgFullName")
+        {
+          PsiElement p = LuaPsiImplUtilKt.getParamNameByIndex(this, index);
+          str = LuaPsiImplUtilKt.getParamAllStringValue(p);
+        }
+        if (str != "") {
+          typeName = typeName.replace(replaceStr, str);
+        }
+      }
+    }
+    return new Tuple4<Boolean, String, String, String>(result, typeName, replaceStr, str);
+  }
+
+
   @Nullable
   public PsiElement getFirstStringArg() {
-    return LuaPsiImplUtilKt.getFirstStringArg(this);
+    return LuaPsiImplUtilKt.getStringArgByIndex(this, 0);
+  }
+
+  @Nullable
+  public PsiElement getFirstParamArg() {
+    return LuaPsiImplUtilKt.getParamNameByIndex(this, 0);
   }
 
   @Override
