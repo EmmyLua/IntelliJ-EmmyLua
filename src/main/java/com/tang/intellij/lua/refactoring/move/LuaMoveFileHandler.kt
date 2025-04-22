@@ -24,8 +24,8 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNamedElement
 import com.intellij.refactoring.move.moveFilesOrDirectories.MoveFileHandler
 import com.intellij.usageView.UsageInfo
-import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.psi.LuaFileUtil
+import com.tang.intellij.lua.psi.LuaPsiFile
 import com.tang.intellij.lua.reference.LuaRequireReference
 import java.util.*
 
@@ -60,7 +60,7 @@ class LuaMoveFileHandler : MoveFileHandler() {
         return usages
     }
 
-    override fun retargetUsages(usageInfos: MutableList<UsageInfo>, oldToNewMap: MutableMap<PsiElement, PsiElement>) {
+    override fun retargetUsages(usageInfos: MutableList<out UsageInfo>, oldToNewMap: MutableMap<PsiElement, PsiElement>) {
         for (usageInfo in usageInfos) {
             val reference = usageInfo.reference
             if (reference is LuaRequireReference) {
