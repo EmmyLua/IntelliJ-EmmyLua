@@ -17,7 +17,6 @@
 package com.tang.intellij.lua.errorreporting
 
 import com.intellij.CommonBundle
-import com.intellij.diagnostic.AbstractMessage
 import com.intellij.ide.DataManager
 import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.ide.plugins.PluginUtil
@@ -172,7 +171,8 @@ class GitHubErrorReporter : LuaErrorReportSubmitter() {
 			}
 		}
 
-		(event.data as? AbstractMessage)?.let { bean.attachments = it.includedAttachments }
+		// fix compatibility verification problems: internal API usages
+		// (event.data as? AbstractMessage)?.let { bean.attachments = it.includedAttachments }
 		val project = CommonDataKeys.PROJECT.getData(dataContext)
 		val reportValues = getKeyValuePairs(
 				project,
