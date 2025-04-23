@@ -23,6 +23,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElementVisitor
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.refactoring.RefactoringFactory
+import com.intellij.util.Processor
 import com.tang.intellij.lua.Constants
 import com.tang.intellij.lua.comment.psi.LuaDocPsiElement
 import com.tang.intellij.lua.psi.LuaLocalDef
@@ -44,12 +45,12 @@ class RemoveUnusedLocal : LocalInspectionTool() {
                     return
                 val search = ReferencesSearch.search(o, o.useScope)
                 var found = false
-                for (reference in search) {
+                search.forEach(Processor { reference ->
                     if (reference.element !is LuaDocPsiElement) {
                         found = true
-                        break
                     }
-                }
+                    !found
+                })
                 if (!found) {
                     holder.registerProblem(o,
                             "Unused parameter : '${o.name}'",

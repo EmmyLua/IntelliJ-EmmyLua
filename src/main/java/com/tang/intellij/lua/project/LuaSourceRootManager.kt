@@ -37,7 +37,7 @@ class LuaSourceRootManager(val project: Project) : PersistentStateComponent<LuaS
         val TOPIC: Topic<LuaSourceRootListener> = Topic.create("lua project source root changes", LuaSourceRootListener::class.java)
 
         fun getInstance(project: Project): LuaSourceRootManager {
-            return project.getComponent(LuaSourceRootManager::class.java)
+            return project.getService(LuaSourceRootManager::class.java)
         }
     }
 

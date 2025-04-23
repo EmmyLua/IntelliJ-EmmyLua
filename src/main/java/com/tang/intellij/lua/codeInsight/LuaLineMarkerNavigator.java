@@ -40,6 +40,7 @@ public abstract class LuaLineMarkerNavigator<T extends PsiElement, S extends Psi
         if (search != null) {
             search.forEach(t1 -> {
                 navElements.add((NavigatablePsiElement) t1);
+                return true;
             });
             PsiElementListNavigator.openTargets(mouseEvent,
                     navElements.toArray(new NavigatablePsiElement[0]),
