@@ -332,12 +332,6 @@
                   topic="com.intellij.openapi.fileTypes.FileTypeListener"/>
     </applicationListeners>
 
-    <project-components>
-        <component>
-            <implementation-class>com.tang.intellij.lua.project.LuaSourceRootManager</implementation-class>
-        </component>
-    </project-components>
-
     <actions>
         <group id="LuaCallHierarchyPopupMenu">
             <reference ref="EditSource"/>
