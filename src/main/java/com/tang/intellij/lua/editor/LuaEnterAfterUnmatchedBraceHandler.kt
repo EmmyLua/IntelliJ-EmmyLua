@@ -67,6 +67,7 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
             var shouldClose = false
             var range: PsiElement? = null
             var cur: PsiElement = lElement
+            val endTypeAtCaret = getEnd(cur.parent.node.elementType)
             while (true) {
                 val searched = cur.parent
                 if (searched == null || searched is PsiFile) break
@@ -86,9 +87,9 @@ class LuaEnterAfterUnmatchedBraceHandler : EnterHandlerDelegate {
                 val endType = getEnd(range.node.elementType)
                 val document = editor.document
                 if (rElement !is PsiWhiteSpace)
-                    document.insertString(caretOffset, "$endType ")
+                    document.insertString(caretOffset, "$endTypeAtCaret ")
                 else
-                    document.insertString(caretOffset, "$endType")
+                    document.insertString(caretOffset, "$endTypeAtCaret")
                 editorActionHandler?.execute(editor, editor.caretModel.currentCaret, dataContext)
 
                 val project = lElement.project
