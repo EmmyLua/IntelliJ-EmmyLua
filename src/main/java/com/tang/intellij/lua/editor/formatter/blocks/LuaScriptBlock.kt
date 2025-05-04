@@ -139,9 +139,11 @@ open class LuaScriptBlock(val psi: PsiElement,
     }
 
     override fun getSpacing(child1: Block?, child2: Block): Spacing? {
-        if ((child1 is LuaScriptBlock && child1.psi is LuaStatement) &&
-                (child2 is LuaScriptBlock && child2.psi is LuaStatement)) {
-            return Spacing.createSpacing(1, 0, 1, true, 1)
+        if (!ctx.settings.KEEP_MULTIPLE_EXPRESSIONS_IN_ONE_LINE) {
+            if ((child1 is LuaScriptBlock && child1.psi is LuaStatement) &&
+                    (child2 is LuaScriptBlock && child2.psi is LuaStatement)) {
+                return Spacing.createSpacing(1, 0, 1, true, 1)
+            }
         }
         return ctx.spaceBuilder.getSpacing(this, child1, child2)
     }
