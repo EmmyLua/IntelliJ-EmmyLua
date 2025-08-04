@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew buildPlugin
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: v${{ env.CI_BUILD_VERSION }}
           path: build/distributions/*.zip
