@@ -183,7 +183,7 @@ project(":") {
     }*/
 
     intellijPlatform {
-        version = buildVersionData.ideaSDKVersion
+        version = version
         sandboxContainer.set(layout.buildDirectory.dir("${buildVersionData.ideaSDKShortVersion}/idea-sandbox"))
     }
 
