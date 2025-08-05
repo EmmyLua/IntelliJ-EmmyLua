@@ -17,6 +17,7 @@
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.ByteArrayOutputStream
 
 plugins {
@@ -151,6 +152,7 @@ project(":") {
         mavenCentral()
         intellijPlatform {
             defaultRepositories()
+            marketplace()
         }
     }
 
@@ -220,20 +222,21 @@ project(":") {
             }
         }
 
+        processResources {
+            dependsOn("installEmmyDebugger")
+        }
+
         compileKotlin {
-            kotlinOptions {
-                jvmTarget = buildVersionData.jvmTarget
+            compilerOptions {
+                jvmTarget.set(JvmTarget.fromTarget(buildVersionData.jvmTarget))
             }
         }
 
         patchPluginXml {
+            dependsOn("installEmmyDebugger")
             sinceBuild.set(buildVersionData.sinceBuild)
             untilBuild.set(buildVersionData.untilBuild)
         }
-
-//        instrumentCode {
-//            compilerVersion.set(buildVersionData.instrumentCodeCompilerVersion)
-//        }
 
         publishPlugin {
             token.set(System.getenv("IDEA_PUBLISH_TOKEN"))
