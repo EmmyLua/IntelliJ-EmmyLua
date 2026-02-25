@@ -43,13 +43,13 @@ data class BuildData(
 
 val buildDataList = listOf(
     BuildData(
-        ideaSDKShortVersion = "2025.3",
-        ideaSDKVersion = "253.28086.51",
-        sinceBuild = "253",
-        untilBuild = "253.*",
+        ideaSDKShortVersion = "2025.2",
+        ideaSDKVersion = "252.23892.409",
+        sinceBuild = "252",
+        untilBuild = "252.*",
         bunch = "212",
-        targetCompatibilityLevel = JavaVersion.VERSION_21,
-        jvmTarget = "21"
+        targetCompatibilityLevel = JavaVersion.VERSION_17,
+        jvmTarget = "17"
     )
 )
 
@@ -164,7 +164,7 @@ project(":") {
         implementation("org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5")
         implementation("com.jgoodies:forms:1.2.1")
         intellijPlatform {
-            intellijIdeaUltimate(buildVersionData.ideaSDKVersion)
+            intellijIdeaCommunity(buildVersionData.ideaSDKShortVersion)
             bundledModule("intellij.spellchecker")
         }
     }
