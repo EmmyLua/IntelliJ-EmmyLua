@@ -37,8 +37,8 @@ class LuaBraceMatcher : PairedBraceMatcher {
         return true
     }
 
-    override fun getCodeConstructStart(psiFile: PsiFile, i: Int): Int {
-        return i
+    override fun getCodeConstructStart(psiFile: PsiFile, openingOffset: Int): Int {
+        return openingOffset
     }
 
     companion object {
