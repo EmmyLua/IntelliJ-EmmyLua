@@ -75,6 +75,12 @@ class LuaLanguageCodeStyleSettingsProvider : LanguageCodeStyleSettingsProvider()
                         "Align table field assign",
                         "Table")
             }
+            SettingsType.COMMENTER_SETTINGS -> {
+                consumer.showStandardOptions(
+                    "LINE_COMMENT_ADD_SPACE",
+                    "LINE_COMMENT_AT_FIRST_COLUMN"
+                )
+            }
             else -> {
             }
         }
