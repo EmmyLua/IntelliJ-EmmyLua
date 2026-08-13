@@ -16,6 +16,8 @@
 
 import de.undercouch.gradle.tasks.download.Download
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.ByteArrayOutputStream
@@ -35,6 +37,7 @@ data class BuildData(
     val archiveName: String = "IntelliJ-EmmyLua",
     val jvmTarget: String = "1.8",
     val targetCompatibilityLevel: JavaVersion = JavaVersion.VERSION_11,
+    val buildJdkVersion: JavaVersion = targetCompatibilityLevel,
     val explicitJavaDependency: Boolean = true,
     val bunch: String = ideaSDKShortVersion,
     // https://github.com/JetBrains/gradle-intellij-plugin/issues/403#issuecomment-542890849
@@ -49,6 +52,7 @@ val buildDataList = listOf(
         untilBuild = "262.*",
         bunch = "212",
         targetCompatibilityLevel = JavaVersion.VERSION_21,
+        buildJdkVersion = JavaVersion.VERSION_25,
         jvmTarget = "21"
     )
 )
@@ -182,6 +186,10 @@ project(":") {
         targetCompatibility = buildVersionData.targetCompatibilityLevel
     }*/
 
+    kotlin {
+        jvmToolchain(buildVersionData.buildJdkVersion.majorVersion.toInt())
+    }
+
     intellijPlatform {
         version = version
         sandboxContainer.set(layout.buildDirectory.dir("${buildVersionData.ideaSDKShortVersion}/idea-sandbox"))
@@ -230,6 +238,13 @@ project(":") {
             compilerOptions {
                 jvmTarget.set(JvmTarget.fromTarget(buildVersionData.jvmTarget))
             }
+        }
+
+        withType<JavaCompile> {
+            javaCompiler.set(project.javaToolchains.compilerFor {
+                languageVersion.set(JavaLanguageVersion.of(buildVersionData.buildJdkVersion.majorVersion.toInt()))
+            })
+            options.release.set(buildVersionData.targetCompatibilityLevel.majorVersion.toInt())
         }
 
         patchPluginXml {
