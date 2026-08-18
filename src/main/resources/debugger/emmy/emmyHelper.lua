@@ -187,12 +187,7 @@ elseif xlua then
     emmy = xluaDebugger
 end
 
-local emmyHelper = rawget(_G, "emmyHelper")
-if emmyHelper == nil then
-    rawset(_G, 'emmyHelper', emmy)
-elseif emmy.queryVariable then
-    emmyHelper.queryVariable = emmy.queryVariable
-end
+rawset(_G, 'emmyHelper', emmy)
 
 local emmyHelperInit = rawget(_G, 'emmyHelperInit')
 if emmyHelperInit then
