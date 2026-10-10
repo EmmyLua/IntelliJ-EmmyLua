@@ -52,6 +52,7 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
         val commonSettings = settings.getCommonSettings(LuaLanguage.INSTANCE)
 
         return SpacingBuilder(settings, LuaLanguage.INSTANCE)
+                .before(SEMI).spaces(0)
                 .before(END).lineBreakInCode()
                 .after(DO).lineBreakInCode()
                 .after(THEN).lineBreakInCode()
@@ -78,7 +79,6 @@ class LuaFormattingModelBuilder : FormattingModelBuilder {
                 .before(RBRACK).none() // ]
                 .after(LPAREN).none() // no spaces after (
                 .before(RPAREN).none() // no spaces before )
-                .before(SEMI).spaces(0)
     }
 
     override fun getRangeAffectingIndent(psiFile: PsiFile, i: Int, astNode: ASTNode): TextRange? {
