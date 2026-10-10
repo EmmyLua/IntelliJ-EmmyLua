@@ -22,6 +22,8 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiNamedElement
 import com.intellij.util.BitUtil
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 interface LuaDeclarationTree {
     companion object {
@@ -382,8 +384,8 @@ private class LuaDeclarationTreePsi(file: PsiFile) : LuaDeclarationTreeBase(file
 }
 
 private class LuaDeclarationTreeStub(file: PsiFile) : LuaDeclarationTreeBase(file)  {
-    val map = mutableMapOf<PsiElement, Int>()
-    var count = 0
+    private val map = ConcurrentHashMap<PsiElement, Int>()
+    private val count = AtomicInteger()
 
     override fun shouldRebuild(): Boolean {
         return super.shouldRebuild() || (file as? LuaPsiFile)?.isContentsLoaded == true
@@ -422,6 +424,6 @@ private class LuaDeclarationTreeStub(file: PsiFile) : LuaDeclarationTreeBase(fil
     }
 
     override fun getPosition(psi: PsiElement): Int {
-        return map.getOrPut(psi) { count++ }
+        return map.computeIfAbsent(psi) { count.getAndIncrement() }
     }
 }
