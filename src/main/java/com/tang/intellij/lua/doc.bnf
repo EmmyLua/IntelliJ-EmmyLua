@@ -74,6 +74,8 @@
         TAG_NAME_GENERIC = 'generic'
         TAG_NAME_ALIAS = 'alias'
         TAG_NAME_SUPPRESS = 'suppress'
+        TAG_NAME_ENUM = 'enum'
+        ENUM_MODIFIER = 'ENUM_MODIFIER'
   ]
   implements("tag.*") = [
     "com.tang.intellij.lua.comment.psi.LuaDocTag"
@@ -90,6 +92,7 @@ private doc_item ::= '@' (tag_param
     | tag_vararg
     | tag_return
     | tag_class
+    | tag_enum
     | tag_field
     | tag_type
     | tag_lan
@@ -263,6 +266,13 @@ tag_class ::= (TAG_NAME_CLASS|TAG_NAME_MODULE) ID (EXTENDS class_name_ref)? comm
         superClassNameRef = 'class_name_ref'
         module = 'TAG_NAME_MODULE'
     ]
+}
+
+// @enum ENUM_ID
+// @enum (key) ENUM_ID
+tag_enum ::= TAG_NAME_ENUM ('(' ENUM_MODIFIER ')')? ID comment_string? {
+    pin = 1
+    elementType = tag_class
 }
 
 // @type CLASS_REF

@@ -47,6 +47,7 @@ public interface LuaDocTypes {
   IElementType AT = new LuaDocTokenType("@");
   IElementType COMMA = new LuaDocTokenType(",");
   IElementType DASHES = new LuaDocTokenType("DASHES");
+  IElementType ENUM_MODIFIER = new LuaDocTokenType("ENUM_MODIFIER");
   IElementType EQ = new LuaDocTokenType("=");
   IElementType EXTENDS = new LuaDocTokenType(":");
   IElementType FUN = new LuaDocTokenType("fun");
@@ -68,6 +69,7 @@ public interface LuaDocTypes {
   IElementType TAG_NAME = new LuaDocTokenType("TAG_NAME");
   IElementType TAG_NAME_ALIAS = new LuaDocTokenType("alias");
   IElementType TAG_NAME_CLASS = new LuaDocTokenType("class");
+  IElementType TAG_NAME_ENUM = new LuaDocTokenType("enum");
   IElementType TAG_NAME_FIELD = new LuaDocTokenType("field");
   IElementType TAG_NAME_GENERIC = new LuaDocTokenType("generic");
   IElementType TAG_NAME_LANGUAGE = new LuaDocTokenType("language");

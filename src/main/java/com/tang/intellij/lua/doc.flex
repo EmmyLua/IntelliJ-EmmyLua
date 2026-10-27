@@ -77,6 +77,8 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 %state xGENERIC
 %state xALIAS
 %state xSUPPRESS
+%state xENUM
+%state xENUM_KEY
 %state xDOUBLE_QUOTED_STRING
 %state xSINGLE_QUOTED_STRING
 
@@ -90,7 +92,7 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
     .                          { yybegin(xCOMMENT_STRING); yypushback(yylength()); }
 }
 
-<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS> {
+<xTAG, xTAG_WITH_ID, xTAG_NAME, xPARAM, xTYPE_REF, xCLASS, xCLASS_EXTEND, xFIELD, xFIELD_ID, xCOMMENT_STRING, xGENERIC, xALIAS, xSUPPRESS, xENUM, xENUM_KEY> {
     {EOL}                      { yybegin(YYINITIAL);return com.intellij.psi.TokenType.WHITE_SPACE;}
     {LINE_WS}+                 { return com.intellij.psi.TokenType.WHITE_SPACE; }
 }
@@ -112,6 +114,7 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
     "see"                      { yybegin(xTAG); return TAG_NAME_SEE; }
     "alias"                    { yybegin(xALIAS); return TAG_NAME_ALIAS; }
     "suppress"                 { yybegin(xSUPPRESS); return TAG_NAME_SUPPRESS; }
+    "enum"                     { yybegin(xENUM); return TAG_NAME_ENUM; }
     {ID}                       { yybegin(xCOMMENT_STRING); return TAG_NAME; }
     [^]                        { return com.intellij.psi.TokenType.BAD_CHARACTER; }
 }
@@ -125,6 +128,15 @@ SINGLE_QUOTED_STRING='([^\\\']|\\\S|\\[\r\n])*'?    //'([^\\'\r\n]|\\[^\r\n])*'?
 <xALIAS> {
     {ID}                       { beginType(); return ID; }
     [^]                        { yybegin(YYINITIAL); yypushback(yylength()); }
+}
+
+<xENUM> {
+    "("                        { yybegin(xENUM_KEY); return LPAREN; }
+    {ID}                       { yybegin(xCLASS_EXTEND); return ID; }
+}
+<xENUM_KEY> {
+    {ID}                       { return ENUM_MODIFIER; }
+    ")"                        { yybegin(xENUM); return RPAREN; }
 }
 
 <xGENERIC> {

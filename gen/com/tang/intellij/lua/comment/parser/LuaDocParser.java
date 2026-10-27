@@ -155,6 +155,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   //     | tag_vararg
   //     | tag_return
   //     | tag_class
+  //     | tag_enum
   //     | tag_field
   //     | tag_type
   //     | tag_lan
@@ -180,6 +181,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   //     | tag_vararg
   //     | tag_return
   //     | tag_class
+  //     | tag_enum
   //     | tag_field
   //     | tag_type
   //     | tag_lan
@@ -197,6 +199,7 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
     if (!r) r = tag_vararg(b, l + 1);
     if (!r) r = tag_return(b, l + 1);
     if (!r) r = tag_class(b, l + 1);
+    if (!r) r = tag_enum(b, l + 1);
     if (!r) r = tag_field(b, l + 1);
     if (!r) r = tag_type(b, l + 1);
     if (!r) r = tag_lan(b, l + 1);
@@ -604,6 +607,46 @@ public class LuaDocParser implements PsiParser, LightPsiParser {
   // comment_string?
   private static boolean tag_def_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "tag_def_1")) return false;
+    comment_string(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // TAG_NAME_ENUM ('(' ENUM_MODIFIER ')')? ID comment_string?
+  public static boolean tag_enum(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_enum")) return false;
+    if (!nextTokenIs(b, TAG_NAME_ENUM)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, TAG_CLASS, null);
+    r = consumeToken(b, TAG_NAME_ENUM);
+    p = r; // pin = 1
+    r = r && report_error_(b, tag_enum_1(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, ID)) && r;
+    r = p && tag_enum_3(b, l + 1) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // ('(' ENUM_MODIFIER ')')?
+  private static boolean tag_enum_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_enum_1")) return false;
+    tag_enum_1_0(b, l + 1);
+    return true;
+  }
+
+  // '(' ENUM_MODIFIER ')'
+  private static boolean tag_enum_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_enum_1_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, LPAREN, ENUM_MODIFIER, RPAREN);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // comment_string?
+  private static boolean tag_enum_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "tag_enum_3")) return false;
     comment_string(b, l + 1);
     return true;
   }
