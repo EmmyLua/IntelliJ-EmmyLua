@@ -60,6 +60,7 @@ class MobServer(private val listener: MobServerListener) : Runnable {
                 val newClient = MobClient(accept, listener)
                 client = newClient
                 listener.onConnect(newClient)
+                newClient.start()
             } catch (e: IOException) {
                 break
             }

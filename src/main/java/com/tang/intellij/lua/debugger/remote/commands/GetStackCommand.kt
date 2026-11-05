@@ -23,7 +23,6 @@ import com.tang.intellij.lua.debugger.remote.value.LuaRValue
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.lib.jse.JsePlatform
 import java.util.*
-import java.util.regex.Pattern
 
 /**
  *
@@ -32,7 +31,6 @@ import java.util.regex.Pattern
 class GetStackCommand : DefaultCommand("STACK --{maxlevel=0}", 1) {
 
     private var hasError: Boolean = false
-    private var errorDataLen: Int = 0
 
     override fun isFinished(): Boolean {
         return !hasError && super.isFinished()
@@ -41,10 +39,9 @@ class GetStackCommand : DefaultCommand("STACK --{maxlevel=0}", 1) {
     override fun handle(data: String): Int {
         if (hasError) {
             hasError = false
-            val error = data.substring(0, errorDataLen)
-            debugProcess.error(error)
-            debugProcess.runCommand(DefaultCommand("RUN", 0))
-            return errorDataLen
+            debugProcess.error(data)
+            debugProcess.runCommand(DefaultCommand("RUN"))
+            return data.toByteArray(Charsets.UTF_8).size
         }
         return super.handle(data)
     }
@@ -52,11 +49,6 @@ class GetStackCommand : DefaultCommand("STACK --{maxlevel=0}", 1) {
     override fun handle(index: Int, data: String) {
         if (data.startsWith("401")) {
             hasError = true
-            val pattern = Pattern.compile("(\\d+)([^\\d]+)(\\d+)")
-            val matcher = pattern.matcher(data)
-            if (matcher.find()) {
-                errorDataLen = Integer.parseInt(matcher.group(3))
-            }
             return
         }
 

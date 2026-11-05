@@ -21,142 +21,117 @@ import com.intellij.openapi.application.ApplicationManager
 import com.tang.intellij.lua.debugger.LogConsoleType
 import com.tang.intellij.lua.debugger.remote.commands.DebugCommand
 import com.tang.intellij.lua.debugger.remote.commands.DefaultCommand
+import java.io.ByteArrayOutputStream
+import java.io.EOFException
 import java.io.IOException
 import java.io.OutputStreamWriter
-import java.net.SocketException
-import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
-import java.nio.charset.Charset
-import java.util.*
-import java.util.regex.Pattern
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 
 class MobClient(private val socketChannel: SocketChannel, private val listener: MobServerListener) {
 
-    private var isStopped: Boolean = false
-    private val commands = LinkedList<DebugCommand>()
-    private var currentCommandWaitForResp: DebugCommand? = null
+    private val isStopped = AtomicBoolean(false)
+    private val commands = ConcurrentLinkedQueue<DebugCommand>()
+    @Volatile private var currentCommandWaitForResp: DebugCommand? = null
     private var streamWriter: OutputStreamWriter? = null
     private val socket = socketChannel.socket()
-    private val receiveBufferSize = 1024 * 1024
 
-    init {
-        socket.receiveBufferSize = receiveBufferSize
-        ApplicationManager.getApplication().executeOnPooledThread {
-            doReceive()
-        }
-
-        ApplicationManager.getApplication().executeOnPooledThread {
-            doSend()
-        }
+    fun start() {
+        ApplicationManager.getApplication().executeOnPooledThread { doReceive() }
+        ApplicationManager.getApplication().executeOnPooledThread { doSend() }
     }
 
     private fun doSend() {
         try {
-            streamWriter = OutputStreamWriter(socket.getOutputStream(), Charset.forName("UTF-8"))
-
-            while (socket.isConnected) {
-                if (isStopped) break
-
-                var command: DebugCommand
-                while (commands.size > 0 && currentCommandWaitForResp == null) {
-                    if (currentCommandWaitForResp == null) {
-                        command = commands.poll()
+            streamWriter = OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8)
+            while (!isStopped.get()) {
+                if (currentCommandWaitForResp == null) {
+                    val command = commands.poll()
+                    if (command != null) {
                         command.debugProcess = listener.process
+                        if (command.getRequireRespLines() > 0)
+                            currentCommandWaitForResp = command
                         command.write(this)
                         streamWriter!!.write("\n")
                         streamWriter!!.flush()
-                        if (command.getRequireRespLines() > 0)
-                            currentCommandWaitForResp = command
                     }
                 }
                 Thread.sleep(5)
             }
-        } catch (e: SocketException) {
-            //e.message?.let { listener.error(it) }
         } catch (e: Exception) {
-            e.message?.let { listener.error(it) }
-        } finally {
-            onClosed()
+            onClosed("send failed", e)
         }
     }
 
     private fun doReceive() {
         try {
-            var readSize: Int
-            val bf = ByteBuffer.allocate(receiveBufferSize)
-            while (!isStopped) {
-                readSize = socketChannel.read(bf)
-                if (readSize > 0) {
-                    var begin = 0
-                    for (i in 1..readSize + 1) {
-                        if (bf[i - 1].toInt() == '\n'.code) {
-                            onResp(String(bf.array(), begin, i))
-                            begin = i
-                        }
+            val input = socket.getInputStream().buffered()
+            while (!isStopped.get()) {
+                val line = ByteArrayOutputStream()
+                while (true) {
+                    val byte = input.read()
+                    if (byte == -1) throw EOFException()
+                    if (byte == '\n'.code) break
+                    line.write(byte)
+                }
+                val header = line.toString(Charsets.UTF_8.name()).trimEnd('\r')
+                val code = header.substringBefore(' ').toIntOrNull() ?: continue
+                val length = when {
+                    header.matches(Regex("200 OK \\d+")) -> header.substringAfterLast(' ').toInt()
+                    code == 401 || code == 204 -> header.substringAfterLast(' ').toInt()
+                    else -> null
+                }
+                val body = length?.let {
+                    val bytes = ByteArray(it)
+                    var offset = 0
+                    while (offset < bytes.size) {
+                        val count = input.read(bytes, offset, bytes.size - offset)
+                        if (count == -1) throw EOFException()
+                        offset += count
                     }
-                    if (begin < readSize) {
-                        onResp(String(bf.array(), begin, readSize))
-                    }
-                    bf.clear()
+                    String(bytes, Charsets.UTF_8)
+                }
+                if (code in 201..204) {
+                    listener.handleResp(this, code, body ?: header.split(' ', limit = 3).getOrNull(2))
+                    continue
+                }
+                val command = currentCommandWaitForResp
+                if (command != null) {
+                    command.handle("$header\n")
+                    if (body != null) command.handle(body)
+                    if (command.isFinished()) currentCommandWaitForResp = null
+                } else {
+                    listener.handleResp(this, code, body ?: header.split(' ', limit = 3).getOrNull(2))
                 }
             }
-        } catch (e: IOException) {
-            onSocketClosed()
+        } catch (e: EOFException) {
+            onClosed("EOF", e)
         } catch (e: Exception) {
-            e.message?.let { listener.error(it) }
+            onClosed("receive failed", e)
         }
-    }
-
-    private fun onResp(data: String) {
-        val cmd = currentCommandWaitForResp
-        if (cmd != null) {
-            val eat = cmd.handle(data)
-            if (eat > 0) {
-                if (cmd.isFinished())
-                    currentCommandWaitForResp = null
-                return
-            }
-        }
-
-        val pattern = Pattern.compile("(\\d+) (\\w+)( (.+))?")
-        val matcher = pattern.matcher(data)
-        if (matcher.find()) {
-            val code = Integer.parseInt(matcher.group(1))
-            //String status = matcher.group(2);
-            val context = matcher.group(4)
-            listener.handleResp(this, code, context)
-        }
-    }
-
-    private fun onSocketClosed() {
-        listener.onDisconnect(this)
     }
 
     @Throws(IOException::class)
     fun write(data: String) {
         streamWriter!!.write(data)
-        //println("send:" + data)
     }
 
     fun stop() {
-        try {
-            streamWriter?.write("done\n")
-        } catch (ignored: IOException) {
-        }
-        currentCommandWaitForResp = null
-        try {
-            socket.close()
-        } catch (ignored: Exception) {
-        }
-        onClosed()
-        isStopped = true
+        onClosed("stopped")
     }
 
-    private fun onClosed() {
-        if (!isStopped) {
-            isStopped = true
-            listener.println("Disconnected.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+    private fun onClosed(reason: String, cause: Exception? = null) {
+        if (!isStopped.compareAndSet(false, true)) return
+        currentCommandWaitForResp = null
+        commands.clear()
+        try {
+            socket.close()
+        } catch (ignored: IOException) {
         }
+        val detail = cause?.let { " (${it.javaClass.simpleName})" } ?: ""
+        listener.println("Disconnected: $reason$detail.", LogConsoleType.NORMAL, ConsoleViewContentType.SYSTEM_OUTPUT)
+        listener.onDisconnect(this)
     }
 
     fun sendAddBreakpoint(file: String, line: Int) {
