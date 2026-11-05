@@ -25,8 +25,7 @@ import java.util.regex.Pattern
  */
 class EvaluatorCommand(expr: String, stackLevel: Int, private val callback: Callback) : DefaultCommand("EXEC $expr --{maxlevel=1, stack=$stackLevel}", 2) {
     private var hasError2Process: Boolean = false
-    private var dataLen: Int = 0
-    private val dataBuffer = StringBuffer()
+    private var dataLen: Int = -1
 
     interface Callback {
         fun onResult(data: String)
@@ -52,26 +51,17 @@ class EvaluatorCommand(expr: String, stackLevel: Int, private val callback: Call
     }*/
 
     override fun handle(data: String): Int {
-        if (hasError2Process && dataLen > 0) {
-            hasError2Process = false
+        if (dataLen >= 0) {
             handleLines++
-            val error = data.substring(0, dataLen)
-            debugProcess.error(error)
-            onResult("do local _={\"\\\"401_error_happened\\\"\"};return _;end")
-            return dataLen
-        }
-        if (dataLen != 0) {
-            val index = data.indexOf("return _;end")
-            return if (index > 0) {
-                dataBuffer.append(data.substring(0, index + 12))
-                val code = dataBuffer.toString()
-                handleLines++
-                onResult(code)
-                index + 12
+            dataLen = -1
+            if (hasError2Process) {
+                hasError2Process = false
+                debugProcess.error(data)
+                onResult("do local _={\"\\\"401_error_happened\\\"\"};return _;end")
             } else {
-                dataBuffer.append(data)
-                data.length
+                onResult(data)
             }
+            return data.toByteArray(Charsets.UTF_8).size
         }
         return super.handle(data)
     }
@@ -97,7 +87,7 @@ class EvaluatorCommand(expr: String, stackLevel: Int, private val callback: Call
         if (data.startsWith("400")) {
             hasError2Process = false
             handleLines++
-            dataLen = 0
+            dataLen = -1
             onResult("do local _={\"\\\"400_bad_request\\\"\"};return _;end")
         }
         if (data.startsWith("200 OK")) {

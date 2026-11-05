@@ -43,7 +43,7 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
     private val runProfile: IRemoteConfiguration = session.runProfile as IRemoteConfiguration
     private val editorsProvider: LuaDebuggerEditorsProvider = LuaDebuggerEditorsProvider()
     private var mobServer: MobServer? = null
-    private var mobClient: MobClient? = null
+    @Volatile private var mobClient: MobClient? = null
     private var baseDir: String? = null
 
     override fun getEditorsProvider(): XDebuggerEditorsProvider {
@@ -118,12 +118,14 @@ open class LuaMobDebugProcess(session: XDebugSession) : LuaDebugProcess(session)
         }
     }
 
+    @Synchronized
     override fun onDisconnect(client: MobClient) {
-        mobServer?.restart()
+        if (mobClient !== client) return
         mobClient = null
         baseDir = null
     }
 
+    @Synchronized
     override fun onConnect(client: MobClient) {
         mobClient = client
         client.addCommand("DELB * 0")

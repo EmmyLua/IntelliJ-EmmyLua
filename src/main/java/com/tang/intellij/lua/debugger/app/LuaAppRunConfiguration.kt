@@ -18,6 +18,7 @@ package com.tang.intellij.lua.debugger.app
 
 import com.intellij.execution.ExecutionException
 import com.intellij.execution.Executor
+import com.intellij.execution.configuration.EnvironmentVariablesComponent
 import com.intellij.execution.configurations.*
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.module.Module
@@ -81,6 +82,7 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     @Throws(WriteExternalException::class)
     override fun writeExternal(element: Element) {
         super.writeExternal(element)
+        EnvironmentVariablesComponent.writeExternal(element, envs)
         JDOMExternalizerUtil.writeField(element, "program", program)
         JDOMExternalizerUtil.writeField(element, "file", file)
         JDOMExternalizerUtil.writeField(element, "workingDir", workingDir)
@@ -93,6 +95,9 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     @Throws(InvalidDataException::class)
     override fun readExternal(element: Element) {
         super.readExternal(element)
+        val environment = linkedMapOf<String, String>()
+        EnvironmentVariablesComponent.readExternal(element, environment)
+        envs = environment
         JDOMExternalizerUtil.readField(element, "program")?.let { program = it }
         file = JDOMExternalizerUtil.readField(element, "file")
         workingDir = JDOMExternalizerUtil.readField(element, "workingDir")
@@ -113,13 +118,13 @@ class LuaAppRunConfiguration(project: Project, factory: ConfigurationFactory)
     val parametersArray: Array<String>
         get() {
             val list = ArrayList<String>()
-            if (false == parameters?.isEmpty()) {
-                val strings = ParametersListUtil.parseToArray(parameters!!)
-                list.addAll(Arrays.asList(*strings))
-            }
             val file = file
             if (file != null && file.isNotEmpty()) {
                 list.add(file)
+            }
+            if (false == parameters?.isEmpty()) {
+                val strings = ParametersListUtil.parseToArray(parameters!!)
+                list.addAll(Arrays.asList(*strings))
             }
             return list.toTypedArray()
         }
